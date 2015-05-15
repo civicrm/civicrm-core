@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAdvanceSearch() {
+  public function testAdvanceSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -73,7 +73,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("receipt_text");
     $this->multiselect2("role_id", array('Volunteer'));
     // Select $100 fee
-    $this->click("css=input[data-amount=100]");
+    $this->click("xpath=//input[@data-amount='100']");
     $this->check("record_contribution");
     $this->waitForElementPresent("contribution_status_id");
     $this->select("payment_instrument_id", "Check");
@@ -107,6 +107,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select2("relationship_type_id", "Employee of");
     $this->waitForElementPresent("xpath=//input[@id='related_contact_id'][@placeholder='- select organization -']");
     $this->select2("related_contact_id", "Default", TRUE);
+    $this->waitForAjaxContent();
     $this->webtestFillDate("start_date", "-1 day");
     $this->webtestFillDate("end_date", "+1 day");
     $this->clickAjaxLink('_qf_Relationship_upload-bottom', NULL);
@@ -125,12 +126,15 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
       'location' => array('state_province', 'addAddressSearchDetail'),
       'demographics' => array('civicrm_gender_Transgender_3', 'addDemographicSearchDetail'),
       'notes' => array('note', ''),
-      'activity' => array('activity_status[5]', 'addActivitySearchDetail'),
+      'activity' => array('activity_type_id', 'addActivitySearchDetail'),
       'CiviContribute' => array('contribution_currency_type', 'addContributionSearchDetail'),
       'CiviEvent' => array('participant_fee_amount_high', 'addParticipantSearchDetail'),
       'CiviMember' => array('member_end_date_high', 'addMemberSearchDetail'),
       'CiviPledge' => array('pledge_frequency_interval', 'addPledgeSearchDetail'),
-      'relationship' => array("xpath=//div[@id='relationship']/table/tbody/tr//td/label[text()='Relationship Status']/../label[text()='All']", ''),
+      'relationship' => array(
+        "xpath=//div[@id='relationship']/table/tbody/tr//td/label[text()='Relationship Status']/../label[text()='All']",
+        '',
+      ),
     );
 
     foreach ($searchBlockValues as $block => $blockValues) {
@@ -167,14 +171,14 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->waitForText("xpath=//form[@id='Advanced']/div[3]/div/div", "No matches found for");
   }
 
-  /*
+  /**
    * Check for CRM-9873
    */
-  function testActivitySearchByTypeTest() {
+  public function testActivitySearchByTypeTest() {
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->clickAjaxLink("activity", 'activity_subject');
-    $this->check("xpath=//div[@id='Activity']//div/label[text()='Tell a Friend']/../input");
+    $this->multiselect2("activity_type_id", array('Tell a Friend'));
     $this->clickLink("_qf_Advanced_refresh");
     $count = explode(" ", trim($this->getText("xpath=//div[@id='search-status']/table/tbody/tr/td")));
     $count = $count[0];
@@ -186,7 +190,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
       $cal = $count / $perPageRow;
       $mod = $count % $perPageRow;
       $j = 1;
-      for ($i=1; $i<=$cal; $i++) {
+      for ($i = 1; $i <= $cal; $i++) {
         $subTotal = $i * $perPageRow;
         $lastPageSub = $subTotal + 1;
 
@@ -197,7 +201,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
 
         //go to next page
         $this->click("xpath=//div[@class='crm-search-results']/div[@class='crm-pager']/span[@class='crm-pager-nav']/a[@title='next page']");
-        $this->waitForElementPresent("task");
+        $this->waitForElementPresent("xpath=//a[@title='first page']");
         $j = $j + $subTotal;
       }
 
@@ -210,48 +214,59 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     }
   }
 
-  //function to check match for sumbit Advance Search
   /**
+   * function to check match for sumbit Advance Search.
    * @param string $firstName
    */
-  function submitSearch($firstName) {
+  public function submitSearch($firstName) {
     $this->clickLink("_qf_Advanced_refresh");
     // verify unique name
-    $this->waitForText("xpath=//div[@class='crm-search-results']/table/tbody", preg_quote("adv$firstName, $firstName"));
+    $this->waitForAjaxContent();
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr//td/a[text()='adv$firstName, $firstName']");
     // should give 1 result only as we are searching with unique name
     $this->waitForText("xpath=//div[@id='search-status']/table/tbody/tr/td", preg_quote("1 Contact"));
     // click to edit search
     $this->click("xpath=//form[@id='Advanced']//div[2]/div/div[1]");
   }
 
-  /*
+  /**
    * Check for CRM-14952
    */
-  function testStateSorting() {
+  public function testStateSorting() {
     $this->webtestLogin();
     $this->openCiviPage('contact/search/advanced', 'reset=1', 'group');
     $this->select2("group", "Newsletter", TRUE);
     $this->select2("group", "Summer", TRUE);
     $this->select2("group", "Advisory", TRUE);
     $this->clickAjaxLink("location", 'country');
-    $this->select2("country", "United States", False);
+    $this->select2("country", "United States", FALSE);
     $this->waitForElementPresent('state_province');
-    $this->multiselect2("state_province", array("Ohio", "New York", "New Mexico", "Connecticut", "Georgia", "New Jersey", "Texas"));
+    $this->multiselect2("state_province", array(
+        "Ohio",
+        "New York",
+        "New Mexico",
+        "Connecticut",
+        "Georgia",
+        "New Jersey",
+        "Texas",
+      ));
     $this->clickLink("_qf_Advanced_refresh", "xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
 
     $stateBeforeSort = $this->getText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]");
-    $this->click("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
+    $this->clickAjaxLink("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(),'State')]");
+    $this->clickAjaxLink("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(), 'State')]");
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']//table/thead/tr//th/a[contains(text(), 'State')]");
     $this->assertElementNotContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[6]", $stateBeforeSort);
   }
 
-  // function to fill basic search detail
   /**
+   * function to fill basic search detail.
    * @param string $firstName
    * @param string $groupName
    * @param $tagName
    */
-  function addBasicSearchDetail($firstName, $groupName, $tagName) {
+  public function addBasicSearchDetail($firstName, $groupName, $tagName) {
     // fill partial sort name
     $this->type("sort_name", "$firstName");
     // select subtype
@@ -260,7 +275,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select("group", "label=$groupName");
     // select tag
     $this->select("contact_tags", "label=$tagName");
-    // select prefered language
+    // select preferred language
     $this->select("preferred_language", "value=en_US");
     // select privacy
     $this->select("privacy_options", "value=do_not_email");
@@ -272,11 +287,11 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->check("preferred_communication_method[2]");
   }
 
-  // function to fill address search block values in advance search
   /**
+   * function to fill address search block values in advance search.
    * @param $firstName
    */
-  function addAddressSearchDetail($firstName) {
+  public function addAddressSearchDetail($firstName) {
     // select location type (home and main)
     $this->multiselect2('location_type', array('Home', 'Main'));
     // fill street address
@@ -293,77 +308,77 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select2("state_province", "Alaska", TRUE);
   }
 
-  // function to fill activity search block in advance search
   /**
+   * function to fill activity search block in advance search.
    * @param $firstName
    */
-  function addActivitySearchDetail($firstName) {
-    // check activity types
-    $checkActivityTypes = array("Contribution", "Event Registration", "Membership Signup");
-    foreach ($checkActivityTypes as $labels) {
-      $this->click("xpath=//div[@id='activity']/table/tbody/tr[2]/td[1]/div[1]//div/label[text()=\"$labels\"]");
-    }
+  public function addActivitySearchDetail($firstName) {
+    // select activity types
+    $activityTypes = array("Contribution", "Event Registration", "Membership Signup");
+    $this->multiselect2('activity_type_id', $activityTypes);
     // fill date range
-    $this->select("activity_date_relative","value=0");
+    $this->select("activity_date_relative", "value=0");
     $this->webtestFillDate("activity_date_low", "-1 day");
     $this->webtestFillDate("activity_date_high", "+1 day");
     $this->type("activity_subject", "Student - membership source$firstName - Status: New");
     // fill activity status
-
-    $this->click("xpath=//div[@id='activity']/table/tbody//tr/td[2]/label[text()='Activity Status']/../label[text()='Scheduled']");
-    $this->click("xpath=//div[@id='activity']/table/tbody//tr/td[2]/label[text()='Activity Status']/../label[text()='Completed']");
+    $this->multiselect2('status_id', array('Scheduled', 'Completed'));
   }
 
-  // function to fill demographic search details
-  function addDemographicSearchDetail() {
+  /**
+   * function to fill demographic search details.
+   */
+  public function addDemographicSearchDetail() {
     // fill birth date range
-    $this->select("birth_date_relative","value=0");
+    $this->select("birth_date_relative", "value=0");
     $this->webtestFillDate("birth_date_low", "-3 year");
     $this->webtestFillDate("birth_date_high", "now");
     // fill deceased date range
     $this->click("xpath=//div[@id='demographics']/table/tbody//tr/td/label[text()='Deceased']/../label[text()='Yes']");
-    $this->select("deceased_date_relative","value=0");
+    $this->select("deceased_date_relative", "value=0");
     $this->webtestFillDate("deceased_date_low", "-1 month");
     $this->webtestFillDate("deceased_date_high", "+1 month");
     // fill gender (male)
     $this->check("civicrm_gender_Male_2");
   }
 
-  //function to fill contribution search details
   /**
+   * function to fill contribution search details.
    * @param $firstName
    */
-  function addContributionSearchDetail($firstName) {
+  public function addContributionSearchDetail($firstName) {
     // fill contribution date range
-    $this->select("contribution_date_relative","value=0");
+    $this->select("contribution_date_relative", "value=0");
     $this->webtestFillDate("contribution_date_low", "-1 day");
     $this->webtestFillDate("contribution_date_high", "+1 day");
     // fill amount range
     $this->type("contribution_amount_low", "1");
     $this->type("contribution_amount_high", "200");
     // check for completed
-    $this->check("contribution_status_id[1]");
+    $this->multiselect2("contribution_status_id", array('Completed'));
     // enter check number
-    $this->select("contribution_payment_instrument_id", "Check");
+    $this->select("payment_instrument_id", "Check");
     $this->type("contribution_check_number", "chqNo$firstName");
     // fill transaction id
-    $this->type("contribution_transaction_id", "trid$firstName");
-      // fill financial type
-      $this->select("financial_type_id", "Event Fee");
+    $this->type("contribution_trxn_id", "trid$firstName");
+    // fill financial type
+    $this->select("financial_type_id", "Event Fee");
     // fill currency type
-    $this->select("contribution_currency_type", "USD");
+    $this->select2("contribution_currency_type", "USD");
   }
 
-  // function to fill participant search details
-  function addParticipantSearchDetail() {
+  /**
+   * function to fill participant search details.
+   */
+  public function addParticipantSearchDetail() {
     // fill event name
     $this->select2("event_id", "Fall Fundraiser Dinner");
     // fill event type
     $this->select2("event_type_id", "Fundraiser");
-    // check participant status (registered)
-    $this->click("xpath=//div[@id='participantForm']/table/tbody//tr/td/label[text()='Participant Status']/../div//div/label[text()='Registered']");
-    // check participant role (Volunteer)
-    $this->click("xpath=//div[@id='participantForm']/table/tbody//tr/td/label[text()='Participant Role']/../div//div/label[text()='Volunteer']");
+    // select participant status (registered)
+    $this->multiselect2('participant_status_id', array('Registered'));
+    // select participant role (Volunteer)
+    $this->multiselect2('participant_role_id', array('Volunteer'));
     // fill participant fee level (couple)
     $this->select2("participant_fee_id", "Couple");
     // fill amount range
@@ -371,11 +386,11 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("participant_fee_amount_high", "150");
   }
 
-  // function to fill member search details
   /**
+   * function to fill member search details.
    * @param $firstName
    */
-  function addMemberSearchDetail($firstName) {
+  public function addMemberSearchDetail($firstName) {
     // check membership type (Student)
     $this->click("xpath=//div[@id='memberForm']/table/tbody/tr[1]/td[1]/div[1]//div/label[text()='Student']");
     // check membership status (completed)
@@ -385,26 +400,26 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // check to search primary member
     $this->click("xpath=//div[@id='memberForm']/table/tbody/tr[2]/td[2]/p/input");
     // add join date range
-    $this->select("member_join_date_relative","value=0");
+    $this->select("member_join_date_relative", "value=0");
     $this->webtestFillDate("member_join_date_low", "-1 day");
     $this->webtestFillDate("member_join_date_high", "+1 day");
     // add start date range
-    $this->select("member_start_date_relative","value=0");
+    $this->select("member_start_date_relative", "value=0");
     $this->webtestFillDate("member_start_date_low", "-1 day");
     $this->webtestFillDate("member_start_date_high", "+1 day");
     // add end date range
-    $this->select("member_end_date_relative","value=0");
+    $this->select("member_end_date_relative", "value=0");
     $this->webtestFillDate("member_end_date_low", "-1 year");
     $this->webtestFillDate("member_end_date_high", "+2 year");
   }
 
-  // function to fill member search details
   /**
+   * function to fill member search details.
    * @param $firstName
    */
-  function addPledgeSearchDetail($firstName) {
+  public function addPledgeSearchDetail($firstName) {
     // fill pledge schedule date range
-    $this->select("pledge_payment_date_relative","value=0");
+    $this->select("pledge_payment_date_relative", "value=0");
     $this->webtestFillDate("pledge_payment_date_low", "-1 day");
     $this->webtestFillDate("pledge_payment_date_high", "+1 day");
     // fill Pledge payment status
@@ -426,11 +441,11 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select("pledge_financial_type_id", "Donation");
   }
 
-  // function to create contact with details (contact details, address, Constituent information ...)
   /**
+   * function to create contact with details (contact details, address, Constituent information ...)
    * @param null $firstName
    */
-  function createDetailContact($firstName = NULL) {
+  public function createDetailContact($firstName = NULL) {
     if (!$firstName) {
       $firstName = substr(sha1(rand()), 0, 7);
     }
@@ -499,5 +514,5 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Contact_upload_view", 'css=.crm-summary-display_name');
     $this->assertElementContainsText('css=.crm-summary-display_name', "$firstName adv$firstName");
   }
-}
 
+}

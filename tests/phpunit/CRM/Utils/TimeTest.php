@@ -2,7 +2,15 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Utils_TimeTest
+ */
 class CRM_Utils_TimeTest extends CiviUnitTestCase {
+  /**
+   * Equal cases.
+   *
+   * @return array
+   */
   public function equalCases() {
     $cases = array(); // array(0 => $timeA, 1 => $timeB, 2 => $threshold, 3 => $expectedResult)
     $cases[] = array('2012-04-01 12:00:00', '2012-04-01 12:00:00', 0, 1);
@@ -16,17 +24,21 @@ class CRM_Utils_TimeTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test equals.
+   *
    * @param string $timeA
    * @param string $timeB
    * @param int $threshold
    * @param bool $expectedResult
+   *
    * @dataProvider equalCases
    */
-  function testEquals($timeA, $timeB, $threshold, $expectedResult) {
+  public function testEquals($timeA, $timeB, $threshold, $expectedResult) {
     $actual = CRM_Utils_Time::isEqual($timeA, $timeB, $threshold);
     $this->assertEquals($expectedResult, $actual);
 
     $actual = CRM_Utils_Time::isEqual($timeB, $timeA, $threshold);
     $this->assertEquals($expectedResult, $actual);
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -36,10 +36,10 @@ class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
-    $id             = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $petition_id    = CRM_Utils_Request::retrieve('pid', 'Positive', $this);
-    $params['id']   = $petition_id;
+  public function run() {
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $petition_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this);
+    $params['id'] = $petition_id;
     $this->petition = array();
     CRM_Campaign_BAO_Survey::retrieve($params, $this->petition);
     $this->assign('petitionTitle', $this->petition['title']);
@@ -52,15 +52,14 @@ class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
 
     // send thank you or email verification emails
     /*
-       * sendEmailMode
-       * 1 = connected user via login/pwd - thank you
-       *      or dedupe contact matched who doesn't have a tag CIVICRM_TAG_UNCONFIRMED - thank you
-       *      login using fb connect - thank you + click to add msg to fb wall
-       * 2 = send a confirmation request email
-       */
-
+     * sendEmailMode
+     * 1 = connected user via login/pwd - thank you
+     *      or dedupe contact matched who doesn't have a tag CIVICRM_TAG_UNCONFIRMED - thank you
+     *      login using fb connect - thank you + click to add msg to fb wall
+     * 2 = send a confirmation request email
+     */
 
     return parent::run();
   }
-}
 
+}

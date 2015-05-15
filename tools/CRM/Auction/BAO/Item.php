@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -55,11 +55,8 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
    * @return CRM_Auction_BAO_Item object
-   * @access public
-   * @static
    */
-  static
-  function retrieve(&$params, &$defaults) {
+  static function retrieve(&$params, &$defaults) {
     $auction = new CRM_Auction_DAO_Item();
     $auction->copyValues($params);
     if ($auction->find(TRUE)) {
@@ -75,11 +72,9 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
    * @param int      $id        id of the database record
    * @param boolean  $is_active value we want to set the is_active field
    *
-   * @return Object             DAO object on sucess, null otherwise
-   * @static
+   * @return Object             DAO object on success, null otherwise
    */
-  static
-  function setIsActive($id, $is_active) {
+  static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Auction_DAO_Item', $id, 'is_active', $is_active);
   }
 
@@ -87,16 +82,9 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
    * add the auction
    *
    * @param array $params reference array contains the values submitted by the form
-   *
-   * @access public
-   * @static
-   *
    * @return object
    */
-  static
-  function add(&$params) {
-    require_once 'CRM/Utils/Hook.php';
-
+  static function add(&$params) {
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Auction_Item', $params['id'], $params);
     }
@@ -137,12 +125,8 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
    * @param array $params reference array contains the values submitted by the form
    *
    * @return object
-   * @access public
-   * @static
-   *
    */
   public static function create(&$params) {
-    require_once 'CRM/Core/Transaction.php';
     $transaction = new CRM_Core_Transaction();
 
     $auction = self::add($params);
@@ -161,14 +145,8 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
    * delete the auction
    *
    * @param int $id  auction id
-   *
-   * @access public
-   * @static
-   *
    */
-  static
-  function del($id) {
-    require_once 'CRM/Auction/DAO/Item.php';
+  static function del($id) {
     $auction     = new CRM_Auction_DAO_Item();
     $auction->id = $id;
     $result      = $auction->delete();
@@ -183,11 +161,8 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
    * @internal param int $id profile id
    *
    * @return boolean
-   * @access public
-   * @static
    */
-  static
-  function isEmailInProfile($profileId) {
+  static function isEmailInProfile($profileId) {
     $query = "
 SELECT field_name
 FROM civicrm_uf_field

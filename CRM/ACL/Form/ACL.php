@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -36,7 +36,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -45,11 +45,10 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -113,10 +112,9 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -155,7 +153,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       $extra,
       '&nbsp;', TRUE
     );
-
 
     $label = ts('Role');
     $role = array(
@@ -199,7 +196,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
    *
    * @return bool
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     $showHide = new CRM_Core_ShowHideBlocks();
 
     // Make sure role is not -1
@@ -268,16 +265,14 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
   public function postProcess() {
     // note this also resets any ACL cache
     CRM_Core_BAO_Cache::deleteGroup('contact fields');
-
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_ACL_BAO_ACL::del($this->_id);
@@ -321,4 +316,3 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
   }
 
 }
-

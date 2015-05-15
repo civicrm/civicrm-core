@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -85,15 +85,12 @@
     </table>
     </p>
     <p>
-    {ts}Auto-renew Memberships - You can offer constituents the option to have their membership renewed automatically AND use the membership price set feature if:
-        <ul>
-        <li>You are using a payment processor that supports auto-renewals.</li>
-        <li>All membership types in the price set have the auto-renew feature enabled (Administer > CiviMember > Membership Types).</li>
-        <li>All membership types in the price set have the same duration (e.g. they are one year memberships).<li>
+    {ts}Auto-renew Memberships - You can offer constituents the option to have their membership renewed automatically AND use the membership price set feature if:{/ts} <ul>
+        <li>{ts}You are using a payment processor that supports auto-renewals.{/ts}</li>
+        <li>{ts}All membership types in the price set have the auto-renew feature enabled (Administer > CiviMember > Membership Types){/ts}.</li>
+        <li>{ts}All membership types in the price set have the same duration (e.g. they are one year memberships).{/ts}<li>
         </ul>
-        These constraints are due to the fact that when a constituent signs up for multiple memberships using a price set - a single recurring payment record is created
-        which covers the total fees for all selected memberships.
-    {/ts}
+        {ts}These constraints are due to the fact that when a constituent signs up for multiple memberships using a price set - a single recurring payment record is created which covers the total fees for all selected memberships.{/ts}
     </p>
 {/htxt}
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -34,16 +34,16 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testEditContact() {
+  public function testEditContact() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
     // create contact
     $firstName = 'WebTest' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'ContactEdit' . substr(sha1(rand()), 0, 7);
+    $lastName = 'ContactEdit' . substr(sha1(rand()), 0, 7);
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
-    $this->type("first_name",$firstName);
-    $this->type("last_name",$lastName);
+    $this->type("first_name", $firstName);
+    $this->type("last_name", $lastName);
 
     //fill in phone  1
     $this->type("phone_1_phone", "111113333");
@@ -91,7 +91,7 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
     $this->type("phone_2_phone_ext", "111");
     $this->select('phone_2_location_type_id', 'value=3');
 
-     //Edit in phone  3
+    //Edit in phone  3
     $this->type("phone_3_phone", "777777699");
     $this->type("phone_3_phone_ext", "197");
     $this->select('phone_3_location_type_id', 'value=1');
@@ -112,4 +112,5 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("2342322222  ext. 198");
 
   }
+
 }

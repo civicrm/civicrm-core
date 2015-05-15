@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -36,13 +36,17 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
   protected $_type = NULL;
 
   /**
+   * Run page.
+   *
+   * This includes assigning smarty variables and other page processing.
+   *
    * @return string
    * @throws Exception
    */
-  function run() {
-    $job_id   = CRM_Utils_Request::retrieve('jid', 'Integer', CRM_Core_DAO::$_nullObject);
+  public function run() {
+    $job_id = CRM_Utils_Request::retrieve('jid', 'Integer', CRM_Core_DAO::$_nullObject);
     $queue_id = CRM_Utils_Request::retrieve('qid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $hash     = CRM_Utils_Request::retrieve('h', 'String', CRM_Core_DAO::$_nullObject);
+    $hash = CRM_Utils_Request::retrieve('h', 'String', CRM_Core_DAO::$_nullObject);
 
     if (!$job_id ||
       !$queue_id ||
@@ -50,7 +54,6 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
     ) {
       CRM_Core_Error::fatal(ts("Missing input parameters"));
     }
-
 
     // verify that the three numbers above match
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
@@ -125,5 +128,5 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

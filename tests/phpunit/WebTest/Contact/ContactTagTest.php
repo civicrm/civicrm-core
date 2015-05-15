@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testTagAContact() {
+  public function testTagAContact() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/tag", "action=add&reset=1", "_qf_Tag_next");
@@ -76,7 +76,7 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->checkCRMStatus();
   }
 
-  function testTagSetContact() {
+  public function testTagSetContact() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/tag", "action=add&reset=1&tagset=1");
@@ -136,7 +136,6 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
-
     // Type search name in autocomplete.
     $this->click("css=input#sort_name_navigation");
     $this->type("css=input#sort_name_navigation", $firstName);
@@ -150,5 +149,5 @@ class WebTest_Contact_ContactTagTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText('tags', "tagset1, tagset2");
   }
-}
 
+}

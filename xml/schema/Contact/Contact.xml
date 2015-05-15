@@ -163,10 +163,10 @@
   <field>
     <name>external_identifier</name>
     <type>varchar</type>
-    <length>32</length>
+    <length>64</length>
     <html>
       <type>Text</type>
-      <size>EIGHT</size>
+      <size>8</size>
     </html>
 
     <import>true</import>
@@ -188,7 +188,7 @@
     <length>128</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
 
     <export>true</export>
@@ -207,7 +207,7 @@
     <length>128</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
 
     <export>true</export>
@@ -221,7 +221,7 @@
     <length>128</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
 
     <import>true</import>
@@ -237,7 +237,7 @@
     <length>128</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
 
     <import>true</import>
@@ -254,7 +254,7 @@
     <length>128</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
 
     <import>true</import>
@@ -272,7 +272,8 @@
     <comment>optional URL for preferred image (photo, logo, etc.) to display for this contact.</comment>
     <add>1.1</add>
     <html>
-      <type>Text</type>
+      <type>File</type>
+      <size>30</size>
     </html>
   </field>
   <field>
@@ -365,7 +366,7 @@
     <length>255</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
 
     <import>true</import>
@@ -379,7 +380,7 @@
     <length>64</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
     <import>true</import>
     <headerPattern>/^first|(f(irst\s)?name)$/i</headerPattern>
@@ -399,7 +400,7 @@
     <length>64</length>
     <html>
       <type>Text</type>
-      <size>MEDIUM</size>
+      <size>30</size>
     </html>
     <import>true</import>
     <headerPattern>/^middle|(m(iddle\s)?name)$/i</headerPattern>
@@ -414,7 +415,7 @@
     <length>64</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
     <import>true</import>
     <headerPattern>/^last|(l(ast\s)?name)$/i</headerPattern>
@@ -492,6 +493,9 @@
     <export>true</export>
     <comment>Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in civicrm_option_value.</comment>
     <add>4.4</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <index>
     <name>index_communication_style_id</name>
@@ -623,7 +627,7 @@
     <length>255</length>
     <html>
       <type>Text</type>
-      <size>MEDIUM</size>
+      <size>30</size>
     </html>
     <import>true</import>
     <headerPattern>/^job|(j(ob\s)?title)$/i</headerPattern>
@@ -714,7 +718,7 @@
     <length>128</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
     <import>true</import>
     <headerPattern>/^household|(h(ousehold\s)?name)$/i</headerPattern>
@@ -751,7 +755,7 @@
     <length>128</length>
     <html>
       <type>Text</type>
-      <size>BIG</size>
+      <size>30</size>
     </html>
     <import>true</import>
     <headerPattern>/^organization|(o(rganization\s)?name)$/i</headerPattern>

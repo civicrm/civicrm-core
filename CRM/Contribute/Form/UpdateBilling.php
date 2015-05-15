@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -56,10 +56,9 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   public $_paymentProcessorObj = NULL;
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
@@ -107,8 +106,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
     if (!$this->_paymentProcessor['object']->isSupported('updateSubscriptionBillingInfo')) {
       CRM_Core_Error::fatal(ts("%1 processor doesn't support updating subscription billing details.",
-          array(1 => $this->_paymentProcessor['object']->_processorName)
-        ));
+        array(1 => $this->_paymentProcessor['object']->_processorName)
+      ));
     }
     $this->assign('paymentProcessor', $this->_paymentProcessor);
 
@@ -136,20 +135,26 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    *
    * access        public
    *
-   * @return array reference to the array of default values
-   *
+   * @return array
+   *   reference to the array of default values
    */
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $this->_defaults = array();
 
     if ($this->_subscriptionDetails->contact_id) {
-      $fields  = array();
-      $names   = array(
-        'first_name', 'middle_name', 'last_name', "street_address-{$this->_bltID}", "city-{$this->_bltID}",
-        "postal_code-{$this->_bltID}", "country_id-{$this->_bltID}", "state_province_id-{$this->_bltID}",
+      $fields = array();
+      $names = array(
+        'first_name',
+        'middle_name',
+        'last_name',
+        "street_address-{$this->_bltID}",
+        "city-{$this->_bltID}",
+        "postal_code-{$this->_bltID}",
+        "country_id-{$this->_bltID}",
+        "state_province_id-{$this->_bltID}",
       );
       foreach ($names as $name) {
         $fields[$name] = 1;
@@ -185,14 +190,13 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $type = 'next';
-    if ( $this->_selfService ) {
+    if ($this->_selfService) {
       $type = 'submit';
     }
 
@@ -214,32 +218,32 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
-    // make sure that credit card number and cvv are valid
-    CRM_Core_Payment_Form::validateCreditCard($fields, $errors);
+    // validate the payment instrument values (e.g. credit card number)
+    CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, $self);
 
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -297,7 +301,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
           array(
             1 => $this->_subscriptionDetails->amount,
             2 => $this->_subscriptionDetails->frequency_interval,
-            3 => $this->_subscriptionDetails->frequency_unit
+            3 => $this->_subscriptionDetails->frequency_unit,
           )
         );
         $msgTitle = ts('Details Updated');
@@ -421,18 +425,21 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    $userID  = $session->get('userID');
-    if ( $userID && $status) {
+    $userID = $session->get('userID');
+    if ($userID && $status) {
       $session->setStatus($status, $msgTitle, $msgType);
-    } else if (!$userID) {
-      if ($status)
+    }
+    elseif (!$userID) {
+      if ($status) {
         CRM_Utils_System::setUFMessage($status);
+      }
       $result = (int) ($updateSubscription && isset($ctype));
-      if (isset($tplParams))
+      if (isset($tplParams)) {
         $session->set('resultParams', $tplParams);
+      }
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
-                                                              "reset=1&task=billing&result={$result}"));
+        "reset=1&task=billing&result={$result}"));
     }
   }
-}
 
+}

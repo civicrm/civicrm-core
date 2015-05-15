@@ -40,6 +40,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_AttachmentTest extends CiviUnitTestCase {
   protected static $filePrefix = NULL;
 
+  /**
+   * @return string
+   */
   public static function getFilePrefix() {
     if (!self::$filePrefix) {
       self::$filePrefix = "test_" . CRM_Utils_String::createRandom(5, CRM_Utils_String::ALPHANUMERIC) . '_';
@@ -62,6 +65,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     \Civi\Core\Container::singleton(TRUE);
   }
 
+  /**
+   * @return array
+   */
   public function okCreateProvider() {
     $cases = array(); // array($entityClass, $createParams, $expectedContent)
 
@@ -95,7 +101,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'description' => 'My test description',
         'options' => array(
           'move-file' => $this->tmpFile('mytest.txt'),
-        )
+        ),
       ),
       'This comes from a file',
     );
@@ -103,6 +109,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function badCreateProvider() {
     $cases = array(); // array($entityClass, $createParams, $expectedError)
 
@@ -134,7 +143,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'description' => 'My test description',
         'content' => 'too much content',
         'options' => array(
-          'move-file' => $this->tmpFile('too-much.txt')
+          'move-file' => $this->tmpFile('too-much.txt'),
         ),
       ),
       "/'content' and 'options.move-file' are mutually exclusive/",
@@ -163,6 +172,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function badUpdateProvider() {
     $cases = array(); // array($entityClass, $createParams, $updateParams, $expectedError)
 
@@ -185,13 +197,16 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
           'check_permissions' => 1,
           $readOnlyField => $newValue,
         ),
-        "/Cannot modify $readOnlyField/"
+        "/Cannot modify $readOnlyField/",
       );
     }
 
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function okGetProvider() {
     $cases = array(); // array($getParams, $expectedNames)
 
@@ -199,19 +214,24 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     // Activity #123: example_123.txt (text/plain) and example_123.csv (text/csv)
     // Activity #456: example_456.txt (text/plain) and example_456.csv (text/csv)
 
-    $cases[] = array(
-      array('entity_table' => 'civicrm_activity'),
-      array(
-        self::getFilePrefix() . 'example_123.csv',
-        self::getFilePrefix() . 'example_123.txt',
-        self::getFilePrefix() . 'example_456.csv',
-        self::getFilePrefix() . 'example_456.txt',
-      ),
-    );
-    $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'mime_type' => 'text/plain'),
-      array(self::getFilePrefix() . 'example_123.txt', self::getFilePrefix() . 'example_456.txt'),
-    );
+    // NOTE: Searching across multiple records (w/o entity_id) is currently
+    // prohibited by DynamicFKAuthorization. The technique used to authorize requests
+    // does not adapt well to such searches.
+
+    //$cases[] = array(
+    //  array('entity_table' => 'civicrm_activity'),
+    //  array(
+    //    self::getFilePrefix() . 'example_123.csv',
+    //    self::getFilePrefix() . 'example_123.txt',
+    //    self::getFilePrefix() . 'example_456.csv',
+    //    self::getFilePrefix() . 'example_456.txt',
+    //  ),
+    //);
+    //$cases[] = array(
+    //  array('entity_table' => 'civicrm_activity', 'mime_type' => 'text/plain'),
+    //  array(self::getFilePrefix() . 'example_123.txt', self::getFilePrefix() . 'example_456.txt'),
+    //);
+
     $cases[] = array(
       array('entity_table' => 'civicrm_activity', 'entity_id' => '123'),
       array(self::getFilePrefix() . 'example_123.txt', self::getFilePrefix() . 'example_123.csv'),
@@ -236,6 +256,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return $cases;
   }
 
+  /**
+   * @return array
+   */
   public function badGetProvider() {
     $cases = array(); // array($getParams, $expectedNames)
 
@@ -253,22 +276,22 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     );
     $cases[] = array(
       array('check_permissions' => 1),
-        "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table'/",
+      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table'/",
     );
     $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'name' => 'example_456.csv'),
+      array('entity_table' => 'civicrm_activity', 'entity_id' => '123', 'name' => 'example_456.csv'),
       "/Get by name is not currently supported/",
     );
     $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'content' => 'test'),
+      array('entity_table' => 'civicrm_activity', 'entity_id' => '123', 'content' => 'test'),
       "/Get by content is not currently supported/",
     );
     $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'path' => '/home/foo'),
+      array('entity_table' => 'civicrm_activity', 'entity_id' => '123', 'path' => '/home/foo'),
       "/Get by path is not currently supported/",
     );
     $cases[] = array(
-      array('entity_table' => 'civicrm_activity', 'url' => '/index.php'),
+      array('entity_table' => 'civicrm_activity', 'entity_id' => '123', 'url' => '/index.php'),
       "/Get by url is not currently supported/",
     );
 
@@ -276,9 +299,10 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create an attachment using "content" and then "get" the attachment
+   * Create an attachment using "content" and then "get" the attachment.
    *
-   * @param string $testEntityClass e.g. "CRM_Core_DAO_Activity"
+   * @param string $testEntityClass
+   *   E.g. "CRM_Core_DAO_Activity".
    * @param array $createParams
    * @param string $expectedContent
    * @dataProvider okCreateProvider
@@ -533,18 +557,10 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertAttachmentExistence(FALSE, $createResults['delme']['second']);
   }
 
-  protected function assertAttachmentExistence($exists, $apiResult) {
-    $fileId = $apiResult['id'];
-    $this->assertTrue(is_numeric($fileId));
-    $this->assertEquals($exists, file_exists($apiResult['values'][$fileId]['path']));
-    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_file WHERE id = %1', array(
-      1 => array($fileId, 'Int')
-    ));
-    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', array(
-      1 => array($fileId, 'Int')
-    ));
-  }
-
+  /**
+   * @param $name
+   * @return string
+   */
   protected function tmpFile($name) {
     $tmpDir = sys_get_temp_dir();
     $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
@@ -565,4 +581,5 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
 
     }
   }
+
 }

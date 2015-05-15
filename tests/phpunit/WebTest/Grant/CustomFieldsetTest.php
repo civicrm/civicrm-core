@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomFieldsetTest() {
+  public function testCustomFieldsetTest() {
     // Log in as admin first to verify permissions for CiviGrant
     $this->webtestLogin('admin');
 
@@ -98,15 +98,15 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
 
     // verify tabular data for grant view
     $this->webtestVerifyTabularData(array(
-      'Name' => $contact['display_name'],
-      'Grant Status' => 'Approved',
-      'Grant Type' => $grantType,
-      $grantField => '$ 99.99',
-     )
+        'Name' => $contact['display_name'],
+        'Grant Status' => 'Approved',
+        'Grant Type' => $grantType,
+        $grantField => '$ 99.99',
+      )
     );
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     // Enable CiviGrant module if necessary
@@ -115,10 +115,11 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $triggerElement = array('name' => 'grant_type_id', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Grant', 'subEntity' => 'Emergency', 'triggerElement' => $triggerElement),
-      array('entity' => 'Grant', 'subEntity' => 'Family Support', 'triggerElement' => $triggerElement)
+      array('entity' => 'Grant', 'subEntity' => 'Family Support', 'triggerElement' => $triggerElement),
     );
 
     $pageUrl = array('url' => 'grant/add', 'args' => 'reset=1&action=add&context=standalone');
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
   }
+
 }

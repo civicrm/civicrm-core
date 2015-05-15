@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddCase() {
+  public function testAddCase() {
     $this->webtestLogin('admin');
 
     // Enable CiviCase module if necessary
@@ -64,7 +64,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $cusId_3 = 'custom_' . $customId[2] . '_-1';
 
     // let's give full CiviCase permissions.
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -137,7 +142,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
     // verify if custom data is present
     $this->openCiviPage('case', 'reset=1');
-    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[text()='Manage']");
+    $this->clickLink("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$client['sort_name']}']/../../td[9]/span/a[1][text()='Manage']");
 
     $this->clickAjaxLink("css=#{$customGrp1} .crm-accordion-header", "css=#{$customGrp1} a.button");
     $cusId_1 = 'custom_' . $customId[0] . '_1';
@@ -177,7 +182,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _testGetCustomFieldId($customGrpId1, $noteRichEditor=FALSE) {
+  public function _testGetCustomFieldId($customGrpId1, $noteRichEditor = FALSE) {
     $customId = array();
     $this->openCiviPage('admin/custom/group/field/add', array('reset' => 1, 'action' => 'add', 'gid' => $customGrpId1));
 
@@ -201,7 +206,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $this->clickLink("_qf_Field_next_new-bottom");
 
       // get id of custom fields
-      $this->openCiviPage("admin/custom/group/field", array('reset' => 1, 'action' => 'browse', 'gid' => $customGrpId1));
+      $this->openCiviPage("admin/custom/group/field", array(
+          'reset' => 1,
+          'action' => 'browse',
+          'gid' => $customGrpId1,
+        ));
       $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
       $custom1 = $custom1[1];
       array_push($customId, $custom1);
@@ -229,7 +238,11 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
       $this->clickLink("_qf_Field_done-bottom");
 
       // get id of custom fields
-      $this->openCiviPage("admin/custom/group/field", array('reset' => 1, 'action' => 'browse', 'gid' => $customGrpId1));
+      $this->openCiviPage("admin/custom/group/field", array(
+          'reset' => 1,
+          'action' => 'browse',
+          'gid' => $customGrpId1,
+        ));
       $custom1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr[1]/td[8]/span/a[text()='Edit Field']/@href"));
       $custom1 = $custom1[1];
       array_push($customId, $custom1);
@@ -246,12 +259,17 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
 
   /**
    * @param $customGrpId1
-   * @param int $customId
+   * @param array $customId
    */
-  function _testDeleteCustomData($customGrpId1, $customId) {
+  public function _testDeleteCustomData($customGrpId1, $customId) {
     // delete all custom data
     foreach ($customId as $cKey => $cValue) {
-      $this->openCiviPage("admin/custom/group/field", array('action' => 'delete', 'reset' => '1', 'gid' => $customGrpId1, 'id' => $cValue));
+      $this->openCiviPage("admin/custom/group/field", array(
+          'action' => 'delete',
+          'reset' => '1',
+          'gid' => $customGrpId1,
+          'id' => $cValue,
+        ));
       $this->clickLink("_qf_DeleteField_next-bottom");
     }
 
@@ -263,7 +281,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
   /**
    * CRM-12812
    */
-  function testCaseCustomNoteRichEditor() {
+  public function testCaseCustomNoteRichEditor() {
     $this->webtestLogin('admin');
 
     //setting ckeditor as WYSIWYG
@@ -292,7 +310,12 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $cusId_2 = 'custom_' . $customId[1] . '_-1';
 
     // let's give full CiviCase permissions.
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -397,7 +420,7 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
    * @param string $custMname
    * @param $custLname
    */
-  function _testAdvansearchCaseData($customId, $custFname, $custMname, $custLname) {
+  public function _testAdvansearchCaseData($customId, $custFname, $custMname, $custLname) {
     // search casecontact
     $this->openCiviPage('contact/search/advanced', 'reset=1', '_qf_Advanced_refresh');
     $this->click("CiviCase");
@@ -412,5 +435,5 @@ class WebTest_Case_CaseCustomFieldsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertElementContainsText('crm-container', '1 Contact');
   }
-}
 
+}

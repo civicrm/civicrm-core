@@ -68,7 +68,7 @@
   </field>
   <field>
     <name>weight</name>
-    <title>Case Type Weight</title>
+    <title>Order</title>
     <type>int</type>
     <required>true</required>
     <default>1</default>

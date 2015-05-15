@@ -1,11 +1,9 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,76 +23,61 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 country functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_Country
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: Country.php 2011-02-16 ErikHommel $
  */
 
-require_once 'CRM/Core/DAO/Country.php';
+/**
+ * This api exposes CiviCRM country.
+ *
+ * @package CiviCRM_APIv3
+ */
 
 /**
- * Add an Country for a contact
+ * Add an Country for a contact.
  *
- * Allowed @params array keys are:
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @example CountryCreate.php Standard Create Example
- *
- * @return array API result array
- * {@getfields country_create}
- * @access public
+ * @return array
+ *   API result array
+ * @throws \API_Exception
  */
 function civicrm_api3_country_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_DAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_country_create_spec(&$params) {
   $params['name']['api.required'] = 1;
 }
 
 /**
- * Deletes an existing Country
+ * Deletes an existing Country.
  *
- * @param  array  $params
+ * @param array $params
  *
- * @example CountryDelete.php Standard Delete Example
- *
- * @return boolean | error  true if successfull, error otherwise
- * {@getfields country_delete}
- * @access public
+ * @return array
  */
 function civicrm_api3_country_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_DAO(__FUNCTION__), $params);
 }
 
 /**
- * Retrieve one or more countrys
+ * Retrieve one or more countryies.
  *
- * @param  array input parameters
+ * @param array $params
+ *   Array per getfields metadata.
  *
- *
- * @example CountryGet.php Standard Get Example
- *
- * @param  array $params  an associative array of name/value pairs.
- *
- * @return  array api result array
- * {@getfields country_get}
- * @access public
+ * @return array
+ *   api result array
  */
 function civicrm_api3_country_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_DAO(__FUNCTION__), $params);
 }
-

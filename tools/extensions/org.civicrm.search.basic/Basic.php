@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -49,8 +49,9 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     parent::__construct($formValues);
 
     $this->normalize();
-    $this->_columns = array(ts('') => 'contact_type',
-      ts('') => 'contact_sub_type',
+    $this->_columns = array(
+      '' => 'contact_type',
+      '' => 'contact_sub_type',
       ts('Name') => 'sort_name',
       ts('Address') => 'street_address',
       ts('City') => 'city',

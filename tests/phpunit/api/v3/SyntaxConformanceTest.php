@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -39,7 +39,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * @package CiviCRM_APIv3
  * @subpackage API_Core
  */
-
 class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
@@ -48,49 +47,83 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   protected $deletableTestObjects;
 
-  /** This test case doesn't require DB reset */
+  /**
+   * This test case doesn't require DB reset.
+   */
   public $DBResetRequired = FALSE;
 
   protected $_entity;
 
-  /** Map custom group entities to civicrm components */
+  /**
+   * Map custom group entities to civicrm components.
+   */
   static $componentMap = array(
-    'Contact' => NULL,
-    'Individual' => NULL,
-    'Household' => NULL,
-    'Organization' => NULL,
     'Contribution' => 'CiviContribute',
     'Membership' => 'CiviMember',
     'Participant' => 'CiviEvent',
-    'Group' => NULL,
-    'Relationship' => NULL,
     'Event' => 'CiviEvent',
     'Case' => 'CiviCase',
-    'Activity' => NULL,
     'Pledge' => 'CiviPledge',
     'Grant' => 'CiviGrant',
-    'Address' => NULL,
+    'Campaign' => 'CiviCampaign',
+    'Survey' => 'CiviCampaign',
   );
 
-  /* they are two types of missing APIs:
-       - Those that are to be implemented
-         (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
-       Those that don't exist
-         and that will never exist (eg an obsoleted Entity
-         they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
-    */
-  function setUp() {
+  /**
+   * Set up function.
+   *
+   * There are two types of missing APIs:
+   * Those that are to be implemented
+   * (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
+   * Those that don't exist
+   * and that will never exist (eg an obsoleted Entity
+   * they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
+   */
+  public function setUp() {
     parent::setUp();
     $this->enableCiviCampaign();
-    $this->toBeImplemented['get'] = array('Profile', 'CustomValue', 'Constant', 'CustomSearch', 'Extension', 'ReportTemplate', 'System', 'Setting');
-    $this->toBeImplemented['create'] = array('SurveyRespondant', 'OptionGroup', 'MailingRecipients', 'UFMatch', 'LocationType', 'CustomSearch', 'Extension', 'ReportTemplate', 'System');
-    $this->toBeImplemented['delete'] = array('MembershipPayment', 'OptionGroup', 'SurveyRespondant', 'UFJoin', 'UFMatch', 'Extension', 'LocationType', 'System');
-    $this->onlyIDNonZeroCount['get'] = array('ActivityType', 'Entity', 'Domain','Setting');
+    $this->toBeImplemented['get'] = array(
+      'Profile',
+      'CustomValue',
+      'Constant',
+      'CustomSearch',
+      'Extension',
+      'ReportTemplate',
+      'System',
+      'Setting',
+    );
+    $this->toBeImplemented['create'] = array(
+      'SurveyRespondant',
+      'OptionGroup',
+      'MailingRecipients',
+      'UFMatch',
+      'LocationType',
+      'CustomSearch',
+      'Extension',
+      'ReportTemplate',
+      'System',
+    );
+    $this->toBeImplemented['delete'] = array(
+      'MembershipPayment',
+      'OptionGroup',
+      'SurveyRespondant',
+      'UFJoin',
+      'UFMatch',
+      'Extension',
+      'LocationType',
+      'System',
+    );
+    $this->onlyIDNonZeroCount['get'] = array(
+      'ActivityType',
+      'Entity',
+      'Domain',
+      'Setting',
+    );
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
     $this->deletableTestObjects = array();
   }
 
-  function tearDown() {
+  public function tearDown() {
     foreach ($this->deletableTestObjects as $entityName => $entities) {
       foreach ($entities as $entityID) {
         CRM_Core_DAO::deleteTestObjects($entityName, array('id' => $entityID));
@@ -99,11 +132,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param null $skip
+   * Generate list of all entities.
+   *
+   * @param array $skip
+   *   Entities to skip.
    *
    * @return array
    */
-  public static function entities($skip = NULL) {
+  public static function entities($skip = array()) {
     // The order of operations in here is screwy. In the case where SYNTAX_CONFORMANCE_ENTITIES is
     // defined, we should be able to parse+return it immediately. However, some weird dependency
     // crept into the system where civicrm_api('Entity','get') must be called as part of entities()
@@ -112,7 +148,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $tmp = civicrm_api('Entity', 'Get', array('version' => 3));
     if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
       $tmp = array(
-        'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES'))
+        'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES')),
       );
     }
 
@@ -128,6 +164,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get list of entities for get test.
+   *
    * @return array
    */
   public static function entities_get() {
@@ -136,6 +174,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get entities for create tests.
+   *
    * @return array
    */
   public static function entities_create() {
@@ -156,9 +196,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return static::entities(static::toBeSkipped_getlimit());
   }
 
+  /**
+   * Generate list of entities that can be retrieved using SQL operator syntax.
+   *
+   * @return array
+   */
   public static function entities_getSqlOperators() {
     return static::entities(static::toBeSkipped_getSqlOperators());
   }
+
   /**
    * @return array
    */
@@ -172,6 +218,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function entities_getfields() {
     return static::entities(static::toBeSkipped_getfields(TRUE));
   }
+
   /**
    * @return array
    */
@@ -183,29 +230,39 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function custom_data_entities() {
-    $enableComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
     $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
-    $components = self::$componentMap;
+    $enabledComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
     $customDataEntities = array();
     $invalidEntities = array('Individual', 'Organization', 'Household');
     $entitiesToFix = array('Case', 'Relationship');
-    foreach ($entities as $entityName => $entity ) {
-      if(!in_array($entityName, $invalidEntities)
+    foreach ($entities as $entityName => $entity) {
+      if (!in_array($entityName, $invalidEntities)
         && !in_array($entityName, $entitiesToFix)
-        && (!empty($components[$entityName]) && in_array($components[$entityName], $enableComponents) || $components[$entityName] == NULL)) {
-        $customDataEntities[] = array($entityName );
+      ) {
+        if (!empty(self::$componentMap[$entityName]) && empty($enabledComponents[self::$componentMap[$entityName]])) {
+          CRM_Core_BAO_ConfigSetting::enableComponent(self::$componentMap[$entityName]);
+        }
+        $customDataEntities[] = array($entityName);
       }
     }
     return $customDataEntities;
   }
 
   /**
+   * Get entities to be skipped on get tests.
+   *
    * @param bool $sequential
    *
    * @return array
    */
   public static function toBeSkipped_get($sequential = FALSE) {
-    $entitiesWithoutGet = array('MailingEventSubscribe', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventUnsubscribe', 'Location');
+    $entitiesWithoutGet = array(
+      'MailingEventSubscribe',
+      'MailingEventConfirm',
+      'MailingEventResubscribe',
+      'MailingEventUnsubscribe',
+      'Location',
+    );
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
     }
@@ -217,16 +274,20 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Get entities to be skipped for get call.
+   *
    * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
-   * support id in API but in this case the underlying tables are crying out for a restructue
-   * & it just doesn't make sense
+   * support id in API but in this case the underlying tables are crying out for a restructure
+   * & it just doesn't make sense, on the otherhand Event need id to be existent as pseudo property
+   * is been associated with it, so we need to bypass for get api otherwise it will through pseudo_match validation
    *
-   * @param bool|\unknown_type $sequential
+   * @param bool $sequential
    *
-   * @return multitype:string |multitype:multitype:string
+   * @return array
+   *   Entities that cannot be retrieved by ID
    */
   public static function toBeSkipped_getByID($sequential = FALSE) {
-    return array('MailingContact');
+    return array('MailingContact', 'Event');
   }
 
   /**
@@ -252,7 +313,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function toBeSkipped_delete($sequential = FALSE) {
-    $entitiesWithout = array('MailingContact', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventSubscribe', 'MailingEventUnsubscribe', 'MailingRecipients', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue', 'Setting');
+    $entitiesWithout = array(
+      'MailingContact',
+      'MailingEventConfirm',
+      'MailingEventResubscribe',
+      'MailingEventSubscribe',
+      'MailingEventUnsubscribe',
+      'MailingRecipients',
+      'Constant',
+      'Entity',
+      'Location',
+      'Domain',
+      'Profile',
+      'CustomValue',
+      'Setting',
+    );
     if ($sequential === TRUE) {
       return $entitiesWithout;
     }
@@ -272,7 +347,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_getfields($sequential = FALSE) {
     $entitiesWithMetadataNotYetFixed = array('ReportTemplate', 'CustomSearch');
     if ($sequential === TRUE) {
-      return $entitiesWithMetadataNotYetFixed ;
+      return $entitiesWithMetadataNotYetFixed;
     }
     $entities = array();
     foreach ($entitiesWithMetadataNotYetFixed as $e) {
@@ -280,13 +355,27 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     return $entities;
   }
-/**
- * Generate list of entities to test for get by id functions
- * @param boolean $sequential
- * @return multitype:string |multitype:multitype:string
- */
+
+  /**
+   * Generate list of entities to test for get by id functions.
+   * @param bool $sequential
+   * @return array
+   *   Entities to be skipped
+   */
   public static function toBeSkipped_automock($sequential = FALSE) {
-    $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
+    $entitiesWithoutGet = array(
+      'MailingContact',
+      'EntityTag',
+      'Participant',
+      'ParticipantPayment',
+      'Setting',
+      'SurveyRespondant',
+      'MailingRecipients',
+      'CustomSearch',
+      'Extension',
+      'ReportTemplate',
+      'System',
+    );
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
     }
@@ -299,11 +388,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
 
   /**
-  * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
-  */
+   * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
+   * @param bool $sequential
+   * @return array
+   */
   public static function toBeSkipped_updatesingle($sequential = FALSE) {
     $entitiesWithout = array(
-      'Attachment', // pseudo-entity; testUpdateSingleValueAlter doesn't introspect properly on it. Multiple magic fields
+      'Attachment',
+      // pseudo-entity; testUpdateSingleValueAlter doesn't introspect properly on it. Multiple magic fields
       'Mailing',
       'MailingGroup',
       'MailingJob',
@@ -356,7 +448,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'PaymentProcessor',
       'Setting',
       'MailingContact',
-      'SystemLog' //skip this because it doesn't make sense to update logs
+      'SystemLog',
+      //skip this because it doesn't make sense to update logs,
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -376,12 +469,18 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public static function toBeSkipped_getlimit() {
     $entitiesWithout = array(
-      'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
-      'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
-      'Event', // failed 'check that a 5 limit returns 5' - probably is_template field is wrong or something, or could be limit doesn't work right
-      'Extension', // can't handle creating 25
-      'Note', // fails on 5 limit - probably a set up problem
-      'Setting', //a bit of a pseudoapi - keys by domain
+      'Case',
+      //case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
+      'EntityTag',
+      // non-standard api - has inappropriate mandatory fields & doesn't implement limit
+      'Event',
+      // failed 'check that a 5 limit returns 5' - probably is_template field is wrong or something, or could be limit doesn't work right
+      'Extension',
+      // can't handle creating 25
+      'Note',
+      // fails on 5 limit - probably a set up problem
+      'Setting',
+      //a bit of a pseudoapi - keys by domain
     );
     return $entitiesWithout;
   }
@@ -391,7 +490,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public static function toBeSkipped_getSqlOperators() {
     $entitiesWithout = array(
-      'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
+      'Case', //case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
       'Contact', // on the todo list!
       'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
       'Extension', // can't handle creating 25
@@ -407,7 +506,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getKnownUnworkablesUpdateSingle($entity, $key){
+  public function getKnownUnworkablesUpdateSingle($entity, $key) {
     // can't update values are values for which updates don't result in the value being changed
     $knownFailures = array(
       'ActionSchedule' => array(
@@ -417,16 +516,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       ),
       'ActivityContact' => array(
         'cant_update' => array(
-          'activity_id', //we have an FK on activity_id + contact_id + record id so if we don't leave this one distinct we get an FK constraint error
+          'activity_id',
+          //we have an FK on activity_id + contact_id + record id so if we don't leave this one distinct we get an FK constraint error
         ),
       ),
       'Address' => array(
         'cant_update' => array(
           'state_province_id', //issues with country id - need to ensure same country
-          'master_id',//creates relationship
+          'master_id', //creates relationship
         ),
-        'cant_return' => array(
-        )
+        'cant_return' => array(),
       ),
       'Batch' => array(
         'cant_update' => array(
@@ -434,19 +533,25 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         ),
         'cant_return' => array(
           'entity_table',
-        )
+        ),
       ),
       'CaseType' => array(
         'cant_update' => array(
           'definition',
-        )
+        ),
       ),
       'MembershipBlock' => array(
         'cant_update' => array(
           // The fake/auto-generated values leave us unable to properly cleanup fake data
           'entity_type',
           'entity_id',
-        )
+        ),
+      ),
+      'ContributionSoft' => array(
+        'cant_update' => array(
+          // can't be changed through api
+          'pcp_id',
+        ),
       ),
       'Pledge' => array(
         'cant_update' => array(
@@ -454,7 +559,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'installments',
           'original_installment_amount',
           'next_pay_date',
-          'amount' // can't be changed through API
+          'amount', // can't be changed through API,
         ),
         'break_return' => array(// if these are passed in they are retrieved from the wrong table
           'honor_contact_id',
@@ -462,7 +567,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'contribution_page_id',
           'financial_account_id',
           'financial_type_id',
-          'currency'
+          'currency',
         ),
         'cant_return' => array(// can't be retrieved from api
           'honor_type_id', //due to uniquename missing
@@ -480,16 +585,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'pledge_status_id',
           'pledge_campaign_id',
           'pledge_financial_type_id',
-        )
+        ),
       ),
       'PaymentProcessorType' => array(
         'cant_update' => array(
           'billing_mode',
         ),
-        'break_return' => array(
-        ),
-        'cant_return' => array(
-        ),
+        'break_return' => array(),
+        'cant_return' => array(),
       ),
       'PriceFieldValue' => array(
         'cant_update' => array(
@@ -497,28 +600,30 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         ),
       ),
     );
-    if(empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])){
+    if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])) {
       return array();
     }
     return $knownFailures[$entity][$key];
   }
 
-  /** testing the _get **/
+  /* ----- testing the _get  ----- */
 
   /**
    * @dataProvider toBeSkipped_get
-   entities that don't need a get action
+   *   Entities that don't need a get action
+   * @param $Entity
    */
   public function testNotImplemented_get($Entity) {
     $result = civicrm_api($Entity, 'Get', array('version' => 3));
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
     // $this->assertContains("API ($Entity, Get) does not exist", $result['error_message']);
-    $this->assertRegExp('/API (.*) does not exist/',  $result['error_message']);
+    $this->assertRegExp('/API (.*) does not exist/', $result['error_message']);
   }
 
   /**
    * @dataProvider entities
    * @expectedException PHPUnit_Framework_Error
+   * @param $Entity
    */
   public function testWithoutParam_get($Entity) {
     // should get php complaining that a param is missing
@@ -527,6 +632,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities
+   * @param $Entity
    */
   public function testGetFields($Entity) {
     if (in_array($Entity, $this->deprecatedAPI) || $Entity == 'Entity' || $Entity == 'CustomValue') {
@@ -542,6 +648,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_get
+   * @param $Entity
    */
   public function testEmptyParam_get($Entity) {
 
@@ -553,8 +660,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
     $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
   }
+
   /**
    * @dataProvider entities_get
+   * @param $Entity
    */
   public function testEmptyParam_getString($Entity) {
 
@@ -566,9 +675,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertEquals(2000, $result['error_code']);
     $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
+
   /**
    * @dataProvider entities_get
    * @Xdepends testEmptyParam_get // no need to test the simple if the empty doesn't work/is skipped. doesn't seem to work
+   * @param $Entity
    */
   public function testSimple_get($Entity) {
     // $this->markTestSkipped("test gives core error on test server (but not on our locals). Skip until we can get server to pass");
@@ -591,6 +702,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider custom_data_entities_get
+   * @param $entityName
    */
   public function testCustomDataGet($entityName) {
     $this->createLoggedInUser();// so subsidiary activities are created
@@ -611,12 +723,13 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_get
+   * @param $Entity
    */
   public function testAcceptsOnlyID_get($Entity) {
     // big random number. fun fact: if you multiply it by pi^e, the result is another random number, but bigger ;)
     $nonExistantID = 30867307034;
     if (in_array($Entity, $this->toBeImplemented['get'])
-        || in_array($Entity, $this->toBeSkipped_getByID())
+      || in_array($Entity, $this->toBeSkipped_getByID())
     ) {
       return;
     }
@@ -638,13 +751,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create two entities and make sure we can fetch them individually by ID
+   * Create two entities and make sure we can fetch them individually by ID.
    *
    * @dataProvider entities_get
    *
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
+   * @param $entityName
    */
   public function testByID_get($entityName) {
     if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
@@ -683,9 +797,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities_getlimit
    *
    * @param string $entityName
-   *
    */
-  function testLimit($entityName) {
+  public function testLimit($entityName) {
     $cases = array(); // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
     $cases[] = array(
       array('options' => array('limit' => NULL)),
@@ -731,7 +844,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->checkLimitAgainstExpected($entityName, $case[0], $case[1], $case[2]);
 
       //non preferred / legacy syntax
-      if(isset($case[0]['options']['limit'])) {
+      if (isset($case[0]['options']['limit'])) {
         $this->checkLimitAgainstExpected($entityName, array('rowCount' => $case[0]['options']['limit']), $case[1], $case[2]);
         $this->checkLimitAgainstExpected($entityName, array('option_limit' => $case[0]['options']['limit']), $case[1], $case[2]);
         $this->checkLimitAgainstExpected($entityName, array('option.limit' => $case[0]['options']['limit']), $case[1], $case[2]);
@@ -749,9 +862,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities_getSqlOperators
    *
    * @param string $entityName
-   *
    */
-  function testSqlOperators($entityName) {
+  public function testSqlOperators($entityName) {
     $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
@@ -777,16 +889,17 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that get fetches an appropriate number of results
+   * Check that get fetches an appropriate number of results.
    *
-   * @param string $entityName Name of entity to test
+   * @param string $entityName
+   *   Name of entity to test.
    * @param array $params
-   * @param integer $limit
+   * @param int $limit
    * @param string $message
    */
-  function checkLimitAgainstExpected($entityName, $params, $limit, $message) {
+  public function checkLimitAgainstExpected($entityName, $params, $limit, $message) {
     $result = $this->callAPISuccess($entityName, 'get', $params);
-    if($limit == 30) {
+    if ($limit == 30) {
       $this->assertGreaterThanOrEqual($limit, $result['count'], $message);
       $this->assertGreaterThanOrEqual($limit, $result['count'], $message);
     }
@@ -795,6 +908,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->assertEquals($limit, count($result['values']), $message);
     }
   }
+
   /**
    * Create two entities and make sure we can fetch them individually by ID (e.g. using "contact_id=>2"
    * or "group_id=>4")
@@ -804,6 +918,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
+   * @param $entityName
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testByIDAlias_get($entityName) {
     if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
@@ -821,10 +937,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     // create entities
     $baoObj1 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-    $this->assertTrue(is_integer($baoObj1->id), 'check first id');
+    $this->assertTrue(is_int($baoObj1->id), 'check first id');
     $this->deletableTestObjects[$baoString][] = $baoObj1->id;
     $baoObj2 = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-    $this->assertTrue(is_integer($baoObj2->id), 'check second id');
+    $this->assertTrue(is_int($baoObj2->id), 'check second id');
     $this->deletableTestObjects[$baoString][] = $baoObj2->id;
 
     // fetch first by ID
@@ -850,6 +966,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_get
+   * @param $Entity
    */
   public function testNonExistantID_get($Entity) {
     // cf testAcceptsOnlyID_get
@@ -865,7 +982,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
 
-
     $this->assertArrayHasKey('version', $result);
     $this->assertEquals(3, $result['version']);
     if (!in_array($Entity, $this->onlyIDNonZeroCount['get'])) {
@@ -873,11 +989,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
   }
 
-  /** testing the _create **/
+  /* ---- testing the _create ---- */
 
   /**
    * @dataProvider toBeSkipped_create
-   entities that don't need a create action
+  entities that don't need a create action
+   * @param $Entity
    */
   public function testNotImplemented_create($Entity) {
     $result = civicrm_api($Entity, 'Create', array('version' => 3));
@@ -888,6 +1005,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * @expectedException PHPUnit_Framework_Error
+   * @param $Entity
    */
   public function testWithoutParam_create($Entity) {
     // should create php complaining that a param is missing
@@ -896,12 +1014,13 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_create
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEmptyParam_create($Entity) {
-    $this->markTestIncomplete("fixing this test to test the api functions fails on numberous tests
+    $this->markTestIncomplete("fixing this test to test the api functions fails on numerous tests
       which will either create a completely blank entity (batch, participant status) or
       have a damn good crack at it (e.g mailing job). Marking this as incomplete beats false success");
-    //
     return;
     if (in_array($Entity, $this->toBeImplemented['create'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
@@ -915,6 +1034,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities_create
    *
    * Check that create doesn't work with an invalid
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testInvalidID_create($Entity) {
     // turn test off for noew
@@ -942,6 +1063,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
+   * @param $entityName
    */
   public function testCreateSingleValueAlter($entityName) {
     if (in_array($entityName, $this->toBeImplemented['create'])) {
@@ -952,21 +1074,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $baoString = _civicrm_api3_get_BAO($entityName);
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
-    $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
-    if($entityName != 'Pledge'){
-      $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'create'));
+    $fieldsGet = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get', 'options' => array('get_options' => 'all')));
+    if ($entityName != 'Pledge') {
+      $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'create', 'options' => array('get_options' => 'all')));
     }
     $fields = $fields['values'];
     $return = array_keys($fieldsGet['values']);
     $valuesNotToReturn = $this->getKnownUnworkablesUpdateSingle($entityName, 'break_return');
-      // these can't be requested as return values
+    // these can't be requested as return values
     $entityValuesThatDoNotWork = array_merge(
-        $this->getKnownUnworkablesUpdateSingle($entityName, 'cant_update'),
-        $this->getKnownUnworkablesUpdateSingle($entityName, 'cant_return'),
-        $valuesNotToReturn
-      );
+      $this->getKnownUnworkablesUpdateSingle($entityName, 'cant_update'),
+      $this->getKnownUnworkablesUpdateSingle($entityName, 'cant_return'),
+      $valuesNotToReturn
+    );
 
-    $return = array_diff($return,$valuesNotToReturn);
+    $return = array_diff($return, $valuesNotToReturn);
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject($baoString, array('currency' => 'USD'), 2, 0);
 
@@ -991,16 +1113,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $fieldName = $specs['uniquename'];
       }
       if ($field == 'currency' || $field == 'id' || $field == strtolower($entityName) . '_id'
-      || in_array($field,$entityValuesThatDoNotWork)) {
+        || in_array($field, $entityValuesThatDoNotWork)
+      ) {
         //@todo id & entity_id are correct but we should fix currency & frequency_day
         continue;
       }
       $this->assertArrayHasKey('type', $specs, "the _spec function for $entityName field $field does not specify the type");
       switch ($specs['type']) {
         case CRM_Utils_Type::T_DATE:
-        case CRM_Utils_Type::T_TIMESTAMP:
           $entity[$fieldName] = '2012-05-20';
           break;
+
+        case CRM_Utils_Type::T_TIMESTAMP:
+          // 4.6 doesn't support timestamp updates from 4.7 we should uncomment this. See CRM-16431.
+          continue;
+
         //case CRM_Utils_Type::T_DATETIME:
 
         case 12:
@@ -1013,7 +1140,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_TEXT:
         case CRM_Utils_Type::T_LONGTEXT:
         case CRM_Utils_Type::T_EMAIL:
-          $entity[$fieldName] = substr('New String',0, CRM_Utils_Array::Value('maxlength',$specs,100));
+          $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
           break;
 
         case CRM_Utils_Type::T_INT:
@@ -1022,16 +1149,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             $entity[$fieldName] = 2;
           }
           elseif (!empty($specs['FKClassName'])) {
-            if($specs['FKClassName'] == $baoString){
+            if ($specs['FKClassName'] == $baoString) {
               $entity[$fieldName] = (string) $entity2['id'];
             }
-            else{
+            else {
               $uniqueName = CRM_Utils_Array::value('uniqueName', $specs);
               if (!empty($entity[$fieldName])) {
                 $resetFKTo = array($fieldName => $entity[$fieldName]);
               }
               $entity[$fieldName] = (string) empty($entity2[$field]) ? CRM_Utils_Array::value($uniqueName, $entity2) : $entity2[$field];
-             //todo - there isn't always something set here - & our checking on unset values is limited
+              //todo - there isn't always something set here - & our checking on unset values is limited
               if (empty($entity[$field])) {
                 unset($entity[$field]);
               }
@@ -1055,23 +1182,33 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_URL:
           $entity[$field] = 'warm.beer.com';
       }
-      if (!empty($specs['pseudoconstant'])) {
-        $options = $this->callAPISuccess($entityName, 'getoptions', array('context' => 'create', 'field' => $field));
-        if (empty($options['values'])) {
+      if (empty($specs['FKClassName']) && (!empty($specs['pseudoconstant']) || !empty($specs['options']))) {
+        $options = CRM_Utils_Array::value('options', $specs, array());
+        if (!$options) {
           //eg. pdf_format id doesn't ship with any
-          if(isset($specs['pseudoconstant']['optionGroupName'])) {
-            $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', array('name' => 'pdf_format', 'return' => 'id'));
-            $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID, 'label' => 'new option value'));
-            $options['values'][] = $optionValue['id'];
+          if (isset($specs['pseudoconstant']['optionGroupName'])) {
+            $optionValue = $this->callAPISuccess('option_value', 'create', array(
+                'option_group_id' => $specs['pseudoconstant']['optionGroupName'],
+                'label' => 'new option value',
+                'sequential' => 1,
+              ));
+            $optionValue = $optionValue['values'];
+            $options[$optionValue[0]['value']] = 'new option value';
           }
         }
-        $entity[$field] = array_rand($options['values']);
+        $entity[$field] = array_rand($options);
+      }
+      if (!empty($specs['FKClassName']) && !empty($specs['pseudoconstant'])) {
+        // in the weird situation where a field has both an fk and pseudoconstant defined,
+        // e.g. campaign_id field, need to flush caches.
+        // FIXME: Why doesn't creating a campaign clear caches?
+        civicrm_api3($entityName, 'getfields', array('cache_clear' => 1));
       }
       $updateParams = array(
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
-      if(isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
+      if (isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
@@ -1088,13 +1225,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       );
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
-      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updated\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
+      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updated\n" . print_r(array(
+            'update-params' => $updateParams,
+            'update-result' => $update,
+            'getsingle-params' => $checkParams,
+            'getsingle-result' => $checkEntity,
+            'expected entity' => $entity,
+          ), TRUE));
       if ($resetFKTo) {
         //reset the foreign key fields because otherwise our cleanup routine fails & some other unexpected stuff can kick in
         $entity = array_merge($entity, $resetFKTo);
         $updateParams = array_merge($updateParams, $resetFKTo);
         $this->callAPISuccess($entityName, 'create', $updateParams);
-        if(isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
+        if (isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
           //api has special handling on these 2 fields for backward compatibility reasons
           $entity['contribution_type_id'] = $updateParams['financial_type_id'];
         }
@@ -1103,13 +1246,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $baoObj->free();
   }
 
-  /** testing the _getFields **/
+  /* ---- testing the _getFields ---- */
 
-  /** testing the _delete **/
+  /* ---- testing the _delete ---- */
 
   /**
    * @dataProvider toBeSkipped_delete
-   entities that don't need a delete action
+  entities that don't need a delete action
+   * @param $Entity
    */
   public function testNotImplemented_delete($Entity) {
     $nonExistantID = 151416349;
@@ -1121,6 +1265,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * @expectedException PHPUnit_Framework_Error
+   * @param $Entity
    */
   public function testWithoutParam_delete($Entity) {
     // should delete php complaining that a param is missing
@@ -1129,6 +1274,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider entities_delete
+   * @param $Entity
    */
   public function testEmptyParam_delete($Entity) {
     if (in_array($Entity, $this->toBeImplemented['delete'])) {
@@ -1139,8 +1285,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
     $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
   }
+
   /**
    * @dataProvider entities_delete
+   * @param $Entity
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testInvalidID_delete($Entity) {
     // turn test off for now
@@ -1152,6 +1301,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     $result = $this->callAPIFailure($Entity, 'Delete', array('id' => 999));
   }
+
   /**
    * @dataProvider entities
    */
@@ -1169,6 +1319,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
+   * @param $entityName
+   * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testByID_delete($entityName) {
     // turn test off for noew
@@ -1192,7 +1344,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->callAPISuccess($entityName, 'delete', array('id' => $baoObj2->id));
     //make sure 1 less exists now
     $result = $this->callAPISuccess($entityName, 'getcount', array(),
-      ($createcount + $startCount) -1
+      ($createcount + $startCount) - 1
     );
 
     //make sure id #1 exists
@@ -1209,16 +1361,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * Create two entities and make sure delete action only deletes one!
    *
    * @dataProvider entities_getfields
-   *
+   * @param $entity
    */
   public function testGetfieldsHasTitle($entity) {
     $entities = $this->getEntitiesSupportingCustomFields();
     if (in_array($entity, $entities)) {
       $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, $entity . 'Test.php');
     }
-    $actions =  $this->callAPISuccess($entity, 'getactions', array());
+    $actions = $this->callAPISuccess($entity, 'getactions', array());
     foreach ($actions['values'] as $action) {
-      if (substr($action, -7) == '_create'  || substr($action, -4) == '_get' || substr($action, -7) == '_delete') {
+      if (substr($action, -7) == '_create' || substr($action, -4) == '_get' || substr($action, -7) == '_delete') {
         //getactions can't distinguish between contribution_page.create & contribution_page.create
         continue;
       }
@@ -1249,10 +1401,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     return $returnEntities;
   }
+
   /**
    * @param string $entityName
    * @param int $count
-   *
    *
    * @return array
    */
@@ -1260,24 +1412,24 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $baoString = _civicrm_api3_get_BAO($entityName);
     if (empty($baoString)) {
       $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
-      return;
+      return array();
     }
     $baos = array();
     $i = 0;
-    while($i < $count) {
-    // create entities
+    while ($i < $count) {
+      // create entities
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
-      $this->assertTrue(is_integer($baoObj->id), 'check first id');
+      $this->assertTrue(is_int($baoObj->id), 'check first id');
       $this->deletableTestObjects[$baoString][] = $baoObj->id;
       $baos[] = $baoObj;
-      $i ++;
+      $i++;
     }
     return $baos;
   }
 
 
   /**
-   * Verify that HTML metacharacters provided as inputs appear consistently
+   * Verify that HTML metacharacters provided as inputs appear consistently.
    * as outputs.
    *
    * At time of writing, the encoding scheme requires (for example) that an
@@ -1332,8 +1484,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     // Verify that chaining handles decoding
     $chainResult = $this->callAPISuccess('Event', 'Get', array(
       'id' => $eventId,
-      'api.event.get' => array(
-      ),
+      'api.event.get' => array(),
     ));
     $this->assertEquals('CiviCRM <> TheRest', $chainResult['values'][$eventId]['title']);
     $this->assertEquals('TheRest <> CiviCRM', $chainResult['values'][$eventId]['description']);
@@ -1357,7 +1508,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ));
     //$this->assertTrue((bool)$setValueDescriptionResult['is_error']); // not supported by setValue
     $this->assertEquals('setValueDescription: TheRest <> CiviCRM', $setValueDescriptionResult['values']['description']);
-}
+  }
 
   /**
    * Verify that write operations (create/update) use partial HTML-encoding
@@ -1378,10 +1529,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertAPISuccess($createResult);
     $eventId = $createResult['id'];
     $this->assertDBQuery('createNew: CiviCRM &lt;&gt; TheRest', 'SELECT title FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
     $this->assertDBQuery('createNew: TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
 
     // Verify that "create" handles encoding for updates
@@ -1393,10 +1544,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ));
     $this->assertAPISuccess($createWithIdResult);
     $this->assertDBQuery('createWithId:  CiviCRM &lt;&gt; TheRest', 'SELECT title FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
     $this->assertDBQuery('createWithId:  TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
 
     // Verify that "setvalue" handles encoding for updates
@@ -1408,7 +1559,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ));
     $this->assertAPISuccess($setValueTitleResult);
     $this->assertDBQuery('setValueTitle: CiviCRM &lt;&gt; TheRest', 'SELECT title FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
     $setValueDescriptionResult = civicrm_api('Event', 'setvalue', array(
       'version' => 3,
@@ -1419,7 +1570,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     //$this->assertTrue((bool)$setValueDescriptionResult['is_error']); // not supported by setValue
     $this->assertAPISuccess($setValueDescriptionResult);
     $this->assertDBQuery('setValueDescription: TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', array(
-      1 => array($eventId, 'Integer')
+      1 => array($eventId, 'Integer'),
     ));
   }
+
 }

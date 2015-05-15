@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     $this->webtestLogin('admin');
 
     // Create new group
@@ -103,9 +103,8 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->waitForText('crm-notification-container', "Campaign $title");
-
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div/table[@class='campaigns dataTable no-footer']/tbody//tr//td/div[contains(text(),'{$campaignTitle}')]/../../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div/table[@class='campaigns dataTable no-footer']/tbody//tr//td/div[contains(text(),'{$campaignTitle}')]/../../td[1]");
     $this->memberAddTest($campaignTitle, $id);
   }
 
@@ -113,7 +112,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
    * @param $campaignTitle
    * @param int $id
    */
-  function memberAddTest($campaignTitle, $id) {
+  public function memberAddTest($campaignTitle, $id) {
     //Add new memebershipType
     $memTypeParams = $this->webtestAddMembershipType();
 
@@ -168,5 +167,5 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
 
     $this->webtestVerifyTabularData(array('Campaign' => $campaignTitle));
   }
-}
 
+}

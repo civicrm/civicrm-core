@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,10 +35,12 @@
   {ts}Contributor{/ts}
 {/htxt}
 {htxt id="id-contribution_contact"}
-<p>{ts}Check this box if someone other than the member is paying for this
-membership (i.e. a gift membership or gift subscription), and you want to link
-the payment to the person who is actually paying.  You will be able to select
-an existing contact or enter a new one. The resulting contribution record will
-be linked to the payer, and a soft credit for that contribution will be linked to
-this contact (the member).{/ts}</p>
+  <p>{ts}Check this box if someone other than the member is paying for this membership (i.e. a gift membership or gift subscription), and you want to link the payment to the person who is actually paying.  You will be able to select an existing contact or enter a new one. The resulting contribution record will be linked to the payer, and a soft credit for that contribution will be linked to this contact (the member).{/ts}</p>
+{/htxt}
+
+{htxt id="override_end_date-title"}
+  {ts}Override End Date for Auto-renew Memberships{/ts}
+{/htxt}
+{htxt id="override_end_date"}
+  <p>{ts}If CiviCRM's membership end-date is different from when the payment processor will next collect a payment, various problems can occur. Members may experience a gap in their membership, and the renewal date may get changed from what is manually entered. Use care when modifying the End Date value, and check the associated recurring payment in your payment processor system so they always match.{/ts}</p>
 {/htxt}

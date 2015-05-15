@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,11 +35,11 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomDataImport() {
+  public function testCustomDataImport() {
     $this->webtestLogin();
 
-    $firstName1       = 'Ma_' . substr(sha1(rand()), 0, 7);
-    $firstName2       = 'An_' . substr(sha1(rand()), 0, 7);
+    $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
+    $firstName2 = 'An_' . substr(sha1(rand()), 0, 7);
     $customGroupTitle = 'Custom ' . substr(sha1(rand()), 0, 7);
 
     $firstName3 = 'Ma' . substr(sha1(rand()), 0, 4);
@@ -113,7 +113,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualCustomCSVData($customGroupTitle, $firstName1, $firstName2, $id1, $id2) {
+  public function _individualCustomCSVData($customGroupTitle, $firstName1, $firstName2, $id1, $id2) {
     list($customDataParams, $customDataVerify) = $this->_addCustomData($customGroupTitle, $id1, $id2);
 
     $headers = array(
@@ -155,7 +155,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _addCustomData($customGroupTitle, $id1, $id2) {
+  public function _addCustomData($customGroupTitle, $id1, $id2) {
 
     $this->openCiviPage("admin/custom/group", "reset=1");
 
@@ -189,7 +189,7 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     // enter years prior to current date
     $this->type('start_date_years', 3);
 
-    // enter years upto the end year
+    // enter years up to the end year
     $this->type('end_date_years', 3);
 
     // select the date and time format
@@ -211,8 +211,8 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Custom field '{$dateFieldLabel}' has been saved.");
 
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$dateFieldLabel']");
-    $dateFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$dateFieldLabel']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($dateFieldLabel), 'Missing text: ' . $dateFieldLabel);
+    $dateFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$dateFieldLabel']/../../td[8]/span/a@href"));
     $dateFieldId = $dateFieldId[1];
 
     // create another custom field - Integer Radio
@@ -252,8 +252,8 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
     //Is custom field created
     $this->waitForText("crm-notification-container", "Custom field '$radioFieldLabel' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$radioFieldLabel']/parent::td/parent::tr/td[8]/span/a");
-    $radioFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$radioFieldLabel']/../../td[8]/span/a@href"));
+    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$radioFieldLabel']/parent::td/parent::tr/td[8]/span/a");
+    $radioFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$radioFieldLabel']/../../td[8]/span/a@href"));
     $radioFieldId = $radioFieldId[1];
 
     // create another custom field - multiselect
@@ -291,8 +291,8 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText("crm-notification-container", "Custom field '{$multiSelectLabel}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$multiSelectLabel']/parent::td/parent::tr/");
-    $multiSelectFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$multiSelectLabel']/parent::td/parent::tr/td[8]/span/a@href"));
+    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$multiSelectLabel']/parent::td/parent::tr/");
+    $multiSelectFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$multiSelectLabel']/parent::td/parent::tr/td[8]/span/a@href"));
     $multiSelectFieldId = $multiSelectFieldId[1];
 
     // create another custom field - contact reference
@@ -317,8 +317,8 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('newCustomField');
 
     $this->waitForText("crm-notification-container", "Custom field '{$contactReferenceLabel}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$contactReferenceLabel']/parent::td/parent::tr/");
-    $contactReferenceFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$contactReferenceLabel']/parent::td/parent::tr/td[8]/span/a@href"));
+    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$contactReferenceLabel']/parent::td/parent::tr/");
+    $contactReferenceFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$contactReferenceLabel']/parent::td/parent::tr/td[8]/span/a@href"));
     $contactReferenceFieldId = $contactReferenceFieldId[1];
 
     $customDataParams = array(
@@ -352,5 +352,5 @@ class WebTest_Import_CustomDataTest extends ImportCiviSeleniumTestCase {
 
     return array($customDataParams, $customDataVerify);
   }
-}
 
+}

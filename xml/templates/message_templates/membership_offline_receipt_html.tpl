@@ -146,7 +146,7 @@
        {if $dataArray}
         <tr>
          <td {$labelStyle}>
-          {ts}Amount Before Tax : {/ts}
+          {ts}Amount Before Tax:{/ts}
          </td>
          <td {$valueStyle}>
           {$formValues.total_amount-$totalTaxAmount|crmMoney}

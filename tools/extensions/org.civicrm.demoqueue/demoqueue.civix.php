@@ -4,6 +4,7 @@
 
 /**
  * (Delegated) Implementation of hook_civicrm_config
+ * @param $config
  */
 function _demoqueue_civix_civicrm_config(&$config) {
   $template =& CRM_Core_Smarty::singleton();

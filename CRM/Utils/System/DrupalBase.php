@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -44,10 +44,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @var bool
    */
   var $supports_UF_Logging = TRUE;
+
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     /**
      * deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
      * functions and leave the codebase oblivious to the type of CMS
@@ -59,14 +59,9 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param string dir base civicrm directory
-   * Return default Site Settings
-   * @return array array
-   * - $url, (Joomla - non admin url)
-   * - $siteName,
-   * - $siteRoot
+   * @inheritDoc
    */
-  function getDefaultSiteSettings($dir){
+  public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
     $siteName = $siteRoot = NULL;
     $matches = array();
@@ -89,14 +84,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if a resource url is within the drupal directory and format appropriately
+   * Check if a resource url is within the drupal directory and format appropriately.
    *
-   * @param url (reference)
+   * @param $url (reference)
    *
-   * @return bool: TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more
-   * efficiently if it is known to be in the drupal site
+   * @return bool
+   *   TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more
+   *   efficiently if it is known to be in the drupal site
    */
-  function formatResourceUrl(&$url) {
+  public function formatResourceUrl(&$url) {
     $internal = FALSE;
     $base = CRM_Core_Config::singleton()->resourceBase;
     global $base_url;
@@ -127,13 +123,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @todo - this only provides a limited amount of flexiblity - it still expects a 'civicrm' folder with a 'drupal' folder
    * and is only flexible as to the name of the civicrm folder.
    *
-   * @param string $url potential resource url based on standard folder assumptions
-   * @return string $url with civicrm-core directory appended if not standard civi dir
+   * @param string $url
+   *   Potential resource url based on standard folder assumptions.
+   * @return string
+   *   with civicrm-core directory appended if not standard civi dir
    */
-  function appendCoreDirectoryToResourceBase($url) {
+  public function appendCoreDirectoryToResourceBase($url) {
     global $civicrm_root;
     $lastDirectory = basename($civicrm_root);
-    if($lastDirectory != 'civicrm') {
+    if ($lastDirectory != 'civicrm') {
       return $url .= $lastDirectory . '/';
     }
     return $url;
@@ -142,23 +140,16 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
    *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
-   * @param $forceBackend boolean  a gross joomla hack
-   *
-   * @return string an HTML string containing a link to the given path.
-   * @access public
-   *
+   * @inheritDoc
    */
-  function url($path = NULL, $query = NULL, $absolute = FALSE,
-    $fragment = NULL, $htmlize = TRUE,
-    $frontend = FALSE, $forceBackend = FALSE
+  public function url(
+    $path = NULL,
+    $query = NULL,
+    $absolute = FALSE,
+    $fragment = NULL,
+    $htmlize = TRUE,
+    $frontend = FALSE,
+    $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
     $script = 'index.php';
@@ -216,103 +207,97 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * Get User ID from UserFramework system (Drupal)
-   * @param object $user object as described by the CMS
-   * @return mixed <NULL, number>
+   * @inheritDoc
    */
-  function getUserIDFromUserObject($user) {
+  public function getUserIDFromUserObject($user) {
     return !empty($user->uid) ? $user->uid : NULL;
   }
 
   /**
-   * Get Unique Identifier from UserFramework system (CMS)
-   * @param object $user object as described by the User Framework
-   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
-   *
+   * @inheritDoc
    */
-  function getUniqueIdentifierFromUserObject($user) {
+  public function setMessage($message) {
+    drupal_set_message($message);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->mail) ? NULL : $user->mail;
   }
 
   /**
-   * Get currently logged in user unique identifier - this tends to be the email address or user name.
-   *
-   * @return string $userID logged in user unique identifier
+   * @inheritDoc
    */
-  function getLoggedInUniqueIdentifier() {
+  public function getLoggedInUniqueIdentifier() {
     global $user;
     return $this->getUniqueIdentifierFromUserObject($user);
   }
 
   /**
-   * Action to take when access is not permitted
+   * @inheritDoc
    */
-  function permissionDenied() {
+  public function permissionDenied() {
     drupal_access_denied();
   }
 
   /**
-   * Get Url to view user record
-   * @param integer $contactID Contact ID
-   *
-   * @return string
+   * @inheritDoc
    */
-  function getUserRecordUrl($contactID) {
+  public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
-    if (CRM_Core_Session::singleton()->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account'))) {
+    if (CRM_Core_Session::singleton()
+        ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array(
+          'cms:administer users',
+          'cms:view user account',
+        ))
+    ) {
       return CRM_Utils_System::url('user/' . $uid);
     };
   }
 
   /**
-   * Is the current user permitted to add a user
-   * @return bool
+   * @inheritDoc
    */
-  function checkPermissionAddUser() {
-    if (CRM_Core_Permission::check('administer users')) {
-      return TRUE;
-    }
+  public function checkPermissionAddUser() {
+    return CRM_Core_Permission::check('administer users');
   }
 
-
   /**
-   * Log error to CMS
+   * @inheritDoc
    */
-  function logger($message) {
+  public function logger($message) {
     if (CRM_Core_Config::singleton()->userFrameworkLogging) {
-      watchdog('civicrm', $message, NULL, WATCHDOG_DEBUG);
+      watchdog('civicrm', '%message', array('%message' => $message), NULL, WATCHDOG_DEBUG);
     }
   }
 
   /**
-   * Flush css/js caches
+   * @inheritDoc
    */
-  function clearResourceCache() {
+  public function clearResourceCache() {
     _drupal_flush_css_js();
   }
 
   /**
-   * Append to coreResourcesList
+   * Append Drupal js to coreResourcesList.
    */
-  function appendCoreResources(&$list) {
+  public function appendCoreResources(&$list) {
     $list[] = 'js/crm.drupal.js';
   }
 
   /**
-   * Reset any system caches that may be required for proper CiviCRM
-   * integration.
+   * @inheritDoc
    */
-  function flush() {
+  public function flush() {
     drupal_flush_all_caches();
   }
 
   /**
-   * Get a list of all installed modules, including enabled and disabled ones
-   *
-   * @return array CRM_Core_Module
-   *
+   * @inheritDoc
    */
-  function getModules() {
+  public function getModules() {
     $result = array();
     $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     foreach ($q as $row) {
@@ -325,12 +310,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * Find any users/roles/security-principals with the given permission
    * and replace it with one or more permissions.
    *
-   * @param $oldPerm string
-   * @param $newPerms array, strings
+   * @param string $oldPerm
+   * @param array $newPerms
+   *   Array, strings.
    *
    * @return void
    */
-  function replacePermission($oldPerm, $newPerms) {
+  public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);
     if (!empty($roles)) {
       foreach (array_keys($roles) as $rid) {
@@ -339,15 +325,11 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
   }
+
   /**
-   * Format the url as per language Negotiation.
-   *
-   * @param string $url
-   *
-   * @return string $url, formatted url.
-   * @static
+   * @inheritDoc
    */
-  function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
+  public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
       return $url;
     }
@@ -389,11 +371,11 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
               //kinda hackish but not sure how to do it right
               //hope http_build_url() will help at some point.
               if (is_array($parseUrl) && !empty($parseUrl)) {
-                $urlParts           = explode('/', $url);
-                $hostKey            = array_search($parseUrl['host'], $urlParts);
-                $ufUrlParts         = parse_url(CIVICRM_UF_BASEURL);
+                $urlParts = explode('/', $url);
+                $hostKey = array_search($parseUrl['host'], $urlParts);
+                $ufUrlParts = parse_url(CIVICRM_UF_BASEURL);
                 $urlParts[$hostKey] = $ufUrlParts['host'];
-                $url                = implode('/', $urlParts);
+                $url = implode('/', $urlParts);
               }
             }
           }
@@ -404,29 +386,25 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * GET CMS Version
-   * @return string
+   * @inheritDoc
    */
-  function getVersion() {
+  public function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
 
   /**
+   * @inheritDoc
    */
-  function updateCategories() {
-    // copied this from profile.module. Seems a bit inefficient, but i dont know a better way
-    // CRM-3600
+  public function updateCategories() {
+    // copied this from profile.module. Seems a bit inefficient, but i don't know a better way
     cache_clear_all();
     menu_rebuild();
   }
 
   /**
-   * Get the locale set in the hosting CMS
-   *
-   * @return string  with the locale or null for none
-   *
+   * @inheritDoc
    */
-  function getUFLocale() {
+  public function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
     // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
     // sometimes for CLI based on order called, this might not be set and/or empty
@@ -450,32 +428,62 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
     return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
+
   /**
    * Perform any post login activities required by the UF -
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
    * calls hook_user op 'login' and generates a new session.
    *
-   * @param array params
+   * @param array $params
    *
    * FIXME: Document values accepted/required by $params
-   *
    */
-  function userLoginFinalize($params = array()){
+  public function userLoginFinalize($params = array()) {
     user_login_finalize($params);
   }
 
   /**
-   * Figure out the post url for the form
-   *
-   * @param mix $action the default action if one is pre-specified
-   *
-   * @return string the url to post the form
-   * @access public
+   * @inheritDoc
    */
-  function postURL($action) {
+  public function getLoginDestination(&$form) {
+    $args = NULL;
+
+    $id = $form->get('id');
+    if ($id) {
+      $args .= "&id=$id";
+    }
+    else {
+      $gid = $form->get('gid');
+      if ($gid) {
+        $args .= "&gid=$gid";
+      }
+      else {
+        // Setup Personal Campaign Page link uses pageId
+        $pageId = $form->get('pageId');
+        if ($pageId) {
+          $component = $form->get('component');
+          $args .= "&pageId=$pageId&component=$component&action=add";
+        }
+      }
+    }
+
+    $destination = NULL;
+    if ($args) {
+      // append destination so user is returned to form they came from after login
+      $destination = CRM_Utils_System::currentPath() . '?reset=1' . $args;
+    }
+    return $destination;
+  }
+
+  /**
+   * Fixme: Why are we overriding the parent function? Seems inconsistent.
+   * This version supplies slightly different params to $this->url (not absolute and html encoded) but why?
+   */
+  public function postURL($action) {
     if (!empty($action)) {
       return $action;
     }
     return $this->url($_GET['q']);
   }
+
 }

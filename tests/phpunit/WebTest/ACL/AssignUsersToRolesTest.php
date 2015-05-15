@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAssignUsersToRoles() {
+  public function testAssignUsersToRoles() {
 
     $this->webtestLogin();
 
@@ -52,6 +52,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
 
     $label = "TestAclRole" . substr(sha1(rand()), 0, 4);
     $this->type("label", $label);
+    $this->type("value", "Acl value" . $label);
     $this->click("_qf_Options_next-bottom");
 
     $this->waitForText('crm-notification-container', "The ACL Role '{$label}' has been saved.");
@@ -72,7 +73,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_ACL_next-bottom");
   }
 
-  function testACLforSmartGroups() {
+  public function testACLforSmartGroups() {
     $this->webtestLogin();
 
     //Create role
@@ -147,6 +148,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->openCiviPage("admin/options/acl_role", "action=add&reset=1", "_qf_Options_cancel-bottom");
     $label = "TestAclRole" . substr(sha1(rand()), 0, 4);
     $this->type("label", $label);
+    $this->type("value", "Acl value" . $label);
     $this->click("_qf_Options_next-bottom");
     $this->waitForText('crm-notification-container', "The ACL Role '{$label}' has been saved.");
 
@@ -174,7 +176,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Advanced_refresh");
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']");
     $this->assertElementNotContainsText("xpath=//form[@id='Advanced']/div[3]/div/div", "No matches found for");
-    $this->assertElementContainsText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[8]", 'United States');
+    $this->verifyText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[8]", 'United States');
   }
-}
 
+}

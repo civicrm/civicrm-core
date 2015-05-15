@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Description of AddRecurringActivityTest
@@ -32,13 +32,16 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
+/**
+ * Class WebTest_Activity_AddRecurringActivityTest
+ */
 class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testRecurringActivity() {
+  public function testRecurringActivity() {
     $this->webtestLogin();
 
     //Adding new contact
@@ -62,9 +65,8 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
 
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->clickAt("xpath=//div[@class='select2-result-label']");
-    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']","$contact1");
+    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", "$contact1");
     $this->assertElementContainsText("xpath=//div[@id='s2id_target_contact_id']", "Karan, $contact1", 'Contact not found in line ' . __LINE__);
-
 
     //Assigned To field
     $this->click("xpath=//div[@id='s2id_assignee_contact_id']/ul/li/input");
@@ -79,19 +81,23 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$contact2");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$contact2");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Jane, $contact2", 'Contact not found in line ' . __LINE__);
 
-    $subject = "Test activity recursion";
+    if ($this->isTextPresent("A copy of this activity will be emailed to each Assignee.")) {
+      $isAssigneeNotificationEnabled = TRUE;
+    }
+
+    $subject = "Test activity recursion " . substr(sha1(rand()), 0, 7);
     $this->type("subject", $subject);
     $this->type("duration", "30");
 
     //Lets configure recursion for activity
     $this->click("css=.crm-activity-form-block-recurring_activity div.crm-accordion-header");
     $this->click('repetition_frequency_unit');
-    $this->select('repetition_frequency_unit', 'label=monthly');
+    $this->select('repetition_frequency_unit', 'label=month');
     $this->click('repetition_frequency_interval');
     $this->select('repetition_frequency_interval', 'label=1');
     $this->click('CIVICRM_QFID_1_repeats_by');
@@ -105,33 +111,37 @@ class WebTest_Activity_AddRecurringActivityTest extends CiviSeleniumTestCase {
     }
     $this->type('start_action_offset', $occurrences);
     $this->click('_qf_Activity_upload-bottom');
-    $this->waitForTextPresent('Based on your repeat configuration, here is the list of dates. Do you wish to create a recurring set with these dates?');
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Ok']");
+    $this->waitForTextPresent('A repeating set will be created with the following dates.');
+
+    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Continue']");
     $this->waitForPageToLoad();
 
     //Lets go to search screen and see if the records new activities are created()
     $this->openCiviPage("activity/search", "?reset=1", '_qf_Search_refresh');
-    $search_subject = 'Test activity recursion';
-    $this->type('activity_subject', $search_subject);
+    $this->type('activity_subject', $subject);
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad();
 
     //Minus tr having th and parent activity
     $countOfActivities = $this->getXpathCount("//div[@class='crm-search-results']/table/tbody/tr");
     $countOfActivities = $countOfActivities - 2;
+
+    if (!empty($isAssigneeNotificationEnabled)) {
+      $countOfActivities--;
+    }
+
     $this->assertEquals($occurrences, $countOfActivities);
-    $this->assertTrue($this->isTextPresent("Recurring Activity - (Child)"));
-    $this->assertTrue($this->isTextPresent("Recurring Activity - (Parent)"));
+    $this->assertTrue($this->isTextPresent("Repeating"));
 
     //Cascade changes
     $this->click("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td/span/a[text()='Edit']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");
-    $this->type('subject', 'Test activity recursion modified');
+    $this->type('subject', "{$subject} modified");
     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Save']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button/span[text()='Cancel']");
-    $this->click("xpath=//div[@id='recurring-dialog']/div[@class='show-block']/div[@class='recurring-dialog-inner-wrapper']/div[@class='recurring-dialog-inner-left']/button[text()='This and Following entities']");
+    $this->click("xpath=//input[@id='recur-this-and-all-following-entity']");
     $this->waitForAjaxContent();
-    $this->type('activity_subject', 'Test activity recursion modified');
+    $this->type('activity_subject', "{$subject} modified");
     $this->click('_qf_Search_refresh');
     $this->waitForPageToLoad();
     $countOfActivities = $this->getXpathCount("xpath=//div[@class='crm-search-results']/table/tbody/tr");

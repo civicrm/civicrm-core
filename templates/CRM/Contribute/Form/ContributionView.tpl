@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
         {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
       {/if}
       <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span>
-          <div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
+          <div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
       </a>
     {/if}
     {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute')}
@@ -48,14 +48,16 @@
     {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
     {if $invoicing && $cancelledStatus}
-      <div class="crm-printButton">
+      <div class="css_right">
         <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+          <div class="icon ui-icon-print"></div>
         {if $contribution_status != 'Refunded'}
           {ts}Print Invoice{/ts}</a>
         {else}
           {ts}Print Invoice and Credit Note{/ts}</a>
         {/if}
         <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
+          <div class="icon ui-icon-mail-closed"></div>
           {ts}Email Invoice{/ts}</a>
       </div>
     {/if}
@@ -148,7 +150,7 @@
   {/if}
   <tr>
     <td class="label">{ts}Paid By{/ts}</td>
-    <td>{$payment_instrument}</td>
+    <td>{$payment_instrument}{if $payment_processor_name} ({$payment_processor_name}){/if}</td>
   </tr>
 
   {if $payment_instrument eq 'Check'|ts}
@@ -313,7 +315,7 @@
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
     {/if}
     <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span><div
-          class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+          class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span></a>
   {/if}
   {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute')}
     {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}
@@ -324,17 +326,5 @@
           class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
-  {if $invoicing && $cancelledStatus}
-    <div class="crm-printButton">
-      <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
-      {if $contribution_status != 'Refunded'}
-        {ts}Print Invoice{/ts}</a>
-      {else}
-        {ts}Print Invoice and Credit Note{/ts}</a>
-      {/if}
-      <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
-        {ts}Email Invoice{/ts}</a>
-    </div>
-  {/if}
 </div>
 </div>

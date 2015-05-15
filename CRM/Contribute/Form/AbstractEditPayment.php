@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
  * This class generates form components for processing a contribution
+ * CRM-16229 - During the event registration bulk action via search we
+ * need to inherit CRM_Contact_Form_Task so that we can inherit functions
+ * like getContactIds and make use of controller state. But this is not possible
+ * because CRM_Event_Form_Participant inherits this class.
+ * Ideal situation would be something like
+ * CRM_Event_Form_Participant extends CRM_Contact_Form_Task,
+ * CRM_Contribute_Form_AbstractEditPayment
+ * However this is not possible. Currently PHP does not support multiple
+ * inheritance. So work around solution is to extend this class with
+ * CRM_Contact_Form_Task which further extends CRM_Core_Form.
  *
  */
-class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
+class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_mode;
 
   public $_action;
@@ -66,19 +74,25 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * @var array
    */
   protected $_paymentProcessors = array();
+
   /**
-   * The id of the contribution that we are processing
+   * Instance of the payment processor object.
+   *
+   * @var CRM_Core_Payment
+   */
+  protected $_paymentObject;
+
+  /**
+   * The id of the contribution that we are processing.
    *
    * @var int
-   * @public
    */
   public $_id;
 
   /**
-   * The id of the premium that we are proceessing
+   * The id of the premium that we are proceessing.
    *
    * @var int
-   * @public
    */
   public $_premiumID = NULL;
 
@@ -91,7 +105,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * The id of the note
    *
    * @var int
-   * @public
    */
   public $_noteID;
 
@@ -99,7 +112,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * The id of the contact associated with this contribution
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
@@ -107,7 +119,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * The id of the pledge payment that we are processing
    *
    * @var int
-   * @public
    */
   public $_ppID;
 
@@ -115,7 +126,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * The id of the pledge that we are processing
    *
    * @var int
-   * @public
    */
   public $_pledgeID;
 
@@ -124,7 +134,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * financial transaction
    *
    * @var boolean
-   * @public
    */
   public $_online = FALSE;
 
@@ -132,7 +141,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * Stores all product option
    *
    * @var array
-   * @public
    */
   public $_options;
 
@@ -140,7 +148,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * Stores the honor id
    *
    * @var int
-   * @public
    */
   public $_honorID = NULL;
 
@@ -167,7 +174,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
 
   public $_compId;
 
-  /*
+  /**
    * Store the line items if price set used.
    */
   public $_lineItems;
@@ -196,6 +203,16 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * @var array
    */
   public $billingFieldSets = array();
+
+  /**
+   * Pre process function with common actions.
+   */
+  public function preProcess() {
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->assign('contactID', $this->_contactID);
+
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
+  }
 
   /**
    * @param int $id
@@ -247,7 +264,8 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   }
 
   /**
-   * @param string $type eg 'Contribution'
+   * @param string $type
+   *   Eg 'Contribution'.
    * @param string $subType
    * @param int $entityId
    */
@@ -265,7 +283,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * @param int $id
    * @todo - this function is a long way, non standard of saying $dao = new CRM_Contribute_DAO_ContributionProduct(); $dao->id = $id; $dao->find();
    */
-  public function assignPremiumProduct($id) { //to get Premium id
+  public function assignPremiumProduct($id) {
     $sql = "
 SELECT *
 FROM   civicrm_contribution_product
@@ -284,13 +302,13 @@ WHERE  contribution_id = {$id}
   /**
    * This function process contribution related objects.
    *
-   * @param integer $contributionId
-   * @param integer $statusId
-   * @param integer|null $previousStatusId
+   * @param int $contributionId
+   * @param int $statusId
+   * @param int|null $previousStatusId
    *
    * @return null|string
    */
-  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL) {
+  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {
     $statusMsg = NULL;
     if (!$contributionId || !$statusId) {
       return $statusMsg;
@@ -300,6 +318,7 @@ WHERE  contribution_id = {$id}
       'contribution_id' => $contributionId,
       'contribution_status_id' => $statusId,
       'previous_contribution_status_id' => $previousStatusId,
+      'receive_date' => $receiveDate,
     );
 
     $updateResult = CRM_Contribute_BAO_Contribution::transitionComponents($params);
@@ -337,11 +356,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
           $endDate = CRM_Utils_Array::value('membership_end_date', $updateResult);
           if ($endDate) {
             $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
-              array(
-                1 => $userDisplayName,
-                2 => $endDate
-              )
-            );
+                array(
+                  1 => $userDisplayName,
+                  2 => $endDate,
+                )
+              );
           }
         }
       }
@@ -378,14 +397,15 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @return array of valid processors. The array resembles the DB table but also has 'object' as a key
+   * @return array
+   *   Array of valid processors. The array resembles the DB table but also has 'object' as a key
    * @throws Exception
    */
   public function getValidProcessors() {
     $defaultID = NULL;
     $capabilities = array('BackOffice');
-    if ($this->_mode == 'live') {
-      $capabilities[] = 'LiveMode';
+    if ($this->_mode) {
+      $capabilities[] = (ucfirst($this->_mode) . 'Mode');
     }
     $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors($capabilities);
     return $processors;
@@ -393,7 +413,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * Assign billing type id to bltID
+   * Assign billing type id to bltID.
    *
    * @throws CRM_Core_Exception
    * @return void
@@ -416,7 +436,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     //only valid processors get display to user
 
     if ($this->_mode) {
-      $this->assign(CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')), TRUE);
+      $this->assign('processorSupportsFutureStartDate', CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('supportsFutureRecurStartDate')));
       $this->_paymentProcessors = $this->getValidProcessors();
       if (!isset($this->_paymentProcessor['id'])) {
         // if the payment processor isn't set yet (as indicated by the presence of an id,) we'll grab the first one which should be the default
@@ -425,13 +445,17 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       if (empty($this->_paymentProcessors)) {
         throw new CRM_Core_Exception(ts('You will need to configure the %1 settings for your Payment Processor before you can submit a credit card transactions.', array(1 => $this->_mode)));
       }
-      $this->_processors  = array();
+      $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
         $this->_processors[$id] = ts($processor['name']);
+        if (!empty($processor['description'])) {
+          $this->_processors[$id] .= ' : ' . ts($processor['description']);
+        }
       }
       //get the valid recurring processors.
-      $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
-      $this->_recurPaymentProcessors = array_intersect_assoc($this->_processors, $recurring);
+      $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
+      $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
+      $this->_recurPaymentProcessors = array_intersect_key($this->_processors, $recurring);
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
@@ -443,11 +467,13 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
+   * Get current currency from DB or use default currency.
+   *
    * @param $submittedValues
    *
    * @return mixed
    */
-  public function getCurrency($submittedValues) { // get current currency from DB or use default currency
+  public function getCurrency($submittedValues) {
     $config = CRM_Core_Config::singleton();
 
     $currentCurrency = CRM_Utils_Array::value('currency',
@@ -558,7 +584,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
             CRM_Core_Session::setStatus(ts('This contact has a pending or overdue pledge payment of %2 which is scheduled for %3. <a href="%1">Click here to enter a pledge payment</a>.', array(
               1 => $ppUrl,
               2 => $ppAmountDue,
-              3 => $ppSchedDate
+              3 => $ppSchedDate,
             )), ts('Notice'), 'alert');
           }
         }
@@ -622,4 +648,5 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       CRM_Core_Error::fatal($e->getMessage());
     }
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testMemberAdd() {
+  public function testMemberAdd() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -46,8 +46,8 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     // Add new individual using Quick Add block on the main page
     $firstName1 = "John_" . substr(sha1(rand()), 0, 7);
-    $lastName   = "Smith_" . substr(sha1(rand()), 0, 7);
-    $Name1      = $lastName . ', ' . $firstName1;
+    $lastName = "Smith_" . substr(sha1(rand()), 0, 7);
+    $Name1 = $lastName . ', ' . $firstName1;
     $this->webtestAddContact($firstName1, $lastName, "$firstName1.$lastName@example.com");
 
     // Add membership for this individual
@@ -152,7 +152,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   /**
    * @param array $memTypeParams
    */
-  function _addMembership($memTypeParams) {
+  public function _addMembership($memTypeParams) {
     // click through to the membership view screen
     $this->click("css=li#tab_member a");
     $this->waitForElementPresent("link=Add Membership");
@@ -189,7 +189,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
    * @param $profileTitle
    * @param array $customDataParams
    */
-  function _addProfile($profileTitle, $customDataParams) {
+  public function _addProfile($profileTitle, $customDataParams) {
 
     $this->openCiviPage("admin/uf/group", "reset=1");
 
@@ -203,7 +203,11 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
     $gid = $this->urlArg('gid');
 
-    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid,
+      ), 'field_name[0]');
 
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$customDataParams[0]} :: {$customDataParams[1]}");
@@ -227,7 +231,7 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _addCustomData() {
+  public function _addCustomData() {
     $customGroupTitle = 'Custom_' . substr(sha1(rand()), 0, 4);
 
     $this->openCiviPage('admin/custom/group', 'reset=1');
@@ -270,4 +274,5 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
 
     return array($textFieldLabel, $customGroupTitle);
   }
+
 }

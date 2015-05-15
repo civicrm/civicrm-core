@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -24,12 +24,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,17 +41,16 @@
 class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
   /**
-   * Scheduled Reminder ID
+   * Scheduled Reminder ID.
    */
   protected $_id = NULL;
 
   public $_freqUnits;
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -68,8 +67,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       return;
     }
     elseif ($this->_action & (CRM_Core_Action::UPDATE)) {
-      $this->_mappingID =
-        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'mapping_id');
+      $this->_mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'mapping_id');
       if ($this->_context == 'event') {
         $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
       }
@@ -89,12 +87,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
 
-      if (!empty($_POST) && !empty($_POST['entity']) && empty($this->_context)) {
-        $mappingID = $_POST['entity'][0];
-      }
-      elseif ($this->_mappingID) {
-        $mappingID = $this->_mappingID;
-      }
+    if (!empty($_POST) && !empty($_POST['entity']) && empty($this->_context)) {
+      $mappingID = $_POST['entity'][0];
+    }
+    elseif ($this->_mappingID) {
+      $mappingID = $this->_mappingID;
+    }
 
     $this->add(
       'text',
@@ -114,15 +112,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         CRM_Core_Error::fatal('Could not find mapping for scheduled reminders.');
       }
 
-      $sel = & $this->add(
+      $sel = &$this->add(
         'hierselect',
-          'entity',
-          ts('Entity'),
-          array(
-            'name' => 'entity[0]',
-            'style' => 'vertical-align: top;',
-          ),
-        TRUE
+        'entity',
+        ts('Entity'),
+        array(
+          'name' => 'entity[0]',
+          'style' => 'vertical-align: top;',
+        )
       );
       $sel->setOptions(array($sel1, $sel2, $sel3));
 
@@ -147,7 +144,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     //get the frequency units.
-    $this->_freqUnits = CRM_Core_SelectValues::getScheduleReminderFrequencyUnits();
+    $this->_freqUnits = CRM_Core_SelectValues::getRecurringFrequencyUnits();
 
     //pass the mapping ID in UPDATE mode
     $mappings = CRM_Core_BAO_ActionSchedule::getMapping($mappingID);
@@ -183,7 +180,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //reminder_frequency
     $this->add('select', 'start_action_unit', ts('Frequency'), $freqUnitsDisplay, TRUE);
 
-    $condition = array('before' => ts('before'),
+    $condition = array(
+      'before' => ts('before'),
       'after' => ts('after'),
     );
     //reminder_action
@@ -261,16 +259,17 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $this->setPageTitle(ts('Scheduled Reminder'));
   }
+
   /**
-   * Global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
+   * @param array $fields
+   *   The input form values.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] === 0) ||
       (array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] == 0)
@@ -287,7 +286,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
 
-    if (!empty($fields['is_active']) && $fields['mode'] != 'SMS' &&
+    if (!empty($fields['is_active']) &&
+      CRM_Utils_Array::value('mode', $fields) == 'SMS' &&
       CRM_Utils_System::isNull($fields['subject'])
     ) {
       $errors['subject'] = ts('Subject is a required field.');
@@ -306,14 +306,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $recipientKind = array(
       'participant_role' => array(
         'name' => 'participant role',
-        'target_id' => 'recipient_listing'
+        'target_id' => 'recipient_listing',
       ),
       'manual' => array(
         'name' => 'recipient',
-        'target_id' => 'recipient_manual_id'
-      )
+        'target_id' => 'recipient_manual_id',
+      ),
     );
-    if (!empty($fields['limit_to']) && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
+    if ($fields['limit_to'] != '' && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
       $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', array(1 => $recipientKind[$fields['recipient']]['name']));
     }
 
@@ -327,7 +327,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * @return int
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['is_active'] = 1;
       $defaults['mode'] = 'Email';
@@ -373,9 +373,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -465,7 +464,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     if (!empty($this->_mappingID) && !empty($this->_compId)) {
-      $params['mapping_id']   = $this->_mappingID;
+      $params['mapping_id'] = $this->_mappingID;
       $params['entity_value'] = $this->_compId;
       $params['entity_status'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $values['entity']);
     }
@@ -513,8 +512,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //TODO: handle postprocessing of SMS and/or Email info based on $modePrefixes
 
     $composeFields = array(
-      'template', 'saveTemplate',
-      'updateTemplate', 'saveTemplateName',
+      'template',
+      'saveTemplate',
+      'updateTemplate',
+      'saveTemplateName',
     );
     $msgTemplate = NULL;
     //mail template is composed
@@ -534,7 +535,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
           $templateParams += array(
             'msg_text' => $params['sms_body_text'],
             'is_sms' => TRUE,
-        );
+          );
         }
         else {
           $templateParams += array(
@@ -598,7 +599,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     if ($this->_action) {
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $status = ts("Your Reminder titled %1 has been updated.",
-                  array(1 => "<strong>{$values['title']}</strong>")
+          array(1 => "<strong>{$values['title']}</strong>")
         );
       }
 
@@ -610,4 +611,5 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
+
 }

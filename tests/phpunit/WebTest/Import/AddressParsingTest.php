@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -36,9 +36,9 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Check for Valid Street Address
+   * Check for Valid Street Address.
    */
-  function testValidStreetAddressParsing() {
+  public function testValidStreetAddressParsing() {
     $this->webtestLogin();
 
     //Go to the URL of Address Setting to enable street address parsing option
@@ -91,9 +91,9 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Check for Invalid Street Address
+   * Check for Invalid Street Address.
    */
-  function testInvalidStreetAddressParsing() {
+  public function testInvalidStreetAddressParsing() {
     $this->webtestLogin();
 
     //Go to the URL of Address Setting to enable street address parsing option
@@ -147,9 +147,9 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Check Street Address when Address Parsing is Disabled
+   * Check Street Address when Address Parsing is Disabled.
    */
-  function testStreetAddress() {
+  public function testStreetAddress() {
     $this->webtestLogin();
 
     //Go to the URL of Address Setting to enable street address parsing option
@@ -187,7 +187,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _validStreetAddressCSVData() {
+  public function _validStreetAddressCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -203,7 +203,8 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => 'A' . substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => 'A' . substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => substr(sha1(rand()), 0, 7) . 'and',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -215,7 +216,8 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
         'state' => 'NY',
         'country' => 'United States',
       ),
-      array('first_name' => 'S' . substr(sha1(rand()), 0, 7),
+      array(
+        'first_name' => 'S' . substr(sha1(rand()), 0, 7),
         'middle_name' => substr(sha1(rand()), 0, 7),
         'last_name' => substr(sha1(rand()), 0, 7) . 'sum',
         'email' => substr(sha1(rand()), 0, 7) . '@example.com',
@@ -237,7 +239,7 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _invalidStreetAddressCSVData() {
+  public function _invalidStreetAddressCSVData() {
     $headers = array(
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
@@ -283,5 +285,5 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
-}
 
+}

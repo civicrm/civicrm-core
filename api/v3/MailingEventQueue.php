@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,53 +23,66 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 /**
  *
  * APIv3 functions for registering/processing mailing group events.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_MailerGroup
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
  */
+
 /**
- * Handle a confirm event
+ * Handle a queue event.
  *
- * @param array $params Associative array of property
- *                       name/value pairs to insert in new 'survey'
+ * @param array $params
+ *   Array of property.
  *
  * @throws Exception
- * @return array api result array
- * {@getfields mailing_event_confirm_create}
- * @access public
+ * @return array
+ *   api result array
  */
 function civicrm_api3_mailing_event_queue_create($params) {
   if (!array_key_exists('id', $params) && !array_key_exists('email_id', $params) && !array_key_exists('phone_id', $params)) {
-    throw new API_Exception("Mandatory key missing from params array: id, email_id, or phone_id field is required" );
+    throw new API_Exception("Mandatory key missing from params array: id, email_id, or phone_id field is required");
   }
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',
-    array('job_id','contact_id'),
+    array('job_id', 'contact_id'),
     FALSE
   );
   return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params);
 }
 
+/**
+ * Get mailing event queue record.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
 function civicrm_api3_mailing_event_queue_get($params) {
   return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_Queue', $params);
 }
 
+/**
+ * Delete mailing event queue record.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ */
 function civicrm_api3_mailing_event_queue_delete($params) {
   return _civicrm_api3_basic_delete('CRM_Mailing_Event_BAO_Queue', $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_queue_create_spec(&$params) {
   $params['job_id']['api.required'] = 1;

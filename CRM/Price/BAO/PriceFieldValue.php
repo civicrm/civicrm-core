@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -42,15 +42,14 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Insert/update a new entry in the database.
    *
-   * @param array $params (reference), array $ids
+   * @param array $params
+   *   (reference), array $ids.
    *
    * @param $ids
    *
-   * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
-   * @static
+   * @return CRM_Price_DAO_PriceFieldValue
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
 
     $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
@@ -71,25 +70,26 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Creates a new entry in the database.
    *
-   * @param array $params (reference), array $ids
+   * @param array $params
+   *   (reference), array $ids.
    *
    * @param $ids
    *
-   * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
-   * @static
+   * @return CRM_Price_DAO_PriceFieldValue
    */
-  static function create(&$params, $ids = array()) {
+  public static function create(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     if (!is_array($params) || empty($params)) {
-      return;
+      return NULL;
     }
-    if(!$id && empty($params['name'])) {
+    if (!$id && empty($params['name'])) {
       $params['name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 242));
     }
 
-    if ($id  && !empty($params['weight'])) {
-      if (isset($params['name']))unset($params['name']);
+    if ($id && !empty($params['weight'])) {
+      if (isset($params['name'])) {
+        unset($params['name']);
+      }
 
       $oldWeight = NULL;
       if ($id) {
@@ -111,10 +111,10 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   }
 
   /**
-   * Get defaults for new entity
+   * Get defaults for new entity.
    * @return array
    */
-  static function getDefaults() {
+  public static function getDefaults() {
     return array(
       'is_active' => 1,
       'weight' => 1,
@@ -123,34 +123,36 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects.
+   * Retrieve DB object based on input parameters.
    *
-   * @param array $params   (reference ) an assoc array
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * It also stores all the retrieved values in the default array.
    *
-   * @return CRM_Price_DAO_PriceFieldValue object
-   * @access public
-   * @static
+   * @param array $params
+   *   (reference ) an assoc array.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
+   *
+   * @return CRM_Price_DAO_PriceFieldValue
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Price_DAO_PriceFieldValue', $params, $defaults);
   }
 
   /**
-   * Retrive the all values for given field id
+   * Retrive the all values for given field id.
    *
-   * @param int $fieldId price_field_id
-   * @param array $values (reference ) to hold the values
-   * @param string $orderBy for order by, default weight
+   * @param int $fieldId
+   *   Price_field_id.
+   * @param array $values
+   *   (reference ) to hold the values.
+   * @param string $orderBy
+   *   For order by, default weight.
    * @param bool|int $isActive is_active, default false
    *
-   * @return array $values
+   * @return array
    *
-   * @access public
-   * @static
    */
-  static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
+  public static function getValues($fieldId, &$values, $orderBy = 'weight', $isActive = FALSE) {
     $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
     $fieldValueDAO->price_field_id = $fieldId;
     $fieldValueDAO->orderBy($orderBy, 'label');
@@ -169,12 +171,11 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Get the price field option label.
    *
-   * @param int $id id of field option.
+   * @param int $id
+   *   Id of field option.
    *
-   * @return string name
-   *
-   * @access public
-   * @static
+   * @return string
+   *   name
    *
    */
   public static function getOptionLabel($id) {
@@ -182,30 +183,30 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   }
 
   /**
-   * Update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id         Id of the database record
-   * @param boolean  $is_active  Value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return   Object            DAO object on sucess, null otherwise
+   * @return Object
+   *   DAO object on success, null otherwise
    *
-   * @access public
-   * @static
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'is_active', $is_active);
   }
 
   /**
-   * Delete all values of the given field id
+   * Delete all values of the given field id.
    *
-   * @param  int    $fieldId    Price field id
+   * @param int $fieldId
+   *   Price field id.
    *
    *
-   * @access public
-   * @static
    */
-  static function deleteValues($fieldId) {
+  public static function deleteValues($fieldId) {
     if (!$fieldId) {
       return;
     }
@@ -218,14 +219,13 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   /**
    * Delete the value.
    *
-   * @param   int   $id  Id
+   * @param int $id
+   *   Id.
    *
-   * @return  boolean
+   * @return bool
    *
-   * @access public
-   * @static
    */
-  static function del($id) {
+  public static function del($id) {
     if (!$id) {
       return FALSE;
     }
@@ -239,14 +239,15 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * Update civicrm_price_field_value.financial_type_id
    * when financial_type_id of contribution_page or event is changed
    *
-   * @param   int $entityId Id
-   * @param   String $entityTable entity table
-   * @param   String $financialTypeID financial type id
+   * @param int $entityId
+   *   Id.
+   * @param string $entityTable table.
+   *   Entity table.
+   * @param string $financialTypeID type id.
+   *   Financial type id.
    *
-   * @access public
-   * @static
    */
-  static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
+  public static function updateFinancialType($entityId, $entityTable, $financialTypeID) {
     if (!$entityId || !$entityTable || !$financialTypeID) {
       return;
     }
@@ -276,5 +277,5 @@ WHERE cpse.id IS NOT NULL {$where}";
 
     CRM_Core_DAO::executeQuery($sql, $params);
   }
-}
 
+}

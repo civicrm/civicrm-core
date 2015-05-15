@@ -4,6 +4,7 @@ require_once 'multisite.civix.php';
 
 /**
  * Implementation of hook_civicrm_config
+ * @param $config
  */
 function multisite_civicrm_config(&$config) {
   _multisite_civix_civicrm_config($config);
@@ -64,6 +65,7 @@ function multisite_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  *
  * Generate a list of entities to create/deactivate/delete when this module
  * is installed, disabled, uninstalled.
+ * @param $entities
  */
 function multisite_civicrm_managed(&$entities) {
   return _multisite_civix_civicrm_managed($entities);
@@ -170,6 +172,7 @@ function multisite_civicrm_permissions(&$permissions){
 
 /**
  * Implementation of hook_civicrm_config
+ * @param null $metaDataFolders
  */
 function multisite_civicrm_alterSettingsFolders(&$metaDataFolders = NULL){
   _multisite_civix_civicrm_alterSettingsFolders($metaDataFolders);
@@ -253,7 +256,7 @@ function _multisite_get_domain_group($permission = 1) {
       */
       return NULL;
     }
-    // We will check for the possiblility of the acl_enabled setting being deliberately set to 0
+    // We will check for the possibility of the acl_enabled setting being deliberately set to 0
     if($permission){
      $aclsEnabled = civicrm_api('setting', 'getvalue', array(
       'version' => 3,

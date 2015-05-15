@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,17 +22,17 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Upgrade_Incremental_php_FourOne {
-  // This was changed in 4.3 so we define it locally for compatability with older dbs
+  // This was changed in 4.3 so we define it locally for compatibility with older dbs
   const NAVIGATION_NAME = "Navigation Menu";
 
   /**
@@ -41,7 +40,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviCase', $config->enableComponents)) {
       if (!CRM_Core_DAO::checkTriggerViewPermission(TRUE, FALSE)) {
@@ -54,14 +53,16 @@ class CRM_Upgrade_Incremental_php_FourOne {
   }
 
   /**
-   * Compute any messages which should be displayed after upgrade
+   * Compute any messages which should be displayed after upgrade.
    *
-   * @param $postUpgradeMessage string, alterable
-   * @param $rev string, an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs
+   * @param string $postUpgradeMessage
+   *   alterable.
+   * @param string $rev
+   *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    *
    * @return void
    */
-  function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.1.alpha1') {
       $postUpgradeMessage .= '<br />' .
         ts('WARNING! CiviCRM 4.1 introduces an improved way of handling cron jobs. However the new method is NOT backwards compatible. <strong>Please notify your system administrator that all CiviCRM related cron jobs will cease to work, and will need to be re-configured (this includes sending CiviMail mailings, updating membership statuses, etc.).</strong> Refer to the <a href="%1">online documentation</a> for detailed instructions.', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC41/Managing+Scheduled+Jobs'));
@@ -79,7 +80,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
   /**
    * @param $rev
    */
-  function upgrade_4_1_alpha1($rev) {
+  public function upgrade_4_1_alpha1($rev) {
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviCase', $config->enableComponents)) {
       if (!CRM_Case_BAO_Case::createCaseViews()) {
@@ -103,7 +104,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
 
-
     $this->transferPreferencesToSettings();
     $this->createNewSettings();
 
@@ -116,7 +116,7 @@ class CRM_Upgrade_Incremental_php_FourOne {
     CRM_Core_BAO_Navigation::resetNavigation();
   }
 
-  function transferPreferencesToSettings() {
+  public function transferPreferencesToSettings() {
     // first transfer system preferences
     $domainColumnNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
@@ -141,7 +141,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
         'mailing_backend',
       ),
     );
-
 
     $userColumnNames = array(
       self::NAVIGATION_NAME => array(
@@ -214,7 +213,7 @@ VALUES
     CRM_Core_DAO::executeQuery($sql);
   }
 
-  function createNewSettings() {
+  public function createNewSettings() {
     $domainColumns = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
         array('contact_ajax_check_similar', 1),
@@ -294,7 +293,7 @@ VALUES
   /**
    * @param array $params
    */
-  static function retrieveDirectoryAndURLPaths(&$params) {
+  public static function retrieveDirectoryAndURLPaths(&$params) {
 
     $sql = "
 SELECT v.name as valueName, v.value, g.name as optionName
@@ -322,7 +321,7 @@ AND    v.is_active = 1
   /**
    * @param $rev
    */
-  function upgrade_4_1_alpha2($rev) {
+  public function upgrade_4_1_alpha2($rev) {
     $dao = new CRM_Core_DAO_Setting();
     $dao->group_name = 'Directory Preferences';
     $dao->name = 'customTemplateDir';
@@ -335,14 +334,14 @@ AND    v.is_active = 1
     $dao->free();
 
     // Do the regular upgrade
-    $upgrade = new CRM_Upgrade_Form;
+    $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
   }
 
   /**
    * @param $rev
    */
-  function upgrade_4_1_beta1($rev) {
+  public function upgrade_4_1_beta1($rev) {
     //CRM-9311
     $groupNames = array('directory_preferences', 'url_preferences');
     foreach ($groupNames as $groupName) {
@@ -413,7 +412,7 @@ AND    v.is_active = 1
   /**
    * @param $rev
    */
-  function upgrade_4_1_1($rev) {
+  public function upgrade_4_1_1($rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->assign('addDedupeEmail', !(CRM_Core_DAO::checkFieldExists('civicrm_mailing', 'dedupe_email')));
 
@@ -426,8 +425,8 @@ AND    v.is_active = 1
   /**
    * @return string
    */
-  function getTemplateMessage() {
+  public function getTemplateMessage() {
     return "Blah";
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCheckDashboardElements() {
+  public function testCheckDashboardElements() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -64,7 +64,7 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up (span with delete token class indicates that it's present)...
-    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']","$contactFirstName1");
+    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", "$contactFirstName1");
 
     // Now we're doing the same for "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
@@ -80,7 +80,7 @@ class WebTest_Generic_CheckActivityTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$contactFirstName2");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$contactFirstName2");
   }
-}
 
+}

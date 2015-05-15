@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: Display.php 36505 2011-10-03 14:19:56Z lobo $
  *
  */
@@ -38,7 +38,7 @@
  *
  */
 class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviMail Component Settings'));
     $this->_varNames = array(
       CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME => array(
@@ -114,7 +114,7 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
     parent::preProcess();
   }
 
-  function postProcess() {
+  public function postProcess() {
     // check if mailing tab is enabled, if not prompt user to enable the tab if "write_activity_record" is disabled
     $params = $this->controller->exportValues($this->_name);
 
@@ -138,4 +138,5 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
 
     parent::postProcess();
   }
+
 }

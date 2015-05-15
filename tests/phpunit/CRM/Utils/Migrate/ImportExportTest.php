@@ -7,12 +7,12 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     $tablesToTruncate = array(
       'civicrm_custom_group',
       'civicrm_custom_field',
@@ -27,7 +27,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    * load the XML into a clean DB and see if it creates matching custom-group
    * and custom-field.
    */
-  function basicXmlTestCases() {
+  public function basicXmlTestCases() {
     // a small library which we use to describe test cases
     $fixtures = array();
     $fixtures['textField'] = array(
@@ -82,7 +82,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       __DIR__ . '/fixtures/Contact-text.xml',
     );
 
-    /*
+    /* @codingStandardsIgnoreStart
     $cases[] = array(
       // CustomGroup params
       array(
@@ -94,7 +94,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       // expectedXmlFilePath
       __DIR__ . '/fixtures/Contact-select.xml',
     );
-    */
+    @codingStandardsIgnoreEnd */
 
     $cases[] = array(
       // CustomGroup params
@@ -158,9 +158,9 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    * @param $expectedXmlFilePath
    * @dataProvider basicXmlTestCases
    */
-  function testBasicXMLExports($customGroupParams, $fieldParams, $expectedXmlFilePath) {
+  public function testBasicXMLExports($customGroupParams, $fieldParams, $expectedXmlFilePath) {
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE title = %1', array(
-      1 => array($customGroupParams['title'], 'String')
+      1 => array($customGroupParams['title'], 'String'),
     ));
     $customGroup = $this->customGroupCreate($customGroupParams);
     $fieldParams['custom_group_id'] = $customGroup['id'];
@@ -183,9 +183,9 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    * @throws CRM_Core_Exception
    * @dataProvider basicXmlTestCases
    */
-  function testBasicXMLImports($expectCustomGroup, $expectCustomField, $inputXmlFilePath) {
+  public function testBasicXMLImports($expectCustomGroup, $expectCustomField, $inputXmlFilePath) {
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE title = %1', array(
-      1 => array($expectCustomGroup['title'], 'String')
+      1 => array($expectCustomGroup['title'], 'String'),
     ));
 
     $importer = new CRM_Utils_Migrate_Import();
@@ -205,4 +205,5 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       $this->assertEquals($expectValue, $customField[$expectKey]);
     }
   }
+
 }

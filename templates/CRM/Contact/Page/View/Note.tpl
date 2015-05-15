@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@
             {/if}
           </table>
           <div class="crm-submit-buttons">
-            <a class="button cancel" href="{crmURL p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}">{ts}Done{/ts}</a>
+            {crmButton class="cancel" icon="close" p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}{ts}Done{/ts}{/crmButton}
           </div>
 
         {if $comments}
@@ -100,7 +100,7 @@
 
 {if $permission EQ 'edit' AND ($action eq 16)}
    <div class="action-link">
-   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><div class="icon add-icon"></div>{ts}Add Note{/ts}</span></a>
+   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Note{/ts}</span></a>
    </div>
    <div class="clear"></div>
 {/if}
@@ -202,36 +202,16 @@
 {* show browse table for any action *}
 <div id="notes">
     {strip}
-    {include file="CRM/common/jsortable.tpl"}
-
-    <script type="text/javascript">
-    {literal}
-      CRM.$(function($) {
-        var tabId = $('.dataTable').attr('id');
-
-        $('table#'+ tabId).dataTable().fnSettings().aoDrawCallback.push( {
-          "fn": function () {
-            $('#'+ tabId +' tr').each( function() {
-              drawCommentRows(this.id)
-            });
-          },
-          "sName": "user"
-        } );
-      });
-
-    {/literal}
-    </script>
-
-        <table id="options" class="display">
+        <table id="options" class="display crm-sortable" data-order='[[3,"desc"]]'>
         <thead>
         <tr>
-          <th></th>
+          <th data-orderable="false"></th>
           <th>{ts}Note{/ts}</th>
           <th>{ts}Subject{/ts}</th>
           <th>{ts}Date{/ts}</th>
           <th>{ts}Created By{/ts}</th>
-          <th>{ts}Attachment(s){/ts}</th>
-          <th></th>
+          <th data-orderable="false">{ts}Attachment(s){/ts}</th>
+          <th data-orderable="false"></th>
         </tr>
         </thead>
 
@@ -276,9 +256,8 @@
 </div>
 {elseif ($action eq 16)}
    <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
-        {capture assign=link}class="action-item medium-popup" accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}"{/capture}
-        {ts 1=$link}There are no Notes for this contact. You can <a %1>add one</a>.{/ts}
+      <div class="icon inform-icon"></div>
+      {ts}There are no Notes for this contact.{/ts}
    </div>
 {/if}
 </div>

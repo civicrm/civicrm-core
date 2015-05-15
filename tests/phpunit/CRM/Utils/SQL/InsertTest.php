@@ -1,15 +1,14 @@
 <?php
-  require_once 'CiviTest/CiviUnitTestCase.php';
+require_once 'CiviTest/CiviUnitTestCase.php';
 
-  /**
-   * Class CRM_Utils_SQL_SelectTest
-   */
+/**
+ * Class CRM_Utils_SQL_SelectTest
+ */
 class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
-  function testRow_twice() {
+  public function testRow_twice() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
-      ->row(array('first' => '1', 'second' => '2' ))
-      ->row(array('second' => '2b', 'first' => '1b'))
-      ;
+      ->row(array('first' => '1', 'second' => '2'))
+      ->row(array('second' => '2b', 'first' => '1b'));
     $expected = '
       INSERT INTO foo (`first`,`second`) VALUES
       ("1","2"),
@@ -18,15 +17,14 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $this->assertLike($expected, $insert->toSQL());
   }
 
-  function testRows() {
+  public function testRows() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
-      ->row(array('first' => '1', 'second' => '2' ))
+      ->row(array('first' => '1', 'second' => '2'))
       ->rows(array(
-      array('second' => '2b', 'first' => '1b'),
-      array('first' => '1c', 'second' => '2c')
+        array('second' => '2b', 'first' => '1b'),
+        array('first' => '1c', 'second' => '2c'),
       ))
-      ->row(array('second' => '2d', 'first' => '1d'))
-    ;
+      ->row(array('second' => '2d', 'first' => '1d'));
     $expected = '
       INSERT INTO foo (`first`,`second`) VALUES
       ("1","2"),
@@ -42,9 +40,10 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
    * @param $actual
    * @param string $message
    */
-  function assertLike($expected, $actual, $message = '') {
+  public function assertLike($expected, $actual, $message = '') {
     $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expected)));
     $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));
     $this->assertEquals($expected, $actual, $message);
   }
+
 }

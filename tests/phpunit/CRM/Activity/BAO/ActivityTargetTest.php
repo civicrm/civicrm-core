@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -31,15 +31,13 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for CRM_Activity_BAO_ActivityTarget BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -47,15 +45,14 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
 
   /**
    * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
    *
-   * @access protected
+   * This method is called after a test is executed.
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   public function testRetrieveTargetIdsByActivityIdZeroID() {
-    $activity = $this->activityCreate();
-
+    $this->activityCreate();
     $target = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId(0);
     $this->assertSame($target, array(), 'No targets returned');
   }
@@ -70,5 +67,5 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
     $this->assertEquals(count($targetIDs), 1, 'One target ID match for activity');
     $this->assertEquals($targetIDs[0], $activity['target_contact_id'], 'The returned target contacts ids match');
   }
-}
 
+}

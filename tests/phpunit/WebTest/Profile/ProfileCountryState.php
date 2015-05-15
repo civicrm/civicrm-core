@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStateCountry() {
+  public function testStateCountry() {
     $this->webtestLogin();
     $config = CRM_Core_Config::singleton();
     // Add new profile.
@@ -54,13 +54,16 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     $this->click('_qf_Group_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-
     //check for  profile create
     $this->waitForText('crm-notification-container', "Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
     $gid = $this->urlArg('gid');
 
     //Add Country field to profile
-    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid,
+      ), 'field_name[0]');
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
@@ -84,25 +87,25 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    if($gid) {
+    if ($gid) {
       $this->openCiviPage('admin/setting/localization', 'reset=1', '_qf_Localization_next-bottom');
       $country = array(1001 => 'Afghanistan', 1013 => 'Australia', 1039 => 'Canada', 1101 => 'India');
       $enabledCountries = $this->getSelectOptions("countryLimit-t");
       $enabledStates = $this->getSelectOptions("provinceLimit-t");
       $newCountry = array();
-      foreach($country as $countryID => $countryName) {
-        if(!in_array($countryName, $enabledCountries)) {
+      foreach ($country as $countryID => $countryName) {
+        if (!in_array($countryName, $enabledCountries)) {
           $newCountry[$countryID] = $countryName;
           $this->addSelection("countryLimit-f", "label=$countryName");
           $this->click("xpath=//select[@id='countryLimit-f']/option[@value='$countryID']");
           $this->click("xpath=//tr[@class='crm-localization-form-block-countryLimit']/td[2]/table//tbody/tr/td[2]/input[@name='add']");
         }
-        if(!in_array($countryName, $enabledStates)) {
+        if (!in_array($countryName, $enabledStates)) {
           $this->addSelection("provinceLimit-f", "label=$countryName");
           $this->click("//option[@value='$countryID']");
           $this->click("xpath=//tr[@class='crm-localization-form-block-provinceLimit']/td[2]/table//tbody/tr/td[2]/input[@name='add']");
         }
-        $added = true;
+        $added = TRUE;
       }
       if ($added) {
         $this->click("_qf_Localization_next-bottom");
@@ -130,16 +133,16 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
       $this->openCiviPage("admin/setting/localization", "reset=1", "_qf_Localization_next-bottom");
       $enabledCountries = $this->getSelectOptions("countryLimit-t");
       $enabledStates = $this->getSelectOptions("provinceLimit-t");
-      $removed = false;
-      foreach($newCountry as $countryID => $countryName) {
-          $this->addSelection("countryLimit-t", "label=$countryName");
-          $this->click("xpath=//select[@id='countryLimit-t']/option[@value='$countryID']");
-          $this->click("xpath=//tr[@class='crm-localization-form-block-countryLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
+      $removed = FALSE;
+      foreach ($newCountry as $countryID => $countryName) {
+        $this->addSelection("countryLimit-t", "label=$countryName");
+        $this->click("xpath=//select[@id='countryLimit-t']/option[@value='$countryID']");
+        $this->click("xpath=//tr[@class='crm-localization-form-block-countryLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
 
-          $this->addSelection("provinceLimit-t", "label=$countryName");
-          $this->click("//option[@value='$countryID']");
-          $this->click("xpath=//tr[@class='crm-localization-form-block-provinceLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
-          $removed = true;
+        $this->addSelection("provinceLimit-t", "label=$countryName");
+        $this->click("//option[@value='$countryID']");
+        $this->click("xpath=//tr[@class='crm-localization-form-block-provinceLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
+        $removed = TRUE;
       }
       if ($removed) {
         $this->click("_qf_Localization_next-bottom");
@@ -148,4 +151,5 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
       }
     }
   }
+
 }

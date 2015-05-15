@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-
-
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -37,8 +34,9 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_ContactTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_apiversion = 3;
     $params = array(
       'label' => 'sub_individual',
@@ -49,7 +47,6 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     );
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypeIndividual = $params['name'];
-    $this->_subTypeIndividualId = $result->id;
 
     $params = array(
       'label' => 'sub_organization',
@@ -60,7 +57,6 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     );
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypeOrganization = $params['name'];
-    $this->_subTypeOrganizationId = $result->id;
 
     $params = array(
       'label' => 'sub_household',
@@ -71,30 +67,13 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     );
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->subTypeHousehold = $params['name'];
-    $this->_subTypeHouseholdId = $result->id;
   }
 
   /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   */
-  function tearDown() {
-    $contactTypeIds = array(
-      $this->_subTypeIndividualId,
-      $this->_subTypeOrganizationId,
-      $this->_subTypeHouseholdId,
-    );
-    foreach ($contactTypeIds as $typeId) {
-      $this->contactTypeDelete($typeId);
-    }
-  }
-
-  /**
-   * Test add methods with valid data
+   * Test add methods with valid data.
    * success expected
    */
-  function testContactCreate() {
+  public function testContactCreate() {
 
     // check for Type:Individual Subtype:sub_individual
     $contactParams = array(
@@ -135,9 +114,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
 
   /**
-   * Test add with invalid data
+   * Test add with invalid data.
    */
-  function testContactAddInvalidData() {
+  public function testContactAddInvalidData() {
 
     // check for Type:Individual Subtype:sub_household
     $contactParams = array(
@@ -159,10 +138,10 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
 
   /**
-   * Test update with no subtype to valid subtype
+   * Test update with no subtype to valid subtype.
    * success expected
    */
-  function testContactUpdateNoSubtypeValid() {
+  public function testContactUpdateNoSubtypeValid() {
 
     // check for Type:Individual
     $contactParams = array(
@@ -225,9 +204,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
 
   /**
-   * Test update with no subtype to invalid subtype
+   * Test update with no subtype to invalid subtype.
    */
-  function testContactUpdateNoSubtypeInvalid() {
+  public function testContactUpdateNoSubtypeInvalid() {
 
     // check for Type:Individual
     $contactParams = array(
@@ -248,7 +227,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $updateContact = $this->callAPIFailure('contact', 'create', $updateParams);
     $params = array(
       'contact_id' => $contact['id'],
-     );
+    );
     $this->callAPISuccess('contact', 'delete', $params);
 
     // check for Type:Organization
@@ -272,10 +251,10 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test update with no subtype to valid subtype
+   * Test update with no subtype to valid subtype.
    * success expected
    */
-  function testContactUpdateSubtypeValid() {
+  public function testContactUpdateSubtypeValid() {
 
     $params = array(
       'label' => 'sub2_individual',
@@ -320,7 +299,6 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type'], "In line " . __LINE__);
     $this->callAPISuccess('contact', 'delete', $params);
 
-
     $params = array(
       'label' => 'sub2_organization',
       'name' => 'sub2_organization',
@@ -362,9 +340,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test update with no subtype to invalid subtype
+   * Test update with no subtype to invalid subtype.
    */
-  function testContactUpdateSubtypeInvalid() {
+  public function testContactUpdateSubtypeInvalid() {
 
     // check for Type:Individual subtype:sub_individual
     $contactParams = array(
@@ -408,5 +386,5 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('contact', 'delete', $params);
   }
-}
 
+}

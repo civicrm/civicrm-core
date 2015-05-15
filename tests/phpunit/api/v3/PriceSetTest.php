@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2014                                |
+| Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -24,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -39,10 +38,13 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   protected $_entity = 'price_set';
 
   public $DBResetRequired = TRUE;
+
+  /**
+   * Set up for class.
+   */
   public function setUp() {
     parent::setUp();
     $this->_params = array(
-#     [domain_id] =>
       'name' => 'default_goat_priceset',
       'title' => 'Goat accessories',
       'is_active' => 1,
@@ -55,11 +57,11 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
   }
 
   /**
-   *
+   * Test create price set.
    */
   public function testCreatePriceSet() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -69,16 +71,38 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check that no name doesn't cause failure
+   * Test for creating price sets used for both events and contributions.
+   */
+  public function testCreatePriceSetForEventAndContribution() {
+    // Create the price set
+    $createParams = array(
+      'name' => 'some_price_set',
+      'title' => 'Some Price Set',
+      'is_active' => 1,
+      'financial_type_id' => 1,
+      'extends' => array(1, 2),
+    );
+    $createResult = $this->callAPIAndDocument($this->_entity, 'create', $createParams, __FUNCTION__, __FILE__);
+
+    // Get priceset we just created.
+    $result = $this->callAPISuccess($this->_entity, 'getSingle', array(
+      'id' => $createResult['id'],
+    ));
+
+    // Count the number of items in 'extends'.
+    $this->assertEquals(2, count($result['extends']));
+  }
+
+  /**
+   * Check that no name doesn't cause failure.
    */
   public function testCreatePriceSetNoName() {
     $params = $this->_params;
     unset($params['name']);
-    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+    $this->callAPISuccess($this->_entity, 'create', $params);
   }
 
   /**
-   *
    */
   public function testGetBasicPriceSet() {
     $getParams = array(
@@ -126,10 +150,10 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   }
 
   public static function setUpBeforeClass() {
-      // put stuff here that should happen before all tests in this unit
+    // put stuff here that should happen before all tests in this unit
   }
 
-  public static function tearDownAfterClass(){
+  public static function tearDownAfterClass() {
     $tablesToTruncate = array(
       'civicrm_contact',
       'civicrm_contribution',
@@ -137,5 +161,5 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
     $unitTest = new CiviUnitTestCase();
     $unitTest->quickCleanup($tablesToTruncate);
   }
-}
 
+}

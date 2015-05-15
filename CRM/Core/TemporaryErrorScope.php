@@ -72,7 +72,7 @@ class CRM_Core_TemporaryErrorScope {
   public static function getActive() {
     return array(
       '_PEAR_default_error_mode' => $GLOBALS['_PEAR_default_error_mode'],
-      '_PEAR_default_error_options' =>$GLOBALS['_PEAR_default_error_options'],
+      '_PEAR_default_error_options' => $GLOBALS['_PEAR_default_error_options'],
       'modeException' => CRM_Core_Error::$modeException,
     );
   }
@@ -85,4 +85,5 @@ class CRM_Core_TemporaryErrorScope {
     $GLOBALS['_PEAR_default_error_options'] = $frame['_PEAR_default_error_options'];
     CRM_Core_Error::$modeException = $frame['modeException'];
   }
+
 }

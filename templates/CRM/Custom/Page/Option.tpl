@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,7 +39,6 @@
         {strip}
         {* handle enable/disable actions*}
          {include file="CRM/common/enableDisableApi.tpl"}
-         {include file="CRM/common/crmeditable.tpl"}
         <table class="selector row-highlight">
           <tr class="columnheader">
             <th>{ts}Label{/ts}</th>
@@ -50,10 +49,10 @@
             <th>&nbsp;</th>
           </tr>
           {foreach from=$customOption item=row key=id}
-            <tr id="OptionValue-{$id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-custom_option {if NOT $row.is_active} disabled{/if}">
-              <td><span class="crm-custom_option-label crm-editable crmf-label">{$row.label}</span></td>
-              <td><span class="crm-custom_option-value disabled-crm-editable" data-field="value" data-action="update">{$row.value}</span></td>
-              <td class="crm-custom_option-default_value crmf-value">{$row.default_value}</td>
+            <tr id="OptionValue-{$id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-custom_option{if !$row.is_active} disabled{/if}">
+              <td class="crm-custom_option-label crm-editable crmf-label">{$row.label}</td>
+              <td class="crm-custom_option-value disabled-crm-editable" data-field="value" data-action="update">{$row.value}</td>
+              <td class="crm-custom_option-default_value crmf-default_value">{$row.default_value}</td>
               <td class="nowrap crm-custom_option-weight crmf-weight">{$row.weight}</td>
               <td id="row_{$id}_status" class="crm-custom_option-is_active crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
               <td>{$row.action|replace:'xx':$id}</td>
@@ -63,8 +62,8 @@
         {/strip}
 
         <div class="action-link">
-            <a href="{crmURL q="reset=1&action=add&fid=$fid&gid=$gid"}" class="button action-item"><span><div class="icon add-icon"></div> {ts 1=$fieldTitle}Add Option for '%1'{/ts}</span></a>
-            <a href="{crmURL p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid"}" class="button action-item cancel"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
+            {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="circle-plus"}{ts}Add Option{/ts}{/crmButton}
+            {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="close"}{ts}Done{/ts}{/crmButton}
         </div>
       </div>
     </div>

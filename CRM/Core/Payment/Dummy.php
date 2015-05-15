@@ -14,12 +14,11 @@
  * $Id: Dummy.php 45429 2013-02-06 22:11:18Z lobo $
  */
 
-/* NOTE:
- * When looking up response codes in the Authorize.Net API, they
- * begin at one, so always delete one from the "Position in Response"
+/**
+ * Dummy payment processor
  */
 class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
-  CONST CHARSET = 'iso-8859-1';
+  const CHARSET = 'iso-8859-1';
 
   protected $_mode = NULL;
 
@@ -27,10 +26,19 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   protected $_doDirectPaymentResult = array();
 
   /**
+   * Set result from do Direct Payment for test purposes.
+   *
    * @param array $doDirectPaymentResult
+   *  Result to be returned from test.
    */
   public function setDoDirectPaymentResult($doDirectPaymentResult) {
     $this->_doDirectPaymentResult = $doDirectPaymentResult;
+    if (empty($this->_doDirectPaymentResult['trxn_id'])) {
+      $this->_doDirectPaymentResult['trxn_id'] = array();
+    }
+    else {
+      $this->_doDirectPaymentResult['trxn_id'] = (array) $doDirectPaymentResult['trxn_id'];
+    }
   }
 
   /**
@@ -38,54 +46,35 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
    * @param $paymentProcessor
    *
    * @return \CRM_Core_Payment_Dummy
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Dummy Processor');
   }
 
   /**
-   * Singleton function used to manage this object
+   * Submit a payment using Advanced Integration Method.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
    *
-   * @param object $paymentProcessor
-   * @param null $paymentForm
-   * @param bool $force
-   *
-   * @return object
-   * @static
+   * @return array
+   *   the result in a nice formatted array (or an error object)
    */
-  static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    $processorName = $paymentProcessor['name'];
-    if (CRM_Utils_Array::value($processorName, self::$_singleton) === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_Dummy($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$processorName];
-  }
-
-  /**
-   * Submit a payment using Advanced Integration Method
-   *
-   * @param  array $params assoc array of input parameters for this transaction
-   *
-   * @return array the result in a nice formatted array (or an error object)
-   * @public
-   */
-  function doDirectPayment(&$params) {
+  public function doDirectPayment(&$params) {
     // Invoke hook_civicrm_paymentProcessor
     // In Dummy's case, there is no translation of parameters into
     // the back-end's canonical set of parameters.  But if a processor
@@ -98,24 +87,33 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $params,
       $cookedParams
     );
+    // This means we can test failing transactions by setting a past year in expiry. A full expiry check would
+    // be more complete.
+    if (!empty($params['credit_card_exp_date']) && date('Y') >
+      CRM_Core_Payment_Form::getCreditCardExpirationYear($params)) {
+      $error = new CRM_Core_Error(ts('transaction failed'));
+      return $error;
+    }
     //end of hook invocation
     if (!empty($this->_doDirectPaymentResult)) {
-      return $this->_doDirectPaymentResult;
+      $result = $this->_doDirectPaymentResult;
+      $result['trxn_id'] = array_shift($this->_doDirectPaymentResult['trxn_id']);
+      return $result;
     }
     if ($this->_mode == 'test') {
-      $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test\\_%'";
-      $p                 = array();
-      $trxn_id           = strval(CRM_Core_Dao::singleValueQuery($query, $p));
-      $trxn_id           = str_replace('test_', '', $trxn_id);
-      $trxn_id           = intval($trxn_id) + 1;
+      $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test\\_%'";
+      $p = array();
+      $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+      $trxn_id = str_replace('test_', '', $trxn_id);
+      $trxn_id = intval($trxn_id) + 1;
       $params['trxn_id'] = sprintf('test_%08d', $trxn_id);
     }
     else {
-      $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'live_%'";
-      $p                 = array();
-      $trxn_id           = strval(CRM_Core_Dao::singleValueQuery($query, $p));
-      $trxn_id           = str_replace('live_', '', $trxn_id);
-      $trxn_id           = intval($trxn_id) + 1;
+      $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'live_%'";
+      $p = array();
+      $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+      $trxn_id = str_replace('live_', '', $trxn_id);
+      $trxn_id = intval($trxn_id) + 1;
       $params['trxn_id'] = sprintf('live_%08d', $trxn_id);
     }
     $params['gross_amount'] = $params['amount'];
@@ -135,12 +133,17 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * @param null $errorCode
-   * @param null $errorMessage
+   * Generate error object.
    *
-   * @return object
+   * Throwing exceptions is preferred over this.
+   *
+   * @param string $errorCode
+   * @param string $errorMessage
+   *
+   * @return CRM_Core_Error
+   *   Error object.
    */
-  function &error($errorCode = NULL, $errorMessage = NULL) {
+  public function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
       $e->push($errorCode, 0, NULL, $errorMessage);
@@ -152,13 +155,13 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * This function checks to see if we have the right config values
+   * This function checks to see if we have the right config values.
    *
-   * @return string the error message if any
-   * @public
+   * @return string
+   *   the error message if any
    */
-  function checkConfig() {
+  public function checkConfig() {
     return NULL;
   }
-}
 
+}

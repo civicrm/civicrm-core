@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2014                                |
+| Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -24,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -37,7 +36,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   protected $id;
   public $DBResetRequired = FALSE;
 
-  function setUp() {
+  public function setUp() {
     $this->params = array(
       'domain_id' => 1,
       'name' => "my mail setting",
@@ -49,12 +48,11 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
       'is_default' => 1,
     );
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
-  function tearDown() {}
-
   /**
-   * Test creation
+   * Test creation.
    */
   public function testCreateMailSettings() {
     $this->callAPISuccessGetCount('mail_settings', array(), 1);
@@ -66,7 +64,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test caches cleared adequately
+   * Test caches cleared adequately.
    */
   public function testCreateUpdateMailSettings() {
     $result = $this->callAPISuccess('MailSettings', 'create', $this->params);
@@ -78,7 +76,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test get method
+   * Test get method.
    */
   public function testGetMailSettings() {
     $this->callAPIAndDocument('MailSettings', 'create', $this->params, __FUNCTION__, __FILE__);
@@ -99,12 +97,12 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test chained delete
+   * Test chained delete.
    */
   public function testGetMailSettingsChainDelete() {
-    $description = "demonstrates get + delete in the same call";
-    $subFile     = 'ChainedGetDelete';
-    $params      = array(
+    $description = "Demonstrates get + delete in the same call.";
+    $subFile = 'ChainedGetDelete';
+    $params = array(
       'title' => "MailSettings title",
       'api.MailSettings.delete' => 1,
     );
@@ -112,5 +110,5 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('MailSettings', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
     $this->assertEquals(0, $this->callAPISuccess('MailSettings', 'getcount', array()));
   }
-}
 
+}

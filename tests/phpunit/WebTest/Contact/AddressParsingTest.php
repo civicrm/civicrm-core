@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function teststreetAddressParsing() {
+  public function teststreetAddressParsing() {
     // Logging in.
     $this->webtestLogin();
 
@@ -96,7 +96,7 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
     $this->type("address_4_street_address", "121 SW Sherman Way Suite 15");
     $this->type("address_4_city", "Birmingham");
     $this->type("address_4_postal_code", "5491");
-    $this->assertTrue($this->isTextPresent("- select - United States"));
+    $this->assertSelected('address_4_country_id', "United States");
     $this->select("address_4_state_province_id", "value=1002");
 
     // Store location type of each address
@@ -147,7 +147,7 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
         'street_number' => '121',
         'street_name' => 'SW Sherman Way',
         'street_unit' => 'Suite 15',
-      )
+      ),
     );
     foreach ($verifyData as $loc => $values) {
       $num = $address[$loc];
@@ -156,5 +156,5 @@ class WebTest_Contact_AddressParsingTest extends CiviSeleniumTestCase {
       }
     }
   }
-}
 
+}

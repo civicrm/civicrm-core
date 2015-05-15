@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneActivityAdd() {
+  public function testStandaloneActivityAdd() {
     $this->webtestLogin();
 
     // Adding Anderson, Anthony and Summerson, Samuel for testStandaloneActivityAdd test
@@ -65,7 +65,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up (span with delete token class indicates that it's present)...
-    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']","$firstName1");
+    $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", "$firstName1");
 
     //..and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText("xpath=//div[@id='s2id_target_contact_id']", "Anderson, $firstName1", 'Contact not found in line ' . __LINE__);
@@ -84,7 +84,7 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName2");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$firstName2");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Summerson, $firstName2", 'Contact not found in line ' . __LINE__);
@@ -164,12 +164,12 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
     );
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
     $triggerElement = array('name' => 'activity_type_id', 'type' => 'select');
     $customSets = array(
       array('entity' => 'Activity', 'subEntity' => 'Interview', 'triggerElement' => $triggerElement),
-      array('entity' => 'Activity', 'subEntity' => 'Meeting', 'triggerElement' => $triggerElement)
+      array('entity' => 'Activity', 'subEntity' => 'Meeting', 'triggerElement' => $triggerElement),
     );
 
     $pageUrl = array('url' => 'activity', 'args' => 'reset=1&action=add&context=standalone');
@@ -180,10 +180,11 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
    * @param $expected
    * @param null $xpathPrefix
    */
-  function VerifyTabularData($expected, $xpathPrefix = NULL) {
+  public function VerifyTabularData($expected, $xpathPrefix = NULL) {
     foreach ($expected as $label => $value) {
-        $this->waitForElementPresent("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span");
-        $this->verifyText("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span", preg_quote($value), 'In line ' . __LINE__);
+      $this->waitForElementPresent("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span");
+      $this->verifyText("xpath=//table/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td/span", preg_quote($value), 'In line ' . __LINE__);
     }
   }
+
 }

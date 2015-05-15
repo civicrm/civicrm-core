@@ -1,67 +1,77 @@
 <?php
 /**
- * Test Generated example of using mailing_a_b create API
- * *
+ * Test Generated example demonstrating the MailingAB.create API.
+ *
+ * @return array
+ *   API result array
  */
-function mailing_a_b_create_example(){
-$params = array(
-  'mailing_id_a' => 1,
-  'mailing_id_b' => 2,
-  'mailing_id_c' => 3,
-  'testing_criteria_id' => 1,
-  'winner_criteria_id' => 1,
-  'declare_winning_time' => '+2 days',
-  'group_percentage' => 10,
-);
+function mailing_a_b_create_example() {
+  $params = array(
+    'mailing_id_a' => 1,
+    'mailing_id_b' => 2,
+    'mailing_id_c' => 3,
+    'testing_criteria' => 'subject',
+    'winner_criteria' => 'open',
+    'declare_winning_time' => '+2 days',
+    'group_percentage' => 10,
+  );
 
-try{
-  $result = civicrm_api3('mailing_a_b', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+  try{
+    $result = civicrm_api3('MailingAB', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
 
-return $result;
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function mailing_a_b_create_expectedresult(){
+function mailing_a_b_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 1,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 1,
+    'values' => array(
       '1' => array(
-          'id' => '1',
-          'mailing_id_a' => '1',
-          'mailing_id_b' => '2',
-          'mailing_id_c' => '3',
-          'domain_id' => '1',
-          'testing_criteria_id' => '1',
-          'winner_criteria_id' => '1',
-          'specific_url' => '',
-          'declare_winning_time' => '20140728171837',
-          'group_percentage' => '10',
-        ),
+        'id' => '1',
+        'name' => '',
+        'status' => '',
+        'mailing_id_a' => '1',
+        'mailing_id_b' => '2',
+        'mailing_id_c' => '3',
+        'domain_id' => '1',
+        'testing_criteria_id' => '',
+        'winner_criteria_id' => '',
+        'specific_url' => '',
+        'declare_winning_time' => '20150224231452',
+        'group_percentage' => '10',
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
 /*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testMailingABCreateSuccess and can be found in
+* This example has been generated from the API test suite.
+* The test that created it is called "testMailingABCreateSuccess"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingABTest.php
 *
 * You can see the outcome of the API tests at
@@ -71,7 +81,7 @@ function mailing_a_b_create_expectedresult(){
 * http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
 * Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api/explorer
+* http://MYSITE.ORG/path/to/civicrm/api
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing

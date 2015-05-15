@@ -97,7 +97,7 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
 
   }
 
-  function testGetAllDeclaredActivityTypes() {
+  public function testGetAllDeclaredActivityTypes() {
     $repo = new CRM_Case_XMLRepository(
       array('CaseTypeWithTwoActivityTypes', 'CaseTypeWithThreeActivityTypes'),
       array(
@@ -114,7 +114,7 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testGetAllDeclaredRelationshipTypes() {
+  public function testGetAllDeclaredRelationshipTypes() {
     $repo = new CRM_Case_XMLRepository(
       array('CaseTypeWithTwoRoles', 'CaseTypeWithThreeRoles', 'CaseTypeWithSingleActivityType'),
       array(
@@ -130,7 +130,7 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  function testGetActivityReferenceCount_1() {
+  public function testGetActivityReferenceCount_1() {
     $repo = new CRM_Case_XMLRepository(
       array('CaseTypeWithSingleActivityType'),
       array(
@@ -146,7 +146,7 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
     $this->assertEquals(0, $repo->getActivityReferenceCount('Third Activity Type'));
   }
 
-  function testGetActivityReferenceCount_23() {
+  public function testGetActivityReferenceCount_23() {
     $repo = new CRM_Case_XMLRepository(
       array('CaseTypeWithTwoActivityTypes', 'CaseTypeWithThreeActivityTypes'),
       array(
@@ -163,7 +163,7 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
     $this->assertEquals(1, $repo->getActivityReferenceCount('Third Activity Type'));
   }
 
-  function testGetRoleReferenceCount_1() {
+  public function testGetRoleReferenceCount_1() {
     $repo = new CRM_Case_XMLRepository(
       array('CaseTypeWithSingleRole', 'CaseTypeWithSingleActivityType'),
       array(
@@ -179,7 +179,7 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
     $this->assertEquals(0, $repo->getRelationshipReferenceCount('Third Role'));
   }
 
-  function testGetRoleReferenceCount_23() {
+  public function testGetRoleReferenceCount_23() {
     $repo = new CRM_Case_XMLRepository(
       array('CaseTypeWithTwoRoles', 'CaseTypeWithThreeRoles', 'CaseTypeWithSingleActivityType'),
       array(
@@ -195,4 +195,5 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
     $this->assertEquals(2, $repo->getRelationshipReferenceCount('Second Role'));
     $this->assertEquals(1, $repo->getRelationshipReferenceCount('Third Role'));
   }
+
 }

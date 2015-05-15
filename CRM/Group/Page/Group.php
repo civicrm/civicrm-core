@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -38,82 +38,79 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   /**
    * @return string
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Contact_BAO_Group';
   }
 
   /**
-   * Define action links
+   * Define action links.
    *
-   * @return array self::$_links array of action links
-   * @access public
+   *   self::$_links array of action links
    */
-  function &links() {}
+  public function &links() {
+  }
 
   /**
-   * Return class name of edit form
+   * Return class name of edit form.
    *
    * @return string
-   * @access public
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Group_Form_Edit';
   }
 
   /**
-   * Return name of edit form
+   * Return name of edit form.
    *
    * @return string
-   * @access public
    */
-  function editName() {
+  public function editName() {
     return ts('Edit Group');
   }
 
   /**
-   * Return name of delete form
+   * Return name of delete form.
    *
    * @return string
-   * @access public
    */
-  function deleteName() {
+  public function deleteName() {
     return 'Delete Group';
   }
 
   /**
-   * Return user context uri to return to
+   * Return user context uri to return to.
    *
    * @param null $mode
    *
    * @return string
-   * @access public
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/group';
   }
 
   /**
-   * Return user context uri params
+   * Return user context uri params.
    *
    * @param null $mode
    *
    * @return string
-   * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
   }
 
   /**
-   * Make sure that the user has permission to access this group
+   * Make sure that the user has permission to access this group.
    *
-   * @param int $id the id of the object
-   * @param int $title name or title of the object
+   * @param int $id
+   *   The id of the object.
+   * @param int $title
+   *   Name or title of the object.
    *
-   * @return string   the permission that the user has (or null)
-   * @access public
+   * @return string
+   *   the permission that the user has (or null)
    */
-  function checkPermission($id, $title) {
+  public function checkPermission($id, $title) {
     return CRM_Contact_BAO_Group::checkPermission($id, $title);
   }
 
@@ -124,9 +121,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
    * @param int $action
    *
    * @return void
-   * @access public
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     $groupPermission = CRM_Core_Permission::check('edit groups') ? CRM_Core_Permission::EDIT : CRM_Core_Permission::VIEW;
     $this->assign('groupPermission', $groupPermission);
 
@@ -154,9 +150,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     $this->search();
   }
 
-  function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+  public function search() {
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::DELETE
       )
@@ -170,5 +165,5 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     $form->process();
     $form->run();
   }
-}
 
+}

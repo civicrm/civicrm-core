@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,8 +40,8 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
 
   public function preProcess() {
     $this->_indexID = CRM_Utils_Request::retrieve('id', 'Integer', $this, FALSE);
-    $this->_config  = CRM_Utils_Request::retrieve('config', 'Integer', $this, 0);
-    $this->_action  = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_config = CRM_Utils_Request::retrieve('config', 'Integer', $this, 0);
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/tplstrings', 'reset=1'));
@@ -100,5 +100,5 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
 
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/tplstrings', "reset=1"));
   }
-}
 
+}

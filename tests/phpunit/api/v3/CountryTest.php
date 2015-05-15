@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,21 +32,21 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_country* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Contact
+ * @package CiviCRM_APIv3
+ * @subpackage API_Contact
  */
 class api_v3_CountryTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_params;
 
 
-  function setUp() {
+  public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
-    $this->quickCleanup(array('civicrm_country'));
+    $this->useTransaction(TRUE);
     $this->_params = array(
       'name' => 'Made Up Land',
-      'iso_code' => 'ML',
+      'iso_code' => 'ZZ',
       'region_id' => 1,
     );
   }
@@ -64,7 +64,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('country', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('country', 'delete', array('id' => $create['id'],), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('country', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('country', 'get', array(
       'id' => $create['id'],
@@ -92,7 +92,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   public function testGet() {
     $country = $this->callAPISuccess('Country', 'create', $this->_params);
     $params = array(
-      'iso_code' =>  $this->_params['iso_code'],
+      'iso_code' => $this->_params['iso_code'],
     );
     $result = $this->callAPIAndDocument('Country', 'Get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($country['values'][$country['id']]['name'], $result['values'][$country['id']]['name']);
@@ -104,7 +104,6 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   /**
    * If a new country is created and it is created again it should not create a second one.
    * We check on the iso code (there should be only one iso code
-   *
    */
   public function testCreateDuplicateFail() {
     $params = $this->_params;
@@ -116,5 +115,5 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(1, $check);
   }
-}
 
+}

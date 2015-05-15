@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -42,10 +41,9 @@
 class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
   /**
-   * All the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -53,7 +51,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * The mailing id of the mailing we're operating on
    *
    * @int
-   * @access protected
    */
   protected $_mailingId;
 
@@ -61,7 +58,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * The action that we are performing (in CRM_Core_Action terms)
    *
    * @int
-   * @access protected
    */
   protected $_action;
 
@@ -71,10 +67,9 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   public $_archived;
 
   /**
-   * Scheduled mailing
+   * Scheduled mailing.
    *
    * @boolean
-   * @access public
    */
   public $_scheduled;
 
@@ -85,13 +80,11 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_unscheduled = $this->_archived = $archiveLinks = FALSE;
-    $this->_mailingId   = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
-    $this->_sms         = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
+    $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
+    $this->_sms = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
     $this->assign('sms', $this->_sms);
     // check that the user has permission to access mailing id
     CRM_Mailing_BAO_Mailing::checkPermission($this->_mailingId);
@@ -124,7 +117,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $newArgs = func_get_args();
@@ -137,14 +130,13 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       CRM_Mailing_BAO_MailingJob::runJobs_post();
     }
 
-    $this->_sortByCharacter =
-      CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
-
+    $this->_sortByCharacter
+      = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
     // CRM-11920 all should set sortByCharacter to null, not empty string
     if (strtolower($this->_sortByCharacter) == 'all' || !empty($_POST)) {
-      $this->_sortByCharacter = null;
-      $this->set('sortByCharacter', null);
+      $this->_sortByCharacter = NULL;
+      $this->set('sortByCharacter', NULL);
     }
 
     if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
@@ -237,7 +229,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       CRM_Core_Selector_Controller::TEMPLATE
     );
 
-
     $controller->setEmbedded(TRUE);
     $controller->run();
 
@@ -292,9 +283,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     return parent::run();
   }
 
-  function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+  public function search() {
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE
       )
     ) {
@@ -317,7 +307,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    *
    * @return string
    */
-  function whereClause(&$params, $sortBy = TRUE) {
+  public function whereClause(&$params, $sortBy = TRUE) {
     $values = array();
 
     $clauses = array();
@@ -349,5 +339,5 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
     return implode(' AND ', $clauses);
   }
-}
 
+}

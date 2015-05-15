@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Activity_Import_Field {
 
   /**#@+
-   * @access protected
    * @var string
    */
 
@@ -92,7 +91,7 @@ class CRM_Activity_Import_Field {
    * @param string $headerPattern
    * @param string $dataPattern
    */
-  function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
+  public function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     $this->_name = $name;
     $this->_title = $title;
     $this->_type = $type;
@@ -102,27 +101,28 @@ class CRM_Activity_Import_Field {
     $this->_value = NULL;
   }
 
-  function resetValue() {
+  public function resetValue() {
     $this->_value = NULL;
   }
 
   /**
    * The value is in string format. convert the value to the type of this field
    * and set the field value with the appropriate type
+   * @param $value
    */
-  function setValue($value) {
+  public function setValue($value) {
     $this->_value = $value;
   }
 
   /**
    * @return bool
    */
-  function validate() {
+  public function validate() {
 
     if (CRM_Utils_System::isNull($this->_value)) {
       return TRUE;
     }
     return TRUE;
   }
-}
 
+}

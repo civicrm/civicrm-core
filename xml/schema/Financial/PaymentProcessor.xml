@@ -67,7 +67,7 @@
     <pseudoconstant>
       <table>civicrm_payment_processor_type</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <labelColumn>title</labelColumn>
     </pseudoconstant>
     <length>10</length>
     <add>4.3</add>
@@ -164,7 +164,7 @@
   </field>
   <field>
     <name>class_name</name>
-    <title>Suffix for PHP clas name implementation</title>
+    <title>Suffix for PHP class name implementation</title>
     <type>varchar</type>
     <length>255</length>
     <add>1.8</add>

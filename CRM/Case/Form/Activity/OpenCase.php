@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,17 +40,16 @@
 class CRM_Case_Form_Activity_OpenCase {
 
   /**
-   * The id of the client associated with this case
+   * The id of the client associated with this case.
    *
    * @var int
-   * @public
    */
   public $_contactID;
 
   /**
    * @param CRM_Core_Form $form
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     //get multi client case configuration
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
     $form->_allowMultiClient = (bool) $xmlProcessorProcess->getAllowMultipleCaseClients();
@@ -84,7 +83,7 @@ class CRM_Case_Form_Activity_OpenCase {
     $form->_caseStatusId = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
 
     // Add attachments
-    CRM_Core_BAO_File::buildAttachment( $form, 'civicrm_activity', $form->_activityId );
+    CRM_Core_BAO_File::buildAttachment($form, 'civicrm_activity', $form->_activityId);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/case', 'reset=1'));
   }
@@ -93,13 +92,12 @@ class CRM_Case_Form_Activity_OpenCase {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     $defaults = array();
     if ($form->_context == 'caseActivity') {
       return $defaults;
@@ -146,12 +144,15 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * @param CRM_Case_Form_Case $form
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     if ($form->_context == 'caseActivity') {
       return;
     }
     if ($form->_context == 'standalone') {
-      $form->addEntityRef('client_id', ts('Client'), array('create' => TRUE, 'multiple' => $form->_allowMultiClient), TRUE);
+      $form->addEntityRef('client_id', ts('Client'), array(
+          'create' => TRUE,
+          'multiple' => $form->_allowMultiClient,
+        ), TRUE);
     }
 
     $caseTypes = CRM_Case_PseudoConstant::caseType();
@@ -188,7 +189,7 @@ class CRM_Case_Form_Activity_OpenCase {
     // calling this field activity_location to prevent conflict with contact location fields
     $form->add('text', 'activity_location', ts('Location'), CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'));
 
-    $form->addWysiwyg('activity_details', ts('Details'), array('rows' => 4, 'cols' => 60), FALSE);
+    $form->add('wysiwyg', 'activity_details', ts('Details'), array('rows' => 4, 'cols' => 60), FALSE);
 
     $form->addButtons(array(
         array(
@@ -210,16 +211,15 @@ class CRM_Case_Form_Activity_OpenCase {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param array $params
    *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {
+  public static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
       return;
     }
@@ -251,17 +251,16 @@ class CRM_Case_Form_Activity_OpenCase {
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param $fields
    * @param $files
    * @param CRM_Core_Form $form
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     if ($form->_context == 'caseActivity') {
       return TRUE;
     }
@@ -271,16 +270,15 @@ class CRM_Case_Form_Activity_OpenCase {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
-   * @access public
    *
    * @param $form
    * @param array $params
    *
    * @return void
    */
-  static function endPostProcess(&$form, &$params) {
+  public static function endPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
       return;
     }
@@ -343,9 +341,9 @@ class CRM_Case_Form_Activity_OpenCase {
 
     // Add parameters for attachments
     $numAttachments = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
-    for ( $i = 1; $i <= $numAttachments; $i++ ) {
+    for ($i = 1; $i <= $numAttachments; $i++) {
       $attachName = "attachFile_$i";
-      if ( isset( $params[$attachName] ) && !empty( $params[$attachName] ) ) {
+      if (isset($params[$attachName]) && !empty($params[$attachName])) {
         $xmlProcessorParams[$attachName] = $params[$attachName];
       }
     }
@@ -360,15 +358,15 @@ class CRM_Case_Form_Activity_OpenCase {
     if ($buttonName == $form->getButtonName('upload', 'new')) {
       if ($form->_context == 'standalone') {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/case/add',
-            'reset=1&action=add&context=standalone'
-          ));
+          'reset=1&action=add&context=standalone'
+        ));
       }
       else {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/case',
-            "reset=1&action=add&context=case&cid={$form->_contactID}"
-          ));
+          "reset=1&action=add&context=case&cid={$form->_contactID}"
+        ));
       }
     }
   }
-}
 
+}

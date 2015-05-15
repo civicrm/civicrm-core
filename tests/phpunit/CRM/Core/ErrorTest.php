@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,34 +31,24 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for linking to resource files
  */
 class CRM_Core_ErrorTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name'    => 'Errors',
-      'description' => 'Tests for error handling',
-      'group'     => 'Core',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $config = CRM_Core_Config::singleton();
     $this->oldConfigAndLogDir = $config->configAndLogDir;
     $config->configAndLogDir = $this->createTempDir('test-log-');
   }
 
-  function tearDown() {
+  public function tearDown() {
     $config = CRM_Core_Config::singleton();
-    $config->configAndLogDir= $this->oldConfigAndLogDir;
+    $config->configAndLogDir = $this->oldConfigAndLogDir;
     parent::tearDown();
   }
 
   /**
    * Make sure that formatBacktrace() accepts values from debug_backtrace()
    */
-  function testFormatBacktrace_debug() {
+  public function testFormatBacktrace_debug() {
     $bt = debug_backtrace();
     $msg = CRM_Core_Error::formatBacktrace($bt);
     $this->assertRegexp('/CRM_Core_ErrorTest->testFormatBacktrace_debug/', $msg);
@@ -67,7 +57,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
   /**
    * Make sure that formatBacktrace() accepts values from Exception::getTrace()
    */
-  function testFormatBacktrace_exception() {
+  public function testFormatBacktrace_exception() {
     $e = new Exception('foo');
     $msg = CRM_Core_Error::formatBacktrace($e->getTrace());
     $this->assertRegexp('/CRM_Core_ErrorTest->testFormatBacktrace_exception/', $msg);
@@ -78,7 +68,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
    *
    * This tests a theory about what caused CRM-10766.
    */
-  function testMixLog() {
+  public function testMixLog() {
     CRM_Core_Error::debug_log_message("static-1");
     $logger = CRM_Core_Error::createDebugLogger();
     CRM_Core_Error::debug_log_message("static-2");
@@ -90,17 +80,18 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     $logger2->info('obj-3');
     CRM_Core_Error::debug_log_message("static-5");
     $this->assertLogRegexp('/static-1.*static-2.*obj-1.*static-3.*obj-2.*static-4.*obj-3.*static-5/s');
-}
+  }
 
   /**
    * @param $pattern
    */
-  function assertLogRegexp($pattern) {
+  public function assertLogRegexp($pattern) {
     $config = CRM_Core_Config::singleton();
-    $logFiles = glob($config->configAndLogDir.'/CiviCRM*.log');
-    $this->assertEquals(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir.'/CiviCRM*log*/');
+    $logFiles = glob($config->configAndLogDir . '/CiviCRM*.log');
+    $this->assertEquals(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir . '/CiviCRM*log*/');
     foreach ($logFiles as $logFile) {
       $this->assertRegexp($pattern, file_get_contents($logFile));
     }
   }
+
 }

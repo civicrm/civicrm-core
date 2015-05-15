@@ -87,4 +87,11 @@
     <comment>Keeps track of the sequence number of this repetition.</comment>
     <add>3.4</add>
   </field>
+  <field>
+    <name>reference_date</name>
+    <type>date</type>
+    <default>NULL</default>
+    <comment>Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)</comment>
+    <add>4.6</add>
+  </field>
 </table>

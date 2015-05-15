@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,7 @@
      {else}
      <div class="messages status no-popup">
       <div class="icon inform-icon"></div> &nbsp;
-      {ts}No modifications have been logged for this contact.{/ts}
+      {ts}None found.{/ts}
      </div>
      {/if}
     </div>

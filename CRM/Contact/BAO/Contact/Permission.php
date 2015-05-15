@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,28 +23,28 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Contact_BAO_Contact_Permission {
 
   /**
-   * Check if the logged in user has permissions for the operation type
+   * Check if the logged in user has permissions for the operation type.
    *
-   * @param int $id contact id
+   * @param int $id
+   *   Contact id.
    * @param int|string $type the type of operation (view|edit)
    *
-   * @return boolean true if the user has permission, false otherwise
-   * @access public
-   * @static
+   * @return bool
+   *   true if the user has permission, false otherwise
    */
-  static function allow($id, $type = CRM_Core_Permission::VIEW) {
+  public static function allow($id, $type = CRM_Core_Permission::VIEW) {
     $tables = array();
     $whereTables = array();
 
@@ -81,17 +81,16 @@ WHERE contact_a.id = %1 AND $permission";
   }
 
   /**
-   * Fill the acl contact cache for this contact id if empty
+   * Fill the acl contact cache for this contact id if empty.
    *
    * @param int $userID
    * @param int|string $type the type of operation (view|edit)
-   * @param boolean $force should we force a recompute
+   * @param bool $force
+   *   Should we force a recompute.
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
+  public static function cache($userID, $type = CRM_Core_Permission::VIEW, $force = FALSE) {
     static $_processed = array();
 
     if ($type = CRM_Core_Permission::VIEW) {
@@ -144,21 +143,19 @@ ON DUPLICATE KEY UPDATE
 
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_acl_contact_cache WHERE contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)');
     $_processed[$userID] = 1;
-
-    return;
   }
 
   /**
-   * Check if there are any contacts in cache table
+   * Check if there are any contacts in cache table.
    *
    * @param int|string $type the type of operation (view|edit)
-   * @param int $contactID contact id
+   * @param int $contactID
+   *   Contact id.
    *
-   * @return boolean
-   * @access public
-   * @static
+   * @return bool
    */
-  static function hasContactsInCache($type = CRM_Core_Permission::VIEW,
+  public static function hasContactsInCache(
+    $type = CRM_Core_Permission::VIEW,
     $contactID = NULL
   ) {
     if (!$contactID) {
@@ -194,7 +191,7 @@ AND    $operationClause LIMIT 1";
    *
    * @return array
    */
-  static function cacheClause($contactAlias = 'contact_a', $contactID = NULL) {
+  public static function cacheClause($contactAlias = 'contact_a', $contactID = NULL) {
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
     ) {
@@ -240,16 +237,18 @@ AND    $operationClause LIMIT 1";
   }
 
   /**
-   * Get the permission base on its relationship
+   * Get the permission base on its relationship.
    *
-   * @param int $selectedContactID contact id of selected contact
-   * @param int $contactID contact id of the current contact
+   * @param int $selectedContactID
+   *   Contact id of selected contact.
+   * @param int $contactID
+   *   Contact id of the current contact.
    *
-   * @return bool true if logged in user has permission to view
+   * @return bool
+   *   true if logged in user has permission to view
    *   selected contact record else false
-   * @static
    */
-  static function relationship($selectedContactID, $contactID = NULL) {
+  public static function relationship($selectedContactID, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
     $config = CRM_Core_Config::singleton();
     if (!$contactID) {
@@ -322,7 +321,8 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
   AND  ( civicrm_relationship.is_active = 1 )
 ";
       }
-      $params = array(1 => array($contactID, 'Integer'),
+      $params = array(
+        1 => array($contactID, 'Integer'),
         2 => array($selectedContactID, 'Integer'),
       );
       return CRM_Core_DAO::singleValueQuery($query, $params);
@@ -337,11 +337,12 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
    *
    * @return bool
    */
-  static function validateOnlyChecksum($contactID, &$form, $redirect = TRUE) {
+  public static function validateOnlyChecksum($contactID, &$form, $redirect = TRUE) {
     // check if this is of the format cs=XXX
     if (!CRM_Contact_BAO_Contact_Utils::validChecksum($contactID,
-        CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)
-      )) {
+      CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)
+    )
+    ) {
       if ($redirect) {
         // also set a message in the UF framework
         $message = ts('You do not have permission to edit this contact record. Contact the site administrator if you need assistance.');
@@ -372,12 +373,13 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
    * @param bool $checkSumValidationResult
    * @param null $form
    */
-  static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
+  public static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
     $session = CRM_Core_Session::singleton();
     if ($checkSumValidationResult && $form && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
       // if result is already validated, and url has cs, set the flag.
       $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
-    } else if (($session->get('authSrc') & CRM_Core_Permission::AUTH_SRC_CHECKSUM) == CRM_Core_Permission::AUTH_SRC_CHECKSUM) {
+    }
+    elseif (($session->get('authSrc') & CRM_Core_Permission::AUTH_SRC_CHECKSUM) == CRM_Core_Permission::AUTH_SRC_CHECKSUM) {
       // if checksum wasn't present in REQUEST OR checksum result validated as FALSE,
       // and flag was already set exactly as AUTH_SRC_CHECKSUM, unset it.
       $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_UNKNOWN);
@@ -391,12 +393,12 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
    *
    * @return bool
    */
-  static function validateChecksumContact($contactID, &$form, $redirect = TRUE) {
+  public static function validateChecksumContact($contactID, &$form, $redirect = TRUE) {
     if (!self::allow($contactID, CRM_Core_Permission::EDIT)) {
       // check if this is of the format cs=XXX
       return self::validateOnlyChecksum($contactID, $form, $redirect);
     }
     return TRUE;
   }
-}
 
+}

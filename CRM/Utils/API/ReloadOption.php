@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Implement the "reload" option. This option can be used with "create" to force
@@ -38,7 +38,7 @@
  * @endcode
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  */
 
@@ -65,14 +65,14 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function fromApiInput($apiRequest) {
     return $apiRequest;
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function toApiOutput($apiRequest, $result) {
     $reloadMode = NULL;
@@ -116,7 +116,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
   }
 
   /**
-   * Identify the fields which should be returned
+   * Identify the fields which should be returned.
    *
    * @param $apiRequest
    * @return array
@@ -129,4 +129,5 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
     );
     return $returnKeys;
   }
+
 }

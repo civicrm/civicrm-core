@@ -14,18 +14,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Authorize.net IPN processing',
-      'description' => 'Authorize.net IPN methods.',
-      'group' => 'Payment Processor Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorCreate(array(
       'payment_processor_type_id' => 'AuthNet',
@@ -40,14 +29,14 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->_contributionPageID = $contributionPage['id'];
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
-  function testIPNPaymentRecurSuccess() {
+  public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $paypalIPN->main();
@@ -60,7 +49,10 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
     $paypalIPN->main();
-    $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+        'contribution_recur_id' => $this->_contributionRecurID,
+        'sequential' => 1,
+      ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
   }
@@ -68,7 +60,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
-  function testIPNPaymentMembershipRecurSuccess() {
+  public function testIPNPaymentMembershipRecurSuccess() {
     $this->setupMembershipRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $paypalIPN->main();
@@ -81,17 +73,22 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
     $paypalIPN->main();
-    $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+        'contribution_recur_id' => $this->_contributionRecurID,
+        'sequential' => 1,
+      ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
-    $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id'],));
-    $this->callAPISuccessGetSingle('line_item', array('contribution_id' => $contribution['values'][1]['id'], 'entity_table' => 'civicrm_membership'));
+    $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id']));
+    $this->callAPISuccessGetSingle('line_item', array(
+        'contribution_id' => $contribution['values'][1]['id'],
+        'entity_table' => 'civicrm_membership',
+      ));
   }
 
   /**
-   *
    */
-  function getRecurTransaction() {
+  public function getRecurTransaction() {
     return array(
       "x_amount" => "200.00",
       "x_country" => 'US',
@@ -136,17 +133,18 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'x_avs_code' => 'Z',
       'x_response_reason_text' => 'This transaction has been approved.',
       'x_response_reason_code' => '1',
-      'x_response_code' => '1'
+      'x_response_code' => '1',
     );
   }
 
   /**
    * @return array
    */
-  function getRecurSubsequentTransaction() {
+  public function getRecurSubsequentTransaction() {
     return array_merge($this->getRecurTransaction(), array(
       'x_trans_id' => 'second_one',
       'x_MD5_Hash' => 'EA7A3CD65A85757827F51212CA1486A8',
     ));
   }
+
 }

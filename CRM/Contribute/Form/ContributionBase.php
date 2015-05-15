@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,7 +43,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The id of the contribution page that we are processsing
    *
    * @var int
-   * @public
    */
   public $_id;
 
@@ -59,7 +58,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The contact id related to a membership
    *
    * @var int
-   * @public
    */
   public $_membershipContactID;
 
@@ -67,7 +65,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The values for the contribution db object
    *
    * @var array
-   * @protected
    */
   public $_values;
 
@@ -75,7 +72,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The paymentProcessor attributes for this page
    *
    * @var array
-   * @protected
    */
   public $_paymentProcessor;
   public $_paymentObject = NULL;
@@ -84,7 +80,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The membership block for this page
    *
    * @var array
-   * @protected
    */
   public $_membershipBlock = NULL;
 
@@ -97,7 +92,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The default values for the form
    *
    * @var array
-   * @protected
    */
   protected $_defaults;
 
@@ -105,7 +99,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The params submitted by the form and computed by the app
    *
    * @var array
-   * @public
    */
   public $_params;
 
@@ -113,7 +106,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The fields involved in this contribution page
    *
    * @var array
-   * @public
    */
   public $_fields = array();
 
@@ -121,7 +113,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The billing location id for this contribiution page
    *
    * @var int
-   * @protected
    */
   public $_bltID;
 
@@ -129,7 +120,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Cache the amount to make things easier
    *
    * @var float
-   * @public
    */
   public $_amount;
 
@@ -137,7 +127,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Pcp id
    *
    * @var integer
-   * @public
    */
   public $_pcpId;
 
@@ -145,7 +134,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Pcp block
    *
    * @var array
-   * @public
    */
   public $_pcpBlock;
 
@@ -153,7 +141,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Pcp info
    *
    * @var array
-   * @public
    */
   public $_pcpInfo;
 
@@ -170,7 +157,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * The Membership ID for membership renewal
    *
    * @var int
-   * @public
    */
   public $_membershipId;
 
@@ -178,7 +164,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Price Set ID, if the new price set method is used
    *
    * @var int
-   * @protected
    */
   public $_priceSetId;
 
@@ -186,17 +171,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Array of fields for the price set
    *
    * @var array
-   * @protected
    */
   public $_priceSet;
 
   public $_action;
 
- /**
+  /**
    * Is honor block is enabled for this contribution?
    *
    * @var boolean
-   * @protected
    */
   public $_honor_block_is_active = FALSE;
 
@@ -213,13 +196,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_useForMember;
 
   public $_isBillingAddressRequiredForPayLater;
+
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
-   * @return void
-   * @access public
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
+   * @throws \Exception
    */
   public function preProcess() {
+
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
 
@@ -263,7 +248,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               $this->assign('membershipContactID', $this->_membershipContactID);
               $this->assign('membershipContactName', $employers[$this->_membershipContactID]['name']);
               $validMembership = TRUE;
-            } else {
+            }
+            else {
               $membershipType = new CRM_Member_BAO_MembershipType();
               $membershipType->id = $membership->membership_type_id;
               if ($membershipType->find(TRUE)) {
@@ -316,10 +302,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       CRM_Contribute_BAO_ContributionPage::setValues($this->_id, $this->_values);
 
-      // check if form is active
       if (empty($this->_values['is_active'])) {
-        // form is inactive, die a fatal death
-        CRM_Core_Error::fatal(ts('The page you requested is currently unavailable.'));
+        throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
       }
 
       // also check for billing informatin
@@ -450,10 +434,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // Handle PCP
     $pcpId = CRM_Utils_Request::retrieve('pcpId', 'Positive', $this);
     if ($pcpId) {
-      $pcp             = CRM_PCP_BAO_PCP::handlePcp($pcpId, 'contribute', $this->_values);
-      $this->_pcpId    = $pcp['pcpId'];
+      $pcp = CRM_PCP_BAO_PCP::handlePcp($pcpId, 'contribute', $this->_values);
+      $this->_pcpId = $pcp['pcpId'];
       $this->_pcpBlock = $pcp['pcpBlock'];
-      $this->_pcpInfo  = $pcp['pcpInfo'];
+      $this->_pcpInfo = $pcp['pcpInfo'];
     }
 
     // Link (button) for users to create their own Personal Campaign page
@@ -537,22 +521,20 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Set the default values
+   * Set the default values.
    *
    * @return void
-   * @access public
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
   /**
-   * Assign the minimal set of variables to the template
+   * Assign the minimal set of variables to the template.
    *
    * @return void
-   * @access public
    */
-  function assignToTemplate() {
+  public function assignToTemplate() {
     $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
     if (!empty($this->_params['billing_middle_name'])) {
       $name .= " {$this->_params['billing_middle_name']}";
@@ -564,17 +546,22 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     $this->assign('paymentProcessor', $this->_paymentProcessor);
     $vars = array(
-      'amount', 'currencyID',
-      'credit_card_type', 'trxn_id', 'amount_level',
+      'amount',
+      'currencyID',
+      'credit_card_type',
+      'trxn_id',
+      'amount_level',
     );
 
     $config = CRM_Core_Config::singleton();
     if (isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur'])) {
       $this->assign('is_recur_enabled', 1);
       $vars = array_merge($vars, array(
-        'is_recur', 'frequency_interval', 'frequency_unit',
-          'installments',
-        ));
+        'is_recur',
+        'frequency_interval',
+        'frequency_unit',
+        'installments',
+      ));
     }
 
     if (in_array('CiviPledge', $config->enableComponents) &&
@@ -584,10 +571,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       $vars = array_merge($vars, array(
         'is_pledge',
-          'pledge_frequency_interval',
-          'pledge_frequency_unit',
-          'pledge_installments',
-        ));
+        'pledge_frequency_interval',
+        'pledge_frequency_unit',
+        'pledge_installments',
+      ));
     }
 
     if (isset($this->_params['amount_other']) || isset($this->_params['selectMembership'])) {
@@ -596,12 +583,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     foreach ($vars as $v) {
       if (isset($this->_params[$v])) {
-        if ($v == 'frequency_unit' || $v == 'pledge_frequency_unit') {
-          $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
-          if (array_key_exists($this->_params[$v], $frequencyUnits)) {
-            $this->_params[$v] = $frequencyUnits[$this->_params[$v]];
-          }
-        }
         if ($v == "amount" && $this->_params[$v] === 0) {
           $this->_params[$v] = CRM_Utils_Money::format($this->_params[$v], NULL, NULL, TRUE);
         }
@@ -658,7 +639,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $date = CRM_Utils_Date::mysqlToIso($date);
         $this->assign('credit_card_exp_date', $date);
         $this->assign('credit_card_number',
-                      CRM_Utils_System::mungeCreditCard(CRM_Utils_array::value('credit_card_number', $this->_params))
+          CRM_Utils_System::mungeCreditCard(CRM_Utils_array::value('credit_card_number', $this->_params))
         );
       }
     }
@@ -674,7 +655,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Add the custom fields
+   * Add the custom fields.
    *
    * @param int $id
    * @param string $name
@@ -683,9 +664,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @param null $fieldTypes
    *
    * @return void
-   * @access public
    */
-  function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
+  public function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
     if ($id) {
       $contactID = $this->getContactID();
 
@@ -746,7 +726,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
           if ($profileContactType) {
             //Since we are showing honoree name separately so we are removing it from honoree profile just for display
-            $honoreeNamefields = array('prefix_id', 'first_name', 'last_name', 'suffix_id', 'organization_name', 'household_name');
+            $honoreeNamefields = array(
+              'prefix_id',
+              'first_name',
+              'last_name',
+              'suffix_id',
+              'organization_name',
+              'household_name',
+            );
             if ($profileContactType == 'honor' && in_array($field['name'], $honoreeNamefields)) {
               unset($fields[$field['name']]);
               continue;
@@ -794,12 +781,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Check template file exists
+   * Check template file exists.
    * @param null $suffix
    *
    * @return null|string
    */
-  function checkTemplateFileExists($suffix = NULL) {
+  public function checkTemplateFileExists($suffix = NULL) {
     if ($this->_id) {
       $templateFile = "CRM/Contribute/Form/Contribution/{$this->_id}/{$this->_name}.{$suffix}tpl";
       $template = CRM_Core_Form::getTemplate();
@@ -811,15 +798,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Use the form name to create the tpl file name
+   * Use the form name to create the tpl file name.
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function getTemplateFileName() {
+  public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
@@ -829,12 +815,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * i.e. we dont override
    *
    * @return string
-   * @access public
    */
   /**
    * @return string
    */
-  function overrideExtraTemplateFileName() {
+  public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
@@ -842,7 +827,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Authenticate pledge user during online payment.
    *
-   * @access public
    *
    * @return void
    */
@@ -852,14 +836,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     //get pledge status and contact id
-    $pledgeValues     = array();
-    $pledgeParams     = array('id' => $this->_values['pledge_id']);
+    $pledgeValues = array();
+    $pledgeParams = array('id' => $this->_values['pledge_id']);
     $returnProperties = array('contact_id', 'status_id');
     CRM_Core_DAO::commonRetrieve('CRM_Pledge_DAO_Pledge', $pledgeParams, $pledgeValues, $returnProperties);
 
     //get all status
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $validStatus = array(array_search('Pending', $allStatus),
+    $validStatus = array(
+      array_search('Pending', $allStatus),
       array_search('In Progress', $allStatus),
       array_search('Overdue', $allStatus),
     );
@@ -896,7 +881,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * When we get the control back from payment gate way
    * lets delete the recurring and related contribution.
    *
-   **/
+   */
   public function cancelRecurring() {
     $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject);
     if ($isCancel) {
@@ -912,5 +897,5 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
   }
-}
 
+}

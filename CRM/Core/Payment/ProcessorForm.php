@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -45,7 +45,7 @@ class CRM_Core_Payment_ProcessorForm {
    *
    * @throws Exception
    */
-  static function preProcess(&$form, $type = NULL, $mode = NULL ) {
+  public static function preProcess(&$form, $type = NULL, $mode = NULL) {
     if ($type) {
       $form->_type = $type;
     }
@@ -61,7 +61,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
-      $form->_paymentObject = &CRM_Core_Payment::singleton($mode, $form->_paymentProcessor, $form);
+      $form->_paymentObject = CRM_Core_Payment::singleton($mode, $form->_paymentProcessor, $form);
       $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL();
     }
 
@@ -69,7 +69,6 @@ class CRM_Core_Payment_ProcessorForm {
     // we do this outside of the above conditional to avoid
     // saving the country/state list in the session (which could be huge)
     CRM_Core_Payment_Form::setPaymentFieldsByProcessor($form, $form->_paymentProcessor);
-
 
     $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
 
@@ -84,7 +83,8 @@ class CRM_Core_Payment_ProcessorForm {
 
     // make sure we have a valid payment class, else abort
     if (!empty($form->_values['is_monetary']) &&
-      !$form->_paymentProcessor['class_name'] && empty($form->_values['is_pay_later'])) {
+      !$form->_paymentProcessor['class_name'] && empty($form->_values['is_pay_later'])
+    ) {
       CRM_Core_Error::fatal(ts('Payment processor is not set for this page'));
     }
 
@@ -104,10 +104,14 @@ class CRM_Core_Payment_ProcessorForm {
   /**
    * @param $form
    */
-  static function buildQuickform(&$form) {
+  public static function buildQuickform(&$form) {
     //@todo document why this addHidden is here
-    $form->addElement('hidden', 'hidden_processor', 1);
+    //CRM-15743 - we should not set/create hidden element for pay later
+    // because payment processor is not selected
+    if (!empty($form->_paymentProcessorID)) {
+      $form->addElement('hidden', 'hidden_processor', 1);
+    }
     CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($form->_isBillingAddressRequiredForPayLater));
   }
-}
 
+}

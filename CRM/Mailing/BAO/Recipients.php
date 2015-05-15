@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
@@ -46,7 +46,7 @@ class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
    *
    * @return null|string
    */
-  static function mailingSize($mailingID) {
+  public static function mailingSize($mailingID) {
     $sql = "
 SELECT count(*) as count
 FROM   civicrm_mailing_recipients
@@ -63,7 +63,8 @@ WHERE  mailing_id = %1
    *
    * @return Object
    */
-  static function mailingQuery($mailingID,
+  public static function mailingQuery(
+    $mailingID,
     $offset = NULL, $limit = NULL
   ) {
     $limitString = NULL;
@@ -95,7 +96,7 @@ WHERE  mailing_id = %1
    * @param int $totalLimit
    *   Number of recipients to move
    */
-  static function updateRandomRecipients($sourceMailingId, $newMailingID, $totalLimit = NULL) {
+  public static function updateRandomRecipients($sourceMailingId, $newMailingID, $totalLimit = NULL) {
     $limitString = NULL;
     if ($totalLimit) {
       $limitString = "LIMIT 0, $totalLimit";
@@ -127,9 +128,10 @@ SET mr.mailing_id = $newMailingID
    * Redistribute recipients from $sourceMailingId to a series of other mailings.
    *
    * @param int $sourceMailingId
-   * @param array $to (int $targetMailingId => int $count)
+   * @param array $to
+   *   (int $targetMailingId => int $count).
    */
-  static function reassign($sourceMailingId, $to) {
+  public static function reassign($sourceMailingId, $to) {
     foreach ($to as $targetMailingId => $count) {
       if ($count > 0) {
         CRM_Mailing_BAO_Recipients::updateRandomRecipients($sourceMailingId, $targetMailingId, $count);
@@ -138,4 +140,3 @@ SET mr.mailing_id = $newMailingID
   }
 
 }
-

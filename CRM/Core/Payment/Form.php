@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -45,8 +45,10 @@ class CRM_Core_Payment_Form {
    *  Note that this code is written to accommodate the possibility CiviCRM will switch to implementing pay later as a manual processor in future
    *
    * @param CRM_Contribute_Form_AbstractEditPayment|CRM_Contribute_Form_Contribution_Main $form
-   * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
-   * @param bool $forceBillingFieldsForPayLater display billing fields even for pay later
+   * @param array $processor
+   *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
+   * @param bool $forceBillingFieldsForPayLater
+   *   Display billing fields even for pay later.
    */
   static public function setPaymentFieldsByProcessor(&$form, $processor, $forceBillingFieldsForPayLater = FALSE) {
     $form->billingFieldSets = array();
@@ -67,7 +69,7 @@ class CRM_Core_Payment_Form {
     // @todo - replace this section with one similar to above per discussion - probably use a manual processor shell class to stand in for that capability
     //return without adding billing fields if billing_mode = 4 (@todo - more the ability to set that to the payment processor)
     // or payment processor is NULL (pay later)
-    if (($processor == NULL && !$forceBillingFieldsForPayLater) ||  CRM_Utils_Array::value('billing_mode', $processor) == 4) {
+    if (($processor == NULL && !$forceBillingFieldsForPayLater) || CRM_Utils_Array::value('billing_mode', $processor) == 4) {
       return;
     }
     //@todo setPaymentFields defines the billing fields - this should be moved to the processor class & renamed getBillingFields
@@ -79,13 +81,12 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Add general billing fields
+   * Add general billing fields.
    * @todo set these like processor fields & let payment processors alter them
    *
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @access protected
    */
   static protected function setBillingDetailsFields(&$form) {
     $bltID = $form->_bltID;
@@ -158,7 +159,8 @@ class CRM_Core_Payment_Form {
       'title' => ts('Country'),
       'cc_field' => TRUE,
       'attributes' => array(
-        '' => ts('- select -')) +
+        '' => ts('- select -'),
+      ) +
       CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
     );
@@ -206,7 +208,7 @@ class CRM_Core_Payment_Form {
    *
    * @return array
    */
-  static function getPaymentFields($paymentProcessor) {
+  public static function getPaymentFields($paymentProcessor) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
     return $paymentProcessorObject->getPaymentFormFields();
   }
@@ -216,7 +218,7 @@ class CRM_Core_Payment_Form {
    *
    * @return array
    */
-  static function getPaymentFieldMetadata($paymentProcessor) {
+  public static function getPaymentFieldMetadata($paymentProcessor) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
     return $paymentProcessorObject->getPaymentFormFieldsMetadata();
   }
@@ -226,7 +228,7 @@ class CRM_Core_Payment_Form {
    *
    * @return string
    */
-  static function getPaymentTypeName($paymentProcessor) {
+  public static function getPaymentTypeName($paymentProcessor) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
     return $paymentProcessorObject->getPaymentTypeName();
   }
@@ -236,21 +238,23 @@ class CRM_Core_Payment_Form {
    *
    * @return string
    */
-  static function getPaymentTypeLabel($paymentProcessor) {
+  public static function getPaymentTypeLabel($paymentProcessor) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
     return ts(($paymentProcessorObject->getPaymentTypeLabel()) . ' Information');
   }
 
   /**
    * @param CRM_Contribute_Form_AbstractEditPayment|CRM_Contribute_Form_Contribution_Main|CRM_Core_Payment_ProcessorForm|CRM_Contribute_Form_UpdateBilling $form
-   * @param array $processor array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
-   * @param bool $isBillingDataOptional This manifests for 'NULL' (pay later) payment processor as the addition of billing fields to the form and
+   * @param array $processor
+   *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
+   * @param bool $isBillingDataOptional
+   *   This manifests for 'NULL' (pay later) payment processor as the addition of billing fields to the form and.
    *   for payment processors that gather payment data on site as rendering the fields as not being required. (not entirely sure why but this
    *   is implemented for back office forms)
    *
    * @return bool
    */
-  static function buildPaymentForm($form, $processor, $isBillingDataOptional){
+  public static function buildPaymentForm(&$form, $processor, $isBillingDataOptional) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
     $profileAddressFields = $form->get('profileAddressFields');
     if (!empty($profileAddressFields)) {
@@ -261,7 +265,7 @@ class CRM_Core_Payment_Form {
     // which was previously available only in some form flows
     if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->isSupported('buildForm')) {
       $form->_paymentProcessor['object']->buildForm($form);
-      return;
+      return NULL;
     }
 
     self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional));
@@ -273,8 +277,8 @@ class CRM_Core_Payment_Form {
 
   /**
    * @param CRM_Core_Form $form
-   * @param array $paymentFields array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors
-
+   * @param array $paymentFields
+   *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
    * @param $paymentFields
    */
   protected static function addRules(&$form, $paymentFields) {
@@ -313,10 +317,24 @@ class CRM_Core_Payment_Form {
   }
 
   /**
+   * Validate the payment instrument values before passing it to the payment processor
+   * We want this to be overrideable by the payment processor, and default to using
+   * this object's validCreditCard for credit cards (implemented as the default in the Payment class).
+   */
+  public static function validatePaymentInstrument($payment_processor_id, $values, &$errors, $form) {
+    // ignore if we don't have a payment instrument to validate (e.g. backend payments)
+    if ($payment_processor_id > 0) {
+      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($payment_processor_id, 'live');
+      $payment = CRM_Core_Payment::singleton('live', $paymentProcessor, $form);
+      $payment->validatePaymentInstrument($values, $errors);
+    }
+  }
+
+  /**
    * The credit card pseudo constant results only the CC label, not the key ID
    * So we normalize the name to use it as a CSS class.
    */
-  static function getCreditCardCSSNames() {
+  public static function getCreditCardCSSNames() {
     $creditCardTypes = array();
     foreach (CRM_Contribute_PseudoConstant::creditCard() as $key => $name) {
       // Replace anything not css-friendly by an underscore
@@ -331,11 +349,14 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Make sure that credit card number and cvv are valid
+   * Make sure that credit card number and cvv are valid.
    * Called within the scope of a QF formRule function
+   *
+   * @param array $values
+   * @param array $errors
    */
-  static function validateCreditCard($values, &$errors) {
-    if (!empty($values['credit_card_type'])) {
+  public static function validateCreditCard($values, &$errors) {
+    if (!empty($values['credit_card_type']) || !empty($values['credit_card_number'])) {
       if (!empty($values['credit_card_number']) &&
         !CRM_Utils_Rule::creditCardNumber($values['credit_card_number'], $values['credit_card_type'])
       ) {
@@ -347,23 +368,17 @@ class CRM_Core_Payment_Form {
         $errors['cvv2'] = ts('Please enter a valid Card Verification Number');
       }
     }
-    elseif (!empty($values['credit_card_number'])) {
-      $errors['credit_card_number'] = ts('Please enter a valid Card Number');
-    }
   }
 
   /**
-   * Map address fields
+   * Map address fields.
    *
    * @param int $id
-   * @param $src
-   * @param $dst
+   * @param array $src
+   * @param array $dst
    * @param bool $reverse
-   *
-   * @return void
-   * @static
    */
-  static function mapParams($id, &$src, &$dst, $reverse = FALSE) {
+  public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
     static $map = NULL;
     if (!$map) {
       $map = array(
@@ -377,6 +392,7 @@ class CRM_Core_Payment_Form {
         'state_province' => "billing_state_province-$id",
         'postal_code' => "billing_postal_code-$id",
         'country' => "billing_country-$id",
+        'contactID' => 'contact_id',
       );
     }
 
@@ -395,16 +411,15 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Get the credit card expiration month
+   * Get the credit card expiration month.
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * See CRM-9017
    *
    * @param $src
    *
    * @return int
-   * @static
    */
-  static function getCreditCardExpirationMonth($src) {
+  public static function getCreditCardExpirationMonth($src) {
     if ($month = CRM_Utils_Array::value('M', $src['credit_card_exp_date'])) {
       return $month;
     }
@@ -413,16 +428,16 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Get the credit card expiration year
+   * Get the credit card expiration year.
    * The date format for this field should typically be "M Y" (ex: Feb 2011) or "m Y" (02 2011)
    * This function exists only to make it consistent with getCreditCardExpirationMonth
    *
    * @param $src
    *
    * @return int
-   * @static
    */
-  static function getCreditCardExpirationYear($src) {
+  public static function getCreditCardExpirationYear($src) {
     return CRM_Utils_Array::value('Y', $src['credit_card_exp_date']);
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -104,22 +104,22 @@ class CRM_GCD {
    */
 
   // Set ADD_TO_DB = FALSE to do a dry run
-  CONST ADD_TO_DB = TRUE;
+  const ADD_TO_DB = TRUE;
 
-  CONST DATA_FILENAME = "sample_data.xml";
-  CONST NUM_DOMAIN = 1;
-  CONST NUM_CONTACT = 200;
-  CONST INDIVIDUAL_PERCENT = 80;
-  CONST HOUSEHOLD_PERCENT = 10;
-  CONST ORGANIZATION_PERCENT = 10;
-  CONST NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
-  CONST NUM_ACTIVITY = 150;
+  const DATA_FILENAME = "sample_data.xml";
+  const NUM_DOMAIN = 1;
+  const NUM_CONTACT = 200;
+  const INDIVIDUAL_PERCENT = 80;
+  const HOUSEHOLD_PERCENT = 10;
+  const ORGANIZATION_PERCENT = 10;
+  const NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
+  const NUM_ACTIVITY = 150;
 
   // Location types from the table crm_location_type
-  CONST HOME = 1;
-  CONST WORK = 2;
-  CONST MAIN = 3;
-  CONST OTHER = 4;
+  const HOME = 1;
+  const WORK = 2;
+  const MAIN = 3;
+  const OTHER = 4;
 
   /**
    * Class constructor
@@ -147,6 +147,7 @@ class CRM_GCD {
   /**
    * Public wrapper for calling private "add" functions
    * Provides user feedback
+   * @param $itemName
    */
   public function generate($itemName) {
     echo "Generating $itemName\n";
@@ -260,7 +261,10 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   *********************************/
+   ********************************
+   * @param int $size
+   * @return string
+   */
 
   // get a randomly generated string
   private function randomString($size = 32) {
@@ -388,6 +392,9 @@ class CRM_GCD {
 
   /**
    * Automatically manage the is_primary field by tracking which contacts have each item
+   * @param $cid
+   * @param $type
+   * @return int
    */
   private function isPrimary($cid, $type) {
     if (empty($this->location[$type][$cid])) {
@@ -400,6 +407,9 @@ class CRM_GCD {
   /**
    * Execute a query unless we are doing a dry run
    * Note: this wrapper should not be used for SELECT queries
+   * @param $query
+   * @param array $params
+   * @return \CRM_Core_DAO
    */
   private function _query($query, $params = array()) {
     if (self::ADD_TO_DB) {
@@ -409,6 +419,7 @@ class CRM_GCD {
 
   /**
    * Call dao insert method unless we are doing a dry run
+   * @param $dao
    */
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
@@ -422,6 +433,7 @@ class CRM_GCD {
 
   /**
    * Call dao update method unless we are doing a dry run
+   * @param $dao
    */
   private function _update(&$dao) {
     if (self::ADD_TO_DB) {
@@ -435,6 +447,8 @@ class CRM_GCD {
 
   /**
    * Add core DAO object
+   * @param $type
+   * @param $params
    */
   private function _addDAO($type, $params) {
     $daoName = "CRM_Core_DAO_$type";
@@ -450,6 +464,8 @@ class CRM_GCD {
 
   /**
    * Fetch contact type based on stored mapping
+   * @param $id
+   * @return
    */
   private function getContactType($id) {
     foreach (array('Individual', 'Household', 'Organization') as $type) {
@@ -1684,9 +1700,9 @@ VALUES
   private function addPCP() {
     $query = "
 INSERT INTO `civicrm_pcp`
-    (contact_id, status_id, title, intro_text, page_text, donate_link_text, page_id, page_type, is_thermometer, is_honor_roll, goal_amount, currency, is_active, pcp_block_id)
+    (contact_id, status_id, title, intro_text, page_text, donate_link_text, page_id, page_type, is_thermometer, is_honor_roll, goal_amount, currency, is_active, pcp_block_id, is_notify)
 VALUES
-    ({$this->Individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"http://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 'contribute', 1, 1, 5000.00, 'USD', 1, 1);
+    ({$this->Individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"http://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 'contribute', 1, 1, 5000.00, 'USD', 1, 1, 1);
 ";
     $this->_query($query);
   }

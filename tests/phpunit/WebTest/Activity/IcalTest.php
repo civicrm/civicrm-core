@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CiviTest/CiviMailUtils.php';
@@ -41,7 +41,7 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneActivityAdd() {
+  public function testStandaloneActivityAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/setting/preferences/display", "reset=1", "name=activity_assignee_notification_ics");
@@ -73,7 +73,7 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("xpath=//div[@class='select2-result-label']");
     $this->clickAt("xpath=//div[@class='select2-result-label']");
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName1");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$firstName1");
 
     $subject = "Testing Ical attachment for activity assignee";
     $this->type("subject", $subject);
@@ -119,5 +119,5 @@ class WebTest_Activity_IcalTest extends CiviSeleniumTestCase {
       }
     }
   }
-}
 
+}

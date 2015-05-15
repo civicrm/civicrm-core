@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,7 +54,6 @@
         {strip}
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
   {include file="CRM/common/jsortable.tpl"}
         <table id="price_set" class="display crm-price-set-listing">
         <thead>
@@ -67,17 +66,17 @@
         </thead>
         {foreach from=$rows item=row}
       <tr id="price_set-{$row.id}" class="crm-entity crm-price-set_{$row.id} {cycle values="even-row,odd-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-            <td class="crm-price-set-title crm-editable" data-field="title">{$row.title}</td>
-          <td class="crm-price-set-extends">{$row.extends}</td>
-          <td id="row_{$row.id}_status" class="crm-price-set-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{$row.action|replace:'xx':$row.id}</td>
+          <td class="crmf-title crm-editable">{$row.title}</td>
+          <td class="crmf-extends">{$row.extends}</td>
+          <td class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+          <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>
 
         {if NOT ($action eq 1 or $action eq 2) }
         <div class="action-link">
-            <a href="{crmURL p='civicrm/admin/price' q="action=add&reset=1"}" id="newPriceSet" class="button"><span><div class="icon add-icon"></div>{ts}Add Set of Price Fields{/ts}</span></a>
+            {crmButton p='civicrm/admin/price' q="action=add&reset=1" id="newPriceSet"  icon="circle-plus"}{ts}Add Set of Price Fields{/ts}{/crmButton}
         </div>
         {/if}
 

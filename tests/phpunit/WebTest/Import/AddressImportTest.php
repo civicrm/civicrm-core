@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomAddressDataImport() {
+  public function testCustomAddressDataImport() {
     $this->webtestLogin();
 
     $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
@@ -59,7 +59,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->click("css=ul.ui-autocomplete li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    foreach($customDataParams['customFields'] as $key => $value){
+    foreach ($customDataParams['customFields'] as $key => $value) {
       $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-summary-row']/div[@class='crm-label'][contains(text(), '$key')]"));
       $this->assertElementContainsText('address-block-1', "$value");
     }
@@ -73,7 +73,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualCustomCSVData($customDataParams, $firstName1) {
+  public function _individualCustomCSVData($customDataParams, $firstName1) {
 
     $headers = array(
       'first_name' => 'First Name',
@@ -84,13 +84,12 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
       'state' => 'State',
       'country' => 'Country',
     );
-    foreach( $customDataParams['headers'] as $key =>$value){
+    foreach ($customDataParams['headers'] as $key => $value) {
       $headers[$key] = $value;
     }
 
-    $rows = array( 0 =>
-
-      array(
+    $rows = array(
+      0 => array(
         'first_name' => $firstName1,
         'last_name' => 'Anderson',
         'address_1' => 'Add 1',
@@ -109,7 +108,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _addCustomData() {
+  public function _addCustomData() {
 
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
@@ -140,9 +139,9 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     // clicking save
     $this->click('_qf_Field_done-bottom');
 
-    $this->waitForText('crm-notification-container',"Custom field '{$customField}' has been saved.");
-    $this->waitForElementPresent("xpath=//span[text()='$customField']");
-    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
+    $this->waitForText('crm-notification-container', "Custom field '{$customField}' has been saved.");
+    $this->assertTrue($this->isTextPresent($customField), 'Missing text: ' . $customField);
+    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
 
     // create custom field - Integer
@@ -150,14 +149,14 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField1 = 'Customfield_int ' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField1);
-    $this->select("data_type[0]","value=1");
+    $this->select("data_type[0]", "value=1");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField1}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField1']");
-    $customFieldId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField1']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField1), 'Missing text: ' . $customField1);
+    $customFieldId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField1']/../../td[8]/span/a@href"));
     $customFieldId1 = $customFieldId1[1];
 
     // create custom field - Number
@@ -165,65 +164,65 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField2 = 'Customfield_Number ' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField2);
-    $this->select("data_type[0]","value=2");
+    $this->select("data_type[0]", "value=2");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField2}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField2']");
-    $customFieldId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField2']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField2), 'Missing text: ' . $customField2);
+    $customFieldId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField2']/../../td[8]/span/a@href"));
     $customFieldId2 = $customFieldId2[1];
 
     // create custom field - "alphanumeric select"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField3 = 'Customfield_alp_select' . substr(sha1(rand()), 0, 4);
-    $customFieldId3 = $this->_createMultipleValueCustomField($customField3,'Select');
+    $customFieldId3 = $this->_createMultipleValueCustomField($customField3, 'Select');
 
     // create custom field - "alphanumeric radio"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField4 = 'Customfield_alp_radio' . substr(sha1(rand()), 0, 4);
-    $customFieldId4 = $this->_createMultipleValueCustomField($customField4,'Radio');
+    $customFieldId4 = $this->_createMultipleValueCustomField($customField4, 'Radio');
 
     // create custom field - "alphanumeric checkbox"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField5 = 'Customfield_alp_checkbox' . substr(sha1(rand()), 0, 4);
-    $customFieldId5 = $this->_createMultipleValueCustomField($customField5,'CheckBox');
+    $customFieldId5 = $this->_createMultipleValueCustomField($customField5, 'CheckBox');
 
     // create custom field - "alphanumeric multiselect"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField6 = 'Customfield_alp_multiselect' . substr(sha1(rand()), 0, 4);
-    $customFieldId6 = $this->_createMultipleValueCustomField($customField6,'Multi-Select');
+    $customFieldId6 = $this->_createMultipleValueCustomField($customField6, 'Multi-Select');
 
     // create custom field - "alphanumeric advmultiselect"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField7 = 'Customfield_alp_advmultiselect' . substr(sha1(rand()), 0, 4);
-    $customFieldId7 = $this->_createMultipleValueCustomField($customField7,'AdvMulti-Select');
+    $customFieldId7 = $this->_createMultipleValueCustomField($customField7, 'AdvMulti-Select');
 
     // create custom field - "alphanumeric autocompleteselect"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField8 = 'Customfield_alp_autocompleteselect' . substr(sha1(rand()), 0, 4);
-    $customFieldId8 = $this->_createMultipleValueCustomField($customField8,'Autocomplete-Select');
+    $customFieldId8 = $this->_createMultipleValueCustomField($customField8, 'Autocomplete-Select');
 
     // create custom field - Money
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField9 = 'Customfield_Money' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField9);
-    $this->select("data_type[0]","value=3");
+    $this->select("data_type[0]", "value=3");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField9}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField9']");
-    $customFieldId9 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField9']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField9), 'Missing text: ' . $customField9);
+    $customFieldId9 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField9']/../../td[8]/span/a@href"));
     $customFieldId9 = $customFieldId9[1];
 
     // create custom field - Date
@@ -231,15 +230,15 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Field_done-bottom');
     $customField10 = 'Customfield_Date' . substr(sha1(rand()), 0, 4);
     $this->type('label', $customField10);
-    $this->select("data_type[0]","value=5");
-    $this->select("date_format","value=yy-mm-dd");
+    $this->select("data_type[0]", "value=5");
+    $this->select("date_format", "value=yy-mm-dd");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customField10}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField10']");
-    $customFieldId10 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField10']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customField9), 'Missing text: ' . $customField9);
+    $customFieldId10 = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField10']/../../td[8]/span/a@href"));
     $customFieldId10 = $customFieldId10[1];
 
     return array(
@@ -272,7 +271,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
         ),
       ),
       'customFields' => array(
-        $customField  => 'This is a test field',
+        $customField => 'This is a test field',
         $customField3 => 'label1',
         $customField4 => 'label1',
         $customField5 => 'label1',
@@ -293,24 +292,23 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _createMultipleValueCustomField( $customFieldName, $type ){
+  public function _createMultipleValueCustomField($customFieldName, $type) {
     $this->type('label', $customFieldName);
-    $this->select("data_type[0]","value=0");
-    $this->select("data_type[1]","value=".$type);
-    $this->type("option_label_1","label1");
-    $this->type("option_value_1","label1");
-    $this->type("option_label_2","label2");
-    $this->type("option_value_2","label2");
+    $this->select("data_type[0]", "value=0");
+    $this->select("data_type[1]", "value=" . $type);
+    $this->type("option_label_1", "label1");
+    $this->type("option_value_1", "label1");
+    $this->type("option_label_2", "label2");
+    $this->type("option_value_2", "label2");
 
     // clicking save
     $this->click('_qf_Field_done-bottom');
     $this->waitForElementPresent('newCustomField');
     $this->waitForText('crm-notification-container', "Custom field '{$customFieldName}' has been saved.");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customFieldName']");
-    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customFieldName']/../../td[8]/span/a@href"));
+    $this->assertTrue($this->isTextPresent($customFieldName), 'Missing text: ' . $customFieldName);
+    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customFieldName']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
     return $customFieldId;
   }
 
 }
-

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     parent::setUp();
   }
 
-  function testUpdatePendingContribution() {
+  public function testUpdatePendingContribution() {
     $this->webtestLogin();
 
     //Offline Pay Later Contribution
@@ -74,9 +74,10 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
   }
 
   /**
-   * @return array of contact details
+   * @return array
+   *   Array of contact details
    */
-  function _testOfflineContribution() {
+  public function _testOfflineContribution() {
     // Create a contact to be used as soft creditor
     $softCreditFname = substr(sha1(rand()), 0, 7);
     $softCreditLname = substr(sha1(rand()), 0, 7);
@@ -88,7 +89,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $contact = $this->createDialogContact();
 
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
 
     // fill in Received Date
     $this->webtestFillDate('receive_date');
@@ -125,7 +126,6 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->type("net_amount", "0");
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
-
 
     //Premium section
     $this->click("Premium");
@@ -183,7 +183,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
   /**
    * @param array $contact
    */
-  function _testOnlineContribution($contact) {
+  public function _testOnlineContribution($contact) {
 
     // Use default payment processor
     $processorName = 'Test Processor';
@@ -268,5 +268,5 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     );
     $this->webtestVerifyTabularData($expected);
   }
-}
 
+}

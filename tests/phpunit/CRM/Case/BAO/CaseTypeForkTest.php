@@ -12,16 +12,16 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 
 
   /**
-   * Edit the definition of ForkableCaseType
+   * Edit the definition of ForkableCaseType.
    */
-  function testForkable() {
+  public function testForkable() {
     $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'ForkableCaseType', 'id', 'name');
     $this->assertTrue(is_numeric($caseTypeId) && $caseTypeId > 0);
 
@@ -36,7 +36,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
           array('name' => 'First act'),
           array('name' => 'Second act'),
         ),
-      )
+      ),
     ));
 
     $this->assertTrue(CRM_Case_BAO_CaseType::isForkable($caseTypeId));
@@ -56,7 +56,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
   /**
    * Attempt to edit the definition of UnforkableCaseType. This fails.
    */
-  function testUnforkable() {
+  public function testUnforkable() {
     $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'UnforkableCaseType', 'id', 'name');
     $this->assertTrue(is_numeric($caseTypeId) && $caseTypeId > 0);
     $this->assertDBNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should not have DB-based definition");
@@ -71,7 +71,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
           array('name' => 'First act'),
           array('name' => 'Second act'),
         ),
-      )
+      ),
     ));
 
     $this->assertFalse(CRM_Case_BAO_CaseType::isForkable($caseTypeId));
@@ -83,7 +83,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
    * @param $caseTypes
    * @see \CRM_Utils_Hook::caseTypes
    */
-  function hook_caseTypes(&$caseTypes) {
+  public function hook_caseTypes(&$caseTypes) {
     $caseTypes['ForkableCaseType'] = array(
       'module' => 'civicrm',
       'name' => 'ForkableCaseType',

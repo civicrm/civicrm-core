@@ -154,8 +154,7 @@
   font-size: .8em;
 }
 
-.crm-designer .crm-designer-palette-tree span.ui-button-text,
-.crm-designer .crm-designer-edit-custom span.ui-button-text {
+.crm-designer .crm-designer-palette-tree span.ui-button-text {
   padding: 0.4em;
 }
 

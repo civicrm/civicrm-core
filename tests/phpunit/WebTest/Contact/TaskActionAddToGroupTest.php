@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddContactsToGroup() {
+  public function testAddContactsToGroup() {
 
     $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
@@ -104,7 +104,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
   }
 
-  function testMultiplePageContactSearchAddContactsToGroup() {
+  public function testMultiplePageContactSearchAddContactsToGroup() {
     $this->webtestLogin();
     $newGroupName = 'Group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($newGroupName);
@@ -116,13 +116,13 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("toggleSelect");
     $this->click("toggleSelect");
     $this->click("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a");
-    $this->waitForText("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a", "First");
+    $this->waitForText("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a", "Next >");
     $this->click("toggleSelect");
     $this->waitForText("xpath=//input[@value='ts_sel']/following-sibling::label/span", '50');
     $this->select("task", "label=Add Contacts to Group");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-     // Select the new group and click to add
+    // Select the new group and click to add
     $this->click("group_id");
     $this->select("group_id", "label=" . $newGroupName);
     $this->click("_qf_AddToGroup_next-bottom");
@@ -139,5 +139,5 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
 
     $this->assertTrue($this->isTextPresent("50 Contacts"), 'Looking for 50 results belonging to group: ' . $newGroupName);
   }
-}
 
+}

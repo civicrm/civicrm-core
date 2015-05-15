@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,7 +39,7 @@
  *
  */
 class CRM_Contact_Task {
-  CONST
+  const
     GROUP_CONTACTS = 1,
     REMOVE_CONTACTS = 2,
     TAG_CONTACTS = 3,
@@ -70,7 +70,6 @@ class CRM_Contact_Task {
    * The task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
@@ -78,11 +77,10 @@ class CRM_Contact_Task {
    * The optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
-  static function initTasks() {
+  public static function initTasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
         self::GROUP_CONTACTS => array(
@@ -112,11 +110,6 @@ class CRM_Contact_Task {
         self::EMAIL_CONTACTS => array(
           'title' => ts('Send Email to Contacts'),
           'class' => 'CRM_Contact_Form_Task_Email',
-          'result' => TRUE,
-        ),
-        self::SMS_CONTACTS => array(
-          'title' => ts('Send SMS to Contacts'),
-          'class' => 'CRM_Contact_Form_Task_SMS',
           'result' => TRUE,
         ),
         self::DELETE_CONTACTS => array(
@@ -181,6 +174,16 @@ class CRM_Contact_Task {
         ),
       );
 
+      //CRM-16329, if SMS provider is configured show sms action.
+      $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
+      if ($providersCount) {
+        self::$_tasks[self::SMS_CONTACTS] = array(
+          'title' => ts('Send SMS to Contacts'),
+          'class' => 'CRM_Contact_Form_Task_SMS',
+          'result' => TRUE,
+        );
+      }
+
       if (CRM_Contact_BAO_ContactType::isActive('Household')) {
         $label = CRM_Contact_BAO_ContactType::getLabel('Household');
         self::$_tasks[self::HOUSEHOLD_CONTACTS] = array(
@@ -239,32 +242,45 @@ class CRM_Contact_Task {
         );
       }
 
-      if (CRM_Core_Permission::access('CiviMail')) {
-        self::$_tasks[self::CREATE_MAILING] = array(
-          'title' => ts('Schedule/Send a Mass Mailing'),
-          'class' => array(
-            'CRM_Mailing_Form_Group',
-            'CRM_Mailing_Form_Settings',
-            'CRM_Mailing_Form_Upload',
-            'CRM_Mailing_Form_Test',
-            'CRM_Mailing_Form_Schedule',
-          ),
-          'result' => FALSE,
-        );
+      if (defined('CIVICRM_CIVIMAIL_UI_LEGACY')) {
+        if (CRM_Core_Permission::access('CiviMail')) {
+          self::$_tasks[self::CREATE_MAILING] = array(
+            'title' => ts('Schedule/Send a Mass Mailing'),
+            'class' => array(
+              'CRM_Mailing_Form_Group',
+              'CRM_Mailing_Form_Settings',
+              'CRM_Mailing_Form_Upload',
+              'CRM_Mailing_Form_Test',
+              'CRM_Mailing_Form_Schedule',
+            ),
+            'result' => FALSE,
+          );
+        }
+        elseif (CRM_Mailing_Info::workflowEnabled() &&
+          CRM_Core_Permission::check('create mailings')
+        ) {
+          self::$_tasks[self::CREATE_MAILING] = array(
+            'title' => ts('Create a Mass Mailing'),
+            'class' => array(
+              'CRM_Mailing_Form_Group',
+              'CRM_Mailing_Form_Settings',
+              'CRM_Mailing_Form_Upload',
+              'CRM_Mailing_Form_Test',
+            ),
+            'result' => FALSE,
+          );
+        }
       }
-      elseif (CRM_Mailing_Info::workflowEnabled() &&
-        CRM_Core_Permission::check('create mailings')
-      ) {
-        self::$_tasks[self::CREATE_MAILING] = array(
-          'title' => ts('Create a Mass Mailing'),
-          'class' => array(
-            'CRM_Mailing_Form_Group',
-            'CRM_Mailing_Form_Settings',
-            'CRM_Mailing_Form_Upload',
-            'CRM_Mailing_Form_Test',
-          ),
-          'result' => FALSE,
-        );
+      else {
+        if (CRM_Core_Permission::access('CiviMail')
+          || (CRM_Mailing_Info::workflowEnabled() && CRM_Core_Permission::check('create mailings'))
+        ) {
+          self::$_tasks[self::CREATE_MAILING] = array(
+            'title' => ts('Schedule/Send a Mass Mailing'),
+            'class' => 'CRM_Mailing_Form_Task_AdhocMailing',
+            'result' => FALSE,
+          );
+        }
       }
 
       self::$_tasks += CRM_Core_Component::taskList();
@@ -279,11 +295,10 @@ class CRM_Contact_Task {
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
-   * @return array the set of tasks for a group of contacts
-   * @static
-   * @access public
+   * @return array
+   *   the set of tasks for a group of contacts
    */
-  static function &taskTitles() {
+  public static function &taskTitles() {
     self::initTasks();
 
     $titles = array();
@@ -314,12 +329,13 @@ class CRM_Contact_Task {
    * of the user
    *
    * @param int $permission
-   * @param bool $deletedContacts  are these tasks for operating on deleted contacts?
+   * @param bool $deletedContacts
+   *   Are these tasks for operating on deleted contacts?.
    *
-   * @return array set of tasks that are valid for the user
-   * @access public
+   * @return array
+   *   set of tasks that are valid for the user
    */
-  static function &permissionedTaskTitles($permission, $deletedContacts = FALSE) {
+  public static function &permissionedTaskTitles($permission, $deletedContacts = FALSE) {
     self::initTasks();
     $tasks = array();
     if ($deletedContacts) {
@@ -356,13 +372,12 @@ class CRM_Contact_Task {
   }
 
   /**
-   * These tasks get added based on the context the user is in
+   * These tasks get added based on the context the user is in.
    *
-   * @return array the set of optional tasks for a group of contacts
-   * @static
-   * @access public
+   * @return array
+   *   the set of optional tasks for a group of contacts
    */
-  static function &optionalTaskTitle() {
+  public static function &optionalTaskTitle() {
     $tasks = array(
       self::SAVE_SEARCH_UPDATE => self::$_tasks[self::SAVE_SEARCH_UPDATE]['title'],
     );
@@ -374,7 +389,7 @@ class CRM_Contact_Task {
    *
    * @return array
    */
-  static function getTask($value) {
+  public static function getTask($value) {
     self::initTasks();
 
     if (!CRM_Utils_Array::value($value, self::$_tasks)) {
@@ -386,5 +401,5 @@ class CRM_Contact_Task {
       CRM_Utils_Array::value('result', self::$_tasks[$value]),
     );
   }
-}
 
+}

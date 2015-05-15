@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * The extension manager handles installing, disabling enabling, and
  * uninstalling extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -77,7 +77,8 @@ interface CRM_Extension_Manager_Interface {
    * Perform type-specific removal logic (before updating the extension
    * row in the "civicrm_extension" table).
    *
-   * @param CRM_Extension_Info $info may be generated from xml or DB (which is lossy)
+   * @param CRM_Extension_Info $info
+   *   May be generated from xml or DB (which is lossy).
    * @see CRM_Extension_Manager::createInfoFromDB
    */
   public function onPreDisable(CRM_Extension_Info $info);
@@ -86,7 +87,8 @@ interface CRM_Extension_Manager_Interface {
    * Perform type-specific removal logic (after updating the extension
    * row in the "civicrm_extension" table).
    *
-   * @param CRM_Extension_Info $info may be generated from xml or DB (which is lossy)
+   * @param CRM_Extension_Info $info
+   *   May be generated from xml or DB (which is lossy).
    * @see CRM_Extension_Manager::createInfoFromDB
    */
   public function onPostDisable(CRM_Extension_Info $info);
@@ -95,7 +97,8 @@ interface CRM_Extension_Manager_Interface {
    * Perform type-specific removal logic (before removing the extension
    * row in the "civicrm_extension" table).
    *
-   * @param CRM_Extension_Info $info may be generated from xml or DB (which is lossy)
+   * @param CRM_Extension_Info $info
+   *   May be generated from xml or DB (which is lossy).
    * @see CRM_Extension_Manager::createInfoFromDB
    */
   public function onPreUninstall(CRM_Extension_Info $info);
@@ -104,7 +107,8 @@ interface CRM_Extension_Manager_Interface {
    * Perform type-specific removal logic (after removing the extension
    * row in the "civicrm_extension" table).
    *
-   * @param CRM_Extension_Info $info may be generated from xml or DB (which is lossy)
+   * @param CRM_Extension_Info $info
+   *   May be generated from xml or DB (which is lossy).
    * @see CRM_Extension_Manager::createInfoFromDB
    */
   public function onPostUninstall(CRM_Extension_Info $info);
@@ -122,5 +126,7 @@ interface CRM_Extension_Manager_Interface {
    * @param CRM_Extension_Info $newInfo
    *
    * @return mixed
-   */public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
+   */
+  public function onPostReplace(CRM_Extension_Info $oldInfo, CRM_Extension_Info $newInfo);
+
 }

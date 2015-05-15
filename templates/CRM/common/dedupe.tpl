@@ -1,5 +1,5 @@
 {* common dupe contacts processing *}
-<div id='processDupes' class="success-status" style="display:none;"></div>
+<div id='processDupes' style="display:none;"></div>
 {literal}
 <script type='text/javascript'>
 

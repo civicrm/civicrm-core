@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     parent::setUp();
   }
 
-  function testOnlineAutoRenewMembershipAnonymous() {
+  public function testOnlineAutoRenewMembershipAnonymous() {
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
@@ -65,7 +65,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
     // has changed a bit. No point in adding test for external page as we 'll test with fake transactions.
   }
 
-  function testOnlineAutoRenewMembershipAuthenticated() {
+  public function testOnlineAutoRenewMembershipAuthenticated() {
     //configure membership signup page.
     $pageId = $this->_configureMembershipPage();
 
@@ -101,7 +101,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
   /**
    * @return null
    */
-  function _configureMembershipPage() {
+  public function _configureMembershipPage() {
     static $pageId = NULL;
 
     if (!$pageId) {
@@ -122,7 +122,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -134,7 +133,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -144,7 +142,8 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $onBehalf = FALSE;
       $pledges = FALSE;
       $recurring = TRUE;
-      $membershipTypes = array(array('id' => 1, 'auto_renew' => 1),
+      $membershipTypes = array(
+        array('id' => 1, 'auto_renew' => 1),
         array('id' => 2, 'auto_renew' => 1),
       );
       $memPriceSetId = NULL;
@@ -186,5 +185,5 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
 
     return $pageId;
   }
-}
 
+}

@@ -108,7 +108,7 @@
     <length>16</length>
     <html>
       <type>Text</type>
-      <size>FOUR</size>
+      <size>4</size>
     </html>
     <import>true</import>
     <export>true</export>

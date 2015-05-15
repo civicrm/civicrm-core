@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * CRM_Core_Page_AJAX_Attachment defines an end-point for AJAX operations which upload file-attachments.
@@ -31,6 +31,7 @@
  * To upload a new file, submit a POST (multi-part encoded) to "civicrm/ajax/attachment". Inputs:
  *  - POST['entity_table']: string
  *  - POST['entity_id']: int
+ *  - POST['attachment_token']: string
  *  - FILES[*]: all of the files to attach to the entity
  *
  * The response is a JSON document. Foreach item in FILES, there's a corresponding record in the response which
@@ -40,15 +41,23 @@
  */
 class CRM_Core_Page_AJAX_Attachment {
 
+  const ATTACHMENT_TOKEN_TTL = 10800; // 3hr; 3*60*60
+
+  /**
+   * (Page Callback)
+   */
   public static function attachFile() {
     $result = self::_attachFile($_POST, $_FILES, $_SERVER);
     self::sendResponse($result);
   }
 
   /**
-   * @param array $post (like global $_POST)
-   * @param array $files (like global $_FILES)
-   * @param array $server (like global $_SERVER)
+   * @param array $post
+   *   Like global $_POST.
+   * @param array $files
+   *   Like global $_FILES.
+   * @param array $server
+   *   Like global $_SERVER.
    * @return array
    */
   public static function _attachFile($post, $files, $server) {
@@ -56,9 +65,9 @@ class CRM_Core_Page_AJAX_Attachment {
     $results = array();
 
     foreach ($files as $key => $file) {
-      if (!$config->debug && !self::isAJAX($server)) {
+      if (!$config->debug && !self::checkToken($post['crm_attachment_token'])) {
         require_once 'api/v3/utils.php';
-        $results[$key] = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api3().",
+        $results[$key] = civicrm_api3_create_error("SECURITY ALERT: Attaching files via AJAX requires a recent, valid token.",
           array(
             'IP' => $server['REMOTE_ADDR'],
             'level' => 'security',
@@ -114,15 +123,8 @@ class CRM_Core_Page_AJAX_Attachment {
   }
 
   /**
-   * @param array $server (like global $_SERVER)
-   * @return bool
-   */
-  public static function isAJAX($server) {
-    return array_key_exists('HTTP_X_REQUESTED_WITH', $server) && $server['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest";
-  }
-
-  /**
-   * @param array $result list of API responses, keyed by file
+   * @param array $result
+   *   List of API responses, keyed by file.
    */
   public static function sendResponse($result) {
     $isError = FALSE;
@@ -140,8 +142,38 @@ class CRM_Core_Page_AJAX_Attachment {
       }
     }
 
-    header('Content-Type: text/javascript');
-    echo json_encode(array_merge($result));
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(array_merge($result));
   }
+
+  /**
+   * @return string
+   */
+  public static function createToken() {
+    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
+    $ts = CRM_Utils_Time::getTimeRaw();
+    return $signer->sign(array(
+      'for' => 'crmAttachment',
+      'ts' => $ts,
+    )) . ';;;' . $ts;
+  }
+
+  /**
+   * @param string $token
+   *   A token supplied by the user.
+   * @return bool
+   *   TRUE if the token is valid for submitting attachments
+   * @throws Exception
+   */
+  public static function checkToken($token) {
+    list ($signature, $ts) = explode(';;;', $token);
+    $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
+    if (!is_numeric($ts) || CRM_Utils_Time::getTimeRaw() > $ts + self::ATTACHMENT_TOKEN_TTL) {
+      return FALSE;
+    }
+    return $signer->validate($signature, array(
+      'for' => 'crmAttachment',
+      'ts' => $ts,
+    ));
+  }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CiviCRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: $
  *
  */
@@ -45,7 +45,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
    */
   var $calls;
 
-  function setUp() {
+  public function setUp() {
     $this->calls = array(
       'civicrm_alterMailer' => 0,
       'send' => 0,
@@ -53,24 +53,24 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  function testHookAlterMailer() {
+  public function testHookAlterMailer() {
     $test = $this;
     $mockMailer = new CRM_Utils_FakeObject(array(
-      'send' => function ($recipients, $headers, $body) use ($test) {
-        $test->calls['send']++;
-        $test->assertEquals(array('to@example.org'), $recipients);
-        $test->assertEquals('Subject Example', $headers['Subject']);
-      }
+    'send' => function ($recipients, $headers, $body) use ($test) {
+      $test->calls['send']++;
+      $test->assertEquals(array('to@example.org'), $recipients);
+      $test->assertEquals('Subject Example', $headers['Subject']);
+    },
     ));
 
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterMailer',
-      function (&$mailer, $driver, $params) use ($test, $mockMailer) {
-        $test->calls['civicrm_alterMailer']++;
-        $test->assertTrue(is_string($driver) && !empty($driver));
-        $test->assertTrue(is_array($params));
-        $test->assertTrue(is_callable(array($mailer, 'send')));
-        $mailer = $mockMailer;
-      }
+    function (&$mailer, $driver, $params) use ($test, $mockMailer) {
+      $test->calls['civicrm_alterMailer']++;
+      $test->assertTrue(is_string($driver) && !empty($driver));
+      $test->assertTrue(is_array($params));
+      $test->assertTrue(is_callable(array($mailer, 'send')));
+      $mailer = $mockMailer;
+    }
     );
 
     $params = array();

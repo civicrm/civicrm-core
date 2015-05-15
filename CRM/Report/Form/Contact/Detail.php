@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,17 +23,17 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
-  CONST ROW_COUNT_LIMIT = 10;
+  const ROW_COUNT_LIMIT = 10;
 
   protected $_summary = NULL;
 
@@ -41,16 +41,14 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     'Contact',
     'Individual',
     'Household',
-    'Organization'
+    'Organization',
   );
 
   /**
-   *
    */
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -64,6 +62,9 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           'first_name' => array(
             'title' => ts('First Name'),
           ),
+          'middle_name' => array(
+            'title' => ts('Middle Name'),
+          ),
           'last_name' => array(
             'title' => ts('Last Name'),
           ),
@@ -71,14 +72,21 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+          ),
+          'age' => array(
+            'title' => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
+          ),
           'contact_type' => array(
             'title' => ts('Contact Type'),
           ),
           'contact_sub_type' => array(
             'title' => ts('Contact Subtype'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
           ),
         ),
         'filters' => array(
@@ -89,9 +97,20 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           'sort_name' => array(
             'title' => ts('Contact Name'),
           ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
           'birth_date' => array(
             'title' => ts('Birth Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -100,7 +119,24 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'title' => ts('Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
-            'default_order' => 'ASC'
+            'default_order' => 'ASC',
+          ),
+          'first_name' => array(
+            'title' => ts('First Name'),
+          ),
+          'gender_id' => array(
+            'name' => 'gender_id',
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'name' => 'birth_date',
+            'title' => ts('Birth Date'),
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
         ),
       ),
@@ -335,8 +371,8 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         'fields' => array(
           'phone' => NULL,
           'phone_ext' => array(
-            'title' => ts('Phone Extension')
-          )
+            'title' => ts('Phone Extension'),
+          ),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -346,12 +382,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->_csvSupported = FALSE;
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     $this->_component = array(
@@ -359,7 +395,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       'membership_civireport',
       'participant_civireport',
       'relationship_civireport',
-      'activity_civireport'
+      'activity_civireport',
     );
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -409,8 +445,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
     foreach ($this->_component as $val) {
       if (!empty($select[$val])) {
-        $this->_selectComponent[$val] =
-          "SELECT " . implode(', ', $select[$val]) . " ";
+        $this->_selectComponent[$val] = "SELECT " . implode(', ', $select[$val]) . " ";
         unset($select[$val]);
       }
     }
@@ -425,12 +460,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $group = " ";
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
@@ -538,15 +573,14 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('operatorType', $field) &
-            CRM_Report_Form::OP_DATE
+          if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE
           ) {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
@@ -587,7 +621,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @return array
    */
-  function clauseComponent() {
+  public function clauseComponent() {
     $selectedContacts = implode(',', $this->_contactSelected);
     $contribution = $membership = $participant = NULL;
     $eligibleResult = $rows = $tempArray = array();
@@ -733,7 +767,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = array();
 
     $count = count($rows);
@@ -747,23 +781,23 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     return $statistics;
   }
 
-  //Override to set limit is 10
   /**
+   * Override to set limit is 10
    * @param int $rowCount
    */
-  function limit($rowCount = self::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
     parent::limit($rowCount);
   }
 
-  //Override to set pager with limit is 10
   /**
+   * Override to set pager with limit is 10
    * @param int $rowCount
    */
-  function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
     parent::setPager($rowCount);
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -787,15 +821,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
       //unset Conmponent id and contact id from display
       foreach ($this->_columnHeadersComponent as $componentTitle => $headers) {
-        $id_header =
-          'civicrm_' . substr_replace($componentTitle, '', -11, 11) . '_' .
+        $id_header = 'civicrm_' . substr_replace($componentTitle, '', -11, 11) . '_' .
           substr_replace($componentTitle, '', -11, 11) . '_id';
-        $contact_header =
-          'civicrm_' . substr_replace($componentTitle, '', -11, 11) .
+        $contact_header = 'civicrm_' . substr_replace($componentTitle, '', -11, 11) .
           '_contact_id';
         if ($componentTitle == 'activity_civireport') {
-          $id_header =
-            'civicrm_' . substr_replace($componentTitle, '', -11, 11) . '_id';
+          $id_header = 'civicrm_' . substr_replace($componentTitle, '', -11, 11) . '_id';
         }
 
         unset($this->_columnHeadersComponent[$componentTitle][$id_header]);
@@ -811,10 +842,15 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
    */
-  function alterDisplay(&$rows) {
-    // custom code to alter rows
+  public function alterDisplay(&$rows) {
 
     $entryFound = FALSE;
 
@@ -835,13 +871,30 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      //handle gender
+      if (array_key_exists('civicrm_contact_gender_id', $row)) {
+        if ($value = $row['civicrm_contact_gender_id']) {
+          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
+        }
+        $entryFound = TRUE;
+      }
+
+      // display birthday in the configured custom format
+      if (array_key_exists('civicrm_contact_birth_date', $row)) {
+        $birthDate = $row['civicrm_contact_birth_date'];
+        if ($birthDate) {
+          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
+        }
+        $entryFound = TRUE;
+      }
+
       if (array_key_exists('civicrm_address_state_province_id', $row)) {
         if ($value = $row['civicrm_address_state_province_id']) {
           $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
         }
         $entryFound = TRUE;
       }
-
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
@@ -854,7 +907,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   /**
    * @param $componentRows
    */
-  function alterComponentDisplay(&$componentRows) {
+  public function alterComponentDisplay(&$componentRows) {
     // custom code to alter rows
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
@@ -866,8 +919,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           // handle contribution
           if ($component == 'contribution_civireport') {
             if ($val = CRM_Utils_Array::value('civicrm_contribution_financial_type_id', $row)) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] =
-                CRM_Contribute_PseudoConstant::financialType($val, FALSE);
+              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($val, FALSE);
             }
 
             if ($val = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
@@ -940,5 +992,5 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       }
     }
   }
-}
 
+}

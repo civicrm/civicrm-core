@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -89,13 +89,12 @@
 
 {* handle enable/disable actions*}
 {include file="CRM/common/enableDisableApi.tpl"}
-{include file="CRM/common/crmeditable.tpl"}
 
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
   // for CRM-11310 and CRM-10635 : processing just parent groups on initial display
-  // passing '1' for parentsOnlyArg to show parent child heirarchy structure display
+  // passing '1' for parentsOnlyArg to show parent child hierarchy structure display
   // on initial load of manage group page and
   // also to handle search filtering for initial load of same page.
   buildGroupSelector(true, 1);
@@ -178,7 +177,8 @@ CRM.$(function($) {
           $(nRow).addClass(cl).attr({id: 'row_' + id, 'data-id': id, 'data-entity': 'group'});
           $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-title" />');
           $('td:eq(1)', nRow).addClass('right');
-          $('td:eq(3)', nRow).wrapInner('<span class="crm-editable crmf-description" data-type="textarea" />');
+          $('td:eq(3)', nRow).wrapInner('<div class="crm-editable crmf-description" data-type="textarea" />');
+          $('td:eq(5)', nRow).wrapInner('<div class="crm-editable crmf-visibility" data-type="select" />');
           if (parentsOnly) {
             if ($(nRow).hasClass('crm-group-parent')) {
               $(nRow).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
@@ -187,6 +187,7 @@ CRM.$(function($) {
           return nRow;
         },
         "fnDrawCallback": function() {
+          // FIXME: trigger crmLoad and crmEditable would happen automatically
           $('.crm-editable').crmEditable();
         },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -295,9 +296,9 @@ CRM.$(function($) {
               }
               appendHTML += '<td class="right">' + val.count + "</td>";
               appendHTML += "<td>" + val.created_by + "</td>";
-              appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
+              appendHTML += '<td class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</td>";
               appendHTML += "<td>" + val.group_type + "</td>";
-              appendHTML += "<td>" + val.visibility + "</td>";
+              appendHTML += '<td class="crm-editable crmf-visibility" data-type="select">' + val.visibility + "</td>";
               if (showOrgInfo) {
                 appendHTML += "<td>" + val.org_info + "</td>";
               }
@@ -306,7 +307,6 @@ CRM.$(function($) {
             });
             $( rowID ).after( appendHTML );
             $( rowID ).next().trigger('crmLoad');
-            $('.crm-editable').crmEditable();
           }
       });
     }

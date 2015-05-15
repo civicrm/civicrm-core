@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,25 +23,25 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Core_I18n_Form extends CRM_Core_Form {
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
     global $tsLocale;
     $this->_locales = array_keys($config->languageLimit);
 
     // get the part of the database we want to edit and validate it
-    $table            = CRM_Utils_Request::retrieve('table', 'String', $this);
-    $field            = CRM_Utils_Request::retrieve('field', 'String', $this);
-    $id               = CRM_Utils_Request::retrieve('id', 'Int', $this);
+    $table = CRM_Utils_Request::retrieve('table', 'String', $this);
+    $field = CRM_Utils_Request::retrieve('field', 'String', $this);
+    $id = CRM_Utils_Request::retrieve('id', 'Int', $this);
     $this->_structure = CRM_Core_I18n_SchemaStructure::columns();
     if (!isset($this->_structure[$table][$field])) {
       CRM_Core_Error::fatal("$table.$field is not internationalized.");
@@ -61,13 +61,33 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $dao->query($query, FALSE);
     $dao->fetch();
 
-    // we want TEXTAREAs for long fields and INPUTs for short ones
-    $this->_structure[$table][$field] == 'text' ? $type = 'textarea' : $type = 'text';
+    // get html type and attributes for this field
+    $widgets = CRM_Core_I18n_SchemaStructure::widgets();
+    $widget = $widgets[$table][$field];
+
+    // attributes
+    $attributes = array('class' => '');
+    if (isset($widget['rows'])) {
+      $attributes['rows'] = $widget['rows'];
+    }
+    if (isset($widget['cols'])) {
+      $attributes['cols'] = $widget['cols'];
+    }
+    $required = !empty($widget['required']);
 
     $languages = CRM_Core_I18n::languages(TRUE);
     foreach ($this->_locales as $locale) {
-      $this->addElement($type, "{$field}_{$locale}", $languages[$locale], array('class' => 'huge huge12' . ($locale == $tsLocale ? ' default-lang' : '')));
-      $this->_defaults["{$field}_{$locale}"] = $dao->$locale;
+      $name = "{$field}_{$locale}";
+      if ($locale == $tsLocale) {
+        $attributes['class'] .= ' default-lang';
+      }
+      if ($widget['type'] == 'RichTextEditor') {
+        $attributes['class'] .= ' collapsed';
+        $widget['type'] = 'wysiwyg';
+      }
+      $this->add($widget['type'], $name, $languages[$locale], $attributes, $required);
+
+      $this->_defaults[$name] = $dao->$locale;
     }
 
     $this->addDefaultButtons(ts('Save'), 'next', NULL);
@@ -84,35 +104,35 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
    *
    * access        public
    *
-   * @return array reference to the array of default values
-   *
+   * @return array
+   *   reference to the array of default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
-  function postProcess() {
+  public function postProcess() {
     $values = $this->exportValues();
-    $table  = $values['table'];
-    $field  = $values['field'];
+    $table = $values['table'];
+    $field = $values['field'];
 
     // validate table and field
     if (!isset($this->_structure[$table][$field])) {
       CRM_Core_Error::fatal("$table.$field is not internationalized.");
     }
 
-    $cols   = array();
+    $cols = array();
     $params = array(array($values['id'], 'Int'));
-    $i      = 1;
+    $i = 1;
     foreach ($this->_locales as $locale) {
       $cols[] = "{$field}_{$locale} = %$i";
       $params[$i] = array($values["{$field}_{$locale}"], 'String');
       $i++;
     }
     $query = "UPDATE $table SET " . implode(', ', $cols) . " WHERE id = %0";
-    $dao   = new CRM_Core_DAO();
+    $dao = new CRM_Core_DAO();
     $query = CRM_Core_DAO::composeQuery($query, $params, TRUE);
     $dao->query($query, FALSE);
   }
-}
 
+}

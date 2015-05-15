@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,11 +40,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   protected $_phoneField_a = FALSE;
   protected $_phoneField_b = FALSE;
   protected $_customGroupExtends = array(
-    'Relationship'
+    'Relationship',
   );
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
-  function __construct() {
+  public function __construct() {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
 
@@ -86,7 +85,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
-        'grouping' => 'conact_a_fields',
+        'grouping' => 'contact_a_fields',
       ),
       'civicrm_contact_b' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -125,7 +124,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
-        'grouping' => 'conact_b_fields',
+        'grouping' => 'contact_b_fields',
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
@@ -135,7 +134,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'email',
           ),
         ),
-        'grouping' => 'conact_a_fields',
+        'grouping' => 'contact_a_fields',
       ),
       'civicrm_email_b' => array(
         'dao' => 'CRM_Core_DAO_Email',
@@ -146,7 +145,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'email',
           ),
         ),
-        'grouping' => 'conact_b_fields',
+        'grouping' => 'contact_b_fields',
       ),
       'civicrm_phone' => array(
         'dao' => 'CRM_Core_DAO_Phone',
@@ -161,7 +160,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'phone_ext',
           ),
         ),
-        'grouping' => 'conact_a_fields',
+        'grouping' => 'contact_a_fields',
       ),
       'civicrm_phone_b' => array(
         'dao' => 'CRM_Core_DAO_Phone',
@@ -169,14 +168,14 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         'fields' => array(
           'phone_b' => array(
             'title' => ts('Phone (Contact B)'),
-            'name' => 'phone'
+            'name' => 'phone',
           ),
           'phone_ext_b' => array(
             'title' => ts('Phone Ext (Contact B)'),
-            'name' => 'phone_ext'
+            'name' => 'phone_ext',
           ),
         ),
-        'grouping' => 'conact_b_fields',
+        'grouping' => 'contact_b_fields',
       ),
       'civicrm_relationship_type' => array(
         'dao' => 'CRM_Contact_DAO_RelationshipType',
@@ -224,9 +223,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Relationship'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array(
-                '' => '- any relationship type -'
-              ) +
-              CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
+              '' => '- any relationship type -',
+            ) +
+            CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
@@ -255,11 +254,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -291,7 +290,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_relationship {$this->_aliases['civicrm_relationship']}
 
@@ -354,7 +353,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $whereClauses = $havingClauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -467,7 +466,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $isStatusFilter = FALSE;
@@ -505,7 +504,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     return $statistics;
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = " ";
     $groupBy = array();
     if ($this->relationType == 'a_b') {
@@ -524,11 +523,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact_b']}.sort_name ";
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
 
     $this->relationType = NULL;
@@ -541,9 +540,9 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
 
     $this->buildACLClause(array(
-        $this->_aliases['civicrm_contact'],
-        $this->_aliases['civicrm_contact_b']
-      ));
+      $this->_aliases['civicrm_contact'],
+      $this->_aliases['civicrm_contact_b'],
+    ));
     $sql = $this->buildQuery();
     $this->buildRows($sql, $rows);
 
@@ -560,7 +559,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   /**
    * @param $rows
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
 
@@ -588,8 +587,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        $rows[$rowNum]['civicrm_contact_sort_name_a'] =
-          $rows[$rowNum]['civicrm_contact_sort_name_a'] . ' (' .
+        $rows[$rowNum]['civicrm_contact_sort_name_a']
+          = $rows[$rowNum]['civicrm_contact_sort_name_a'] . ' (' .
           $rows[$rowNum]['civicrm_contact_id'] . ')';
         $rows[$rowNum]['civicrm_contact_sort_name_a_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_a_hover'] = ts("View Contact details for this contact.");
@@ -603,8 +602,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_b_id'],
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
-        $rows[$rowNum]['civicrm_contact_b_sort_name_b'] =
-          $rows[$rowNum]['civicrm_contact_b_sort_name_b'] . ' (' .
+        $rows[$rowNum]['civicrm_contact_b_sort_name_b']
+          = $rows[$rowNum]['civicrm_contact_b_sort_name_b'] . ' (' .
           $rows[$rowNum]['civicrm_contact_b_id'] . ')';
         $rows[$rowNum]['civicrm_contact_b_sort_name_b_link'] = $url;
         $rows[$rowNum]['civicrm_contact_b_sort_name_b_hover'] = ts("View Contact details for this contact.");
@@ -614,8 +613,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       if (array_key_exists('civicrm_relationship_relationship_id', $row) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
-        $url =
-          "/civicrm/contact/view/rel?reset=1&action=update&rtype=a_b&cid=" .
+        $url = "/civicrm/contact/view/rel?reset=1&action=update&rtype=a_b&cid=" .
           $row['civicrm_contact_id'] . "&id=" .
           $row['civicrm_relationship_relationship_id'];
         $rows[$rowNum]['civicrm_relationship_relationship_id_link'] = $url;
@@ -630,5 +628,5 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       }
     }
   }
-}
 
+}

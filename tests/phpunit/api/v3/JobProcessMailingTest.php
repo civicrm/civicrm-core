@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,13 +31,14 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
 require_once 'CiviTest/CiviUnitTestCase.php';
 //@todo - why doesn't class loader find these (I tried renaming)
 require_once 'CiviTest/CiviMailUtils.php';
+
 /**
  * Class api_v3_JobTest
  */
@@ -55,28 +56,29 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    */
   private $_mut;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     $this->_groupID = $this->groupCreate();
     $this->_email = 'test@test.test';
     $this->_params = array(
       'subject' => 'Accidents in cars cause children',
-      'body_text' => 'BEWARE children need regular infusions of toys',
+      'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
       'name' => 'mailing name',
       'created_id' => 1,
       'groups' => array('include' => array($this->_groupID)),
+      'scheduled_date' => 'now',
     );
-    $this->_mut = new CiviMailUtils( $this, true );
+    $this->_mut = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('mail_settings', 'get', array('api.mail_settings.create' => array('domain' => 'chaos.org')));
   }
 
   /**
-   *
    */
-  function tearDown() {
+  public function tearDown() {
     $this->_mut->stop();
-    $this->quickCleanup(array('civicrm_mailing', 'civicrm_mailing_job', 'civicrm_contact'));
+    //    $this->quickCleanup(array('civicrm_mailing', 'civicrm_mailing_job', 'civicrm_contact'));
     CRM_Utils_Hook::singleton()->reset();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
     parent::tearDown();
@@ -84,9 +86,9 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check mailing is sent
+   * Check mailing is sent.
    */
-  function testProcessMailing() {
+  public function testProcessMailing() {
     $this->createContactsInGroup(10, $this->_groupID);
     CRM_Core_Config::singleton()->mailerBatchLimit = 2;
     $this->callAPISuccess('mailing', 'create', $this->_params);
@@ -95,27 +97,32 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param integer $count
-   * @param integer $groupID
+   * @param int $count
+   * @param int $groupID
    */
-  function createContactsInGroup($count, $groupID) {
-    for($i = 1; $i <= $count; $i++ ) {
+  public function createContactsInGroup($count, $groupID) {
+    for ($i = 1; $i <= $count; $i++) {
       $contactID = $this->individualCreate(array('first_name' => $count, 'email' => 'mail' . $i . '@nul.com'));
-      $this->callAPISuccess('group_contact', 'create', array('contact_id' => $contactID, 'group_id' => $groupID, 'status' => 'Added'));
+      $this->callAPISuccess('group_contact', 'create', array(
+          'contact_id' => $contactID,
+          'group_id' => $groupID,
+          'status' => 'Added',
+        ));
     }
   }
 
   /**
-   * @param integer $start
-   * @param integer $count
+   * @param int $start
+   * @param int $count
    *
    * @return array
    */
-  function getRecipients($start, $count) {
+  public function getRecipients($start, $count) {
     $recipients = array();
-    for($i = $start; $i < ($start + $count); $i++ ) {
+    for ($i = $start; $i < ($start + $count); $i++) {
       $recipients[][0] = 'mail' . $i . '@nul.com';
     }
     return $recipients;
   }
+
 }

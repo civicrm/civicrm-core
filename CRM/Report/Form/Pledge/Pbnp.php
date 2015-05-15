@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,16 +41,14 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
   public $_drilldownReport = array('pledge/summary' => 'Link to Detail Report');
 
   protected $_customGroupExtends = array(
-    'Pledge'
+    'Pledge',
   );
 
   /**
-   *
    */
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
@@ -193,12 +191,12 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->assign('reportTitle', ts('Pledged but not Paid Report'));
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -225,7 +223,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = NULL;
 
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -233,7 +231,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     foreach (array(
                'Pending',
                'In Progress',
-               'Overdue'
+               'Overdue',
              ) as $statusKey) {
       if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
         $unpaidStatus[] = $key;
@@ -271,28 +269,32 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "
          GROUP BY {$this->_aliases['civicrm_pledge']}.contact_id,
                   {$this->_aliases['civicrm_pledge']}.id,
                   {$this->_aliases['civicrm_pledge']}.currency";
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_pledge']}.contact_id, {$this->_aliases['civicrm_pledge']}.id";
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::PostProcess();
   }
 
   /**
-   * @param $rows
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
    */
-  function alterDisplay(&$rows) {
-    // custom code to alter rows
+  public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $checkList = array();
     $display_flag = $prev_cid = $cid = 0;
@@ -331,8 +333,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
       //handle the Financial Type Ids
       if (array_key_exists('civicrm_pledge_financial_type_id', $row)) {
         if ($value = $row['civicrm_pledge_financial_type_id']) {
-          $rows[$rowNum]['civicrm_pledge_financial_type_id'] =
-            CRM_Contribute_PseudoConstant::financialType($value, FALSE);
+          $rows[$rowNum]['civicrm_pledge_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($value, FALSE);
         }
         $entryFound = TRUE;
       }
@@ -390,5 +391,5 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
       }
     }
   }
-}
 
+}

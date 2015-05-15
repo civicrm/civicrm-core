@@ -14,7 +14,8 @@ class SequenceListener implements CaseChangeListener {
   private static $singleton;
 
   /**
-   * @param bool $reset whether to forcibly rebuild the entire container
+   * @param bool $reset
+   *   Whether to forcibly rebuild the entire container.
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
   public static function singleton($reset = FALSE) {
@@ -24,10 +25,18 @@ class SequenceListener implements CaseChangeListener {
     return self::$singleton;
   }
 
+  /**
+   * @param \Civi\CCase\Event\CaseChangeEvent $event
+   */
   public static function onCaseChange_static(\Civi\CCase\Event\CaseChangeEvent $event) {
     self::singleton()->onCaseChange($event);
   }
 
+  /**
+   * @param \Civi\CCase\Event\CaseChangeEvent $event
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function onCaseChange(\Civi\CCase\Event\CaseChangeEvent $event) {
     /** @var \Civi\CCase\Analyzer $analyzer */
     $analyzer = $event->analyzer;
@@ -57,7 +66,7 @@ class SequenceListener implements CaseChangeListener {
 
     // OK, the activity has completed every step in the sequence!
     civicrm_api3('Case', 'create', array(
-      'id'  => $analyzer->getCaseId(),
+      'id' => $analyzer->getCaseId(),
       'status_id' => 'Closed',
     ));
     $analyzer->flush();
@@ -87,7 +96,8 @@ class SequenceListener implements CaseChangeListener {
   }
 
   /**
-   * @param Analyzer $analyzer the case being analyzed -- to which we want to add an activity
+   * @param Analyzer $analyzer
+   *   The case being analyzed -- to which we want to add an activity.
    * @param \SimpleXMLElement $actXML the <ActivityType> tag which describes the new activity
    */
   public function createActivity(Analyzer $analyzer, \SimpleXMLElement $actXML) {
@@ -100,4 +110,5 @@ class SequenceListener implements CaseChangeListener {
     $r = civicrm_api3('Activity', 'create', $params);
     $analyzer->flush();
   }
+
 }

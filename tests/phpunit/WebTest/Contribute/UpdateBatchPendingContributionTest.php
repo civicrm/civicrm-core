@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     parent::setUp();
   }
 
-  function testBatchUpdatePendingContribution() {
+  public function testBatchUpdatePendingContribution() {
     $this->webtestLogin();
     $this->_testOfflineContribution();
     $this->_testOfflineContribution();
@@ -44,7 +44,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "Individual");
-    $this->click('contribution_status_id_2');
+    $this->multiselect2('contribution_status_id', array("Pending"));
     $this->clickLink("_qf_Search_refresh");
 
     $this->click('radio_ts', 'ts_all');
@@ -59,7 +59,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForElementPresent("contribution_date_low");
 
     $this->type("sort_name", "Individual");
-    $this->click('contribution_status_id_1');
+    $this->multiselect2('contribution_status_id', array("Completed"));
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -73,7 +73,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->webtestVerifyTabularData($expected);
   }
 
-  function testParticipationAdd() {
+  public function testParticipationAdd() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -99,13 +99,14 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "Anderson");
-    $this->click('contribution_status_id_2');
+    $this->multiselect2('contribution_status_id', array("Pending"));
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('radio_ts', 'ts_all');
 
     $this->select('task', "label=Update Pending Contribution Status");
+    $this->waitForElementPresent("_qf_Search_next_action");
     $this->click("_qf_Search_next_action");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->select('contribution_status_id', 'label=Completed');
@@ -116,14 +117,14 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     $this->waitForElementPresent("contribution_date_low");
 
     $this->type("sort_name", "Anderson");
-    $this->click('contribution_status_id_1');
+    $this->multiselect2('contribution_status_id', array("Completed"));
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("xpath=//div[@id='contributionSearch']/table[@class='selector row-highlight']/tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     $expected = array(
-      'Received Into'        => "Deposit Bank Account",
+      'Received Into' => "Deposit Bank Account",
       'Contribution Status' => "Completed",
     );
 
@@ -133,7 +134,7 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
   /**
    * @param string $firstName
    */
-  function _addParticipant($firstName) {
+  public function _addParticipant($firstName) {
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');
 
@@ -172,9 +173,9 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     // Is status message correct?
     $this->waitForText("crm-notification-container", "Event registration for $firstName Anderson has been added");
 
-    $this->waitForElementPresent("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//form[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -188,14 +189,14 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
     );
   }
 
-  function _testOfflineContribution() {
+  public function _testOfflineContribution() {
     $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
 
     // create new contact using dialog
     $this->createDialogContact();
 
     // select financial type
-    $this->select( "financial_type_id", "value=1" );
+    $this->select("financial_type_id", "value=1");
 
     //Contribution status
     $this->select("contribution_status_id", "label=Pending");
@@ -226,5 +227,5 @@ class WebTest_Contribute_UpdateBatchPendingContributionTest extends CiviSelenium
       $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", preg_quote($value));
     }
   }
-}
 
+}

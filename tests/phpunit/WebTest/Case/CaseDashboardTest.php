@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAllOrMyCases() {
+  public function testAllOrMyCases() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -43,7 +43,12 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -118,5 +123,5 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     $this->clickLink("css=a.crm-case-summary-drilldown", "css=input.crm-form-submit");
     $this->assertTrue($this->isChecked("name=case_owner value=2"), 'Drilldown on dashboard summary cells not properly setting search form value to my cases.');
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
@@ -31,18 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Tests for field options
  */
 class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'FieldOptions',
-      'description' => 'Tests for field-specific option values',
-      'group' => 'Core',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
@@ -50,7 +39,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  function testOptionValues() {
+  public function testOptionValues() {
     /**
      * baoName/field combinations to test
      * Format: array[BAO Name] = $properties, where properties is an array whose
@@ -103,4 +92,5 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
       }
     }
   }
+
 }

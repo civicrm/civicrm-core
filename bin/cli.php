@@ -2,7 +2,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2008                 |
  +--------------------------------------------------------------------+
@@ -22,10 +22,10 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
-require_once ('cli.class.php');
+require_once 'cli.class.php';
 $cli = new civicrm_Cli();
-$cli->initialize() || die( 'Died during initialization' );
-$cli->callApi() || die( 'Died during callApi' );
+$cli->initialize() || die('Died during initialization');
+$cli->callApi() || die('Died during callApi');

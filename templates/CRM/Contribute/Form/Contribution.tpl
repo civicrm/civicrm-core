@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -68,7 +68,7 @@
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-     <a class="open-inline crm-hover-button action-item" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a>
+     <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a>
     </div>
     {/if}
   <div class="crm-submit-buttons">
@@ -218,6 +218,21 @@
     {/if}
 
   </table>
+
+  <div class="accordion ui-accordion ui-widget ui-helper-reset">
+    {* Billing Pane is the only billing pane currently *}
+    {foreach from=$billingPanes key=paneName item=paneValue}
+      <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
+        <div class="crm-accordion-header" id="{$paneValue.id}">
+          {$paneName}
+        </div><!-- /.crm-accordion-header -->
+        <div class="crm-accordion-body">
+          <div class="{$paneValue.id}"></div>
+        </div>
+      </div>
+    {/foreach}
+  </div>
+
     <!-- start of soft credit -->
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
       <div class="crm-accordion-header">
@@ -247,8 +262,7 @@
               <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
                 {$form.pcp_made_through_id.html} &nbsp;
-                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or
-                 email address.{/ts}</span>
+                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</span>
 
                 <div class="spacer"></div>
                  <div class="crm-contribution-form-block-pcp_details">
@@ -260,8 +274,7 @@
                     <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
                       <td class="label">{$form.pcp_roll_nickname.label}</td>
                       <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
-                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor
-                      Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
+                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
                       </td>
                     </tr>
                     <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
@@ -637,7 +650,7 @@ CRM.$(function($) {
           taxRate = 0;
           cj("#totalTaxAmount").hide( );
         } else {
-          cj("#totalTaxAmount").show( );          
+          cj("#totalTaxAmount").show( );
         }
         var totalAmount = $('#total_amount').val();
         var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';

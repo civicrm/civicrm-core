@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,18 +38,16 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
 
   protected $_customGroupExtends = array(
     'Contact',
-    'Individual'
+    'Individual',
   );
 
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   /**
-   *
    */
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
 
     $this->_columns = array(
       'civicrm_employer' => array(
@@ -83,8 +80,15 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           'first_name' => array(
             'title' => ts('First Name'),
           ),
+          'middle_name' => array(
+            'title' => ts('Middle Name'),
+          ),
           'last_name' => array(
             'title' => ts('Last Name'),
+          ),
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
           ),
           'job_title' => array(
             'title' => ts('Job Title'),
@@ -93,9 +97,12 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           'gender_id' => array(
             'title' => ts('Gender'),
           ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+          ),
+          'age' => array(
+            'title' => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
           ),
           'contact_type' => array(
             'title' => ts('Contact Type'),
@@ -106,7 +113,29 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
         ),
         'filters' => array(
           'sort_name' => array('title' => ts('Employee Name')),
-          'id' => array('no_display' => TRUE),
+          'source' => array(
+            'title' => ts('Contact Source'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'id' => array(
+            'title' => ts('Contact ID'),
+            'no_display' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -192,11 +221,11 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
 
     $select = $this->_columnHeaders = array();
 
@@ -218,7 +247,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
 FROM civicrm_contact {$this->_aliases['civicrm_contact']}
 
@@ -242,21 +271,20 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
              AND {$this->_aliases['civicrm_email']}.is_primary = 1) ";
   }
 
-  function where() {
+  public function where() {
 
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('operatorType', $field) &
-            CRM_Report_Form::OP_DATE
+          if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE
           ) {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
-            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type']);
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
@@ -281,9 +309,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       $this->_where = "WHERE {$this->_aliases['civicrm_contact']}.employer_id!='null' ";
     }
     else {
-      $this->_where =
-        "WHERE ({$this->_aliases['civicrm_contact']}.employer_id!='null') AND " .
-        implode(' AND ', $clauses);
+      $this->_where = "WHERE ({$this->_aliases['civicrm_contact']}.employer_id!='null') AND " . implode(' AND ', $clauses);
     }
 
     if ($this->_aclWhere) {
@@ -291,28 +317,33 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_employer']}.id,{$this->_aliases['civicrm_contact']}.id";
   }
 
-  function orderBy() {
+  public function orderBy() {
     $this->_orderBy = "ORDER BY {$this->_aliases['civicrm_employer']}.organization_name, {$this->_aliases['civicrm_contact']}.display_name";
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause(array(
-        $this->_aliases['civicrm_contact'],
-        $this->_aliases['civicrm_employer']
-      ));
+      $this->_aliases['civicrm_contact'],
+      $this->_aliases['civicrm_employer'],
+    ));
     parent::postProcess();
   }
 
   /**
-   * @param $rows
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
    */
-  function alterDisplay(&$rows) {
-    // custom code to alter rows
+  public function alterDisplay(&$rows) {
     $checkList = array();
     $entryFound = FALSE;
 
@@ -355,6 +386,15 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
         $entryFound = TRUE;
       }
 
+      // display birthday in the configured custom format
+      if (array_key_exists('civicrm_contact_birth_date', $row)) {
+        $birthDate = $row['civicrm_contact_birth_date'];
+        if ($birthDate) {
+          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
+        }
+        $entryFound = TRUE;
+      }
+
       // convert employee name to links
       if (array_key_exists('civicrm_contact_display_name', $row) &&
         array_key_exists('civicrm_contact_id', $row)
@@ -389,4 +429,5 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
       }
     }
   }
+
 }

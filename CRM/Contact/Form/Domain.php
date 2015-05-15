@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -46,7 +46,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   protected $_id;
 
   /**
-   * The contact_id of domain
+   * The contact_id of domain.
    *
    * @var int
    */
@@ -60,7 +60,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   protected $_fromEmailId = NULL;
 
   /**
-   * Default location type fields
+   * Default location type fields.
    *
    * @var array
    */
@@ -72,9 +72,23 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @var int
    * @const
    */
-  CONST LOCATION_BLOCKS = 1;
+  const LOCATION_BLOCKS = 1;
 
-  function preProcess() {
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Domain';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('Organization Address and Contact Info'));
     $breadCrumbPath = CRM_Utils_System::url('civicrm/admin', 'reset=1');
     CRM_Utils_System::appendBreadCrumb(ts('Administer CiviCRM'), $breadCrumbPath);
@@ -90,28 +104,17 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     $location->preProcess($this);
   }
 
-  /*
-   * Set default values for the form.
-   * the default values are retrieved from the database
-   *
-   * @access public
-   * @return void
-   */
   /**
-   * This virtual function is used to set the default values of
+   * This virtual function is used to set the default values of.
    * various form elements
    *
-   * access        public
-   *
-   * @return array reference to the array of default values
-   *
-   */
-  /**
    * @return array
+   *   reference to the array of default values
+   *
    */
-  function setDefaultValues() {
-    $defaults  = array();
-    $params    = array();
+  public function setDefaultValues() {
+    $defaults = array();
+    $params = array();
 
     if (isset($this->_id)) {
       $params['id'] = $this->_id;
@@ -150,18 +153,14 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
-
-    $this->add('text', 'name', ts('Organization Name'), array('size' => 25), TRUE);
-    $this->add('text', 'description', ts('Description'), array('size' => 25));
-
+    $this->addField('name', array('label' => ts('Organization Name')), TRUE);
+    $this->addField('description', array('label' => ts('Description'), 'size' => 30));
     $this->add('text', 'email_name', ts('FROM Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', 'email'), TRUE);
-
     $this->add('text', 'email_address', ts('FROM Email Address'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', 'email'), TRUE);
     $this->addRule('email_address', ts('Domain Email Address must use a valid email address format (e.g. \'info@example.org\').'), 'email');
 
@@ -169,17 +168,17 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     CRM_Contact_Form_Location::buildQuickForm($this);
 
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'subName' => 'view',
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      ));
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'subName' => 'view',
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
@@ -188,30 +187,29 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Domain', 'formRule'));
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     // check for state/country mapping
     $errors = CRM_Contact_Form_Edit_Address::formRule($fields, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullObject);
     // $errors === TRUE means no errors from above formRule excution,
-    // so declaring $errors to array for futher processing
+    // so declaring $errors to array for further processing
     if ($errors === TRUE) {
       $errors = array();
     }
@@ -234,10 +232,9 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -269,10 +266,10 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     }
 
     $params += array('contact_id' => $this->_contactId);
-    $contactParams = array (
-      'sort_name'    => $domain->name,
+    $contactParams = array(
+      'sort_name' => $domain->name,
       'display_name' => $domain->name,
-      'legal_name'   => $domain->name,
+      'legal_name' => $domain->name,
       'organization_name' => $domain->name,
       'contact_id' => $this->_contactId,
       'contact_type' => 'Organization',
@@ -312,7 +309,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       $emailParams['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues);
     }
 
-
     //reset default within domain.
     $emailParams['reset_default_for'] = array('domain_id' => CRM_Core_Config::domainID());
 
@@ -322,5 +318,5 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
   }
-}
 
+}

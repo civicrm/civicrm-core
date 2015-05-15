@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,11 +23,11 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  */
 
@@ -40,34 +40,44 @@ interface CRM_Extension_Container_Interface {
   /**
    * Determine if any unmet requirements prevent use of this container.
    *
-   * @return array list of error messages; empty if OK
+   * @return array
+   *   List of error messages; empty if OK.
    */
   public function checkRequirements();
 
   /**
-   * Get a list of extensions available in this container
+   * Get a list of extensions available in this container.
    *
-   * @return array list of keys (strings)
+   * @return array
+   *   List of keys (strings).
    */
   public function getKeys();
 
   /**
    * Determine the main .php file for an extension
    *
-   * @param string $key fully-qualified extension name
-   * @return string local path to the extension's main .php file
+   * @param string $key
+   *   Fully-qualified extension name.
+   * @return string
+   *   Local path to the extension's main .php file.
    * @throws Exception
    */
   public function getPath($key);
 
   /**
-   * Determine the base URL for resources provided by the extension
+   * Determine the base URL for resources provided by the extension.
    *
-   * @param string $key fully-qualified extension name
-   * @return string public URL
+   * @param string $key
+   *   Fully-qualified extension name.
+   * @return string
+   *   Public URL.
    * @throws Exception
    */
   public function getResUrl($key);
 
+  /**
+   * Scan the container for available extensions.
+   */
   public function refresh();
+
 }

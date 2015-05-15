@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *  Mail utils for use during unit testing to allow retrieval
@@ -59,12 +59,13 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   protected $_webtest = FALSE;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param CiviSeleniumTestCase|CiviUnitTestCase $unit_test The currently running test
-   * @param bool $startImmediately Start writing to db now or wait until start() is called
+   * @param bool $startImmediately
+   *   Start writing to db now or wait until start() is called.
    */
-  function __construct(&$unit_test, $startImmediately = TRUE) {
+  public function __construct(&$unit_test, $startImmediately = TRUE) {
     $this->_ut = $unit_test;
 
     // Check if running under webtests or not
@@ -78,9 +79,9 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Start writing emails to db instead of current option
+   * Start writing emails to db instead of current option.
    */
-  function start() {
+  public function start() {
     if ($this->_webtest) {
       // Change outbound mail setting
       $this->_ut->openCiviPage('admin/setting/smtp', "reset=1", "_qf_Smtp_next");
@@ -116,7 +117,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     }
   }
 
-  function stop() {
+  public function stop() {
     if ($this->_webtest) {
       if ($this->_outBound_option != CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB) {
         // Change outbound mail setting
@@ -149,7 +150,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    *
    * @return ezcMail|string
    */
-  function getMostRecentEmail($type = 'raw') {
+  public function getMostRecentEmail($type = 'raw') {
     $msg = '';
 
     if ($this->_webtest) {
@@ -180,6 +181,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       case 'raw':
         // nothing to do
         break;
+
       case 'ezc':
         $msg = $this->convertToEzc($msg);
         break;
@@ -188,12 +190,13 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * @param string $type 'raw'|'ezc'
+   * @param string $type
+   *   'raw'|'ezc'.
    *
    * @throws Exception
    * @return array(ezcMail)|array(string)
    */
-  function getAllMessages($type = 'raw') {
+  public function getAllMessages($type = 'raw') {
     $msgs = array();
 
     if ($this->_webtest) {
@@ -211,6 +214,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       case 'raw':
         // nothing to do
         break;
+
       case 'ezc':
         foreach ($msgs as $i => $msg) {
           $msgs[$i] = $this->convertToEzc($msg);
@@ -224,7 +228,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   /**
    * @return int
    */
-  function getSelectedOutboundOption() {
+  public function getSelectedOutboundOption() {
     $selectedOption = CRM_Mailing_Config::OUTBOUND_OPTION_MAIL;
     // Is there a better way to do this? How do you get the currently selected value of a radio button in selenium?
     for ($i = 0; $i <= 5; $i++) {
@@ -244,30 +248,32 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    */
 
   /**
-   * Check contents of mail log
+   * Check contents of mail log.
    *
-   * @param array $strings strings that should be included
-   * @param array $absentStrings strings that should not be included
+   * @param array $strings
+   *   Strings that should be included.
+   * @param array $absentStrings
+   *   Strings that should not be included.
    * @param string $prefix
    *
    * @return \ezcMail|string
    */
-  function checkMailLog($strings, $absentStrings = array(), $prefix = '') {
+  public function checkMailLog($strings, $absentStrings = array(), $prefix = '') {
     $mail = $this->getMostRecentEmail('raw');
     foreach ($strings as $string) {
       $this->_ut->assertContains($string, $mail, "$string .  not found in  $mail  $prefix");
     }
     foreach ($absentStrings as $string) {
-      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");
-      ;
+      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");;
     }
     return $mail;
   }
 
   /**
-   * Check that mail log is empty
+   * Check that mail log is empty.
+   * @param string $prefix
    */
-  function assertMailLogEmpty($prefix = '') {
+  public function assertMailLogEmpty($prefix = '') {
     $mail = $this->getMostRecentEmail('raw');
     $this->_ut->assertEmpty($mail, 'mail sent when it should not have been ' . $prefix);
   }
@@ -275,9 +281,10 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   /**
    * Assert that $expectedRecipients (and no else) have received emails
    *
-   * @param array $expectedRecipients array($msgPos => array($recipPos => $emailAddr))
+   * @param array $expectedRecipients
+   *   Array($msgPos => array($recipPos => $emailAddr)).
    */
-  function assertRecipients($expectedRecipients) {
+  public function assertRecipients($expectedRecipients) {
     $recipients = array();
     foreach ($this->getAllMessages('ezc') as $message) {
       $recipients[] = CRM_Utils_Array::collect('email', $message->to);
@@ -292,9 +299,9 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * Remove any sent messages from the log
+   * Remove any sent messages from the log.
    */
-  function clearMessages() {
+  public function clearMessages() {
     if ($this->_webtest) {
       throw new Exception("Not implementated: clearMessages for WebTest");
     }
@@ -304,7 +311,8 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   * @param string $msg email header and body
+   * @param string $msg
+   *   Email header and body.
    * @return ezcMail
    */
   private function convertToEzc($msg) {
@@ -314,4 +322,5 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
     $this->_ut->assertNotEmpty($mail, 'Cannot parse mail');
     return $mail[0];
   }
+
 }

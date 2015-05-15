@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,7 +49,6 @@
       {strip}
         {* handle enable/disable actions*}
         {include file="CRM/common/enableDisableApi.tpl"}
-        {include file="CRM/common/crmeditable.tpl"}
         <table id="options" class="row-highlight">
           <thead>
           <tr>
@@ -100,8 +99,8 @@
   {/if}
   {if $addMoreFields && !$isReserved}
     <div class="action-link">
-      <a href="{crmURL q="reset=1&action=add&fid=$fid&sid=$sid"}" class="button"><span><div class="icon add-icon"></div> {ts 1=$fieldTitle}New Option for '%1'{/ts}</span></a>
-      <a href="{crmURL p="civicrm/admin/price/field" q="reset=1&sid=$sid"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
+      {crmButton q="reset=1&action=add&fid=$fid&sid=$sid" icon="circle-plus"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field" q="reset=1&sid=$sid" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

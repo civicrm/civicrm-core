@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -34,31 +34,32 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
   protected function setUp() {
     parent::setUp();
   }
-  function testAdminAddNewProfile() {
+
+  public function testAdminAddNewProfile() {
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile();
     $this->_deleteProfile($id, $profileTitle);
   }
 
-  function testUserAddNewProfile() {
+  public function testUserAddNewProfile() {
     //add the required permission
     $permissions = array(
       'edit-2-profile-listings-and-forms',
       'edit-2-access-all-custom-data',
-      'edit-2-access-civicrm'
+      'edit-2-access-civicrm',
     );
     $this->changePermissions($permissions);
     list($id, $profileTitle) = $this->_addNewProfile(TRUE, FALSE, TRUE);
     $this->_deleteProfile($id, $profileTitle);
   }
 
-  function testAddNewNonMultiProfile() {
+  public function testAddNewNonMultiProfile() {
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile(FALSE);
     $this->_deleteProfile($id, $profileTitle);
   }
 
-  function testNonSearchableMultiProfile() {
+  public function testNonSearchableMultiProfile() {
     $this->webtestLogin();
     list($id, $profileTitle) = $this->_addNewProfile(TRUE, TRUE);
     $this->_deleteProfile($id, $profileTitle);
@@ -71,7 +72,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _addNewProfile($checkMultiRecord = TRUE, $checkSearchable = FALSE, $userCheck = FALSE) {
+  public function _addNewProfile($checkMultiRecord = TRUE, $checkSearchable = FALSE, $userCheck = FALSE) {
     $params = $this->_testCustomAdd($checkSearchable);
 
     $this->openCiviPage('admin/uf/group', 'reset=1');
@@ -116,14 +117,18 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
     $gid = $this->urlArg('gid');
 
-    $this->openCiviPage('admin/uf/group/field/add', array('action' => 'add', 'reset' => 1, 'gid' => $gid), 'field_name[0]');
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid,
+      ), 'field_name[0]');
 
     //Add field to profile
     $this->click('field_name[0]');
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
     $this->click('field_name_1');
-    $this->select('field_name_1', 'label='.$params['textFieldLabel'].' :: '.$params['customGroupTitle']);
+    $this->select('field_name_1', 'label=' . $params['textFieldLabel'] . ' :: ' . $params['customGroupTitle']);
     if ($checkMultiRecord) {
       $this->click('is_multi_summary');
     }
@@ -143,7 +148,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->select('field_name[0]', 'value=Contact');
     $this->click("//option[@value='Contact']");
     $this->click('field_name_1');
-    $this->select('field_name_1', 'label='.$params['selectFieldLabel'].' :: '.$params['customGroupTitle']);
+    $this->select('field_name_1', 'label=' . $params['selectFieldLabel'] . ' :: ' . $params['customGroupTitle']);
     if ($checkMultiRecord) {
       $this->click('is_multi_summary');
     }
@@ -239,12 +244,12 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='Edit']");
     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-content ui-widget-content modal-dialog crm-ajax-container']/form/div[2]//div[@id='crm-profile-block']");
     $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
-    $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $recordNew['text'].'edit');
+    $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $recordNew['text'] . 'edit');
     $this->click("css=.ui-dialog-buttonset button[data-identifier=_qf_Edit_next]");
-    $this->waitForText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", $recordNew['text'].'edit');
+    $this->waitForText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", $recordNew['text'] . 'edit');
     $editalertText = $this->getAlert();
     $this->assertEquals("Thank you. Your information has been saved.", $editalertText);
-    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", preg_quote($recordNew['text'].'edit'));
+    $this->verifyText("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr[1]/td[1]", preg_quote($recordNew['text'] . 'edit'));
 
     // Check the delete functionality
     $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='Delete']");
@@ -256,7 +261,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->assertEquals("Deleted Your record has been deleted.", $delText);
 
     $this->click("//div[@id='custom--table-wrapper']/div/div/table/tbody/tr/td[3]/span/a[text()='View']");
-    $this->waitForText("css=.ui-dialog-title", 'View '.$params['customGroupTitle'] . ' Record');
+    $this->waitForText("css=.ui-dialog-title", 'View ' . $params['customGroupTitle'] . ' Record');
     $this->assertElementContainsText("css=.ui-dialog-content.crm-ajax-container", $params['textFieldLabel']);
     if ($checkSearchable) {
       $this->verifyElementNotPresent("//div[@id='profile-dialog']/div/div/div/div/div[1]/div[2]/a");
@@ -284,7 +289,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
    * @param int $gid
    * @param $profileTitle
    */
-  function _deleteProfile($gid, $profileTitle) {
+  public function _deleteProfile($gid, $profileTitle) {
     $this->webtestLogin();
     $this->openCiviPage("admin/uf/group", "action=delete&id={$gid}", '_qf_Group_next-bottom');
     $this->click('_qf_Group_next-bottom');
@@ -297,7 +302,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
    *
    * @return mixed
    */
-  function _testCustomAdd($checkSearchable) {
+  public function _testCustomAdd($checkSearchable) {
 
     $this->openCiviPage('admin/custom/group', 'action=add&reset=1');
 
@@ -367,11 +372,11 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
 
   /**
    * @param string $context
-   * @param string $parentElement
-   *
+   * @param bool $dialog
    * @return mixed
+   *
    */
-  function _addRecords($context = 'Edit', $dialog = FALSE) {
+  public function _addRecords($context = 'Edit', $dialog = FALSE) {
     $params['text'] = 'text' . substr(sha1(rand()), 0, 3);
     $this->waitForElementPresent("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']");
     $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@class='crm-form-text required']", $params['text']);
@@ -380,14 +385,14 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->type('first_name', $params['firstname']);
       $params['lastname'] = 'Anderson' . substr(sha1(rand()), 0, 3);
       $this->type('last_name', $params['lastname']);
-      $params['email'] =  $params['firstname'].$params['lastname'].'@exa.com';
+      $params['email'] = $params['firstname'] . $params['lastname'] . '@exa.com';
       $this->type('email-Primary', $params['email']);
       $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
-      $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
+      $this->select("//div[@id='crm-profile-block']//div/div[2]/select", 'value=1');
     }
     else {
       $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
-      $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
+      $this->select("//div[@id='crm-profile-block']//div/div[2]/select", 'value=1');
 
     }
     if ($dialog) {
@@ -398,4 +403,5 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     }
     return $params;
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -38,7 +38,7 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
   /**
    * Test Saved Import Mapping for Individuals.
    */
-  function testSaveIndividualMapping() {
+  public function testSaveIndividualMapping() {
 
     // Logging in.
     $this->webtestLogin();
@@ -87,7 +87,7 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualCSVData() {
+  public function _individualCSVData() {
     $headers = array(
       'individual_prefix' => 'Individual Prefix',
       'first_name' => 'First Name',
@@ -136,5 +136,5 @@ class WebTest_Import_SavedMappingTest extends ImportCiviSeleniumTestCase {
 
     return array($headers, $rows);
   }
-}
 
+}

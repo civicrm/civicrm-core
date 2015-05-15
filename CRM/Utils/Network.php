@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: $
  *
  */
@@ -42,10 +42,13 @@ class CRM_Utils_Network {
    *
    * @param $host
    * @param $port
-   * @param int $serverStartupTimeOut seconds
-   * @param float $interval seconds to wait in between pollings
+   * @param int $serverStartupTimeOut
+   *   Seconds.
+   * @param float $interval
+   *   Seconds to wait in between pollings.
    *
-   * @return bool TRUE if service is online
+   * @return bool
+   *   TRUE if service is online
    */
   public static function waitForServiceStartup($host, $port, $serverStartupTimeOut, $interval = 0.333) {
     $start = time();
@@ -76,9 +79,11 @@ class CRM_Utils_Network {
         error_reporting($old_error_reporting);
         return TRUE;
       }
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
     }
     error_reporting($old_error_reporting);
     return FALSE;
   }
+
 }

@@ -1,8 +1,8 @@
 /**
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -578,14 +578,14 @@
         if (!widget.throbber) {
           widget.throbber = $(opts.throbberMarkup).appendTo($('.widget-wrapper', widget.element));
         }
-      };
+      }
 
       // Event handler/callback for cancel button clicks.
       // @todo test this gets caught by all browsers when the cancel button is 'clicked' via the keyboard.
       function cancelEditSettings() {
         widget.toggleSettings();
         return false;
-      };
+      }
 
       // Helper function to execute external script on the server.
       // @todo It would be nice to provide some context to the script.  How?
@@ -594,7 +594,7 @@
           $.getScript(url);
         }
       }
-    };
+    }
   };
 
   // Public static properties of dashboard.  Default settings.

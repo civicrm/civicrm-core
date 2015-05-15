@@ -32,3 +32,26 @@ function mysqldump_cmd() {
   _mysql_vars
   echo "mysqldump -u$DBUSER $PASSWDSECTION $HOSTSECTION $PORTSECTION $DBARGS"
 }
+
+## Pick the first available command. If none, then abort.
+## example: COMPOSER=$(pickcmd composer composer.phar)
+function pickcmd() {
+  for name in "$@" ; do
+    if which $name >> /dev/null ; then
+      echo $name
+      return
+    fi
+  done
+  echo "ERROR: Failed to find any of these commands: $@"
+  exit 1
+}
+
+## usage: has_commands <cmd1> <cmd2> ...
+function has_commands() {
+  for cmd in "$@" ; do
+    if ! which $cmd >> /dev/null ; then
+      return 1
+    fi
+  done
+  return 0
+}

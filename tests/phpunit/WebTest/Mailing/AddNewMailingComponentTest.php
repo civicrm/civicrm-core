@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testHeaderAdd() {
+  public function testHeaderAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/component", "action=add&reset=1");
@@ -69,10 +69,10 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "The mailing component '$componentName' has been saved.");
 
     // Verify text.
-    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Header']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td/div[text()='{$componentName}']/../../td[2][text()='Header']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
   }
 
-  function testFooterAdd() {
+  public function testFooterAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/component", "action=add&reset=1");
@@ -103,13 +103,13 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->waitForText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
+    $this->waitForText('crm-notification-container', "The mailing component '$componentName' has been saved.");
 
     // Verify text.
-    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Footer']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td/div[text()='{$componentName}']/../../td[2][text()='Footer']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
   }
 
-  function testAutomatedAdd() {
+  public function testAutomatedAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("admin/component", "action=add&reset=1");
@@ -140,9 +140,10 @@ class WebTest_Mailing_AddNewMailingComponentTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Is status message correct.
-    $this->waitForText('crm-notification-container',  "The mailing component '$componentName' has been saved.");
+    $this->waitForText('crm-notification-container', "The mailing component '$componentName' has been saved.");
 
     // Verify text
-    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[text()='{$componentName}']/../td[2][text()='Reply']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td/div[text()='{$componentName}']/../../td[2][text()='Reply']/../td[3][text()='{$subject}']/../td[4][text()='{$txtMsg}']/../td[5][text()='{$htmlMsg}']"), "The row doesn't consists of proper component details");
   }
+
 }

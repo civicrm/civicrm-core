@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -32,21 +32,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_PaymentTest
  */
 class CRM_Core_PaymentTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Payment Test',
-      'description' => 'Test Payment methods.',
-      'group' => 'Payment Processor Tests',
-    );
-  }
 
   /**
    * Test the payment method is adequately logged - we don't expect the processing to succeed
    */
-  function testHandlePaymentMethodLogging() {
+  public function testHandlePaymentMethodLogging() {
     $params = array('processor_name' => 'Paypal', 'data' => 'blah');
     try {
       CRM_Core_Payment::handlePaymentMethod('method', $params);
@@ -57,4 +47,5 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $log = $this->callAPISuccess('SystemLog', 'get', array());
     $this->assertEquals('payment_notification processor_name=Paypal', $log['values'][$log['id']]['message']);
   }
+
 }

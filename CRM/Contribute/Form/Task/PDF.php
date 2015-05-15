@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
@@ -49,11 +48,11 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
   protected $_rows;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
-   */ function preProcess() {
+   */
+  public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE
     );
@@ -91,18 +90,19 @@ AND    {$this->_componentClause}";
 
     $url = CRM_Utils_System::url('civicrm/contribute/search', $urlParams);
     $breadCrumb = array(
-      array('url' => $url,
+      array(
+        'url' => $url,
         'title' => ts('Search Results'),
-      ));
+      ),
+    );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Print Contribution Receipts'));
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
@@ -137,17 +137,16 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Set default values
+   * Set default values.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     return array('pdf_format_id' => $defaultFormat['id'], 'receipt_update' => 1, 'override_privacy' => 0);
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -183,19 +182,18 @@ AND    {$this->_componentClause}";
       $contribution = &$objects['contribution'];
 
       // set some fake input values so we can reuse IPN code
-      $input['amount']     = $contribution->total_amount;
-      $input['is_test']    = $contribution->is_test;
+      $input['amount'] = $contribution->total_amount;
+      $input['is_test'] = $contribution->is_test;
       $input['fee_amount'] = $contribution->fee_amount;
       $input['net_amount'] = $contribution->net_amount;
-      $input['trxn_id']    = $contribution->trxn_id;
-      $input['trxn_date']  = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
+      $input['trxn_id'] = $contribution->trxn_id;
+      $input['trxn_date'] = isset($contribution->trxn_date) ? $contribution->trxn_date : NULL;
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
       $values = array();
       $mail = $elements['baseIPN']->sendMail($input, $ids, $objects, $values, FALSE, $elements['createPdf']);
-
 
       if ($mail['html']) {
         $message[] = $mail['html'];
@@ -236,18 +234,19 @@ AND    {$this->_componentClause}";
   }
 
   /**
-   * Declaration of common variables for Invoice and PDF
+   * Declaration of common variables for Invoice and PDF.
    *
-   * @access public
    *
-   * @param array $contribIds Contribution Id
-   * @param array $params parameter for pdf or email invoices
-   * @param array $contactIds Contact Id
+   * @param array $contribIds
+   *   Contribution Id.
+   * @param array $params
+   *   Parameter for pdf or email invoices.
+   * @param array $contactIds
+   *   Contact Id.
    *
-   * @return array array of common elements
+   * @return array
+   *   array of common elements
    *
-   * @access public
-   * @static
    */
   static public function getElements($contribIds, $params, $contactIds) {
     $pdfElements = array();
@@ -262,18 +261,19 @@ AND    {$this->_componentClause}";
 
     $pdfElements['createPdf'] = FALSE;
     if (!empty($pdfElements['params']['output']) &&
-      ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt")) {
+      ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt")
+    ) {
       $pdfElements['createPdf'] = TRUE;
     }
 
     $excludeContactIds = array();
     if (!$pdfElements['createPdf']) {
       $returnProperties = array(
-                                'email' => 1,
-                                'do_not_email' => 1,
-                                'is_deceased' => 1,
-                                'on_hold' => 1,
-                                );
+        'email' => 1,
+        'do_not_email' => 1,
+        'is_deceased' => 1,
+        'on_hold' => 1,
+      );
 
       list($contactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, $returnProperties, FALSE, FALSE);
       $pdfElements['suppressedEmails'] = 0;
@@ -282,10 +282,11 @@ AND    {$this->_componentClause}";
         if (empty($values['email']) ||
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
           || CRM_Utils_Array::value('is_deceased', $values)
-          || !empty($values['on_hold'])) {
-            $suppressedEmails++;
-            $pdfElements['suppressedEmails'] = $suppressedEmails;
-            $excludeContactIds[] = $values['contact_id'];
+          || !empty($values['on_hold'])
+        ) {
+          $suppressedEmails++;
+          $pdfElements['suppressedEmails'] = $suppressedEmails;
+          $excludeContactIds[] = $values['contact_id'];
         }
       }
     }
@@ -293,5 +294,5 @@ AND    {$this->_componentClause}";
 
     return $pdfElements;
   }
-}
 
+}

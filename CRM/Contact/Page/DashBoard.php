@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,12 +40,11 @@
 class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
 
   /**
-   * Run dashboard
+   * Run dashboard.
    *
    * @return void
-   * @access public
    */
-  function run() {
+  public function run() {
     // Add dashboard js and css
     $resources = CRM_Core_Resources::singleton();
     $resources->addScriptFile('civicrm', 'js/jquery/jquery.dashboard.js', 0, 'html-header', FALSE);
@@ -73,8 +72,8 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     }
 
     //check that default FROM email address, owner (domain) organization name and default mailbox are configured.
-    $fromEmailOK      = TRUE;
-    $ownerOrgOK       = TRUE;
+    $fromEmailOK = TRUE;
+    $ownerOrgOK = TRUE;
     $defaultMailboxOK = TRUE;
 
     // Don't put up notices if user doesn't have administer CiviCRM permission
@@ -126,5 +125,5 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

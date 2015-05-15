@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -64,8 +64,7 @@
       <tr class="crm-case-activity-form-block-details">
         <td class="label">{ts}Notes{/ts}</td>
         <td class="view-value">
-          {* If using plain textarea, assign class=huge to make input large enough. *}
-          {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+          {$form.details.html}
         </td>
       </tr>
       {* Added Activity Details accordion tab *}
@@ -76,6 +75,9 @@
               {ts}Activity Details{/ts}
             </div><!-- /.crm-accordion-header -->
             <div class="crm-accordion-body">
+    {else}
+      <tr class="crm-case-activity-form-block-activity-details">
+        <td colspan="2">
     {/if}
     {* End block for change status, case type and start date. *}
             <table class="form-layout-compressed">
@@ -100,7 +102,7 @@
                 </tr>
 
                 {if $action eq 1 or $action eq 2}
-                  <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
+                  <tr class="crm-case-activity-form-block-target_contact_id hiddenElement" id="with-contacts-widget">
                     <td class="label font-size10pt">{ts}With Contact{/ts}</td>
                     <td class="view-value">
                       {$form.target_contact_id.html}
@@ -128,7 +130,7 @@
                   <td>{$form.assignee_contact_id.html}
                     {if $activityAssigneeNotification}
                       <br />
-                      <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+                      <span class="description"><span class="icon ui-icon-mail-closed"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
                     {/if}
                   </td>
                 </tr>
@@ -163,8 +165,7 @@
                 <tr class="crm-case-activity-form-block-details">
                   <td class="label">{$form.details.label}</td>
                   <td class="view-value">
-                  {* If using plain textarea, assign class=huge to make input large enough. *}
-                    {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+                    {$form.details.html}
                   </td>
                 </tr>
               {/if}
@@ -245,7 +246,7 @@
               <td class="label">{$form.followup_activity_subject.label}</td>
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
-      <tr>
+            <tr>
               <td class="label">
                 {$form.followup_assignee_contact_id.label}
                 {edit}
@@ -264,14 +265,18 @@
     {if $activityTypeFile NEQ 'ChangeCaseStatus'
     && $activityTypeFile NEQ 'ChangeCaseType'
     && $activityTypeFile NEQ 'ChangeCaseStartDate'}
-    <table class="form-layout-compressed">
-      <tr class="crm-case-activity-form-block-status_id">
-        <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
+      <tr>
+        <td colspan="2">
+          <table class="form-layout-compressed">
+            <tr class="crm-case-activity-form-block-status_id">
+              <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
+            </tr>
+            <tr class="crm-case-activity-form-block-priority_id">
+              <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
+            </tr>
+          </table>
+        </td>
       </tr>
-      <tr class="crm-case-activity-form-block-priority_id">
-        <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
-      </tr>
-    </table>
     {/if}
     {if $form.tag.html}
     <tr class="crm-case-activity-form-block-tag">

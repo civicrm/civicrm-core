@@ -13,7 +13,7 @@ class CRM_Widget_Widget {
 
   static $_methodTable;
 
-  function initialize() {
+  public function initialize() {
     if (!self::$_methodTable) {
       self::$_methodTable = array(
         'getContributionPageData' => array(
@@ -37,7 +37,7 @@ class CRM_Widget_Widget {
     }
   }
 
-  function &methodTable() {
+  public function &methodTable() {
     self::initialize();
 
     return self::$_methodTable;
@@ -52,7 +52,7 @@ class CRM_Widget_Widget {
    *
    * @return string
    */
-  function registerRequest($contributionPageID, $widgetID, $action) {
+  public function registerRequest($contributionPageID, $widgetID, $action) {
     return "I registered a request to $action on $contributionPageID from $widgetID";
   }
 
@@ -62,7 +62,7 @@ class CRM_Widget_Widget {
    * @param int $contributionPageID
    * @param string $widgetID
    *
-   * @return stdClass
+   * @return object
    */
   public function getContributionPageData($contributionPageID, $widgetID) {
     $config = CRM_Core_Config::singleton();
@@ -183,7 +183,8 @@ WHERE  id = %1";
    *
    * @param int $contributionPageID
    * @param string $widgetID
-   * @param string $format - either myspace or normal
+   * @param string $format
+   *   Either myspace or normal.
    *
    * @return string
    */
@@ -192,5 +193,5 @@ WHERE  id = %1";
     return "<embed>.......................</embed>" .
     print_r(func_get_args(), 1);
   }
-}
 
+}

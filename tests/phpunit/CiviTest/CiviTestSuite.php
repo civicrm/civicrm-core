@@ -39,9 +39,11 @@ require_once 'PHPUnit/Framework/TestSuite.php';
 class CiviTestSuite extends PHPUnit_Framework_TestSuite {
 
   /**
-   * Simple name based constructor
+   * Simple name based constructor.
+   * @param string $theClass
+   * @param string $name
    */
-  function __construct($theClass = '', $name = '') {
+  public function __construct($theClass = '', $name = '') {
     if (empty($name)) {
       $name = str_replace('_',
         ' ',
@@ -59,28 +61,29 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
   }
 
   /**
-   *  Test suite setup
+   *  Test suite setup.
    */
   protected function setUp() {
     //print __METHOD__ . "\n";
   }
 
   /**
-   *  Test suite teardown
+   *  Test suite teardown.
    */
   protected function tearDown() {
     //print __METHOD__ . "\n";
   }
 
   /**
-   *  suppress failed test error issued by phpunit when it finds
+   *  suppress failed test error issued by phpunit when it finds.
    *  a test suite with no tests
    */
-  function testNothing() {
+  public function testNothing() {
   }
 
   /**
-   *
+   * @param $myfile
+   * @return \PHPUnit_Framework_TestSuite
    */
   protected function implSuite($myfile) {
     $name = str_replace('_',
@@ -102,15 +105,16 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
    *  Add all test classes *Test and all test suites *Tests in subdirectories
    *
    * @param PHPUnit_Framework_TestSuite $suite
+   *   Test suite object to add tests to
    * @param $myfile
    * @param SplFileInfo $dirInfo
+   *   object to scan
    *
-   * @internal param $ &object Test suite object to add tests to
-   * @internal param \Directory $object to scan
-   * @return Test suite has been updated
+   * @return void
    */
-  protected function addAllTests(PHPUnit_Framework_TestSuite & $suite,
-                                 $myfile, SplFileInfo $dirInfo
+  protected function addAllTests(
+    PHPUnit_Framework_TestSuite &$suite,
+    $myfile, SplFileInfo $dirInfo
   ) {
     //echo get_class($this)."::addAllTests($myfile,".$dirInfo->getRealPath().")\n";
     if (!$dirInfo->isReadable()
@@ -210,4 +214,5 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
 
     // print_r(array($prefix, 'addTests' => $addTests, 'addAllTests' => $addAllTests, 'addTestSuites' => $addTestSuites));
   }
+
 }

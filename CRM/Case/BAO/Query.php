@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,7 +39,7 @@ class CRM_Case_BAO_Query {
    *
    * @return array
    */
-  static function &getFields($excludeActivityFields = FALSE) {
+  public static function &getFields($excludeActivityFields = FALSE) {
     $fields = array();
     $fields = CRM_Case_BAO_Case::exportableFields();
 
@@ -52,14 +52,13 @@ class CRM_Case_BAO_Query {
   }
 
   /**
-   * Build select for Case
+   * Build select for Case.
    *
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function select(&$query) {
+  public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) || !empty($query->_returnProperties['case_id'])) {
       $query->_select['case_id'] = "civicrm_case.id as case_id";
       $query->_element['case_id'] = 1;
@@ -225,9 +224,8 @@ class CRM_Case_BAO_Query {
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function where(&$query) {
+  public static function where(&$query) {
     foreach ($query->_params as $id => $values) {
       if (!is_array($values) || count($values) != 5) {
         continue;
@@ -244,15 +242,14 @@ class CRM_Case_BAO_Query {
   }
 
   /**
-   * Where clause for a single field
+   * Where clause for a single field.
    *
    * @param $values
    * @param $query
    *
    * @return void
-   * @access public
    */
-  static function whereClauseSingle(&$values, &$query) {
+  public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $val = $names = array();
     switch ($name) {
@@ -536,7 +533,7 @@ class CRM_Case_BAO_Query {
    *
    * @return string
    */
-  static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side) {
     $from = "";
 
     switch ($name) {
@@ -576,8 +573,8 @@ class CRM_Case_BAO_Query {
 
       case 'case_relationship':
         $session = CRM_Core_Session::singleton();
-        $userID  = $session->get('userID');
-        $from   .= " $side JOIN civicrm_relationship case_relationship ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.case_id = civicrm_case.id )";
+        $userID = $session->get('userID');
+        $from .= " $side JOIN civicrm_relationship case_relationship ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.case_id = civicrm_case.id )";
         break;
 
       case 'case_relation_type':
@@ -604,12 +601,11 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
-   * Getter for the qill object
+   * Getter for the qill object.
    *
    * @return string
-   * @access public
    */
-  function qill() {
+  public function qill() {
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
@@ -619,7 +615,8 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    *
    * @return array|null
    */
-  static function defaultReturnProperties($mode,
+  public static function defaultReturnProperties(
+    $mode,
     $includeCustomFields = TRUE
   ) {
 
@@ -661,9 +658,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
-   * This includes any extra fields that might need for export etc
+   * This includes any extra fields that might need for export etc.
    */
-  static function extraReturnProperties($mode) {
+  public static function extraReturnProperties($mode) {
     $properties = NULL;
 
     if ($mode & CRM_Contact_BAO_Query::MODE_CASE) {
@@ -685,7 +682,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   /**
    * @param $tables
    */
-  static function tableNames(&$tables) {
+  public static function tableNames(&$tables) {
     if (!empty($tables['civicrm_case'])) {
       $tables = array_merge(array('civicrm_case_contact' => 1), $tables);
     }
@@ -696,16 +693,14 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
-   * Add all the elements shared between case search and advanaced search
+   * Add all the elements shared between case search and advanaced search.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    *
    * @return void
-   * @static
    */
-  static function buildSearchForm(&$form) {
+  public static function buildSearchForm(&$form) {
     $config = CRM_Core_Config::singleton();
 
     //validate case configuration.
@@ -723,7 +718,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     }
 
     CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'case_to',   1, '_end_date_low',   '_end_date_high',   ts('From'), FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);
 
     $form->assign('validCiviCase', TRUE);
 
@@ -775,6 +770,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * @param $row
    * @param int $id
    */
-  static function searchAction(&$row, $id) {}
-}
+  public static function searchAction(&$row, $id) {
+  }
 
+}

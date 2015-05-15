@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -34,7 +34,7 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testEditMembershipActivityTypes() {
+  public function testEditMembershipActivityTypes() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
     // create contact
@@ -69,7 +69,7 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='memberships']//table/tbody/tr[1]/td[9]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
     $expected = array(
-      'Membership Type'  => $membershipTypes['membership_type'],
+      'Membership Type' => $membershipTypes['membership_type'],
       'Status' => 'New',
       'Source' => 'Membership StandaloneAddTest Webtest',
     );
@@ -91,15 +91,13 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     $this->openCiviPage('activity/search', 'reset=1', "_qf_Search_refresh");
 
     $this->type("sort_name", $contactName);
-    $this->click('activity_type_id[35]');
-    $this->click('activity_type_id[36]');
+    $this->select('activity_type_id', 'value=35');
+    $this->select('activity_type_id', 'value=36');
     $this->clickLink("_qf_Search_refresh");
 
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[2][text()='Change Membership Status']"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[3][text()='Status changed from New to Current']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[2][text()='Change Membership Type']"));
+    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[3][text()='Type changed from {$membershipTypes['membership_type']} to General']"));
     $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[2]/td[5]/a[text()='{$contactName}']"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[2][text()='Change Membership Type']"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[3][text()='Type changed from {$membershipTypes['membership_type']} to General']"));
-    $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr[3]/td[5]/a[text()='{$contactName}']"));
   }
+
 }

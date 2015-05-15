@@ -74,6 +74,8 @@ function check_a($a, $reporter) {
 
 /**
  * Determine if snippet of JS returns strictly false
+ * @param $js
+ * @return bool
  */
 function js_returns_false($js) {
   return
@@ -86,6 +88,8 @@ function js_returns_false($js) {
 
 /**
  * Determine if snippet of JS returns a function call
+ * @param $js
+ * @return int
  */
 function js_returns_func($js) {
   return preg_match('/^ *return +[a-zA-Z0-9\._$]+\(/', $js);

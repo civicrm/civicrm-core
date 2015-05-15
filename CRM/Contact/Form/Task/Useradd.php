@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class generates form components generic to useradd
@@ -42,26 +42,24 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    * Contact.display_name of contact for whom we are adding user
    *
    * @var int
-   * @public
    */
   public $_displayName;
 
   /**
-   * Primary email of contact for whom we are adding user
+   * Primary email of contact for whom we are adding user.
    *
    * @var int
-   * @public
    */
   public $_email;
 
-  function preProcess() {
+  public function preProcess() {
     $params = $defaults = $ids = array();
 
-    $this->_contactId   = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $params['id']       = $params['contact_id'] = $this->_contactId;
-    $contact            = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $params['id'] = $params['contact_id'] = $this->_contactId;
+    $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
     $this->_displayName = $contact->display_name;
-    $this->_email       = $contact->email;
+    $this->_email = $contact->email;
     CRM_Utils_System::setTitle(ts('Create User Record for %1', array(1 => $this->_displayName)));
   }
 
@@ -69,11 +67,10 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults['contactID'] = $this->_contactId;
     $defaults['name'] = $this->_displayName;
@@ -85,10 +82,9 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $element = $this->add('text', 'name', ts('Full Name'), array('class' => 'huge'));
@@ -122,7 +118,6 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * @access public
    *
    * @return void
    */
@@ -135,11 +130,10 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * Validation Rule
+   * Validation Rule.
    *
-   * @static
    */
-  static function usernameRule($params) {
+  public static function usernameRule($params) {
     $config = CRM_Core_Config::singleton();
     $errors = array();
     $check_params = array(
@@ -150,5 +144,5 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
 
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

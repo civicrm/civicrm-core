@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -44,12 +44,12 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   protected $_reportTitle;
 
   /* values
-     *
-     * @var array
-     */
+   *
+   * @var array
+   */
   public $_values;
 
-  CONST NUM_OPTION = 11;
+  const NUM_OPTION = 11;
 
   public function preProcess() {
     parent::preProcess();
@@ -77,12 +77,10 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
-   * @return array    array of default values
-   * @access public
+   * @return array
+   *   array of default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     // set defaults for weight.
@@ -98,12 +96,9 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Build the form object
-   *
-   * @param null
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $optionGroups = CRM_Campaign_BAO_Survey::getResultSets();
@@ -120,7 +115,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         'option_group_id',
         ts('Select Result Set'),
         array(
-          '' => ts('- select -')
+          '' => ts('- select -'),
         ) + $optionGroups, FALSE,
         array('onChange' => 'loadOptionGroup( )')
       );
@@ -130,7 +125,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       ts('Survey Responses'),
       $optionTypes,
       array(
-        'onclick' => "showOptionSelect();"
+        'onclick' => "showOptionSelect();",
       ), '<br/>', TRUE
     );
 
@@ -200,18 +195,23 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     }
 
     $this->addFormRule(array(
-        'CRM_Campaign_Form_Survey_Results',
-        'formRule'
-      ), $this);
+      'CRM_Campaign_Form_Survey_Results',
+      'formRule',
+    ), $this);
 
     parent::buildQuickForm();
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
+   * @param $fields
+   * @param $files
+   * @param $form
+   *
+   * @return array|bool
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
     if (!empty($fields['option_label']) && !empty($fields['option_value']) &&
       (count(array_filter($fields['option_label'])) == 0) &&
@@ -344,12 +344,9 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   }
 
   /**
-   * Process the form
-   *
-   * @param null
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -418,23 +415,21 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     if (!$this->_reportId && $survey->id && !empty($params['create_report'])) {
       $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
       $activityStatus = array_flip($activityStatus);
-      $this->_params =
-        array(
-          'name' => "survey_{$survey->id}",
-          'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
-          'status_id_op' => 'eq',
-          'status_id_value' => $activityStatus['Scheduled'], // reserved status
-          'survey_id_value' => array($survey->id),
-          'description' => ts('Detailed report for canvassing, phone-banking, walk lists or other surveys.'),
-        );
+      $this->_params = array(
+        'name' => "survey_{$survey->id}",
+        'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
+        'status_id_op' => 'eq',
+        'status_id_value' => $activityStatus['Scheduled'], // reserved status
+        'survey_id_value' => array($survey->id),
+        'description' => ts('Detailed report for canvassing, phone-banking, walk lists or other surveys.'),
+      );
       //Default value of order by
-      $this->_params['order_bys'] =
-        array(
-          1 => array(
-            'column' => 'sort_name',
-            'order' => 'ASC'
-          ),
-        );
+      $this->_params['order_bys'] = array(
+        1 => array(
+          'column' => 'sort_name',
+          'order' => 'ASC',
+        ),
+      );
       // for WalkList or default
       $displayFields = array(
         'id',
@@ -443,30 +438,29 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         'street_number',
         'street_name',
         'street_unit',
-        'survey_response'
+        'survey_response',
       );
       if (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') ==
         $this->_values['activity_type_id']
       ) {
-        $this->_params['order_bys'] =
-          array(
-            1 => array(
-              'column' => 'street_name',
-              'order' => 'ASC'
-            ),
-            2 => array(
-              'column' => 'street_number_odd_even',
-              'order' => 'ASC'
-            ),
-            3 => array(
-              'column' => 'street_number',
-              'order' => 'ASC'
-            ),
-            4 => array(
-              'column' => 'sort_name',
-              'order' => 'ASC'
-            ),
-          );
+        $this->_params['order_bys'] = array(
+          1 => array(
+            'column' => 'street_name',
+            'order' => 'ASC',
+          ),
+          2 => array(
+            'column' => 'street_number_odd_even',
+            'order' => 'ASC',
+          ),
+          3 => array(
+            'column' => 'street_number',
+            'order' => 'ASC',
+          ),
+          4 => array(
+            'column' => 'sort_name',
+            'order' => 'ASC',
+          ),
+        );
       }
       elseif (CRM_Core_OptionGroup::getValue('activity_type', 'PhoneBank') ==
         $this->_values['activity_type_id']
@@ -489,11 +483,11 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
       $query = "SELECT MAX(id) FROM civicrm_report_instance WHERE name = %1";
       $reportID = CRM_Core_DAO::singleValueQuery($query, array(
-          1 => array(
-            "survey_{$survey->id}",
-            'String'
-          )
-        ));
+        1 => array(
+          "survey_{$survey->id}",
+          'String',
+        ),
+      ));
       if ($reportID) {
         $url = CRM_Utils_System::url("civicrm/report/instance/{$reportID}", 'reset=1');
         $status = ts("A Survey Detail Report <a href='%1'>%2</a> has been created.",
@@ -511,4 +505,5 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     parent::endPostProcess();
   }
+
 }

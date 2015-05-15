@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddPaidEventNoTemplate() {
+  public function testAddPaidEventNoTemplate() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -78,7 +78,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->_testVerifyRegisterPage($registerStrings);
   }
 
-  function testAddPaidEventDiscount() {
+  public function testAddPaidEventDiscount() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -118,7 +118,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->_testOnlineRegistration($registerUrl, $numberRegistrations, $anonymous);
   }
 
-  function testDeletePriceSetDiscount() {
+  public function testDeletePriceSetDiscount() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -165,7 +165,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testAddDeleteEventDiscount() {
+  public function testAddDeleteEventDiscount() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -207,7 +207,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    * @param $eventTitle
    * @param $discount
    */
-  function _deleteDiscount($id, $eventTitle, $discount) {
+  public function _deleteDiscount($id, $eventTitle, $discount) {
     $this->openCiviPage("event/manage/fee", "reset=1&action=update&id=$id", "_qf_Fee_upload-bottom");
     $this->type("discount_name_2", "");
     $this->click("xpath=//tr[@id='discount_2']/td[3]/a");
@@ -221,7 +221,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->assertStringsPresent($discount[1]);
   }
 
-  function testAddPaidEventWithTemplate() {
+  public function testAddPaidEventWithTemplate() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -256,7 +256,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->_testVerifyRegisterPage($registerStrings);
   }
 
-  function testAddFreeEventWithTemplate() {
+  public function testAddFreeEventWithTemplate() {
 
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -294,7 +294,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->verifyElementNotPresent("css=div.paid_event-section");
   }
 
-  function testUnpaidPaid() {
+  public function testUnpaidPaid() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -321,7 +321,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->assertNotChecked('is_pay_later');
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     $triggerElement = array('name' => 'event_type_id', 'type' => 'select');
@@ -337,7 +337,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    * @param $eventTitle
    * @param $eventDescription
    */
-  function _testAddEventInfo($eventTitle, $eventDescription) {
+  public function _testAddEventInfo($eventTitle, $eventDescription) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
     $this->select("event_type_id", "value=1");
@@ -369,7 +369,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    * @param int $templateID
    * @param int $eventTypeID
    */
-  function _testAddEventInfoFromTemplate($eventTitle, $eventDescription, $templateID, $eventTypeID) {
+  public function _testAddEventInfoFromTemplate($eventTitle, $eventDescription, $templateID, $eventTypeID) {
     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
 
     // Select event template. Use option value, not label - since labels can be translated and test would fail
@@ -403,7 +403,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   /**
    * @param $streetAddress
    */
-  function _testAddLocation($streetAddress) {
+  public function _testAddLocation($streetAddress) {
     // Wait for Location tab form to load
     $this->waitForAjaxContent();
     $this->waitForElementPresent("_qf_Location_upload-bottom");
@@ -432,7 +432,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro", $double = FALSE, $payLater = FALSE) {
+  public function _testAddFees($discount = FALSE, $priceSet = FALSE, $processorName = "PP Pro", $double = FALSE, $payLater = FALSE) {
     $discount1 = "Early-bird" . substr(sha1(rand()), 0, 7);
     $discount2 = "";
     // Go to Fees tab
@@ -500,7 +500,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    * @param $registerIntro
    * @param bool $multipleRegistrations
    */
-  function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
+  public function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
     // Go to Online Registration tab
     $this->click("link=Online Registration");
     $this->waitForElementPresent("_qf_Registration_upload-bottom");
@@ -537,7 +537,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    *
    * @return null
    */
-  function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
+  public function _testVerifyEventInfo($eventTitle, $eventInfoStrings, $eventFees = NULL) {
     // verify event input on info page
     // start at Manage Events listing
     $this->openCiviPage("event/manage", "reset=1");
@@ -562,7 +562,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    *
    * @return string
    */
-  function _testVerifyRegisterPage($registerStrings) {
+  public function _testVerifyRegisterPage($registerStrings) {
     // Go to Register page and check for intro text and fee levels
     $this->click("link=Register Now");
     $this->waitForElementPresent("_qf_Register_upload-bottom");
@@ -580,7 +580,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE, $isPayLater = FALSE, $participantEmailInfo = array(), $paymentProcessor = NULL) {
+  public function _testOnlineRegistration($registerUrl, $numberRegistrations = 1, $anonymous = TRUE, $isPayLater = FALSE, $participantEmailInfo = array(), $paymentProcessor = NULL) {
     $infoPassed = FALSE;
     if (!empty($participantEmailInfo)) {
       $infoPassed = TRUE;
@@ -676,12 +676,12 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   /**
    * @param $eventTitle
    */
-  function _testAddReminder($eventTitle) {
+  public function _testAddReminder($eventTitle) {
     // Go to Schedule Reminders tab
     $this->click('css=li#tab_reminder a');
     $this->waitForElementPresent("newScheduleReminder");
     $this->click("newScheduleReminder");
-    $this->waitForElementPresent("_qf_ScheduleReminders_upload-bottom");
+    $this->waitForElementPresent("_qf_ScheduleReminders_next-bottom");
     $this->type("title", "Event Reminder for " . $eventTitle);
     $this->select('entity', 'label=Registered');
 
@@ -701,10 +701,10 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->type("text_message", "This is the test text version here!!!");
     //click on save
-    $this->click('_qf_ScheduleReminders_upload-bottom');
+    $this->click('_qf_ScheduleReminders_next-bottom');
     $this->waitForElementPresent("link=Add Reminder");
 
-    $this->waitForElementPresent("link=Edit");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/span/a[1]");
 
     $verifyText = array(
       1 => 'Event Reminder for ' . $eventTitle,
@@ -721,7 +721,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     }
   }
 
-  function testEventAddMultipleParticipant() {
+  public function testEventAddMultipleParticipant() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
     $this->openCiviPage("event/add", "reset=1&action=add");
@@ -763,17 +763,16 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $participantEmails = array($primaryParticipant, $secParticipant, $thirdParticipant);
     $addtlPart = array($secParticipant, $thirdParticipant);
-    $primaryParticipantInfo =
-    $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
+    $primaryParticipantInfo = $this->_testOnlineRegistration($registerUrl, 2, $anonymous, FALSE, $participantEmails, "Test Processor");
     $primaryDisplayName = "{$primaryParticipantInfo['first_name']} {$primaryParticipantInfo['last_name']}";
     $this->webtestLogin();
     $this->openCiviPage("event/search", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
     $this->clickLink('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a");
-    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[contains(text(),
      '{$secParticipant['last_name']}, {$secParticipant['first_name']}')]/../../td[6]", preg_quote('225.00'));
-    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[3]/a[contains(text(),
+    $this->verifyText("xpath=//div[@id='participantSearch']/table/tbody//tr/td[@class='crm-participant-sort_name']/a[contains(text(),
     '{$thirdParticipant['last_name']}, {$thirdParticipant['first_name']}')]/../../td[6]", preg_quote('225.00'));
 
     //CRM-12618 check edit screen of additional participant and ensuring record_contribution not present
@@ -807,7 +806,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
-    $this->click("xpath=//div[@id='searchForm']/table/tbody/tr[5]/td[1]/div//div/label[text()='Pending from pay later']");
+    $this->multiselect2('participant_status_id', array('Pending from pay later'));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[2][text()='Edit']");
 
@@ -835,7 +834,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
 
     $this->openCiviPage("event/search?reset=1", "reset=1");
     $this->select2("event_id", $eventTitle, FALSE);
-    $this->click("xpath=//td[@class='crm-event-form-block-participant_status']/div[@class='listing-box']//div/label[text()='Pending from pay later']");
+    $this->multiselect2('participant_status_id', array('Pending from pay later'));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForElementPresent("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']");
     $uRL = $this->getAttribute("xpath=//div[@id='participantSearch']/table/tbody//tr/td[11]/span/a[text()='View']@href");
@@ -854,7 +853,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
   /**
    * @param int $contributionID
    */
-  function verifyFinancialRecords($contributionID) {
+  public function verifyFinancialRecords($contributionID) {
     // check count for civicrm_contribution and civicrm_financial_item in civicrm_entity_financial_trxn
     $query = "SELECT COUNT(DISTINCT(c1.id)) civicrm_contribution, COUNT(c2.id) civicrm_financial_item  FROM civicrm_entity_financial_trxn c1
 LEFT JOIN civicrm_entity_financial_trxn c2 ON c1.financial_trxn_id = c2.financial_trxn_id AND c2.entity_table ='civicrm_financial_item'
@@ -873,17 +872,16 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->assertEquals('2', $dao->civicrm_financial_trxn, 'civicrm_financial_trxn count does not match');
   }
 
-  function testEventApprovalRegistration() {
+  public function testEventApprovalRegistration() {
     $this->webtestLogin();
 
     //Participant Status
     $this->openCiviPage("admin/participant_status", "reset=1&action=browse");
-    $this->_testEnableParticipantStatuses('Awaiting approval');
-    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Awaiting approval')]/../td[9]/span/a[2][text()='Disable']");
-    $this->_testEnableParticipantStatuses('Pending from approval');
-    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Pending from approval')]/../td[9]/span/a[2][text()='Disable']");
-    $this->_testEnableParticipantStatuses('Rejected');
-    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Rejected')]/../td[9]/span/a[2][text()='Disable']");
+    foreach (array('Awaiting approval', 'Pending from approval', 'Rejected') as $label) {
+      $status = $this->webtest_civicrm_api("ParticipantStatusType", "getsingle", array('label' => $label));
+      $this->_testEnableParticipantStatuses($status['id']);
+      $this->isElementPresent("xpath=//tr[@id='participant_status_type-{$status['id']}']/td[9]/span/a[2][text()='Disable']");
+    }
 
     //Create New Event
 
@@ -900,7 +898,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->type('summary', 'This is a great conference. Sign up now!');
 
     // Type description in ckEditor (fieldname, text to type, editor)
-    $this->fillRichTextField('description', $eventDescription );
+    $this->fillRichTextField('description', $eventDescription);
     $this->type('max_participants', '50');
     $this->click('is_map');
     $this->click('_qf_EventInfo_upload-bottom');
@@ -915,11 +913,11 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->click('CIVICRM_QFID_1_is_monetary');
     $processorName = 'Test Processor';
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
-    $this->select('financial_type_id','label=Event Fee');
-    $this->type("label[1]",'Junior Stars');
-    $this->type("value[1]",'500.00');
-    $this->type("label[2]",'Super Stars');
-    $this->type("value[2]",'1000.00');
+    $this->select('financial_type_id', 'label=Event Fee');
+    $this->type("label[1]", 'Junior Stars');
+    $this->type("value[1]", '500.00');
+    $this->type("label[2]", 'Super Stars');
+    $this->type("value[2]", '1000.00');
     $this->check('default');
     $this->click('_qf_Fee_upload-bottom');
     $this->waitForText('crm-notification-container', "'Fees' information has been saved.");
@@ -927,52 +925,53 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     // intro text for registration page
     $registerIntro = 'Fill in all the fields below and click Continue.';
 
-   // Go to Online Registration tab
-   $this->click('link=Online Registration');
-   $this->waitForElementPresent('_qf_Registration_upload-bottom');
-   $this->click('is_online_registration');
-   $this->assertChecked('is_online_registration');
+    // Go to Online Registration tab
+    $this->click('link=Online Registration');
+    $this->waitForElementPresent('_qf_Registration_upload-bottom');
+    $this->click('is_online_registration');
+    $this->assertChecked('is_online_registration');
 
-   //Requires Approvel
-   $this->click('requires_approval');
-   $this->assertChecked('requires_approval');
-   $this->click('_qf_Registration_upload-bottom');
-   $this->waitForText('crm-notification-container', "'Online Registration' information has been saved.");
+    //Requires Approvel
+    $this->click('requires_approval');
+    $this->assertChecked('requires_approval');
+    $this->click('_qf_Registration_upload-bottom');
+    $this->waitForText('crm-notification-container', "'Online Registration' information has been saved.");
 
-   // verify event input on info page
-   // start at Manage Events listing
-   $this->openCiviPage('event/manage', 'reset=1');
-   $this->click("link=$eventTitle");
-   $this->waitForPageToLoad($this->getTimeoutMsec());
-   $firstName = substr(sha1(rand()), 0, 7);
-   $this->webtestAddContact($firstName, 'Anderson', TRUE);
-   $contactName = "Anderson, $firstName";
-   $displayName = "$firstName Anderson";
-   $this->openCiviPage("event/register", "reset=1&id=$id", '_qf_Register_upload-bottom');
-   $this->type('first_name',$firstName);
-
-   //fill in last name
-   $lastName = 'Recuron'.substr(sha1(rand()), 0, 7);
-   $this->type('last_name', $contactName);
-   $email = $firstName . '@example.com';
-   $this->type('email-Primary', $email);
-   $this->click('_qf_Register_upload');
-   $this->waitForElementPresent("_qf_Confirm_next");
-   $this->click('_qf_Confirm_next');
+    // verify event input on info page
+    // start at Manage Events listing
+    $this->openCiviPage('event/manage', 'reset=1');
+    $this->click("link=$eventTitle");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-   $this->waitForElementPresent("xpath=//div[@class='section']");
-   $this->assertTextPresent("Thank You for Registering");
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, 'Anderson', TRUE);
+    $contactName = "Anderson, $firstName";
+    $displayName = "$firstName Anderson";
+    $this->openCiviPage("event/register", "reset=1&id=$id", '_qf_Register_upload-bottom');
+    $this->type('first_name', $firstName);
+
+    //fill in last name
+    $lastName = 'Recuron' . substr(sha1(rand()), 0, 7);
+    $this->type('last_name', $contactName);
+    $email = $firstName . '@example.com';
+    $this->type('email-Primary', $email);
+    $this->click('_qf_Register_upload');
+    $this->waitForElementPresent("_qf_Confirm_next");
+    $this->click('_qf_Confirm_next');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='crm-group participant_info-group']");
+    $this->assertTextPresent("Thank You for Registering");
 
   }
 
   /**
    * @param $status
    */
-  function _testEnableParticipantStatuses($status) {
-   // enable participant status
-   if ($this->isElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']")) {
-     $this->click("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']");
-     $this->waitForElementPresent("xpath=//td[@class='crm-participant-label crm-editable crm-editable-enabled'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Disable']");
-   }
- }
+  public function _testEnableParticipantStatuses($statusId) {
+    // enable participant status
+    if ($this->isElementPresent("xpath=//tr[@id='participant_status_type-{$statusId}']/td[9]/span/a[2][text()='Enable']")) {
+      $this->click("xpath=//tr[@id='participant_status_type-{$statusId}']/td[9]/span/a[2][text()='Enable']");
+      $this->waitForElementPresent("xpath=//tr[@id='participant_status_type-{$statusId}']/td[9]/span/a[2][text()='Disable']");
+    }
+  }
+
 }

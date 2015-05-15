@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testTagSetSearch() {
+  public function testTagSetSearch() {
     $this->webtestLogin();
 
     $tagSet1 = $this->_testAddTagSet();
@@ -117,7 +117,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
   /**
    * @return array
    */
-  function _testAddTagSet() {
+  public function _testAddTagSet() {
     // Go to add tag set url.
     $this->openCiviPage('admin/tag', 'action=add&reset=1&tagset=1');
 
@@ -144,17 +144,17 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "The tag '$tagSetName' has been saved.");
 
     // sort by ID desc
-    $this->click("xpath=//table//tr/th[text()=\"ID\"]");
+    $this->click("xpath=//div[@id='cat']/div/table/thead/tr/th[2]/div[text()='ID']");
     $this->waitForElementPresent("css=table.display tbody tr td");
 
     // verify text
-    $this->waitForElementPresent("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']");
+    $this->assertTrue($this->isTextPresent($tagSetName), 'Missing text: ' . $tagSetName);
 
-    $tagid = explode('&id=', $this->getAttribute("xpath=//table//tbody/tr/td[1][text()= '$tagSetName']/following-sibling::td[7]/span/a[text()= 'Edit']@href"));
+    $tagid = explode('&id=', $this->getAttribute("xpath=//table[@class='display dataTable no-footer']/tbody//tr/td[1]/div[text()= '$tagSetName']/../../td[8]/span/a[text()= 'Edit']@href"));
     $tagid = explode('&', $tagid[1]);
     $tagid = $tagid[0];
 
     return $tagid;
   }
-}
 
+}

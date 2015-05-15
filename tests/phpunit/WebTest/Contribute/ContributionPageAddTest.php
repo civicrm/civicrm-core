@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviSeleniumTestCase.php';
  * Class WebTest_Contribute_ContributionPageAddTest
  */
 class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
-  function testContributionPageAdd() {
+  public function testContributionPageAdd() {
     // open browser, login
     $this->webtestLogin();
 
@@ -85,8 +85,10 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->isElementPresent("xpath=//div[@class='content other_amount-content']/input");
   }
 
-  // CRM-12510 Test copy contribution page
-  function testContributionPageCopy() {
+  /**
+   * CRM-12510 Test copy contribution page
+   */
+  public function testContributionPageCopy() {
     // open browser, login
     $this->webtestLogin();
 
@@ -144,7 +146,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   /**
    * Check CRM-7943
    */
-  function testContributionPageSeparatePayment() {
+  public function testContributionPageSeparatePayment() {
     // open browser, login
     $this->webtestLogin();
 
@@ -190,7 +192,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   /**
    * Check CRM-7949
    */
-  function testContributionPageSeparatePaymentPayLater() {
+  public function testContributionPageSeparatePaymentPayLater() {
     // open browser, login
     $this->webtestLogin();
 
@@ -225,7 +227,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('first_name', $firstName);
     $this->type('last_name', $lastName);
 
-    $this->select('state_province-1',"value=1002");
+    $this->select('state_province-1', "value=1002");
     $this->clickLink('_qf_Main_upload-bottom', '_qf_Confirm_next-bottom');
 
     $this->click('_qf_Confirm_next-bottom');
@@ -238,7 +240,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$lastName $firstName");
-    $this->select('financial_type_id',"label=Member Dues");
+    $this->select('financial_type_id', "label=Member Dues");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
     $expected = array(
@@ -256,7 +258,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->click("xpath=id('Search')/div[2]/div/div[1]");
     $this->waitForElementPresent("financial_type_id");
     $this->type("sort_name", $firstName);
-    $this->select('financial_type_id',"label=Donation");
+    $this->select('financial_type_id', "label=Donation");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
 
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
@@ -287,7 +289,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
   /**
    * CRM-12994
    */
-  function testContributionPageAddPremiumRequiredField() {
+  public function testContributionPageAddPremiumRequiredField() {
     // open browser, login
     $this->webtestLogin();
 
@@ -356,7 +358,9 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // fill in Receipt details
     $this->type('thankyou_title', "Thank-you Page Title $hash");
+    $this->click("thankyou_text-plain");
     $this->fillRichTextField('thankyou_text', 'This is thankyou message for ' . $pageTitle, 'CKEditor');
+    $this->click("thankyou_footer-plain");
     $this->fillRichTextField('thankyou_footer', 'This is thankyou footer message for ' . $pageTitle, 'CKEditor');
     $this->click('is_email_receipt');
     $this->waitForElementPresent('bcc_receipt');
@@ -393,8 +397,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     $this->type('title', $pageTitle);
     $this->click('_qf_SearchContribution_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->isElementPresent("xpath=//table[@id='option11_wrapper']/tbody/tr/td/strong[text()='$pageTitle']");
-    $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
+    $this->isElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[1]/strong[text()='$pageTitle']");
+    $this->waitForElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
     $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']");
     $this->waitForElementPresent("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
     $this->click("xpath=//table[@id='option11']/tbody/tr/td[4]/div[@class='crm-contribution-page-configure-actions']/span[text()='Configure']/ul[@class='panel']/li[8]/a[@title='Premiums']");
@@ -437,5 +441,5 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     // contribution page is saved.
     $this->assertTrue($this->isTextPresent($premiumSavedText));
   }
-}
 
+}

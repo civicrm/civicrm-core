@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPCPAdd() {
+  public function testPCPAdd() {
     // open browser, login
     $this->webtestLogin();
 
@@ -200,5 +200,5 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->verifyText("PCP", preg_quote($pcpTitle));
     $this->verifyText("PCP", preg_quote("{$lastName}, {$firstName}"));
   }
-}
 
+}

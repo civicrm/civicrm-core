@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 3.2                                                |
+-- | CiviCRM version 4.6                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -288,7 +288,7 @@ CREATE TABLE civicrm_sms_history (
 -- *
 -- *******************************************************/
 
-   ALTER TABLE `civicrm_uf_group` ADD limit_listings_group_id int unsigned    COMMENT 'Group id, foriegn key from civicrm_group';
+   ALTER TABLE `civicrm_uf_group` ADD limit_listings_group_id int unsigned    COMMENT 'Group id, foreign key from civicrm_group';
 
    ALTER TABLE `civicrm_uf_group` ADD INDEX (`limit_listings_group_id`);
 

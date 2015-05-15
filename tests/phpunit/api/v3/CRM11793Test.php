@@ -9,23 +9,15 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_CRM11793Test extends CiviUnitTestCase {
-  /**
-   *  Constructor
-   *
-   *  Initialize configuration
-   */
-  function __construct() {
-    parent::__construct();
-  }
 
   /**
-   *  Test setup for every test
+   * Test setup for every test.
    *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Connect to the database, truncate the tables that will be used
+   * and redirect stdin to a temporary file
    */
   public function setUp() {
     //  Connect to the database
@@ -39,35 +31,36 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
     Contact::createOrganisation();
   }
 
-  function tearDown() {
+  public function tearDown() {
   }
 
   /**
-   *  Test civicrm_contact_create
+   * Test civicrm_contact_create.
    *
-   *  Verify that attempt to create individual contact with only
-   *  first and last names succeeds
+   * Verify that attempt to create individual contact with only
+   * first and last names succeeds
    */
-  function testCRM11793Organization() {
+  public function testCRM11793Organization() {
     $this->_testCRM11793ContactType('Organization');
   }
 
-  function testCRM11793Household() {
+  public function testCRM11793Household() {
     $this->_testCRM11793ContactType('Household');
   }
-  function testCRM11793Individual() {
+
+  public function testCRM11793Individual() {
     $this->_testCRM11793ContactType('Individual');
   }
 
   /**
    * @param $contactType
    */
-  function _testCRM11793ContactType($contactType) {
+  public function _testCRM11793ContactType($contactType) {
     $result = $this->callAPISuccess(
       'contact',
       'get',
       array(
-        'contact_type' => $contactType
+        'contact_type' => $contactType,
       )
     );
 
@@ -75,4 +68,5 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
       $this->assertEquals($contact['contact_type'], $contactType, "In line " . __LINE__);
     }
   }
+
 }

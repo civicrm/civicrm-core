@@ -132,9 +132,4 @@
     <path>civicrm/ajax/delcaserole</path>
     <page_callback>CRM_Case_Page_AJAX::deleteCaseRoles</page_callback>
   </item>
-  <item>
-    <path>civicrm/case/changeactivitystatus</path>
-    <title>Change Activity Status</title>
-    <page_callback>CRM_Case_Form_ActivityChangeStatus</page_callback>
-  </item>
 </menu>

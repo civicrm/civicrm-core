@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,17 +39,9 @@
 class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
-   * Create a user in Drupal.
-   *
-   * @param array  $params associated array
-   * @param string $mail email id for cms user
-   *
-   * @return uid if user exists, false otherwise
-   *
-   * @access public
-   *
+   * @inheritDoc
    */
-  function createUser(&$params, $mail) {
+  public function createUser(&$params, $mail) {
     $user = \Drupal::currentUser();
     $user_register_conf = \Drupal::config('user.settings')->get('register');
     $verify_mail_conf = \Drupal::config('user.settings')->get('verify_mail');
@@ -100,9 +92,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case $user_register_conf == 'admin_only' || $user->isAuthenticated():
         _user_mail_notify('register_admin_created', $account);
         break;
+
       case $user_register_conf == 'visitors':
         _user_mail_notify('register_no_approval_required', $account);
         break;
+
       case 'visitors_admin_approval':
         _user_mail_notify('register_pending_approval', $account);
         break;
@@ -112,13 +106,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Update the Drupal user's email address.
-   *
-   * @param integer $ufID  User ID in CMS
-   * @param string $email Primary contact email address
+   * @inheritDoc
    */
-  function updateCMSName($ufID, $email) {
-    $user = user_load($ufID);
+  public function updateCMSName($ufID, $email) {
+    $user = entity_load('user', $ufID);
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
@@ -129,16 +120,19 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if username and email exists in the drupal db
+   * Check if username and email exists in the drupal db.
    *
-   * @param array $params       array of name and mail values
-   * @param array $errors  errors
-   * @param string $emailName   field label for the 'email'
+   * @param array $params
+   *   Array of name and mail values.
+   * @param array $errors
+   *   Errors.
+   * @param string $emailName
+   *   Field label for the 'email'.
    *
    *
    * @return void
    */
-  static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+  public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     // If we are given a name, let's check to see if it already exists.
     if (!empty($params['name'])) {
       $name = $params['name'];
@@ -149,7 +143,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both username uniqueness and validity.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the username field; discard the rest.
-      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'name.0.value'; });
+      $violations = array_filter($violations, function ($v) {
+        return $v->getPropertyPath() == 'name.0.value';
+      });
       if (count($violations) > 0) {
         $errors['cms_name'] = $violations[0]->getMessage();
       }
@@ -165,7 +161,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both email uniqueness.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the email field; discard the rest.
-      $violations = array_filter($violations, function ($v) { return $v->getPropertyPath() == 'mail.0.value'; });
+      $violations = array_filter($violations, function ($v) {
+        return $v->getPropertyPath() == 'mail.0.value';
+      });
       if (count($violations) > 0) {
         $errors[$emailName] = $violations[0]->getMessage();
       }
@@ -173,86 +171,27 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Get the drupal destination string. When this is passed in the
-   * URL the user will be directed to it after filling in the drupal form
-   *
-   * @param CRM_Core_Form $form Form object representing the 'current' form - to which the user will be returned
-   * @return string $destination destination value for URL
-   *
-   */
-  function getLoginDestination(&$form) {
-    $args = NULL;
-
-    $id = $form->get('id');
-    if ($id) {
-      $args .= "&id=$id";
-    }
-    else {
-      $gid = $form->get('gid');
-      if ($gid) {
-        $args .= "&gid=$gid";
-      }
-      else {
-        // Setup Personal Campaign Page link uses pageId
-        $pageId = $form->get('pageId');
-        if ($pageId) {
-          $component = $form->get('component');
-          $args .= "&pageId=$pageId&component=$component&action=add";
-        }
-      }
-    }
-
-    $destination = NULL;
-    if ($args) {
-      // append destination so user is returned to form they came from after login
-      $destination = CRM_Utils_System::currentPath() . '?reset=1' . $args;
-    }
-    return $destination;
-  }
-
-  /**
-   * Get user login URL for hosting CMS (method declared in each CMS system class)
-   *
-   * @param string $destination - if present, add destination to querystring (works for Drupal only)
-   *
-   * @return string - loginURL for the current CMS
-   * @static
+   * @inheritDoc
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? array('destination' => $destination) : array();
     return \Drupal::url('user.page', array(), array('query' => $query));
   }
 
-
   /**
-   * Sets the title of the page
-   *
-   * @param string $title
-   * @param string $pageTitle
-   *
-   * @return void
-   * @access public
+   * @inheritDoc
    */
-  function setTitle($title, $pageTitle = NULL) {
+  public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
-
     \Drupal::service('civicrm.page_state')->setTitle($pageTitle);
   }
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb
-   *
-   * @param $breadcrumbs
-   *
-   * @internal param string $title
-   * @internal param string $url
-   *
-   * @return void
-   * @access public
+   * @inheritDoc
    */
-  function appendBreadCrumb($breadcrumbs) {
+  public function appendBreadCrumb($breadcrumbs) {
     $civicrmPageState = \Drupal::service('civicrm.page_state');
     foreach ($breadcrumbs as $breadcrumb) {
       $civicrmPageState->addBreadcrumb($breadcrumb['title'], $breadcrumb['url']);
@@ -260,136 +199,112 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Reset an additional breadcrumb tag to the existing breadcrumb
-   *
-   * @return void
-   * @access public
+   * @inheritDoc
    */
-  function resetBreadCrumb() {
+  public function resetBreadCrumb() {
     \Drupal::service('civicrm.page_state')->resetBreadcrumbs();
   }
 
   /**
-   * Append a string to the head of the html file
-   *
-   * @param string $header the new string to be appended
-   *
-   * @return void
-   * @access public
+   * @inheritDoc
    */
-  function addHTMLHead($header) {
+  public function addHTMLHead($header) {
     \Drupal::service('civicrm.page_state')->addHtmlHeader($header);
   }
 
   /**
-   * Add a script file
-   *
-   * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
+   * @inheritDoc
    */
   public function addScriptUrl($url, $region) {
-    $options = array('group' => JS_LIBRARY, 'weight' => 10);
+    static $weight = 0;
+
     switch ($region) {
       case 'html-header':
       case 'page-footer':
-        $options['scope'] = substr($region, 5);
         break;
       default:
         return FALSE;
     }
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $options['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    \Drupal::service('civicrm.page_state')->addJS($url, $options);
+
+    $script = array(
+      '#tag' => 'script',
+      '#attributes' => array(
+        'src' => $url,
+      ),
+      '#weight' => $weight,
+    );
+    $weight++;
+    \Drupal::service('civicrm.page_state')->addJS($script);
     return TRUE;
   }
 
   /**
-   * Add an inline script
-   *
-   * @param $code: string, javascript code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
+   * @inheritDoc
    */
   public function addScript($code, $region) {
-    $options = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
     switch ($region) {
       case 'html-header':
       case 'page-footer':
-        $options['scope'] = substr($region, 5);
         break;
       default:
         return FALSE;
     }
-    \Drupal::service('civicrm.page_state')->addJS($code, $options);
+
+    $script = array(
+      '#tag' => 'script',
+      '#value' => $code,
+    );
+    \Drupal::service('civicrm.page_state')->addJS($script);
     return TRUE;
   }
 
   /**
-   * Add a css file
-   *
-   * @param $url: string, absolute path to file
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
+   * @inheritDoc
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $options = array();
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $options['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    \Drupal::service('civicrm.page_state')->addCSS($url, $options);
+    $css = array(
+      '#tag' => 'link',
+      '#attributes' => array(
+        'href' => $url,
+        'rel' => 'stylesheet',
+      ),
+    );
+    \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
 
   /**
-   * Add an inline style
-   *
-   * @param $code: string, css code
-   * @param $region string, location within the document: 'html-header', 'page-header', 'page-footer'
-   *
-   * Note: This function is not to be called directly
-   * @see CRM_Core_Region::render()
-   *
-   * @return bool TRUE if we support this operation in this CMS, FALSE otherwise
-   * @access public
+   * @inheritDoc
    */
   public function addStyle($code, $region) {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $options = array('type' => 'inline');
-    \Drupal::service('civicrm.page_state')->addCSS($code, $options);
+    $css = array(
+      '#tag' => 'style',
+      '#value' => $code,
+    );
+    \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
 
   /**
-   * Check if a resource url is within the drupal directory and format appropriately
+   * Check if a resource url is within the drupal directory and format appropriately.
    *
    * This seems to be a legacy function. We assume all resources are within the drupal
    * directory and always return TRUE. As well, we clean up the $url.
+   *
+   * FIXME: This is not a legacy function and the above is not a safe assumption.
+   * External urls are allowed by CRM_Core_Resources and this needs to return the correct value.
    *
    * @param $url
    *
    * @return bool
    */
-  function formatResourceUrl(&$url) {
+  public function formatResourceUrl(&$url) {
     // Remove leading slash if present.
     $url = ltrim($url, '/');
 
@@ -397,47 +312,52 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (($pos = strpos($url, '?')) !== FALSE) {
       $url = substr($url, 0, $pos);
     }
-
+    // FIXME: Should not unconditionally return true
     return TRUE;
   }
 
   /**
-   * Rewrite various system urls to https
-   *
    * This function does nothing in Drupal 8. Changes to the base_url should be made
    * in settings.php directly.
-   *
-   * @param null
-   *
-   * @return void
-   * @access public
    */
-  function mapConfigToSSL() {
+  public function mapConfigToSSL() {
   }
 
   /**
-   * @param string $path         The base path (eg. civicrm/search/contact)
-   * @param string $query      The query string (eg. reset=1&cid=66) but html encoded(?) (optional)
-   * @param bool $absolute     Produce an absolute including domain and protocol (optional)
-   * @param string $fragment   A named anchor (optional)
-   * @param bool $htmlize      Produce a html encoded url (optional)
-   * @param bool $frontend     A joomla hack (unused)
-   * @param bool $forceBackend A joomla jack (unused)
-   * @return string
+   * @inheritDoc
    */
-  function url($path = '', $query = '', $absolute = FALSE, $fragment = '', $htmlize = FALSE, $frontend = FALSE, $forceBackend = FALSE) {
+  public function url(
+    $path = '',
+    $query = '',
+    $absolute = FALSE,
+    $fragment = NULL,
+    $htmlize = FALSE,
+    $frontend = FALSE,
+    $forceBackend = FALSE
+  ) {
     $query = html_entity_decode($query);
+
     $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
 
+    // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal::url($url['route_name'], array(), array(
+      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", [
         'query' => $url['query'],
-        'absolute' => $absolute,
         'fragment' => $fragment,
-      ));
+        'absolute' => $absolute,
+      ])->toString();
     }
     catch (Exception $e) {
+      // @Todo: log to watchdog
       $url = '';
+    }
+
+    // Special case: CiviCRM passes us "*path*?*query*" as a skeleton, but asterisks
+    // are invalid and Drupal will attempt to escape them. We unescape them here:
+    if ($path == '*path*') {
+      // First remove trailing equals sign that has been added since the key '?*query*' has no value.
+      $url = rtrim($url, '=');
+      $url = urldecode($url);
     }
 
     if ($htmlize) {
@@ -446,24 +366,12 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return $url;
   }
 
-
   /**
-   * Authenticate the user against the drupal db
-   *
-   * @param string $name     the user name
-   * @param string $password the password for the above user name
-   * @param boolean $loadCMSBootstrap load cms bootstrap?
-   * @param NULL|string $realPath filename of script
-   *
-   * @return mixed false if no auth
-   *               array(
-   *  contactID, ufID, unique string ) if success
-   * @access public
-   *
-   * This always bootstraps Drupal
+   * @inheritDoc
    */
-  function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    (new CRM_Utils_System_Drupal8())->loadBootStrap(array(), FALSE);
+  public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+    $system = new CRM_Utils_System_Drupal8();
+    $system->loadBootStrap(array(), FALSE);
 
     $uid = \Drupal::service('user.auth')->authenticate($name, $password);
     $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
@@ -472,9 +380,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Load user into session
+   * @inheritDoc
    */
-  function loadUser($username) {
+  public function loadUser($username) {
     $user = user_load_by_name($username);
     if (!$user) {
       return FALSE;
@@ -494,29 +402,21 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Determine the native ID of the CMS user
+   * Determine the native ID of the CMS user.
    *
    * @param string $username
    * @return int|NULL
    */
-  function getUfId($username) {
+  public function getUfId($username) {
     if ($id = user_load_by_name($username)->id()) {
       return $id;
     }
   }
 
   /**
-   * Set a message in the UF to display to a user
-   *
-   * @param string $message the message to set
-   *
-   * @access public
+   * @inheritDoc
    */
-  function setMessage($message) {
-    drupal_set_message($message);
-  }
-
-  function permissionDenied() {
+  public function permissionDenied() {
     \Drupal::service('civicrm.page_state')->setAccessDenied();
   }
 
@@ -524,24 +424,32 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * In previous versions, this function was the controller for logging out. In Drupal 8, we rewrite the route
    * to hand off logout to the standard Drupal logout controller. This function should therefore never be called.
    */
-  function logout() {
+  public function logout() {
     // Pass
   }
 
   /**
-   * Load drupal bootstrap
+   * Load drupal bootstrap.
    *
-   * @param array $params Either uid, or name & pass.
-   * @param boolean $loadUser boolean Require CMS user load.
-   * @param boolean $throwError If true, print error on failure and exit.
-   * @param boolean|string $realPath path to script
+   * @param array $params
+   *   Either uid, or name & pass.
+   * @param bool $loadUser
+   *   Boolean Require CMS user load.
+   * @param bool $throwError
+   *   If true, print error on failure and exit.
+   * @param bool|string $realPath path to script
    *
    * @return bool
    * @Todo Handle setting cleanurls configuration for CiviCRM?
    */
-  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $run_once = FALSE;
-    if ($run_once) return TRUE; else $run_once = TRUE;
+    if ($run_once) {
+      return TRUE;
+    }
+    else {
+      $run_once = TRUE;
+    }
 
     if (!($root = $this->cmsRootPath())) {
       return FALSE;
@@ -580,7 +488,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * @return NULL|string
    */
-  function cmsRootPath($path = NULL) {
+  public function cmsRootPath($path = NULL) {
     if (defined('DRUPAL_ROOT')) {
       return DRUPAL_ROOT;
     }
@@ -610,18 +518,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Check if user is logged in.
-   *
-   * @return bool
+   * @inheritDoc
    */
   public function isUserLoggedIn() {
     return \Drupal::currentUser()->isAuthenticated();
   }
 
   /**
-   * Get currently logged in user uf id.
-   *
-   * @return int $userID logged in user uf id.
+   * @inheritDoc
    */
   public function getLoggedInUfID() {
     if ($id = \Drupal::currentUser()->id()) {
@@ -630,12 +534,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Get the default location for CiviCRM blocks
-   *
-   * @return string
-   *
+   * @inheritDoc
    */
-  function getDefaultBlockLocation() {
+  public function getDefaultBlockLocation() {
     return 'sidebar_first';
   }
+
 }

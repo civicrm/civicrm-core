@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,7 +43,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Cache of preview data values
    *
    * @var array
-   * @access protected
    */
   protected $_dataValues;
 
@@ -51,7 +50,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Mapper fields
    *
    * @var array
-   * @access protected
    */
   protected $_mapperFields;
 
@@ -59,7 +57,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Loaded mapping ID
    *
    * @var int
-   * @access protected
    */
   protected $_loadedMappingId;
 
@@ -67,7 +64,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Number of columns in import file
    *
    * @var int
-   * @access protected
    */
   protected $_columnCount;
 
@@ -75,7 +71,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Column headers, if we have them
    *
    * @var array
-   * @access protected
    */
   protected $_columnHeaders;
 
@@ -84,7 +79,6 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * form building already.
    *
    * @var array
-   * @access protected
    */
   protected $_fieldUsed;
 
@@ -92,20 +86,18 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Match Fields');
   }
 
   /**
-   * Attempt to match header labels with our mapper fields
+   * Attempt to match header labels with our mapper fields.
    *
-   * @param header
-   * @param mapperFields
+   * @param string $header
+   * @param array $patterns
    *
    * @return string
-   * @access public
    */
   public function defaultFromHeader($header, &$patterns) {
     foreach ($patterns as $key => $re) {
@@ -124,18 +116,17 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
   }
 
   /**
-   * Guess at the field names given the data and patterns from the schema
+   * Guess at the field names given the data and patterns from the schema.
    *
-   * @param patterns
-   * @param index
+   * @param array $patterns
+   * @param string $index
    *
    * @return string
-   * @access public
    */
   public function defaultFromData(&$patterns, $index) {
-    $best     = '';
+    $best = '';
     $bestHits = 0;
-    $n        = count($this->_dataValues);
+    $n = count($this->_dataValues);
 
     foreach ($patterns as $key => $re) {
       // Skip empty key/patterns

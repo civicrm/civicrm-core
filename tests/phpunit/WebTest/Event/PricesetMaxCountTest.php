@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testWithoutFieldCount() {
+  public function testWithoutFieldCount() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -170,7 +170,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp1}");
 
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jones'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jones' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -198,7 +198,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // exceed maximun count for text field, check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '2');
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -211,22 +211,19 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
 
     // select sold option for select field, check for form rule
-    $this->select("price_{$selectFieldId}", "value={$selectFieldOp1}");
-    $this->click('_qf_Register_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertStringsPresent(array('Sorry, this option is currently sold out.'));
+    $this->assertElementContainsText("xpath=//select[@id='price_{$selectFieldId}']//option[@value='crm_disabled_opt-{$selectFieldOp1}']", "(Sold out)");
 
     // fill correct available option for select field
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
 
+    $this->click("css=input[data-amount=10]");
     $this->click('_qf_Register_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->_checkConfirmationAndRegister();
   }
 
-  function testWithFieldCount() {
+  public function testWithFieldCount() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -366,7 +363,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -396,7 +393,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // check for form rule
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '2');
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -409,12 +406,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
 
     // check for sold option for select field
-    $this->select("price_{$selectFieldId}", "value={$selectFieldOp1}");
-
-    $this->click('_qf_Register_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertStringsPresent(array('Sorry, this option is currently sold out.'));
+    $this->assertElementContainsText("xpath=//select[@id='price_{$selectFieldId}']//option[@value='crm_disabled_opt-{$selectFieldOp1}']", "(Sold out)");
 
     // check for sold option for select field
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
@@ -425,7 +417,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->_checkConfirmationAndRegister();
   }
 
-  function testAdditionalParticipantWithoutFieldCount() {
+  public function testAdditionalParticipantWithoutFieldCount() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -564,7 +556,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '7');
 
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -585,7 +577,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '6');
 
     $this->type('first_name', 'Mary Add 2');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -606,7 +598,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
     $this->type('first_name', 'Mary Add 2');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -619,12 +611,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
 
     // check for select
-    $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
-
-    $this->click('_qf_Participant_2_next-Array');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertStringsPresent(array('Sorry, currently only 2 seats are available for this option.'));
+    $this->assertElementContainsText("xpath=//select[@id='price_{$selectFieldId}']//option[@value='crm_disabled_opt-{$selectFieldOp2}']", "(Sold out)");
 
     // Skip participant3 and register
     $this->click('_qf_Participant_2_next_skip-Array');
@@ -650,7 +637,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -663,12 +650,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
 
     // check for select field
-    $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
-
-    $this->click('_qf_Register_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertStringsPresent(array('Sorry, this option is currently sold out.'));
+    $this->assertElementContainsText("xpath=//select[@id='price_{$selectFieldId}']//option[@value='crm_disabled_opt-{$selectFieldOp2}']", "(Sold out)");
 
     // fill available value for select
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp1}");
@@ -681,7 +663,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '2');
 
     $this->type('first_name', 'Mary Add 1');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -694,12 +676,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
 
     // check for select field
-    $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
-
-    $this->click('_qf_Participant_1_next-Array');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertStringsPresent(array('Sorry, this option is currently sold out.'));
+    $this->assertElementContainsText("xpath=//select[@id='price_{$selectFieldId}']//option[@value='crm_disabled_opt-{$selectFieldOp2}']", "(Sold out)");
 
     // fill available value for select
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp1}");
@@ -710,7 +687,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->_checkConfirmationAndRegister();
   }
 
-  function testAdditionalParticipantWithFieldCount() {
+  public function testAdditionalParticipantWithFieldCount() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -856,7 +833,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '7');
 
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -877,7 +854,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '6');
 
     $this->type('first_name', 'Mary Add 1');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -898,7 +875,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
     $this->type('first_name', 'Mary Add 2');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -911,12 +888,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
 
     // check for select
-    $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
-
-    $this->click('_qf_Participant_2_next-Array');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertStringsPresent(array('Sorry, currently only 4 seats are available for this option.'));
+    $this->assertElementContainsText("xpath=//select[@id='price_{$selectFieldId}']//option[@value='crm_disabled_opt-{$selectFieldOp2}']", "(Sold out)");
 
     // Skip participant3 and register
     $this->click('_qf_Participant_2_next_skip-Array');
@@ -942,7 +914,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '3');
 
     $this->type('first_name', 'Mary');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -955,12 +927,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
 
     // check for select field
-    $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
-
-    $this->click('_qf_Register_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertStringsPresent(array('Sorry, this option is currently sold out.'));
+    $this->assertElementContainsText("xpath=//select[@id='price_{$selectFieldId}']//option[@value='crm_disabled_opt-{$selectFieldOp2}']", "(Sold out)");
 
     // fill available value for select
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp1}");
@@ -973,7 +940,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '2');
 
     $this->type('first_name', 'Mary Add 1');
-    $this->type('last_name', 'Jane'. substr(sha1(rand()), 0, 5));
+    $this->type('last_name', 'Jane' . substr(sha1(rand()), 0, 5));
     $email = 'jane_' . substr(sha1(rand()), 0, 5) . '@example.org';
     $this->type('email-Primary', $email);
 
@@ -986,12 +953,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->type("xpath=//input[@id='price_{$textFieldId}']", '1');
 
     // check for select field
-    $this->select("price_{$selectFieldId}", "value={$selectFieldOp2}");
-
-    $this->click('_qf_Participant_1_next-Array');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    $this->assertStringsPresent(array('Sorry, this option is currently sold out.'));
+    $this->assertElementContainsText("xpath=//select[@id='price_{$selectFieldId}']//option[@value='crm_disabled_opt-{$selectFieldOp2}']", "(Sold out)");
 
     // fill available value for select
     $this->select("price_{$selectFieldId}", "value={$selectFieldOp1}");
@@ -1006,7 +968,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
    * @param $setTitle
    * @param null $financialType
    */
-  function _testAddSet($setTitle, $financialType = NULL) {
+  public function _testAddSet($setTitle, $financialType = NULL) {
     $this->openCiviPage('admin/price', 'reset=1&action=add', '_qf_Set_next-bottom');
 
     // Enter Priceset fields (Title, Used For ...)
@@ -1027,7 +989,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
   /**
    * @param $fields
    */
-  function _testAddPriceFields($fields) {
+  public function _testAddPriceFields($fields) {
     $fieldCount = count($fields);
     $count = 1;
     $this->waitForElementPresent('label');
@@ -1085,7 +1047,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
    * @param $options
    * @param $fieldType
    */
-  function _testAddMultipleChoiceOptions($options, $fieldType) {
+  public function _testAddMultipleChoiceOptions($options, $fieldType) {
     foreach ($options as $oIndex => $oValue) {
       $this->type("option_label_{$oIndex}", $oValue['label']);
       $this->type("option_amount_{$oIndex}", $oValue['amount']);
@@ -1121,7 +1083,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
    *
    * @return string
    */
-  function _testAddEvent($params) {
+  public function _testAddEvent($params) {
     $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
 
     $this->select('event_type_id', "value={$params['event_type_id']}");
@@ -1149,7 +1111,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     // Go to Fees tab
     $this->click('link=Fees');
     $this->waitForElementPresent('_qf_Fee_upload-bottom');
-    $this->click('xpath=//form[@id="Fee"]/div[2]/table/tbody/tr[2]/td[2]/label[contains(text(), "Yes")]');
+    $this->click('xpath=//form[@id="Fee"]//div/table/tbody//tr//td/label[contains(text(), "Yes")]');
     $processorName = $params['payment_processor'];
     $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
     $this->select('financial_type_id', 'value=4');
@@ -1199,7 +1161,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     return $this->getLocation();
   }
 
-  function _fillRegisterWithBillingInfo() {
+  public function _fillRegisterWithBillingInfo() {
     $this->waitForElementPresent('credit_card_type');
     $this->select('credit_card_type', 'value=Visa');
     $this->type('credit_card_number', '4111111111111111');
@@ -1218,12 +1180,14 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function _checkConfirmationAndRegister() {
+  public function _checkConfirmationAndRegister() {
     $confirmStrings = array('Event Fee(s)', 'Billing Name and Address', 'Credit Card Information');
     $this->assertStringsPresent($confirmStrings);
+    $this->waitForElementPresent("_qf_Confirm_next-bottom");
     $this->click('_qf_Confirm_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $thankStrings = array('Thank You for Registering', 'Event Total', 'Transaction Date');
     $this->assertStringsPresent($thankStrings);
   }
+
 }

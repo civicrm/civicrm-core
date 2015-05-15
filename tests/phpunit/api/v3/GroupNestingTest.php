@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -31,7 +31,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for GroupNesting API - civicrm_group_nesting_*
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_GroupNestingTest extends CiviUnitTestCase {
   protected $_apiversion;
@@ -39,8 +39,6 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     $this->_apiversion = 3;
@@ -77,8 +75,6 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
   protected function tearDown() {
     //  Truncate the tables
@@ -108,10 +104,12 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('group_nesting', 'get', $params, __FUNCTION__, __FILE__);
     // expected data loaded in setUp
     $expected = array(
-      1 => array('id' => 1,
+      1 => array(
+        'id' => 1,
         'child_group_id' => 2,
         'parent_group_id' => 1,
-      ));
+      ),
+    );
 
     $this->assertEquals($expected, $result['values']);
   }
@@ -122,13 +120,15 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    */
   public function testGetWithChildGroupId() {
     $params = array(
-      'child_group_id' => 4,    );
+      'child_group_id' => 4,
+    );
 
     $result = $this->callAPISuccess('group_nesting', 'get', $params);
 
     // expected data loaded in setUp
     $expected = array(
-      3 => array('id' => 3,
+      3 => array(
+        'id' => 3,
         'child_group_id' => 4,
         'parent_group_id' => 1,
       ),
@@ -148,13 +148,15 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    */
   public function testGetWithParentGroupId() {
     $params = array(
-      'parent_group_id' => 1,    );
+      'parent_group_id' => 1,
+    );
 
     $result = $this->callAPISuccess('group_nesting', 'get', $params);
 
     // expected data loaded in setUp
     $expected = array(
-      1 => array('id' => 1,
+      1 => array(
+        'id' => 1,
         'child_group_id' => 2,
         'parent_group_id' => 1,
       ),
@@ -223,7 +225,8 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     // groups id=1 and id=2 loaded in setUp
     $getparams = array(
       'parent_group_id' => 1,
-      'child_group_id' => 2,    );
+      'child_group_id' => 2,
+    );
 
     $result = $this->callAPISuccess('group_nesting', 'get', $getparams);
     $params = array('id' => $result['id']);
@@ -238,5 +241,5 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
   public function testDeleteWithEmptyParams() {
     $result = $this->callAPIFailure('group_nesting', 'delete', array());
   }
-}
 
+}

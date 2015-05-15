@@ -5,18 +5,8 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  * Class CRM_Case_PseudoConstantTest
  */
 class CRM_Case_PseudoConstantTest extends CiviCaseTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Case PseudoConstants',
-      'description' => 'Test Case_PseudoConstant methods.',
-      'group' => 'Case',
-    );
-  }
 
-  function testCaseType() {
+  public function testCaseType() {
     CRM_Core_PseudoConstant::flush();
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $expectedTypes = array(
@@ -25,4 +15,5 @@ class CRM_Case_PseudoConstantTest extends CiviCaseTestCase {
     );
     $this->assertEquals($expectedTypes, $caseTypes);
   }
+
 }

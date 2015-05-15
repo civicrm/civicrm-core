@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -104,7 +104,7 @@
           {/if}
           {if $activityAssigneeNotification}
             <br />
-            <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+            <span class="description"><span class="icon ui-icon-mail-closed"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
           {/if}
         {/if}
       </td>
@@ -155,13 +155,11 @@
     <td class="label">{$form.details.label}</td>
     {if $activityTypeName eq "Print PDF Letter"}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-      {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+      {$form.details.html}
       </td>
       {else}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-       {if $defaultWysiwygEditor eq 0}{$form.details.html|crmStripAlternatives|crmAddClass:huge}{else}{$form.details.html|crmStripAlternatives}{/if}
+       {$form.details.html|crmStripAlternatives}
       </td>
     {/if}
   </tr>
@@ -211,38 +209,7 @@
   {if $action eq 2 OR $action eq 1}
     <tr class="crm-activity-form-block-recurring_activity">
       <td colspan="2">
-        {include file="CRM/Core/Form/RecurringEntity.tpl"}
-        {literal}
-          <script type="text/javascript">
-            CRM.$(function($) {
-              if ($('#activity_date_time').val() !== "" && $('#activity_date_time_time').val() !== "") {
-                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
-                $('#repetition_start_date_time').val($('#activity_date_time_time').val());
-              }
-
-              $('#activity_date_time_display').change(function() {
-                $('#repetition_start_date, #repetition_start_date_display').val($('#activity_date_time').val());
-              });
-
-              $('#activity_date_time_time').change(function() {
-                $('#repetition_start_date_time').val($('#activity_date_time_time').val());
-              });
-
-              if ($('#start_action_offset').val() == "" && $('#repeat_absolute_date_display').val() == "") {
-                $('#recurring-entity-block').addClass('collapsed');
-              }
-            });
-          </script>
-        {/literal}
-        {if $action eq 1}
-          {literal}
-            <script type="text/javascript">
-              CRM.$(function($) {
-                $('#recurring-entity-block div.crm-submit-buttons').css('display', 'none');
-              });
-            </script>
-          {/literal}
-        {/if}
+        {include file="CRM/Core/Form/RecurringEntity.tpl" recurringFormIsEmbedded=true}
       </td>
     </tr>
   {/if}
@@ -317,7 +284,7 @@
       {if ($context eq 'fulltext' || $context eq 'search') && $searchKey}
         {assign var='urlParams' value="reset=1&atype=$atype&action=update&reset=1&id=$entityID&cid=$contactId&context=$context&key=$searchKey"}
       {/if}
-      <a href="{crmURL p='civicrm/activity/add' q=$urlParams}" class="edit button" title="{ts}Edit{/ts}"><span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+      <a href="{crmURL p='civicrm/activity/add' q=$urlParams}" class="edit button" title="{ts}Edit{/ts}"><span><div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span></a>
     {/if}
 
     {if call_user_func(array('CRM_Core_Permission','check'), 'delete activities')}

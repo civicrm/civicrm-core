@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Export/ExportCiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testPrefixGenderSuffix(){
+  public function testPrefixGenderSuffix() {
     $this->webtestLogin();
 
     // Create new  group
@@ -46,7 +46,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // We're using Quick Add block on the main page for this.
     $firstContactName = 'TestExport' . substr(sha1(rand()), 0, 7);
 
-    list($emailContactFirst,$prefixLabelContactFrst,$suffixLabelContactFrst,$genderLabelContactFrst) = WebTest_Export_ContactTest::webtestAddContactWithGenderPrefixSuffix($firstContactName, "Smith", "$firstContactName.smith@example.org", Null);
+    list($emailContactFirst, $prefixLabelContactFrst, $suffixLabelContactFrst, $genderLabelContactFrst) = WebTest_Export_ContactTest::webtestAddContactWithGenderPrefixSuffix($firstContactName, "Smith", "$firstContactName.smith@example.org", NULL);
 
     $sortFirstName = "Smith, $firstContactName";
     $displayFirstName = "$firstContactName Smith";
@@ -62,7 +62,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->waitForAjaxContent();
 
     $secondContactName = 'TestExport2' . substr(sha1(rand()), 0, 7);
-    list($emailContactSecond,$prefixLabelContactScnd,$suffixLabelContactScnd,$genderLabelContactScnd) = WebTest_Export_ContactTest::webtestAddContactWithGenderPrefixSuffix($secondContactName, "John", "$secondContactName.john@example.org", Null);
+    list($emailContactSecond, $prefixLabelContactScnd, $suffixLabelContactScnd, $genderLabelContactScnd) = WebTest_Export_ContactTest::webtestAddContactWithGenderPrefixSuffix($secondContactName, "John", "$secondContactName.john@example.org", NULL);
 
     $sortSecondName = "John, $secondContactName";
     $displaySecondName = "$secondContactName John";
@@ -120,24 +120,21 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // All other rows to be check.
     $checkRows = array(
       1 => array(
+        'First Name' => $secondContactName,
+        'Last Name' => 'John',
+        'Email' => '' . strtolower($emailContactSecond) . '',
+        'Individual Suffix' => $suffixLabelContactScnd,
+        'Gender' => $genderLabelContactScnd,
+      ),
+      2 => array(
         'First Name' => $firstContactName,
         'Last Name' => 'Smith',
-        'Email' => ''.strtolower($emailContactFirst).'',
+        'Email' => '' . strtolower($emailContactFirst) . '',
         'Sort Name' => $sortFirstName,
-        'Display Name' => $prefixLabelContactFrst.' '.$displayFirstName.' '.$suffixLabelContactFrst,
+        'Display Name' => $prefixLabelContactFrst . ' ' . $displayFirstName . ' ' . $suffixLabelContactFrst,
         'Individual Prefix' => $prefixLabelContactFrst,
         'Individual Suffix' => $suffixLabelContactFrst,
         'Gender' => $genderLabelContactFrst,
-      ),
-      2 => array(
-        'First Name' => $secondContactName,
-        'Last Name' => 'John',
-        'Email' => ''.strtolower($emailContactSecond).'',
-        'Sort Name' => $sortSecondName,
-        'Display Name' => $prefixLabelContactScnd.' '.$displaySecondName.' '.$suffixLabelContactScnd,
-        'Individual Prefix' => $prefixLabelContactScnd,
-        'Individual Suffix' => $suffixLabelContactScnd,
-        'Gender' => $genderLabelContactScnd,
       ),
     );
 
@@ -148,7 +145,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
   /**
    *  Test Contact Export.
    */
-  function testContactExport() {
+  public function testContactExport() {
     $this->webtestLogin();
 
     // Create new  group
@@ -239,18 +236,18 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // All other rows to be check.
     $checkRows = array(
       1 => array(
-        'First Name' => $firstName,
-        'Last Name' => 'Smith',
-        'Email' => "$firstName.smith@example.org",
-        'Sort Name' => $sortName,
-        'Display Name' => $displayName,
-      ),
-      2 => array(
         'First Name' => $childName,
         'Last Name' => 'John',
         'Email' => "$childName.john@example.org",
         'Sort Name' => $childSortName,
         'Display Name' => $childDisplayName,
+      ),
+      2 => array(
+        'First Name' => $firstName,
+        'Last Name' => 'Smith',
+        'Email' => "$firstName.smith@example.org",
+        'Sort Name' => $sortName,
+        'Display Name' => $displayName,
       ),
     );
 
@@ -258,7 +255,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->reviewCSV($csvFile, $checkHeaders, $checkRows, 2);
   }
 
-  function testMergeHousehold() {
+  public function testMergeHousehold() {
     $this->webtestLogin();
 
     // Create new  group
@@ -282,7 +279,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->type("address_1_street_address", "121A Sherman St. Apt. 12");
     $this->type("address_1_city", "Dumfries");
     $this->type("address_1_postal_code", "1234");
-    $this->assertElementContainsText('address_table_1', "- select - United States");
+    $this->select("address_1_country_id", "United States");
     $this->select("address_1_state_province_id", "value=1019");
 
     $this->click('_qf_Contact_upload_view');
@@ -417,7 +414,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function webtestAddContactWithGenderPrefixSuffix($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
+  public function webtestAddContactWithGenderPrefixSuffix($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
     $url = $this->sboxPath . 'civicrm/contact/add?reset=1&ct=Individual';
     if ($contactSubtype) {
       $url = $url . "&cst={$contactSubtype}";
@@ -436,24 +433,24 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $genderLabelArray = array(
       1 => 'Female',
       2 => 'Male',
-      3 => 'Transgender'
+      3 => 'Transgender',
     );
     $prefix = rand(1, 4);
     $suffix = rand(1, 8);
     $gender = rand(1, 3);
-    $genderLabel = "civicrm_gender_".$genderLabelArray[$gender]."_$gender";
+    $genderLabel = "civicrm_gender_" . $genderLabelArray[$gender] . "_$gender";
     $this->select("prefix_id", "value=$prefix");
     $this->select("suffix_id", "value=$suffix");
     $this->click("demographics");
     $this->waitForElementPresent("civicrm_gender_Female_1");
-    $this->click($genderLabel,"value=$gender");
+    $this->click($genderLabel, "value=$gender");
     $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
     $this->click('_qf_Contact_upload_view-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $prefixLabel = WebTest_Export_ContactTest::getOptionLabel('individual_prefix',$prefix);
-    $suffixLabel = WebTest_Export_ContactTest::getOptionLabel('individual_suffix',$suffix);
-    $genderLabel = WebTest_Export_ContactTest::getOptionLabel('gender',$gender);
-    return array($email,$prefixLabel,$suffixLabel,$genderLabel);
+    $prefixLabel = WebTest_Export_ContactTest::getOptionLabel('individual_prefix', $prefix);
+    $suffixLabel = WebTest_Export_ContactTest::getOptionLabel('individual_suffix', $suffix);
+    $genderLabel = WebTest_Export_ContactTest::getOptionLabel('gender', $gender);
+    return array($email, $prefixLabel, $suffixLabel, $genderLabel);
   }
 
   /**
@@ -462,15 +459,16 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
    *
    * @return array|int
    */
-  function getOptionLabel($optionGroupName,$optionValue){
+  public function getOptionLabel($optionGroupName, $optionValue) {
     $params = array(
       'version' => 3,
       'sequential' => 1,
       'option_group_name' => $optionGroupName,
       'value' => $optionValue,
-      'return' => 'label'
+      'return' => 'label',
     );
-    $optionLabel = $this->webtest_civicrm_api("OptionValue", "getvalue",$params);
+    $optionLabel = $this->webtest_civicrm_api("OptionValue", "getvalue", $params);
     return $optionLabel;
   }
+
 }

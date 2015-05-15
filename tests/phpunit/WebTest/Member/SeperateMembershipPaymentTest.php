@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.5                                                |
+   | CiviCRM version 4.6                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2014                                |
+   | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -35,7 +35,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     parent::setUp();
   }
 
-  function testSeperateMembershipCreate() {
+  public function testSeperateMembershipCreate() {
     // a random 7-char string and an even number to make this pass unique
     $hash = substr(sha1(rand()), 0, 7);
     $rand = 2 * rand(2, 50);
@@ -91,14 +91,14 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
 
     // create new membership types
     $memTypeParams1 = $this->webtestAddMembershipType();
-    $memTypeTitle1  = $memTypeParams1['membership_type'];
-    $memTypeId1     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[12]/span/a[3]@href"));
-    $memTypeId1     = $memTypeId1[1];
+    $memTypeTitle1 = $memTypeParams1['membership_type'];
+    $memTypeId1 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td/div[text()='{$memTypeTitle1}']/../../td[12]/span/a[3]@href"));
+    $memTypeId1 = $memTypeId1[1];
 
     $memTypeParams2 = $this->webtestAddMembershipType();
-    $memTypeTitle2  = $memTypeParams2['membership_type'];
-    $memTypeId2     = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[12]/span/a[3]@href"));
-    $memTypeId2     = $memTypeId2[1];
+    $memTypeTitle2 = $memTypeParams2['membership_type'];
+    $memTypeId2 = explode('&id=', $this->getAttribute("xpath=//div[@id='membership_type']/table/tbody//tr/td/div[text()='{$memTypeTitle2}']/../../td[12]/span/a[3]@href"));
+    $memTypeId2 = $memTypeId2[1];
 
     // edit contribution page memberships tab to add two new membership types
     $this->openCiviPage('admin/contribute/membership', "reset=1&action=update&id={$pageId}", "_qf_MembershipBlock_next-bottom");
@@ -148,7 +148,7 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
    * @param int $memTypeId
    * @param int $cid
    */
-  function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
+  public function _testOnlineMembershipSignup($pageId, $memTypeId, $cid = NULL) {
     //Open Live Contribution Page
     $args = array('reset' => 1, 'id' => $pageId);
     if ($cid) {
@@ -162,4 +162,5 @@ class WebTest_Member_SeperateMembershipPaymentTest extends CiviSeleniumTestCase 
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
     $this->clickLink("_qf_Confirm_next-bottom", NULL);
   }
+
 }

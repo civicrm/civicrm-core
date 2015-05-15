@@ -23,22 +23,16 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
   protected $fixtures;
 
-  function get_info() {
-    return array(
-      'name'    => 'ManagedEntities',
-      'description' => 'Test automatic creation/deletion of entities',
-      'group'     => 'Core',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
+    $this->useTransaction(TRUE);
     parent::setUp();
     $this->modules = array(
       'one' => new CRM_Core_Module('com.example.one', TRUE),
       'two' => new CRM_Core_Module('com.example.two', TRUE),
     );
-    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_managed');
-    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name like "CRM_Example_%"');
+
+    // Testing on drupal-demo fails because some extensions have mgd ents.
+    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_managed');
 
     $this->fixtures['com.example.one-foo'] = array(
       'module' => 'com.example.one',
@@ -66,10 +60,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->apiKernel->registerApiProvider($this->adhocProvider);
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
-    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_managed');
-    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_option_value WHERE name like "CRM_Example_%"');
     \Civi\Core\Container::singleton(TRUE);
   }
 
@@ -78,7 +70,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * to (1) create 'foo' entity, (2) create 'bar' entity', (3) remove 'foo'
    * entity
    */
-  function testAddRemoveEntitiesModule_UpdateAlways_DeleteAlways() {
+  public function testAddRemoveEntitiesModule_UpdateAlways_DeleteAlways() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -127,7 +119,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Set up an active module with one managed-entity and, over
    * time, the content of the entity changes
    */
-  function testModifyDeclaration_UpdateAlways() {
+  public function testModifyDeclaration_UpdateAlways() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -153,7 +145,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Set up an active module with one managed-entity and, over
    * time, the content of the entity changes
    */
-  function testModifyDeclaration_UpdateNever() {
+  public function testModifyDeclaration_UpdateNever() {
     $decls = array();
 
     // create first managed entity ('foo')
@@ -183,12 +175,12 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * ensure that the policy is followed (ie the entity is not
    * deleted).
    */
-  function testRemoveDeclaration_CleanupNever() {
+  public function testRemoveDeclaration_CleanupNever() {
     $decls = array();
 
     // create first managed entity ('foo')
     $decls[] = array_merge($this->fixtures['com.example.one-foo'], array(
-      'cleanup' => 'never'
+      'cleanup' => 'never',
     ));
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
@@ -212,12 +204,12 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * ensure that the policy is followed (ie the entity is not
    * deleted).
    */
-  function testRemoveDeclaration_CleanupUnused() {
+  public function testRemoveDeclaration_CleanupUnused() {
     $decls = array();
 
     // create first managed entity ('foo')
     $decls[] = array_merge($this->fixtures['com.example.one-foo'], array(
-      'cleanup' => 'unused'
+      'cleanup' => 'unused',
     ));
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
@@ -226,13 +218,13 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // Override 'getrefcount' ==> The refcount is 1
-    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function($apiRequest) {
+    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function ($apiRequest) {
       return civicrm_api3_create_success(array(
         array(
           'name' => 'mock',
           'type' => 'mock',
           'count' => 1,
-        )
+        ),
       ));
     });
 
@@ -245,9 +237,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $this->assertEquals($foo['id'], $foo2['id']);
 
-
     // Override 'getrefcount' ==> The refcount is 0
-    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function($apiRequest) {
+    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function ($apiRequest) {
       return civicrm_api3_create_success(array());
     });
 
@@ -261,9 +252,9 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Setup an active module with a malformed entity declaration.
    */
-  function testInvalidDeclarationModule() {
+  public function testInvalidDeclarationModule() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = array(
@@ -280,15 +271,16 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
-     // good
+    }
+    catch (Exception $e) {
+      // good
     }
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Setup an active module with a malformed entity declaration.
    */
-  function testMissingName() {
+  public function testMissingName() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = array(
@@ -305,15 +297,16 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
-     // good
+    }
+    catch (Exception $e) {
+      // good
     }
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Setup an active module with a malformed entity declaration.
    */
-  function testMissingEntity() {
+  public function testMissingEntity() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = array(
@@ -330,8 +323,9 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
-     // good
+    }
+    catch (Exception $e) {
+      // good
     }
   }
 
@@ -339,7 +333,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Setup an active module with an entity -- then disable and re-enable the
    * module
    */
-  function testDeactivateReactivateModule() {
+  public function testDeactivateReactivateModule() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = $this->fixtures['com.example.one-foo'];
@@ -373,7 +367,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Setup an active module with an entity -- then entirely uninstall the
    * module
    */
-  function testUninstallModule() {
+  public function testUninstallModule() {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = $this->fixtures['com.example.one-foo'];
@@ -383,7 +377,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
-    // then destory module; note that decls go away
+    // then destroy module; note that decls go away
     unset($this->modules['one']);
     $me = new CRM_Core_ManagedEntities($this->modules, array());
     $me->reconcile();
@@ -391,4 +385,5 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertTrue(NULL === $fooNew);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
   }
+
 }

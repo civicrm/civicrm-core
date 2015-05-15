@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: Selector.php 11510 2007-09-18 09:21:34Z lobo $
- *
  */
 
 /**
  * This class is used to retrieve and display a range of
  * contacts that match the given criteria (specifically for
  * results of advanced search options.
- *
  */
 class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
@@ -45,7 +43,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * This defines two actions- View and Edit.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
@@ -53,14 +50,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
-   * @static
    */
   static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
-   * @static
    */
   static $_properties = array('contact_id', 'contact_type', 'display_name');
 
@@ -69,7 +64,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_formValues;
 
@@ -77,7 +71,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * Params is the array in a value used by the search query creator
    *
    * @var array
-   * @access protected
    */
   public $_params;
 
@@ -85,7 +78,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * Represent the type of selector
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
@@ -95,7 +87,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * The public visible fields to be shown to the user
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
@@ -107,11 +98,13 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   protected $_customSearchClass;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
    * @param $customSearchClass
-   * @param array $formValues array of form values imported
-   * @param array $params array of parameters for query
+   * @param array $formValues
+   *   Array of form values imported.
+   * @param array $params
+   *   Array of parameters for query.
    * @param null $returnProperties
    * @param \const|int $action - action of search basic or advanced.
    *
@@ -121,18 +114,17 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @param null $contextMenu
    *
    * @return \CRM_Contact_Selector_Custom
-  @access public
    */
-  function __construct(
+  public function __construct(
     $customSearchClass,
-    $formValues        = NULL,
-    $params            = NULL,
-    $returnProperties  = NULL,
-    $action            = CRM_Core_Action::NONE,
+    $formValues = NULL,
+    $params = NULL,
+    $returnProperties = NULL,
+    $action = CRM_Core_Action::NONE,
     $includeContactIds = FALSE,
     $searchChildGroups = TRUE,
-    $searchContext     = 'search',
-    $contextMenu       = NULL
+    $searchContext = 'search',
+    $contextMenu = NULL
   ) {
     $this->_customSearchClass = $customSearchClass;
     $this->_formValues = $formValues;
@@ -143,12 +135,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     if (!$ext->isExtensionKey($customSearchClass)) {
       if ($ext->isExtensionClass($customSearchClass)) {
         $customSearchFile = $ext->classToPath($customSearchClass);
-        require_once ($customSearchFile);
+        require_once $customSearchFile;
       }
       else {
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php');
+        require_once str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php';
       }
-      $this->_search = new $customSearchClass( $formValues );
+      $this->_search = new $customSearchClass($formValues);
     }
     else {
       $fnName = $ext->keyToPath;
@@ -160,16 +152,14 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
   /**
    * This method returns the links that are given for each search row.
-   * currently the links added for each row are
    *
+   * Currently the links added for each row are
    * - View
    * - Edit
    *
    * @return array
-   * @access public
-   *
    */
-  static function &links() {
+  public static function &links() {
     list($key) = func_get_args();
     $searchContext = "&context=custom";
     $extraParams = ($key) ? "&key={$key}" : NULL;
@@ -211,29 +201,30 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @param $action
    * @param array $params
-   *
-   * @access public
    */
-  function getPagerParams($action, &$params) {
-    $params['status']    = ts('Contact %%StatusMessage%%');
+  public function getPagerParams($action, &$params) {
+    $params['status'] = ts('Contact %%StatusMessage%%');
     $params['csvString'] = NULL;
-    $params['rowCount']  = CRM_Utils_Pager::ROWCOUNT;
+    $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
 
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
 
   /**
-   * Returns the column headers as an array of tuples:
-   * (name, sortName (key to the sort array))
+   * Returns the column headers as an array of tuples.
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * Keys are name, sortName, key to the sort array.
    *
-   * @return array the column headers that need to be displayed
-   * @access public
+   * @param string $action
+   *   The action being performed.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
+   *
+   * @return array
+   *   the column headers that need to be displayed
    */
-  function &getColumnHeaders($action = NULL, $output = NULL) {
+  public function &getColumnHeaders($action = NULL, $output = NULL) {
     $columns = $this->_search->columns();
     if ($output == CRM_Core_Selector_Controller::EXPORT) {
       return array_keys($columns);
@@ -259,27 +250,33 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param null $action
    *
-   * @return int Total number of rows
-   * @access public
+   * @return int
+   *   Total number of rows
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     return $this->_search->count();
   }
 
   /**
-   * Returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
 
     $includeContactIDs = FALSE;
     if (($output == CRM_Core_Selector_Controller::EXPORT ||
@@ -294,15 +291,16 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     // contact query object used for creating $sql
     $contactQueryObj = NULL;
     if (method_exists($this->_search, 'getQueryObj') &&
-      is_a($this->_search->getQueryObj(), 'CRM_Contact_BAO_Query')) {
+      is_a($this->_search->getQueryObj(), 'CRM_Contact_BAO_Query')
+    ) {
       $contactQueryObj = $this->_search->getQueryObj();
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
 
-    $columns     = $this->_search->columns();
+    $columns = $this->_search->columns();
     $columnNames = array_values($columns);
-    $links       = self::links($this->_key);
+    $links = self::links($this->_key);
 
     $permissions = array(CRM_Core_Permission::getPermission());
     if (CRM_Core_Permission::check('delete contacts')) {
@@ -312,8 +310,8 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
     $alterRow = FALSE;
     if (method_exists($this->_customSearchClass,
-        'alterRow'
-      )) {
+      'alterRow'
+    )) {
       $alterRow = TRUE;
     }
     $image = FALSE;
@@ -359,8 +357,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
         }
 
         if ($image) {
-          $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($dao->contact_sub_type ?
-            $dao->contact_sub_type : $dao->contact_type, FALSE, $contactID
+          $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($dao->contact_sub_type ? $dao->contact_sub_type : $dao->contact_type, FALSE, $contactID
           );
         }
         $rows[] = $row;
@@ -373,20 +370,18 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * Given the current formValues, gets the query in local
-   * language
+   * Given the current formValues, gets the query in local language.
    *
-   * @param  array(
-     reference)   $formValues   submitted formValues
-   *
-   * @return array              $qill         which contains an array of strings
-   * @access public
+   * @return array
+   *   which contains an array of strings
    */
   public function getQILL() {
     return NULL;
   }
 
   /**
+   * Get summary.
+   *
    * @return mixed
    */
   public function getSummary() {
@@ -396,22 +391,28 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   /**
    * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Custom Search');
   }
 
   /**
+   * Do nothing.
+   *
    * @return null
    */
-  function alphabetQuery() {
+  public function alphabetQuery() {
     return NULL;
   }
 
   /**
+   * Generate contact ID query.
+   *
    * @param array $params
    * @param $action
    * @param int $sortID
@@ -420,7 +421,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @return Object
    */
-  function &contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $params = array();
     $sql = $this->_search->contactIDs($params);
 
@@ -428,9 +429,11 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param $rows
+   * Add actions.
+   *
+   * @param array $rows
    */
-  function addActions(&$rows) {
+  public function addActions(&$rows) {
     $links = self::links($this->_key);
 
     $permissions = array(CRM_Core_Permission::getPermission());
@@ -453,12 +456,14 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   }
 
   /**
-   * @param $rows
+   * Remove actions.
+   *
+   * @param array $rows
    */
-  function removeActions(&$rows) {
+  public function removeActions(&$rows) {
     foreach ($rows as $rid => & $rValue) {
       unset($rValue['action']);
     }
   }
-}
 
+}

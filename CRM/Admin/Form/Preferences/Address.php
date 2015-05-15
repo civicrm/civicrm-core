@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -37,13 +37,14 @@
  * This class generates form components for Address Section
  */
 class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
 
     CRM_Utils_System::setTitle(ts('Settings - Addresses'));
 
     // Address Standardization
     $addrProviders = array(
-      '' => '- select -') + CRM_Core_SelectValues::addressProvider();
+      '' => '- select -',
+    ) + CRM_Core_SelectValues::addressProvider();
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
@@ -93,12 +94,11 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults['address_standardization_provider'] = $this->_config->address_standardization_provider;
     $defaults['address_standardization_userid'] = $this->_config->address_standardization_userid;
     $defaults['address_standardization_url'] = $this->_config->address_standardization_url;
-
 
     $this->addressSequence = isset($newSequence) ? $newSequence : "";
 
@@ -129,17 +129,15 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
       $defaults['mailing_format'] = $this->_config->mailing_format;
     }
 
-
     parent::cbsDefaultValues($defaults);
 
     return $defaults;
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -158,7 +156,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
    *
    * @return bool
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $p = $fields['address_standardization_provider'];
     $u = $fields['address_standardization_userid'];
     $w = $fields['address_standardization_url'];
@@ -181,9 +179,8 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -193,7 +190,6 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
     }
 
     $this->_params = $this->controller->exportValues($this->_name);
-
 
     // check if county option has been set
     $options = CRM_Core_OptionGroup::values('address_options', FALSE, FALSE, TRUE);
@@ -217,5 +213,5 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
     $this->postProcessCommon();
   }
-}
 
+}

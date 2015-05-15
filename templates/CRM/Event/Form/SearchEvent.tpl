@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,13 +34,7 @@
              <div style="height: auto; vertical-align: bottom">{$form.eventsByDates.html}</div>
         </td>
         <td rowspan="2"><label>{ts}Event Type{/ts}</label>
-            <div class="listing-box">
-                {foreach from=$form.event_type_id item="event_val"}
-                <div class="{cycle values="odd-row,even-row"}">
-                    {$event_val.html}
-                </div>
-                {/foreach}
-            </div>
+          {$form.event_type_id.html}
         </td>
         <td class="right" rowspan="2">&nbsp;{include file="CRM/common/formButtons.tpl"}</td>
     </tr>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
     </div>
 {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-            <a href="{$newGrantURL}" class="button"><span><div class="icon add-icon"></div>{ts}Add Grant{/ts}</span></a><br/><br/>
+            <a href="{$newGrantURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Grant{/ts}</span></a><br/><br/>
             </div>
         {/if}
     {if $rows}

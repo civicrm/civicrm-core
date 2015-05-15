@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testContactContextActivityAdd() {
+  public function testContactContextActivityAdd() {
     $this->webtestLogin();
 
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
@@ -73,7 +73,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName1");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$firstName1");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Summerson, $firstName1", 'Contact not found in line ' . __LINE__);
@@ -117,11 +117,10 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', $subject);
 
-    $this->waitForElementPresent(
-      "xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']//tbody//tr[2]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-activity-selector-activity']/div[2]/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']//tbody//tr[2]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='crm-activity-selector-activity']/div[2]/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // verify Activity created
@@ -147,7 +146,7 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     );
   }
 
-  function testSeparateActivityForMultiTargetContacts() {
+  public function testSeparateActivityForMultiTargetContacts() {
     $this->webtestLogin();
 
     //creating contacts
@@ -181,7 +180,6 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
-
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", "$firstName1", 'Contact not found in line ' . __LINE__);
 
@@ -196,7 +194,6 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     // ...need to use mouseDownAt on first result (which is a li element), click does not work
     $this->clickAt("xpath=//div[@class='select2-result-label']");
-
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->waitForText("xpath=//div[@id='s2id_target_contact_id']", "$firstName2", 'Contact not found in line ' . __LINE__);
@@ -223,12 +220,12 @@ class WebTest_Activity_ContactContextAddTest extends CiviSeleniumTestCase {
 
     $this->clickLink('_qf_Search_refresh');
 
-    $targetContacts = array("Summerson, ". $firstName1, "Andersonnn, ". $firstName2, "Anderson, ". $firstName3 );
+    $targetContacts = array("Summerson, " . $firstName1, "Andersonnn, " . $firstName2, "Anderson, " . $firstName3);
 
     //check whether separate activities are created for the target contacts
     foreach ($targetContacts as $contact) {
       $this->assertTrue($this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody//tr/td[5]/a[text()='$contact']"));
     }
   }
-}
 
+}

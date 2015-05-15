@@ -7,7 +7,12 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class TransactionSubscriberTest extends \CiviUnitTestCase {
 
-  function transactionOptions() {
+  /**
+   * Get transaction options.
+   *
+   * @return array
+   */
+  public function transactionOptions() {
     $r = array();
     // $r[] = array(string $entity, string $action, array $params, bool $isTransactional, bool $isForceRollback, bool $isNested);
 
@@ -27,10 +32,42 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
     $r[] = array(3, 'Widget', 'create', array('options' => array('force_rollback' => TRUE)), TRUE, TRUE, TRUE);
     $r[] = array(3, 'Widget', 'create', array('options' => array('force_rollback' => FALSE)), TRUE, FALSE, FALSE);
 
-    $r[] = array(3, 'Widget', 'create', array('is_transactional' => TRUE, 'options' => array('force_rollback' => TRUE)), TRUE, TRUE, TRUE);
-    $r[] = array(3, 'Widget', 'create', array('is_transactional' => TRUE, 'options' => array('force_rollback' => FALSE)), TRUE, FALSE, FALSE);
-    $r[] = array(3, 'Widget', 'create', array('is_transactional' => FALSE, 'options' => array('force_rollback' => TRUE)), TRUE, TRUE, TRUE);
-    $r[] = array(3, 'Widget', 'create', array('is_transactional' => FALSE, 'options' => array('force_rollback' => FALSE)), FALSE, FALSE, FALSE);
+    $r[] = array(
+      3,
+      'Widget',
+      'create',
+      array('is_transactional' => TRUE, 'options' => array('force_rollback' => TRUE)),
+      TRUE,
+      TRUE,
+      TRUE,
+    );
+    $r[] = array(
+      3,
+      'Widget',
+      'create',
+      array('is_transactional' => TRUE, 'options' => array('force_rollback' => FALSE)),
+      TRUE,
+      FALSE,
+      FALSE,
+    );
+    $r[] = array(
+      3,
+      'Widget',
+      'create',
+      array('is_transactional' => FALSE, 'options' => array('force_rollback' => TRUE)),
+      TRUE,
+      TRUE,
+      TRUE,
+    );
+    $r[] = array(
+      3,
+      'Widget',
+      'create',
+      array('is_transactional' => FALSE, 'options' => array('force_rollback' => FALSE)),
+      FALSE,
+      FALSE,
+      FALSE,
+    );
 
     $r[] = array(4, 'Widget', 'get', array(), FALSE, FALSE, FALSE);
     $r[] = array(4, 'Widget', 'create', array(), TRUE, FALSE, FALSE);
@@ -46,10 +83,21 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
   }
 
   /**
-   * Ensure that API parameters "is_transactional" and "force_rollback" are parsed correctly
+   * Ensure that API parameters "is_transactional" and "force_rollback" are parsed correctly.
+   *
    * @dataProvider transactionOptions
+   *
+   * @param $version
+   * @param $entity
+   * @param $action
+   * @param array $params
+   * @param bool $isTransactional
+   * @param bool $isForceRollback
+   * @param bool $isNested
+   *
+   * @throws \API_Exception
    */
-  function testTransactionOptions($version, $entity, $action, $params, $isTransactional, $isForceRollback, $isNested) {
+  public function testTransactionOptions($version, $entity, $action, $params, $isTransactional, $isForceRollback, $isNested) {
     $txs = new TransactionSubscriber();
     $apiProvider = NULL;
 
@@ -61,13 +109,13 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
     $this->assertEquals($isNested, $txs->isNested($apiProvider, $apiRequest), 'check isNested');
   }
 
-  function testForceRollback() {
+  public function testForceRollback() {
     $result = $this->callAPISuccess('contact', 'create', array(
       'contact_type' => 'Individual',
       'first_name' => 'Me',
       'last_name' => 'Myself',
       'options' => array(
-        'force_rollback' => TRUE
+        'force_rollback' => TRUE,
       ),
     ));
     $this->assertTrue(is_numeric($result['id']));
@@ -75,4 +123,5 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
       1 => array($result['id'], 'Integer'),
     ));
   }
+
 }

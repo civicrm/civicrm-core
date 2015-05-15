@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testIndividualAdd() {
+  public function testIndividualAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -199,12 +199,12 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertChecked("check_3");
   }
 
-  function testMergeContactSubType() {
+  public function testMergeContactSubType() {
     $this->webtestLogin();
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $this->waitForElementPresent('_qf_Contact_cancel-bottom');
     //fill in first name
-    $firstName = "Anderson".substr(sha1(rand()), 0, 4);
+    $firstName = "Anderson" . substr(sha1(rand()), 0, 4);
     $this->type('first_name', $firstName);
 
     //fill in last name
@@ -226,7 +226,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $this->waitForElementPresent('_qf_Contact_cancel-bottom');
 
-    $fName = "John".substr(sha1(rand()), 0, 4);
+    $fName = "John" . substr(sha1(rand()), 0, 4);
     $this->type('first_name', $fName);
     $lName = substr(sha1(rand()), 0, 4);
     $this->type('last_name', $lName);
@@ -240,8 +240,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_DedupeFind_submit-bottom');
     $this->click("_qf_DedupeFind_next-bottom");
 
-    $this->waitForElementPresent("xpath=//table[@id='option51']/tbody/tr[1]/td[4]/a[text()='merge']");
-    $this->waitForElementPresent("xpath=//*[@id='DedupeFind']/a[3]/span[contains(text(),'Done')]");
+    $this->waitForElementPresent("xpath=//form[@id='DedupeFind']/div[2]/div/table/tbody/tr[1]/td[4]/a[text()='merge']");
+    $this->waitForElementPresent("xpath=//form[@id='DedupeFind']/a[3]/span[contains(text(),'Done')]");
     $this->isElementPresent("xpath=//table[@id='option51']/tbody/tr/td[1]/a[text()='{$firstName} {$lastName}']/../td[2]/a[text()='{$fName} {$lName}']");
     $this->click("xpath=//table[@id='option51']/tbody/tr[1]/td[4]/a[text()='merge']");
     $this->waitForElementPresent('_qf_Merge_cancel-bottom');
@@ -250,12 +250,13 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent("Staff, Student"));
   }
+
   /**
    * @param string $firstName
    * @param string $lastName
    * @param $subject
    */
-  function addActivity($firstName, $lastName, $subject) {
+  public function addActivity($firstName, $lastName, $subject) {
     $withContact = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($withContact, "Anderson", $withContact . "@anderson.name");
 
@@ -276,7 +277,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Now we're filling the "Assigned To" field.
     // Typing contact's name into the field (using typeKeys(), not type()!)...
-    $this->select2("assignee_contact_id", $firstName,TRUE,FALSE);
+    $this->select2("assignee_contact_id", $firstName, TRUE, FALSE);
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertTrue($this->isTextPresent("$lastName, " . $firstName), "Contact not found in line " . __LINE__);
@@ -315,7 +316,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Activity '$subject' has been saved.", "Status message didn't show up after saving!");
   }
 
-  function testMergeTest() {
+  public function testMergeTest() {
     $this->webtestLogin();
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -499,26 +500,26 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='phone-block']/div/div/div[3]/div[2][contains(text(), '9876543210')]"));
   }
 
-  function testBatchMerge(){
+  public function testBatchMerge() {
     $this->webtestLogin();
 
     // add contact1 and its duplicate
     //first name
-    $firstName = "Kerry".substr(sha1(rand()), 0, 7);
+    $firstName = "Kerry" . substr(sha1(rand()), 0, 7);
     //last name
-    $lastName = "King".substr(sha1(rand()), 0, 7);
-    $this->_createContacts($firstName,$lastName);
+    $lastName = "King" . substr(sha1(rand()), 0, 7);
+    $this->_createContacts($firstName, $lastName);
 
     //add contact2 and its duplicate
     //These are the contacts with conflicts in communication preference.these contacts will be skipped during merge.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     //fill in first name
-    $firstName1 = "Kurt".substr(sha1(rand()), 0, 7);
+    $firstName1 = "Kurt" . substr(sha1(rand()), 0, 7);
     $this->type('first_name', $firstName1);
 
     //fill in last name
-    $lastName1 = "Cobain".substr(sha1(rand()), 0, 7);
+    $lastName1 = "Cobain" . substr(sha1(rand()), 0, 7);
     $this->type('last_name', $lastName1);
 
     //fill in email id
@@ -576,30 +577,31 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // add contact3 and its duplicate
     //fill in first name
-    $firstName2 = "David".substr(sha1(rand()), 0, 7);
+    $firstName2 = "David" . substr(sha1(rand()), 0, 7);
     //fill in last name
-    $lastName2 = "Gilmour".substr(sha1(rand()), 0, 7);
-    $this->_createContacts($firstName2,$lastName2);
+    $lastName2 = "Gilmour" . substr(sha1(rand()), 0, 7);
+    $this->_createContacts($firstName2, $lastName2);
 
     // add contact4 and its duplicate
     //fill in first name
-    $firstName3 = "Dave".substr(sha1(rand()), 0, 7);
+    $firstName3 = "Dave" . substr(sha1(rand()), 0, 7);
     //fill in last name
-    $lastName3 = "Mustaine".substr(sha1(rand()), 0, 7);
-    $this->_createContacts($firstName3,$lastName3);
+    $lastName3 = "Mustaine" . substr(sha1(rand()), 0, 7);
+    $this->_createContacts($firstName3, $lastName3);
 
     // Find and Merge Contacts with Supervised Rule
     $this->openCiviPage("contact/dedupefind", "reset=1&rgid=1&action=renew", "css=#DedupeFind table.pagerDisplay tbody tr");
 
     $this->select("name=option51_length", "value=100");
     $totalContacts = $this->getXpathCount("//table[@class='pagerDisplay']/tbody/tr");
-    $this->click("xpath=//form[@id='DedupeFind']//a/span[text()='Batch Merge Duplicates']");
+    $this->click("//form[@id='DedupeFind']//a/span[contains(text(),'Batch Merge Duplicates')]");
 
     // Check confirmation alert.
     $this->assertTrue(
-      (bool)preg_match("/^This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation./",
+      (bool) preg_match("/^This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation./",
         $this->getConfirmation()
-                                       ));
+      )
+    );
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('civicrm-footer');
@@ -621,10 +623,10 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $contactEmails = array(
       1 => "{$firstName}.{$lastName}@example.com",
       2 => "{$firstName2}.{$lastName2}@example.com",
-      3 => "{$firstName3}.{$lastName3}@example.com"
+      3 => "{$firstName3}.{$lastName3}@example.com",
     );
 
-    foreach($contactEmails as $key => $value) {
+    foreach ($contactEmails as $key => $value) {
       $this->click('sort_name_navigation');
       $this->type('css=input#sort_name_navigation', $value);
       $this->typeKeys('css=input#sort_name_navigation', $value);
@@ -637,9 +639,14 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Helper FN
+   * Helper FN.
+   * @param null $firstName
+   * @param null $lastName
+   * @param null $organizationName
+   * @param string $contactType
+   * @return array
    */
-  function _createContacts($firstName = NULL, $lastName = NULL, $organizationName = NULL, $contactType = 'Individual') {
+  public function _createContacts($firstName = NULL, $lastName = NULL, $organizationName = NULL, $contactType = 'Individual') {
     if ($contactType == 'Individual') {
       // add contact
       $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -721,16 +728,17 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
       return array(
         'mainId' => $mainId,
-        'duplicateId' => $duplicateId
+        'duplicateId' => $duplicateId,
       );
     }
   }
 
   /**
-   * Helper FN
+   * Helper FN.
    * to create new membership type
+   * @param $membershipOrganization
    */
-  function addMembershipType($membershipOrganization) {
+  public function addMembershipType($membershipOrganization) {
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
     $this->click("link=Add Membership Type");
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
@@ -739,7 +747,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->select2('member_of_contact_id', $membershipOrganization);
 
     $this->type('minimum_fee', '1');
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
@@ -761,11 +769,11 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
   /**
    * Test for CRM-12695 fix
    */
-  function testMergeOrganizations() {
+  public function testMergeOrganizations() {
     $this->webtestLogin();
 
     // build organisation name
-    $orgnaizationName = 'org_'.substr(sha1(rand()), 0, 7);
+    $orgnaizationName = 'org_' . substr(sha1(rand()), 0, 7);
 
     $contactIds = array();
     // create organization and its duplicate
@@ -915,13 +923,13 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
 
     // Check if Membership for the individual is created
     $this->waitForElementPresent("xpath=//li[@id='tab_member']/a/em");
-    $this->verifyText("xpath=//li[@id='tab_member']/a/em", 1);
+    $this->verifyText("xpath=//li[@id='tab_member']/a/em", 0);
   }
 
   /**
    * Test for CRM-15658 fix
    */
-  function testMergeEmailAndAddress() {
+  public function testMergeEmailAndAddress() {
     $this->webtestLogin();
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
     $firstName = substr(sha1(rand()), 0, 7);
@@ -971,8 +979,8 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Contact Saved");
 
     $this->openCiviPage("contact/dedupefind", "reset=1&action=update&rgid=4");
-    $this->click("xpath=//a/span[text()='Refresh Duplicates']");
-    $this->assertTrue((bool)preg_match("/This will refresh the duplicates list. Click OK to proceed./", $this->getConfirmation()));
+    $this->click("//a/span[contains(text(),'Refresh Duplicates')]");
+    $this->assertTrue((bool) preg_match("/This will refresh the duplicates list. Click OK to proceed./", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("xpath=//a[text()='$firstName $lastName']/../../td[4]/a[text()='merge']");
@@ -996,5 +1004,5 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
     $this->assertElementNotContainsText("address-block-2", "Birmingham");
     $this->assertElementNotContainsText("address-block-2", "3456");
   }
-}
 
+}

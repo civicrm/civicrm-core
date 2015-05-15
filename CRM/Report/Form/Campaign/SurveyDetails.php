@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -47,19 +47,17 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     'Individual',
     'Household',
     'Organization',
-    'Activity'
+    'Activity',
   );
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   private static $_surveyRespondentStatus;
 
   /**
-   *
    */
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     //filter options for survey activity status.
     $responseStatus = array('' => '- Any -');
     self::$_surveyRespondentStatus = array();
@@ -101,9 +99,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array(
-                '' => ts('- any interviewer -')
-              ) + $allSurveyInterviewers,
-          )
+              '' => ts('- any interviewer -'),
+            ) + $allSurveyInterviewers,
+          ),
         ),
         'grouping' => 'survey-interviewer-fields',
       ),
@@ -125,14 +123,14 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'sort_name' => array(
             'title' => ts('Respondent Name'),
             'operator' => 'like',
-          )
+          ),
         ),
         'grouping' => 'contact-fields',
         'order_bys' => array(
           'sort_name' => array(
             'title' => ts('Respondent Name'),
             'required' => TRUE,
-          )
+          ),
         ),
       ),
       'civicrm_phone' => array(
@@ -141,7 +139,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'phone' => array(
             'name' => 'phone',
             'title' => ts('Phone'),
-          )
+          ),
         ),
         'grouping' => 'location-fields',
       ),
@@ -233,7 +231,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           'email' => array(
             'name' => 'email',
             'title' => ts('Email'),
-          )
+          ),
         ),
         'grouping' => 'location-fields',
       ),
@@ -291,11 +289,11 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
 
     //add the survey response fields.
@@ -332,7 +330,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(",\n", $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = " FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -378,7 +376,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -414,8 +412,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     //apply survey activity types filter.
     $surveyActivityTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     if (!empty($surveyActivityTypes)) {
-      $clauses[] =
-        "( {$this->_aliases['civicrm_activity']}.activity_type_id IN ( " .
+      $clauses[] = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN ( " .
         implode(' , ', array_keys($surveyActivityTypes)) . ' ) )';
     }
 
@@ -435,7 +432,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
@@ -458,7 +455,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $orderBys = CRM_Utils_Array::value('order_bys', $this->_params, array());
     if (in_array($this->_outputMode, array(
       'print',
-      'pdf'
+      'pdf',
     ))) {
 
       $outPut = array();
@@ -491,8 +488,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
           //get the data per page.
           $dataPerPage[$pageCnt][] = $row;
           $lastStreetName = CRM_Utils_Array::value('civicrm_address_street_name', $row);
-          $lastStreetNum =
-            CRM_Utils_Array::value('civicrm_address_street_number', $row) % 2;
+          $lastStreetNum = CRM_Utils_Array::value('civicrm_address_street_number', $row) % 2;
         }
 
         foreach ($dataPerPage as $page) {
@@ -612,18 +608,19 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
   }
 
   /**
-   * @param $rows
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
    */
-  function alterDisplay(&$rows) {
+  public function alterDisplay(&$rows) {
 
-    //format the survey result data.
     $this->_formatSurveyResult($rows);
-
-    //format the survey response data.
     $this->_formatSurveyResponseData($rows);
 
-
-    // custom code to alter rows
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
       // handle state province
@@ -655,14 +652,12 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
         $entryFound = TRUE;
       }
 
-
       if (array_key_exists('civicrm_activity_contact_contact_id', $row)) {
         $rows[$rowNum]['civicrm_activity_contact_contact_id'] = CRM_Utils_Array::value($row['civicrm_activity_contact_contact_id'],
           CRM_Campaign_BAO_Survey::getInterviewers()
         );
         $entryFound = TRUE;
       }
-
 
       if (array_key_exists('civicrm_activity_survey_id', $row)) {
         $rows[$rowNum]['civicrm_activity_survey_id'] = CRM_Utils_Array::value($row['civicrm_activity_survey_id'],
@@ -817,7 +812,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
         $value = $responseField->label;
         if (in_array($this->_outputMode, array(
           'print',
-          'pdf'
+          'pdf',
         ))) {
           $value = $responseField->value;
         }
@@ -875,20 +870,19 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
     foreach ($responseFields as $key => $value) {
       if (substr($key, 0, 5) == 'phone' && !empty($value['location_type_id'])) {
         $fName = str_replace('-', '_', $key);
-        $this->_columns["civicrm_{$fName}"] =
-          array(
-            'dao' => 'CRM_Core_DAO_Phone',
-            'alias' => "phone_civireport_{$fName}",
-            'fields' => array(
-              $fName => array_merge($value, array(
-                  'is_required' => '1',
-                  'alias' => "phone_civireport_{$fName}",
-                  'dbAlias' => "phone_civireport_{$fName}.phone",
-                  'no_display' => TRUE,
-                )
-              ),
+        $this->_columns["civicrm_{$fName}"] = array(
+          'dao' => 'CRM_Core_DAO_Phone',
+          'alias' => "phone_civireport_{$fName}",
+          'fields' => array(
+            $fName => array_merge($value, array(
+                'is_required' => '1',
+                'alias' => "phone_civireport_{$fName}",
+                'dbAlias' => "phone_civireport_{$fName}.phone",
+                'no_display' => TRUE,
+              )
             ),
-          );
+          ),
+        );
         $this->_aliases["civicrm_phone_{$fName}"] = $this->_columns["civicrm_{$fName}"]['alias'];
         $this->_locationBasedPhoneField = TRUE;
       }
@@ -944,7 +938,7 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
       $title = $responseFields[$fieldName]['title'];
       if (in_array($this->_outputMode, array(
         'print',
-        'pdf'
+        'pdf',
       ))) {
         $title = 'Q' . $fildCnt++;
       }
@@ -961,11 +955,10 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
         'dataType' => $response->data_type,
         'htmlType' => $response->html_type,
         'required' => TRUE,
-        'alias' => ($response->data_type == 'ContactReference') ?
-          $this->_columns[$resTable]['alias'] .
-          '_contact' : $this->_columns[$resTable]['alias'],
+        'alias' => ($response->data_type == 'ContactReference') ? $this->_columns[$resTable]['alias'] .
+        '_contact' : $this->_columns[$resTable]['alias'],
         'dbAlias' => $this->_columns[$resTable]['alias'] . '.' .
-          $response->column_name,
+        $response->column_name,
         'no_display' => TRUE,
         'isSurveyResponseField' => TRUE,
       );
@@ -974,4 +967,5 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
       $this->_aliases[$resTable] = $this->_columns[$resTable]['alias'];
     }
   }
+
 }

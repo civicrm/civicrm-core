@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.5                                                |
+   | CiviCRM version 4.6                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2014                                |
+   | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -35,7 +35,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddActivityToCase() {
+  public function testAddActivityToCase() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -43,7 +43,12 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -81,7 +86,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->_testAddNewActivity($contact['first_name'], $subject, $customGroupTitle, $contact['sort_name']);
   }
 
-  function testLinkCases() {
+  public function testLinkCases() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -89,7 +94,12 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -186,13 +196,14 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     );
     $this->webtestVerifyTabularData($LinkCaseActivityData);
   }
+
   /**
    * @param string $firstName
    * @param $caseSubject
    * @param $customGroupTitle
    * @param $contactName
    */
-  function _testAddNewActivity($firstName, $caseSubject, $customGroupTitle, $contactName) {
+  public function _testAddNewActivity($firstName, $caseSubject, $customGroupTitle, $contactName) {
     $customDataParams = $this->_addCustomData($customGroupTitle);
     //$customDataParams = array( 'optionLabel_47d58', 'custom_8_-1' );
 
@@ -232,7 +243,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->clickAt("xpath=//div[@class='select2-result-label']");
 
     // ...again, waiting for the box with contact name to show up...
-    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']","$firstName1");
+    $this->waitForText("xpath=//div[@id='s2id_assignee_contact_id']", "$firstName1");
 
     // ...and verifying if the page contains properly formatted display name for chosen contact.
     $this->assertElementContainsText("xpath=//div[@id='s2id_assignee_contact_id']", "Summerson, $firstName1", 'Contact not found in line ' . __LINE__);
@@ -299,30 +310,29 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
     $id = $this->urlArg('id');
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]");
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]");
 
-    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]//a[text()='{$subject}']");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]//a[text()='{$subject}']");
 
     $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
     $this->assertElementContainsText('crm-activity-view-table', "$textField");
     $this->click("xpath=//span[@class='ui-button-icon-primary ui-icon ui-icon-closethick']");
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody/tr[1]/td[2]");
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody/tr[1]/td[2]");
 
-    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id."']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/a[text()='Scheduled']");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/div[text()='Scheduled']");
 
-    $this->waitForElementPresent("xpath=//html/body/div[7]");
-    $this->waitForElementPresent('activity_change_status');
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/div/form/select");
 
     // change activity status
-    $this->select('activity_change_status', 'value=2');
-    $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[1]/span[2]");
+    $this->select("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/div/form/select", 'value=2');
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id . "']/tbody//tr/td[2]/a[text()='{$subject}']/../../td[6]/div/form/button[@type='submit']");
     $this->openCiviPage('case', 'reset=1');
     $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[2]/a[text()='{$contactName}']/../../td[9]/span/a[text()='Manage']");
     $this->waitForElementPresent('_qf_CaseView_cancel-bottom');
     $id2 = $this->urlArg('id');
-    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_".$id2."']/tbody/tr[1]/td[2]");
-    $this->click("xpath=//div[@id='activities']//table[@id='case_id_".$id2."']//a[text()='{$subject}']");
+    $this->waitForElementPresent("xpath=//div[@id='activities']//table[@id='case_id_" . $id2 . "']/tbody/tr[1]/td[2]");
+    $this->click("xpath=//div[@id='activities']//table[@id='case_id_" . $id2 . "']//a[text()='{$subject}']");
     $this->waitForElementPresent('ActivityView');
     $this->waitForElementPresent("css=table#crm-activity-view-table tr.crm-case-activityview-form-block-groupTitle");
   }
@@ -332,7 +342,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
    *
    * @return array
    */
-  function _addCustomData($customGroupTitle) {
+  public function _addCustomData($customGroupTitle) {
 
     $this->openCiviPage('admin/custom/group', 'reset=1');
 
@@ -406,10 +416,10 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
 
     //Is custom field created
     $this->waitForText('crm-notification-container', "Custom field '$textFieldLabel' has been saved.");
-    $textFieldId = explode('&id=', $this->getAttribute("xpath=//table[@id='options']/tbody//tr/td[1]/span[text()='$textFieldLabel']/../../td[8]/span/a[1][text()='Edit Field']/@href"));
+    $textFieldId = explode('&id=', $this->getAttribute("xpath=//table[@id='options']/tbody//tr/td[1]/div[text()='$textFieldLabel']/../../td[8]/span/a[1][text()='Edit Field']/@href"));
     $textFieldId = $textFieldId[1];
 
     return array($radioOptionLabel1, "custom_{$textFieldId}_-1");
   }
-}
 
+}

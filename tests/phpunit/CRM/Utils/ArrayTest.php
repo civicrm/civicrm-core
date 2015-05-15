@@ -6,39 +6,39 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
-  function testIndexArray() {
+  public function testIndexArray() {
     $inputs = array();
     $inputs[] = array(
       'lang' => 'en',
       'msgid' => 'greeting',
       'familiar' => FALSE,
-      'value' => 'Hello'
+      'value' => 'Hello',
     );
     $inputs[] = array(
       'lang' => 'en',
       'msgid' => 'parting',
-      'value' => 'Goodbye'
+      'value' => 'Goodbye',
     );
     $inputs[] = array(
       'lang' => 'fr',
       'msgid' => 'greeting',
-      'value' => 'Bon jour'
+      'value' => 'Bon jour',
     );
     $inputs[] = array(
       'lang' => 'fr',
       'msgid' => 'parting',
-      'value' => 'Au revoir'
+      'value' => 'Au revoir',
     );
     $inputs[] = array(
       'lang' => 'en',
       'msgid' => 'greeting',
       'familiar' => TRUE,
-      'value' => 'Hey'
+      'value' => 'Hey',
     );
     $inputs[] = array(
       'msgid' => 'greeting',
       'familiar' => TRUE,
-      'value' => 'Universal greeting'
+      'value' => 'Universal greeting',
     );
 
     $byLangMsgid = CRM_Utils_Array::index(array('lang', 'msgid'), $inputs);
@@ -49,7 +49,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($inputs[5], $byLangMsgid[NULL]['greeting']);
   }
 
-  function testCollect() {
+  public function testCollect() {
     $arr = array(
       array('catWord' => 'cat', 'dogWord' => 'dog'),
       array('catWord' => 'chat', 'dogWord' => 'chien'),
@@ -59,14 +59,14 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
 
     $arr = array();
-    $arr['en']= (object) array('catWord' => 'cat', 'dogWord' => 'dog');
-    $arr['fr']= (object) array('catWord' => 'chat', 'dogWord' => 'chien');
-    $arr['es']= (object) array('catWord' => 'gato');
+    $arr['en'] = (object) array('catWord' => 'cat', 'dogWord' => 'dog');
+    $arr['fr'] = (object) array('catWord' => 'chat', 'dogWord' => 'chien');
+    $arr['es'] = (object) array('catWord' => 'gato');
     $expected = array('en' => 'cat', 'fr' => 'chat', 'es' => 'gato');
     $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
   }
 
-  function testProduct0() {
+  public function testProduct0() {
     $actual = CRM_Utils_Array::product(
       array(),
       array('base data' => 1)
@@ -76,7 +76,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ), $actual);
   }
 
-  function testProduct1() {
+  public function testProduct1() {
     $actual = CRM_Utils_Array::product(
       array('dim1' => array('a', 'b')),
       array('base data' => 1)
@@ -87,7 +87,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ), $actual);
   }
 
-  function testProduct3() {
+  public function testProduct3() {
     $actual = CRM_Utils_Array::product(
       array('dim1' => array('a', 'b'), 'dim2' => array('alpha', 'beta'), 'dim3' => array('one', 'two')),
       array('base data' => 1)
@@ -104,17 +104,17 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ), $actual);
   }
 
-  function testIsSubset() {
+  public function testIsSubset() {
     $this->assertTrue(CRM_Utils_Array::isSubset(array(), array()));
     $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('a')));
-    $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('b','a','c')));
-    $this->assertTrue(CRM_Utils_Array::isSubset(array('b','d'), array('a','b','c','d')));
+    $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('b', 'a', 'c')));
+    $this->assertTrue(CRM_Utils_Array::isSubset(array('b', 'd'), array('a', 'b', 'c', 'd')));
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array()));
     $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b')));
-    $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b','c','d')));
+    $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b', 'c', 'd')));
   }
 
-  function testRemove() {
+  public function testRemove() {
     $data = array(
       'one' => 1,
       'two' => 2,
@@ -126,4 +126,5 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     CRM_Utils_Array::remove($data, 'one', 'two', array('three', 'four'), 'five');
     $this->assertEquals($data, array('six' => 6));
   }
+
 }

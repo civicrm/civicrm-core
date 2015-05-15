@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,13 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,12 +41,11 @@
 class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_ManageEvent {
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
     $setTab = CRM_Utils_Request::retrieve('setTab', 'Int', $this, FALSE, 0);
 
@@ -65,7 +64,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
         else {
           $action += CRM_Core_Action::ENABLE;
         }
-        $scheduleReminder = new CRM_Admin_Page_ScheduleReminders;
+        $scheduleReminder = new CRM_Admin_Page_ScheduleReminders();
         $links = $scheduleReminder->links();
         $links[CRM_Core_Action::DELETE]['qs'] .= "&context=event&compId={$this->_id}";
         $links[CRM_Core_Action::UPDATE]['qs'] .= "&context=event&compId={$this->_id}";
@@ -83,15 +82,19 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     }
 
     $this->assign('rows', $reminderList);
-    $this->assign('setTab' , $setTab);
-    $this->assign('component' , 'event');
+    $this->assign('setTab', $setTab);
+    $this->assign('component', 'event');
 
     // Update tab "disabled" css class
     $this->ajaxResponse['tabValid'] = is_array($reminderList) && (count($reminderList) > 0);
     $this->setPageTitle(ts('Scheduled Reminder'));
   }
 
-  function getTemplateFileName() {
+  /**
+   * @return string
+   */
+  public function getTemplateFileName() {
     return 'CRM/Admin/Page/ScheduleReminders.tpl';
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -32,29 +32,19 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Core_BAO_ActionScheduleTest
  */
 class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
+
   /**
    * @var object see CiviTest/CiviMailUtils
    */
-  var $mut;
+  public $mut;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Action-Schedule BAO',
-      'description' => 'Test sending of scheduled notifications.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     require_once 'CiviTest/CiviMailUtils.php';
-    $this->mut = new CiviMailUtils($this, true);
+    $this->mut = new CiviMailUtils($this, TRUE);
 
-    $this->fixtures['rolling_membership'] = array( // createTestObject
+    $this->fixtures['rolling_membership'] = array(
       'membership_type_id' => array(
         'period_type' => 'rolling',
         'duration_unit' => 'month',
@@ -67,7 +57,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'is_override' => 0,
     );
 
-    $this->fixtures['rolling_membership_past'] = array( // createTestObject
+    $this->fixtures['rolling_membership_past'] = array(
       'membership_type_id' => array(
         'period_type' => 'rolling',
         'duration_unit' => 'month',
@@ -80,25 +70,25 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'is_override' => 'NULL',
     );
 
-    $this->fixtures['phonecall'] = array( // createTestObject
+    $this->fixtures['phonecall'] = array(
       'status_id' => 1,
       'activity_type_id' => 2,
       'activity_date_time' => '20120615100000',
       'is_current_revision' => 1,
       'is_deleted' => 0,
     );
-    $this->fixtures['contact'] = array( // API
+    $this->fixtures['contact'] = array(
       'is_deceased' => 0,
       'contact_type' => 'Individual',
       'email' => 'test-member@example.com',
     );
-    $this->fixtures['contact_birthdate'] = array( // API
+    $this->fixtures['contact_birthdate'] = array(
       'is_deceased' => 0,
       'contact_type' => 'Individual',
       'email' => 'test-bday@example.com',
       'birth_date' => '20050707',
     );
-    $this->fixtures['sched_activity_1day'] = array( // create()
+    $this->fixtures['sched_activity_1day'] = array(
       'name' => 'One_Day_Phone_Call_Notice',
       'title' => 'One Day Phone Call Notice',
       'limit_to' => '1',
@@ -158,7 +148,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'day',
       'subject' => '1-Day (repeating)',
     );
-    $this->fixtures['sched_membership_join_2week'] = array( // create()
+    $this->fixtures['sched_membership_join_2week'] = array(
       'name' => 'sched_membership_join_2week',
       'title' => 'sched_membership_join_2week',
       'absolute_date' => '',
@@ -187,7 +177,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'week',
       'subject' => 'subject sched_membership_join_2week',
     );
-    $this->fixtures['sched_membership_end_2week'] = array( // create()
+    $this->fixtures['sched_membership_end_2week'] = array(
       'name' => 'sched_membership_end_2week',
       'title' => 'sched_membership_end_2week',
       'absolute_date' => '',
@@ -216,8 +206,36 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'week',
       'subject' => 'subject sched_membership_end_2week',
     );
+    $this->fixtures['sched_on_membership_end_date'] = array(
+      'name' => 'sched_on_membership_end_date',
+      'title' => 'sched_on_membership_end_date',
+      'body_html' => '<p>Your membership expired today</p>',
+      'body_text' => 'Your membership expired today',
+      'is_active' => 1,
+      'mapping_id' => 4,
+      'record_activity' => 1,
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_end_date',
+      'start_action_offset' => '0',
+      'start_action_unit' => 'hour',
+      'subject' => 'subject send reminder on membership_end_date',
+    );
+    $this->fixtures['sched_after_1day_membership_end_date'] = array(
+      'name' => 'sched_after_1day_membership_end_date',
+      'title' => 'sched_after_1day_membership_end_date',
+      'body_html' => '<p>Your membership expired yesterday</p>',
+      'body_text' => 'Your membership expired yesterday',
+      'is_active' => 1,
+      'mapping_id' => 4,
+      'record_activity' => 1,
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_end_date',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject send reminder on membership_end_date',
+    );
 
-    $this->fixtures['sched_membership_end_2month'] = array( // create()
+    $this->fixtures['sched_membership_end_2month'] = array(
       'name' => 'sched_membership_end_2month',
       'title' => 'sched_membership_end_2month',
       'absolute_date' => '',
@@ -247,7 +265,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'subject sched_membership_end_2month',
     );
 
-    $this->fixtures['sched_contact_bday_yesterday'] = array( // create()
+    $this->fixtures['sched_contact_bday_yesterday'] = array(
       'name' => 'sched_contact_bday_yesterday',
       'title' => 'sched_contact_bday_yesterday',
       'absolute_date' => '',
@@ -277,7 +295,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'subject sched_contact_bday_yesterday',
     );
 
-    $this->fixtures['sched_contact_bday_anniv'] = array( // create()
+    $this->fixtures['sched_contact_bday_anniv'] = array(
       'name' => 'sched_contact_bday_anniv',
       'title' => 'sched_contact_bday_anniv',
       'absolute_date' => '',
@@ -307,7 +325,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'subject sched_contact_bday_anniv',
     );
 
-    $this->fixtures['sched_contact_grad_tomorrow'] = array( // create()
+    $this->fixtures['sched_contact_grad_tomorrow'] = array(
       'name' => 'sched_contact_grad_tomorrow',
       'title' => 'sched_contact_grad_tomorrow',
       'absolute_date' => '',
@@ -336,7 +354,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'subject sched_contact_grad_tomorrow',
     );
 
-    $this->fixtures['sched_contact_grad_anniv'] = array( // create()
+    $this->fixtures['sched_contact_grad_anniv'] = array(
       'name' => 'sched_contact_grad_anniv',
       'title' => 'sched_contact_grad_anniv',
       'absolute_date' => '',
@@ -364,14 +382,75 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'week',
       'subject' => 'subject sched_contact_grad_anniv',
     );
-    $this->fixtures['sched_membership_end_2month_repeat_twice_4_weeks'] = array( // create()
+
+    $this->fixtures['sched_contact_created_yesterday'] = array(
+      'name' => 'sched_contact_created_yesterday',
+      'title' => 'sched_contact_created_yesterday',
+      'absolute_date' => '',
+      'body_html' => '<p>Your contact was created yesterday</p>',
+      'body_text' => 'Your contact was created yesterday!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 1,
+      'entity_value' => 'created_date',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_created_yesterday',
+    );
+
+    $this->fixtures['sched_contact_mod_anniv'] = array(
+      'name' => 'sched_contact_mod_anniv',
+      'title' => 'sched_contact_mod_anniv',
+      'absolute_date' => '',
+      'body_html' => '<p>You last updated your data last year</p>',
+      'body_text' => 'Go update your stuff!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 2,
+      'entity_value' => 'modified_date',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'before',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_mod_anniv',
+    );
+
+    $this->fixtures['sched_membership_end_2month_repeat_twice_4_weeks'] = array(
       'name' => 'sched_membership_end_2month',
       'title' => 'sched_membership_end_2month',
       'absolute_date' => '',
       'body_html' => '<p>body sched_membership_end_2month</p>',
       'body_text' => 'body sched_membership_end_2month',
       'end_action' => '',
-      'end_date' => '',
+      'end_date' => 'membership_end_date',
       'end_frequency_interval' => '4',
       'end_frequency_unit' => 'month',
       'entity_status' => '',
@@ -393,7 +472,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'month',
       'subject' => 'subject sched_membership_end_2month',
     );
-    $this->fixtures['sched_membership_end_limit_to_none'] = array( // create()
+    $this->fixtures['sched_membership_end_limit_to_none'] = array(
       'name' => 'limit to none',
       'title' => 'limit to none',
       'absolute_date' => '',
@@ -428,27 +507,31 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
    *
-   * @access protected
+   * This method is called after a test is executed.
    */
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
 
     $this->mut->clearMessages();
     $this->mut->stop();
     unset($this->mut);
-    $this->quickCleanup(array('civicrm_action_schedule', 'civicrm_action_log', 'civicrm_membership', 'civicrm_email'));
+    $this->quickCleanup(array(
+      'civicrm_action_schedule',
+      'civicrm_action_log',
+      'civicrm_membership',
+      'civicrm_email',
+    ));
     $this->_tearDown();
   }
 
-  function testActivityDateTime_Match_NonRepeatableSchedule() {
+  public function testActivityDateTimeMatchNonRepeatableSchedule() {
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_activity_1day']);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
-    $contact =  $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
     $activity->save();
 
     $source['contact_id'] = $contact['id'];
@@ -458,50 +541,57 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $activityContact->save();
 
     $this->assertCronRuns(array(
-      array( // Before the 24-hour mark, no email
+      array(
+        // Before the 24-hour mark, no email
         'time' => '2012-06-14 04:00:00',
         'recipients' => array(),
       ),
-      array( // After the 24-hour mark, an email
+      array(
+        // After the 24-hour mark, an email
         'time' => '2012-06-14 15:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
-      array( // Run cron again; message already sent
+      array(
+        // Run cron again; message already sent
         'time' => '',
         'recipients' => array(),
       ),
     ));
   }
 
-  function testActivityDateTime_Match_RepeatableSchedule() {
+  public function testActivityDateTimeMatchRepeatableSchedule() {
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures['sched_activity_1day_r']);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
     $this->assertTrue(is_numeric($activity->id));
-    $contact =  $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
     $activity->save();
 
     $source['contact_id'] = $contact['id'];
     $source['activity_id'] = $activity->id;
-    $source['record_type_id'] =2;
+    $source['record_type_id'] = 2;
     $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
     $activityContact->save();
 
     $this->assertCronRuns(array(
-      array( // Before the 24-hour mark, no email
+      array(
+        // Before the 24-hour mark, no email
         'time' => '012-06-14 04:00:00',
         'recipients' => array(),
       ),
-      array( // After the 24-hour mark, an email
+      array(
+        // After the 24-hour mark, an email
         'time' => '2012-06-14 15:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
-      array( // Run cron 4 hours later; first message already sent
+      array(
+        // Run cron 4 hours later; first message already sent
         'time' => '2012-06-14 20:00:00',
         'recipients' => array(),
       ),
-      array( // Run cron 6 hours later; send second message
+      array(
+        // Run cron 6 hours later; send second message.
         'time' => '2012-06-14 21:00:01',
         'recipients' => array(array('test-member@example.com')),
       ),
@@ -518,14 +608,14 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * For contacts/members which match schedule based on join date,
    * an email should be sent.
    */
-  function testMembershipJoinDate_Match() {
+  public function testMembershipJoinDateMatch() {
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
     $this->assertTrue(is_numeric($membership->id));
     $result = $this->callAPISuccess('Email', 'create', array(
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
       'location_type_id' => 1,
-     ));
+    ));
     $this->assertAPISuccess($result);
 
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
@@ -536,11 +626,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // start_date=2012-03-15 ; schedule is 2 weeks after start_date
     $this->assertCronRuns(array(
-      array( // Before the 2-week mark, no email
+      array(
+        // Before the 2-week mark, no email.
         'time' => '2012-03-28 01:00:00',
         'recipients' => array(),
       ),
-      array( // After the 2-week mark, send an email
+      array(
+        // After the 2-week mark, send an email.
         'time' => '2012-03-29 01:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
@@ -548,10 +640,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test end date email sent.
+   *
    * For contacts/members which match schedule based on join date,
    * an email should be sent.
    */
-  function testMembershipJoinDate_NonMatch() {
+  public function testMembershipJoinDateNonMatch() {
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', $this->fixtures['rolling_membership']);
     $this->assertTrue(is_numeric($membership->id));
     $result = $this->callAPISuccess('Email', 'create', array(
@@ -570,7 +664,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // start_date=2012-03-15 ; schedule is 2 weeks after start_date
     $this->assertCronRuns(array(
-      array( // After the 2-week mark, don't send email because we have different membership type
+      array(
+        // After the 2-week mark, don't send email because we have different membership type.
         'time' => '2012-03-29 01:00:00',
         'recipients' => array(),
       ),
@@ -578,10 +673,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that the first and SECOND notifications are sent out
-   *
+   * Test that the first and SECOND notifications are sent out.
    */
-  function testMembershipEndDate_Repeat() {
+  public function testMembershipEndDateRepeat() {
     // creates membership with end_date = 20120615
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
     $result = $this->callAPISuccess('Email', 'create', array(
@@ -596,11 +690,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
     $this->assertCronRuns(array(
-      array( // After the 2-week mark, send an email
+      array(
+        // After the 2-week mark, send an email.
         'time' => '2012-08-15 01:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
-      array( // After the 2-week mark, send an email
+      array(
+        // After the 2-week mark, send an email.
         'time' => '2012-09-12 01:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
@@ -608,11 +704,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test behaviour when date changes.
+   *
    * Test that the first notification is sent but the second is NOT sent if the end date changes in
    * between
    *  see CRM-15376
    */
-  function testMembershipEndDate_Repeat_ChangedEndDate_CRM_15376() {
+  public function testMembershipEndDateRepeatChangedEndDate_CRM_15376() {
     // creates membership with end_date = 20120615
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
     $this->callAPISuccess('Email', 'create', array(
@@ -626,16 +724,18 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
     $this->assertCronRuns(array(
-      array( // After the 2-week mark, send an email
+      array(
+        // After the 2-week mark, send an email.
         'time' => '2012-08-15 01:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
     ));
 
-    //extend membership - reminder should NOT go out
+    // Extend membership - reminder should NOT go out.
     $this->callAPISuccess('membership', 'create', array('id' => $membership->id, 'end_date' => '2014-01-01'));
     $this->assertCronRuns(array(
-      array( // After the 2-week mark, send an email
+      array(
+        // After the 2-week mark, send an email.
         'time' => '2012-09-12 01:00:00',
         'recipients' => array(),
       ),
@@ -643,17 +743,19 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test membership end date email sends.
+   *
    * For contacts/members which match schedule based on end date,
    * an email should be sent.
    */
-  function testMembershipEndDate_Match() {
+  public function testMembershipEndDateMatch() {
     // creates membership with end_date = 20120615
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
     $this->assertTrue(is_numeric($membership->id));
     $this->callAPISuccess('Email', 'create', array(
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
-     ));
+    ));
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
 
     $actionSchedule = $this->fixtures['sched_membership_end_2week'];
@@ -663,28 +765,60 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
     $this->assertCronRuns(array(
-      array( // Before the 2-week mark, no email
+      array(
+        // Before the 2-week mark, no email.
         'time' => '2012-05-31 01:00:00',
-        // 'time' => '2012-06-01 01:00:00', // FIXME: Is this the right boundary?
+        // 'time' => '2012-06-01 01:00:00',
+        // FIXME: Is this the right boundary?
         'recipients' => array(),
       ),
-      array( // After the 2-week mark, send an email
+      array(
+        // After the 2-week mark, send an email.
         'time' => '2012-06-01 01:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
+    ));
+
+    // Now suppose user has renewed for rolling membership after 3 months, so upcoming assertion is written
+    // to ensure that new reminder is sent 2 week before the new end_date i.e. '2012-09-15'
+    $membership->end_date = '2012-09-15';
+    $membership->save();
+
+    //change the email id of chosen membership contact to assert
+    //recipient of not the previously sent mail but the new one
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'is_primary' => 1,
+      'contact_id' => $membership->contact_id,
+      'email' => 'member2@example.com',
+    ));
+    $this->assertAPISuccess($result);
+
+    // end_date=2012-09-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns(array(
+      array(
+        // Before the 2-week mark, no email
+        'time' => '2012-08-31 01:00:00',
+        'recipients' => array(),
+      ),
+      //array( // After the 2-week mark, send an email
+      //'time' => '2012-09-01 01:00:00',
+      //'recipients' => array(array('member2@example.com')),
+      //),
     ));
   }
 
 
   /**
-  * For contacts/members which match schedule based on end date,
-  * an email should be sent.
-  */
-  function testMembershipEndDate_NoMatch() {
+   * Test membership end date email.
+   *
+   * For contacts/members which match schedule based on end date,
+   * an email should be sent.
+   */
+  public function testMembershipEndDateNoMatch() {
     // creates membership with end_date = 20120615
-    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership_past'], array('status_id' => 3)));
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 3)));
     $this->assertTrue(is_numeric($membership->id));
-    $result =  $this->callAPISuccess('Email', 'create', array(
+    $result = $this->callAPISuccess('Email', 'create', array(
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
     ));
@@ -697,61 +831,68 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
     $this->assertCronRuns(array(
-      array( // Before the 2-week mark, no email
+      array(
+        // Before the 2-week mark, no email.
         'time' => '2012-05-31 01:00:00',
-        // 'time' => '2012-06-01 01:00:00', // FIXME: Is this the right boundary?
+        // 'time' => '2012-06-01 01:00:00',
+        // FIXME: Is this the right boundary?
         'recipients' => array(),
       ),
-      array( // After the 2-week mark, send an email
+      array(
+        // After the 2-week mark, send an email.
         'time' => '2013-05-01 01:00:00',
         'recipients' => array(),
       ),
     ));
   }
 
-  function testContactBirthDate_noAnniv() {
+  public function testContactBirthDateNoAnniv() {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $actionSchedule = $this->fixtures['sched_contact_bday_yesterday'];
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
     $this->assertCronRuns(array(
-      array( // On the birthday, no email
+      array(
+        // On the birthday, no email.
         'time' => '2005-07-07 01:00:00',
         'recipients' => array(),
       ),
-      array( // The next day, send an email
+      array(
+        // The next day, send an email.
         'time' => '2005-07-08 20:00:00',
         'recipients' => array(array('test-bday@example.com')),
       ),
     ));
   }
 
-  function testContactBirthDate_Anniv() {
-    $contact =  $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
+  public function testContactBirthDateAnniversary() {
+    $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $actionSchedule = $this->fixtures['sched_contact_bday_anniv'];
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
     $this->assertCronRuns(array(
-      array( // On some random day, no email
+      array(
+        // On some random day, no email.
         'time' => '2014-03-07 01:00:00',
         'recipients' => array(),
       ),
-      array( // On the eve of their 9th birthday, send an email
+      array(
+        // On the eve of their 9th birthday, send an email.
         'time' => '2014-07-06 20:00:00',
         'recipients' => array(array('test-bday@example.com')),
       ),
     ));
   }
 
-  function testContactCustomDate_noAnniv() {
+  public function testContactCustomDateNoAnniv() {
     $group = array(
       'title' => 'Test_Group',
       'name' => 'test_group',
       'extends' => array('Individual'),
       'style' => 'Inline',
-      'is_multiple' => false,
+      'is_multiple' => FALSE,
       'is_active' => 1,
     );
     $createGroup = $this->callAPISuccess('custom_group', 'create', $group);
@@ -771,21 +912,64 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
     $this->assertCronRuns(array(
-      array( // On some random day, no email
+      array(
+        // On some random day, no email.
         'time' => '2014-03-07 01:00:00',
         'recipients' => array(),
       ),
-      array( // On the eve of their graduation, send an email
+      array(
+        // On the eve of their graduation, send an email.
         'time' => '2013-12-15 20:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
     ));
-    $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id'],));
+    $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
   }
+
+  public function testContactCreatedNoAnniv() {
+    $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
+    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $actionSchedule = $this->fixtures['sched_contact_created_yesterday'];
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array(
+        // On the date created, no email.
+        'time' => $contact['values'][$contact['id']]['created_date'],
+        'recipients' => array(),
+      ),
+      array(
+        // The next day, send an email.
+        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['created_date'] . ' +1 day')),
+        'recipients' => array(array('test-bday@example.com')),
+      ),
+    ));
+  }
+
+  public function testContactModifiedAnniversary() {
+    $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
+    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
+    $actionSchedule = $this->fixtures['sched_contact_mod_anniv'];
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array(
+        // On some random day, no email.
+        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . ' -60 days')),
+        'recipients' => array(),
+      ),
+      array(
+        // On the eve of 3 years after they were modified, send an email.
+        'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . ' +3 years -23 hours')),
+        'recipients' => array(array('test-bday@example.com')),
+      ),
+    ));
+  }
+
   /**
-   * Check that limit_to + an empty recipients doesn't sent to multiple contacts
+   * Check that limit_to + an empty recipients doesn't sent to multiple contacts.
    */
-  function testMembershipLimitToNone() {
+  public function testMembershipLimitToNone() {
     // creates membership with end_date = 20120615
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
 
@@ -806,7 +990,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
     $this->assertCronRuns(array(
-      array( // Before the 2-week mark, no email
+      array(
+        // Before the 2-week mark, no email.
         'time' => '2012-05-31 01:00:00',
         // 'time' => '2012-06-01 01:00:00', // FIXME: Is this the right boundary?
         'recipients' => array(),
@@ -814,15 +999,173 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
   }
 
+  public function testMembership_referenceDate() {
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
 
+    $this->assertTrue(is_numeric($membership->id));
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'member@example.com',
+    ));
 
-  function testContactCustomDate_Anniv() {
+    $result = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+    $this->assertAPISuccess($result);
+
+    $actionSchedule = $this->fixtures['sched_membership_join_2week'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    // start_date=2012-03-15 ; schedule is 2 weeks after start_date
+    $this->assertCronRuns(array(
+      array(
+        // After the 2-week mark, send an email
+        'time' => '2012-03-29 01:00:00',
+        'recipients' => array(array('member@example.com')),
+      ),
+      array(
+        // After the 2-week 1day mark, don't send an email
+        'time' => '2012-03-30 01:00:00',
+        'recipients' => array(),
+      ),
+    ));
+
+    //check if reference date is set to membership's join date
+    //as per the action_start_date chosen for current schedule reminder
+    $this->assertEquals('2012-03-15',
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $membership->contact_id, 'reference_date', 'contact_id')
+    );
+
+    //change current membership join date that may signifies as memberhip renewal activity
+    $membership->join_date = '2012-03-29';
+    $membership->save();
+
+    $this->assertCronRuns(array(
+      array(
+        // After the 13 days of the changed join date 2012-03-29, don't send an email
+        'time' => '2012-04-11 01:00:00',
+        'recipients' => array(),
+      ),
+      array(
+         // After the 2-week of the changed join date 2012-03-29, send an email
+        'time' => '2012-04-12 01:00:00',
+        'recipients' => array(array('member@example.com')),
+      ),
+    ));
+  }
+
+  public function testMembershipOnMultipleReminder() {
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 2)));
+
+    $this->assertTrue(is_numeric($membership->id));
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'member@example.com',
+    ));
+    $result = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+    $this->assertAPISuccess($result);
+
+    $actionScheduleBefore = $this->fixtures['sched_membership_end_2week'];           // Send email 2 weeks before end_date
+    $actionScheduleOn = $this->fixtures['sched_on_membership_end_date'];             // Send email on end_date/expiry date
+    $actionScheduleAfter = $this->fixtures['sched_after_1day_membership_end_date'];  // Send email 1 day after end_date/grace period
+    $actionScheduleBefore['entity_value'] = $actionScheduleOn['entity_value'] = $actionScheduleAfter['entity_value'] = $membership->membership_type_id;
+    foreach (array('actionScheduleBefore', 'actionScheduleOn', 'actionScheduleAfter') as $value) {
+      $$value = CRM_Core_BAO_ActionSchedule::add($$value);
+      $this->assertTrue(is_numeric($$value->id));
+    }
+
+    $this->assertCronRuns(
+      array(
+        array(
+          // 1day 2weeks before membership end date(MED), don't send mail
+          'time' => '2012-05-31 01:00:00',
+          'recipients' => array(),
+        ),
+        array(
+          // 2 weeks before MED, send an email
+          'time' => '2012-06-01 01:00:00',
+          'recipients' => array(array('member@example.com')),
+        ),
+        array(
+          // 1day before MED, don't send mail
+          'time' => '2012-06-14 01:00:00',
+          'recipients' => array(),
+        ),
+        array(
+          // On MED, send an email
+          'time' => '2012-06-15 00:00:00',
+          'recipients' => array(array('member@example.com')),
+        ),
+        array(
+          // After 1day of MED, send an email
+          'time' => '2012-06-16 01:00:00',
+          'recipients' => array(array('member@example.com')),
+        ),
+        array(
+          // After 1day 1min of MED, don't send an email
+          'time' => '2012-06-17 00:01:00',
+          'recipients' => array(),
+        ),
+      )
+    );
+
+    // Assert the timestamp as of when the emails of respective three reminders as configured
+    // 2 weeks before, on and 1 day after MED, are sent
+    $this->assertEquals('2012-06-01 01:00:00',
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleBefore->id, 'action_date_time', 'action_schedule_id', TRUE));
+    $this->assertEquals('2012-06-15 00:00:00',
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleOn->id, 'action_date_time', 'action_schedule_id', TRUE));
+    $this->assertEquals('2012-06-16 01:00:00',
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleAfter->id, 'action_date_time', 'action_schedule_id', TRUE));
+
+    //extend MED to 2 weeks after the current MED (that may signifies as memberhip renewal activity)
+    // and lets assert as of when the new set of reminders will be sent against their respective Schedule Reminders(SR)
+    $membership->end_date = '2012-06-20';
+    $membership->save();
+
+    $result = $this->callAPISuccess('Contact', 'get', array('id' => $membership->contact_id));
+    $this->assertCronRuns(
+      array(
+        array(
+          // 1day 2weeks before membership end date(MED), don't send mail
+          'time' => '2012-06-05 01:00:00',
+          'recipients' => array(),
+        ),
+        array(
+          // 2 weeks before MED, send an email
+          'time' => '2012-06-06 01:00:00',
+          'recipients' => array(array('member@example.com')),
+        ),
+        array(
+          // 1day before MED, don't send mail
+          'time' => '2012-06-19 01:00:00',
+          'recipients' => array(),
+        ),
+        array(
+          // On MED, send an email
+          'time' => '2012-06-20 00:00:00',
+          'recipients' => array(array('member@example.com')),
+        ),
+        array(
+          // After 1day of MED, send an email
+          'time' => '2012-06-21 01:00:00',
+          'recipients' => array(array('member@example.com')),
+        ),
+        array(
+          // After 1day 1min of MED, don't send an email
+          'time' => '2012-07-21 00:01:00',
+          'recipients' => array(),
+        ),
+      ));
+  }
+
+  public function testContactCustomDate_Anniv() {
     $group = array(
       'title' => 'Test_Group now',
       'name' => 'test_group_now',
       'extends' => array('Individual'),
       'style' => 'Inline',
-      'is_multiple' => false,
+      'is_multiple' => FALSE,
       'is_active' => 1,
     );
     $createGroup = $this->callAPISuccess('custom_group', 'create', $group);
@@ -843,16 +1186,18 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
     $this->assertCronRuns(array(
-      array( // On some random day, no email
+      array(
+        // On some random day, no email.
         'time' => '2014-03-07 01:00:00',
         'recipients' => array(),
       ),
-      array( // A week after their 5th anniversary of graduation, send an email
+      array(
+        // A week after their 5th anniversary of graduation, send an email.
         'time' => '2018-12-23 20:00:00',
         'recipients' => array(array('test-member@example.com')),
       ),
     ));
-    $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id'],));
+    $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
   }
 
   // TODO // function testMembershipEndDate_NonMatch() { }
@@ -862,15 +1207,14 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   // TODO // function testEventNameEndDate_Match() { }
 
   /**
-   * Run a series of cron jobs and make an assertion about email deliveries
+   * Run a series of cron jobs and make an assertion about email deliveries.
    *
-   * @param $cronRuns
-   *
-   * @internal param array $jobSchedule specifying when to run cron and what messages to expect; each item is an array with keys:
-   *  - time: string, e.g. '2012-06-15 21:00:01'
-   *  - recipients: array(array(string)), list of email addresses which should receive messages
+   * @param array $cronRuns
+   *   array specifying when to run cron and what messages to expect; each item is an array with keys:
+   *   - time: string, e.g. '2012-06-15 21:00:01'
+   *   - recipients: array(array(string)), list of email addresses which should receive messages
    */
-  function assertCronRuns($cronRuns) {
+  public function assertCronRuns($cronRuns) {
     foreach ($cronRuns as $cronRun) {
       CRM_Utils_Time::setTime($cronRun['time']);
       $this->callAPISuccess('job', 'send_reminder', array());
@@ -879,11 +1223,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     }
   }
 
-  ////////////////////////////////
-  ////////////////////////////////
-  ////////////////////////////////
-  ////////////////////////////////
-
   /**
    * @var array(DAO_Name => array(int)) List of items to garbage-collect during tearDown
    */
@@ -891,9 +1230,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
    *
-   * @access protected
+   * This method is called before a test is executed.
    */
   protected function _setUp() {
     $this->_testObjects = array();
@@ -901,9 +1239,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
    *
-   * @access protected
+   * This method is called after a test is executed.
    */
   protected function _tearDown() {
     parent::tearDown();
@@ -912,25 +1249,33 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * This is a wrapper for CRM_Core_DAO::createTestObject which tracks
-   * created entities and provides for brainless clenaup.
+   * created entities and provides for brainless cleanup.
    *
    * @see CRM_Core_DAO::createTestObject
+   *
+   * @param $daoName
+   * @param array $params
+   * @param int $numObjects
+   * @param bool $createOnly
+   *
+   * @return array|NULL|object
    */
-  function createTestObject($daoName, $params = array(
-    ), $numObjects = 1, $createOnly = FALSE) {
+  public function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
     if (is_array($objects)) {
       $this->registerTestObjects($objects);
-    } else {
+    }
+    else {
       $this->registerTestObjects(array($objects));
     }
     return $objects;
   }
 
   /**
-   * @param $objects array DAO or BAO objects
+   * @param array $objects
+   *   DAO or BAO objects.
    */
-  function registerTestObjects($objects) {
+  public function registerTestObjects($objects) {
     //if (is_object($objects)) {
     //  $objects = array($objects);
     //}
@@ -940,7 +1285,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     }
   }
 
-  function deleteTestObjects() {
+  public function deleteTestObjects() {
     // Note: You might argue that the FK relations between test
     // objects could make this problematic; however, it should
     // behave intuitively as long as we mentally split our

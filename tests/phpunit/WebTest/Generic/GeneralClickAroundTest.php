@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,12 +35,12 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function login() {
+  public function login() {
     $this->webtestLogin();
     $this->openCiviPage('');
   }
 
-  function testSearchMenu() {
+  public function testSearchMenu() {
     $this->login();
     // click Search -> Find Contacts
     // Use class names for menu items since li array can change based on which components are enabled
@@ -66,7 +66,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertText('search-status', 'Tagged IN Major Donor');
   }
 
-  function testNewIndividual() {
+  public function testNewIndividual() {
     $this->login();
 
     // Create New → Individual
@@ -87,7 +87,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Do not phone");
   }
 
-  function testManageGroups() {
+  public function testManageGroups() {
     $this->login();
 
     // Contacts → Manage Groups
@@ -102,7 +102,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Add Group");
   }
 
-  function testContributionDashboard() {
+  public function testContributionDashboard() {
     $this->webtestLogin();
     // Enable CiviContribute module if necessary
     $this->enableComponents("CiviContribute");
@@ -117,7 +117,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Recent Contributions");
   }
 
-  function testEventDashboard() {
+  public function testEventDashboard() {
     $this->webtestLogin();
 
     // Enable CiviEvent module if necessary
@@ -141,7 +141,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Configure");
   }
 
-  function testMembershipsDashboard() {
+  public function testMembershipsDashboard() {
     $this->webtestLogin();
 
     // Enable CiviMember module if necessary
@@ -158,7 +158,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Find more members...");
   }
 
-  function testFindContributions() {
+  public function testFindContributions() {
     $this->webtestLogin();
 
     // Enable CiviContribute module if necessary
@@ -183,7 +183,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Currency");
   }
 
-  function testNewMailing() {
+  public function testNewMailing() {
     $this->webtestLogin();
 
     // Enable CiviMail module if necessary
@@ -197,13 +197,10 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->click("css=ul#civicrm-menu li.crm-Mailings");
     $this->clickLink("css=ul#civicrm-menu li.crm-New_Mailing a");
 
-    $this->assertTextPresent("New Mailing");
-    $this->assertElementPresent("name");
-    $this->assertElementPresent("includeGroups");
-    $this->assertElementPresent("excludeGroups");
+    $this->assertTextPresent("Mailing");
   }
 
-  function testConstituentReportSummary() {
+  public function testConstituentReportSummary() {
     $this->login();
 
     // Constituent Report Summary
@@ -227,7 +224,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Total Row(s)");
   }
 
-  function testCustomData() {
+  public function testCustomData() {
     $this->login();
 
     // Use class names for menu items since li array can change based on which components are enabled
@@ -249,14 +246,13 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Post-form Help");
   }
 
-  function testProfile() {
+  public function testProfile() {
     $this->login();
 
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Administer");
     $this->click("css=ul#civicrm-menu li.crm-Customize_Data_and_Screens");
     $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Profiles']");
-
 
     $this->assertTextPresent("CiviCRM Profile");
     // Verify Reserved Profiles
@@ -291,7 +287,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Proximity Search");
   }
 
-  function testTags() {
+  public function testTags() {
     $this->login();
 
     // Use class names for menu items since li array can change based on which components are enabled
@@ -307,14 +303,13 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Volunteer");
   }
 
-  function testActivityTypes() {
+  public function testActivityTypes() {
     $this->login();
 
     // Use class names for menu items since li array can change based on which components are enabled
     $this->click("css=ul#civicrm-menu li.crm-Administer");
     $this->click("css=ul#civicrm-menu li.crm-Customize_Data_and_Screens");
     $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Activity Types']");
-
 
     // Verify activity types
     $this->assertTextPresent("Meeting");
@@ -324,7 +319,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Membership Signup");
   }
 
-  function testRelationshipTypes() {
+  public function testRelationshipTypes() {
     $this->login();
 
     // Use class names for menu items since li array can change based on which components are enabled
@@ -342,7 +337,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Volunteer for");
   }
 
-  function testMessageTemplates() {
+  public function testMessageTemplates() {
     $this->login();
 
     // Use class names for menu items since li array can change based on which components are enabled
@@ -351,7 +346,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Message Templates']");
 
     // Verify message templates
-    $this->click("//a[contains(text(),'System Workflow Messages')]");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[contains(text(),'System Workflow Messages')]");
     $this->assertTextPresent("Contributions - Receipt (on-line)");
     $this->assertTextPresent("Events - Registration Confirmation and Receipt (off-line)");
     $this->assertTextPresent("Memberships - Signup and Renewal Receipts (off-line)");
@@ -359,5 +354,5 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Profiles - Admin Notification");
     $this->assertTextPresent("Tell-a-Friend Email");
   }
-}
 
+}

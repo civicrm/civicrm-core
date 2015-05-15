@@ -8,14 +8,19 @@ class EnvTestRunner {
   protected $phpunit;
   protected $envTestSuite;
 
-  function __construct($phpunit = "phpunit", $envTestSuite = 'EnvTests') {
+  /**
+   * @param string $phpunit
+   * @param string $envTestSuite
+   */
+  public function __construct($phpunit = "phpunit", $envTestSuite = 'EnvTests') {
     $this->phpunit = $phpunit;
     $this->envTestSuite = $envTestSuite;
   }
 
   /**
    * @param array $tests
-   * @return array (string $testName => string $status)
+   * @return array
+   *   (string $testName => string $status)
    */
   public function run($tests) {
     $envTests = implode(' ', $tests);
@@ -28,4 +33,5 @@ class EnvTestRunner {
     unlink($jsonFile);
     return $results;
   }
+
 }

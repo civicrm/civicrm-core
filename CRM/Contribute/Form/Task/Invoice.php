@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  *
  */
 
@@ -46,38 +46,31 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_single = FALSE;
 
   /**
-   * Gives all the statues for conribution
-   *
-   * @access public
+   * Gives all the statues for conribution.
    */
   public $_contributionStatusId;
 
   /**
-   * Gives the HTML template of PDF Invoice
-   *
-   * @access public
+   * Gives the HTML template of PDF Invoice.
    */
   public $_messageInvoice;
 
   /**
-   * This variable is used to assign parameters for HTML template of PDF Invoice
-   *
-   * @access public
+   * This variable is used to assign parameters for HTML template of PDF Invoice.
    */
   public $_invoiceTemplate;
 
   /**
-   * Selected output
+   * Selected output.
    */
   public $_selectedOutput;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
     if ($id) {
       $this->_contributionIds = array($id);
@@ -128,7 +121,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       array(
         'url' => $url,
         'title' => ts('Search Results'),
-      )
+      ),
     );
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
@@ -145,9 +138,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
@@ -191,51 +183,34 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
     }
 
-    $this->addWysiwyg('email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array(
+    $this->add('wysiwyg', 'email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array(
       'rows' => 2,
-      'cols' => 40
+      'cols' => 40,
     ));
 
-    if ($this->_selectedOutput == 'email') {
-      $this->addButtons(array(
-          array(
-            'type' => 'upload',
-            'name' => ts('Email Invoice'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-    }
-    else {
-      $this->addButtons(array(
-          array(
-            'type' => 'upload',
-            'name' => ts('Process Invoice(s)'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-    }
+    $this->addButtons(array(
+        array(
+          'type' => 'upload',
+          'name' => $this->_selectedOutput == 'email' ? ts('Send Email') : ts('Process Invoice(s)'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
+    );
   }
 
   /**
-   * Global validation rules for the form
+   * Global validation rules for the form.
    *
    * @param array $values
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($values) {
+  public static function formRule($values) {
     $errors = array();
 
     if ($values['output'] == 'email_invoice' && empty($values['from_email_address'])) {
@@ -246,9 +221,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -258,18 +232,19 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   *
-   * process the PDf and email with activity and attachment
+   * Process the PDf and email with activity and attachment.
    * on click of Print Invoices
    *
-   * @param array $contribIDs Contribution Id
-   * @param array $params associated array of submitted values
-   * @param array $contactIds Contact Id
-   * @param CRM_Core_Form $form form object
-   * @static
-   *
+   * @param array $contribIDs
+   *   Contribution Id.
+   * @param array $params
+   *   Associated array of submitted values.
+   * @param array $contactIds
+   *   Contact Id.
+   * @param CRM_Core_Form $form
+   *   Form object.
    */
-  static function printPDF($contribIDs, &$params, $contactIds, &$form) {
+  public static function printPDF($contribIDs, &$params, $contactIds, &$form) {
     // get all the details needed to generate a invoice
     $messageInvoice = array();
     $invoiceTemplate = CRM_Core_Smarty::singleton();
@@ -302,7 +277,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         CRM_Core_Error::fatal();
       }
 
-      $contribution = & $objects['contribution'];
+      $contribution = &$objects['contribution'];
 
       $input['amount'] = $contribution->total_amount;
       $input['invoice_id'] = $contribution->invoice_id;
@@ -490,6 +465,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       );
       $session = CRM_Core_Session::singleton();
       $contactID = $session->get('userID');
+      //CRM-16319 - we dont store in userID in case the user is doing multiple
+      //transactions etc
+      if (empty($contactID)) {
+        $contactID = $session->get('transaction.userID');
+      }
       $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
       $emails = array();
       $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
@@ -572,7 +552,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         CRM_Utils_PDF_Utils::html2pdf($messageInvoice, 'Invoice.pdf', FALSE, array(
           'margin_top' => 10,
           'margin_left' => 65,
-          'metric' => 'px'
+          'metric' => 'px',
         ));
         // functions call for adding activity with attachment
         $fileName = self::putFile($html);
@@ -597,17 +577,17 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
+   * Add activity for Email Invoice and the PDF Invoice.
    *
-   * This function is use for adding activity for
-   * Email Invoice and the PDF Invoice
+   * @param string $subject
+   *   Activity subject.
+   * @param array $contactIds
+   *   Contact Id.
+   * @param string $fileName
+   *   Gives the location with name of the file.
+   * @param array $params
+   *   For invoices.
    *
-   * @param string $subject Activity subject
-   * @param array $contactIds Contact Id
-   * @param string $fileName gives the location with name of the file
-   * @param array $params for invoices
-   *
-   * @access public
-   * @static
    */
   static public function addActivities($subject, $contactIds, $fileName, $params) {
     $session = CRM_Core_Session::singleton();
@@ -621,7 +601,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'name'
       );
     }
-    else{
+    else {
       $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
         'Emailed Invoice',
         'name'
@@ -645,18 +625,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
+   * Create the Invoice file in upload folder for attachment.
    *
-   * This function is use for creating the Invoice file in upload folder
-   * for attachment
-   *
-   * @param $html content for pdf in html format
-   *
-   * return $fileName of file which is in pdf format
+   * @param string $html
+   *   Content for pdf in html format.
    *
    * @return string
+   *   Name of file which is in pdf format
    */
   static public function putFile($html) {
-    require_once("packages/dompdf/dompdf_config.inc.php");
+    require_once "packages/dompdf/dompdf_config.inc.php";
     spl_autoload_register('DOMPDF_autoload');
     $doc = new DOMPDF();
     $doc->load_html($html);
@@ -671,12 +649,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Callback to perform action on Print Invoice button.
    */
-  static function getPrintPDF() {
+  public static function getPrintPDF() {
     $contributionId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
     $contributionIDs = array($contributionId);
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
     $params = array('output' => 'pdf_invoice');
     CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId, CRM_Core_DAO::$_nullObject);
   }
-}
 
+}

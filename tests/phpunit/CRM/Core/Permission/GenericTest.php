@@ -8,7 +8,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_Permission_GenericTest extends CiviUnitTestCase {
 
   /**
-   * @return array of CRM_Core_Permission_Base
+   * @return array
+   *   Array of CRM_Core_Permission_Base
    */
   public function permissionClasses() {
     $cases = array();
@@ -38,4 +39,5 @@ class CRM_Core_Permission_GenericTest extends CiviUnitTestCase {
     $provider = new $providerClass();
     $this->assertEquals(TRUE, $provider->check(CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION));
   }
+
 }

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,14 +51,14 @@
         </thead>
         <tbody>
         {foreach from=$customField item=row}
-        <tr id="CustomField-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {if NOT $row.is_active} disabled{/if}">
-            <td><span class="crm-editable crmf-label">{$row.label}</span></td>
+        <tr id="CustomField-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
+            <td class="crm-editable" data-field="label">{$row.label}</td>
             <td>{$row.data_type}</td>
             <td>{$row.html_type}</td>
             <td class="nowrap">{$row.weight}</td>
-            <td>{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{if $row.is_searchable eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td class="crm-editable" data-type="boolean" data-field="is_required">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td class="crm-editable" data-type="boolean" data-field="is_searchable">{if $row.is_searchable eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td>{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
@@ -77,10 +77,9 @@
         {/if}
     {/if}
     <div class="action-link">
-      <a href="{crmURL p='civicrm/admin/custom/group/field/add' q="reset=1&action=add&gid=$gid"}" id="newCustomField" class="button action-item"><span><div class="icon add-icon"></div>{ts}Add Custom Field{/ts}</span></a>
-      <a href="{crmURL p="civicrm/admin/custom/group" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
+      {crmButton p='civicrm/admin/custom/group/field/add' q="reset=1&action=add&gid=$gid" id="newCustomField"  class="action-item" icon="circle-plus"}{ts}Add Custom Field{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/custom/group" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
     </div>
 {/if}
 
-{include file="CRM/common/crmeditable.tpl"}
 

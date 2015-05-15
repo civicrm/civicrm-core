@@ -49,7 +49,8 @@ class Requirements {
    *     - file_paths
    *     - db_config
    *
-   * @return array An array of check summaries. Each array contains the keys 'title', 'severity', and 'details'.
+   * @return array
+   *   An array of check summaries. Each array contains the keys 'title', 'severity', and 'details'.
    */
   public function checkAll(array $config) {
     return array_merge($this->checkSystem($config['file_paths']), $this->checkDatabase($config['db_config']));
@@ -84,7 +85,7 @@ class Requirements {
    * @param array $db_config
    *   An array with keys:
    *   - host (with optional port specified eg. localhost:12345)
-   *   = database (name of database to select)
+   *   - database (name of database to select)
    *   - username
    *   - password
    *
@@ -101,7 +102,7 @@ class Requirements {
   }
 
   /**
-   * Check configured php Memory
+   * Check configured php Memory.
    * @return array
    */
   public function checkMemory() {
@@ -120,10 +121,10 @@ class Requirements {
     if ($mem < $min && $mem > 0) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
     }
-    else if ($mem < $recommended && $mem != 0) {
+    elseif ($mem < $recommended && $mem != 0) {
       $results['severity'] = $this::REQUIREMENT_WARNING;
     }
-    else if ($mem == 0) {
+    elseif ($mem == 0) {
       $results['details'] = "Cannot determine PHP memory allocation. Install only if you're sure you've allocated at least 32 MB.";
       $results['severity'] = $this::REQUIREMENT_WARNING;
     }
@@ -132,7 +133,7 @@ class Requirements {
   }
 
   /**
-   * Get Configured PHP memory
+   * Get Configured PHP memory.
    * @return float
    */
   protected function getPHPMemory() {
@@ -141,10 +142,13 @@ class Requirements {
     switch (strtolower(substr($memString, -1))) {
       case "k":
         return round(substr($memString, 0, -1) * 1024);
+
       case "m":
         return round(substr($memString, 0, -1) * 1024 * 1024);
+
       case "g":
         return round(substr($memString, 0, -1) * 1024 * 1024 * 1024);
+
       default:
         return round($memString);
     }
@@ -153,7 +157,7 @@ class Requirements {
   /**
    * @return array
    */
-  function checkServerVariables() {
+  public function checkServerVariables() {
     $results = array(
       'title' => 'CiviCRM PHP server variables',
       'severity' => $this::REQUIREMENT_OK,
@@ -278,7 +282,7 @@ class Requirements {
     $results = array(
       'title' => 'CiviCRM InnoDB support',
       'severity' => $this::REQUIREMENT_ERROR,
-      'details' => 'Could not determine if MySQL has InnoDB support. Assuming none.'
+      'details' => 'Could not determine if MySQL has InnoDB support. Assuming none.',
     );
 
     $conn = @mysql_connect($db_config['host'], $db_config['username'], $db_config['password']);
@@ -467,7 +471,7 @@ class Requirements {
    *
    * @return array
    */
-  function checkMysqlLockTables($db_config) {
+  public function checkMysqlLockTables($db_config) {
     $results = array(
       'title' => 'CiviCRM MySQL Lock Tables',
       'severity' => $this::REQUIREMENT_OK,
@@ -477,7 +481,7 @@ class Requirements {
     $conn = @mysql_connect($db_config['server'], $db_config['username'], $db_config['password']);
     if (!$conn) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
-      $results['details'] =  'Could not connect to database';
+      $results['details'] = 'Could not connect to database';
       return $results;
     }
 
@@ -540,4 +544,5 @@ class Requirements {
 
     return $results;
   }
+
 }

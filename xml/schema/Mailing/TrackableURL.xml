@@ -17,8 +17,7 @@
   </primaryKey>
   <field>
     <name>url</name>
-    <type>varchar</type>
-    <length>255</length>
+    <type>text</type>    
     <required>true</required>
     <comment>The URL to be tracked.</comment>
   </field>

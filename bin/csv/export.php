@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2011                 |
  +--------------------------------------------------------------------+
@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /**
@@ -33,8 +33,8 @@
  * php bin/csv/export.php -e <entity> [ --field=value --field=value ] [ -s site.org ]
  * e.g.: php bin/csv/export.php -e Contact --email=jamie@progressivetech.org
  *
- **/
-require_once (dirname(__DIR__) . '/cli.class.php');
+ */
+require_once dirname(__DIR__) . '/cli.class.php';
 
 $entityExporter = new civicrm_cli_csv_exporter();
 $entityExporter->run();

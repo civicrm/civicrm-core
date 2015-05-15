@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,30 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * APIv3 functions for registering/processing mailing ab testing events.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_MailingAB
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
  */
 
 /**
- * Files required for this package
+ * @param array $spec
  */
+function _civicrm_api3_mailing_a_b_create_spec(&$spec) {
+  $spec['created_date']['api.default'] = 'now';
+  $spec['created_id']['api.required'] = 1;
+  $spec['created_id']['api.default'] = 'user_contact_id';
+}
 
 /**
- * Handle a create mailing ab testing
+ * Handle a create mailing ab testing.
  *
  * @param array $params
- * @param array $ids
  *
- * @return array API Success Array
+ * @return array
+ *   API Success Array
  */
 function civicrm_api3_mailing_a_b_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -57,9 +57,9 @@ function civicrm_api3_mailing_a_b_create($params) {
  * Handle a delete event.
  *
  * @param array $params
- * @param array $ids
  *
- * @return array API Success Array
+ * @return array
+ *   API Success Array
  */
 function civicrm_api3_mailing_a_b_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -69,6 +69,7 @@ function civicrm_api3_mailing_a_b_delete($params) {
  * Handle a get event.
  *
  * @param array $params
+ *
  * @return array
  */
 function civicrm_api3_mailing_a_b_get($params) {
@@ -76,12 +77,14 @@ function civicrm_api3_mailing_a_b_get($params) {
 }
 
 /**
- * Adjust Metadata for submit action
+ * Adjust Metadata for submit action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $spec
+ *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_mailing_a_b_submit_spec(&$params) {
+function _civicrm_api3_mailing_a_b_submit_spec(&$spec) {
   $mailingFields = CRM_Mailing_DAO_Mailing::fields();
   $mailingAbFields = CRM_Mailing_DAO_MailingAB::fields();
   $spec['id'] = $mailingAbFields['id'];
@@ -96,9 +99,10 @@ function _civicrm_api3_mailing_a_b_submit_spec(&$params) {
 }
 
 /**
- * Send A/B mail to A/B recipients respectively
+ * Send A/B mail to A/B recipients respectively.
  *
  * @param array $params
+ *
  * @return array
  * @throws API_Exception
  */
@@ -165,28 +169,38 @@ function civicrm_api3_mailing_a_b_submit($params) {
 }
 
 /**
- * Adjust Metadata for graph_stats action
+ * Adjust Metadata for graph_stats action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_a_b_graph_stats_spec(&$params) {
-  $params['criteria']['title'] = 'Criteria';
-  $params['criteria']['default'] = 'Open';
+  $params['criteria'] = array(
+    'title' => 'Criteria',
+    'default' => 'Open',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+
   // mailing_ab_winner_criteria
   $params['target_date']['title'] = 'Target Date';
   $params['target_date']['type'] = CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME;
-  $params['split_count']['title'] = 'Split Count';
-  $params['split_count']['api.default'] = 6;
+  $params['split_count'] = array(
+    'title' => 'Split Count',
+    'api.default' => 6,
+    'type' => CRM_Utils_Type::T_INT,
+  );
   $params['split_count_select']['title'] = 'Split Count Select';
   $params['split_count_select']['api.required'] = 1;
   $params['target_url']['title'] = 'Target URL';
 }
 
 /**
- * Send graph detail for A/B tests mail
+ * Send graph detail for A/B tests mail.
  *
  * @param array $params
+ *
  * @return array
  * @throws API_Exception
  */
@@ -221,10 +235,11 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $graphStats[$name] = array(
           $params['split_count_select'] => array(
             'count' => CRM_Mailing_Event_BAO_Opened::getTotalCount($mailingAB[$column], NULL, TRUE, $toDate),
-            'time' => CRM_Utils_Date::customFormat($toDate)
-          )
+            'time' => CRM_Utils_Date::customFormat($toDate),
+          ),
         );
         break;
+
       case 'total unique clicks':
         $result = CRM_Mailing_Event_BAO_TrackableURLOpen::getRows($mailingAB['mailing_id_a'], NULL, TRUE, 0, 1, "civicrm_mailing_event_trackable_url_open.time_stamp ASC");
         $startDate = CRM_Utils_Date::processDate($result[0]['date']);
@@ -235,10 +250,11 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $graphStats[$name] = array(
           $params['split_count_select'] => array(
             'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, NULL, $toDate),
-            'time' => CRM_Utils_Date::customFormat($toDate)
-          )
+            'time' => CRM_Utils_Date::customFormat($toDate),
+          ),
         );
         break;
+
       case 'total clicks on a particular link':
         if (empty($params['target_url'])) {
           throw new API_Exception("Provide url to get stats result for total clicks on a particular link");
@@ -254,8 +270,8 @@ function civicrm_api3_mailing_a_b_graph_stats($params) {
         $graphStats[$name] = array(
           $params['split_count_select'] => array(
             'count' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], NULL, FALSE, $url_id, $toDate),
-            'time' => CRM_Utils_Date::customFormat($toDate)
-          )
+            'time' => CRM_Utils_Date::customFormat($toDate),
+          ),
         );
         break;
     }

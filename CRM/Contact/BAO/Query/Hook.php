@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -44,11 +44,9 @@ class CRM_Contact_BAO_Query_Hook {
   protected $_queryObjects = NULL;
 
   /**
-   * Singleton function used to manage this object
+   * Singleton function used to manage this object.
    *
    * @return object
-   * @static
-   *
    */
   public static function singleton() {
     static $singleton = NULL;
@@ -58,11 +56,12 @@ class CRM_Contact_BAO_Query_Hook {
     return $singleton;
   }
 
- /**
-  * Get or build the list of search objects (via hook)
-  *
-  * @return array of CRM_Contact_BAO_Query_Interface objects
-  */
+  /**
+   * Get or build the list of search objects (via hook)
+   *
+   * @return array
+   *   Array of CRM_Contact_BAO_Query_Interface objects
+   */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
       $this->_queryObjects = array();
@@ -164,4 +163,5 @@ class CRM_Contact_BAO_Query_Hook {
       $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
     }
   }
+
 }

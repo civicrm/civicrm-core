@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
@@ -36,7 +36,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomSameFieldAdd() {
+  public function testCustomSameFieldAdd() {
     $this->open($this->sboxPath);
     $this->webtestLogin();
 
@@ -44,7 +44,7 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->_testCustomAdd();
   }
 
-  function _testCustomAdd() {
+  public function _testCustomAdd() {
     //CRM-7564 : Different gropus can contain same custom fields
     $this->open($this->sboxPath . "civicrm/admin/custom/group?action=add&reset=1");
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -166,5 +166,5 @@ class WebTest_Admin_CustomAddTestSameField extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
 
   }
-}
 
+}

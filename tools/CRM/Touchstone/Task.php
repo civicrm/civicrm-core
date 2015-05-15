@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,13 +39,12 @@
  *
  */
 class CRM_Touchstone_Task {
-  CONST FIRST_ACTION = 1, SECOND_ACTION = 2, THIRD_ACTION = 3;
+  const FIRST_ACTION = 1, SECOND_ACTION = 2, THIRD_ACTION = 3;
 
   /**
    * the task array
    *
    * @var array
-   * @static
    */
   static $_tasks = NULL;
 
@@ -53,7 +52,6 @@ class CRM_Touchstone_Task {
    * the optional task array
    *
    * @var array
-   * @static
    */
   static $_optionalTasks = NULL;
 
@@ -62,15 +60,12 @@ class CRM_Touchstone_Task {
    * on a contact / group of contacts
    *
    * @return array the set of tasks for a group of contacts
-   * @static
-   * @access public
    */
-  static
-  function &tasks() {
+  static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => ts('Perform First Task'),
-        1 => ts('Perform Second Task'),
+        2 => ts('Perform Second Task'),
         5 => ts('Perform Third Task'),
       );
     }

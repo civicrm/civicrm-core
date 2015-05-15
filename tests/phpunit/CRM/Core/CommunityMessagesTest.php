@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -58,11 +57,11 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       self::$webResponses = array(
         'http-error' => array(
           CRM_Utils_HttpClient::STATUS_DL_ERROR,
-          NULL
+          NULL,
         ),
         'bad-json' => array(
           CRM_Utils_HttpClient::STATUS_OK,
-          '<html>this is not json!</html>'
+          '<html>this is not json!</html>',
         ),
         'invalid-ttl-document' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -74,7 +73,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'markup' => '<h1>Invalid document</h1>',
               ),
             ),
-          ))
+          )),
         ),
         'first-valid-response' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -86,7 +85,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'markup' => '<h1>First valid response</h1>',
               ),
             ),
-          ))
+          )),
         ),
         'second-valid-response' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -98,7 +97,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'markup' => '<h1>Second valid response</h1>',
               ),
             ),
-          ))
+          )),
         ),
         'two-messages' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -115,7 +114,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'components' => array('CiviMail'),
               ),
             ),
-          ))
+          )),
         ),
         'two-messages-halfbadcomp' => array(
           CRM_Utils_HttpClient::STATUS_OK,
@@ -132,7 +131,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
                 'components' => array('CiviMail'),
               ),
             ),
-          ))
+          )),
         ),
       );
     }
@@ -224,7 +223,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * Store the NACK and retry after the default time period (DEFAULT_RETRY).
    *
    * @dataProvider badWebResponses
-   * @param array $badWebResponse Description of a web request that returns some kind of failure
+   * @param array $badWebResponse
+   *   Description of a web request that returns some kind of failure.
    */
   public function testGetDocument_NewFailure_CacheOK_UpdateOK($badWebResponse) {
     $this->assertNotEmpty($badWebResponse);
@@ -268,7 +268,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * A new update succeeds.
    *
    * @dataProvider badWebResponses
-   * @param array $badWebResponse Description of a web request that returns some kind of failure
+   * @param array $badWebResponse
+   *   Description of a web request that returns some kind of failure.
    */
   public function testGetDocument_NewOK_UpdateFailure_CacheOK_UpdateOK($badWebResponse) {
     $this->assertNotEmpty($badWebResponse);
@@ -315,7 +316,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   }
 
   /**
-   * Randomly pick among two options
+   * Randomly pick among two options.
    */
   public function testPick_rand() {
     $communityMessages = new CRM_Core_CommunityMessages(
@@ -364,7 +365,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertEquals($trials, $freq['<h1>Two</h1>']);
   }
 
-  function testEvalMarkup() {
+  public function testEvalMarkup() {
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectNoHttpRequest()
@@ -398,4 +399,5 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       ->will($this->returnValue($response));
     return $client;
   }
+
 }

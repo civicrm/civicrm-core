@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testParticipationAdd() {
+  public function testParticipationAdd() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -98,7 +98,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
   /**
    * @param string $firstName
    */
-  function addParticipant($firstName) {
+  public function addParticipant($firstName) {
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", '_qf_Participant_upload-bottom');
 
     // Type contact last name in contact auto-complete, wait for dropdown and click first result
@@ -163,5 +163,5 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     );
     $this->verifyText("xpath=//td[text()='Selections']/following-sibling::td//div/div", preg_quote('Event Total: $ 800.00'));
   }
-}
 
+}

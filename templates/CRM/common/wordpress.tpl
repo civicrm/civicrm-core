@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,9 +42,6 @@
     </div>
 {/if}
 
-{* include wysiwyg related files*}
-{include file="CRM/common/wysiwyg.tpl"}
-
 {if isset($browserPrint) and $browserPrint}
 {* Javascript window.print link. Used for public pages where we can't do printer-friendly view. *}
 <div id="printer-friendly">
@@ -81,7 +78,7 @@
   {include file="CRM/common/status.tpl"}
   {crmRegion name='page-body'}
     <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
-    {if isset($isForm) and $isForm}
+    {if isset($isForm) and $isForm and isset($formTpl)}
       {include file="CRM/Form/$formTpl.tpl"}
     {else}
       {include file=$tplFile}

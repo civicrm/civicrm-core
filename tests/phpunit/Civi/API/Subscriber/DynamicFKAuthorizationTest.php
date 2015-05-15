@@ -77,6 +77,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       $this->kernel,
       'FakeFile',
       array('create', 'get'),
+      // Given a file ID, determine the entity+table it's attached to.
       "select
       case %1
         when " . self::FILE_WIDGET_ID . " then 1
@@ -94,6 +95,8 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
         else null
       end as entity_id
       ",
+      // Get a list of custom fields (field_name,table_name,extends)
+      "select",
       array('fake_widget', 'fake_forbidden')
     ));
   }
@@ -103,7 +106,10 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     \CRM_Core_DAO_AllCoreTables::init(TRUE);
   }
 
-  function okDataProvider() {
+  /**
+   * @return array
+   */
+  public function okDataProvider() {
     $cases = array();
 
     $cases[] = array('Widget', 'create', array('id' => self::WIDGET_ID));
@@ -114,14 +120,16 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     $cases[] = array(
       'FakeFile',
       'create',
-      array('entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID)
+      array('entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID),
     );
-    $cases[] = array('FakeFile', 'get', array('entity_table' => 'fake_widget'));
 
     return $cases;
   }
 
-  function badDataProvider() {
+  /**
+   * @return array
+   */
+  public function badDataProvider() {
     $cases = array();
 
     $cases[] = array('Forbidden', 'create', array('id' => self::FORBIDDEN_ID), '/Authorization failed/');
@@ -137,20 +145,33 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       'FakeFile',
       'create',
       array('entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID),
-      '/Authorization failed/'
+      '/Authorization failed/',
     );
     $cases[] = array(
       'FakeFile',
       'get',
       array('entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID),
-      '/Authorization failed/'
+      '/Authorization failed/',
     );
 
-    $cases[] = array('FakeFile', 'create', array(), "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/");
-    $cases[] = array('FakeFile', 'get', array(), "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/");
+    $cases[] = array(
+      'FakeFile',
+      'create',
+      array(),
+      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/",
+    );
+    $cases[] = array(
+      'FakeFile',
+      'get',
+      array(),
+      "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/",
+    );
 
     $cases[] = array('FakeFile', 'create', array('entity_table' => 'unknown'), '/Unrecognized target entity/');
     $cases[] = array('FakeFile', 'get', array('entity_table' => 'unknown'), '/Unrecognized target entity/');
+
+    // We should be allowed to lookup files for fake_widgets, but we need an ID.
+    $cases[] = array('FakeFile', 'get', array('entity_table' => 'fake_widget'), '/Missing entity_id/');
 
     return $cases;
   }
@@ -158,10 +179,10 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   /**
    * @param $entity
    * @param $action
-   * @param $params
+   * @param array $params
    * @dataProvider okDataProvider
    */
-  function testOk($entity, $action, $params) {
+  public function testOk($entity, $action, $params) {
     $params['version'] = 3;
     $params['debug'] = 1;
     $params['check_permissions'] = 1;
@@ -177,10 +198,11 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   /**
    * @param $entity
    * @param $action
-   * @param $params
+   * @param array $params
+   * @param $expectedError
    * @dataProvider badDataProvider
    */
-  function testBad($entity, $action, $params, $expectedError) {
+  public function testBad($entity, $action, $params, $expectedError) {
     $params['version'] = 3;
     $params['debug'] = 1;
     $params['check_permissions'] = 1;
@@ -193,4 +215,5 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     ), TRUE));
     $this->assertRegExp($expectedError, $result['error_message']);
   }
+
 }

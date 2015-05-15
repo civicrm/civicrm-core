@@ -45,9 +45,10 @@ class CRM_Utils_SQL_Select {
   private $offset = NULL;
 
   /**
-   * Create a new SELECT query
+   * Create a new SELECT query.
    *
-   * @param string $from table-name and optional alias
+   * @param string $from
+   *   Table-name and optional alias.
    * @return CRM_Utils_SQL_Select
    */
   public static function from($from) {
@@ -55,19 +56,22 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Create a new SELECT query
+   * Create a new SELECT query.
    *
-   * @param string $from table-name and optional alias
+   * @param string $from
+   *   Table-name and optional alias.
    */
   public function __construct($from) {
     $this->from = $from;
   }
 
   /**
-   * Add a new JOIN clause
+   * Add a new JOIN clause.
    *
-   * @param string $name the effective alias of the joined table
-   * @param string $expr the complete join expression (eg "INNER JOIN mytable myalias ON mytable.id = maintable.foo_id")
+   * @param string $name
+   *   The effective alias of the joined table.
+   * @param string $expr
+   *   The complete join expression (eg "INNER JOIN mytable myalias ON mytable.id = maintable.foo_id").
    * @param array|null $args
    * @return CRM_Utils_SQL_Select
    */
@@ -107,7 +111,7 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Group results by adding extra items to the GROUP BY clause
+   * Group results by adding extra items to the GROUP BY clause.
    *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
@@ -137,7 +141,7 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Sort results by adding extra items to the ORDER BY clause
+   * Sort results by adding extra items to the ORDER BY clause.
    *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
@@ -152,7 +156,7 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
-   * Set a limit on the number of records to return
+   * Set a limit on the number of records to return.
    *
    * @param int $limit
    * @param int $offset
@@ -174,7 +178,7 @@ class CRM_Utils_SQL_Select {
   /**
    * Given a string like "field_name = @value", replace "@value" with an escaped SQL string
    *
-   * @param string SQL expression
+   * @param $expr SQL expression
    * @param null|array $args a list of values to insert into the SQL expression; keys are prefix-coded:
    *   prefix '@' => escape SQL
    *   prefix '#' => literal number, skip escaping but do validation
@@ -184,7 +188,8 @@ class CRM_Utils_SQL_Select {
    * PHP NULL's will be treated as SQL NULL's. The PHP string "null" will be treated as a string.
    *
    * @throws CRM_Core_Exception
-   * @return string SQL expression
+   * @return string
+   *   SQL expression
    */
   public function interpolate($expr, $args) {
     if ($args === NULL) {
@@ -222,14 +227,16 @@ class CRM_Utils_SQL_Select {
 
   /**
    * @param string|NULL $value
-   * @return string SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
+   * @return string
+   *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
    */
   protected function escapeString($value) {
     return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
   }
 
   /**
-   * @return string SQL statement
+   * @return string
+   *   SQL statement
    */
   public function toSQL() {
     if ($this->selects) {
@@ -262,4 +269,5 @@ class CRM_Utils_SQL_Select {
     }
     return $sql;
   }
+
 }

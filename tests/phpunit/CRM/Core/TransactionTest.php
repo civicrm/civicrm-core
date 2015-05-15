@@ -20,21 +20,27 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    */
   private $cids;
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->quickCleanup(array('civicrm_contact', 'civicrm_activity'));
     $this->callbackLog = array();
     $this->cids = array();
   }
 
-  function dataCreateStyle() {
+  /**
+   * @return array
+   */
+  public function dataCreateStyle() {
     return array(
       array('sql-insert'),
       array('bao-create'),
     );
   }
 
-  function dataCreateAndCommitStyles() {
+  /**
+   * @return array
+   */
+  public function dataCreateAndCommitStyles() {
     return array(
       array('sql-insert', 'implicit-commit'),
       array('sql-insert', 'explicit-commit'),
@@ -44,11 +50,13 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param string $createStyle 'sql-insert'|'bao-create'
-   * @param string $commitStyle 'implicit-commit'|'explicit-commit'
+   * @param string $createStyle
+   *   'sql-insert'|'bao-create'.
+   * @param string $commitStyle
+   *   'implicit-commit'|'explicit-commit'.
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testBasicCommit($createStyle, $commitStyle) {
+  public function testBasicCommit($createStyle, $commitStyle) {
     $this->createContactWithTransaction('reuse-tx', $createStyle, $commitStyle);
     $this->assertCount(1, $this->cids);
     $this->assertContactsExistByOffset(array(0 => TRUE));
@@ -56,22 +64,25 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider dataCreateStyle
+   * @param $createStyle
    */
-  function testBasicRollback($createStyle) {
+  public function testBasicRollback($createStyle) {
     $this->createContactWithTransaction('reuse-tx', $createStyle, 'rollback');
     $this->assertCount(1, $this->cids);
     $this->assertContactsExistByOffset(array(0 => FALSE));
   }
 
   /**
-   * Test in which an outer function makes multiple calls to inner functions
+   * Test in which an outer function makes multiple calls to inner functions.
    * but then rolls back the entire set.
    *
-   * @param string $createStyle 'sql-insert'|'bao-create'
-   * @param string $commitStyle 'implicit-commit'|'explicit-commit'
+   * @param string $createStyle
+   *   'sql-insert'|'bao-create'.
+   * @param string $commitStyle
+   *   'implicit-commit'|'explicit-commit'.
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testBatchRollback($createStyle, $commitStyle) {
+  public function testBatchRollback($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
       array(
@@ -91,11 +102,13 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * createContactWithTransaction use nesting (savepoints), so the
    * batch is able to commit.
    *
-   * @param string $createStyle 'sql-insert'|'bao-create'
-   * @param string $commitStyle 'implicit-commit'|'explicit-commit'
+   * @param string $createStyle
+   *   'sql-insert'|'bao-create'.
+   * @param string $commitStyle
+   *   'implicit-commit'|'explicit-commit'.
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testMixedBatchCommit_nesting($createStyle, $commitStyle) {
+  public function testMixedBatchCommit_nesting($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
       array(
@@ -116,11 +129,13 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * createContactWithTransaction reuses the main transaction,
    * so the overall batch must rollback.
    *
-   * @param string $createStyle 'sql-insert'|'bao-create'
-   * @param string $commitStyle 'implicit-commit'|'explicit-commit'
+   * @param string $createStyle
+   *   'sql-insert'|'bao-create'.
+   * @param string $commitStyle
+   *   'implicit-commit'|'explicit-commit'.
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testMixedBatchCommit_reuse($createStyle, $commitStyle) {
+  public function testMixedBatchCommit_reuse($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
       array(
@@ -140,11 +155,13 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * createContactWithTransaction using a mix of rollback/commit.
    * The overall batch is rolled back.
    *
-   * @param string $createStyle 'sql-insert'|'bao-create'
-   * @param string $commitStyle 'implicit-commit'|'explicit-commit'
+   * @param string $createStyle
+   *   'sql-insert'|'bao-create'.
+   * @param string $commitStyle
+   *   'implicit-commit'|'explicit-commit'.
    * @dataProvider dataCreateAndCommitStyles
    */
-  function testMixedBatchRollback_nesting($createStyle, $commitStyle) {
+  public function testMixedBatchRollback_nesting($createStyle, $commitStyle) {
     $this->assertFalse(CRM_Core_Transaction::isActive());
     $this->runBatch(
       'reuse-tx',
@@ -192,10 +209,22 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testCallback_commit() {
     $tx = new CRM_Core_Transaction();
 
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array('qwe','rty'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array('uio','p[]'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array($this, '_preRollback'), array('asd','fgh'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array($this, '_postRollback'), array('jkl',';'));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
+        'qwe',
+        'rty',
+      ));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
+        'uio',
+        'p[]',
+      ));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
+        $this,
+        '_preRollback',
+      ), array('asd', 'fgh'));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
+        $this,
+        '_postRollback',
+      ), array('jkl', ';'));
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
 
@@ -208,10 +237,22 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testCallback_rollback() {
     $tx = new CRM_Core_Transaction();
 
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array('ewq','ytr'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array('oiu','][p'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array($this, '_preRollback'), array('dsa','hgf'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array($this, '_postRollback'), array('lkj',';'));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
+        'ewq',
+        'ytr',
+      ));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
+        'oiu',
+        '][p',
+      ));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
+        $this,
+        '_preRollback',
+      ), array('dsa', 'hgf'));
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
+        $this,
+        '_postRollback',
+      ), array('lkj', ';'));
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
     $tx->rollback();
@@ -223,13 +264,15 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param string $createStyle 'sql-insert'|'bao-create'
-   * @param string $commitStyle 'implicit-commit'|'explicit-commit'
+   * @param string $createStyle
+   *   'sql-insert'|'bao-create'.
+   * @param string $commitStyle
+   *   'implicit-commit'|'explicit-commit'.
    * @dataProvider dataCreateAndCommitStyles
    */
   public function testRun_ok($createStyle, $commitStyle) {
     $test = $this;
-    CRM_Core_Transaction::create(TRUE)->run(function($tx) use (&$test, $createStyle, $commitStyle) {
+    CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
       $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
       $test->assertContactsExistByOffset(array(0 => TRUE));
     });
@@ -237,8 +280,10 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param string $createStyle 'sql-insert'|'bao-create'
-   * @param string $commitStyle 'implicit-commit'|'explicit-commit'
+   * @param string $createStyle
+   *   'sql-insert'|'bao-create'.
+   * @param string $commitStyle
+   *   'implicit-commit'|'explicit-commit'.
    * @dataProvider dataCreateAndCommitStyles
    */
   public function testRun_exception($createStyle, $commitStyle) {
@@ -246,12 +291,13 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $test = $this;
     $e = NULL; // Exception
     try {
-      CRM_Core_Transaction::create(TRUE)->run(function($tx) use (&$test, $createStyle, $commitStyle) {
+      CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
         $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
         $test->assertContactsExistByOffset(array(0 => TRUE));
         throw new Exception("Ruh-roh");
       });
-    } catch (Exception $ex) {
+    }
+    catch (Exception $ex) {
       $e = $ex;
       if (get_class($e) != 'Exception' || $e->getMessage() != 'Ruh-roh') {
         throw $e;
@@ -275,7 +321,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param array $existsByOffset array(int $cidOffset => bool $expectExists)
+   * @param array $existsByOffset
+   *   Array(int $cidOffset => bool $expectExists).
    * @param int $generalOffset
    */
   public function assertContactsExistByOffset($existsByOffset, $generalOffset = 0) {
@@ -293,10 +340,14 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * Use SQL to INSERT a contact and assert success. Perform
    * work within a transaction.
    *
-   * @param string $nesting 'reuse-tx'|'nest-tx' how to construct transaction
-   * @param string $insert 'sql-insert'|'bao-create' how to add the example record
-   * @param string $outcome 'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction
-   * @return int cid
+   * @param string $nesting
+   *   'reuse-tx'|'nest-tx' how to construct transaction.
+   * @param string $insert
+   *   'sql-insert'|'bao-create' how to add the example record.
+   * @param string $outcome
+   *   'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction.
+   * @return int
+   *   cid
    */
   public function createContactWithTransaction($nesting, $insert, $outcome) {
     if ($nesting != 'reuse-tx' && $nesting != 'nest-tx') {
@@ -314,7 +365,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     if ($insert == 'sql-insert') {
       $r = CRM_Core_DAO::executeQuery("INSERT INTO civicrm_contact(first_name,last_name) VALUES ('ff', 'll')");
       $cid = mysql_insert_id();
-    } elseif ($insert == 'bao-create') {
+    }
+    elseif ($insert == 'bao-create') {
       $params = array(
         'contact_type' => 'Individual',
         'first_name' => 'FF',
@@ -330,7 +382,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     if ($outcome == 'rollback') {
       $tx->rollback();
-    } elseif ($outcome == 'explicit-commit') {
+    }
+    elseif ($outcome == 'explicit-commit') {
       $tx->commit();
     } // else: implicit-commit
 
@@ -338,15 +391,19 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Perform a series of operations within smaller transactions
+   * Perform a series of operations within smaller transactions.
    *
-   * @param string $nesting 'reuse-tx'|'nest-tx' how to construct transaction
-   * @param array $callbacks see createContactWithTransaction
-   * @param array $existsByOffset see assertContactsMix
-   * @param string $outcome 'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction
-   * @return int cid
+   * @param string $nesting
+   *   'reuse-tx'|'nest-tx' how to construct transaction.
+   * @param array $callbacks
+   *   See createContactWithTransaction.
+   * @param array $existsByOffset
+   *   See assertContactsMix.
+   * @param string $outcome
+   *   'rollback'|'implicit-commit'|'explicit-commit' how to finish transaction.
+   * @return void
    */
-  function runBatch($nesting, $callbacks, $existsByOffset, $outcome)  {
+  public function runBatch($nesting, $callbacks, $existsByOffset, $outcome) {
     if ($nesting != 'reuse-tx' && $nesting != 'nest-tx') {
       throw new RuntimeException('Bad test data: nesting=' . $nesting);
     }
@@ -366,24 +423,42 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     if ($outcome == 'rollback') {
       $tx->rollback();
-    } elseif ($outcome == 'explicit-commit') {
+    }
+    elseif ($outcome == 'explicit-commit') {
       $tx->commit();
     } // else: implicit-commit
   }
 
-  function _preCommit($arg1, $arg2) {
+  /**
+   * @param $arg1
+   * @param $arg2
+   */
+  public function _preCommit($arg1, $arg2) {
     $this->callbackLog[] = array('_preCommit', $arg1, $arg2);
   }
 
-  function _postCommit($arg1, $arg2) {
+  /**
+   * @param $arg1
+   * @param $arg2
+   */
+  public function _postCommit($arg1, $arg2) {
     $this->callbackLog[] = array('_postCommit', $arg1, $arg2);
   }
 
-  function _preRollback($arg1, $arg2) {
+  /**
+   * @param $arg1
+   * @param $arg2
+   */
+  public function _preRollback($arg1, $arg2) {
     $this->callbackLog[] = array('_preRollback', $arg1, $arg2);
   }
 
-  function _postRollback($arg1, $arg2) {
+  /**
+   * @param $arg1
+   * @param $arg2
+   */
+  public function _postRollback($arg1, $arg2) {
     $this->callbackLog[] = array('_postRollback', $arg1, $arg2);
   }
+
 }

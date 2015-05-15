@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Provider;
 
 use Civi\API\Events;
 
 /**
- * A static provider is useful for creating mock API implementations which manages records in-memory.
+ * A static provider is useful for creating mock API implementations which
+ * manages records in-memory.
  *
- * TODO Add a static provider to SyntaxConformanceTest to ensure that it's representative.
+ * TODO Add a static provider to SyntaxConformanceTest to ensure that it's
+ * representative.
  */
 class StaticProvider extends AdhocProvider {
   protected $records;
   protected $fields;
 
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::RESOLVE => array(
@@ -49,6 +54,18 @@ class StaticProvider extends AdhocProvider {
     );
   }
 
+  /**
+   * @param int $version
+   *   API version.
+   * @param string $entity
+   *   API entity.
+   * @param array $fields
+   *   List of fields in this fake entity.
+   * @param array $perms
+   *   Array(string $action => string $perm).
+   * @param array $records
+   *   List of mock records to be read/updated by API calls.
+   */
   public function __construct($version, $entity, $fields, $perms = array(), $records = array()) {
     parent::__construct($version, $entity);
 
@@ -61,9 +78,9 @@ class StaticProvider extends AdhocProvider {
     $this->records = \CRM_Utils_Array::index(array('id'), $records);
     $this->fields = $fields;
 
-    $this->addAction('create', $perms['create'], array($this, '_create'));
-    $this->addAction('get', $perms['get'], array($this, '_get'));
-    $this->addAction('delete', $perms['delete'], array($this, '_delete'));
+    $this->addAction('create', $perms['create'], array($this, 'doCreate'));
+    $this->addAction('get', $perms['get'], array($this, 'doGet'));
+    $this->addAction('delete', $perms['delete'], array($this, 'doDelete'));
   }
 
   /**
@@ -75,12 +92,20 @@ class StaticProvider extends AdhocProvider {
 
   /**
    * @param array $records
+   *   List of mock records to be read/updated by API calls.
    */
   public function setRecords($records) {
     $this->records = $records;
   }
 
-  public function _create($apiRequest) {
+  /**
+   * @param array $apiRequest
+   *   The full description of the API request.
+   * @return array
+   *    Formatted API result
+   * @throws \API_Exception
+   */
+  public function doCreate($apiRequest) {
     if (isset($apiRequest['params']['id'])) {
       $id = $apiRequest['params']['id'];
     }
@@ -102,7 +127,14 @@ class StaticProvider extends AdhocProvider {
     return civicrm_api3_create_success($this->records[$id]);
   }
 
-  public function _get($apiRequest) {
+  /**
+   * @param array $apiRequest
+   *   The full description of the API request.
+   * @return array
+   *    Formatted API result
+   * @throws \API_Exception
+   */
+  public function doGet($apiRequest) {
     $id = @$apiRequest['params']['id'];
     if ($id && isset($this->records[$id])) {
       return civicrm_api3_create_success(array($id => $this->records[$id]));
@@ -112,11 +144,19 @@ class StaticProvider extends AdhocProvider {
     }
   }
 
-  public function _delete($apiRequest) {
+  /**
+   * @param array $apiRequest
+   *   The full description of the API request.
+   * @return array
+   *    Formatted API result
+   * @throws \API_Exception
+   */
+  public function doDelete($apiRequest) {
     $id = @$apiRequest['params']['id'];
     if ($id && isset($this->records[$id])) {
       unset($this->records[$id]);
     }
     return civicrm_api3_create_success(array());
   }
+
 }

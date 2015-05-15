@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,44 +39,38 @@
 class CRM_Custom_Form_Group extends CRM_Core_Form {
 
   /**
-   * The set id saved to the session for an update
+   * The set id saved to the session for an update.
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
   /**
-   *  set is empty or not
+   *  set is empty or not.
    *
    * @var bool
-   * @access protected
    */
   protected $_isGroupEmpty = TRUE;
 
   /**
-   * Array of existing subtypes set for a custom set
+   * Array of existing subtypes set for a custom set.
    *
    * @var array
-   * @access protected
    */
   protected $_subtypes = array();
 
   /**
-   * Array of default params
+   * Array of default params.
    *
    * @var array
-   * @access protected
    */
   protected $_defaults = array();
 
   /**
-   * Set variables up before form is built
+   * Set variables up before form is built.
    *
-   * @param null
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // current set id
@@ -110,28 +104,30 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param $self
    *
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     //validate group title as well as name.
-    $title  = $fields['title'];
-    $name   = CRM_Utils_String::munge($title, '_', 64);
-    $query  = 'select count(*) from civicrm_custom_group where ( name like %1 OR title like %2 ) and id != %3';
-    $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
-        2 => array($title, 'String'),
-        3 => array((int)$self->_id, 'Integer'),
-      ));
+    $title = $fields['title'];
+    $name = CRM_Utils_String::munge($title, '_', 64);
+    $query = 'select count(*) from civicrm_custom_group where ( name like %1 OR title like %2 ) and id != %3';
+    $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(
+      1 => array($name, 'String'),
+      2 => array($title, 'String'),
+      3 => array((int) $self->_id, 'Integer'),
+    ));
     if ($grpCnt) {
       $errors['title'] = ts('Custom group \'%1\' already exists in Database.', array(1 => $title));
     }
@@ -153,7 +149,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     }
 
     if (!empty($fields['is_multiple'])) {
-        $self->assign('showMultiple', TRUE);
+      $self->assign('showMultiple', TRUE);
     }
 
     if (empty($fields['is_multiple']) && $fields['style'] == 'Tab with table') {
@@ -174,26 +170,22 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @param null
    *
    * @return void
-   * @access public
    * @see valid_date
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Custom_Form_Group', 'formRule'), $this);
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
-   * @param null
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -207,18 +199,18 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $this->assign('contactTypes', json_encode($contactTypes));
 
-    $sel1         = array("" => "- select -") + CRM_Core_SelectValues::customGroupExtends();
-    $sel2         = array();
+    $sel1 = array("" => ts("- select -")) + CRM_Core_SelectValues::customGroupExtends();
+    $sel2 = array();
     $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
 
-    $eventType       = CRM_Core_OptionGroup::values('event_type');
-    $grantType       = CRM_Core_OptionGroup::values('grant_type');
-    $campaignTypes   = CRM_Campaign_PseudoConstant::campaignType();
-    $membershipType  = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
+    $eventType = CRM_Core_OptionGroup::values('event_type');
+    $grantType = CRM_Core_OptionGroup::values('grant_type');
+    $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $participantRole = CRM_Core_OptionGroup::values('participant_role');
-    $relTypeInd      = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
-    $relTypeOrg      = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
-    $relTypeHou      = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Household');
+    $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
+    $relTypeOrg = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
+    $relTypeHou = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Household');
 
     ksort($sel1);
     asort($activityType);
@@ -262,11 +254,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         if ($main == 'Relationship') {
           $relName = self::getFormattedList($sel2[$main]);
           $sel2[$main] = array(
-            '' => ts("- Any -")) + $relName;
+            '' => ts("- Any -"),
+          ) + $relName;
         }
         else {
           $sel2[$main] = array(
-            '' => ts("- Any -")) + $sel2[$main];
+            '' => ts("- Any -"),
+          ) + $sel2[$main];
         }
       }
     }
@@ -279,7 +273,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         $contactSubTypes[$key] = $key;
       }
       $sel2['Contact'] = array(
-        "" => "-- Any --") + $contactSubTypes;
+        "" => ("- Any -"),
+      ) + $contactSubTypes;
     }
     else {
       if (!isset($this->_id)) {
@@ -297,7 +292,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       ts('Used For'),
       array(
         'name' => 'extends[0]',
-        'style' => 'vertical-align: top;'
+        'style' => 'vertical-align: top;',
       ),
       TRUE
     );
@@ -340,8 +335,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->assign('defaultSubtypes', json_encode($this->_subtypes));
 
     // help text
-    $this->addWysiwyg('help_pre', ts('Pre-form Help'), $attributes['help_pre']);
-    $this->addWysiwyg('help_post', ts('Post-form Help'), $attributes['help_post']);
+    $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), $attributes['help_pre']);
+    $this->add('wysiwyg', 'help_post', ts('Post-form Help'), $attributes['help_post']);
 
     // weight
     $this->add('text', 'weight', ts('Order'), $attributes['weight'], TRUE);
@@ -392,11 +387,11 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       ),
     );
     if (!$this->_isGroupEmpty && !empty($this->_subtypes)) {
-      $buttons[0]['js'] = array('onclick' => "return warnDataLoss()");
+      $buttons[0]['class'] = 'crm-warnDataLoss';
     }
     $this->addButtons($buttons);
 
-    // views are implemented as frozen form
+    // TODO: Is this condition ever true? Can this code be removed?
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
       $this->addElement('button', 'done', ts('Done'), array('onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"));
@@ -407,12 +402,11 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
    *
-   * @return array   array of default values
-   * @access public
+   * @return array
+   *   array of default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = &$this->_defaults;
     $this->assign('showMaxMultiple', TRUE);
     if ($this->_action == CRM_Core_Action::ADD) {
@@ -457,12 +451,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   }
 
   /**
-   * Process the form
+   * Process the form.
    *
-   * @param null
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // get the submitted form values.
@@ -499,8 +491,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
       $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group->id . '&action=' . ($action ? 'add' : 'browse'));
       CRM_Core_Session::setStatus(ts("Your custom field set '%1' has been added. You can add custom fields now.",
-          array(1 => $group->title)
-        ), ts('Saved'), 'success');
+        array(1 => $group->title)
+      ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);
     }
@@ -511,7 +503,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     if (is_array($db_prefix) && $config->userSystem->is_drupal && module_exists('views')) {
       // get table_name for each custom group
       $tables = array();
-      $sql    = "SELECT table_name FROM civicrm_custom_group WHERE is_active = 1";
+      $sql = "SELECT table_name FROM civicrm_custom_group WHERE is_active = 1";
       $result = CRM_Core_DAO::executeQuery($sql);
       while ($result->fetch()) {
         $tables[$result->table_name] = $result->table_name;
@@ -522,8 +514,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
 
       if (!empty($missingTableNames)) {
         CRM_Core_Session::setStatus(ts("To ensure that all of your custom data groups are available to Views, you may need to add the following key(s) to the db_prefix array in your settings.php file: '%1'.",
-            array(1 => implode(', ', $missingTableNames))
-          ), ts('Note'), 'info');
+          array(1 => implode(', ', $missingTableNames))
+        ), ts('Note'), 'info');
       }
     }
   }
@@ -531,11 +523,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /**
    * Return a formatted list of relationship name.
    *
-   * @param array $list array of relationship name.
+   * @param array $list
+   *   Array of relationship name.
    *
-   * @return array of relationship name.
+   * @return array
+   *   Array of relationship name.
    */
-  static function getFormattedList(&$list) {
+  public static function getFormattedList(&$list) {
     $relName = array();
 
     foreach ($list as $listItemKey => $itemValue) {
@@ -558,5 +552,5 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     }
     return $relName;
   }
-}
 
+}

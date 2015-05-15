@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     parent::setUp();
   }
 
-  function testOfflineRecurContribution() {
+  public function testOfflineRecurContribution() {
     $this->webtestLogin();
 
     // We need a payment processor
@@ -43,18 +43,18 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->webtestAddPaymentProcessor($processorName, 'AuthNet');
 
     // create a new contact for whom recurring contribution is to be created
-    $firstName  = 'Jane' . substr(sha1(rand()), 0, 7);
+    $firstName = 'Jane' . substr(sha1(rand()), 0, 7);
     $middleName = 'Middle';
-    $lastName   = 'Recuroff_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Recuroff_' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName, "{$firstName}@example.com");
     $contactName = "$firstName $lastName";
 
     $this->click('css=li#tab_contribute a');
 
-    $this->waitForElementPresent('link=Submit Credit Card Contribution');
+    $this->waitForElementPresent('link=Record Contribution (Check, Cash, EFT ...)');
     // since we don't have live credentials we will switch to test mode
-    $url = $this->getAttribute("xpath=//*[@id='Search']//a[text()='Submit Credit Card Contribution']@href");
-    $url = str_replace('mode=live', 'mode=test', $url);
+    $url = $this->getAttribute("xpath=//*[@id='Search']/div[2]/div[2]/a[1]@href");
+    $url .= '&mode=test';
     $this->open($url);
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -97,7 +97,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     // View Recurring Contribution Record
     $verifyData = array(
       'From' => "$contactName",
-                          'Financial Type'    => 'Donation (test)',
+      'Financial Type' => 'Donation (test)',
       'Total Amount' => 'Installments: 12, Interval: 1 month(s)',
       'Contribution Status' => 'Pending : Incomplete Transaction',
       'Paid By' => 'Credit Card',
@@ -109,5 +109,5 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
       );
     }
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCustomDataImport() {
+  public function testCustomDataImport() {
     $this->webtestLogin();
 
     $firstName1 = 'Ma_' . substr(sha1(rand()), 0, 7);
@@ -57,7 +57,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForText("crm-notification-container", "The rule '{$newRuleTitle}' has been saved.");
 
-    $rgId = explode('&rgid=', $this->getAttribute("xpath=//div[@id='browseValues_Individual']//table/tbody//tr/td[text()='{$newRuleTitle}']/../td[3]/span/a[text()='Use Rule']@href"));
+    $rgId = explode('&rgid=', $this->getAttribute("xpath=//div[@id='browseValues_Individual']/div/div/table/tbody//tr/td[text()='{$newRuleTitle}']/../td[3]/span/a[1][text()='Use Rule']@href"));
     $rgId = explode('&', $rgId[1]);
 
     // Add Contact
@@ -113,7 +113,7 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _individualCustomCSVData($customDataParams, $firstName1) {
+  public function _individualCustomCSVData($customDataParams, $firstName1) {
     $headers = array(
       'first_name' => 'First Name',
       'last_name' => 'Last Name',
@@ -121,7 +121,8 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     );
 
     $rows = array(
-      array('first_name' => $firstName1,
+      array(
+        'first_name' => $firstName1,
         'last_name' => 'Anderson',
         "custom_{$customDataParams[0]}" => 'This is a test field',
       ),
@@ -135,14 +136,14 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
    * @param $originalRows
    * @param $checkSummary
    */
-  function checkDuplicateContacts($originalHeaders, $originalRows, $checkSummary) {
+  public function checkDuplicateContacts($originalHeaders, $originalRows, $checkSummary) {
     $this->assertTrue($this->isTextPresent('CiviCRM has detected one record which is a duplicate of existing CiviCRM contact record. These records have not been imported.'));
   }
 
   /**
    * @return array
    */
-  function _addCustomData() {
+  public function _addCustomData() {
 
     $this->openCiviPage("admin/custom/group", "reset=1");
 
@@ -184,10 +185,10 @@ class WebTest_Import_ContactCustomDataTest extends ImportCiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@id='field_page']//table/tbody//tr/td");
 
     $this->waitForText('crm-notification-container', "Custom field '{$customField}' has been saved.");
-    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/span[text()='$customField']/../../td[8]/span/a@href"));
+    $customFieldId = explode('&id=', $this->getAttribute("xpath=//div[@id='field_page']//table/tbody//tr/td/div[text()='$customField']/../../td[8]/span/a@href"));
     $customFieldId = $customFieldId[1];
 
     return array("custom_{$customFieldId}", $customField, $customGroupTitle);
   }
-}
 
+}

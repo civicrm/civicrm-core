@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 3.2                                                |
+-- | CiviCRM version 4.6                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -61,7 +61,7 @@ CREATE TABLE civicrm_dedupe_rule (
      dedupe_rule_group_id int unsigned NOT NULL COMMENT 'The id of the rule group this rule belongs to',
      rule_table varchar(64) NOT NULL COMMENT 'The name of the table this rule is about',
      rule_field varchar(64) NOT NULL COMMENT 'The name of the field of the table referenced in rule_table',
-     rule_length int unsigned COMMENT 'The lenght of the matching substring',
+     rule_length int unsigned COMMENT 'The length of the matching substring',
      rule_weight int NOT NULL COMMENT 'The weight of the rule'
 
 ,    PRIMARY KEY ( id )

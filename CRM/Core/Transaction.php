@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
  * $Id$
  *
@@ -85,12 +85,12 @@
 class CRM_Core_Transaction {
 
   /**
-   * These constants represent phases at which callbacks can be invoked
+   * These constants represent phases at which callbacks can be invoked.
    */
-  CONST PHASE_PRE_COMMIT = 1;
-  CONST PHASE_POST_COMMIT = 2;
-  CONST PHASE_PRE_ROLLBACK = 4;
-  CONST PHASE_POST_ROLLBACK = 8;
+  const PHASE_PRE_COMMIT = 1;
+  const PHASE_POST_COMMIT = 2;
+  const PHASE_PRE_ROLLBACK = 4;
+  const PHASE_POST_ROLLBACK = 8;
 
   /**
    * Whether commit() has been called on this instance
@@ -99,11 +99,12 @@ class CRM_Core_Transaction {
   private $_pseudoCommitted = FALSE;
 
   /**
-   * Ensure that an SQL transaction is started
+   * Ensure that an SQL transaction is started.
    *
    * This is a thin wrapper around __construct() which allows more fluent coding.
    *
-   * @param bool $nest Determines what to do if there's currently an active transaction:
+   * @param bool $nest
+   *   Determines what to do if there's currently an active transaction:.
    *   - If true, then make a new nested transaction ("SAVEPOINT")
    *   - If false, then attach to the existing transaction
    * @return \CRM_Core_Transaction
@@ -113,28 +114,29 @@ class CRM_Core_Transaction {
   }
 
   /**
-   * Ensure that an SQL transaction is started
+   * Ensure that an SQL transaction is started.
    *
-   * @param bool $nest Determines what to do if there's currently an active transaction:
+   * @param bool $nest
+   *   Determines what to do if there's currently an active transaction:.
    *   - If true, then make a new nested transaction ("SAVEPOINT")
    *   - If false, then attach to the existing transaction
    */
-  function __construct($nest = FALSE) {
+  public function __construct($nest = FALSE) {
     \Civi\Core\Transaction\Manager::singleton()->inc($nest);
   }
 
-  function __destruct() {
+  public function __destruct() {
     $this->commit();
   }
 
   /**
-   * Immediately commit or rollback
+   * Immediately commit or rollback.
    *
    * (Note: Prior to 4.6, return void)
    *
    * @return \CRM_Core_Exception this
    */
-  function commit() {
+  public function commit() {
     if (!$this->_pseudoCommitted) {
       $this->_pseudoCommitted = TRUE;
       \Civi\Core\Transaction\Manager::singleton()->dec();
@@ -156,7 +158,7 @@ class CRM_Core_Transaction {
    * Mark the transaction for rollback.
    *
    * (Note: Prior to 4.6, return void)
-   * @return \CRM_Core_Exception this
+   * @return \CRM_Core_Transaction
    */
   public function rollback() {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
@@ -173,14 +175,16 @@ class CRM_Core_Transaction {
    * After calling run(), the CRM_Core_Transaction object is "used up"; do not
    * use it again.
    *
-   * @param mixed $callable Should exception one paramter (CRM_Core_Transaction $tx)
-   * @return \CRM_Core_Exception this
+   * @param string $callable
+   *   Should exception one parameter (CRM_Core_Transaction $tx).
+   * @return CRM_Core_Transaction
    * @throws Exception
    */
   public function run($callable) {
     try {
       $callable($this);
-    } catch (Exception $ex) {
+    }
+    catch (Exception $ex) {
       $this->rollback()->commit();
       throw $ex;
     }
@@ -214,7 +218,7 @@ class CRM_Core_Transaction {
   }
 
   /**
-   * Determine whether there is a pending transaction
+   * Determine whether there is a pending transaction.
    */
   static public function isActive() {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getFrame();
@@ -222,7 +226,7 @@ class CRM_Core_Transaction {
   }
 
   /**
-   * Add a transaction callback
+   * Add a transaction callback.
    *
    * Note: It's conceivable to add callbacks to the main/overall transaction
    * (aka $manager->getBaseFrame()) or to the innermost nested transaction
@@ -233,13 +237,18 @@ class CRM_Core_Transaction {
    *
    * Pre-condition: isActive()
    *
-   * @param $phase A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}
-   * @param $callback A PHP callback
-   * @param mixed $params Optional values to pass to callback.
+   * @param int $phase
+   *   A constant; one of: self::PHASE_{PRE,POST}_{COMMIT,ROLLBACK}.
+   * @param string $callback
+   *   A PHP callback.
+   * @param mixed $params
+   *   Optional values to pass to callback.
    *          See php manual call_user_func_array for details.
+   * @param int $id
    */
-  static public function addCallback($phase, $callback, $params = null, $id = NULL) {
+  static public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
     $frame->addCallback($phase, $callback, $params, $id);
   }
+
 }

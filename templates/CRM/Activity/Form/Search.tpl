@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,9 +35,8 @@
         {strip}
           <table class="form-layout">
             <tr>
-              <td class="font-size12pt" colspan="3">
+              <td class="font-size12pt" colspan="2">
                 {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}
-                &nbsp;&nbsp;&nbsp;{$form.buttons.html}
                 <div>
                   <div class="description font-italic">{ts}Complete OR Partial Name{/ts}
                     <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
@@ -46,12 +45,13 @@
                   </div>
                 </div>
               </td>
+              <td>{include file="CRM/common/formButtons.tpl" location="top"}</td>
             </tr>
 
             {include file="CRM/Activity/Form/Search/Common.tpl"}
 
             <tr>
-              <td colspan="3">{$form.buttons.html}</td>
+              <td colspan="3">{include file="CRM/common/formButtons.tpl" location="botton"}</td>
             </tr>
           </table>
         {/strip}

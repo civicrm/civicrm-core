@@ -113,6 +113,35 @@ function do_gencode() {
   popd > /dev/null
 }
 
+## usage: do_setupconf <civicrm-path>
+function do_setupconf() {
+  pushd "$1" >> /dev/null
+    echo "[[Initialize bin/setup.conf]]"
+    if [ ! -f "bin/setup.conf" ]; then
+      pwd
+      echo       cp "bin/setup.conf.txt" "bin/setup.conf"
+      cp "bin/setup.conf.txt" "bin/setup.conf"
+    fi
+    echo "[[chmod 600 bin/setup.conf]]"
+    chmod 600 bin/setup.conf
+    echo ""
+    echo "====================[ Next steps (for Civi v4.6+) ]===================="
+    echo "  * Edit the following file and fill in credentials for the CiviCRM DB."
+    echo "    $1/bin/setup.conf"
+    echo "  * Perform one of these steps:"
+    echo "    + Run 'bin/setup.sh -Dg' to download and generate missing code."
+    echo "    + Run 'bin/setup.sh' to download code and reset the CiviCRM DB"
+    echo "      with the latest schema."
+    echo "  * If this is a network-accessible server (eg staging/production), then"
+    echo "    setup.conf may present a security issue. The permissions have been"
+    echo "    preset to restrict access in most servers - but this may not work"
+    echo "    in all environments. Please:"
+    echo "    + Check whether the file is web-accessible."
+    echo "    + Optionally, change the permissions."
+    echo "    + Optionally, delete the file."
+  popd > /dev/null
+}
+
 ###########################################
 ## config_repo <repo-name> <local-path> <default-branch> <git-scripts-path>
 ##                  1            2              3               4
@@ -236,6 +265,8 @@ case "$CIVICRM_CMS" in
     config_repo civicrm-joomla     "$CIVICRM_ROOT/joomla"     "$CIVICRM_BRANCH"      "../../tools/scripts/git"
     config_repo civicrm-wordpress  "$CIVICRM_ROOT/WordPress"  "$CIVICRM_BRANCH"      "../../tools/scripts/git"
     ;;
+  none)
+    ;;
   *)
     echo "Unrecognized CMS: $CIVICRM_CMS"
 esac
@@ -244,6 +275,9 @@ if [ "$CIVICRM_L10N" == "--l10n" ]; then
   do_targzify "https://download.civicrm.org/civicrm-l10n-core/archives/civicrm-l10n-daily.tar.gz" "civicrm-l10n-daily.tar.gz" "$CIVICRM_ROOT/l10n"
 fi
 
-if [ -z "$SKIP_GENCODE" ]; then
+if [ -f "$CIVICRM_ROOT/composer.json" ]; then
+  ## Civi v4.6+
+  do_setupconf "$CIVICRM_ROOT"
+elif [ -z "$SKIP_GENCODE" ]; then
   do_gencode "$CIVICRM_ROOT"
 fi

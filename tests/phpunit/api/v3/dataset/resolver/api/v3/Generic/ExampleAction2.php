@@ -1,7 +1,9 @@
 <?php
 
 /**
- * @param $apiRequest
+ * Example result for API Test.
+ *
+ * @param array $apiRequest
  *
  * @return array
  */
@@ -13,4 +15,3 @@ function civicrm_api3_generic_example_action2($apiRequest) {
     $apiRequest['action']
   );
 }
-

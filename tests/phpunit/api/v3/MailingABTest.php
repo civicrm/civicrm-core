@@ -40,20 +40,10 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   protected $_entity = 'MailingAB';
   protected $_groupID;
 
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Mailer',
-      'description' => 'Test all Mailer methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
+    $this->createLoggedInUser();
     $this->_mailingID_A = $this->createMailing();
     $this->_mailingID_B = $this->createMailing();
     $this->_mailingID_C = $this->createMailing();
@@ -63,15 +53,15 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
       'mailing_id_a' => $this->_mailingID_A,
       'mailing_id_b' => $this->_mailingID_B,
       'mailing_id_c' => $this->_mailingID_C,
-      'testing_criteria_id' => 1,
-      'winner_criteria_id' => 1,
+      'testing_criteria' => 'subject',
+      'winner_criteria' => 'open',
       'declare_winning_time' => '+2 days',
       'group_percentage' => 10,
     );
   }
 
   /**
-   * Test civicrm_mailing_create
+   * Test civicrm_mailing_create.
    */
   public function testMailingABCreateSuccess() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -80,7 +70,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_mailing_delete
+   * Test civicrm_mailing_delete.
    */
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -106,6 +96,9 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * @return array
+   */
   public function groupPctProvider() {
     $cases = array(); // array(int $totalSize, int $groupPct, int $expectedCountA, $expectedCountB, $expectedCountC)
     $cases[] = array(400, 7, 28, 28, 344);
@@ -178,24 +171,30 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $this->assertEquals($expectedCountC, $countC, "check mailing recipients C in line " . __LINE__);
   }
 
+  /**
+   * @param $expectedA
+   * @param $expectedB
+   * @param $expectedC
+   */
   protected function assertJobCounts($expectedA, $expectedB, $expectedC) {
     $this->assertDBQuery($expectedA, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
-        1 => array(
-          $this->_mailingID_A,
-          'Integer'
-        )
-      ));
+      1 => array(
+        $this->_mailingID_A,
+        'Integer',
+      ),
+    ));
     $this->assertDBQuery($expectedB, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
-        1 => array(
-          $this->_mailingID_B,
-          'Integer'
-        )
-      ));
+      1 => array(
+        $this->_mailingID_B,
+        'Integer',
+      ),
+    ));
     $this->assertDBQuery($expectedC, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
-        1 => array(
-          $this->_mailingID_C,
-          'Integer'
-        )
-      ));
+      1 => array(
+        $this->_mailingID_C,
+        'Integer',
+      ),
+    ));
   }
+
 }

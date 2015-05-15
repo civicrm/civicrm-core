@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddMembership() {
+  public function testAddMembership() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -87,7 +87,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
   /**
    * @return array
    */
-  function addMembershipType() {
+  public function addMembershipType() {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';
     $this->webtestAddOrganization($membershipOrg, TRUE);
@@ -111,7 +111,7 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     // Membership fees
     $this->type('minimum_fee', '100');
-    $this->select( 'financial_type_id', "value={$memTypeParams['financial_type']}" );
+    $this->select('financial_type_id', "value={$memTypeParams['financial_type']}");
 
     // Duration for which the membership will be active
     $this->type('duration_interval', 1);
@@ -128,4 +128,5 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
 
     return $memTypeParams;
   }
+
 }

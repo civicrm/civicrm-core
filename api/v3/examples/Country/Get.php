@@ -1,56 +1,64 @@
 <?php
 /**
- * Test Generated example of using country get API
- * *
+ * Test Generated example demonstrating the Country.get API.
+ *
+ * @return array
+ *   API result array
  */
-function country_get_example(){
-$params = array(
-  'iso_code' => 'ML',
-);
+function country_get_example() {
+  $params = array(
+    'iso_code' => 'ZZ',
+  );
 
-try{
-  $result = civicrm_api3('country', 'get', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+  try{
+    $result = civicrm_api3('Country', 'get', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
 
-return $result;
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function country_get_expectedresult(){
+function country_get_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 1,
-  'values' => array(
-      '1' => array(
-          'id' => '1',
-          'name' => 'Made Up Land',
-          'iso_code' => 'ML',
-          'region_id' => '1',
-          'is_province_abbreviated' => 0,
-        ),
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 1254,
+    'values' => array(
+      '1254' => array(
+        'id' => '1254',
+        'name' => 'Made Up Land',
+        'iso_code' => 'ZZ',
+        'region_id' => '1',
+        'is_province_abbreviated' => 0,
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
 /*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testGet and can be found in
+* This example has been generated from the API test suite.
+* The test that created it is called "testGet"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CountryTest.php
 *
 * You can see the outcome of the API tests at
@@ -60,7 +68,7 @@ function country_get_expectedresult(){
 * http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
 * Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api/explorer
+* http://MYSITE.ORG/path/to/civicrm/api
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing

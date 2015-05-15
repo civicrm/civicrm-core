@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class introduces component to the system and provides all the
@@ -31,24 +31,25 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Report_Info extends CRM_Core_Component_Info {
 
-  // docs inherited from interface
+  /**
+   * @inheritDoc
+   */
   protected $keyword = 'report';
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * Provides base information about the component.
    * Needs to be implemented in component's information
    * class.
    *
-   * @return array collection of required component settings
-   * @access public
-   *
+   * @return array
+   *   collection of required component settings
    */
   /**
    * @return array
@@ -64,8 +65,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   }
 
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * Provides permissions that are used by component.
    * Needs to be implemented in component's information
    * class.
@@ -74,29 +75,50 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * implementation of $getAllUnconditionally is required.
    *
    * @param bool $getAllUnconditionally
-   *
-   * @return array|null collection of permissions, null if none
-   * @access public
-   */
-  /**
-   * @param bool $getAllUnconditionally
+   * @param bool $descriptions
+   *   Whether to return permission descriptions
    *
    * @return array|null
+   *   collection of permissions, null if none
    */
-  public function getPermissions($getAllUnconditionally = FALSE) {
-    return array('access CiviReport', 'access Report Criteria', 'administer reserved reports', 'administer Reports');
+  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+    $permissions = array(
+      'access CiviReport' => array(
+        ts('access CiviReport'),
+        ts('View reports'),
+      ),
+      'access Report Criteria' => array(
+        ts('access Report Criteria'),
+        ts('Change report search criteria'),
+      ),
+      'administer reserved reports' => array(
+        ts('administer reserved reports'),
+        ts('Edit all reports that have been marked as reserved'),
+      ),
+      'administer Reports' => array(
+        ts('administer Reports'),
+        ts('Manage report templates'),
+      ),
+    );
+
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
+
+    return $permissions;
   }
 
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * Provides information about user dashboard element
    * offered by this component.
    *
-   * @return array|null collection of required dashboard settings,
+   * @return array|null
+   *   collection of required dashboard settings,
    *                    null if no element offered
-   * @access public
-   *
    */
   /**
    * @return array|null
@@ -109,9 +131,8 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   /**
    * Provides component's user dashboard page object.
    *
-   * @return mixed component's User Dashboard applet object
-   * @access public
-   *
+   * @return mixed
+   *   component's User Dashboard applet object
    */
   /**
    * @return mixed
@@ -121,15 +142,14 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
     return NULL;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * Provides information about user dashboard element
    * offered by this component.
    *
-   * @return array|null collection of required dashboard settings,
+   * @return array|null
+   *   collection of required dashboard settings,
    *                    null if no element offered
-   * @access public
-   *
    */
   /**
    * @return array|null
@@ -139,15 +159,14 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
     return NULL;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * Provides information about advanced search pane
    * offered by this component.
    *
-   * @return array|null collection of required pane settings,
+   * @return array|null
+   *   collection of required pane settings,
    *                    null if no element offered
-   * @access public
-   *
    */
   /**
    * @return array|null
@@ -157,16 +176,15 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
     return NULL;
   }
 
-  // docs inherited from interface
   /**
+   * @inheritDoc
    * Provides potential activity types that this
    * component might want to register in activity history.
    * Needs to be implemented in component's information
    * class.
    *
-   * @return array|null collection of activity types
-   * @access public
-   *
+   * @return array|null
+   *   collection of activity types
    */
   /**
    * @return array|null
@@ -175,10 +193,11 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
     return NULL;
   }
 
-  // add shortcut to Create New
   /**
+   * add shortcut to Create New.
    * @param $shortCuts
    */
-  public function creatNewShortcut(&$shortCuts) {}
-}
+  public function creatNewShortcut(&$shortCuts) {
+  }
 
+}

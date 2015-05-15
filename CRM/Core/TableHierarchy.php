@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,13 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class representing the table relationships
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,7 +38,6 @@ class CRM_Core_TableHierarchy {
   /**
    * This array defines weights for table, which are used to sort array of table in from clause
    * @var array
-   * @static
    */
   static $info = array(
     'civicrm_contact' => '01',
@@ -58,7 +56,7 @@ class CRM_Core_TableHierarchy {
     'civicrm_entity_tag' => '22',
     'civicrm_note' => '23',
     'civicrm_contribution' => '24',
-    'civicrm_financial_type'    => '25',
+    'civicrm_financial_type' => '25',
     'civicrm_participant' => '26',
     'civicrm_event' => '27',
     'civicrm_worldregion' => '28',
@@ -81,11 +79,11 @@ class CRM_Core_TableHierarchy {
   /**
    * @return array
    */
-  static function &info() {
+  public static function &info() {
     //get the campaign related tables.
     CRM_Campaign_BAO_Query::info(self::$info);
 
     return self::$info;
   }
-}
 
+}

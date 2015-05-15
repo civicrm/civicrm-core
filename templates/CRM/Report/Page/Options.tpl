@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 </div>
 {if $action ne 1 and $action ne 2}
   <div class="action-link">
-    <a href="{$newReport}"  id="new"|cat:$GName class="button"><span>&raquo; {ts 1=$GName}Register New %1{/ts}</span></a>
+    <a href="{$newReport}"  id="new"|cat:$GName class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts 1=$GName}Register New %1{/ts}</span></a>
   </div>
   <div class="spacer"></div>
 {/if}
@@ -37,7 +37,6 @@
     {strip}
       {* handle enable/disable actions*}
       {include file="CRM/common/enableDisableApi.tpl"}
-      {include file="CRM/common/crmeditable.tpl"}
       <table id="options" class="row-highlight">
         <thead>
         <tr>
@@ -65,7 +64,7 @@
               <td class="crm-report-optionList-default_value">{$row.default_value}</td>
             {/if}
             <td class="crm-report-optionList-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td class="crm-report-optionList-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td class="crm-report-optionList-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-report-optionList-component_name">{$row.component_name}</td>
             <td class="crm-report-optionList-action">{$row.action}</td>
           </tr>
@@ -75,7 +74,7 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-        <a href="{$newReport}"  id="new"|cat:$GName class="button"><span>&raquo; {ts 1=$GName}Register New %1{/ts}</span></a>
+        <a href="{$newReport}"  id="new"|cat:$GName class="button"><span><div class="icon ui-icon-circle-plus"> {ts 1=$GName}Register New %1{/ts}</span></a>
       </div>
     {/if}
   </div>

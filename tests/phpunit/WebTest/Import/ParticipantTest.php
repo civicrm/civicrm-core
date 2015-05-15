@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 
@@ -38,7 +38,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test participant import for Individuals.
    */
-  function testParticipantImportIndividual() {
+  public function testParticipantImportIndividual() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -59,7 +59,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test participant import for Organizations.
    */
-  function testParticipantImportOrganization() {
+  public function testParticipantImportOrganization() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -80,7 +80,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   /**
    *  Test participant import for Households.
    */
-  function testParticipantImportHousehold() {
+  public function testParticipantImportHousehold() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
 
@@ -103,7 +103,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _participantIndividualCSVData() {
+  public function _participantIndividualCSVData() {
     $eventInfo = $this->_addNewEvent();
 
     $firstName1 = substr(sha1(rand()), 0, 7);
@@ -150,7 +150,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
    *
    * @return array
    */
-  function _participantHouseholdCSVData() {
+  public function _participantHouseholdCSVData() {
     $eventInfo = $this->_addNewEvent();
 
     $household1 = substr(sha1(rand()), 0, 7) . ' home';
@@ -194,7 +194,7 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
    * Helper function to provide data for participant import for Organization.
    * @return array
    */
-  function _participantOrganizationCSVData() {
+  public function _participantOrganizationCSVData() {
     $eventInfo = $this->_addNewEvent();
 
     $organization1 = substr(sha1(rand()), 0, 7) . ' org';
@@ -235,13 +235,15 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Helper function to add new event
+   * Helper function to add new event.
    *
-   * @param array $params parameters to create an event
+   * @param array $params
+   *   Parameters to create an event.
    *
-   * @return array $params event details of newly created event
+   * @return array
+   *   event details of newly created event
    */
-  function _addNewEvent($params = array()) {
+  public function _addNewEvent($params = array()) {
 
     if (empty($params)) {
 
@@ -257,8 +259,8 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
         'event_type_id' => 4,
         'payment_processor' => $processorName,
         'fee_level' => array(
-        'Member' => "250.00",
-        'Non-Member' => "325.00",
+          'Member' => "250.00",
+          'Non-Member' => "325.00",
         ),
       );
     }
@@ -335,5 +337,5 @@ class WebTest_Import_ParticipantTest extends ImportCiviSeleniumTestCase {
 
     return $params;
   }
-}
 
+}

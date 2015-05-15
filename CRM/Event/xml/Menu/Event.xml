@@ -90,7 +90,7 @@
   <item>
      <path>civicrm/admin/participant_status</path>
      <title>Participant Status</title>
-     <page_callback>CRM_Admin_Page_ParticipantStatus</page_callback>
+     <page_callback>CRM_Admin_Page_ParticipantStatusType</page_callback>
      <desc>Define statuses for event participants here (e.g. Registered, Attended, Cancelled...). You can then assign statuses and search for participants by status.</desc>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>

@@ -26,6 +26,8 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Payment\System;
+
 /**
  *  Include configuration
  */
@@ -68,28 +70,28 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   protected $_apiversion = API_LATEST_VERSION;
   /**
-   *  Database has been initialized
+   *  Database has been initialized.
    *
    * @var boolean
    */
   private static $dbInit = FALSE;
 
   /**
-   *  Database connection
+   *  Database connection.
    *
    * @var PHPUnit_Extensions_Database_DB_IDatabaseConnection
    */
   protected $_dbconn;
 
   /**
-   * The database name
+   * The database name.
    *
    * @var string
    */
   static protected $_dbName;
 
   /**
-   * Track tables we have modified during a test
+   * Track tables we have modified during a test.
    */
   protected $_tablesToTruncate = array();
 
@@ -136,7 +138,24 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   private $tx = NULL;
 
   /**
-   *  Constructor
+   * @var CRM_Utils_Hook_UnitTests hookClass
+   * example of setting a method for a hook
+   * $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+   */
+  public $hookClass = NULL;
+
+  /**
+   * @var array common values to be re-used multiple times within a class - usually to create the relevant entity
+   */
+  protected $_params = array();
+
+  /**
+   * @var CRM_Extension_System
+   */
+  protected $origExtensionSystem;
+
+  /**
+   *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
    *  need to show the same arguments as exist in the constructor of
@@ -145,11 +164,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *  ReflectionClass of the Test class and checks the constructor
    *  of that class to decide how to set up the test.
    *
-   * @param  string $name
-   * @param  array  $data
-   * @param  string $dataName
+   * @param string $name
+   * @param array $data
+   * @param string $dataName
    */
-  function __construct($name = NULL, array$data = array(), $dataName = '') {
+  public function __construct($name = NULL, array$data = array(), $dataName = '') {
     parent::__construct($name, $data, $dataName);
 
     // we need full error reporting
@@ -172,15 +191,24 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
     CRM_Core_ClassLoader::singleton()->register();
-    if (function_exists('_civix_phpunit_setUp')) { // FIXME: loosen coupling
+    if (function_exists('_civix_phpunit_setUp')) {
+      // FIXME: loosen coupling
       _civix_phpunit_setUp();
     }
   }
 
+  /**
+   * Override to run the test and assert its state.
+   * @return mixed
+   * @throws \Exception
+   * @throws \PHPUnit_Framework_IncompleteTest
+   * @throws \PHPUnit_Framework_SkippedTest
+   */
   protected function runTest() {
     try {
       return parent::runTest();
-    } catch (PEAR_Exception $e) {
+    }
+    catch (PEAR_Exception $e) {
       // PEAR_Exception has metadata in funny places, and PHPUnit won't log it nicely
       throw new Exception(\CRM_Core_Error::formatTextException($e), $e->getCode());
     }
@@ -189,20 +217,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * @return bool
    */
-  function requireDBReset() {
+  public function requireDBReset() {
     return $this->DBResetRequired;
   }
 
   /**
    * @return string
    */
-  static function getDBName() {
+  public static function getDBName() {
     $dbName = !empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
     return $dbName;
   }
 
   /**
-   *  Create database connection for this instance
+   *  Create database connection for this instance.
    *
    *  Initialize the test database if it hasn't been initialized
    *
@@ -224,7 +252,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   *  Required implementation of abstract method
+   *  Required implementation of abstract method.
    */
   protected function getDataSet() {
   }
@@ -232,7 +260,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * @param bool $perClass
    * @param null $object
-   * @return bool TRUE if the populate logic runs; FALSE if it is skipped
+   * @return bool
+   *   TRUE if the populate logic runs; FALSE if it is skipped
    */
   protected static function _populateDB($perClass = FALSE, &$object = NULL) {
 
@@ -330,7 +359,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
 
     CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
-      'CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'
+      'CiviEvent',
+      'CiviContribute',
+      'CiviMember',
+      'CiviMail',
+      'CiviReport',
+      'CiviPledge',
     ));
 
     return TRUE;
@@ -341,19 +375,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // also set this global hack
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array();
-
-    $env = new CRM_Utils_Check_Env();
-    CRM_Utils_Check::singleton()->assertValid($env->checkMysqlTime());
   }
 
   /**
-   *  Common setup functions for all unit tests
+   *  Common setup functions for all unit tests.
    */
   protected function setUp() {
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
 
-    CRM_Utils_Hook::singleton(TRUE);
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException(); // REVERT
     //  Use a temporary file for STDIN
     $GLOBALS['stdin'] = tmpfile();
@@ -377,7 +407,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // when running unit tests, use mockup user framework
     $config->setUserFramework('UnitTests');
-
+    $this->hookClass = CRM_Utils_Hook::singleton(TRUE);
     // also fix the fatal error handler to throw exceptions,
     // rather than exit
     $config->fatalErrorHandler = 'CiviUnitTestCase_fatalErrorHandler';
@@ -390,6 +420,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // reset all the caches
     CRM_Utils_System::flushCache();
+
+    // Make sure the DB connection is setup properly
+    $config->userSystem->setMySQLTimeZone();
+    $env = new CRM_Utils_Check_Env();
+    CRM_Utils_Check::singleton()->assertValid($env->checkMysqlTime());
 
     // clear permissions stub to not check permissions
     $config = CRM_Core_Config::singleton();
@@ -408,7 +443,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Read everything from the datasets directory and insert into the db
+   * Read everything from the datasets directory and insert into the db.
    */
   public function loadAllFixtures() {
     $fixturesDir = __DIR__ . '/../../fixtures';
@@ -435,7 +470,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Emulate a logged in user since certain functions use that
+   * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
    * CRM-8180
    */
@@ -461,7 +496,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create default domain contacts for the two domains added during test class
+   * Create default domain contacts for the two domains added during test class.
    * database population.
    */
   public function createDomainContacts() {
@@ -470,10 +505,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   *  Common teardown functions for all unit tests
+   *  Common teardown functions for all unit tests.
    */
   protected function tearDown() {
     error_reporting(E_ALL & ~E_NOTICE);
+    CRM_Utils_Hook::singleton()->reset();
+    $this->hookClass->reset();
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
 
@@ -483,7 +520,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
       CRM_Core_Transaction::forceRollbackIfEnabled();
       \Civi\Core\Transaction\Manager::singleton(TRUE);
-    } else {
+    }
+    else {
       CRM_Core_Transaction::forceRollbackIfEnabled();
       \Civi\Core\Transaction\Manager::singleton(TRUE);
 
@@ -500,7 +538,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    *  FIXME: Maybe a better way to do it
    */
-  function foreignKeyChecksOff() {
+  public function foreignKeyChecksOff() {
     self::$utils = new Utils($GLOBALS['mysql_host'],
       $GLOBALS['mysql_port'],
       $GLOBALS['mysql_user'],
@@ -516,12 +554,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return TRUE;
   }
 
-  function foreignKeyChecksOn() {
+  public function foreignKeyChecksOn() {
     // FIXME: might not be needed if previous fixme implemented
   }
 
   /**
-   * Generic function to compare expected values after an api call to retrieved
+   * Generic function to compare expected values after an api call to retrieved.
    * DB values.
    *
    * @daoName  string   DAO Name of object we're evaluating.
@@ -529,8 +567,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @match    array    Associative array of field name => expected value. Empty if asserting
    *                      that a DELETE occurred
    * @delete   boolean  True if we're checking that a DELETE action occurred.
+   * @param $daoName
+   * @param $id
+   * @param $match
+   * @param bool $delete
+   * @throws \PHPUnit_Framework_AssertionFailedError
    */
-  function assertDBState($daoName, $id, $match, $delete = FALSE) {
+  public function assertDBState($daoName, $id, $match, $delete = FALSE) {
     if (empty($id)) {
       // adding this here since developers forget to check for an id
       // and hence we get the first value in the db
@@ -551,7 +594,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // Otherwise check matches of DAO field values against expected values in $match.
     if ($object->find(TRUE)) {
-      $fields = & $object->fields();
+      $fields = &$object->fields();
       foreach ($fields as $name => $value) {
         $dbName = $value['name'];
         if (isset($match[$name])) {
@@ -574,8 +617,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
   }
 
-  // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -585,7 +628,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return null|string
    * @throws PHPUnit_Framework_AssertionFailedError
    */
-  function assertDBNotNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
+  public function assertDBNotNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     if (empty($searchValue)) {
       $this->fail("empty value passed to assertDBNotNull");
     }
@@ -595,45 +638,45 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     return $value;
   }
 
-  // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
    * @param $searchColumn
    * @param $message
    */
-  function assertDBNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
+  public function assertDBNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn, TRUE);
     $this->assertNull($value, $message);
   }
 
-  // Request a record from the DB by id. Success if row not found.
   /**
+   * Request a record from the DB by id. Success if row not found.
    * @param string $daoName
    * @param int $id
    * @param null $message
    */
-  function assertDBRowNotExist($daoName, $id, $message = NULL) {
+  public function assertDBRowNotExist($daoName, $id, $message = NULL) {
     $message = $message ? $message : "$daoName (#$id) should not exist";
     $value = CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id', TRUE);
     $this->assertNull($value, $message);
   }
 
-  // Request a record from the DB by id. Success if row not found.
   /**
+   * Request a record from the DB by id. Success if row not found.
    * @param string $daoName
    * @param int $id
    * @param null $message
    */
-  function assertDBRowExist($daoName, $id, $message = NULL) {
+  public function assertDBRowExist($daoName, $id, $message = NULL) {
     $message = $message ? $message : "$daoName (#$id) should exist";
     $value = CRM_Core_DAO::getFieldValue($daoName, $id, 'id', 'id', TRUE);
     $this->assertEquals($id, $value, $message);
   }
 
-  // Compare a single column value in a retrieved DB record to an expected value
   /**
+   * Compare a single column value in a retrieved DB record to an expected value.
    * @param string $daoName
    * @param $searchValue
    * @param $returnColumn
@@ -641,20 +684,21 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param $expectedValue
    * @param $message
    */
-  function assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
-                                $expectedValue, $message
+  public function assertDBCompareValue(
+    $daoName, $searchValue, $returnColumn, $searchColumn,
+    $expectedValue, $message
   ) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn, TRUE);
     $this->assertEquals($value, $expectedValue, $message);
   }
 
-  // Compare all values in a single retrieved DB record to an array of expected values
   /**
+   * Compare all values in a single retrieved DB record to an array of expected values.
    * @param string $daoName
    * @param array $searchParams
    * @param $expectedValues
    */
-  function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
+  public function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
     //get the values from db
     $dbValues = array();
     CRM_Core_DAO::commonRetrieve($daoName, $searchParams, $dbValues);
@@ -664,16 +708,22 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Assert that a SQL query returns a given value
+   * Assert that a SQL query returns a given value.
    *
    * The first argument is an expected value. The remaining arguments are passed
    * to CRM_Core_DAO::singleValueQuery
    *
    * Example: $this->assertSql(2, 'select count(*) from foo where foo.bar like "%1"',
    * array(1 => array("Whiz", "String")));
+   * @param $expected
+   * @param $query
+   * @param array $params
+   * @param string $message
    */
-  function assertDBQuery($expected, $query, $params = array(), $message = '') {
-    if ($message) $message .= ': ';
+  public function assertDBQuery($expected, $query, $params = array(), $message = '') {
+    if ($message) {
+      $message .= ': ';
+    }
     $actual = CRM_Core_DAO::singleValueQuery($query, $params);
     $this->assertEquals($expected, $actual,
       sprintf('%sexpected=[%s] actual=[%s] query=[%s]',
@@ -689,7 +739,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $expected
    * @param array $actual
    */
-  function assertTreeEquals($expected, $actual) {
+  public function assertTreeEquals($expected, $actual) {
     $e = array();
     $a = array();
     CRM_Utils_Array::flatten($expected, $e, '', ':::');
@@ -701,14 +751,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Assert that two numbers are approximately equal
+   * Assert that two numbers are approximately equal.
    *
    * @param int|float $expected
    * @param int|float $actual
    * @param int|float $tolerance
    * @param string $message
    */
-  function assertApproxEquals($expected, $actual, $tolerance, $message = NULL) {
+  public function assertApproxEquals($expected, $actual, $tolerance, $message = NULL) {
     if ($message === NULL) {
       $message = sprintf("approx-equals: expected=[%.3f] actual=[%.3f] tolerance=[%.3f]", $expected, $actual, $tolerance);
     }
@@ -716,16 +766,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Assert attributes are equal.
+   *
    * @param $expectedValues
    * @param $actualValues
-   * @param null $message
+   * @param string $message
    *
    * @throws PHPUnit_Framework_AssertionFailedError
    */
-  function assertAttributesEquals($expectedValues, $actualValues, $message = NULL) {
+  public function assertAttributesEquals($expectedValues, $actualValues, $message = NULL) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {
-        $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is " . print_r($paramValue, TRUE) . "  value 2 is " . print_r($actualValues[$paramName], TRUE) );
+        $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is " . print_r($paramValue, TRUE) . "  value 2 is " . print_r($actualValues[$paramName], TRUE));
       }
       else {
         $this->fail("Attribute '$paramName' not present in actual array.");
@@ -737,7 +789,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param $key
    * @param $list
    */
-  function assertArrayKeyExists($key, &$list) {
+  public function assertArrayKeyExists($key, &$list) {
     $result = isset($list[$key]) ? TRUE : FALSE;
     $this->assertTrue($result, ts("%1 element exists?",
       array(1 => $key)
@@ -748,7 +800,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param $key
    * @param $list
    */
-  function assertArrayValueNotNull($key, &$list) {
+  public function assertArrayValueNotNull($key, &$list) {
     $this->assertArrayKeyExists($key, $list);
 
     $value = isset($list[$key]) ? $list[$key] : NULL;
@@ -760,40 +812,43 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Check that api returned 'is_error' => 0
-   * else provide full message
-   * @param array $apiResult api result
-   * @param string $prefix extra test to add to message
+   * Check that api returned 'is_error' => 0.
+   *
+   * @param array $apiResult
+   *   Api result.
+   * @param string $prefix
+   *   Extra test to add to message.
    */
-  function assertAPISuccess($apiResult, $prefix = '') {
+  public function assertAPISuccess($apiResult, $prefix = '') {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
     $errorMessage = empty($apiResult['error_message']) ? '' : " " . $apiResult['error_message'];
 
-    if(!empty($apiResult['debug_information'])) {
+    if (!empty($apiResult['debug_information'])) {
       $errorMessage .= "\n " . print_r($apiResult['debug_information'], TRUE);
     }
-    if(!empty($apiResult['trace'])){
+    if (!empty($apiResult['trace'])) {
       $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
     }
     $this->assertEquals(0, $apiResult['is_error'], $prefix . $errorMessage);
   }
 
   /**
-   * Check that api returned 'is_error' => 1
-   * else provide full message
+   * Check that api returned 'is_error' => 1.
    *
-   * @param array $apiResult api result
-   * @param string $prefix extra test to add to message
+   * @param array $apiResult
+   *   Api result.
+   * @param string $prefix
+   *   Extra test to add to message.
    * @param null $expectedError
    */
-  function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
+  public function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
-    if($expectedError && !empty($apiResult['is_error'])){
-      $this->assertEquals($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix );
+    if ($expectedError && !empty($apiResult['is_error'])) {
+      $this->assertEquals($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix);
     }
     $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
     $this->assertNotEmpty($apiResult['error_message']);
@@ -804,14 +859,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param $actual
    * @param string $message
    */
-  function assertType($expected, $actual, $message = '') {
+  public function assertType($expected, $actual, $message = '') {
     return $this->assertInternalType($expected, $actual, $message);
   }
 
   /**
-   * Check that a deleted item has been deleted
+   * Check that a deleted item has been deleted.
+   *
+   * @param $entity
+   * @param $id
    */
-  function assertAPIDeleted($entity, $id) {
+  public function assertAPIDeleted($entity, $id) {
     $this->callAPISuccess($entity, 'getcount', array('id' => $id), 0);
   }
 
@@ -822,15 +880,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $result
    * @param $expected
    * @param array $valuesToExclude
-   * @param string $prefix extra test to add to message
+   * @param string $prefix
+   *   Extra test to add to message.
    */
-  function assertAPIArrayComparison($result, $expected, $valuesToExclude = array(), $prefix = '') {
+  public function assertAPIArrayComparison($result, $expected, $valuesToExclude = array(), $prefix = '') {
     $valuesToExclude = array_merge($valuesToExclude, array('debug', 'xdebug', 'sequential'));
     foreach ($valuesToExclude as $value) {
-      if(isset($result[$value])) {
+      if (isset($result[$value])) {
         unset($result[$value]);
       }
-      if(isset($expected[$value])) {
+      if (isset($expected[$value])) {
         unset($expected[$value]);
       }
     }
@@ -845,25 +904,26 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @return array|int
    */
-  function civicrm_api($entity, $action, $params) {
+  public function civicrm_api($entity, $action, $params) {
     return civicrm_api($entity, $action, $params);
   }
 
   /**
-   * This function exists to wrap api functions
+   * wrap api functions.
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    *
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param mixed $checkAgainst optional value to check result against, implemented for getvalue,
+   * @param mixed $checkAgainst
+   *   Optional value to check result against, implemented for getvalue,.
    *   getcount, getsingle. Note that for getvalue the type is checked rather than the value
    *   for getsingle the array is compared against an array passed in - the id is not compared (for
    *   better or worse )
    *
    * @return array|int
    */
-  function callAPISuccess($entity, $action, $params, $checkAgainst = NULL) {
+  public function callAPISuccess($entity, $action, $params, $checkAgainst = NULL) {
     $params = array_merge(array(
         'version' => $this->_apiversion,
         'debug' => 1,
@@ -871,12 +931,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       $params
     );
     switch (strtolower($action)) {
-      case 'getvalue' :
+      case 'getvalue':
         return $this->callAPISuccessGetValue($entity, $params, $checkAgainst);
-      case 'getsingle' :
+
+      case 'getsingle':
         return $this->callAPISuccessGetSingle($entity, $params, $checkAgainst);
-      case 'getcount' :
-          return $this->callAPISuccessGetCount($entity, $params, $checkAgainst);
+
+      case 'getcount':
+        return $this->callAPISuccessGetCount($entity, $params, $checkAgainst);
     }
     $result = $this->civicrm_api($entity, $action, $params);
     $this->assertAPISuccess($result, "Failure in api call for $entity $action");
@@ -890,29 +952,30 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param string $entity
    * @param array $params
-   * @param string $type - per http://php.net/manual/en/function.gettype.php possible types
-   * - boolean
-   * - integer
-   * - double
-   * - string
-   * - array
-   * - object
+   * @param string $type
+   *   Per http://php.net/manual/en/function.gettype.php possible types.
+   *   - boolean
+   *   - integer
+   *   - double
+   *   - string
+   *   - array
+   *   - object
    *
    * @return array|int
    */
-  function callAPISuccessGetValue($entity, $params, $type = NULL) {
+  public function callAPISuccessGetValue($entity, $params, $type = NULL) {
     $params += array(
       'version' => $this->_apiversion,
       'debug' => 1,
     );
     $result = $this->civicrm_api($entity, 'getvalue', $params);
-    if($type){
-      if($type == 'integer'){
+    if ($type) {
+      if ($type == 'integer') {
         // api seems to return integers as strings
         $this->assertTrue(is_numeric($result), "expected a numeric value but got " . print_r($result, 1));
       }
-      else{
-        $this->assertType($type, $result, "returned result should have been of type $type but was " );
+      else {
+        $this->assertType($type, $result, "returned result should have been of type $type but was ");
       }
     }
     return $result;
@@ -924,27 +987,28 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param string $entity
    * @param array $params
-   * @param array $checkAgainst - array to compare result against
-   * - boolean
-   * - integer
-   * - double
-   * - string
-   * - array
-   * - object
+   * @param array $checkAgainst
+   *   Array to compare result against.
+   *   - boolean
+   *   - integer
+   *   - double
+   *   - string
+   *   - array
+   *   - object
    *
    * @throws Exception
    * @return array|int
    */
-  function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
+  public function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
     $params += array(
       'version' => $this->_apiversion,
       'debug' => 1,
     );
     $result = $this->civicrm_api($entity, 'getsingle', $params);
-    if(!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
+    if (!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
       throw new Exception('Invalid getsingle result' . print_r($result, TRUE));
     }
-    if($checkAgainst){
+    if ($checkAgainst) {
       // @todo - have gone with the fn that unsets id? should we check id?
       $this->checkArrayEquals($result, $checkAgainst);
     }
@@ -960,61 +1024,57 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param null $count
    * @throws Exception
    * @return array|int
-   * @internal param string $type - per http://php.net/manual/en/function.gettype.php possible types
-   * - boolean
-   * - integer
-   * - double
-   * - string
-   * - array
-   * - object
    */
-  function callAPISuccessGetCount($entity, $params, $count = NULL) {
+  public function callAPISuccessGetCount($entity, $params, $count = NULL) {
     $params += array(
       'version' => $this->_apiversion,
       'debug' => 1,
     );
     $result = $this->civicrm_api($entity, 'getcount', $params);
-    if(!is_integer($result) || !empty($result['is_error']) || isset($result['values'])) {
+    if (!is_int($result) || !empty($result['is_error']) || isset($result['values'])) {
       throw new Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
     }
-    if(is_int($count)){
+    if (is_int($count)) {
       $this->assertEquals($count, $result, "incorrect count returned from $entity getcount");
     }
     return $result;
   }
 
   /**
-   * This function exists to wrap api functions
+   * This function exists to wrap api functions.
    * so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
    *
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param string $function - pass this in to create a generated example
-   * @param string $file - pass this in to create a generated example
+   * @param string $function
+   *   Pass this in to create a generated example.
+   * @param string $file
+   *   Pass this in to create a generated example.
    * @param string $description
-   * @param string|null $subfile
-   * @param string|null $actionName
+   * @param string|null $exampleName
+   *
    * @return array|int
    */
-  function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
+  public function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $exampleName = NULL) {
     $params['version'] = $this->_apiversion;
     $result = $this->callAPISuccess($entity, $action, $params);
-    $this->documentMe($params, $result, $function, $file, $description, $subfile, $actionName);
+    $this->documentMe($entity, $action, $params, $result, $function, $file, $description, $exampleName);
     return $result;
   }
 
   /**
-   * This function exists to wrap api functions
+   * This function exists to wrap api functions.
    * so we can ensure they fail where expected & throw exceptions without litterering the test with checks
    * @param string $entity
    * @param string $action
    * @param array $params
-   * @param string $expectedErrorMessage error
+   * @param string $expectedErrorMessage
+   *   Error.
    * @param null $extraOutput
    * @return array|int
    */
-  function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
+  public function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
     if (is_array($params)) {
       $params += array(
         'version' => $this->_apiversion,
@@ -1031,21 +1091,25 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * so the distinction between set
    * up & tested functions is clearer
    *
-   *  @return array api Result
+   * @return array
+   *   api Result
    */
-  public function createTestEntity(){
+  public function createTestEntity() {
     return $entity = $this->callAPISuccess($this->entity, 'create', $this->params);
   }
 
   /**
    * Generic function to create Organisation, to be used in test cases
    *
-   * @param array   parameters for civicrm_contact_add api function call
-   * @param int     sequence number if creating multiple organizations
+   * @param array $params
+   *   parameters for civicrm_contact_add api function call
+   * @param int $seq
+   *   sequence number if creating multiple organizations
    *
-   * @return int    id of Organisation created
+   * @return int
+   *   id of Organisation created
    */
-  function organizationCreate($params = array(), $seq = 0) {
+  public function organizationCreate($params = array(), $seq = 0) {
     if (!$params) {
       $params = array();
     }
@@ -1056,12 +1120,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Generic function to create Individual, to be used in test cases
    *
-   * @param array   parameters for civicrm_contact_add api function call
-   * @param int     sequence number if creating multiple individuals
+   * @param array $params
+   *   parameters for civicrm_contact_add api function call
+   * @param int $seq
+   *   sequence number if creating multiple individuals
    *
-   * @return int    id of Individual created
+   * @return int
+   *   id of Individual created
    */
-  function individualCreate($params = array(), $seq = 0) {
+  public function individualCreate($params = array(), $seq = 0) {
     $params = array_merge($this->sampleContact('Individual', $seq), $params);
     return $this->_contactCreate($params);
   }
@@ -1069,25 +1136,31 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Generic function to create Household, to be used in test cases
    *
-   * @param array   parameters for civicrm_contact_add api function call
-   * @param int     sequence number if creating multiple households
+   * @param array $params
+   *   parameters for civicrm_contact_add api function call
+   * @param int $seq
+   *   sequence number if creating multiple households
    *
-   * @return int    id of Household created
+   * @return int
+   *   id of Household created
    */
-  function householdCreate($params = array(), $seq = 0) {
+  public function householdCreate($params = array(), $seq = 0) {
     $params = array_merge($this->sampleContact('Household', $seq), $params);
     return $this->_contactCreate($params);
   }
 
   /**
-   * Helper function for getting sample contact properties
+   * Helper function for getting sample contact properties.
    *
-   * @param enum     contact type: Individual, Organization
-   * @param int      sequence number for the values of this type
+   * @param string $contact_type
+   *   enum contact type: Individual, Organization
+   * @param int $seq
+   *   sequence number for the values of this type
    *
-   * @return array   properties of sample contact (ie. $params for API call)
+   * @return array
+   *   properties of sample contact (ie. $params for API call)
    */
-  function sampleContact($contact_type, $seq = 0) {
+  public function sampleContact($contact_type, $seq = 0) {
     $samples = array(
       'Individual' => array(
         // The number of values in each list need to be coprime numbers to not have duplicates
@@ -1096,7 +1169,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'last_name' => array('Anderson', 'Miller', 'Smith', 'Collins', 'Peterson'),
       ),
       'Organization' => array(
-        'organization_name' => array('Unit Test Organization', 'Acme', 'Roberts and Sons', 'Cryo Space Labs', 'Sharper Pens'),
+        'organization_name' => array(
+          'Unit Test Organization',
+          'Acme',
+          'Roberts and Sons',
+          'Cryo Space Labs',
+          'Sharper Pens',
+        ),
       ),
       'Household' => array(
         'household_name' => array('Unit Test household'),
@@ -1104,26 +1183,28 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
     $params = array('contact_type' => $contact_type);
     foreach ($samples[$contact_type] as $key => $values) {
-      $params[$key] = $values[$seq % sizeof($values)];
+      $params[$key] = $values[$seq % count($values)];
     }
-    if ($contact_type == 'Individual' ) {
-        $params['email'] = strtolower(
-          $params['first_name'] . '_' . $params['last_name'] . '@civicrm.org'
-        );
-        $params['prefix_id'] = 3;
-        $params['suffix_id'] = 3;
+    if ($contact_type == 'Individual') {
+      $params['email'] = strtolower(
+        $params['first_name'] . '_' . $params['last_name'] . '@civicrm.org'
+      );
+      $params['prefix_id'] = 3;
+      $params['suffix_id'] = 3;
     }
     return $params;
   }
 
   /**
-   * Private helper function for calling civicrm_contact_add
+   * Private helper function for calling civicrm_contact_add.
    *
-   * @param array $params for civicrm_contact_add api function call
+   * @param array $params
+   *   For civicrm_contact_add api function call.
    *
    * @throws Exception
    *
-   * @return int    id of Household created
+   * @return int
+   *   id of Household created
    */
   private function _contactCreate($params) {
     $result = $this->callAPISuccess('contact', 'create', $params);
@@ -1134,25 +1215,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * @param int $contactID
+   * Delete contact, ensuring it is not the domain contact
    *
-   * @return array|int
+   * @param int $contactID
+   *   Contact ID to delete
    */
-  function contactDelete($contactID) {
-    $params = array(
-      'id' => $contactID,
-      'skip_undelete' => 1,
-      'debug' => 1,
-    );
-    $domain = new CRM_Core_BAO_Domain;
+  public function contactDelete($contactID) {
+    $domain = new CRM_Core_BAO_Domain();
     $domain->contact_id = $contactID;
-    if ($domain->find(TRUE)) {
-      // we are finding tests trying to delete the domain contact in cleanup
-      //since this is mainly for cleanup lets put a safeguard here
-      return;
+    if (!$domain->find(TRUE)) {
+      $this->callAPISuccess('contact', 'delete', array(
+        'id' => $contactID,
+        'skip_undelete' => 1,
+      ));
     }
-    $result = $this->callAPISuccess('contact', 'delete', $params);
-    return  $result;
   }
 
   /**
@@ -1160,8 +1236,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @throws Exception
    */
-  function contactTypeDelete($contactTypeId) {
-    require_once 'CRM/Contact/BAO/ContactType.php';
+  public function contactTypeDelete($contactTypeId) {
     $result = CRM_Contact_BAO_ContactType::del($contactTypeId);
     if (!$result) {
       throw new Exception('Could not delete contact type');
@@ -1173,7 +1248,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return mixed
    */
-  function membershipTypeCreate($params = array()) {
+  public function membershipTypeCreate($params = array()) {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
     $memberOfOrganization = $this->organizationCreate();
@@ -1203,7 +1278,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return mixed
    */
-  function contactMembershipCreate($params) {
+  public function contactMembershipCreate($params) {
     $pre = array(
       'join_date' => '2007-01-21',
       'start_date' => '2007-01-21',
@@ -1222,21 +1297,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Membership Type
+   * Delete Membership Type.
    *
    * @param array $params
    */
-  function membershipTypeDelete($params) {
+  public function membershipTypeDelete($params) {
     $this->callAPISuccess('MembershipType', 'Delete', $params);
   }
 
   /**
    * @param int $membershipID
    */
-  function membershipDelete($membershipID) {
+  public function membershipDelete($membershipID) {
     $deleteParams = array('id' => $membershipID);
     $result = $this->callAPISuccess('Membership', 'Delete', $deleteParams);
-    return;
   }
 
   /**
@@ -1244,7 +1318,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return mixed
    */
-  function membershipStatusCreate($name = 'test member status') {
+  public function membershipStatusCreate($name = 'test member status') {
     $params['name'] = $name;
     $params['start_event'] = 'start_date';
     $params['end_event'] = 'end_date';
@@ -1259,12 +1333,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * @param int $membershipStatusID
    */
-  function membershipStatusDelete($membershipStatusID) {
+  public function membershipStatusDelete($membershipStatusID) {
     if (!$membershipStatusID) {
       return;
     }
     $result = $this->callAPISuccess('MembershipStatus', 'Delete', array('id' => $membershipStatusID));
-    return;
   }
 
   /**
@@ -1272,7 +1345,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return mixed
    */
-  function relationshipTypeCreate($params = array()) {
+  public function relationshipTypeCreate($params = array()) {
     $params = array_merge(array(
         'name_a_b' => 'Relation 1 for relationship type create',
         'name_b_a' => 'Relation 2 for relationship type create',
@@ -1281,7 +1354,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'is_reserved' => 1,
         'is_active' => 1,
       ),
-       $params
+      $params
     );
 
     $result = $this->callAPISuccess('relationship_type', 'create', $params);
@@ -1291,11 +1364,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Relatinship Type
+   * Delete Relatinship Type.
    *
    * @param int $relationshipTypeID
    */
-  function relationshipTypeDelete($relationshipTypeID) {
+  public function relationshipTypeDelete($relationshipTypeID) {
     $params['id'] = $relationshipTypeID;
     $this->callAPISuccess('relationship_type', 'delete', $params);
   }
@@ -1305,7 +1378,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return mixed
    */
-  function paymentProcessorTypeCreate($params = NULL) {
+  public function paymentProcessorTypeCreate($params = NULL) {
     if (is_null($params)) {
       $params = array(
         'name' => 'API_Test_PP',
@@ -1325,17 +1398,19 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Participant
+   * Create Participant.
    *
-   * @param array $params  array of contact id and event id values
+   * @param array $params
+   *   Array of contact id and event id values.
    *
-   * @return int $id of participant created
+   * @return int
+   *   $id of participant created
    */
-  function participantCreate($params) {
-    if(empty($params['contact_id'])){
+  public function participantCreate($params) {
+    if (empty($params['contact_id'])) {
       $params['contact_id'] = $this->individualCreate();
     }
-    if(empty($params['event_id'])){
+    if (empty($params['event_id'])) {
       $event = $this->eventCreate();
       $params['event_id'] = $event['id'];
     }
@@ -1354,11 +1429,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Payment Processor
+   * Create Payment Processor.
    *
-   * @return object of Payment Processsor
+   * @return CRM_Financial_DAO_PaymentProcessor
+   *   instance of Payment Processsor
    */
-  function processorCreate() {
+  public function processorCreate() {
     $processorParams = array(
       'domain_id' => 1,
       'name' => 'Dummy',
@@ -1375,12 +1451,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create contribution page
+   * Create contribution page.
    *
    * @param array $params
-   * @return object of contribution page
+   * @return array
+   *   Array of contribution page
    */
-  function contributionPageCreate($params) {
+  public function contributionPageCreate($params) {
     $this->_pageParams = array(
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
@@ -1397,28 +1474,32 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Tag
+   * Create Tag.
    *
    * @param array $params
-   * @return array result of created tag
+   * @return array
+   *   result of created tag
    */
-  function tagCreate($params = array()) {
+  public function tagCreate($params = array()) {
     $defaults = array(
       'name' => 'New Tag3',
       'description' => 'This is description for Our New Tag ',
       'domain_id' => '1',
     );
     $params = array_merge($defaults, $params);
-    $result =  $this->callAPISuccess('Tag', 'create', $params);
+    $result = $this->callAPISuccess('Tag', 'create', $params);
     return $result['values'][$result['id']];
   }
 
   /**
-   * Delete Tag
+   * Delete Tag.
    *
-   * @param  int $tagId   id of the tag to be deleted
+   * @param int $tagId
+   *   Id of the tag to be deleted.
+   *
+   * @return int
    */
-  function tagDelete($tagId) {
+  public function tagDelete($tagId) {
     require_once 'api/api.php';
     $params = array(
       'tag_id' => $tagId,
@@ -1430,23 +1511,25 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Add entity(s) to the tag
    *
-   * @param  array $params
+   * @param array $params
    *
    * @return bool
    */
-  function entityTagAdd($params) {
+  public function entityTagAdd($params) {
     $result = $this->callAPISuccess('entity_tag', 'create', $params);
     return TRUE;
   }
 
   /**
-   * Create contribution
+   * Create contribution.
    *
-   * @param int $cID contact_id
+   * @param int $cID
+   *   Contact_id.
    *
-   * @return int id of created contribution
+   * @return int
+   *   id of created contribution
    */
-  function pledgeCreate($cID) {
+  public function pledgeCreate($cID) {
     $params = array(
       'contact_id' => $cID,
       'pledge_create_date' => date('Ymd'),
@@ -1467,11 +1550,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete contribution
+   * Delete contribution.
    *
    * @param int $pledgeId
    */
-  function pledgeDelete($pledgeId) {
+  public function pledgeDelete($pledgeId) {
     $params = array(
       'pledge_id' => $pledgeId,
     );
@@ -1479,18 +1562,21 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create contribution
+   * Create contribution.
    *
-   * @param int $cID contact_id
-   * @param int $cTypeID id of financial type
-   *
+   * @param int $cID
+   *   Contact_id.
+   * @param int $cTypeID
+   *   Id of financial type.
    * @param int $invoiceID
    * @param int $trxnID
    * @param int $paymentInstrumentID
    * @param bool $isFee
-   * @return int id of created contribution
+   *
+   * @return int
+   *   id of created contribution
    */
-  function contributionCreate($cID, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID = 1, $isFee = TRUE) {
+  public function contributionCreate($cID, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID = 1, $isFee = TRUE) {
     $params = array(
       'domain_id' => 1,
       'contact_id' => $cID,
@@ -1516,16 +1602,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create online contribution
+   * Create online contribution.
    *
    * @param array $params
-   * @param int $financialType id of financial type
-   *
+   * @param int $financialType
+   *   Id of financial type.
    * @param int $invoiceID
    * @param int $trxnID
-   * @return int id of created contribution
+   *
+   * @return int
+   *   id of created contribution
    */
-  function onlineContributionCreate($params, $financialType, $invoiceID = 67890, $trxnID = 12345) {
+  public function onlineContributionCreate($params, $financialType, $invoiceID = 67890, $trxnID = 12345) {
     $contribParams = array(
       'contact_id' => $params['contact_id'],
       'receive_date' => date('Ymd'),
@@ -1543,13 +1631,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete contribution
+   * Delete contribution.
    *
    * @param int $contributionId
    *
    * @return array|int
    */
-  function contributionDelete($contributionId) {
+  public function contributionDelete($contributionId) {
     $params = array(
       'contribution_id' => $contributionId,
     );
@@ -1558,13 +1646,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create an Event
+   * Create an Event.
    *
-   * @param array $params  name-value pair for an event
+   * @param array $params
+   *   Name-value pair for an event.
    *
-   * @return array $event
+   * @return array
    */
-  function eventCreate($params = array()) {
+  public function eventCreate($params = array()) {
     // if no contact was passed, make up a dummy event creator
     if (!isset($params['contact_id'])) {
       $params['contact_id'] = $this->_contactCreate(array(
@@ -1597,13 +1686,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete event
+   * Delete event.
    *
-   * @param int $id ID of the event
+   * @param int $id
+   *   ID of the event.
    *
    * @return array|int
    */
-  function eventDelete($id) {
+  public function eventDelete($id) {
     $params = array(
       'event_id' => $id,
     );
@@ -1611,13 +1701,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete participant
+   * Delete participant.
    *
    * @param int $participantID
    *
    * @return array|int
    */
-  function participantDelete($participantID) {
+  public function participantDelete($participantID) {
     $params = array(
       'id' => $participantID,
     );
@@ -1625,13 +1715,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create participant payment
+   * Create participant payment.
    *
    * @param int $participantID
    * @param int $contributionID
-   * @return int $id of created payment
+   * @return int
+   *   $id of created payment
    */
-  function participantPaymentCreate($participantID, $contributionID = NULL) {
+  public function participantPaymentCreate($participantID, $contributionID = NULL) {
     //Create Participant Payment record With Values
     $params = array(
       'participant_id' => $participantID,
@@ -1643,11 +1734,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete participant payment
+   * Delete participant payment.
    *
    * @param int $paymentID
    */
-  function participantPaymentDelete($paymentID) {
+  public function participantPaymentDelete($paymentID) {
     $params = array(
       'id' => $paymentID,
     );
@@ -1655,12 +1746,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Add a Location
+   * Add a Location.
    *
    * @param int $contactID
-   * @return int location id of created location
+   * @return int
+   *   location id of created location
    */
-  function locationAdd($contactID) {
+  public function locationAdd($contactID) {
     $address = array(
       1 => array(
         'location_type' => 'New Location Type',
@@ -1671,7 +1763,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'state_province' => 'Michigan',
         'supplemental_address_1' => 'Hallmark Ct',
         'supplemental_address_2' => 'Jersey Village',
-      )
+      ),
     );
 
     $params = array(
@@ -1686,21 +1778,23 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Locations of contact
+   * Delete Locations of contact.
    *
-   * @param array $params parameters
+   * @param array $params
+   *   Parameters.
    */
-  function locationDelete($params) {
+  public function locationDelete($params) {
     $this->callAPISuccess('Location', 'delete', $params);
   }
 
   /**
-   * Add a Location Type
+   * Add a Location Type.
    *
    * @param array $params
-   * @return int location id of created location
+   * @return CRM_Core_DAO_LocationType
+   *   location id of created location
    */
-  function locationTypeCreate($params = NULL) {
+  public function locationTypeCreate($params = NULL) {
     if ($params === NULL) {
       $params = array(
         'name' => 'New Location Type',
@@ -1720,52 +1814,55 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete a Location Type
+   * Delete a Location Type.
    *
-   * @param int location type id
+   * @param int $locationTypeId
    */
-  function locationTypeDelete($locationTypeId) {
+  public function locationTypeDelete($locationTypeId) {
     $locationType = new CRM_Core_DAO_LocationType();
     $locationType->id = $locationTypeId;
     $locationType->delete();
   }
 
   /**
-   * Add a Group
+   * Add a Group.
    *
    * @param array $params
-   * @return int groupId of created group
+   * @return int
+   *   groupId of created group
    */
-  function groupCreate($params = array()) {
+  public function groupCreate($params = array()) {
     $params = array_merge(array(
-        'name' => 'Test Group 1',
-        'domain_id' => 1,
-        'title' => 'New Test Group Created',
-        'description' => 'New Test Group Created',
-        'is_active' => 1,
-        'visibility' => 'Public Pages',
-        'group_type' => array(
-          '1' => 1,
-          '2' => 1,
-        ),
-      ), $params);
+      'name' => 'Test Group 1',
+      'domain_id' => 1,
+      'title' => 'New Test Group Created',
+      'description' => 'New Test Group Created',
+      'is_active' => 1,
+      'visibility' => 'Public Pages',
+      'group_type' => array(
+        '1' => 1,
+        '2' => 1,
+      ),
+    ), $params);
 
     $result = $this->callAPISuccess('Group', 'create', $params);
     return $result['id'];
   }
 
 
- /**
-   * Function to add a Group
+  /**
+   * Function to add a Group.
    *
    * @params array to add group
    *
-   * @param array $params
-   * @return int groupId of created group
+   * @param int $groupID
+   * @param int $totalCount
+   * @return int
+   *    groupId of created group
    */
-  function groupContactCreate($groupID, $totalCount = 10) {
+  public function groupContactCreate($groupID, $totalCount = 10) {
     $params = array('group_id' => $groupID);
-    for ($i=1; $i <= $totalCount; $i++) {
+    for ($i = 1; $i <= $totalCount; $i++) {
       $contactID = $this->individualCreate();
       if ($i == 1) {
         $params += array('contact_id' => $contactID);
@@ -1780,11 +1877,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete a Group
+   * Delete a Group.
    *
    * @param int $gid
    */
-  function groupDelete($gid) {
+  public function groupDelete($gid) {
 
     $params = array(
       'id' => $gid,
@@ -1794,10 +1891,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create a UFField
+   * Create a UFField.
    * @param array $params
    */
-  function uFFieldCreate($params = array()) {
+  public function uFFieldCreate($params = array()) {
     $params = array_merge(array(
       'uf_group_id' => 1,
       'field_name' => 'first_name',
@@ -1813,12 +1910,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Add a UF Join Entry
+   * Add a UF Join Entry.
    *
    * @param array $params
-   * @return int $id of created UF Join
+   * @return int
+   *   $id of created UF Join
    */
-  function ufjoinCreate($params = NULL) {
+  public function ufjoinCreate($params = NULL) {
     if ($params === NULL) {
       $params = array(
         'is_active' => 1,
@@ -1834,11 +1932,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete a UF Join Entry
+   * Delete a UF Join Entry.
    *
-   * @param array with missing uf_group_id
+   * @param array $params
+   *   with missing uf_group_id
    */
-  function ufjoinDelete($params = NULL) {
+  public function ufjoinDelete($params = NULL) {
     if ($params === NULL) {
       $params = array(
         'is_active' => 1,
@@ -1854,11 +1953,27 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Group for a contact
+   * @param array $params
+   *   Optional parameters.
+   *
+   * @return int
+   *   Campaign ID.
+   */
+  public function campaignCreate($params = array()) {
+    $this->enableCiviCampaign();
+    $campaign = $this->callAPISuccess('campaign', 'create', array_merge(array(
+      'name' => 'big_campaign',
+      'title' => 'Campaign',
+    ), $params));
+    return $campaign['id'];
+  }
+
+  /**
+   * Create Group for a contact.
    *
    * @param int $contactId
    */
-  function contactGroupCreate($contactId) {
+  public function contactGroupCreate($contactId) {
     $params = array(
       'contact_id.1' => $contactId,
       'group_id' => 1,
@@ -1868,11 +1983,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete Group for a contact
+   * Delete Group for a contact.
    *
    * @param int $contactId
    */
-  function contactGroupDelete($contactId) {
+  public function contactGroupDelete($contactId) {
     $params = array(
       'contact_id.1' => $contactId,
       'group_id' => 1,
@@ -1881,12 +1996,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create Activity
+   * Create Activity.
    *
    * @param array $params
    * @return array|int
    */
-  function activityCreate($params = NULL) {
+  public function activityCreate($params = NULL) {
 
     if ($params === NULL) {
       $individualSourceID = $this->individualCreate();
@@ -1924,33 +2039,35 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create an activity type
+   * Create an activity type.
    *
-   * @param array $params parameters
+   * @param array $params
+   *   Parameters.
+   * @return array
    */
-  function activityTypeCreate($params) {
-    $result = $this->callAPISuccess('ActivityType', 'create', $params);
-    return $result;
+  public function activityTypeCreate($params) {
+    return $this->callAPISuccess('ActivityType', 'create', $params);
   }
 
   /**
-   * Delete activity type
+   * Delete activity type.
    *
-   * @param int $activityTypeId id of the activity type
+   * @param int $activityTypeId
+   *   Id of the activity type.
+   * @return array
    */
-  function activityTypeDelete($activityTypeId) {
+  public function activityTypeDelete($activityTypeId) {
     $params['activity_type_id'] = $activityTypeId;
-    $result = $this->callAPISuccess('ActivityType', 'delete', $params);
-    return $result;
+    return $this->callAPISuccess('ActivityType', 'delete', $params);
   }
 
   /**
-   * Create custom group
+   * Create custom group.
    *
    * @param array $params
    * @return array|int
    */
-  function customGroupCreate($params = array()) {
+  public function customGroupCreate($params = array()) {
     $defaults = array(
       'title' => 'new custom group',
       'extends' => 'Contact',
@@ -1962,11 +2079,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array_merge($defaults, $params);
 
     if (strlen($params['title']) > 13) {
-      $params['title'] =  substr($params['title'], 0, 13);
+      $params['title'] = substr($params['title'], 0, 13);
     }
 
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
-    $this->callAPISuccess('custom_group', 'get', array('title' => $params['title'], array('api.custom_group.delete' => 1)));
+    $this->callAPISuccess('custom_group', 'get', array(
+      'title' => $params['title'],
+      array('api.custom_group.delete' => 1),
+    ));
 
     return $this->callAPISuccess('custom_group', 'create', $params);
   }
@@ -1974,8 +2094,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Existing function doesn't allow params to be over-ridden so need a new one
    * this one allows you to only pass in the params you want to change
+   * @param array $params
+   * @return array|int
    */
-  function CustomGroupCreateByParams($params = array()) {
+  public function CustomGroupCreateByParams($params = array()) {
     $defaults = array(
       'title' => "API Custom Group",
       'extends' => 'Contact',
@@ -1988,9 +2110,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create custom group with multi fields
+   * Create custom group with multi fields.
+   * @param array $params
+   * @return array|int
    */
-  function CustomGroupMultipleCreateByParams($params = array()) {
+  public function CustomGroupMultipleCreateByParams($params = array()) {
     $defaults = array(
       'style' => 'Tab',
       'is_multiple' => 1,
@@ -2000,22 +2124,35 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Create custom group with multi fields
+   * Create custom group with multi fields.
+   * @param array $params
+   * @return array
    */
-  function CustomGroupMultipleCreateWithFields($params = array()) {
+  public function CustomGroupMultipleCreateWithFields($params = array()) {
     // also need to pass on $params['custom_field'] if not set but not in place yet
     $ids = array();
     $customGroup = $this->CustomGroupMultipleCreateByParams($params);
     $ids['custom_group_id'] = $customGroup['id'];
 
-    $customField = $this->customFieldCreate(array('custom_group_id' => $ids['custom_group_id'], 'label' => 'field_1' . $ids['custom_group_id']));
+    $customField = $this->customFieldCreate(array(
+      'custom_group_id' => $ids['custom_group_id'],
+      'label' => 'field_1' . $ids['custom_group_id'],
+    ));
 
     $ids['custom_field_id'][] = $customField['id'];
 
-    $customField = $this->customFieldCreate(array('custom_group_id' => $ids['custom_group_id'], 'default_value' => '', 'label' => 'field_2' . $ids['custom_group_id']));
+    $customField = $this->customFieldCreate(array(
+      'custom_group_id' => $ids['custom_group_id'],
+      'default_value' => '',
+      'label' => 'field_2' . $ids['custom_group_id'],
+    ));
     $ids['custom_field_id'][] = $customField['id'];
 
-    $customField = $this->customFieldCreate(array('custom_group_id' => $ids['custom_group_id'], 'default_value' => '', 'label' => 'field_3' . $ids['custom_group_id']));
+    $customField = $this->customFieldCreate(array(
+      'custom_group_id' => $ids['custom_group_id'],
+      'default_value' => '',
+      'label' => 'field_3' . $ids['custom_group_id'],
+    ));
     $ids['custom_field_id'][] = $customField['id'];
 
     return $ids;
@@ -2025,15 +2162,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create a custom group with a single text custom field.  See
    * participant:testCreateWithCustom for how to use this
    *
-   * @param string $function __FUNCTION__
-   * @param $filename string $file __FILE__
+   * @param string $function
+   *   __FUNCTION__.
+   * @param string $filename
+   *   $file __FILE__.
    *
-   * @return array $ids ids of created objects
+   * @return array
+   *   ids of created objects
    */
-  function entityCustomGroupWithSingleFieldCreate($function, $filename) {
+  public function entityCustomGroupWithSingleFieldCreate($function, $filename) {
     $params = array('title' => $function);
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
-    $params['extends'] =  $entity ? $entity : 'Contact';
+    $params['extends'] = $entity ? $entity : 'Contact';
     $customGroup = $this->CustomGroupCreate($params);
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'label' => $function));
     CRM_Core_PseudoConstant::flush();
@@ -2042,24 +2182,25 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete custom group
+   * Delete custom group.
    *
    * @param int $customGroupID
    *
    * @return array|int
    */
-  function customGroupDelete($customGroupID) {
+  public function customGroupDelete($customGroupID) {
     $params['id'] = $customGroupID;
     return $this->callAPISuccess('custom_group', 'delete', $params);
   }
 
   /**
-   * Create custom field
+   * Create custom field.
    *
-   * @param array $params (custom_group_id) is required
-   * @return array|int
+   * @param array $params
+   *   (custom_group_id) is required.
+   * @return array
    */
-  function customFieldCreate($params) {
+  public function customFieldCreate($params) {
     $params = array_merge(array(
       'label' => 'Custom Field',
       'data_type' => 'String',
@@ -2070,35 +2211,32 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     ), $params);
 
     $result = $this->callAPISuccess('custom_field', 'create', $params);
-
-    if ($result['is_error'] == 0 && isset($result['id'])) {
-      CRM_Core_BAO_CustomField::getTableColumnGroup($result['id'], 1);
-      // force reset of enabled components to help grab custom fields
-      CRM_Core_Component::getEnabledComponents(1);
-      return $result;
-    }
+    // these 2 functions are called with force to flush static caches
+    CRM_Core_BAO_CustomField::getTableColumnGroup($result['id'], 1);
+    CRM_Core_Component::getEnabledComponents(1);
+    return $result;
   }
 
   /**
-   * Delete custom field
+   * Delete custom field.
    *
    * @param int $customFieldID
    *
    * @return array|int
    */
-  function customFieldDelete($customFieldID) {
+  public function customFieldDelete($customFieldID) {
 
     $params['id'] = $customFieldID;
     return $this->callAPISuccess('custom_field', 'delete', $params);
   }
 
   /**
-   * Create note
+   * Create note.
    *
    * @param int $cId
-   * @return array $note
+   * @return array
    */
-  function noteCreate($cId) {
+  public function noteCreate($cId) {
     $params = array(
       'entity_table' => 'civicrm_contact',
       'entity_id' => $cId,
@@ -2112,9 +2250,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Enable CiviCampaign Component
+   * Enable CiviCampaign Component.
    */
-  function enableCiviCampaign() {
+  public function enableCiviCampaign() {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     // force reload of config object
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
@@ -2124,116 +2262,77 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
    * Create test generated example in api/v3/examples.
+   *
    * To turn this off (e.g. on the server) set
    * define(DONT_DOCUMENT_TEST_CONFIG ,1);
    * in your settings file
-   * @param array $params array as passed to civicrm_api function
-   * @param array $result array as received from the civicrm_api function
-   * @param string $function calling function - generally __FUNCTION__
-   * @param string $filename called from file - generally __FILE__
-   * @param string $description descriptive text for the example file
-   * @param string $subfile name for subfile - if this is completed the example will be put in a subfolder (named by the entity)
-   * @param string $action - optional action - otherwise taken from function name
+   *
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   *   Array as passed to civicrm_api function.
+   * @param array $result
+   *   Array as received from the civicrm_api function.
+   * @param string $testFunction
+   *   Calling function - generally __FUNCTION__.
+   * @param string $testFile
+   *   Called from file - generally __FILE__.
+   * @param string $description
+   *   Descriptive text for the example file.
+   * @param string $exampleName
+   *   Name for this example file (CamelCase) - if omitted the action name will be substituted.
    */
-  function documentMe($params, $result, $function, $filename, $description = "", $subfile = NULL, $action = NULL) {
+  private function documentMe($entity, $action, $params, $result, $testFunction, $testFile, $description = "", $exampleName = NULL) {
     if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
       return;
     }
-    $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
-    //todo - this is a bit cludgey
-    if (empty($action)) {
-      if (strstr($function, 'Create')) {
-        $action = empty($action) ? 'create' : $action;
-        $entityAction = 'Create';
+    $entity = _civicrm_api_get_camel_name($entity);
+    $action = strtolower($action);
+
+    if (empty($exampleName)) {
+      // Attempt to convert lowercase action name to CamelCase.
+      // This is clunky/imperfect due to the convention of all lowercase actions.
+      $exampleName = CRM_Utils_String::convertStringToCamel($action);
+      $knownPrefixes = array(
+        'Get',
+        'Set',
+        'Create',
+        'Update',
+        'Send',
+      );
+      foreach ($knownPrefixes as $prefix) {
+        if (strpos($exampleName, $prefix) === 0 && $prefix != $exampleName) {
+          $exampleName[strlen($prefix)] = strtoupper($exampleName[strlen($prefix)]);
+        }
       }
-      elseif (strstr($function, 'GetSingle')) {
-        $action = empty($action) ? 'getsingle' : $action;
-        $entityAction = 'GetSingle';
-      }
-      elseif (strstr($function, 'GetValue')) {
-        $action = empty($action) ? 'getvalue' : $action;
-        $entityAction = 'GetValue';
-      }
-      elseif (strstr($function, 'GetCount')) {
-        $action = empty($action) ? 'getcount' : $action;
-        $entityAction = 'GetCount';
-      }
-      elseif (strstr($function, 'GetFields')) {
-        $action = empty($action) ? 'getfields' : $action;
-        $entityAction = 'GetFields';
-      }
-      elseif (strstr($function, 'GetList')) {
-        $action = empty($action) ? 'getlist' : $action;
-        $entityAction = 'GetList';
-      }
-      elseif (strstr($function, 'GetActions')) {
-        $action = empty($action) ? 'getactions' : $action;
-        $entityAction = 'GetActions';
-      }
-      elseif (strstr($function, 'Get')) {
-        $action = empty($action) ? 'get' : $action;
-        $entityAction = 'Get';
-      }
-      elseif (strstr($function, 'Delete')) {
-        $action = empty($action) ? 'delete' : $action;
-        $entityAction = 'Delete';
-      }
-      elseif (strstr($function, 'Update')) {
-        $action = empty($action) ? 'update' : $action;
-        $entityAction = 'Update';
-      }
-      elseif (strstr($function, 'Subscribe')) {
-        $action = empty($action) ? 'subscribe' : $action;
-        $entityAction = 'Subscribe';
-      }
-      elseif (strstr($function, 'Submit')) {
-        $action = empty($action) ? 'submit' : $action;
-        $entityAction = 'Submit';
-      }
-      elseif (strstr($function, 'Apply')) {
-        $action = empty($action) ? 'apply' : $action;
-        $entityAction = 'Apply';
-      }
-      elseif (strstr($function, 'Replace')) {
-        $action = empty($action) ? 'replace' : $action;
-        $entityAction = 'Replace';
-      }
-    }
-    else {
-      $entityAction = ucwords($action);
     }
 
     $this->tidyExampleResult($result);
-    if(isset($params['version'])) {
+    if (isset($params['version'])) {
       unset($params['version']);
     }
-    // a cleverer person than me would do it in a single regex
-    if (strstr($entity, 'UF')) {
-      $fnPrefix = strtolower(preg_replace('/(?<! )(?<!^)(?<=UF)[A-Z]/', '_$0', $entity));
-    }
-    else {
-      $fnPrefix = strtolower(preg_replace('/(?<! )(?<!^)[A-Z]/', '_$0', $entity));
+    // Format multiline description as array
+    $desc = array();
+    if (is_string($description) && strlen($description)) {
+      foreach (explode("\n", $description) as $line) {
+        $desc[] = trim($line);
+      }
     }
     $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('testfunction', $function);
-    $function = $fnPrefix . "_" . strtolower($action);
-    $smarty->assign('function', $function);
-    $smarty->assign('fnPrefix', $fnPrefix);
+    $smarty->assign('testFunction', $testFunction);
+    $smarty->assign('function', _civicrm_api_get_entity_name_from_camel($entity) . "_$action");
     $smarty->assign('params', $params);
     $smarty->assign('entity', $entity);
-    $smarty->assign('filename', basename($filename));
-    $smarty->assign('description', $description);
+    $smarty->assign('testFile', basename($testFile));
+    $smarty->assign('description', $desc);
     $smarty->assign('result', $result);
-
     $smarty->assign('action', $action);
-    if (empty($subfile)) {
-      $subfile = $entityAction;
-    }
+
     if (file_exists('../tests/templates/documentFunction.tpl')) {
       if (!is_dir("../api/v3/examples/$entity")) {
         mkdir("../api/v3/examples/$entity");
       }
-      $f = fopen("../api/v3/examples/$entity/$subfile.php", "w+b");
+      $f = fopen("../api/v3/examples/$entity/$exampleName.php", "w+b");
       fwrite($f, $smarty->fetch('../tests/templates/documentFunction.tpl'));
       fclose($f);
     }
@@ -2244,10 +2343,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * and debug related fields are unset
    *
    * @param array $result
-   *
    */
-  function tidyExampleResult(&$result){
-    if(!is_array($result)) {
+  public function tidyExampleResult(&$result) {
+    if (!is_array($result)) {
       return;
     }
     $fieldsToChange = array(
@@ -2267,19 +2365,19 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'decision_date' => '20130805000000',
     );
 
-    $keysToUnset = array('xdebug', 'undefined_fields',);
+    $keysToUnset = array('xdebug', 'undefined_fields');
     foreach ($keysToUnset as $unwantedKey) {
-      if(isset($result[$unwantedKey])) {
+      if (isset($result[$unwantedKey])) {
         unset($result[$unwantedKey]);
       }
     }
     if (isset($result['values'])) {
-      if(!is_array($result['values'])) {
+      if (!is_array($result['values'])) {
         return;
       }
       $resultArray = &$result['values'];
     }
-    elseif(is_array($result)) {
+    elseif (is_array($result)) {
       $resultArray = &$result;
     }
     else {
@@ -2287,56 +2385,57 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
 
     foreach ($resultArray as $index => &$values) {
-        if(!is_array($values)) {
-          continue;
-        }
-        foreach($values as $key => &$value) {
-          if(substr($key, 0, 3)  == 'api' && is_array($value)) {
-            if(isset($value['is_error'])) {
-              // we have a std nested result format
-              $this->tidyExampleResult($value);
+      if (!is_array($values)) {
+        continue;
+      }
+      foreach ($values as $key => &$value) {
+        if (substr($key, 0, 3) == 'api' && is_array($value)) {
+          if (isset($value['is_error'])) {
+            // we have a std nested result format
+            $this->tidyExampleResult($value);
+          }
+          else {
+            foreach ($value as &$nestedResult) {
+              // this is an alternative syntax for nested results a keyed array of results
+              $this->tidyExampleResult($nestedResult);
             }
-            else{
-              foreach ($value as &$nestedResult) {
-                // this is an alternative syntax for nested results a keyed array of results
-                $this->tidyExampleResult($nestedResult);
-              }
-            }
-          }
-          if(in_array($key, $keysToUnset)) {
-            unset($values[$key]);
-            break;
-          }
-          if(array_key_exists($key, $fieldsToChange) && !empty($value)) {
-            $value = $fieldsToChange[$key];
-          }
-          if(is_string($value)) {
-            $value =  addslashes($value);
           }
         }
+        if (in_array($key, $keysToUnset)) {
+          unset($values[$key]);
+          break;
+        }
+        if (array_key_exists($key, $fieldsToChange) && !empty($value)) {
+          $value = $fieldsToChange[$key];
+        }
+        if (is_string($value)) {
+          $value = addslashes($value);
+        }
+      }
     }
   }
 
   /**
-   * Delete note
+   * Delete note.
    *
    * @param array $params
    *
    * @return array|int
    */
-  function noteDelete($params) {
+  public function noteDelete($params) {
     return $this->callAPISuccess('Note', 'delete', $params);
   }
 
   /**
-   * Create custom field with Option Values
+   * Create custom field with Option Values.
    *
    * @param array $customGroup
-   * @param string $name name of custom field
+   * @param string $name
+   *   Name of custom field.
    *
    * @return array|int
    */
-  function customFieldOptionValueCreate($customGroup, $name) {
+  public function customFieldOptionValueCreate($customGroup, $name) {
     $fieldParams = array(
       'custom_group_id' => $customGroup['id'],
       'name' => 'test_custom_group',
@@ -2373,7 +2472,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return bool
    */
-  function confirmEntitiesDeleted($entities) {
+  public function confirmEntitiesDeleted($entities) {
     foreach ($entities as $entity) {
 
       $result = $this->callAPISuccess($entity, 'Get', array());
@@ -2382,13 +2481,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         return TRUE;
       }
     }
+    return FALSE;
   }
 
   /**
    * @param $tablesToTruncate
    * @param bool $dropCustomValueTables
+   * @throws \Exception
    */
-  function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
+  public function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
     if ($this->tx) {
       throw new Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
     }
@@ -2426,10 +2527,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    * Clean up financial entities after financial tests (so we remember to get all the tables :-))
    */
-  function quickCleanUpFinancialEntities() {
+  public function quickCleanUpFinancialEntities() {
     $tablesToTruncate = array(
       'civicrm_contribution',
       'civicrm_contribution_soft',
+      'civicrm_contribution_product',
       'civicrm_financial_trxn',
       'civicrm_financial_item',
       'civicrm_contribution_recur',
@@ -2455,21 +2557,26 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->restoreDefaultPriceSetConfig();
     $var = TRUE;
     CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
+    Civi\Payment\System::singleton()->flushProcessors();
   }
 
-  function restoreDefaultPriceSetConfig() {
+  public function restoreDefaultPriceSetConfig() {
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
   }
   /*
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned
    * Default behaviour is to also delete the entity
-   * @param array $params params array to check agains
-   * @param int  $id id of the entity concerned
-   * @param string $entity name of entity concerned (e.g. membership)
-   * @param bool $delete should the entity be deleted as part of this check
-   * @param string $errorText text to print on error
-   *
+   * @param array $params
+   *   Params array to check against.
+   * @param int $id
+   *   Id of the entity concerned.
+   * @param string $entity
+   *   Name of entity concerned (e.g. membership).
+   * @param bool $delete
+   *   Should the entity be deleted as part of this check.
+   * @param string $errorText
+   *   Text to print on error.
    */
   /**
    * @param array $params
@@ -2480,7 +2587,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @throws Exception
    */
-  function getAndCheck($params, $id, $entity, $delete = 1, $errorText = '') {
+  public function getAndCheck($params, $id, $entity, $delete = 1, $errorText = '') {
 
     $result = $this->callAPISuccessGetSingle($entity, array(
       'id' => $id,
@@ -2504,14 +2611,14 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       if ($type == CRM_Utils_Type::T_DATE) {
         $dateFields[] = $settings['name'];
         // we should identify both real names & unique names as dates
-        if($field != $settings['name']) {
+        if ($field != $settings['name']) {
           $dateFields[] = $field;
         }
       }
-      if($type == CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) {
+      if ($type == CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) {
         $dateTimeFields[] = $settings['name'];
         // we should identify both real names & unique names as dates
-        if($field != $settings['name']) {
+        if ($field != $settings['name']) {
           $dateTimeFields[] = $field;
         }
       }
@@ -2542,12 +2649,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Get formatted values in  the actual and expected result
-   * @param array $actual actual calculated values
-   * @param array $expected expected values
-   *
+   * Get formatted values in  the actual and expected result.
+   * @param array $actual
+   *   Actual calculated values.
+   * @param array $expected
+   *   Expected values.
    */
-  function checkArrayEquals(&$actual, &$expected) {
+  public function checkArrayEquals(&$actual, &$expected) {
     self::unsetId($actual);
     self::unsetId($expected);
     $this->assertEquals($actual, $expected);
@@ -2555,17 +2663,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Unset the key 'id' from the array
-   * @param array $unformattedArray The array from which the 'id' has to be unset
-   *
+   * @param array $unformattedArray
+   *   The array from which the 'id' has to be unset.
    */
-  static function unsetId(&$unformattedArray) {
+  public static function unsetId(&$unformattedArray) {
     $formattedArray = array();
     if (array_key_exists('id', $unformattedArray)) {
       unset($unformattedArray['id']);
     }
     if (!empty($unformattedArray['values']) && is_array($unformattedArray['values'])) {
       foreach ($unformattedArray['values'] as $key => $value) {
-        if (is_Array($value)) {
+        if (is_array($value)) {
           foreach ($value as $k => $v) {
             if ($k == 'id') {
               unset($value[$k]);
@@ -2584,11 +2692,12 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    *  Helper to enable/disable custom directory support
    *
-   * @param array $customDirs with members:
+   * @param array $customDirs
+   *   With members:.
    *   'php_path' Set to TRUE to use the default, FALSE or "" to disable support, or a string path to use another path
    *   'template_path' Set to TRUE to use the default, FALSE or "" to disable support, or a string path to use another path
    */
-  function customDirectories($customDirs) {
+  public function customDirectories($customDirs) {
     require_once 'CRM/Core/Config.php';
     $config = CRM_Core_Config::singleton();
 
@@ -2614,18 +2723,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Generate a temporary folder
+   * Generate a temporary folder.
    *
    * @param string $prefix
-   * @return string $string
+   * @return string
    */
-  function createTempDir($prefix = 'test-') {
+  public function createTempDir($prefix = 'test-') {
     $tempDir = CRM_Utils_File::tempdir($prefix);
     $this->tempDirs[] = $tempDir;
     return $tempDir;
   }
 
-  function cleanTempDirs() {
+  public function cleanTempDirs() {
     if (!is_array($this->tempDirs)) {
       // fix test errors where this is not set
       return;
@@ -2638,16 +2747,17 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Temporarily replace the singleton extension with a different one
+   * Temporarily replace the singleton extension with a different one.
+   * @param \CRM_Extension_System $system
    */
-  function setExtensionSystem(CRM_Extension_System $system) {
+  public function setExtensionSystem(CRM_Extension_System $system) {
     if ($this->origExtensionSystem == NULL) {
       $this->origExtensionSystem = CRM_Extension_System::singleton();
     }
     CRM_Extension_System::setSingleton($this->origExtensionSystem);
   }
 
-  function unsetExtensionSystem() {
+  public function unsetExtensionSystem() {
     if ($this->origExtensionSystem !== NULL) {
       CRM_Extension_System::setSingleton($this->origExtensionSystem);
       $this->origExtensionSystem = NULL;
@@ -2662,14 +2772,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @param $extras
    * @return void
    */
-  function setMockSettingsMetaData($extras) {
+  public function setMockSettingsMetaData($extras) {
     CRM_Core_BAO_Setting::$_cache = array();
-    $this->callAPISuccess('system','flush', array());
+    $this->callAPISuccess('system', 'flush', array());
     CRM_Core_BAO_Setting::$_cache = array();
 
-    CRM_Utils_Hook::singleton()->setHook('civicrm_alterSettingsMetaData', function (&$metadata, $domainId, $profile) use ($extras) {
-      $metadata = array_merge($metadata, $extras);
-    });
+    CRM_Utils_Hook::singleton()
+      ->setHook('civicrm_alterSettingsMetaData', function (&$metadata, $domainId, $profile) use ($extras) {
+        $metadata = array_merge($metadata, $extras);
+      });
 
     $fields = $this->callAPISuccess('setting', 'getfields', array());
     foreach ($extras as $key => $spec) {
@@ -2681,10 +2792,10 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    * @param string $name
    */
-  function financialAccountDelete($name) {
+  public function financialAccountDelete($name) {
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->name = $name;
-    if($financialAccount->find(TRUE)) {
+    if ($financialAccount->find(TRUE)) {
       $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount();
       $entityFinancialType->financial_account_id = $financialAccount->id;
       $entityFinancialType->delete();
@@ -2693,185 +2804,174 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Use $ids as an instruction to do test cleanup
-   */
-  function deleteFromIDSArray() {
-    foreach ($this->ids as $entity => $ids) {
-      foreach ($ids as $id) {
-        $this->callAPISuccess($entity, 'delete', array('id' => $id));
-      }
-    }
-  }
-
-  /**
    * FIXME: something NULLs $GLOBALS['_HTML_QuickForm_registered_rules'] when the tests are ran all together
    * (NB unclear if this is still required)
    */
-  function _sethtmlGlobals() {
+  public function _sethtmlGlobals() {
     $GLOBALS['_HTML_QuickForm_registered_rules'] = array(
       'required' => array(
         'html_quickform_rule_required',
-        'HTML/QuickForm/Rule/Required.php'
+        'HTML/QuickForm/Rule/Required.php',
       ),
       'maxlength' => array(
         'html_quickform_rule_range',
-        'HTML/QuickForm/Rule/Range.php'
+        'HTML/QuickForm/Rule/Range.php',
       ),
       'minlength' => array(
         'html_quickform_rule_range',
-        'HTML/QuickForm/Rule/Range.php'
+        'HTML/QuickForm/Rule/Range.php',
       ),
       'rangelength' => array(
         'html_quickform_rule_range',
-        'HTML/QuickForm/Rule/Range.php'
+        'HTML/QuickForm/Rule/Range.php',
       ),
       'email' => array(
         'html_quickform_rule_email',
-        'HTML/QuickForm/Rule/Email.php'
+        'HTML/QuickForm/Rule/Email.php',
       ),
       'regex' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'lettersonly' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'alphanumeric' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'numeric' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'nopunctuation' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'nonzero' => array(
         'html_quickform_rule_regex',
-        'HTML/QuickForm/Rule/Regex.php'
+        'HTML/QuickForm/Rule/Regex.php',
       ),
       'callback' => array(
         'html_quickform_rule_callback',
-        'HTML/QuickForm/Rule/Callback.php'
+        'HTML/QuickForm/Rule/Callback.php',
       ),
       'compare' => array(
         'html_quickform_rule_compare',
-        'HTML/QuickForm/Rule/Compare.php'
-      )
+        'HTML/QuickForm/Rule/Compare.php',
+      ),
     );
     // FIXME: …ditto for $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES']
     $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES'] = array(
       'group' => array(
         'HTML/QuickForm/group.php',
-        'HTML_QuickForm_group'
+        'HTML_QuickForm_group',
       ),
       'hidden' => array(
         'HTML/QuickForm/hidden.php',
-        'HTML_QuickForm_hidden'
+        'HTML_QuickForm_hidden',
       ),
       'reset' => array(
         'HTML/QuickForm/reset.php',
-        'HTML_QuickForm_reset'
+        'HTML_QuickForm_reset',
       ),
       'checkbox' => array(
         'HTML/QuickForm/checkbox.php',
-        'HTML_QuickForm_checkbox'
+        'HTML_QuickForm_checkbox',
       ),
       'file' => array(
         'HTML/QuickForm/file.php',
-        'HTML_QuickForm_file'
+        'HTML_QuickForm_file',
       ),
       'image' => array(
         'HTML/QuickForm/image.php',
-        'HTML_QuickForm_image'
+        'HTML_QuickForm_image',
       ),
       'password' => array(
         'HTML/QuickForm/password.php',
-        'HTML_QuickForm_password'
+        'HTML_QuickForm_password',
       ),
       'radio' => array(
         'HTML/QuickForm/radio.php',
-        'HTML_QuickForm_radio'
+        'HTML_QuickForm_radio',
       ),
       'button' => array(
         'HTML/QuickForm/button.php',
-        'HTML_QuickForm_button'
+        'HTML_QuickForm_button',
       ),
       'submit' => array(
         'HTML/QuickForm/submit.php',
-        'HTML_QuickForm_submit'
+        'HTML_QuickForm_submit',
       ),
       'select' => array(
         'HTML/QuickForm/select.php',
-        'HTML_QuickForm_select'
+        'HTML_QuickForm_select',
       ),
       'hiddenselect' => array(
         'HTML/QuickForm/hiddenselect.php',
-        'HTML_QuickForm_hiddenselect'
+        'HTML_QuickForm_hiddenselect',
       ),
       'text' => array(
         'HTML/QuickForm/text.php',
-        'HTML_QuickForm_text'
+        'HTML_QuickForm_text',
       ),
       'textarea' => array(
         'HTML/QuickForm/textarea.php',
-        'HTML_QuickForm_textarea'
+        'HTML_QuickForm_textarea',
       ),
       'fckeditor' => array(
         'HTML/QuickForm/fckeditor.php',
-        'HTML_QuickForm_FCKEditor'
+        'HTML_QuickForm_FCKEditor',
       ),
       'tinymce' => array(
         'HTML/QuickForm/tinymce.php',
-        'HTML_QuickForm_TinyMCE'
+        'HTML_QuickForm_TinyMCE',
       ),
       'dojoeditor' => array(
         'HTML/QuickForm/dojoeditor.php',
-        'HTML_QuickForm_dojoeditor'
+        'HTML_QuickForm_dojoeditor',
       ),
       'link' => array(
         'HTML/QuickForm/link.php',
-        'HTML_QuickForm_link'
+        'HTML_QuickForm_link',
       ),
       'advcheckbox' => array(
         'HTML/QuickForm/advcheckbox.php',
-        'HTML_QuickForm_advcheckbox'
+        'HTML_QuickForm_advcheckbox',
       ),
       'date' => array(
         'HTML/QuickForm/date.php',
-        'HTML_QuickForm_date'
+        'HTML_QuickForm_date',
       ),
       'static' => array(
         'HTML/QuickForm/static.php',
-        'HTML_QuickForm_static'
+        'HTML_QuickForm_static',
       ),
       'header' => array(
         'HTML/QuickForm/header.php',
-        'HTML_QuickForm_header'
+        'HTML_QuickForm_header',
       ),
       'html' => array(
         'HTML/QuickForm/html.php',
-        'HTML_QuickForm_html'
+        'HTML_QuickForm_html',
       ),
       'hierselect' => array(
         'HTML/QuickForm/hierselect.php',
-        'HTML_QuickForm_hierselect'
+        'HTML_QuickForm_hierselect',
       ),
       'autocomplete' => array(
         'HTML/QuickForm/autocomplete.php',
-        'HTML_QuickForm_autocomplete'
+        'HTML_QuickForm_autocomplete',
       ),
       'xbutton' => array(
         'HTML/QuickForm/xbutton.php',
-        'HTML_QuickForm_xbutton'
+        'HTML_QuickForm_xbutton',
       ),
       'advmultiselect' => array(
         'HTML/QuickForm/advmultiselect.php',
-        'HTML_QuickForm_advmultiselect'
-      )
+        'HTML_QuickForm_advmultiselect',
+      ),
     );
   }
 
@@ -2883,19 +2983,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *  $this->createLoggedInUser();
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
-   *
    */
-  function setupACL() {
+  public function setupACL() {
     global $_REQUEST;
     $_REQUEST = $this->_params;
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
-    $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID,
+    $optionValue = $this->callAPISuccess('option_value', 'create', array(
+      'option_group_id' => $optionGroupID,
       'label' => 'pick me',
       'value' => 55,
     ));
-
 
     CRM_Core_DAO::executeQuery("
       TRUNCATE civicrm_acl_cache
@@ -2904,7 +3003,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     CRM_Core_DAO::executeQuery("
       TRUNCATE civicrm_acl_contact_cache
     ");
-
 
     CRM_Core_DAO::executeQuery("
     INSERT INTO civicrm_acl_entity_role (
@@ -2943,17 +3041,28 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    * Alter default price set so that the field numbers are not all 1 (hiding errors)
    */
-  function offsetDefaultPriceSet() {
+  public function offsetDefaultPriceSet() {
     $contributionPriceSet = $this->callAPISuccess('price_set', 'getsingle', array('name' => 'default_contribution_amount'));
     $firstID = $contributionPriceSet['id'];
-    $this->callAPISuccess('price_set', 'create', array('id' => $contributionPriceSet['id'], 'is_active' => 0, 'name' => 'old'));
+    $this->callAPISuccess('price_set', 'create', array(
+      'id' => $contributionPriceSet['id'],
+      'is_active' => 0,
+      'name' => 'old',
+    ));
     unset($contributionPriceSet['id']);
     $newPriceSet = $this->callAPISuccess('price_set', 'create', $contributionPriceSet);
-    $priceField = $this->callAPISuccess('price_field', 'getsingle', array('price_set_id' => $firstID, 'options' => array('limit' => 1)));
+    $priceField = $this->callAPISuccess('price_field', 'getsingle', array(
+      'price_set_id' => $firstID,
+      'options' => array('limit' => 1),
+    ));
     unset($priceField['id']);
     $priceField['price_set_id'] = $newPriceSet['id'];
     $newPriceField = $this->callAPISuccess('price_field', 'create', $priceField);
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'getsingle', array('price_set_id' => $firstID, 'sequential' => 1, 'options' => array('limit' => 1)));
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'getsingle', array(
+      'price_set_id' => $firstID,
+      'sequential' => 1,
+      'options' => array('limit' => 1),
+    ));
 
     unset($priceFieldValue['id']);
     //create some padding to use up ids
@@ -2963,32 +3072,34 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Create an instance of the paypal processor
+   * Create an instance of the paypal processor.
    * @todo this isn't a great place to put it - but really it belongs on a class that extends
    * this parent class & we don't have a structure for that yet
    * There is another function to this effect on the PaypalPro test but it appears to be silently failing
-   * & the best protection agains that is the functions this class affords
+   * & the best protection against that is the functions this class affords
+   * @param array $params
+   * @return int $result['id'] payment processor id
    */
-  function paymentProcessorCreate($params = array()) {
+  public function paymentProcessorCreate($params = array()) {
     $params = array_merge(array(
-      'name' => 'demo',
-      'domain_id' => CRM_Core_Config::domainID(),
-      'payment_processor_type_id' => 'PayPal',
-      'is_active' => 1,
-      'is_default' => 0,
-      'is_test' => 1,
-      'user_name' => 'sunil._1183377782_biz_api1.webaccess.co.in',
-      'password' => '1183377788',
-      'signature' => 'APixCoQ-Zsaj-u3IH7mD5Do-7HUqA9loGnLSzsZga9Zr-aNmaJa3WGPH',
-      'url_site' => 'https://www.sandbox.paypal.com/',
-      'url_api' => 'https://api-3t.sandbox.paypal.com/',
-      'url_button' => 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',
-      'class_name' => 'Payment_PayPalImpl',
-      'billing_mode' => 3,
-      'financial_type_id' => 1,
-    ),
-    $params);
-    if(!is_numeric($params['payment_processor_type_id'])) {
+        'name' => 'demo',
+        'domain_id' => CRM_Core_Config::domainID(),
+        'payment_processor_type_id' => 'PayPal',
+        'is_active' => 1,
+        'is_default' => 0,
+        'is_test' => 1,
+        'user_name' => 'sunil._1183377782_biz_api1.webaccess.co.in',
+        'password' => '1183377788',
+        'signature' => 'APixCoQ-Zsaj-u3IH7mD5Do-7HUqA9loGnLSzsZga9Zr-aNmaJa3WGPH',
+        'url_site' => 'https://www.sandbox.paypal.com/',
+        'url_api' => 'https://api-3t.sandbox.paypal.com/',
+        'url_button' => 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',
+        'class_name' => 'Payment_PayPalImpl',
+        'billing_mode' => 3,
+        'financial_type_id' => 1,
+      ),
+      $params);
+    if (!is_numeric($params['payment_processor_type_id'])) {
       // really the api should handle this through getoptions but it's not exactly api call so lets just sort it
       //here
       $params['payment_processor_type_id'] = $this->callAPISuccess('payment_processor_type', 'getvalue', array(
@@ -3001,9 +3112,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Set up initial recurring payment allowing subsequent IPN payments
+   * Set up initial recurring payment allowing subsequent IPN payments.
    */
-  function setupRecurringPaymentProcessorTransaction() {
+  public function setupRecurringPaymentProcessorTransaction() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array(
       'contact_id' => $this->_contactID,
       'amount' => 1000,
@@ -3022,7 +3133,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'contact_id' => $this->_contactID,
         'contribution_page_id' => $this->_contributionPageID,
         'payment_processor_id' => $this->_paymentProcessorID,
-      )
+      ),
     ));
     $this->_contributionRecurID = $contributionRecur['id'];
     $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
@@ -3031,7 +3142,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   /**
    * We don't have a good way to set up a recurring contribution with a membership so let's just do one then alter it
    */
-  function setupMembershipRecurringPaymentProcessorTransaction() {
+  public function setupMembershipRecurringPaymentProcessorTransaction() {
     $this->ids['membership_type'] = $this->membershipTypeCreate();
     //create a contribution so our membership & contribution don't both have id = 1
     $this->contributionCreate($this->_contactID, 1, 'abcd', '345j');
@@ -3055,10 +3166,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'unit_price' => 200,
       'line_total' => 200,
       'financial_type_id' => 1,
-      'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', array('return' => 'id', 'label' => 'Membership Amount')),
-      'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', array('return' => 'id', 'label' => 'General')),
+      'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', array(
+        'return' => 'id',
+        'label' => 'Membership Amount',
+      )),
+      'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', array(
+        'return' => 'id',
+        'label' => 'General',
+      )),
     ));
-    $this->callAPISuccess('membership_payment', 'create', array('contribution_id' => $this->_contributionID, 'membership_id' => $this->ids['membership']));
+    $this->callAPISuccess('membership_payment', 'create', array(
+      'contribution_id' => $this->_contributionID,
+      'membership_id' => $this->ids['membership'],
+    ));
   }
 
   /**
@@ -3066,21 +3186,20 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @throws Exception
    */
-  function CiviUnitTestCase_fatalErrorHandler($message) {
+  public function CiviUnitTestCase_fatalErrorHandler($message) {
     throw new Exception("{$message['message']}: {$message['code']}");
   }
 
   /**
-   * Helper function to create new mailing
+   * Helper function to create new mailing.
    * @return mixed
    */
-  function createMailing() {
+  public function createMailing() {
     $params = array(
       'subject' => 'maild' . rand(),
-      'body_text' => 'bdkfhdskfhduew',
+      'body_text' => 'bdkfhdskfhduew{domain.address}{action.optOutUrl}',
       'name' => 'mailing name' . rand(),
       'created_id' => 1,
-      'api.mailing_job.create' => 0,
     );
 
     $result = $this->callAPISuccess('Mailing', 'create', $params);
@@ -3088,10 +3207,10 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Helper function to delete mailing
+   * Helper function to delete mailing.
    * @param $id
    */
-  function deleteMailing($id) {
+  public function deleteMailing($id) {
     $params = array(
       'id' => $id,
     );
@@ -3100,7 +3219,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * Wrap the entire test case in a transaction
+   * Wrap the entire test case in a transaction.
    *
    * Only subsequent DB statements will be wrapped in TX -- this cannot
    * retroactively wrap old DB statements. Therefore, it makes sense to
@@ -3112,18 +3231,36 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * WISHLIST: Monitor SQL queries in unit-tests and generate an exception
    * if TRUNCATE or ALTER is called while using a transaction.
    *
-   * @param bool $nest whether to use nesting or reference-counting
+   * @param bool $nest
+   *   Whether to use nesting or reference-counting.
    */
-  function useTransaction($nest = TRUE) {
+  public function useTransaction($nest = TRUE) {
     if (!$this->tx) {
       $this->tx = new CRM_Core_Transaction($nest);
       $this->tx->rollback();
     }
   }
 
-  function clearOutputBuffer() {
+  public function clearOutputBuffer() {
     while (ob_get_level() > 0) {
       ob_end_clean();
     }
   }
+
+  /**
+   * @param $exists
+   * @param array $apiResult
+   */
+  protected function assertAttachmentExistence($exists, $apiResult) {
+    $fileId = $apiResult['id'];
+    $this->assertTrue(is_numeric($fileId));
+    $this->assertEquals($exists, file_exists($apiResult['values'][$fileId]['path']));
+    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_file WHERE id = %1', array(
+      1 => array($fileId, 'Int'),
+    ));
+    $this->assertDBQuery($exists ? 1 : 0, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', array(
+      1 => array($fileId, 'Int'),
+    ));
+  }
+
 }

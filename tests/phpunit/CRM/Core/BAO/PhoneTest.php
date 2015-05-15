@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -35,25 +35,15 @@ require_once 'CiviTest/Event.php';
  * Class CRM_Core_BAO_PhoneTest
  */
 class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Phone BAOs',
-      'description' => 'Test all Core_BAO_Phone methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
    * Add() method (create and update modes)
    */
-  function testAdd() {
+  public function testAdd() {
     $contactId = Contact::createIndividual();
 
     $params = array();
@@ -96,7 +86,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
   /**
    * AllPhones() method - get all Phones for our contact, with primary Phone first
    */
-  function testAllPhones() {
+  public function testAllPhones() {
     $contactParams = array(
       'first_name' => 'Alan',
       'last_name' => 'Smith',
@@ -124,6 +114,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
    * AllEntityPhones() method - get all Phones for a location block, with primary Phone first
    * @todo FIXME: Fixing this test requires add helper functions in CiviTest to create location block and phone and link them to an event. Punting to 3.1 cycle. DGG
    */
-  function SKIPPED_testAllEntityPhones() {}
-}
+  public function SKIPPED_testAllEntityPhones() {
+  }
 
+}

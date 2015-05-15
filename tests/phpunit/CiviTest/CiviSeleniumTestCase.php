@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *  Include configuration
@@ -49,7 +49,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   protected $loggedInAs = NULL;
 
   /**
-   *  Constructor
+   *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
    *  need to show the same arguments as exist in the constructor of
@@ -58,12 +58,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *  ReflectionClass of the Test class and checks the constructor
    *  of that class to decide how to set up the test.
    *
-   * @param  string $name
-   * @param  array $data
-   * @param  string $dataName
+   * @param string $name
+   * @param array $data
+   * @param string $dataName
    * @param array $browser
    */
-  function __construct($name = NULL, array$data = array(), $dataName = '', array$browser = array()) {
+  public function __construct($name = NULL, array$data = array(), $dataName = '', array$browser = array()) {
     parent::__construct($name, $data, $dataName, $browser);
     $this->loggedInAs = NULL;
 
@@ -103,6 +103,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
   }
 
+  /**
+   * @return string
+   */
   protected function prepareTestSession() {
     $result = parent::prepareTestSession();
 
@@ -119,13 +122,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * @param array $cookies each item is an array with keys:
-   *  - name: string
-   *  - value: string; note that RFC's don't define particular encoding scheme, so
+   * @param array $cookies
+   *   Each item is an Array with keys:
+   *   - name: string
+   *   - value: string; note that RFC's don't define particular encoding scheme, so
    *    you must pick one yourself and pre-encode; does not allow values with
    *    commas, semicolons, or whitespace
-   *  - path: string; default: '/'
-   *  - max_age: int; default: 1 week (7*24*60*60)
+   *   - path: string; default: '/'
+   *   - max_age: int; default: 1 week (7*24*60*60)
    */
   protected function setCookies($cookies) {
     foreach ($cookies as $cookie) {
@@ -133,7 +137,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $cookie['path'] = '/';
       }
       if (!isset($cookie['max_age'])) {
-        $cookie['max_age'] = 7*24*60*60;
+        $cookie['max_age'] = 7 * 24 * 60 * 60;
       }
       $this->deleteCookie($cookie['name'], $cookie['path']);
       $optionExprs = array();
@@ -150,11 +154,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Authenticate as drupal user
-   * @param $user: (str) the key 'user' or 'admin', or a literal username
-   * @param $pass: (str) if $user is a literal username and not 'user' or 'admin', supply the password
+   * Authenticate as drupal user.
+   * @param $user : (str) the key 'user' or 'admin', or a literal username
+   * @param $pass : (str) if $user is a literal username and not 'user' or 'admin', supply the password
    */
-  function webtestLogin($user = 'user', $pass = NULL) {
+  public function webtestLogin($user = 'user', $pass = NULL) {
     // If already logged in as correct user, do nothing
     if ($this->loggedInAs === $user) {
       return;
@@ -179,7 +183,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->loggedInAs = $user;
   }
 
-  function webtestLogout() {
+  public function webtestLogout() {
     if ($this->loggedInAs) {
       $this->open($this->sboxPath . "user/logout");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -190,15 +194,18 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Open an internal path beginning with 'civicrm/'
    *
-   * @param $url (str) omit the 'civicrm/' it will be added for you
-   * @param $args (str|array) optional url arguments
-   * @param $waitFor - page element to wait for - using this is recommended to ensure the document is fully loaded
+   * @param string $url
+   *   omit the 'civicrm/' it will be added for you.
+   * @param string|array $args
+   *   optional url arguments.
+   * @param $waitFor
+   *   Page element to wait for - using this is recommended to ensure the document is fully loaded.
    *
    * Although it doesn't seem to do much now, using this function is recommended for
    * opening all civi pages, and using the $args param is also strongly encouraged
    * This will make it much easier to run webtests in other CMSs in the future
    */
-  function openCiviPage($url, $args = NULL, $waitFor = 'civicrm-footer') {
+  public function openCiviPage($url, $args = NULL, $waitFor = 'civicrm-footer') {
     // Construct full url with args
     // This could be extended in future to work with other CMS style urls
     if ($args) {
@@ -222,11 +229,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click on a link or button
+   * Click on a link or button.
    * Wait for the page to load
    * Wait for an element to be present
+   * @param $element
+   * @param string $waitFor
+   * @param bool $waitForPageLoad
    */
-  function clickLink($element, $waitFor = 'civicrm-footer', $waitForPageLoad = TRUE) {
+  public function clickLink($element, $waitFor = 'civicrm-footer', $waitForPageLoad = TRUE) {
     $this->click($element);
     // conditional wait for page load e.g for ajax form save
     if ($waitForPageLoad) {
@@ -239,11 +249,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click a link or button and wait for an ajax dialog to load
+   * Click a link or button and wait for an ajax dialog to load.
    * @param string $element
    * @param string $waitFor
    */
-  function clickPopupLink($element, $waitFor=NULL) {
+  public function clickPopupLink($element, $waitFor = NULL) {
     $this->clickAjaxLink($element, 'css=.ui-dialog');
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
@@ -251,11 +261,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Click a link or button and wait for ajax content to load or refresh
+   * Click a link or button and wait for ajax content to load or refresh.
    * @param string $element
    * @param string $waitFor
    */
-  function clickAjaxLink($element, $waitFor=NULL) {
+  public function clickAjaxLink($element, $waitFor = NULL) {
     $this->click($element);
     if ($waitFor) {
       $this->waitForElementPresent($waitFor);
@@ -269,7 +279,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param string $element
    * @param string $waitFor
    */
-  function clickLinkSuppressPopup($element, $waitFor = 'civicrm-footer') {
+  public function clickLinkSuppressPopup($element, $waitFor = 'civicrm-footer') {
     $link = $this->getAttribute($element . '@href');
     $this->open($link);
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -279,9 +289,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Wait for all ajax snippets to finish loading
+   * Wait for all ajax snippets to finish loading.
    */
-  function waitForAjaxContent() {
+  public function waitForAjaxContent() {
     $this->waitForElementNotPresent('css=.blockOverlay');
     // Some ajax calls happen in pairs (e.g. submit a popup form then refresh the underlying content)
     // So we'll wait a sec and recheck to see if any more stuff is loading
@@ -292,39 +302,58 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Call the API on the local server
+   * Call the API on the local server.
    * (kind of defeats the point of a webtest - see CRM-11889)
+   * @param $entity
+   * @param $action
+   * @param $params
+   * @return array|int
    */
-  function webtest_civicrm_api($entity, $action, $params) {
+  public function webtest_civicrm_api($entity, $action, $params) {
     if (!isset($params['version'])) {
       $params['version'] = 3;
     }
 
     $result = civicrm_api($entity, $action, $params);
-    $this->assertTrue(!civicrm_error($result), 'Civicrm api error.');
+    $this->assertAPISuccess($result);
     return $result;
   }
 
   /**
-   * Call the API on the remote server
-   * Experimental - currently only works if permissions on remote site allow anon user to access ajax api
+   * Call the API on the remote server using the AJAX endpoint.
+   *
    * @see CRM-11889
+   * @param $entity
+   * @param $action
+   * @param array $params
+   * @return mixed
    */
-  function rest_civicrm_api($entity, $action, $params = array()) {
+  public function rest_civicrm_api($entity, $action, $params = array()) {
     $params += array(
       'version' => 3,
     );
-    $url = "{$this->settings->sandboxURL}/{$this->sboxPath}civicrm/ajax/rest?entity=$entity&action=$action&json=" . json_encode($params);
-    $request = array(
-      'http' => array(
-        'method' => 'POST',
-        // Naughty sidestep of civi's security checks
-        'header' => "X-Requested-With: XMLHttpRequest",
-      ),
+    static $reqId = 0;
+    $reqId++;
+
+    $jsCmd = '
+      setTimeout(function(){
+        CRM.api3("@entity", "@action", @params).then(function(a){
+          cj("<textarea>").css("display", "none").prop("id","crmajax@reqId").val(JSON.stringify(a)).appendTo("body");
+        });
+      }, 500);
+    ';
+    $jsArgs = array(
+      '@entity' => $entity,
+      '@action' => $action,
+      '@params' => json_encode($params),
+      '@reqId' => $reqId,
     );
-    $ctx = stream_context_create($request);
-    $result = file_get_contents($url, FALSE, $ctx);
-    return json_decode($result, TRUE);
+    $js = strtr($jsCmd, $jsArgs);
+    $this->runScript($js);
+    $this->waitForElementPresent("crmajax{$reqId}");
+    $result = json_decode($this->getValue("crmajax{$reqId}"), TRUE);
+    $this->runScript("cj('#crmajax{$reqId}').remove();");
+    return $result;
   }
 
   /**
@@ -332,11 +361,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return array|int
    */
-  function webtestGetFirstValueForOptionGroup($option_group_name) {
+  public function webtestGetFirstValueForOptionGroup($option_group_name) {
     $result = $this->webtest_civicrm_api("OptionValue", "getvalue", array(
       'option_group_name' => $option_group_name,
       'option.limit' => 1,
-      'return' => 'value'
+      'return' => 'value',
     ));
     return $result;
   }
@@ -344,7 +373,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * @return mixed
    */
-  function webtestGetValidCountryID() {
+  public function webtestGetValidCountryID() {
     static $_country_id;
     if (is_null($_country_id)) {
       $config_backend = $this->webtestGetConfig('countryLimit');
@@ -358,7 +387,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return mixed|null
    */
-  function webtestGetValidEntityID($entity) {
+  public function webtestGetValidEntityID($entity) {
     // michaelmcandrew: would like to use getvalue but there is a bug
     // for e.g. group where option.limit not working at the moment CRM-9110
     $result = $this->webtest_civicrm_api($entity, "get", array('option.limit' => 1, 'return' => 'id'));
@@ -373,13 +402,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return mixed
    */
-  function webtestGetConfig($field) {
+  public function webtestGetConfig($field) {
     static $_config_backend;
     if (is_null($_config_backend)) {
       $result = $this->webtest_civicrm_api("Domain", "getvalue", array(
         'current_domain' => 1,
         'option.limit' => 1,
-        'return' => 'config_backend'
+        'return' => 'config_backend',
       ));
       $_config_backend = unserialize($result);
     }
@@ -387,9 +416,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Ensures the required CiviCRM components are enabled
+   * Ensures the required CiviCRM components are enabled.
+   * @param $components
    */
-  function enableComponents($components) {
+  public function enableComponents($components) {
     $this->openCiviPage("admin/setting/component", "reset=1", "_qf_Component_next-bottom");
     $enabledComponents = $this->getSelectOptions("enableComponents-t");
     $added = FALSE;
@@ -408,18 +438,21 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Add a contact with the given first and last names and either a given email
+   * Add a contact with the given first and last names and either a given email.
    * (when specified), a random email (when true) or no email (when unspecified or null).
    *
-   * @param string $fname contact’s first name
-   * @param string $lname contact’s last name
-   * @param mixed $email contact’s email (when string) or random email (when true) or no email (when null)
+   * @param string $fname
+   *   Contact’s first name.
+   * @param string $lname
+   *   Contact’s last name.
+   * @param mixed $email
+   *   Contact’s email (when string) or random email (when true) or no email (when null).
+   * @param string $contactSubtype
    *
-   * @param null $contactSubtype
-   *
-   * @return mixed either a string with the (either generated or provided) email or null (if no email)
+   * @return string|null
+   *   either a string with the (either generated or provided) email or null (if no email)
    */
-  function webtestAddContact($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
+  public function webtestAddContact($fname = 'Anthony', $lname = 'Anderson', $email = NULL, $contactSubtype = NULL) {
     $args = 'reset=1&ct=Individual';
     if ($contactSubtype) {
       $args .= "&cst={$contactSubtype}";
@@ -443,7 +476,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return null|string
    */
-  function webtestAddHousehold($householdName = "Smith's Home", $email = NULL) {
+  public function webtestAddHousehold($householdName = "Smith's Home", $email = NULL) {
     $this->openCiviPage("contact/add", "reset=1&ct=Household");
     $this->click('household_name');
     $this->type('household_name', $householdName);
@@ -466,7 +499,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return null|string
    */
-  function webtestAddOrganization($organizationName = "Organization XYZ", $email = NULL, $contactSubtype = NULL) {
+  public function webtestAddOrganization($organizationName = "Organization XYZ", $email = NULL, $contactSubtype = NULL) {
     $args = 'reset=1&ct=Organization';
     if ($contactSubtype) {
       $args .= "&cst={$contactSubtype}";
@@ -486,15 +519,18 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * @param $sortName
+   * @param string $fieldName
    */
-  function webtestFillAutocomplete($sortName, $fieldName = 'contact_id') {
-    $this->select2($fieldName,$sortName);
+  public function webtestFillAutocomplete($sortName, $fieldName = 'contact_id') {
+    $this->select2($fieldName, $sortName);
     //$this->assertContains($sortName, $this->getValue($fieldName), "autocomplete expected $sortName but didn’t find it in " . $this->getValue($fieldName));
   }
 
   /**
+   * @param $sortName
    */
-  function webtestOrganisationAutocomplete($sortName) {
+  public function webtestOrganisationAutocomplete($sortName) {
     $this->clickAt("//*[@id='contact_id']/../div/a");
     $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
     $this->keyDown("//*[@id='select2-drop']/div/input", " ");
@@ -519,7 +555,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $dateElement
    * @param null $strToTimeArgs
    */
-  function webtestFillDate($dateElement, $strToTimeArgs = NULL) {
+  public function webtestFillDate($dateElement, $strToTimeArgs = NULL, $multiselect = FALSE) {
     $timeStamp = strtotime($strToTimeArgs ? $strToTimeArgs : '+1 month');
 
     $year = date('Y', $timeStamp);
@@ -527,7 +563,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $mon = date('n', $timeStamp) - 1;
     $day = date('j', $timeStamp);
 
-    $this->click("{$dateElement}_display");
+    if (!$multiselect) {
+      $this->click("xpath=//input[starts-with(@id, '{$dateElement}_display_')]");
+    }
     $this->waitForElementPresent("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month");
     $this->select("css=div#ui-datepicker-div.ui-datepicker div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-month", "value=$mon");
     $this->select("css=div#ui-datepicker-div div.ui-datepicker-header div.ui-datepicker-title select.ui-datepicker-year", "value=$year");
@@ -539,7 +577,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $dateElement
    * @param null $strToTimeArgs
    */
-  function webtestFillDateTime($dateElement, $strToTimeArgs = NULL) {
+  public function webtestFillDateTime($dateElement, $strToTimeArgs = NULL) {
     $this->webtestFillDate($dateElement, $strToTimeArgs);
 
     $timeStamp = strtotime($strToTimeArgs ? $strToTimeArgs : '+1 month');
@@ -553,13 +591,16 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Verify that given label/value pairs are in *sibling* td cells somewhere on the page.
    *
-   * @param array $expected       Array of key/value pairs (like Status/Registered) to be checked
-   * @param string $xpathPrefix   Pass in an xpath locator to "get to" the desired table or tables. Will be prefixed to xpath
+   * @param array $expected
+   *   Array of key/value pairs (like Status/Registered) to be checked.
+   * @param string $xpathPrefix
+   *   Pass in an xpath locator to "get to" the desired table or tables. Will be prefixed to xpath.
    *                              table path. Include leading forward slashes (e.g. "//div[@id='activity-content']").
-   * @param string $tableId       Pass in the id attribute of a table to be verified if you want to only check a specific table
+   * @param string $tableId
+   *   Pass in the id attribute of a table to be verified if you want to only check a specific table.
    *                              on the web page.
    */
-  function webtestVerifyTabularData($expected, $xpathPrefix = NULL, $tableId = NULL) {
+  public function webtestVerifyTabularData($expected, $xpathPrefix = NULL, $tableId = NULL) {
     $tableLocator = "";
     if ($tableId) {
       $tableLocator = "[@id='$tableId']";
@@ -577,15 +618,19 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Types text into a ckEditor rich text field in a form
+   * Types text into a ckEditor rich text field in a form.
    *
-   * @param string $fieldName form field name (as assigned by PHP buildForm class)
-   * @param string $text      text to type into the field
-   * @param string $editor    which text editor (valid values are 'CKEditor', 'TinyMCE')
+   * @param string $fieldName
+   *   Form field name (as assigned by PHP buildForm class).
+   * @param string $text
+   *   Text to type into the field.
+   * @param string $editor
+   *   Which text editor (valid values are 'CKEditor', 'TinyMCE').
    *
-   * @return void
+   * @param bool $compressed
+   * @throws \PHPUnit_Framework_AssertionFailedError
    */
-  function fillRichTextField($fieldName, $text = 'Typing this text into editor.', $editor = 'CKEditor', $compressed = FALSE) {
+  public function fillRichTextField($fieldName, $text = 'Typing this text into editor.', $editor = 'CKEditor', $compressed = FALSE) {
     // make sure cursor focuses on the field
     $this->fireEvent($fieldName, 'focus');
     if ($editor == 'CKEditor') {
@@ -606,16 +651,18 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Types option label and name into a table of multiple choice options
+   * Types option label and name into a table of multiple choice options.
    * (for price set fields of type select, radio, or checkbox)
    * TODO: extend for custom field multiple choice table input
    *
-   * @param array  $options           form field name (as assigned by PHP buildForm class)
-   * @param array  $validateStrings   appends label and name strings to this array so they can be validated later
+   * @param array $options
+   *   Form field name (as assigned by PHP buildForm class).
+   * @param array $validateStrings
+   *   Appends label and name strings to this array so they can be validated later.
    *
    * @return void
    */
-  function addMultipleChoiceOptions($options, &$validateStrings) {
+  public function addMultipleChoiceOptions($options, &$validateStrings) {
     foreach ($options as $oIndex => $oValue) {
       $validateStrings[] = $oValue['label'];
       $validateStrings[] = $oValue['amount'];
@@ -632,12 +679,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Use a contact EntityRef field to add a new contact
-   * @param string $field selector
+   * Use a contact EntityRef field to add a new contact.
+   * @param string $field
+   *   Selector.
    * @param string $contactType
-   * @return array of contact attributes (id, names, email)
+   * @return array
+   *   Array of contact attributes (id, names, email)
    */
-  function createDialogContact($field = 'contact_id', $contactType = 'Individual') {
+  public function createDialogContact($field = 'contact_id', $contactType = 'Individual') {
     $selectId = 's2id_' . $this->getAttribute($field . '@id');
     $this->clickAt("xpath=//div[@id='$selectId']/a");
     $this->clickAjaxLink("xpath=//li[@class='select2-no-results']//a[contains(text(), 'New $contactType')]", '_qf_Edit_next');
@@ -651,13 +700,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $params[strtolower($contactType) . '_name'] = "$name $contactType";
     }
-    foreach($params as $param => $val) {
+    foreach ($params as $param => $val) {
       $this->type($param, $val);
     }
     $this->type('email-Primary', $params['email'] = "{$name}@example.com");
     $this->clickAjaxLink('_qf_Edit_next');
 
-    $this->waitForText("xpath=//div[@id='$selectId']","$name");
+    $this->waitForText("xpath=//div[@id='$selectId']", "$name");
 
     $params['sort_name'] = $contactType == 'Individual' ? $params['last_name'] . ', ' . $params['first_name'] : "$name $contactType";
     $params['display_name'] = $contactType == 'Individual' ? $params['first_name'] . ' ' . $params['last_name'] : $params['sort_name'];
@@ -667,9 +716,17 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * @deprecated in favor of createDialogContact
+   * @param string $fname
+   * @param string $lname
+   * @param string $email
+   * @param int $type
+   * @param string $selectId
+   * @param int $row
+   * @param string $prefix
    */
-  function webtestNewDialogContact($fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz',
-                                   $type = 4, $selectId = 's2id_contact_id', $row = 1, $prefix = '') {
+  public function webtestNewDialogContact(
+    $fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz',
+    $type = 4, $selectId = 's2id_contact_id', $row = 1, $prefix = '') {
     // 4 - Individual profile
     // 5 - Organization profile
     // 6 - Household profile
@@ -697,22 +754,22 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     // Is new contact created?
     if ($lname) {
-      $this->waitForText("xpath=//div[@id='$selectId']","$lname, $fname");
+      $this->waitForText("xpath=//div[@id='$selectId']", "$lname, $fname");
     }
     else {
-      $this->waitForText("xpath=//div[@id='$selectId']","$fname");
+      $this->waitForText("xpath=//div[@id='$selectId']", "$fname");
     }
   }
 
   /**
-   * Generic function to check that strings are present in the page
+   * Generic function to check that strings are present in the page.
    *
    * @strings  array    array of strings or a single string
    *
    * @param $strings
-   * @return   void
+   * @return void
    */
-  function assertStringsPresent($strings) {
+  public function assertStringsPresent($strings) {
     foreach ((array) $strings as $string) {
       $this->assertTrue($this->isTextPresent($string), "Could not find $string on page");
     }
@@ -724,11 +781,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @url      string url to parse or retrieve current url if null
    *
    * @param null $url
-   * @return   array  returns an associative array containing any of the various components
+   * @return array
+   *   returns an associative array containing any of the various components
    *                  of the URL that are present. Querystring elements are returned in sub-array (elements.queryString)
    *                  http://php.net/manual/en/function.parse-url.php
    */
-  function parseURL($url = NULL) {
+  public function parseURL($url = NULL) {
     if (!$url) {
       $url = $this->getLocation();
     }
@@ -742,27 +800,32 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Returns a single argument from the url query
+   * Returns a single argument from the url query.
+   * @param $arg
+   * @param null $url
+   * @return null
    */
-   function urlArg($arg, $url = NULL) {
-     $elements = $this->parseURL($url);
-     return isset($elements['queryString'][$arg]) ? $elements['queryString'][$arg] : NULL;
-   }
+  public function urlArg($arg, $url = NULL) {
+    $elements = $this->parseURL($url);
+    return isset($elements['queryString'][$arg]) ? $elements['queryString'][$arg] : NULL;
+  }
 
   /**
    * Define a payment processor for use by a webtest. Default is to create Dummy processor
    * which is useful for testing online public forms (online contribution pages and event registration)
    *
-   * @param string $processorName Name assigned to new processor
-   * @param string $processorType Name for processor type (e.g. PayPal, Dummy, etc.)
-   * @param array $processorSettings Array of fieldname => value for required settings for the processor
+   * @param string $processorName
+   *   Name assigned to new processor.
+   * @param string $processorType
+   *   Name for processor type (e.g. PayPal, Dummy, etc.).
+   * @param array $processorSettings
+   *   Array of fieldname => value for required settings for the processor.
    *
    * @param string $financialAccount
    * @throws PHPUnit_Framework_AssertionFailedError
    * @return int
    */
-
-  function webtestAddPaymentProcessor($processorName = 'Test Processor', $processorType = 'Dummy', $processorSettings = NULL, $financialAccount = 'Deposit Bank Account') {
+  public function webtestAddPaymentProcessor($processorName = 'Test Processor', $processorType = 'Dummy', $processorSettings = NULL, $financialAccount = 'Deposit Bank Account') {
     if (!$processorName) {
       $this->fail("webTestAddPaymentProcessor requires $processorName.");
     }
@@ -803,8 +866,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     elseif ($processorType == 'PayPal') {
       $processorSettings = array(
         'test_user_name' => '559999327053114',
+        'user_name' => '559999327053114',
         'test_password' => 'R2zv2g60-A7GXKJYl0nR0g',
         'test_signature' => 'R2zv2g60-A7GXKJYl0nR0g',
+        'password' => 'R2zv2g60-A7GXKJYl0nR0g',
+        'signature' => 'R2zv2g60-A7GXKJYl0nR0g',
       );
     }
     elseif ($processorType == 'PayPal_Standard') {
@@ -822,7 +888,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->openCiviPage('admin/paymentProcessor', 'action=add&reset=1&pp=' . $pid, 'name');
     $this->type('name', $processorName);
     $this->select('financial_account_id', "label={$financialAccount}");
-    foreach ($processorSettings AS $f => $v) {
+    foreach ($processorSettings as $f => $v) {
       $this->type($f, $v);
     }
 
@@ -836,7 +902,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $this->urlArg('id', $paymentProcessorLink);
   }
 
-  function webtestAddCreditCardDetails() {
+  public function webtestAddCreditCardDetails() {
     $this->waitForElementPresent('credit_card_type');
     $this->select('credit_card_type', 'label=Visa');
     $this->type('credit_card_number', '4807731747657838');
@@ -852,7 +918,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return array
    */
-  function webtestAddBillingDetails($firstName = NULL, $middleName = NULL, $lastName = NULL) {
+  public function webtestAddBillingDetails($firstName = NULL, $middleName = NULL, $lastName = NULL) {
     if (!$firstName) {
       $firstName = 'John';
     }
@@ -884,11 +950,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return null|string
    */
-  function webtestAttachFile($fieldLocator, $filePath = NULL) {
+  public function webtestAttachFile($fieldLocator, $filePath = NULL) {
     if (!$filePath) {
       $filePath = '/tmp/testfile_' . substr(sha1(rand()), 0, 7) . '.txt';
       $fp = @fopen($filePath, 'w');
-      fputs($fp, 'Test file created by selenium test.');
+      fwrite($fp, 'Test file created by selenium test.');
       @fclose($fp);
     }
 
@@ -906,7 +972,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return null|string
    */
-  function webtestCreateCSV($headers, $rows, $filePath = NULL) {
+  public function webtestCreateCSV($headers, $rows, $filePath = NULL) {
     if (!$filePath) {
       $filePath = '/tmp/testcsv_' . substr(sha1(rand()), 0, 7) . '.csv';
     }
@@ -933,11 +999,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * Create new relationship type w/ user specified params or default.
    *
-   * @param $params array of required params.
+   * @param array $params
+   *   array of required params.
    *
-   * @return an array of saved params values.
+   * @return array
+   *   array of saved params values.
    */
-  function webtestAddRelationshipType($params = array()) {
+  public function webtestAddRelationshipType($params = array()) {
     $this->openCiviPage("admin/reltype", "reset=1&action=add");
 
     //build the params if not passed.
@@ -1013,36 +1081,37 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param string $financialType
    * @param bool $fixedAmount
    * @param bool $membershipsRequired
-   * @internal param \can $User define pageTitle, hash and rand values for later data verification
    *
-   * @return null $pageId of newly created online contribution page.
+   * @return null
+   *   of newly created online contribution page.
    */
-  function webtestAddContributionPage($hash = NULL,
-                                      $rand = NULL,
-                                      $pageTitle = NULL,
-                                      $processor = array('Test Processor' => 'Dummy'),
-                                      $amountSection = TRUE,
-                                      $payLater = TRUE,
-                                      $onBehalf = TRUE,
-                                      $pledges = TRUE,
-                                      $recurring = FALSE,
-                                      $membershipTypes = TRUE,
-                                      $memPriceSetId = NULL,
-                                      $friend = TRUE,
-                                      $profilePreId = 1,
-                                      $profilePostId = 7,
-                                      $premiums = TRUE,
-                                      $widget = TRUE,
-                                      $pcp = TRUE,
-                                      $isAddPaymentProcessor = TRUE,
-                                      $isPcpApprovalNeeded = FALSE,
-                                      $isSeparatePayment = FALSE,
-                                      $honoreeSection = TRUE,
-                                      $allowOtherAmount = TRUE,
-                                      $isConfirmEnabled = TRUE,
-                                      $financialType = 'Donation',
-                                      $fixedAmount = TRUE,
-                                      $membershipsRequired = TRUE
+  public function webtestAddContributionPage(
+    $hash = NULL,
+    $rand = NULL,
+    $pageTitle = NULL,
+    $processor = array('Test Processor' => 'Dummy'),
+    $amountSection = TRUE,
+    $payLater = TRUE,
+    $onBehalf = TRUE,
+    $pledges = TRUE,
+    $recurring = FALSE,
+    $membershipTypes = TRUE,
+    $memPriceSetId = NULL,
+    $friend = TRUE,
+    $profilePreId = 1,
+    $profilePostId = 7,
+    $premiums = TRUE,
+    $widget = TRUE,
+    $pcp = TRUE,
+    $isAddPaymentProcessor = TRUE,
+    $isPcpApprovalNeeded = FALSE,
+    $isSeparatePayment = FALSE,
+    $honoreeSection = TRUE,
+    $allowOtherAmount = TRUE,
+    $isConfirmEnabled = TRUE,
+    $financialType = 'Donation',
+    $fixedAmount = TRUE,
+    $membershipsRequired = TRUE
   ) {
     if (!$hash) {
       $hash = substr(sha1(rand()), 0, 7);
@@ -1334,10 +1403,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * Update default strict rule.
    *
    * @param string $contactType
-   * @param array $fields Fields to be set for strict rule
-   * @param int $threshold Rule's threshold value
+   * @param array $fields
+   *   Fields to be set for strict rule.
+   * @param int $threshold
+   *   Rule's threshold value.
    */
-  function webtestStrictDedupeRuleDefault($contactType = 'Individual', $fields = array(), $threshold = 10) {
+  public function webtestStrictDedupeRuleDefault($contactType = 'Individual', $fields = array(), $threshold = 10) {
     // set default strict rule.
     $strictRuleId = 4;
     if ($contactType == 'Organization') {
@@ -1403,7 +1474,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return array
    */
-  function webtestAddMembershipType($period_type = 'rolling', $duration_interval = 1, $duration_unit = 'year', $auto_renew = 'no') {
+  public function webtestAddMembershipType($period_type = 'rolling', $duration_interval = 1, $duration_unit = 'year', $auto_renew = 'no', $minimumFee = 100) {
     $membershipTitle = substr(sha1(rand()), 0, 7);
     $membershipOrg = $membershipTitle . ' memorg';
     $this->webtestAddOrganization($membershipOrg, TRUE);
@@ -1439,9 +1510,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         break;
     }
 
-    $this->select2('member_of_contact_id',$membershipTitle);
+    $this->select2('member_of_contact_id', $membershipTitle);
 
-    $this->type('minimum_fee', '100');
+    $this->type('minimum_fee', $minimumFee);
     $this->select('financial_type_id', "value={$memTypeParams['financial_type']}");
 
     $this->type('duration_interval', $duration_interval);
@@ -1462,7 +1533,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return null|string
    */
-  function WebtestAddGroup($groupName = NULL, $parentGroupName = NULL) {
+  public function WebtestAddGroup($groupName = NULL, $parentGroupName = NULL) {
     $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload-bottom');
 
     // fill group name
@@ -1501,7 +1572,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return null
    */
-  function WebtestAddActivity($activityType = "Meeting") {
+  public function WebtestAddActivity($activityType = "Meeting") {
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
     // We're using Quick Add block on the main page for this.
     $firstName1 = substr(sha1(rand()), 0, 7);
@@ -1574,8 +1645,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * @return bool
    */
-  static
-  function checkDoLocalDBTest() {
+  public static function checkDoLocalDBTest() {
     if (defined('CIVICRM_WEBTEST_LOCAL_DB') &&
       CIVICRM_WEBTEST_LOCAL_DB
     ) {
@@ -1586,116 +1656,75 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Generic function to compare expected values after an api call to retrieved
+   * Generic function to compare expected values after an api call to retrieved.
    * DB values.
    *
-   * @daoName  string   DAO Name of object we're evaluating.
-   * @id       int      Id of object
-   * @match    array    Associative array of field name => expected value. Empty if asserting
-   *                      that a DELETE occurred
-   * @delete   boolean  True if we're checking that a DELETE action occurred.
-   */
-  function assertDBState($daoName, $id, $match, $delete = FALSE) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
-    }
-
-    return CiviDBAssert::assertDBState($this, $daoName, $id, $match, $delete);
-  }
-
-  // Request a record from the DB by seachColumn+searchValue. Success if a record is found.
-  /**
    * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $message
-   *
-   * @return null|string
-   */
-  function assertDBNotNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
-    }
-
-    return CiviDBAssert::assertDBNotNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
-  }
-
-  // Request a record from the DB by seachColumn+searchValue. Success if returnColumn value is NULL.
-  /**
-   * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $message
-   */
-  function assertDBNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
-    }
-
-    return CiviDBAssert::assertDBNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
-  }
-
-  // Request a record from the DB by id. Success if row not found.
-  /**
-   * @param string $daoName
+   *   DAO Name of object we're evaluating.
    * @param int $id
-   * @param $message
+   *   Id of object
+   * @param array $match
+   *   Associative array of field name => expected value. Empty if asserting
+   *                      that a DELETE occurred
+   * @param bool $delete
+   *   are we checking that a DELETE action occurred?
    */
-  function assertDBRowNotExist($daoName, $id, $message) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+  public function assertDBState($daoName, $id, $match, $delete = FALSE) {
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBState($this, $daoName, $id, $match, $delete);
     }
-
-    return CiviDBAssert::assertDBRowNotExist($this, $daoName, $id, $message);
   }
 
-  // Compare a single column value in a retrieved DB record to an expected value
   /**
+   * Request a record from the DB by seachColumn+searchValue. Success if a record is found.
    * @param string $daoName
-   * @param $searchValue
-   * @param $returnColumn
-   * @param $searchColumn
-   * @param $expectedValue
+   * @param string $searchValue
+   * @param string $returnColumn
+   * @param string $searchColumn
    * @param string $message
    */
-  function assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
-                                $expectedValue, $message
-  ) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+  public function assertDBNotNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBNotNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
     }
-
-    return CiviDBAssert::assertDBCompareValue($daoName, $searchValue, $returnColumn, $searchColumn,
-      $expectedValue, $message
-    );
   }
 
-  // Compare all values in a single retrieved DB record to an array of expected values
   /**
+   * Request a record from the DB by searchColumn+searchValue. Success if returnColumn value is NULL.
+   * @param string $daoName
+   * @param string $searchValue
+   * @param string $returnColumn
+   * @param string $searchColumn
+   * @param string $message
+   */
+  public function assertDBNull($daoName, $searchValue, $returnColumn, $searchColumn, $message) {
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBNull($this, $daoName, $searchValue, $returnColumn, $searchColumn, $message);
+    }
+  }
+
+  /**
+   * Request a record from the DB by id. Success if row not found.
+   * @param string $daoName
+   * @param int $id
+   * @param string $message
+   */
+  public function assertDBRowNotExist($daoName, $id, $message) {
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBRowNotExist($this, $daoName, $id, $message);
+    }
+  }
+
+  /**
+   * Compare all values in a single retrieved DB record to an array of expected values.
    * @param string $daoName
    * @param array $searchParams
    * @param $expectedValues
    */
-  function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
+  public function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
+    if (self::checkDoLocalDBTest()) {
+      CiviDBAssert::assertDBCompareValues($this, $daoName, $searchParams, $expectedValues);
     }
-
-    return CiviDBAssert::assertDBCompareValues($this, $daoName, $searchParams, $expectedValues);
-  }
-
-  /**
-   * @param $expectedValues
-   * @param $actualValues
-   */
-  function assertAttributesEquals(&$expectedValues, &$actualValues) {
-    if (!self::checkDoLocalDBTest()) {
-      return;
-    }
-
-    return CiviDBAssert::assertAttributesEquals($expectedValues, $actualValues);
   }
 
   /**
@@ -1703,23 +1732,34 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $actual
    * @param string $message
    */
-  function assertType($expected, $actual, $message = '') {
-    return $this->assertInternalType($expected, $actual, $message);
+  public function assertType($expected, $actual, $message = '') {
+    $this->assertInternalType($expected, $actual, $message);
   }
 
   /**
-   * Add new Financial Account
+   * Add new Financial Account.
+   * @param $financialAccountTitle
+   * @param bool $financialAccountDescription
+   * @param bool $accountingCode
+   * @param bool $firstName
+   * @param bool $financialAccountType
+   * @param bool $taxDeductible
+   * @param bool $isActive
+   * @param bool $isTax
+   * @param bool $taxRate
+   * @param bool $isDefault
    */
-  function _testAddFinancialAccount($financialAccountTitle,
-                                    $financialAccountDescription = FALSE,
-                                    $accountingCode = FALSE,
-                                    $firstName = FALSE,
-                                    $financialAccountType = FALSE,
-                                    $taxDeductible = FALSE,
-                                    $isActive = FALSE,
-                                    $isTax = FALSE,
-                                    $taxRate = FALSE,
-                                    $isDefault = FALSE
+  public function _testAddFinancialAccount(
+    $financialAccountTitle,
+    $financialAccountDescription = FALSE,
+    $accountingCode = FALSE,
+    $firstName = FALSE,
+    $financialAccountType = FALSE,
+    $taxDeductible = FALSE,
+    $isActive = FALSE,
+    $isTax = FALSE,
+    $taxRate = FALSE,
+    $isDefault = FALSE
   ) {
 
     $this->openCiviPage("admin/financial/financialAccount", "reset=1");
@@ -1787,26 +1827,38 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Edit Financial Account
+   * Edit Financial Account.
+   * @param $editfinancialAccount
+   * @param bool $financialAccountTitle
+   * @param bool $financialAccountDescription
+   * @param bool $accountingCode
+   * @param bool $firstName
+   * @param bool $financialAccountType
+   * @param bool $taxDeductible
+   * @param bool $isActive
+   * @param bool $isTax
+   * @param bool $taxRate
+   * @param bool $isDefault
    */
-  function _testEditFinancialAccount($editfinancialAccount,
-                                     $financialAccountTitle = FALSE,
-                                     $financialAccountDescription = FALSE,
-                                     $accountingCode = FALSE,
-                                     $firstName = FALSE,
-                                     $financialAccountType = FALSE,
-                                     $taxDeductible = FALSE,
-                                     $isActive = TRUE,
-                                     $isTax = FALSE,
-                                     $taxRate = FALSE,
-                                     $isDefault = FALSE
+  public function _testEditFinancialAccount(
+    $editfinancialAccount,
+    $financialAccountTitle = FALSE,
+    $financialAccountDescription = FALSE,
+    $accountingCode = FALSE,
+    $firstName = FALSE,
+    $financialAccountType = FALSE,
+    $taxDeductible = FALSE,
+    $isActive = TRUE,
+    $isTax = FALSE,
+    $taxRate = FALSE,
+    $isDefault = FALSE
   ) {
     if ($firstName) {
       $this->openCiviPage("admin/financial/financialAccount", "reset=1");
     }
 
-    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1][text()='{$editfinancialAccount}']/../td[9]/span/a[text()='Edit']");
-    $this->clickLink("xpath=//table/tbody//tr/td[1][text()='{$editfinancialAccount}']/../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
+    $this->waitForElementPresent("xpath=//table/tbody//tr/td[1]/div[text()='{$editfinancialAccount}']/../../td[9]/span/a[text()='Edit']");
+    $this->clickLink("xpath=//table/tbody//tr/td[1]/div[text()='{$editfinancialAccount}']/../../td[9]/span/a[text()='Edit']", '_qf_FinancialAccount_cancel-botttom', FALSE);
 
     // Change Financial Account Name
     if ($financialAccountTitle) {
@@ -1874,10 +1926,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Delete Financial Account
+   * Delete Financial Account.
+   * @param $financialAccountTitle
    */
-  function _testDeleteFinancialAccount($financialAccountTitle) {
-    $this->click("xpath=//table/tbody//tr/td[1][text()='{$financialAccountTitle}']/../td[9]/span/a[text()='Delete']");
+  public function _testDeleteFinancialAccount($financialAccountTitle) {
+    $this->click("xpath=//table/tbody//tr/td[1]/div[text()='{$financialAccountTitle}']/../../td[9]/span/a[text()='Delete']");
     $this->waitForElementPresent('_qf_FinancialAccount_next-botttom');
     $this->click('_qf_FinancialAccount_next-botttom');
     $this->waitForElementPresent('link=Add Financial Account');
@@ -1885,9 +1938,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Verify data after ADD and EDIT
+   * Verify data after ADD and EDIT.
+   * @param $verifyData
    */
-  function _assertFinancialAccount($verifyData) {
+  public function _assertFinancialAccount($verifyData) {
     foreach ($verifyData as $key => $expectedValue) {
       $actualValue = $this->getValue($key);
       if ($key == 'parent_financial_account') {
@@ -1902,7 +1956,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    * @param $verifySelectFieldData
    */
-  function _assertSelectVerify($verifySelectFieldData) {
+  public function _assertSelectVerify($verifySelectFieldData) {
     foreach ($verifySelectFieldData as $key => $expectedvalue) {
       $actualvalue = $this->getSelectedLabel($key);
       $this->assertEquals($expectedvalue, $actualvalue);
@@ -1913,13 +1967,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $financialType
    * @param string $option
    */
-  function addeditFinancialType($financialType, $option = 'new') {
+  public function addeditFinancialType($financialType, $option = 'new') {
     $this->openCiviPage("admin/financial/financialType", "reset=1");
 
     if ($option == 'Delete') {
-      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span[2]");
+      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span[2]");
       $this->waitForElementPresent("css=span.btn-slide-active");
-      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[name]']/../td[7]/span[2]/ul/li[2]/a");
+      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[name]']/../../td[7]/span[2]/ul/li[2]/a");
       $this->waitForElementPresent("_qf_FinancialType_next");
       $this->click("_qf_FinancialType_next");
       $this->waitForElementPresent("newFinancialType");
@@ -1930,7 +1984,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->click("link=Add Financial Type");
     }
     else {
-      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[oldname]']/../td[7]/span/a[text()='Edit']");
+      $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1]/div[text()='$financialType[oldname]']/../../td[7]/span/a[text()='Edit']");
     }
     $this->waitForElementPresent("name");
     $this->type('name', $financialType['name']);
@@ -1963,10 +2017,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Give the specified permissions
+   * Give the specified permissions.
    * Note: this function logs in as 'admin' (logging out if necessary)
+   * @param $permission
    */
-  function changePermissions($permission) {
+  public function changePermissions($permission) {
     $this->webtestLogin('admin');
     $this->open("{$this->sboxPath}admin/people/permissions");
     $this->waitForElementPresent('edit-submit');
@@ -1982,7 +2037,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $profileTitle
    * @param $profileFields
    */
-  function addProfile($profileTitle, $profileFields) {
+  public function addProfile($profileTitle, $profileFields) {
     $this->openCiviPage('admin/uf/group', "reset=1");
 
     $this->clickLink('link=Add Profile', '_qf_Group_cancel-bottom');
@@ -2014,7 +2069,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $cost
    * @param $financialType
    */
-  function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
+  public function addPremium($name, $sku, $amount, $price, $cost, $financialType) {
     $this->waitForElementPresent("_qf_ManagePremiums_upload-bottom");
     $this->type("name", $name);
     $this->type("sku", $sku);
@@ -2033,18 +2088,19 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param $label
    * @param $financialAccount
    */
-  function addPaymentInstrument($label, $financialAccount) {
+  public function addPaymentInstrument($label, $financialAccount) {
     $this->openCiviPage('admin/options/payment_instrument', 'action=add&reset=1', "_qf_Options_next-bottom");
     $this->type("label", $label);
+    $this->type("value", "value" . $label);
     $this->select("financial_account_id", "value=$financialAccount");
     $this->click("_qf_Options_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
   /**
-   * Ensure we have a default mailbox set up for CiviMail
+   * Ensure we have a default mailbox set up for CiviMail.
    */
-  function setupDefaultMailbox() {
+  public function setupDefaultMailbox() {
     $this->openCiviPage('admin/mailSettings', 'action=update&id=1&reset=1');
     // Check if it hasn't already been set up
     if (!$this->getSelectedValue('protocol')) {
@@ -2061,7 +2117,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return string, timeout expressed in milliseconds
    */
-  function getTimeoutMsec() {
+  public function getTimeoutMsec() {
     // note: existing local versions of CiviSeleniumSettings may not declare $timeout, so use @
     $timeout = ($this->settings && @$this->settings->timeout) ? ($this->settings->timeout * 1000) : 30000;
     return (string) $timeout; // don't know why, but all our old code used a string
@@ -2072,17 +2128,19 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * checks custom fields rendering / loading properly on the fly WRT entity passed as parameter
    *
    *
-   * @param array  $customSets       custom sets i.e entity wise sets want to be created and checked
-                                     e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
-                                     'triggerElement' => $triggerElement))
-                                      array  $triggerElement:   the element which is responsible for custom group to load
-
-                                     which uses the entity info as its selection value
-   * @param array  $pageUrl          the url which on which the ajax custom group load takes place
-   * @param callable|boolean $beforeTriggering fn to execute before actual element triggering
+   * @param array $customSets
+   *   Custom sets i.e entity wise sets want to be created and checked.
+   *   e.g    $customSets = array(array('entity' => 'Contribution', 'subEntity' => 'Donation',
+   * 'triggerElement' => $triggerElement))
+   * array  $triggerElement:   the element which is responsible for custom group to load
+   *
+   * which uses the entity info as its selection value
+   * @param array $pageUrl
+   *   The url which on which the ajax custom group load takes place.
+   * @param string $beforeTriggering
    * @return void
    */
-  function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
+  public function customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, $beforeTriggering = NULL) {
     // FIXME: Testing a theory that these failures have something to do with permissions
     $this->webtestLogin('admin');
 
@@ -2102,7 +2160,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->waitForAjaxContent();
     $this->checkForErrorsOnPage();
 
-    foreach($return as $values) {
+    foreach ($return as $values) {
       foreach ($values as $entityType => $customData) {
         //initiate necessary variables
         list($entity, $entityData) = explode('_', $entityType);
@@ -2122,7 +2180,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
           }
           elseif ($elementType == 'checkbox') {
             $val = explode(',', $entityData);
-            foreach($val as $v) {
+            foreach ($val as $v) {
               $checkId = $this->getAttribute("xpath=//label[text()='{$v}']/@for");
               $this->check($checkId);
             }
@@ -2148,7 +2206,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    *
    * @return array
    */
-  function addCustomGroupField($customSets) {
+  public function addCustomGroupField($customSets) {
     $return = array();
     foreach ($customSets as $customSet) {
       $this->openCiviPage("admin/custom/group", "action=add&reset=1");
@@ -2187,7 +2245,12 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
       $customGroupTitle = preg_replace('/\s/', '_', trim($customGroupTitle));
       $return[] = array(
-        "{$customSet['entity']}_{$customSet['subEntity']}" => array('cgtitle' => $customGroupTitle, 'gid' => $gid, 'triggerElement' => $customSet['triggerElement']));
+        "{$customSet['entity']}_{$customSet['subEntity']}" => array(
+          'cgtitle' => $customGroupTitle,
+          'gid' => $gid,
+          'triggerElement' => $customSet['triggerElement'],
+        ),
+      );
 
       // Go home for a sec to give time for caches to clear
       $this->openCiviPage('');
@@ -2196,9 +2259,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Type and select first occurance of autocomplete
+   * Type and select first occurrence of autocomplete.
+   * @param $fieldName
+   * @param $label
+   * @param bool $multiple
+   * @param bool $xpath
    */
-  function select2($fieldName,$label, $multiple = FALSE, $xpath=FALSE) {
+  public function select2($fieldName, $label, $multiple = FALSE, $xpath = FALSE) {
     // In the case of chainSelect, wait for options to load
     $this->waitForElementNotPresent('css=select.loading');
     if ($multiple) {
@@ -2207,7 +2274,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->type("//*[@id='$fieldName']/../div/ul/li//input", $label);
       $this->typeKeys("//*[@id='$fieldName']/../div/ul/li//input", $label);
       $this->waitForElementPresent("//*[@class='select2-result-label']");
-      $this->clickAt("//*[@class='select2-results']/li[1]/div");
+      $this->clickAt("//*[contains(@class,'select2-result-selectable')]/div[contains(@class, 'select2-result-label')]");
     }
     else {
       if ($xpath) {
@@ -2228,16 +2295,25 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Select multiple options
+   * Select multiple options.
+   * @param $fieldid
+   * @param $params
+   * @param $isDate if multiple date is to be selected from datepicker
    */
-  function multiselect2($fieldid, $params) {
+  public function multiselect2($fieldid, $params, $isDate = FALSE) {
     // In the case of chainSelect, wait for options to load
     $this->waitForElementNotPresent('css=select.loading');
-    foreach($params as $value) {
-      $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
-      $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
-      $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
-      $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
+    foreach ($params as $value) {
+      if ($isDate) {
+        $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
+        $this->webtestFillDate($fieldid, $value, TRUE);
+      }
+      else {
+        $this->clickAt("xpath=//*[@id='$fieldid']/../div/ul//li/input");
+        $this->waitForElementPresent("xpath=//ul[@class='select2-results']");
+        $this->clickAt("xpath=//ul[@class='select2-results']//li/div[text()='$value']");
+        $this->assertElementContainsText("xpath=//*[@id='$fieldid']/preceding-sibling::div[1]/", $value);
+      }
     }
     // Wait a sec for select2 to update the original element
     sleep(1);
@@ -2245,8 +2321,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Check for unobtrusive status message as set by CRM.status
+   * @param null $text
    */
-  function checkCRMStatus($text=NULL) {
+  public function checkCRMStatus($text = NULL) {
     $this->waitForElementPresent("css=.crm-status-box-outer.status-success");
     if ($text) {
       $this->assertElementContainsText("css=.crm-status-box-outer.status-success", $text);
@@ -2255,8 +2332,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Check for obtrusive status message as set by CRM.alert
+   * @param $text
+   * @param string $type
    */
-  function checkCRMAlert($text, $type='success') {
+  public function checkCRMAlert($text, $type = 'success') {
     $this->waitForElementPresent("css=div.ui-notify-message.$type");
     $this->waitForText("css=div.ui-notify-message.$type", $text);
     // We got the message, now let's close it so the webtest doesn't get confused by lots of open alerts
@@ -2265,12 +2344,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Enable or disable Pop-ups via Display Preferences
+   * @param bool $enabled
    */
-  function enableDisablePopups($enabled = TRUE) {
+  public function enableDisablePopups($enabled = TRUE) {
     $this->openCiviPage('admin/setting/preferences/display', 'reset=1');
     $isChecked = $this->isChecked('ajaxPopupsEnabled');
     if (($isChecked && !$enabled) || (!$isChecked && $enabled)) {
-        $this->click('ajaxPopupsEnabled');
+      $this->click('ajaxPopupsEnabled');
     }
     if ($enabled) {
       $this->assertChecked('ajaxPopupsEnabled');
@@ -2282,9 +2362,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Attempt to get information about what went wrong if we encounter an error when loading a page
+   * Attempt to get information about what went wrong if we encounter an error when loading a page.
    */
-  function checkForErrorsOnPage() {
+  public function checkForErrorsOnPage() {
     foreach (array('Access denied', 'Page not found') as $err) {
       if ($this->isElementPresent("xpath=//h1[contains(., '$err')]")) {
         $this->fail("'$err' encountered at " . $this->getLocation() . "\nwhile logged in as '{$this->loggedInAs}'");
@@ -2298,4 +2378,33 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->fail($msg);
     }
   }
+
+  /**
+   * @return array
+   *   Contact record (per APIv3).
+   */
+  public function webtestGetLoggedInContact() {
+    $result = $this->rest_civicrm_api('Contact', 'get', array(
+      'id' => 'user_contact_id',
+    ));
+    $this->assertAPISuccess($result, 'Load logged-in contact');
+    return CRM_Utils_Array::first($result['values']);
+  }
+
+  public function assertAPISuccess($apiResult, $prefix = '') {
+    if (!empty($prefix)) {
+      $prefix .= ': ';
+    }
+    $errorMessage = empty($apiResult['error_message']) ? '' : " " . $apiResult['error_message'];
+
+    if (!empty($apiResult['debug_information'])) {
+      $errorMessage .= "\n " . print_r($apiResult['debug_information'], TRUE);
+    }
+    if (!empty($apiResult['trace'])) {
+      $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
+    }
+    $this->assertFalse(civicrm_error($apiResult), $prefix . $errorMessage);
+    //$this->assertEquals(0, $apiResult['is_error']);
+  }
+
 }

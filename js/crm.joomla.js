@@ -10,5 +10,5 @@ CRM.$(function($) {
         // J3 - restore footer admin bar position (CRM-15723)
         $('#status').css('z-index', '');
       }
-    })
+    });
 });

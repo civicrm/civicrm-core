@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,11 +39,11 @@
 class CRM_Event_Form_ManageEvent_TabHeader {
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_ManageEvent $form
    *
    * @return array
    */
-  static function build(&$form) {
+  public static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
@@ -52,20 +52,22 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array('tabSettings' => array(
-        'active' => self::getCurrentTab($tabs),
-      )));
+      ->addSetting(array(
+        'tabSettings' => array(
+          'active' => self::getCurrentTab($tabs),
+        ),
+      ));
     CRM_Event_Form_ManageEvent::addProfileEditScripts();
     return $tabs;
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_ManageEvent $form
    *
    * @return array
    * @throws Exception
    */
-  static function process(&$form) {
+  public static function process(&$form) {
     if ($form->getVar('_id') <= 0) {
       return NULL;
     }
@@ -91,6 +93,10 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs['pcp'] = array('title' => ts('Personal Campaigns')) + $default;
     $tabs['repeat'] = array('title' => ts('Repeat')) + $default;
 
+    // Repeat tab must refresh page when switching repeat mode so js & vars will get set-up
+    if (!$form->_isRepeatingEvent) {
+      unset($tabs['repeat']['class']);
+    }
 
     // check if we're in shopping cart mode for events
     $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
@@ -148,10 +154,9 @@ WHERE      e.id = %1
     CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs,
       array('event_id' => $eventID));
 
-    $fullName  = $form->getVar('_name');
+    $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
-    $new       = '';
-    $action = 'update';
+    $new = '';
 
     // hack for special cases.
     switch ($className) {
@@ -189,6 +194,7 @@ WHERE      e.id = %1
           $tabs[$key]['qfKey'] = NULL;
         }
 
+        $action = 'update';
         if ($key == 'reminder') {
           $action = 'browse';
         }
@@ -203,9 +209,9 @@ WHERE      e.id = %1
   }
 
   /**
-   * @param $form
+   * @param CRM_Event_Form_ManageEvent $form
    */
-  static function reset(&$form) {
+  public static function reset(&$form) {
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
@@ -215,7 +221,7 @@ WHERE      e.id = %1
    *
    * @return int|string
    */
-  static function getCurrentTab($tabs) {
+  public static function getCurrentTab($tabs) {
     static $current = FALSE;
 
     if ($current) {
@@ -234,4 +240,5 @@ WHERE      e.id = %1
     $current = $current ? $current : 'settings';
     return $current;
   }
+
 }

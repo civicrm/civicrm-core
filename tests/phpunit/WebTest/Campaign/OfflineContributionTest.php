@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     $this->webtestLogin('admin');
 
     // Create new group
@@ -109,8 +109,8 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
 
     $this->checkCRMAlert("Campaign $title");
 
-    $this->waitForElementPresent("//td[text()='$campaignTitle']");
-    $campaignId = $this->urlArg('id', $this->getAttribute("//td[text()='$campaignTitle']/../td[13]/span/a[text()='Edit']@href"));
+    $this->waitForElementPresent("//td[3]/div[text()='$campaignTitle']");
+    $campaignId = $this->urlArg('id', $this->getAttribute("//td[3]/div[text()='$campaignTitle']/../../td[13]/span/a[text()='Edit']@href"));
 
     $this->offlineContributionTest($campaignTitle, $campaignId);
 
@@ -122,7 +122,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
    * @param int $id
    * @param bool $past
    */
-  function offlineContributionTest($campaignTitle, $id, $past = FALSE) {
+  public function offlineContributionTest($campaignTitle, $id, $past = FALSE) {
     // Create a contact to be used as soft creditor
     $softCreditFname = substr(sha1(rand()), 0, 7);
     $softCreditLname = substr(sha1(rand()), 0, 7);
@@ -185,7 +185,6 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("invoice_id", time());
     $this->webtestFillDate('thankyou_date');
 
-
     //Premium section
     $this->click("Premium");
     $this->waitForElementPresent("fulfilled_date");
@@ -232,7 +231,7 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
   /**
    * @param string $groupName
    */
-  function pastCampaignsTest($groupName) {
+  public function pastCampaignsTest($groupName) {
     $this->openCiviPage('campaign/add', 'reset=1', '_qf_Campaign_upload-bottom');
 
     $pastTitle = substr(sha1(rand()), 0, 7);
@@ -265,10 +264,10 @@ class WebTest_Campaign_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("link=Campaigns");
     $this->click("search_form_campaign");
     $this->type("campaign_title", $pastCampaignTitle);
-    $this->clickAjaxLink("//a[text()='Search']", "//td[text()='$pastCampaignTitle']");
-    $campaignId = $this->urlArg('id', $this->getAttribute("//td[text()='$pastCampaignTitle']/../td[13]/span/a[text()='Edit']@href"));
+    $this->clickAjaxLink("//a[text()='Search']", "//td[3]/div[text()='$pastCampaignTitle']");
+    $campaignId = $this->urlArg('id', $this->getAttribute("//td[3]/div[text()='$pastCampaignTitle']/../../td[13]/span/a[text()='Edit']@href"));
 
     $this->offlineContributionTest($pastCampaignTitle, $campaignId, TRUE);
   }
-}
 
+}

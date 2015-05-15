@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testStandaloneCaseAdd() {
+  public function testStandaloneCaseAdd() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -43,7 +43,12 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -129,7 +134,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     //change the case status to Resolved to get the end date
     $this->click("xpath=//form[@id='CaseView']/div[2]/table/tbody/tr/td[4]/a");
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
-    $this->select("case_status_id","value=2");
+    $this->select("case_status_id", "value=2");
     $this->click("_qf_Activity_upload-top");
 
     $this->_testSearchbyDate($client['first_name'], $client['last_name'], "this.quarter");
@@ -138,7 +143,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->_testAssignToClient($client['first_name'], $client['last_name'], $caseTypeLabel);
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     // Log in as admin first to verify permissions for CiviCase
     $this->webtestLogin('admin');
 
@@ -146,7 +151,12 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->enableComponents("CiviCase");
 
     // let's give full CiviCase permissions to demo user (registered user).
-    $permission = array('edit-2-access-all-cases-and-activities', 'edit-2-access-my-cases-and-activities', 'edit-2-administer-civicase', 'edit-2-delete-in-civicase');
+    $permission = array(
+      'edit-2-access-all-cases-and-activities',
+      'edit-2-access-my-cases-and-activities',
+      'edit-2-administer-civicase',
+      'edit-2-delete-in-civicase',
+    );
     $this->changePermissions($permission);
 
     // Log in as normal user
@@ -165,7 +175,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param $validateStrings
    * @param $activityTypes
    */
-  function _testVerifyCaseSummary($validateStrings, $activityTypes) {
+  public function _testVerifyCaseSummary($validateStrings, $activityTypes) {
     $this->assertStringsPresent($validateStrings);
     foreach ($activityTypes as $aType) {
       $this->assertElementPresent("xpath=//div[@class='case-control-panel']/div/p/select", $aType);
@@ -178,7 +188,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param $caseRoles
    * @param string $creatorName
    */
-  function _testVerifyCaseRoles($caseRoles, $creatorName) {
+  public function _testVerifyCaseRoles($caseRoles, $creatorName) {
     $id = $this->urlArg('id');
     $this->waitForElementPresent("xpath=//table[@id='caseRoles-selector-$id']/tbody/tr[4]/td[2]/a");
     // check that expected roles are listed in the Case Roles pane
@@ -192,7 +202,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
   /**
    * @param $activityTypes
    */
-  function _testVerifyCaseActivities($activityTypes) {
+  public function _testVerifyCaseActivities($activityTypes) {
     $id = $this->urlArg('id');
     // check that expected auto-created activities are listed in the Case Activities table
     foreach ($activityTypes as $aType) {
@@ -204,7 +214,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param $subject
    * @param $openCaseData
    */
-  function _testVerifyOpenCaseActivity($subject, $openCaseData) {
+  public function _testVerifyOpenCaseActivity($subject, $openCaseData) {
     $id = $this->urlArg('id');
     // check that open case subject is present
     $this->assertText("case_id_$id", $subject);
@@ -226,7 +236,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    * @param string $lastName
    * @param $action
    */
-  function _testSearchbyDate($firstName, $lastName, $action) {
+  public function _testSearchbyDate($firstName, $lastName, $action) {
     // Find Cases
     if ($action != "0") {
       $this->openCiviPage('case/search', 'reset=1');
@@ -277,7 +287,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
    *
    * test for assign case to another client
    */
-   function _testAssignToClient($firstName, $lastName, $caseTypeLabel) {
+  public function _testAssignToClient($firstName, $lastName, $caseTypeLabel) {
     $this->openCiviPage('case/search', 'reset=1', '_qf_Search_refresh-bottom');
     $this->type('sort_name', $firstName);
     $this->clickLink('_qf_Search_refresh-bottom');
@@ -288,5 +298,5 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_EditClient_done-bottom');
     $this->assertElementContainsText('page-title', "{$client['display_name']} - $caseTypeLabel");
   }
-}
 
+}

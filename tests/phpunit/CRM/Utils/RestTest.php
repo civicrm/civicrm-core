@@ -5,22 +5,12 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Utils_RestTest
  */
 class CRM_Utils_RestTest extends CiviUnitTestCase {
-  /**
-   * @return array
-   */
-  function get_info() {
-    return array(
-      'name' => 'Rest Test',
-      'description' => 'Test Rest Interface Utilities',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function testProcessMultiple() {
+  public function testProcessMultiple() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
     $input = array(
       'cow' => array(

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,9 +40,9 @@
     {foreach from=$im item=item}
       {if $item.name or $item.provider}
         {if $item.name}
-        <div class="crm-summary-row">
+        <div class="crm-summary-row {if $item.is_primary eq 1} primary{/if}">
           <div class="crm-label">{$item.provider}&nbsp;({$item.location_type})</div>
-          <div class="crm-content crm-contact_im {if $item.is_primary eq 1} primary{/if}">{$item.name}</div>
+          <div class="crm-content crm-contact_im">{$item.name}</div>
         </div>
         {/if}
       {/if}

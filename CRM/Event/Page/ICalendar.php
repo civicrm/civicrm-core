@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -48,15 +48,15 @@ class CRM_Event_Page_ICalendar extends CRM_Core_Page {
    *
    * @return void
    */
-  function run() {
-    $id       = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
-    $type     = CRM_Utils_Request::retrieve('type', 'Positive', $this, FALSE, 0);
-    $start    = CRM_Utils_Request::retrieve('start', 'Positive', $this, FALSE, 0);
-    $end      = CRM_Utils_Request::retrieve('end', 'Positive', $this, FALSE, 0);
+  public function run() {
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
+    $type = CRM_Utils_Request::retrieve('type', 'Positive', $this, FALSE, 0);
+    $start = CRM_Utils_Request::retrieve('start', 'Positive', $this, FALSE, 0);
+    $end = CRM_Utils_Request::retrieve('end', 'Positive', $this, FALSE, 0);
     $iCalPage = CRM_Utils_Request::retrieve('list', 'Positive', $this, FALSE, 0);
-    $gData    = CRM_Utils_Request::retrieve('gData', 'Positive', $this, FALSE, 0);
-    $html     = CRM_Utils_Request::retrieve('html', 'Positive', $this, FALSE, 0);
-    $rss      = CRM_Utils_Request::retrieve('rss', 'Positive', $this, FALSE, 0);
+    $gData = CRM_Utils_Request::retrieve('gData', 'Positive', $this, FALSE, 0);
+    $html = CRM_Utils_Request::retrieve('html', 'Positive', $this, FALSE, 0);
+    $rss = CRM_Utils_Request::retrieve('rss', 'Positive', $this, FALSE, 0);
 
     $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
     $this->assign('events', $info);
@@ -102,5 +102,5 @@ class CRM_Event_Page_ICalendar extends CRM_Core_Page {
     }
     CRM_Utils_System::civiExit();
   }
-}
 
+}

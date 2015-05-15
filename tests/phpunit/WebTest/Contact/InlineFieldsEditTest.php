@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,19 +35,19 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testAddAndEditField() {
+  public function testAddAndEditField() {
     $this->webtestLogin();
 
     // Add a contact
     $firstName = 'WebTest' . substr(sha1(rand()), 0, 7);
-    $lastName  = 'InlineFieldsEdit' . substr(sha1(rand()), 0, 7);
+    $lastName = 'InlineFieldsEdit' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName);
     $contactId = $this->urlArg('cid');
     $this->waitForElementPresent('css=.crm-inline-edit-container.crm-edit-ready');
 
     // Set Communication Prefs
     $this->inlineEdit('crm-communication-pref-content', array(
-      'css=#email_greeting_display a' => TRUE,
+      'email_greeting_id' => TRUE,
       'privacy_do_not_email' => 1,
       'preferred_communication_method_1' => 1,
       'preferred_communication_method_2' => 1,
@@ -229,7 +229,8 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
   /**
    * Click on an inline-edit block and wait for it to open
    *
-   * @param $block string selector
+   * @param string $block
+   *   selector.
    * @param bool $wait
    */
   private function openInlineForm($block, $wait = TRUE) {
@@ -241,10 +242,11 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Enter values in an inline edit block and save
+   * Enter values in an inline edit block and save.
    *
-   * @param $block string selector
-   * @param $params array
+   * @param string $block
+   *   selector.
+   * @param array $params
    * @param \str|string $valid str: submit behavior
    *   'error' if we are expecting a form validation error,
    *   're_open' (default) after saving, opens the form and validate inputs
@@ -254,10 +256,11 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
   private function inlineEdit($block, $params, $valid = 're_open') {
     $this->openInlineForm($block);
     foreach ($params as $item => $val) {
-      switch(gettype($val)) {
+      switch (gettype($val)) {
         case 'boolean':
           $this->click($item);
           break;
+
         case 'string':
           if (substr($val, 0, 5) == 'date:') {
             $this->webtestFillDate($item, trim(substr($val, 5)));
@@ -266,10 +269,12 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
             $this->type($item, $val);
           }
           break;
+
         case 'integer':
           $method = $val ? 'check' : 'uncheck';
           $this->$method($item);
           break;
+
         case 'array':
           foreach ($val as $option) {
             $selector = is_int($option) ? 'value' : 'label';
@@ -279,7 +284,7 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
       }
     }
     $this->click("css=#$block input.crm-form-submit");
-    if ($valid !== 'error' && $valid !='errorJs') {
+    if ($valid !== 'error' && $valid != 'errorJs') {
       // Verify the form saved
       $this->waitForElementPresent("css=#$block > .crm-inline-block-content");
       $validate = FALSE;
@@ -303,20 +308,22 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
       if ($validate && $valid !== 'no_open') {
         $this->openInlineForm($block);
         foreach ($params as $item => $val) {
-          switch(gettype($val)) {
+          switch (gettype($val)) {
             case 'string':
               if ($val && substr($val, 0, 5) == 'date:') {
                 $val = date('m/d/Y', strtotime(trim(substr($val, 5))));
-                $item .= '_display';
+                $item = "xpath=//input[starts-with(@id, '{$item}_display_')]";
               }
               if ($val) {
                 $this->assertElementValueEquals($item, $val);
               }
               break;
+
             case 'integer':
               $method = $val ? 'assertChecked' : 'assertNotChecked';
               $this->$method($item);
               break;
+
             case 'array':
               foreach ($val as $option) {
                 $method = is_int($option) ? 'assertIsSelected' : 'assertSelected';
@@ -332,14 +339,16 @@ class WebTest_Contact_InlineFieldsEditTest extends CiviSeleniumTestCase {
     }
     // Verify there was a form error
     else {
-      switch($valid) {
+      switch ($valid) {
         case 'errorJs':
           $this->waitForElementPresent('css=label.error');
           break;
+
         default:
           $this->waitForElementPresent('css=#crm-notification-container .error.ui-notify-message');
           $this->click('css=#crm-notification-container .error .ui-notify-cross');
       }
     }
   }
+
 }

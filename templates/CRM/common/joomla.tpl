@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,9 +32,6 @@
 {* Joomla-only container to hold the civicrm menu *}
 <div id="crm-nav-menu-container"></div>
 {crmNavigationMenu is_default=1}
-
-{* include wysiwyg related files*}
-{include file="CRM/common/wysiwyg.tpl"}
 
 <table border="0" cellpadding="0" cellspacing="0" id="crm-content">
   <tr>
@@ -85,7 +82,7 @@
       {include file="CRM/common/status.tpl"}
       {crmRegion name='page-body'}
         <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
-        {if isset($isForm) and $isForm}
+        {if isset($isForm) and $isForm and isset($formTpl)}
           {include file="CRM/Form/$formTpl.tpl"}
         {else}
           {include file=$tplFile}

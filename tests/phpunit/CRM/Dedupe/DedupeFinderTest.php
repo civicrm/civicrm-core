@@ -6,7 +6,7 @@ require_once 'CiviTest/Contact.php';
  * Class CRM_Dedupe_DedupeFinderTest
  */
 class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
-  function testFuzzyDupes() {
+  public function testFuzzyDupes() {
     // make dupe checks based on based on following contact sets:
     // FIRST - LAST - EMAIL
     // ---------------------------------
@@ -96,10 +96,10 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // verify that all contacts have been created separately
     $this->assertEquals(count($contactIds), 7, 'Check for number of contacts.');
 
-    $dao               = new CRM_Dedupe_DAO_RuleGroup();
+    $dao = new CRM_Dedupe_DAO_RuleGroup();
     $dao->contact_type = 'Individual';
-    $dao->level        = 'Fuzzy';
-    $dao->is_default   = 1;
+    $dao->level = 'Fuzzy';
+    $dao->is_default = 1;
     $dao->find(TRUE);
 
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($dao->id, $groupId);
@@ -121,7 +121,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     civicrm_api('group', 'delete', $params);
   }
 
-  function testDupesByParams() {
+  public function testDupesByParams() {
     // make dupe checks based on based on following contact sets:
     // FIRST - LAST - EMAIL
     // ---------------------------------
@@ -191,17 +191,17 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'location_type_id' => 1,
         'version' => 3,
       );
-      $result = civicrm_api( 'address','create',$params );
+      $result = civicrm_api('address', 'create', $params);
       $contactIds[$count++] = $contact['id'];
     }
 
     // verify that all contacts have been created separately
     $this->assertEquals(count($contactIds), 7, 'Check for number of contacts.');
 
-    $dao               = new CRM_Dedupe_DAO_RuleGroup();
+    $dao = new CRM_Dedupe_DAO_RuleGroup();
     $dao->contact_type = 'Individual';
-    $dao->used        = 'General';
-    $dao->is_default   = 1;
+    $dao->used = 'General';
+    $dao->is_default = 1;
     $dao->find(TRUE);
 
     $fields = array(
@@ -222,7 +222,5 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       Contact::delete($contactId);
     }
   }
+
 }
-
-
-

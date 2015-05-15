@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     $this->webtestLogin('admin');
 
     // Enable CiviCampaign module if necessary
@@ -106,8 +106,8 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', "Campaign $title");
 
-    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[3][text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("xpath=//div[@id='campaignList']/div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[3][text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("xpath=//div[@id='campaignList']/div/table/tbody//tr/td[3]/div[text()='{$campaignTitle}']/../../td[1]");
+    $id = (int) $this->getText("xpath=//div[@id='campaignList']/div/table/tbody//tr/td[3]/div[text()='{$campaignTitle}']/../../td[1]");
     $this->activityAddTest($campaignTitle, $id);
   }
 
@@ -115,7 +115,7 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
    * @param $campaignTitle
    * @param int $id
    */
-  function activityAddTest($campaignTitle, $id) {
+  public function activityAddTest($campaignTitle, $id) {
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
     // We're using Quick Add block on the main page for this.
     $firstName1 = substr(sha1(rand()), 0, 7);
@@ -190,20 +190,19 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     $this->type("followup_activity_subject", "This is subject of schedule follow-up activity");
 
     // Clicking save.
-    $this->clickLink("_qf_Activity_upload",'link=View',FALSE);
+    $this->clickLink("_qf_Activity_upload", 'link=View', FALSE);
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', $subject);
 
-    $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-activity-selector-activity']/div[2]/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr[2]/td[8]/span/a[text()='View']");
-    $this->waitForElementPresent('_qf_Activity_cancel-bottom');
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]");
+    $this->click("xpath=//div[@class='crm-activity-selector-activity']/div[2]/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
 
     // verify Activity created
     $this->verifyText("xpath=//form[@id='Activity']/div[2]/table/tbody/tr[5]/td[2]/span", $campaignTitle);
   }
-}
 
+}

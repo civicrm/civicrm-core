@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     parent::setUp();
   }
 
-  function testDeceasedContactsAdvanceSearch() {
+  public function testDeceasedContactsAdvanceSearch() {
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -96,7 +96,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
    * @param string $groupName
    * @param bool $deceased
    */
-  function _testAddContact($firstName, $lastName, $email, $groupName, $deceased = FALSE) {
+  public function _testAddContact($firstName, $lastName, $email, $groupName, $deceased = FALSE) {
     $this->webtestAddContact($firstName, $lastName, $email);
     if ($deceased) {
       $this->click('link=Edit');
@@ -118,5 +118,5 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->select('group_id', "{$groupName}");
     $this->click('_qf_GroupContact_next');
   }
-}
 
+}

@@ -7,7 +7,7 @@ require_once 'CiviTest/Contact.php';
  */
 class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
 
     $this->quickCleanup(array('civicrm_uf_group', 'civicrm_uf_field'));
@@ -41,7 +41,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
       array(
         'field_name' => 'activity_date_time',
         'field_type' => 'Activity',
-      )
+      ),
     ));
     $fields = CRM_Core_BAO_UFField::getAvailableFields($ufGroupId);
 
@@ -175,17 +175,19 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
   /**
    * Make sure that the existence of a profile doesn't break listing all fields
    *
-  public function testGetAvailable_mixed() {
-    // FIXME
-    $this->testGetAvailable_full();
-    // $this->testGetAvailable_byGid();
-    $this->testGetAvailable_full();
-    // $this->testGetAvailable_byGid();
-  } // */
+   * public function testGetAvailable_mixed() {
+   * // FIXME
+   * $this->testGetAvailable_full();
+   * // $this->testGetAvailable_byGid();
+   * $this->testGetAvailable_full();
+   * // $this->testGetAvailable_byGid();
+   * } // */
 
   /**
-   * @param array $fields list of fields to include in the profile
-   * @return int field id
+   * @param array $fields
+   *   List of fields to include in the profile.
+   * @return int
+   *   field id
    */
   protected function createUFGroup($fields) {
     $ufGroup = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
@@ -209,4 +211,5 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
     return $ufGroup->id;
   }
+
 }

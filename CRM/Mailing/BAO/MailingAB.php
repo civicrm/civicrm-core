@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,23 +39,23 @@
 class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
 
   /**
-   * class constructor
+   * class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Construct a new mailingab object
+   * Construct a new mailingab object.
    *
-   * @params array $params        Form values
+   * @params array $params
+   *   Form values.
    *
-   * @param $params
+   * @param array $params
    * @param array $ids
    *
-   * @return object $mailingab      The new mailingab object
-   * @access public
-   * @static
+   * @return object
+   *   $mailingab      The new mailingab object
    */
   public static function create(&$params, $ids = array()) {
     $transaction = new CRM_Core_Transaction();
@@ -71,17 +71,17 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
   }
 
   /**
-   * function to add the mailings
+   * function to add the mailings.
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Reference array contains the id.
    *
-   * @access public
-   * @static
    *
    * @return object
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('mailingab_id', $ids, CRM_Utils_Array::value('id', $params));
 
     if ($id) {
@@ -113,19 +113,18 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
 
 
   /**
-   * Delete MailingAB and all its associated records
+   * Delete MailingAB and all its associated records.
    *
-   * @param  int $id id of the mail to delete
+   * @param int $id
+   *   Id of the mail to delete.
    *
    * @return void
-   * @access public
-   * @static
    */
   public static function del($id) {
     if (empty($id)) {
       CRM_Core_Error::fatal();
     }
-    CRM_Core_Transaction::create()->run(function() use ($id) {
+    CRM_Core_Transaction::create()->run(function () use ($id) {
       CRM_Utils_Hook::pre('delete', 'MailingAB', $id, CRM_Core_DAO::$_nullArray);
 
       $dao = new CRM_Mailing_DAO_MailingAB();
@@ -164,4 +163,25 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     ));
 
   }
+
+  /**
+   * get abtest based on Mailing ID
+   *
+   * @param int $mailingID
+   *   Mailing ID.
+   *
+   * @return object
+   */
+  public static function getABTest($mailingID) {
+    $query = "SELECT * FROM `civicrm_mailing_abtest` ab
+      where (ab.mailing_id_a = %1
+      OR ab.mailing_id_b = %1
+      OR ab.mailing_id_c = %1)
+      GROUP BY ab.id";
+    $params = array(1 => array($mailingID, 'Integer'));
+    $abTest = CRM_Core_DAO::executeQuery($query, $params);
+    $abTest->fetch();
+    return $abTest;
+  }
+
 }

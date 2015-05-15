@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,17 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  *  Test APIv3 civicrm_membership_payment* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Member
+ * @package CiviCRM_APIv3
+ * @subpackage API_Member
  */
-
 class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_contactID;
@@ -42,8 +40,10 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_membershipTypeID;
   protected $_membershipStatusID;
   protected $_contribution = array();
-  function setUp() {
+
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_contactID = $this->organizationCreate(NULL);
     $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
@@ -65,21 +65,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'thankyou_date' => '20080522',
     );
 
-    $this->_contribution = $this->callAPISuccess('contribution','create', $params);
-  }
-
-  function tearDown() {
-    $this->quickCleanup(
-      array(
-        'civicrm_contact',
-        'civicrm_contribution',
-        'civicrm_membership',
-        'civicrm_membership_payment',
-        'civicrm_membership_status',
-        'civicrm_membership_type',
-        'civicrm_line_item',
-      )
-    );
+    $this->_contribution = $this->callAPISuccess('contribution', 'create', $params);
   }
 
   ///////////////// civicrm_membership_payment_create methods
@@ -156,5 +142,5 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['membership_id'], $params['membership_id'], 'Check Membership Id');
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $params['contribution_id'], 'Check Contribution Id');
   }
-}
 
+}

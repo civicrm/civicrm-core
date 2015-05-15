@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Variables class contains definitions of all the core config settings that are allowed on
@@ -31,28 +31,28 @@
  * it need to be defined here first.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
 
   /**
-   * The debug level for civicrm
+   * The debug level for civicrm.
    * @var int
    */
   public $debug = 0;
   public $backtrace = 0;
 
   /**
-   * The directory where Smarty and plugins are installed
+   * The directory where Smarty and plugins are installed.
    * @var string
    */
   public $smartyDir = NULL;
   public $pluginsDir = NULL;
 
   /**
-   * The root directory of our template tree
+   * The root directory of our template tree.
    * @var string
    */
   public $templateDir = NULL;
@@ -253,7 +253,12 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $userFrameworkUsersTableName = 'users';
   public $userFrameworkClass = 'CRM_Utils_System_Drupal';
   public $userHookClass = 'CRM_Utils_Hook_Drupal';
+
+  /**
+   * @var string|CRM_Core_Permission_Base
+   */
   public $userPermissionClass = 'CRM_Core_Permission_Drupal';
+
   public $userFrameworkURLVar = 'q';
   public $userFrameworkDSN = NULL;
   public $userFrameworkBaseURL = NULL;
@@ -325,13 +330,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $logging = FALSE;
 
   /**
-   * Whether CiviCRM should check for newer versions
-   *
-   * @var boolean
-   */
-  public $versionCheck = TRUE;
-
-  /**
    * Whether public pages should display "empowered by CiviCRM"
    *
    * @var boolean
@@ -344,8 +342,12 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    * @var array
    */
   public $enableComponents = array(
-    'CiviContribute', 'CiviPledge', 'CiviMember',
-    'CiviEvent', 'CiviMail', 'CiviReport',
+    'CiviContribute',
+    'CiviPledge',
+    'CiviMember',
+    'CiviEvent',
+    'CiviMail',
+    'CiviReport',
   );
   public $enableComponentIDs = array(1, 6, 2, 3, 4, 8);
 
@@ -441,7 +443,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $formKeyDisable = FALSE;
 
   /**
-   * To determine whether the call is from cms or civicrm
+   * determine whether the call is from cms or civicrm
    */
   public $inCiviCRM = FALSE;
 
@@ -472,7 +474,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $wpBasePage = NULL;
 
   /**
-   * Provide addressSequence
+   * Provide addressSequence.
    *
    * @param
    *
@@ -487,7 +489,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached default currency symbol
+   * Provide cached default currency symbol.
    *
    * @param
    *
@@ -512,7 +514,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached default currency symbol
+   * Provide cached default currency symbol.
    *
    * @param
    *
@@ -533,7 +535,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached default country name
+   * Provide cached default country name.
    *
    * @param
    *
@@ -549,7 +551,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached country limit translated to names
+   * Provide cached country limit translated to names.
    *
    * @param
    *
@@ -579,7 +581,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   }
 
   /**
-   * Provide cached province limit translated to names
+   * Provide cached province limit translated to names.
    *
    * @param
    *
@@ -607,6 +609,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
     }
     return $cachedProvinceLimit;
   }
+
 }
 // end CRM_Core_Config
-

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -57,7 +57,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       )
     );
 
-    $op = new PHPUnit_Extensions_Database_Operation_Insert;
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute(
       $this->_dbconn,
       $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
@@ -79,7 +79,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanup(
       array(
         'civicrm_group',
@@ -110,10 +110,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     $this->callAPIFailure('uf_field', 'create', $params);
   }
 
-  function testCreateUFFieldWithWrongParams() {
+  public function testCreateUFFieldWithWrongParams() {
     $this->callAPIFailure('uf_field', 'create', array('field_name' => 'test field'));
     $this->callAPIFailure('uf_field', 'create', array('label' => 'name-less field'));
   }
+
   /**
    * Create a field with 'weight=1' and then a second with 'weight=1'. The second field
    * winds up with weight=1, and the first field gets bumped to 'weight=2'.
@@ -139,7 +140,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Deleting field
+   * Deleting field.
    */
   public function testDeleteUFField() {
     $ufField = $this->callAPISuccess('uf_field', 'create', $this->_params);
@@ -215,4 +216,5 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       }
     }
   }
+
 }

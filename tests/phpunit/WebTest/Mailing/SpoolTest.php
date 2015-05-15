@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 require_once 'CiviTest/CiviMailUtils.php';
@@ -38,12 +38,12 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testSpooledMailing() {
+  public function testSpooledMailing() {
 
     $this->webtestLogin();
 
     // Start spooling mail
-    $mut = new CiviMailUtils($this, true);
+    $mut = new CiviMailUtils($this, TRUE);
 
     // Add a contact
     $fname = substr(sha1(rand()), 0, 6);
@@ -96,4 +96,5 @@ class WebTest_Mailing_SpoolTest extends CiviSeleniumTestCase {
 
     }
   }
+
 }

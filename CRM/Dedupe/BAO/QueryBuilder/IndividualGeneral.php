@@ -1,7 +1,7 @@
 <?php
 
-// TODO: How to handle NULL values/records?
 /**
+ * TODO: How to handle NULL values/records?
  * Class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
  */
 class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_QueryBuilder {
@@ -10,13 +10,13 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_Query
    *
    * @return array
    */
-  static function record($rg) {
+  public static function record($rg) {
     $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params);
     $civicrm_address = CRM_Utils_Array::value('civicrm_address', $rg->params);
 
     // Since definitely have first and last name, escape them upfront.
-    $first_name     = CRM_Core_DAO::escapeString(CRM_Utils_Array::value('first_name', $civicrm_contact, ''));
-    $last_name      = CRM_Core_DAO::escapeString(CRM_Utils_Array::value('last_name', $civicrm_contact, ''));
+    $first_name = CRM_Core_DAO::escapeString(CRM_Utils_Array::value('first_name', $civicrm_contact, ''));
+    $last_name = CRM_Core_DAO::escapeString(CRM_Utils_Array::value('last_name', $civicrm_contact, ''));
     $street_address = CRM_Core_DAO::escapeString(CRM_Utils_Array::value('street_address', $civicrm_address, ''));
 
     $query = "
@@ -49,7 +49,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_Query
    *
    * @return array
    */
-  static function internal($rg) {
+  public static function internal($rg) {
     $query = "
             SELECT contact1.id id1,  contact2.id id2, {$rg->threshold} weight
             FROM civicrm_contact AS contact1
@@ -68,7 +68,5 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_Query
               AND " . self::internalFilters($rg);
     return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
   }
+
 }
-
-
-

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,10 +41,16 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   protected $_isTagSet;
 
   /**
-   * Build the form object
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Tag';
+  }
+
+  /**
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
@@ -81,7 +87,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
         $selectable = $this->add('checkbox', 'is_selectable', ts('Selectable?'));
         // Selectable should be checked by default when creating a new tag
         if ($this->_action == CRM_Core_Action::ADD) {
-          $selectable->setValue(1);        
+          $selectable->setValue(1);
         }
 
       }
@@ -93,7 +99,10 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       $this->add('text', 'name', ts('Name'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'name'), TRUE
       );
-      $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Core_DAO_Tag', $this->_id));
+      $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+          'CRM_Core_DAO_Tag',
+          $this->_id,
+        ));
 
       $this->add('text', 'description', ts('Description'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description')
@@ -127,9 +136,8 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   }
 
   /**
-   * Process the form submission
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -173,4 +181,3 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   }
 
 }
-

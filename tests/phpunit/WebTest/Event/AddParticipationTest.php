@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 
@@ -35,7 +35,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  function testEventParticipationAdd() {
+  public function testEventParticipationAdd() {
     $this->webtestLogin();
 
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
@@ -93,9 +93,9 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->checkCRMAlert("Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->clickAjaxLink("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
+    $this->clickAjaxLink("xpath=//*[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
       array(
@@ -122,7 +122,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     );
   }
 
-  function testEventParticipationAddWithMultipleRoles() {
+  public function testEventParticipationAddWithMultipleRoles() {
     $this->webtestLogin();
 
     // Adding contact with randomized first name (so we can then select that contact when creating event registration)
@@ -282,9 +282,9 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->checkCRMAlert("Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->clickAjaxLink("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
+    $this->clickAjaxLink("xpath=//*[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']", '_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
       array(
@@ -316,7 +316,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=//table/tbody/tr/td[text()='Total Amount']/following-sibling::td/strong", preg_quote('$ 800.00'), 'In line ' . __LINE__);
   }
 
-  function testEventAddMultipleParticipants() {
+  public function testEventAddMultipleParticipants() {
     $this->webtestLogin();
 
     $processorId = $this->webtestAddPaymentProcessor();
@@ -346,40 +346,82 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     //verifying the registered participants
     $status = "Registered (test)";
 
-    foreach($contacts as $contact) {
+    foreach ($contacts as $contact) {
       $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[9]", preg_quote($status));
       $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[4]/a", preg_quote($eventName));
-}
+    }
   }
 
-  function testAjaxCustomGroupLoad() {
+  public function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
 
     $customSets = array(
-      array('entity' => 'ParticipantEventName', 'subEntity' => 'Fall Fundraiser Dinner',
-        'triggerElement' => array('name' => "event_id", 'type' => "select2")),
-      array('entity' => 'ParticipantRole', 'subEntity' => 'Attendee','triggerElement' => array('name' => 'role_id', 'type' => "select"))
+      array(
+        'entity' => 'ParticipantEventName',
+        'subEntity' => 'Fall Fundraiser Dinner',
+        'triggerElement' => array(
+          'name' => "event_id",
+          'type' => "select2",
+        ),
+      ),
+      array(
+        'entity' => 'ParticipantRole',
+        'subEntity' => 'Attendee',
+        'triggerElement' => array(
+          'name' => 'role_id',
+          'type' => "select",
+        ),
+      ),
     );
     $pageUrl = array('url' => "participant/add", 'args' => "reset=1&action=add&context=standalone");
     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl, TRUE);
   }
 
-  /*
+  /**
    * Webtest for CRM-10983
-   *
    */
-  function testCheckDuplicateCustomDataLoad() {
+  public function testCheckDuplicateCustomDataLoad() {
     $this->webtestLogin();
 
     $customSets = array(
-      array('entity' => 'ParticipantEventType', 'subEntity' => '- Any -',
-        'triggerElement' => array('name' => "event_id", 'type' => "select")),
-      array('entity' => 'ParticipantEventName', 'subEntity' => '- Any -',
-        'triggerElement' => array('name' => "event_id", 'type' => "select")),
-      array('entity' => 'ParticipantEventName', 'subEntity' => 'Rain-forest Cup Youth Soccer Tournament',
-        'triggerElement' => array('name' => "event_id", 'type' => "select")),
-      array('entity' => 'ParticipantRole', 'subEntity' => '- Any -','triggerElement' => array('type' => "checkbox")),
-      array('entity' => 'ParticipantRole', 'subEntity' => 'Volunteer','triggerElement' => array('type' => "checkbox"))
+      array(
+        'entity' => 'ParticipantEventType',
+        'subEntity' => '- Any -',
+        'triggerElement' => array(
+          'name' => "event_id",
+          'type' => "select",
+        ),
+      ),
+      array(
+        'entity' => 'ParticipantEventName',
+        'subEntity' => '- Any -',
+        'triggerElement' => array(
+          'name' => "event_id",
+          'type' => "select",
+        ),
+      ),
+      array(
+        'entity' => 'ParticipantEventName',
+        'subEntity' => 'Rain-forest Cup Youth Soccer Tournament',
+        'triggerElement' => array(
+          'name' => "event_id",
+          'type' => "select",
+        ),
+      ),
+      array(
+        'entity' => 'ParticipantRole',
+        'subEntity' => '- Any -',
+        'triggerElement' => array(
+          'type' => "checkbox",
+        ),
+      ),
+      array(
+        'entity' => 'ParticipantRole',
+        'subEntity' => 'Volunteer',
+        'triggerElement' => array(
+          'type' => "checkbox",
+        ),
+      ),
     );
 
     $return = $this->addCustomGroupField($customSets);
@@ -402,14 +444,11 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * @param string $firstName
-   * @param string $lastName
    * @param int $processorId
    */
-  function _fillParticipantDetails($processorId) {
+  public function _fillParticipantDetails($processorId) {
     $contact = $this->createDialogContact();
 
-    $this->select('payment_processor_id', "value={$processorId}");
     $event_id = $this->getAttribute("xpath=//*[@id='event_id']@value");
     //check if it is the selected event
     $this->assertEquals($event_id, 3);
@@ -418,4 +457,5 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestAddBillingDetails();
     return $contact;
   }
+
 }

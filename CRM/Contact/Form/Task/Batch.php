@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,56 +39,49 @@
 class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
-   * The title of the group
+   * The title of the group.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * Maximum contacts that should be allowed to update
-   *
+   * Maximum contacts that should be allowed to update.
    */
   protected $_maxContacts = 100;
 
   /**
-   * Maximum profile fields that will be displayed
-   *
+   * Maximum profile fields that will be displayed.
    */
   protected $_maxFields = 9;
 
   /**
-   * Variable to store redirect path
-   *
+   * Variable to store redirect path.
    */
   protected $_userContext;
 
   /**
-   * When not to reset sort_name
+   * When not to reset sort_name.
    */
   protected $_preserveDefault = TRUE;
 
   /**
-   * Build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+  public function preProcess() {
+    // initialize the task and row fields
     parent::preProcess();
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
@@ -128,15 +121,18 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       )
     );
 
-
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_contactIds);
 
     // if below fields are missing we should not reset sort name / display name
     // CRM-6794
     $preserveDefaultsArray = array(
-      'first_name', 'last_name', 'middle_name',
-      'organization_name', 'prefix_id', 'suffix_id',
+      'first_name',
+      'last_name',
+      'middle_name',
+      'organization_name',
+      'prefix_id',
+      'suffix_id',
       'household_name',
     );
 
@@ -168,13 +164,12 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   /**
    * Set default values for the form.
    *
-   * @access public
    *
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (empty($this->_fields)) {
-      return;
+      return NULL;
     }
 
     $defaults = $sortName = array();
@@ -196,15 +191,15 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
+   * @param array $fields
+   *   The input form values.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     $externalIdentifiers = array();
     foreach ($fields['field'] as $componentId => $field) {
@@ -224,17 +219,16 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
 
-    $ufGroupId         = $this->get('ufGroupId');
-    $notify            = NULL;
+    $ufGroupId = $this->get('ufGroupId');
+    $notify = NULL;
     $inValidSubtypeCnt = 0;
     //send profile notification email if 'notify' field is set
     $notify = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $ufGroupId, 'notify');
@@ -261,14 +255,19 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     CRM_Core_Session::setStatus('', ts("Updates Saved"), 'success');
     if ($inValidSubtypeCnt) {
-      CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array('plural' => 'Contact Subtype field of %count contacts has not been updated.', 'count' => $inValidSubtypeCnt)), ts('Invalid Subtype'));
+      CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array(
+            'plural' => 'Contact Subtype field of %count contacts has not been updated.',
+            'count' => $inValidSubtypeCnt,
+          )), ts('Invalid Subtype'));
     }
   }
 
   /**
-   * Parse street address
-   * @param array $contactValues contact values
-   * @param CRM_Core_Form $form form object
+   * Parse street address.
+   * @param array $contactValues
+   *   Contact values.
+   * @param CRM_Core_Form $form
+   *   Form object.
    */
   public static function parseStreetAddress(&$contactValues, &$form) {
     if (!is_array($contactValues) || !is_array($form->_fields)) {
@@ -325,5 +324,5 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       $contactValues += $allParseValues;
     }
   }
-}
 
+}

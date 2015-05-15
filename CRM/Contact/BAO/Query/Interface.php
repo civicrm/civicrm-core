@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -112,12 +112,15 @@ abstract class CRM_Contact_BAO_Query_Interface {
    * search field. This approach assumes that each field has a unique-name (ie that the field's
    * unique-name in the API matches the unique-name in the search-builder).
    *
-   * @param array $apiEntities list of entities whose options should be automatically scanned using API metadata
-   * @param array $fieldOptions keys are field unique-names; values describe how to lookup the options
+   * @param array $apiEntities
+   *   List of entities whose options should be automatically scanned using API metadata.
+   * @param array $fieldOptions
+   *   Keys are field unique-names; values describe how to lookup the options.
    *   For boolean options, use value "yesno". For pseudoconstants/FKs, use the name of an API entity
    *   from which the metadata of the field may be queried. (Yes - that is a mouthful.)
    * @void
    */
   public function alterSearchBuilderOptions(&$apiEntities, &$fieldOptions) {
   }
+
 }

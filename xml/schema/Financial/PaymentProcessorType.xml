@@ -35,7 +35,7 @@
   </field>
   <field>
     <name>description</name>
-    <title>Processor Type De</title>
+    <title>Processor Type Description</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Payment Processor Description.</comment>
@@ -91,7 +91,7 @@
   </field>
   <field>
     <name>class_name</name>
-    <title>Suffix for PHP clas name implementation</title>
+    <title>Suffix for PHP class name implementation</title>
     <type>varchar</type>
     <length>255</length>
     <add>1.8</add>

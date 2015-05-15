@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,14 +31,9 @@
 </tr>
 <tr>
   {if $form.activity_type_id}
-    <td><label>{ts}Activity Type(s){/ts}</label>
-      <div id="Activity" class="listing-box">
-        {foreach from=$form.activity_type_id item="activity_type_val"}
-          <div class="{cycle values='odd-row,even-row'}">
-            {$activity_type_val.html}
-          </div>
-        {/foreach}
-      </div>
+    <td><label>{$form.activity_type_id.label}</label>
+       <br />
+       {$form.activity_type_id.html}
     </td>
   {else}
     <td>&nbsp;</td>
@@ -105,8 +100,8 @@
     {$form.activity_subject.html|crmAddClass:big}
   </td>
   <td colspan="2">
-    {$form.activity_status.label}<br/>
-    {$form.activity_status.html}
+    {$form.status_id.label}<br/>
+    {$form.status_id.html}
   </td>
 </tr>
 <tr>
