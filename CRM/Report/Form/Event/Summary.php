@@ -162,8 +162,8 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
             }
           }
           if (!empty($this->_params['id_value'])) {
-            $id_value = is_array($this->_params['id_value']) ? implode(',', $this->_params['id_value']) : $this->_params['id_value'];
-            $this->_participantWhere = " AND civicrm_participant.event_id IN ( {$id_value} ) ";
+            $idValue = is_array($this->_params['id_value']) ? implode(',', $this->_params['id_value']) : $this->_params['id_value'];
+            $this->_participantWhere = " AND civicrm_participant.event_id IN ( $idValue ) ";
           }
 
           if (!empty($clause)) {
