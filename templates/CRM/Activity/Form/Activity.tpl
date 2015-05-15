@@ -45,7 +45,7 @@
   <table class="form-layout">
   <tr>
     <td colspan="2">
-      <div class="status">{ts 1=$delName}Are you sure you want to delete '%1'?{/ts}</div>
+      <div class="status">{ts}Are you sure you want to delete {/ts}{if $delName}{ts 1=$delName}'%1'{/ts}{/if}?</div>
     </td>
   </tr>
   {elseif $action eq 1 or $action eq 2  or $action eq 4 or $context eq 'search' or $context eq 'smog'}
