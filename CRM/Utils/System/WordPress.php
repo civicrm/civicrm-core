@@ -342,8 +342,16 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (!$cmsRootPath) {
       CRM_Core_Error::fatal("Could not find the install directory for WordPress");
     }
-
-    require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-load.php';
+    $path = CRM_Core_BAO_Setting::getItem('CiviCRM Preferences', 'wpLoadPhp');
+    if (!empty($path)) {
+      require_once $path;
+    }
+    elseif (file_exists($cmsRootPath . DIRECTORY_SEPARATOR . 'wp-load.php')) {
+      require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-load.php';
+    }
+    else {
+      CRM_Core_Error::fatal("Could not find the bootstrap file for WordPress");
+    }
     $wpUserTimezone = get_option('timezone_string');
     if ($wpUserTimezone) {
       date_default_timezone_set($wpUserTimezone);
