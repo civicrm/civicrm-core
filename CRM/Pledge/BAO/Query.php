@@ -416,6 +416,14 @@ class CRM_Pledge_BAO_Query {
         );
         CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         return;
+
+      case 'pledge_contact_id':
+        $name = str_replace('pledge_', '', $name);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_pledge.$name", $op, $value, 'Integer');
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Pledge_DAO_Pledge', $name, $value, $op);
+        $query->_qill[$grouping][] = ts('Contact ID %1 %2', array(1 => $op, 2 => $value));
+        $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+        return;
     }
   }
 
