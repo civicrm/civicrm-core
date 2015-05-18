@@ -2735,7 +2735,7 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = self::buildClause("contact_a.contact_type", $op, $contactType);
       }
 
-      $this->_qill[$grouping][] = ts('Contact Type') . ' - ' . implode(' ' . ts('or') . ' ', $quill);
+      $this->_qill[$grouping][] = ts('Contact Type') . " $op " . implode(' ' . ts('or') . ' ', $quill);
 
       if (!empty($subTypes)) {
         $this->includeContactSubTypes($subTypes, $grouping);
