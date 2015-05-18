@@ -62,16 +62,13 @@ class CRM_Contact_Form_Edit_Email {
     $form->applyFilter('__ALL__', 'trim');
 
     //Email box
-    $form->addElement('text', "email[$blockId][email]", ts('Email'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', 'email'));
+    $form->addField("email[$blockId][email]", array('entity' => 'email'));
     $form->addRule("email[$blockId][email]", ts('Email is not valid.'), 'email');
     if (isset($form->_contactType) || $blockEdit) {
       //Block type
-      $form->addSelect("email[$blockId][location_type_id]", array(
-          'entity' => 'email',
-          'class' => 'eight',
-          'placeholder' => NULL,
-        ));
+      $form->addField("email[$blockId][location_type_id]", array('entity' => 'email', 'placeholder' => NULL, 'class' => 'eight'));
 
+      //TODO: Refactor on_hold field to select.
       $multipleBulk = CRM_Core_BAO_Email::isMultipleBulkMail();
 
       //On-hold select
@@ -84,7 +81,7 @@ class CRM_Contact_Form_Edit_Email {
         $form->addElement('select', "email[$blockId][on_hold]", '', $holdOptions);
       }
       else {
-        $form->addElement('advcheckbox', "email[$blockId][on_hold]", NULL);
+        $form->addField("email[$blockId][on_hold]", array('entity' => 'email'));
       }
 
       //Bulkmail checkbox
