@@ -734,4 +734,21 @@ return array(
     'description' => 'When enabled, "empowered by CiviCRM" is displayed at the bottom of public forms.',
     'help_text' => NULL,
   ),
+  'wpLoadPhp' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'wpLoadPhp',
+    'type' => 'String',
+    'html_type' => 'text',
+    'quick_form_type' => 'Element',
+    'prefetch' => 1,
+    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'default' => '',
+    'add' => '4.6',
+    'title' => 'WordPress Path to wp-load.php',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'CiviCRM will use this setting as path to bootstrap WP.',
+    'help_text' => NULL,
+  ),
 );

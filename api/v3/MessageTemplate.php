@@ -1,10 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | Project60 version 4.3                                              |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright TTTP (c) 2004-2013                                       |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |

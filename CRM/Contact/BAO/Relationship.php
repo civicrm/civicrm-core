@@ -234,15 +234,17 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
       $validContacts = TRUE;
       //validate contacts in update mode also.
+      $contactFields = self::setContactABFromIDs($params, $ids, $ids['contactTarget']);
       if (!empty($ids['contact']) && !empty($ids['contactTarget'])) {
-        if (self::checkValidRelationship($params, $ids, $ids['contactTarget'])) {
+        if (self::checkValidRelationship($contactFields, $ids, $ids['contactTarget'])) {
           $validContacts = FALSE;
           $invalid++;
         }
       }
       if ($validContacts) {
         // editing an existing relationship
-        $relationship = self::add($params, $ids, $ids['contactTarget']);
+        $singleInstanceParams = array_merge($params, $contactFields);
+        $relationship = self::add($singleInstanceParams, $ids, $ids['contactTarget']);
         $relationshipIds[] = $relationship->id;
         $relationships[$relationship->id] = $relationship;
         $saved++;
