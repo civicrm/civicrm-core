@@ -97,7 +97,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_receiptContactId = NULL;
 
   /**
-   * Keep a class variable for ALL membeshipID's so
+   * Keep a class variable for ALL membership IDs so
    * postProcess hook function can do something with it
    *
    * @var array
@@ -105,7 +105,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_membershipIDs = array();
 
   /**
-   * An array to hold a list of datefields on the form
+   * An array to hold a list of date fields on the form
    * so that they can be converted to ISO in a consistent manner
    *
    * @var array
@@ -583,52 +583,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $memTypeJs = array('onChange' => "CRM.buildCustomData( 'Membership', this.value );");
-
-    //build the form for auto renew.
-    $autoRenew = array();
-    if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
-      $this->addElement('checkbox',
-        'auto_renew',
-        ts('Membership renewed automatically'),
-        NULL,
-        array('onclick' => "buildReceiptANDNotice( );")
-      );
-
-      $this->assignPaymentRelatedVariables();
-
-      if ($this->_mode) {
-        if (!empty($this->_recurPaymentProcessors)) {
-          if (!empty($membershipType)) {
-            $sql = '
-SELECT  id,
-        auto_renew,
-        duration_unit,
-        duration_interval
- FROM   civicrm_membership_type
-WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
-            $recurMembershipTypes = CRM_Core_DAO::executeQuery($sql);
-            while ($recurMembershipTypes->fetch()) {
-              $autoRenew[$recurMembershipTypes->id] = $recurMembershipTypes->auto_renew;
-              foreach (array(
-                         'id',
-                         'auto_renew',
-                         'duration_unit',
-                         'duration_interval',
-                       ) as $fld) {
-                $this->_recurMembershipTypes[$recurMembershipTypes->id][$fld] = $recurMembershipTypes->$fld;
-              }
-            }
-          }
-          $memTypeJs = array(
-            'onChange' =>
-            "CRM.buildCustomData( 'Membership', this.value ); buildAutoRenew(this.value, null );",
-          );
-          $this->assign('allowAutoRenew', TRUE);
-        }
-      }
-    }
-
-    $this->assign('autoRenewOptions', json_encode($autoRenew));
 
     // for max_related: a little JS to show/hide & set default value
     $memTypeJs['onChange'] = "buildMaxRelated(this.value,true); " . $memTypeJs['onChange'];
@@ -1705,10 +1659,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $lineItems = CRM_Price_BAO_LineItem::getLineItems($params['contribution_id'], 'contribution', NULL, TRUE, TRUE);
           $itemId = key($lineItems);
           $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
-          $fieldType = NULL;
-          if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
-            $fieldType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'html_type');
-          }
+
           $lineItems[$itemId]['unit_price'] = $params['total_amount'];
           $lineItems[$itemId]['line_total'] = $params['total_amount'];
           $lineItems[$itemId]['id'] = $itemId;
