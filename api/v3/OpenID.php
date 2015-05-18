@@ -38,7 +38,7 @@
  *
  * @return array
  */
-function civicrm_api3_openid_create($params) {
+function civicrm_api3_open_i_d_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -50,7 +50,7 @@ function civicrm_api3_openid_create($params) {
  * @param array $params
  *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_openid_create_spec(&$params) {
+function _civicrm_api3_open_i_d_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
 }
 
@@ -62,7 +62,7 @@ function _civicrm_api3_openid_create_spec(&$params) {
  * @return array
  *   API result Array
  */
-function civicrm_api3_openid_delete($params) {
+function civicrm_api3_open_i_d_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -75,6 +75,6 @@ function civicrm_api3_openid_delete($params) {
  * @return array
  *   details of found OpenID
  */
-function civicrm_api3_openid_get($params) {
+function civicrm_api3_open_i_d_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
