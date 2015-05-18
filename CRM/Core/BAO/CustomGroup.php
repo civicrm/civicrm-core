@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Business object for managing custom data groups
- *
+ * Business object for managing custom data groups.
  */
 class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
 
@@ -142,7 +139,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       if ((!empty($params['is_multiple']) || $isMultiple) &&
         ($params['is_multiple'] != $isMultiple)
       ) {
-        $oldTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
+        $oldTableName = CRM_Core_DAO::getFieldValue(
+          'CRM_Core_DAO_CustomGroup',
           $params['id'],
           'table_name'
         );
@@ -763,9 +761,9 @@ ORDER BY civicrm_custom_group.weight,
    *   (reference) the group tree being build.
    * @param string $table
    *   Table name.
-   * @param unknown_type $groupID
+   * @param int $groupID
    *   Custom group ID.
-   * @param unknown_type $fieldID
+   * @param int $fieldID
    *   Custom field ID.
    */
   static public function buildCustomFieldData($dao, &$groupTree, $table, $groupID, $fieldID) {
@@ -868,7 +866,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string
    *   title
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $id, 'title');
@@ -890,8 +887,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return array
    *   array consisting of all group and field details
-   *
-   *
    */
   public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
     // create a new tree
@@ -1168,9 +1163,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param int $entityID
    * @param bool $allSubtypes
-   *
-   * @return void
-   *
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
     $addSubtypeClause = FALSE;
@@ -1230,17 +1222,17 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Delete the Custom Group.
    *
-   * @param $group
-   *   Object the DAO custom group object.
+   * @param CRM_Core_BAO_CustomGroup $group
+   *   Custom group object.
    * @param bool $force
    *   whether to force the deletion, even if there are custom fields.
    *
    * @return bool
-   *   false if field exists for this group, true if group gets deleted.
+   *   False if field exists for this group, true if group gets deleted.
    */
   public static function deleteGroup($group, $force = FALSE) {
 
-    //check wheter this contain any custom fields
+    //check whether this contain any custom fields
     $customField = new CRM_Core_DAO_CustomField();
     $customField->custom_group_id = $group->id;
     $customField->find();
@@ -1266,8 +1258,10 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * @param $groupTree
-   * @param $defaults
+   * Set defaults.
+   *
+   * @param array $groupTree
+   * @param array $defaults
    * @param bool $viewMode
    * @param bool $inactiveNeeded
    * @param int $action
@@ -1410,7 +1404,9 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * @param $groupTree
+   * PostProcess function.
+   *
+   * @param array $groupTree
    * @param array $params
    * @param bool $skipFile
    */
@@ -1542,8 +1538,6 @@ ORDER BY civicrm_custom_group.weight,
    *   Return inactive custom groups.
    * @param string $prefix
    *   Prefix for custom grouptree assigned to template.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
@@ -1570,8 +1564,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Extract the get params from the url, validate
-   * and store it in session
+   * Extract the get params from the url, validate and store it in session.
    *
    * @param CRM_Core_Form $form
    *   The form object.
