@@ -47,11 +47,11 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $this->_entity = 'openID';
+    $this->_entity = 'OpenID';
     $this->_contactID = $this->organizationCreate();
     $this->params = array(
       'contact_id' => $this->_contactID,
-      'name' => 'My OpenID handle',
+      'openid' => 'My OpenID handle',
       'location_type_id' => 1,
     );
   }
