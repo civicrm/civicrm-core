@@ -165,6 +165,9 @@ ORDER BY weight, label
     $params = array(1 => array($optionGroupID, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
+    $total = "SELECT COUNT(*) FROM civicrm_option_value WHERE option_group_id = %1";
+    $count = CRM_Core_DAO::singleValueQuery($total, $params);
+
     $customOption = array();
     $fields = array('label', 'value', 'is_active', 'weight');
     $config = CRM_Core_Config::singleton();
@@ -227,6 +230,7 @@ ORDER BY weight, label
     CRM_Utils_Weight::addOrder($customOption, 'CRM_Core_DAO_OptionValue',
       'id', $returnURL, $filter
     );
+    $this->assign('count', $count);
     $this->assign('customOption', $customOption);
   }
 
