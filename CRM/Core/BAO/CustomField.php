@@ -1113,31 +1113,29 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return string
    *   the display value
-   *
    */
   public static function getDisplayValue($value, $id, &$options, $contactID = NULL, $fieldID = NULL) {
     $option = &$options[$id];
     $attributes = &$option['attributes'];
     $html_type = $attributes['html_type'];
     $data_type = $attributes['data_type'];
-    $format = CRM_Utils_Array::value('format', $attributes);
 
     return self::getDisplayValueCommon($value,
       $option,
       $html_type,
       $data_type,
-      $format,
       $contactID,
       $fieldID
     );
   }
 
   /**
-   * @param $value
-   * @param $option
-   * @param $html_type
-   * @param $data_type
-   * @param null $format
+   * Get display value.
+   *
+   * @param string $value
+   * @param array $option
+   * @param string $html_type
+   * @param string $data_type
    * @param int $contactID
    * @param int $fieldID
    *
@@ -1148,7 +1146,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     &$option,
     $html_type,
     $data_type,
-    $format = NULL,
     $contactID = NULL,
     $fieldID = NULL
   ) {
