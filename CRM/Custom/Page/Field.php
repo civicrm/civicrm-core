@@ -171,10 +171,10 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $customField[$customFieldBAO->id]['data_type'] = $customFieldDataType[$customField[$customFieldBAO->id]['data_type']];
       $customField[$customFieldBAO->id]['order'] = $customField[$customFieldBAO->id]['weight'];
 
+      $links = self::actionLinks();
       if (!empty($customFieldBAO->option_group_id)) {
         $total = "SELECT COUNT(*) FROM civicrm_option_value WHERE option_group_id = {$customFieldBAO->option_group_id}";
         $count = CRM_Core_DAO::singleValueQuery($total);
-        $links = self::actionLinks();
         if ($count > 10) {
           $links[CRM_Core_Action::BROWSE]['class'] = 'no-popup';
         }

@@ -39,18 +39,17 @@ class CRM_Custom_Page_AJAX {
   /**
    * Get list of options.
    *
-   * @return array
    */
   public static function getOptionList() {
     $params = $_REQUEST;
 
     $sortMapper = array(
-        0 => 'options.label',
-        1 => 'options.value',
-        2 => '',
-        3 => 'options.weight',
-        4 => '',
-        5 => '',
+      0 => 'options.label',
+      1 => 'options.value',
+      2 => '',
+      3 => 'options.weight',
+      4 => '',
+      5 => '',
     );
 
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -83,4 +82,5 @@ class CRM_Custom_Page_AJAX {
     echo CRM_Utils_JSON::encodeDataTableSelector($options, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
+
 }
