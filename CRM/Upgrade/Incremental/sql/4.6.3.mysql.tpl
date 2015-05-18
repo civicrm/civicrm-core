@@ -64,3 +64,10 @@ COLLATE utf8_unicode_ci;
 ALTER TABLE civicrm_contribution_recur
   ADD COLUMN `payment_token_id` int(10) unsigned DEFAULT NULL COMMENT 'Optionally used to store a link to a payment token used for this recurring contribution.',
   ADD CONSTRAINT `FK_civicrm_contribution_recur_payment_token_id` FOREIGN KEY (`payment_token_id`) REFERENCES `civicrm_payment_token` (`id`) ON DELETE SET NULL;
+
+--CRM-16480: set total_amount and financial_type fields 'is_required' to null
+SELECT @uf_group_id_contribution := max(id) from civicrm_uf_group where name = 'contribution_batch_entry';
+SELECT @uf_group_id_membership := max(id) from civicrm_uf_group where name = 'membership_batch_entry';
+
+UPDATE civicrm_uf_field
+SET is_required = 0 WHERE uf_group_id IN (@uf_group_id_contribution, @uf_group_id_membership) AND field_name IN ('financial_type', 'total_amount');

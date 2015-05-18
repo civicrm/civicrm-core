@@ -534,7 +534,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    */
   public function tempTable($applyLimit = TRUE) {
     // create temp table with contact ids,contribtuion id,membership id
-    $dropTempTable = 'DROP TABLE IF EXISTS civireport_membership_contribution_detail';
+    $dropTempTable = 'DROP TEMPORARY TABLE IF EXISTS civireport_membership_contribution_detail';
     CRM_Core_DAO::executeQuery($dropTempTable);
 
     $sql = 'CREATE TEMPORARY TABLE civireport_membership_contribution_detail

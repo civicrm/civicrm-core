@@ -674,12 +674,20 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (property_exists($form, '_discountId') && $form->_discountId) {
       $discountId = $form->_discountId;
     }
+
+    //CRM-16456 get all price field including expired one.
+    $getAllPriceField = TRUE;
+    $className = CRM_Utils_System::getClassName($form);
+    if ($className == 'CRM_Event_Form_ParticipantFeeSelection' && $form->_action == CRM_Core_Action::UPDATE) {
+      $getAllPriceField = FALSE;
+    }
+
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', TRUE, $priceSetId);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField, $priceSetId);
     }
     else {
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', TRUE);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField);
     }
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'

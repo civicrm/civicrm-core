@@ -45,6 +45,7 @@
         });
       });
     }, RECIPIENTS_DEBOUNCE_MS);
+    $scope.$watchCollection("mailing.dedupe_email", refreshRecipients);
     $scope.$watchCollection("mailing.recipients.groups.include", refreshRecipients);
     $scope.$watchCollection("mailing.recipients.groups.exclude", refreshRecipients);
     $scope.$watchCollection("mailing.recipients.mailings.include", refreshRecipients);
