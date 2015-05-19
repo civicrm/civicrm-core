@@ -444,6 +444,7 @@
     toggleConfirmButton();
     enableHonorType();
     showRecurHelp();
+    skipPaymentMethod();
   });
 
   function showHidePayPalExpressOption() {
@@ -455,6 +456,28 @@
       cj("#paypalExpress").show();
       cj("#crm-submit-buttons").hide();
     }
+  }
+  
+  function showHidePayment(flag) {
+    if (flag) {
+      cj("#billing-payment-block").hide();
+      cj(".payment_options-group").hide();  
+    }
+    else {
+      cj("#billing-payment-block").hide();
+      cj(".payment_options-group").hide();  
+    }
+  }
+  
+  function skipPaymentMethod() {
+    var flag = false;
+    cj('.price-set-option-content input').each( function(){
+      currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
+      if( cj(this).is(':checked') && currentTotal == 0 ) {
+          flag = true;
+      }
+    });
+    showHidePayment(flag);
   }
 
   CRM.$(function($) {
@@ -480,6 +503,13 @@
     }
 
     $('#pricevalue').each(toggleBillingBlockIfFree).on('change', toggleBillingBlockIfFree);
+    var flag = false;
+    cj('.price-set-option-content input').change(function () {
+      if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
+        flag = true;
+      }
+      showHidePayment(flag);
+    });
   });
   {/literal}
 </script>
