@@ -110,6 +110,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       CRM_Custom_Form_CustomData::preProcess($this);
     }
 
+    // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
+    $this->assign('formClass', 'membershiprenew');
     parent::preProcess();
     // check for edit permission
     if (!CRM_Core_Permission::check('edit memberships')) {
@@ -423,6 +425,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->_contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
     $this->assign('email', $this->_contributorEmail);
+    // The member form uses emailExists. Assigning both while we transition / synchronise.
+    $this->assign('emailExists', $this->_contributorEmail);
 
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
       'mailing_backend'
@@ -437,13 +441,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
     }
     $this->addFormRule(array('CRM_Member_Form_MembershipRenewal', 'formRule'));
-    if ($this->_context != 'standalone') {
-      //CRM-10223 - allow contribution to be recorded against different contact
-      // causes a conflict in standalone mode so skip in standalone for now
-      $this->addElement('checkbox', 'contribution_contact', ts('Record Payment from a Different Contact?'));
-      $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
-      $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
-    }
+    $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different
+      Contact?'));
+    $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
+    $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
   }
 
   /**
@@ -798,12 +799,13 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $this->assign('isAmountzero', 0);
         $this->assign('is_pay_later', 0);
         $this->assign('isPrimary', 1);
+        $this->assign('receipt_text_renewal', $this->_params['receipt_text']);
         if ($this->_mode == 'test') {
           $this->assign('action', '1024');
         }
       }
 
-      list($mailSend, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      list($mailSend) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         array(
           'groupName' => 'msg_tpl_workflow_membership',
           'valueName' => 'membership_offline_receipt',

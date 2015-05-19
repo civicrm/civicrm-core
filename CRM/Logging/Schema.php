@@ -49,7 +49,7 @@ class CRM_Logging_Schema {
   //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement
   private $exceptions = array(
     'civicrm_job' => array('last_run'),
-    'civicrm_group' => array('cache_date'),
+    'civicrm_group' => array('cache_date', 'refresh_date'),
   );
 
   /**

@@ -177,7 +177,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('cdType', TRUE);
       return CRM_Custom_Form_CustomData::preProcess($this);
     }
-
+    // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
+    $this->assign('formClass', 'membership');
     parent::preProcess();
     // get price set id.
     $this->_priceSetId = CRM_Utils_Array::value('priceSetId', $_GET);
@@ -741,9 +742,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
     );
 
-    //CRM-10223 - allow contribution to be recorded against different contact
-    // causes a conflict in standalone mode so skip in standalone for now
     $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
+
     $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
     $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
 
@@ -755,7 +755,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
-    $this->add('textarea', 'receipt_text_signup', ts('Receipt Message'));
+    $this->add('textarea', 'receipt_text', ts('Receipt Message'));
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     if ($this->_contactID) {
@@ -1849,7 +1849,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if (!empty($formValues['send_receipt']) && $receiptSend) {
       $formValues['contact_id'] = $this->_contactID;
       $formValues['contribution_id'] = $contributionId;
-
+      // We really don't need a distinct receipt_text_signup vs receipt_text_renewal as they are
+      // handled in the receipt. But by setting one we avoid breaking templates for now
+      // although at some point we should switch in the templates.
+      $formValues['receipt_text_signup'] = $formValues['receipt_text'];
       // send email receipt
       $mailSend = self::emailReceipt($this, $formValues, $membership);
     }
