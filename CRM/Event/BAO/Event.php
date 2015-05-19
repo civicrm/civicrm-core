@@ -556,7 +556,7 @@ $event_summary_limit
           continue;
         }
         $class = $statusValue['class'];
-        $statusCount = self::eventTotalSeats($dao->id, "( participant.status_id = {$statusId} AND participant.is_test = 0 )");
+        $statusCount = self::eventTotalSeats($dao->id, "( participant.status_id = {$statusId} )");
         if ($statusCount) {
           $urlString = "reset=1&force=1&event={$dao->id}&status=$statusId";
           $statusInfo = array(
