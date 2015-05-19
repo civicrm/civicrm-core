@@ -271,7 +271,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       }
     }
 
-    if ($batchTotal != $self->_batchInfo['total']) {
+    if ((string) $batchTotal !== $self->_batchInfo['total']) {
       $self->assign('batchAmountMismatch', TRUE);
       $errors['_qf_defaults'] = ts('Total for amounts entered below does not match the expected batch total.');
     }
