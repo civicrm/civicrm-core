@@ -525,7 +525,7 @@ class CRM_Core_Resources {
     $patterns = (array) $patterns;
     $files = array();
     foreach ($patterns as $pattern) {
-      if ($pattern{0} === '/') {
+      if (CRM_Utils_File::isAbsolute($pattern)) {
         // Absolute path.
         $files = array_merge($files, (array) glob($pattern, $flags));
       }
