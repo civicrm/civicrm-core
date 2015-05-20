@@ -68,8 +68,8 @@ class api_v3_GrantTest extends CiviUnitTestCase {
 
   public function testCreateGrant() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
 
@@ -134,7 +134,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $this->ids['grant'][0] = $result['id'];
     $result = $this->callAPIAndDocument($this->_entity, 'get', array('rationale' => 'Just Because'), __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
   }
 
   public function testDeleteGrant() {
@@ -142,7 +142,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $checkDeleted['count']);
   }
 
   /**

@@ -139,10 +139,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $result = CRM_Contact_BAO_ContactType::add($params);
-    $this->assertEquals($result->label, $params['label'], 'In line ' . __LINE__);
-    $this->assertEquals($result->name, $params['name'], 'In line ' . __LINE__);
-    $this->assertEquals($result->parent_id, $params['parent_id'], 'In line ' . __LINE__);
-    $this->assertEquals($result->is_active, $params['is_active'], 'In line ' . __LINE__);
+    $this->assertEquals($result->label, $params['label']);
+    $this->assertEquals($result->name, $params['name']);
+    $this->assertEquals($result->parent_id, $params['parent_id']);
+    $this->assertEquals($result->is_active, $params['is_active']);
     CRM_Contact_BAO_ContactType::del($result->id);
 
     $params = array(
@@ -152,10 +152,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'is_active' => 0,
     );
     $result = CRM_Contact_BAO_ContactType::add($params);
-    $this->assertEquals($result->label, $params['label'], 'In line ' . __LINE__);
-    $this->assertEquals($result->name, $params['name'], 'In line ' . __LINE__);
-    $this->assertEquals($result->parent_id, $params['parent_id'], 'In line ' . __LINE__);
-    $this->assertEquals($result->is_active, $params['is_active'], 'In line ' . __LINE__);
+    $this->assertEquals($result->label, $params['label']);
+    $this->assertEquals($result->name, $params['name']);
+    $this->assertEquals($result->parent_id, $params['parent_id']);
+    $this->assertEquals($result->is_active, $params['is_active']);
     CRM_Contact_BAO_ContactType::del($result->id);
   }
 

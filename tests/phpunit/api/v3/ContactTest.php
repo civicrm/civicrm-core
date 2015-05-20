@@ -385,7 +385,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
     $customFldId = $result['values'][$result['id']]['api.CustomField.create']['id'];
-    $this->assertNotNull($result['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $this->assertNotNull($customFldId, 'in line ' . __LINE__);
 
     $params = array(
@@ -395,7 +395,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $customFldDate = date("YmdHis", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
     $this->assertNotNull($customFldDate, 'in line ' . __LINE__);
     $this->assertEquals($dateTime, $customFldDate);
@@ -418,7 +418,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.CustomValue.get' => 1,
     );
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $customFldDate = date("Ymd", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
     $customFldTime = date("His", strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
     $this->assertNotNull($customFldDate, 'in line ' . __LINE__);
@@ -2026,7 +2026,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPISuccess('address', 'create', $params);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
 
     // now do a proximity search with a close enough geocode and hope to match
     // that specific contact only!
@@ -2037,7 +2037,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'distance' => 10,
     );
     $result = $this->callAPISuccess('contact', 'proximity', $proxParams);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
   }
 
   /**
@@ -2185,14 +2185,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->individualCreate(array('last_name' => $name, 'is_deleted' => 1));
     // We should get all but the deleted contact.
     $result = $this->callAPISuccess('contact', 'getlist', array('input' => $name));
-    $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(2, $result['count']);
     // Force-exclude the deceased contact.
     $result = $this->callAPISuccess('contact', 'getlist', array(
       'input' => $name,
       'params' => array('is_deceased' => 0),
     ));
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals($contact, $result['values'][0]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($contact, $result['values'][0]['id']);
   }
 
   /**

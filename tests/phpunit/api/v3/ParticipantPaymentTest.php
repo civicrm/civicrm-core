@@ -118,7 +118,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('participant_payment', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertTrue(array_key_exists('id', $result), 'in line ' . __LINE__);
+    $this->assertTrue(array_key_exists('id', $result));
 
     //delete created contribution
     $this->contributionDelete($contributionID);
@@ -133,7 +133,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   public function testPaymentUpdateWrongParamsType() {
     $params = 'a string';
     $result = $this->callAPIFailure('participant_payment', 'create', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
+    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
 
   /**
