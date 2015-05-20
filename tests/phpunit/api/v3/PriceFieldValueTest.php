@@ -138,8 +138,8 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   public function testCreatePriceFieldValue() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 
@@ -151,7 +151,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'name' => 'contribution_amount',
     );
     $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $getResult['count']);
     $this->callAPISuccess('price_field_value', 'delete', array('id' => $createResult['id']));
   }
 
@@ -183,7 +183,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
 
@@ -211,7 +211,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $result1 = $this->callAPISuccess($this->_entity, 'create', $params1);
     $result2 = $this->callAPISuccess($this->_entity, 'create', $params2);
     $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' => $this->priceFieldID1));
-    $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(2, $result['count']);
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result1['id']));
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result2['id']));
   }

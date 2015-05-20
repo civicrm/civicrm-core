@@ -574,7 +574,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   public function testUpdateWrongParamsType() {
     $params = 'a string';
     $result = $this->callAPIFailure('participant', 'create', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
+    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
 
   /**

@@ -134,8 +134,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   public function testCreate() {
 
     $result = $this->callAPIAndDocument('note', 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note', 'in line ' . __LINE__);
-    $this->assertEquals(date('Y-m-d', strtotime($this->_params['modified_date'])), date('Y-m-d', strtotime($result['values'][$result['id']]['modified_date'])), 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note');
+    $this->assertEquals(date('Y-m-d', strtotime($this->_params['modified_date'])), date('Y-m-d', strtotime($result['values'][$result['id']]['modified_date'])));
 
     $this->assertArrayHasKey('id', $result);
     $note = array(
@@ -156,8 +156,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('Note', 'Create', $params);
     $this->assertAPISuccess($result, 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][0]['note'], "Hello!!! ' testing Note", 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][0]['subject'], "With a '", 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][0]['note'], "Hello!!! ' testing Note");
+    $this->assertEquals($result['values'][0]['subject'], "With a '");
     $this->assertArrayHasKey('id', $result, 'in line ' . __LINE__);
 
     //CleanUP
@@ -221,9 +221,9 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $note = $this->callAPISuccess('Note', 'Get', array());
     $this->assertEquals($note['id'], $this->_noteID, 'in line ' . __LINE__);
     $this->assertEquals($note['values'][$this->_noteID]['entity_id'], $this->_contactID, 'in line ' . __LINE__);
-    $this->assertEquals($note['values'][$this->_noteID]['entity_table'], 'civicrm_contact', 'in line ' . __LINE__);
-    $this->assertEquals('Hello World', $note['values'][$this->_noteID]['subject'], 'in line ' . __LINE__);
-    $this->assertEquals('Note1', $note['values'][$this->_noteID]['note'], 'in line ' . __LINE__);
+    $this->assertEquals($note['values'][$this->_noteID]['entity_table'], 'civicrm_contact');
+    $this->assertEquals('Hello World', $note['values'][$this->_noteID]['subject']);
+    $this->assertEquals('Note1', $note['values'][$this->_noteID]['note']);
   }
 
   /**

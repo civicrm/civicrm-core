@@ -105,8 +105,8 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals(1, $softcontribution['count']);
     $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contribution_id'], $this->_contributionId, 'In line ' . __LINE__);
     $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contact_id'], $this->_softIndividual1Id, 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['amount'], '10.00', 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['currency'], 'USD', 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['amount'], '10.00');
+    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['currency'], 'USD');
     $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['soft_credit_type_id'], 4, 'In line ' . __LINE__);
 
     //create a second soft contribution on the same hard contribution - we are testing that 'id' gets the right soft contribution id (not the contribution id)
@@ -121,7 +121,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contribution_soft', 'get', array(
       'id' => $this->_softcontribution['id'],
     ));
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertEquals($this->_softcontribution['id'], $result['id']);
     $this->assertEquals($this->_softcontribution['id'], $result['id'], print_r($softcontribution, TRUE));
 
@@ -137,7 +137,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
         'contact_id' => $this->_softIndividual2Id,
       )
     );
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
 
     $this->callAPISuccess('contribution_soft', 'Delete', array(
       'id' => $this->_softcontribution['id'],
@@ -211,8 +211,8 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $softcontribution = $this->callAPIAndDocument('contribution_soft', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contribution_id'], $this->_contributionId, 'In line ' . __LINE__);
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contact_id'], $this->_softIndividual1Id, 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['amount'], '10.00', 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['currency'], 'USD', 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['amount'], '10.00');
+    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['currency'], 'USD');
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['soft_credit_type_id'], 5, 'In line ' . __LINE__);
   }
 
@@ -250,7 +250,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($old_contribution_id, $this->_contributionId, 'In line ' . __LINE__);
     $this->assertEquals($old_contact_id, $this->_softIndividual1Id, 'In line ' . __LINE__);
     $this->assertEquals($old_amount, 10.00, 'In line ' . __LINE__);
-    $this->assertEquals($old_currency, 'USD', 'In line ' . __LINE__);
+    $this->assertEquals($old_currency, 'USD');
     $this->assertEquals($old_soft_credit_type_id, 6, 'In line ' . __LINE__);
     $params = array(
       'id' => $softcontributionID,
@@ -271,7 +271,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->assertEquals($softcontribution['values'][$softcontributionID]['contribution_id'], $this->_contributionId, 'In line ' . __LINE__);
     $this->assertEquals($softcontribution['values'][$softcontributionID]['contact_id'], $this->_softIndividual1Id, 'In line ' . __LINE__);
     $this->assertEquals($softcontribution['values'][$softcontributionID]['amount'], 7.00, 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$softcontributionID]['currency'], 'CAD', 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$softcontributionID]['currency'], 'CAD');
     $this->assertEquals($softcontribution['values'][$softcontributionID]['soft_credit_type_id'], 7, 'In line ' . __LINE__);
 
     $params = array(
@@ -332,10 +332,10 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     // We're taking the first element.
     $res = $result['values'][$softcontribution['id']];
 
-    $this->assertEquals($p['contribution_id'], $res['contribution_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p['contact_id'], $res['contact_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p['amount'], $res['amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p['currency'], $res['currency'], 'In line ' . __LINE__);
+    $this->assertEquals($p['contribution_id'], $res['contribution_id']);
+    $this->assertEquals($p['contact_id'], $res['contact_id']);
+    $this->assertEquals($p['amount'], $res['amount']);
+    $this->assertEquals($p['currency'], $res['currency']);
   }
 
   /**
@@ -364,10 +364,10 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contribution_soft', 'get', $params);
     $res = $result['values'][$softcontribution2['id']];
 
-    $this->assertEquals($p2['contribution_id'], $res['contribution_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['contact_id'], $res['contact_id'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['amount'], $res['amount'], 'In line ' . __LINE__);
-    $this->assertEquals($p2['currency'], $res['currency'], 'In line ' . __LINE__);
+    $this->assertEquals($p2['contribution_id'], $res['contribution_id']);
+    $this->assertEquals($p2['contact_id'], $res['contact_id']);
+    $this->assertEquals($p2['amount'], $res['amount']);
+    $this->assertEquals($p2['currency'], $res['currency']);
   }
 
 }

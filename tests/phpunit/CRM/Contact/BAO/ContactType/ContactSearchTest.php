@@ -102,21 +102,21 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
     //asserts for type:Individual
     $this->assertEquals($individual['contact_id'], $this->individual, 'In line ' . __LINE__);
-    $this->assertEquals($individual['first_name'], $this->indiviParams['first_name'], 'In line ' . __LINE__);
-    $this->assertEquals($individual['contact_type'], $this->indiviParams['contact_type'], 'In line ' . __LINE__);
+    $this->assertEquals($individual['first_name'], $this->indiviParams['first_name']);
+    $this->assertEquals($individual['contact_type'], $this->indiviParams['contact_type']);
     $this->assertNotContains('contact_sub_type', $individual);
 
     //asserts for type:Individual subtype:Student
     $this->assertEquals($indiviStudent['contact_id'], $this->indiviStudent, 'In line ' . __LINE__);
-    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name'], 'In line ' . __LINE__);
-    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type'], 'In line ' . __LINE__);
-    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type'], 'In line ' . __LINE__);
+    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name']);
+    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type']);
+    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type']);
 
     //asserts for type:Individual subtype:Parent
     $this->assertEquals($indiviParent['contact_id'], $this->indiviParent, 'In line ' . __LINE__);
-    $this->assertEquals($indiviParent['first_name'], $this->indiviParentParams['first_name'], 'In line ' . __LINE__);
-    $this->assertEquals($indiviParent['contact_type'], $this->indiviParentParams['contact_type'], 'In line ' . __LINE__);
-    $this->assertEquals(end($indiviParent['contact_sub_type']), $this->indiviParentParams['contact_sub_type'], 'In line ' . __LINE__);
+    $this->assertEquals($indiviParent['first_name'], $this->indiviParentParams['first_name']);
+    $this->assertEquals($indiviParent['contact_type'], $this->indiviParentParams['contact_type']);
+    $this->assertEquals(end($indiviParent['contact_sub_type']), $this->indiviParentParams['contact_sub_type']);
 
     // for type:Organization
     $params = array('contact_type' => 'Organization', 'version' => 3);
@@ -127,15 +127,15 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
     //asserts for type:Organization
     $this->assertEquals($organization['contact_id'], $this->organization, 'In line ' . __LINE__);
-    $this->assertEquals($organization['organization_name'], $this->organizationParams['organization_name'], 'In line ' . __LINE__);
-    $this->assertEquals($organization['contact_type'], $this->organizationParams['contact_type'], 'In line ' . __LINE__);
+    $this->assertEquals($organization['organization_name'], $this->organizationParams['organization_name']);
+    $this->assertEquals($organization['contact_type'], $this->organizationParams['contact_type']);
     $this->assertNotContains('contact_sub_type', $organization);
 
     //asserts for type:Organization subtype:Sponsor
     $this->assertEquals($orgSponsor['contact_id'], $this->orgSponsor, 'In line ' . __LINE__);
-    $this->assertEquals($orgSponsor['organization_name'], $this->orgSponsorParams['organization_name'], 'In line ' . __LINE__);
-    $this->assertEquals($orgSponsor['contact_type'], $this->orgSponsorParams['contact_type'], 'In line ' . __LINE__);
-    $this->assertEquals(end($orgSponsor['contact_sub_type']), $this->orgSponsorParams['contact_sub_type'], 'In line ' . __LINE__);
+    $this->assertEquals($orgSponsor['organization_name'], $this->orgSponsorParams['organization_name']);
+    $this->assertEquals($orgSponsor['contact_type'], $this->orgSponsorParams['contact_type']);
+    $this->assertEquals(end($orgSponsor['contact_sub_type']), $this->orgSponsorParams['contact_sub_type']);
 
     // for type:Household
     $params = array('contact_type' => 'Household', 'version' => 3);
@@ -145,8 +145,8 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
     //asserts for type:Household
     $this->assertEquals($household['contact_id'], $this->household, 'In line ' . __LINE__);
-    $this->assertEquals($household['household_name'], $this->householdParams['household_name'], 'In line ' . __LINE__);
-    $this->assertEquals($household['contact_type'], $this->householdParams['contact_type'], 'In line ' . __LINE__);
+    $this->assertEquals($household['household_name'], $this->householdParams['household_name']);
+    $this->assertEquals($household['contact_type'], $this->householdParams['contact_type']);
     $this->assertNotContains('contact_sub_type', $household);
   }
 
@@ -165,9 +165,9 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
     //asserts for type:Individual subtype:Student
     $this->assertEquals($indiviStudent['contact_id'], $this->indiviStudent, 'In line ' . __LINE__);
-    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name'], 'In line ' . __LINE__);
-    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type'], 'In line ' . __LINE__);
-    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type'], 'In line ' . __LINE__);
+    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name']);
+    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type']);
+    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type']);
 
     //all other contact(rather than subtype:student) should not
     //exists
@@ -185,9 +185,9 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
     //asserts for type:Organization subtype:Sponsor
     $this->assertEquals($orgSponsor['contact_id'], $this->orgSponsor, 'In line ' . __LINE__);
-    $this->assertEquals($orgSponsor['organization_name'], $this->orgSponsorParams['organization_name'], 'In line ' . __LINE__);
-    $this->assertEquals($orgSponsor['contact_type'], $this->orgSponsorParams['contact_type'], 'In line ' . __LINE__);
-    $this->assertEquals(end($orgSponsor['contact_sub_type']), $this->orgSponsorParams['contact_sub_type'], 'In line ' . __LINE__);
+    $this->assertEquals($orgSponsor['organization_name'], $this->orgSponsorParams['organization_name']);
+    $this->assertEquals($orgSponsor['contact_type'], $this->orgSponsorParams['contact_type']);
+    $this->assertEquals(end($orgSponsor['contact_sub_type']), $this->orgSponsorParams['contact_sub_type']);
 
     //all other contact(rather than subtype:Sponsor) should not
     //exists
@@ -213,9 +213,9 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
     //asserts for type:Individual subtype:Student
     $this->assertEquals($indiviStudent['contact_id'], $this->indiviStudent, 'In line ' . __LINE__);
-    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name'], 'In line ' . __LINE__);
-    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type'], 'In line ' . __LINE__);
-    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type'], 'In line ' . __LINE__);
+    $this->assertEquals($indiviStudent['first_name'], $this->indiviStudentParams['first_name']);
+    $this->assertEquals($indiviStudent['contact_type'], $this->indiviStudentParams['contact_type']);
+    $this->assertEquals(end($indiviStudent['contact_sub_type']), $this->indiviStudentParams['contact_sub_type']);
 
     //all other contact(rather than subtype:student) should not
     //exists
@@ -233,9 +233,9 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
     //asserts for type:Organization subtype:Sponsor
     $this->assertEquals($orgSponsor['contact_id'], $this->orgSponsor, 'In line ' . __LINE__);
-    $this->assertEquals($orgSponsor['organization_name'], $this->orgSponsorParams['organization_name'], 'In line ' . __LINE__);
-    $this->assertEquals($orgSponsor['contact_type'], $this->orgSponsorParams['contact_type'], 'In line ' . __LINE__);
-    $this->assertEquals(end($orgSponsor['contact_sub_type']), $this->orgSponsorParams['contact_sub_type'], 'In line ' . __LINE__);
+    $this->assertEquals($orgSponsor['organization_name'], $this->orgSponsorParams['organization_name']);
+    $this->assertEquals($orgSponsor['contact_type'], $this->orgSponsorParams['contact_type']);
+    $this->assertEquals(end($orgSponsor['contact_sub_type']), $this->orgSponsorParams['contact_sub_type']);
 
     //all other contact(rather than subtype:Sponsor) should not
     //exists
