@@ -174,7 +174,55 @@ if (!defined('CIVICRM_UF_BASEURL')) {
   define( 'CIVICRM_UF_BASEURL'      , '%%baseURL%%' );
 }
 
-/*
+/**
+ * Define any CiviCRM Settings Overrides per http://wiki.civicrm.org/confluence/display/CRMDOC/Override+CiviCRM+Settings
+ *
+ * Uncomment and edit the below as appropriate.
+ */
+ // Add this line only once above any settings overrides.
+ //  global $civicrm_setting;
+
+ // Override the Temporary Files directory.
+ // $civicrm_setting['Directory Preferences']['customFileUploadDir'] = '/path/to/upload';
+
+ // Override the custom files upload directory.
+ // $civicrm_setting['Directory Preferences']['uploadDir'] = '/path/to/upload-dir' ;
+
+ // Override the images directory.
+ // $civicrm_setting['Directory Preferences']['imageUploadDir'] = '/path/to/image-upload-dir' ;
+
+ // Override the custom templates directory.
+ // $civicrm_setting['Directory Preferences']['customTemplateDir'] = '/path/to/template-dir';
+
+ // Override the Custom php path directory.
+ // $civicrm_setting['Directory Preferences']['customPHPPathDir'] = '/path/to/custom-php-dir';
+
+ // Override the extensions directory.
+ // $civicrm_setting['Directory Preferences']['extensionsDir'] = '/path/to/extensions-dir';
+
+ // Override the resource url
+ // $civicrm_setting['URL Preferences']['userFrameworkResourceURL'] = 'http://example.com/example-resource-url/';
+
+ // Override the Image Upload URL (System Settings > Resource URLs)
+ // $civicrm_setting['URL Preferences']['imageUploadURL'] = 'http://example.com/example-image-upload-url';
+
+ // Override the Custom CiviCRM CSS URL
+ // $civicrm_setting['URL Preferences']['customCSSURL'] = 'http://example.com/example-css-url' ;
+
+ // Override the extensions resource URL
+ // $civicrm_setting['URL Preferences']['extensionsURL'] = 'http://example.com/pathtoextensiondir'
+
+ // Disable display of Community Messages on home dashboard
+ // $civicrm_setting['CiviCRM Preferences']['communityMessagesUrl'] = false;
+
+ // Disable automatic download / installation of extensions
+ // $civicrm_setting['Extension Preferences']['ext_repo_url'] = false;
+
+ // Disable version update alerts.
+ // $civicrm_setting['CiviCRM Preferences']['versionAlert']; = false;
+
+
+/**
  * If you are using any CiviCRM script in the bin directory that
  * requires authentication, then you also need to set this key.
  * We recommend using a 16-32 bit alphanumeric/punctuation key.
