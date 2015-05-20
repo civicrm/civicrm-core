@@ -135,7 +135,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       $tables = array();
       foreach ($occurrences as $occurrence) {
         $className = get_class($occurrence);
-        if (!in_array($className, $ignoreTables)) {
+        if (!in_array($className, $tables) && !in_array($className, $ignoreTables)) {
           $tables[] = $className;
         }
       }
