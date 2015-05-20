@@ -29,18 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying custom data
- *
+ * Page for displaying custom data.
  */
 class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
   /**
-   * The id of the object being viewed (note/relationship etc)
+   * The id of the object being viewed (note/relationship etc).
    *
    * @int
    */
@@ -57,8 +54,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
   /**
    * Add a few specific things to view contact.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -83,9 +78,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    *
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
-   *
-   *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -95,13 +87,13 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url($doneURL, 'action=browse&selectedChild=custom_' . $this->_groupId), FALSE);
 
-    // get permission detail view or edit
-    // use a comtact id specific function which gives us much better granularity
+    // Get permission detail - view or edit.
+    // use a contact id specific function which gives us much better granularity
     // CRM-12646
     $editCustomData = CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT);
     $this->assign('editCustomData', $editCustomData);
 
-    //allow to edit own customdata CRM-5518
+    // Allow to edit own custom data CRM-5518.
     $editOwnCustomData = FALSE;
     if ($session->get('userID') == $this->_contactId) {
       $editOwnCustomData = TRUE;
@@ -112,7 +104,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
       //Custom Groups Inline
       $entityType = CRM_Contact_BAO_Contact::getContactType($this->_contactId);
       $entitySubType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId);
-      $groupTree = &CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $this->_contactId,
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $this->_contactId,
         $this->_groupId, $entitySubType
       );
 
@@ -142,6 +134,11 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         $page->set('multiRecordFieldListing', $multiRecordFieldListing);
         $page->set('pageViewType', 'customDataView');
         $page->set('contactType', $ctype);
+        $page->assign('viewCustomData', array(
+          $this->_groupId => array(
+            $this->_groupId => $groupTree[$this->_groupId],
+          ),
+        ));
         $page->run();
       }
       else {
