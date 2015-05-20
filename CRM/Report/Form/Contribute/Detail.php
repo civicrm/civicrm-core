@@ -417,11 +417,10 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
-              LEFT JOIN civicrm_line_item   {$this->_aliases['civicrm_line_item']}
-                      ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id AND
-                         {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'";
-
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
+    
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
+    $this->getPermissionedFTQuery($this);
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'both'
     ) {
@@ -444,9 +443,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                        ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id
                INNER JOIN civicrm_contact      {$this->_aliases['civicrm_contact']}
                        ON {$this->_aliases['civicrm_contact']}.id = contribution_soft_civireport.contact_id
-               {$this->_aclFrom}
-               LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
-                       ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id";
+               {$this->_aclFrom}";
     }
 
     if (!empty($this->_params['ordinality_value'])) {
@@ -497,6 +494,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                         ON {$this->_aliases['civicrm_batch']}.id = {$this->_aliases['civicrm_entity_batch']}.batch_id";
     }
 
+    
   }
 
   public function groupBy() {
@@ -590,8 +588,6 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
-    CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClauses, NULL, $this->_aliases['civicrm_contribution']);
-    CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClauses, NULL, $this->_aliases['civicrm_line_item']);
 
     $this->beginPostProcess();
 
@@ -635,6 +631,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     // simple reset of ->_from
     $this->from();
+
 
     // also include custom group from if included
     // since this might be included in select
