@@ -511,7 +511,7 @@ WHERE  id = %1
       }
       $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
 
-      if(empty($customClass->where())) {
+      if (empty($customClass->where())) {
         $searchSQL .= " WHERE ";
       }
       else {
