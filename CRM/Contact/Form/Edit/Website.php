@@ -60,14 +60,11 @@ class CRM_Contact_Form_Edit_Website {
 
     //Website type select
     $form->addField("website[$blockId][website_type_id]", array('entity' => 'website', 'class' => 'eight'));
-    //Website box
-    $form->addField("website[$blockId][url]", array(
-      'entity' => 'website',
-      'onfocus' => "if (!this.value) {  this.value='http://';} else return false",
-      'onblur' => "if ( this.value == 'http://') {  this.value='';} else return false",
-      ));
 
-    $form->addRule("website[$blockId][url]", ts('Enter a valid web location beginning with \'http://\' or \'https://\'. EXAMPLE: http://www.mysite.org/'), 'url');
+    //Website box
+    $form->addField("website[$blockId][url]", array('entity' => 'website'));
+    $form->addRule("website[$blockId][url]", ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
+
   }
 
 }
