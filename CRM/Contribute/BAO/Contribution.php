@@ -1905,17 +1905,18 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     $additionalWhere = " AND contribution.financial_type_id IN (0)";
+    $liWhere = " AND i.financial_type_id IN (0)";
     if (!empty($financialTypes)) {
-      $additionalWhere = " 
-         AND contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
-         AND i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+      $additionalWhere = " AND contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',' , array_keys($financialTypes)) . ")";
     }
     $contactContributionsSQL = "
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
-      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution'
+      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution' $liWhere 
       WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} 
-      $additionalWhere ";
+      $additionalWhere 
+      AND i.id IS NULL";
 
     $contactSoftCreditContributionsSQL = "
       SELECT contribution.id
