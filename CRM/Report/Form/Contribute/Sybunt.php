@@ -319,10 +319,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
-             {$this->_aclFrom}
-              LEFT JOIN civicrm_line_item   {$this->_aliases['civicrm_line_item']}
-                      ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id AND
-                         {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'";
+             {$this->_aclFrom}";
 
     if ($this->isTableSelected('civicrm_email')) {
       $this->_from .= "
@@ -392,9 +389,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
-    $this->_where .= " AND {$this->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
   }
 
   public function groupBy() {
@@ -439,6 +433,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->from();
     $this->where();
     $this->groupBy();
+
+    $this->getPermissionedFTQuery($this);
 
     $rows = $contactIds = array();
     if (empty($this->_params['charts'])) {
