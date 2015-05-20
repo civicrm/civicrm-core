@@ -4493,4 +4493,21 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     );
   }
 
+
+  public function getPermissionedFTQuery(&$query) {
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    
+    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from} 
+              INNER JOIN civicrm_line_item   {$query->_aliases['civicrm_line_item']}
+                      ON {$query->_aliases['civicrm_contribution']}.id = {$query->_aliases['civicrm_line_item']}.contribution_id AND
+                         {$query->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution' 
+              {$query->_where} 
+                      AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
+                      AND {$query->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")  
+              GROUP BY {$query->_aliases['civicrm_contribution']}.id";
+    CRM_Core_DAO::executeQuery($sql);
+    $query->_from .= " 
+              INNER JOIN civicrm_contribution_temp temp ON {$query->_aliases['civicrm_contribution']}.id = temp.id ";
+  }
+
 }

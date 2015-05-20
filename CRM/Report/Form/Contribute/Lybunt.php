@@ -429,19 +429,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->from();
     $this->where();
     $this->groupBy();
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    
-    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$this->_aliases['civicrm_contribution']}.id {$this->_from} 
-              INNER JOIN civicrm_line_item   {$this->_aliases['civicrm_line_item']}
-                      ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id AND
-                         {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution' 
-              {$this->_where} 
-                      AND {$this->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
-                      AND {$this->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")  
-              GROUP BY {$this->_aliases['civicrm_contribution']}.id";
-    CRM_Core_DAO::executeQuery($sql);
-    $this->_from .= " 
-              INNER JOIN civicrm_contribution_temp temp ON {$this->_aliases['civicrm_contribution']}.id = temp.id ";
+
+    $this->getPermissionedFTQuery($this);
 
     $rows = $this->_contactIds = array();
     $this->limit();
