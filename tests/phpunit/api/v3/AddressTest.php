@@ -326,7 +326,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $params = $this->_params;
     unset($params['is_primary']);
     $address1 = $this->callAPISuccess('address', 'create', $params);
-    $this->assertApiSuccess($address1, 'In line ' . __LINE__);
+    $this->assertApiSuccess($address1);
     //now we check & make sure it has been set to primary
     $check = $this->callAPISuccess('address', 'getcount', array(
       'is_primary' => 1,

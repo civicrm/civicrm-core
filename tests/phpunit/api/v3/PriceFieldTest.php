@@ -106,9 +106,9 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $deleteParams = array('id' => $createResult['id']);
     $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($deleteResult, 'In line ' . __LINE__);
+    $this->assertAPISuccess($deleteResult);
     $endCount = $this->callAPISuccess($this->_entity, 'getcount', array());
-    $this->assertEquals($startCount, $endCount, 'In line ' . __LINE__);
+    $this->assertEquals($startCount, $endCount);
   }
 
   public function testGetFieldsPriceField() {

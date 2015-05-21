@@ -103,11 +103,11 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     );
     $softcontribution = $this->callAPIAndDocument('contribution_soft', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $softcontribution['count']);
-    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contribution_id'], $this->_contributionId, 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contact_id'], $this->_softIndividual1Id, 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contribution_id'], $this->_contributionId);
+    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['contact_id'], $this->_softIndividual1Id);
     $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['amount'], '10.00');
     $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['currency'], 'USD');
-    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['soft_credit_type_id'], 4, 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$this->_softcontribution['id']]['soft_credit_type_id'], 4);
 
     //create a second soft contribution on the same hard contribution - we are testing that 'id' gets the right soft contribution id (not the contribution id)
     $p['contact_id'] = $this->_softIndividual2Id;
@@ -209,11 +209,11 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     );
 
     $softcontribution = $this->callAPIAndDocument('contribution_soft', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contribution_id'], $this->_contributionId, 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contact_id'], $this->_softIndividual1Id, 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contribution_id'], $this->_contributionId);
+    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contact_id'], $this->_softIndividual1Id);
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['amount'], '10.00');
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['currency'], 'USD');
-    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['soft_credit_type_id'], 5, 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['soft_credit_type_id'], 5);
   }
 
   /**
@@ -238,7 +238,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     );
     $original = $this->callAPISuccess('contribution_soft', 'get', $old_params);
     //Make sure it came back
-    $this->assertEquals($original['id'], $softcontributionID, 'In line ' . __LINE__);
+    $this->assertEquals($original['id'], $softcontributionID);
     //set up list of old params, verify
     $old_contribution_id = $original['values'][$softcontributionID]['contribution_id'];
     $old_contact_id = $original['values'][$softcontributionID]['contact_id'];
@@ -247,11 +247,11 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $old_soft_credit_type_id = $original['values'][$softcontributionID]['soft_credit_type_id'];
 
     //check against original values
-    $this->assertEquals($old_contribution_id, $this->_contributionId, 'In line ' . __LINE__);
-    $this->assertEquals($old_contact_id, $this->_softIndividual1Id, 'In line ' . __LINE__);
-    $this->assertEquals($old_amount, 10.00, 'In line ' . __LINE__);
+    $this->assertEquals($old_contribution_id, $this->_contributionId);
+    $this->assertEquals($old_contact_id, $this->_softIndividual1Id);
+    $this->assertEquals($old_amount, 10.00);
     $this->assertEquals($old_currency, 'USD');
-    $this->assertEquals($old_soft_credit_type_id, 6, 'In line ' . __LINE__);
+    $this->assertEquals($old_soft_credit_type_id, 6);
     $params = array(
       'id' => $softcontributionID,
       'contribution_id' => $this->_contributionId,
@@ -268,11 +268,11 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     );
     $softcontribution = $this->callAPISuccess('contribution_soft', 'get', $new_params);
     //check against original values
-    $this->assertEquals($softcontribution['values'][$softcontributionID]['contribution_id'], $this->_contributionId, 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$softcontributionID]['contact_id'], $this->_softIndividual1Id, 'In line ' . __LINE__);
-    $this->assertEquals($softcontribution['values'][$softcontributionID]['amount'], 7.00, 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$softcontributionID]['contribution_id'], $this->_contributionId);
+    $this->assertEquals($softcontribution['values'][$softcontributionID]['contact_id'], $this->_softIndividual1Id);
+    $this->assertEquals($softcontribution['values'][$softcontributionID]['amount'], 7.00);
     $this->assertEquals($softcontribution['values'][$softcontributionID]['currency'], 'CAD');
-    $this->assertEquals($softcontribution['values'][$softcontributionID]['soft_credit_type_id'], 7, 'In line ' . __LINE__);
+    $this->assertEquals($softcontribution['values'][$softcontributionID]['soft_credit_type_id'], 7);
 
     $params = array(
       'id' => $softcontributionID,

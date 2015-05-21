@@ -237,7 +237,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
 
       'contact_id' => $this->_contactID,
     ));
-    $this->assertAPISuccess($get, 'In line ' . __LINE__);
+    $this->assertAPISuccess($get);
     $this->assertEquals(0, $get['count'], 'Incorrect email count at ' . __LINE__);
   }
 
@@ -247,7 +247,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
 
       'contact_id' => $this->_contactID,
     ));
-    $this->assertAPISuccess($get, 'In line ' . __LINE__);
+    $this->assertAPISuccess($get);
     $this->assertEquals(0, $get['count'], 'email already exists ' . __LINE__);
     $description = "Demonstrates use of Replace in a nested API call.";
     $subfile = "NestedReplaceEmail";

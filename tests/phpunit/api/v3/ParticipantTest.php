@@ -341,7 +341,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     );
     $participant = $this->callAPISuccess('participant', 'get', $params);
 
-    $this->assertEquals($participant['count'], 2, 'in line ' . __LINE__);
+    $this->assertEquals($participant['count'], 2);
   }
 
   ///////////////// civicrm_participant_create methods

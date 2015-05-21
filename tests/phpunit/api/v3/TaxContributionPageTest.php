@@ -255,14 +255,14 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->_ids['contributionId'] = $contribution['id'];
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID);
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['tax_amount'], 20, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['tax_amount'], 20);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
@@ -324,14 +324,14 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     );
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID);
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['tax_amount'], 20, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['tax_amount'], 20);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2);
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
 
@@ -350,14 +350,14 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     );
 
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 120.00);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->financialtypeID);
+    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
+    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['tax_amount'], 20, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2, 'In line ' . __LINE__);
+    $this->assertEquals($contribution['values'][$contribution['id']]['tax_amount'], 20);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2);
     $this->_checkFinancialRecords($contribution, 'pending');
   }
 

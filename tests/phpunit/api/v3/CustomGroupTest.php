@@ -95,7 +95,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
     $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: extends');
-    $this->assertAPIFailure($customGroup, 'In line ' . __LINE__);
+    $this->assertAPIFailure($customGroup);
   }
 
   /**
@@ -355,7 +355,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'id' => $customGroup['id'],
     );
     $result = $this->callAPIAndDocument('custom_group', 'delete', $params, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
   }
 
   /**

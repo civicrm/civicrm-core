@@ -95,7 +95,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('uf_join', 'get', $searchParams);
 
     foreach ($result['values'] as $key => $value) {
-      $this->assertEquals($value['uf_group_id'], $this->_ufGroupId, 'In line ' . __LINE__);
+      $this->assertEquals($value['uf_group_id'], $this->_ufGroupId);
     }
   }
 

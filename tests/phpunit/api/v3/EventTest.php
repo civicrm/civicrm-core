@@ -363,7 +363,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->_params[0]['event_title'] = $this->_params[0]['title'];
     unset($this->_params[0]['title']);
     $result = $this->callAPISuccess('Event', 'Create', $this->_params[0]);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertArrayHasKey('id', $result['values'][$result['id']]);
     $result = $this->callAPISuccess($this->_entity, 'Get', array('id' => $result['id']));
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
@@ -409,7 +409,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'event_id' => $this->_eventIds[0],
     );
     $result = $this->callAPISuccess('Event', 'Delete', $params);
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
+    $this->assertAPISuccess($result);
   }
 
   /**
