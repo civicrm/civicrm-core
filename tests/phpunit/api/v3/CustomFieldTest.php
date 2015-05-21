@@ -414,7 +414,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument('custom_field', 'delete', $params, __FUNCTION__, __FILE__);
 
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
+    $this->assertAPISuccess($result);
   }
 
   /**

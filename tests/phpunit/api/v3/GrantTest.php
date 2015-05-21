@@ -133,14 +133,14 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->ids['grant'][0] = $result['id'];
     $result = $this->callAPIAndDocument($this->_entity, 'get', array('rationale' => 'Just Because'), __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count']);
   }
 
   public function testDeleteGrant() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count']);
   }

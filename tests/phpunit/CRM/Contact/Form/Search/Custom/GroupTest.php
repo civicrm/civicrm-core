@@ -149,7 +149,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
       );
     }
     asort($all);
-    $this->assertEquals($full, $all, 'In line ' . __LINE__);
+    $this->assertEquals($full, $all);
   }
 
   /**
@@ -182,7 +182,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     }
     $contacts = array_keys($contacts);
     sort($contacts, SORT_NUMERIC);
-    $this->assertEquals($ids, $contacts, 'In line ' . __LINE__);
+    $this->assertEquals($ids, $contacts);
   }
 
   /**

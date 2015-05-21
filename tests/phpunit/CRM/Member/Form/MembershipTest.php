@@ -307,7 +307,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found New membership status
-    $this->assertTrue($rc, 'In line ' . __LINE__);
+    $this->assertTrue($rc);
   }
 
   /**
@@ -369,7 +369,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Grace membership status
-    $this->assertTrue($rc, 'In line ' . __LINE__);
+    $this->assertTrue($rc);
   }
 
   /**
@@ -390,7 +390,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $rc = $obj->formRule($params, $files, $obj);
 
     //  Should have found Expired membership status
-    $this->assertTrue($rc, 'In line ' . __LINE__);
+    $this->assertTrue($rc);
   }
 
   /**

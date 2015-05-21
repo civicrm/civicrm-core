@@ -62,7 +62,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     sort($contacts, SORT_NUMERIC);
 
-    $this->assertEquals($ids, $contacts, 'In line ' . __LINE__);
+    $this->assertEquals($ids, $contacts);
   }
 
   /**

@@ -155,10 +155,10 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'sequential' => 1,
     );
     $result = $this->callAPISuccess('Note', 'Create', $params);
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertEquals($result['values'][0]['note'], "Hello!!! ' testing Note");
     $this->assertEquals($result['values'][0]['subject'], "With a '");
-    $this->assertArrayHasKey('id', $result, 'in line ' . __LINE__);
+    $this->assertArrayHasKey('id', $result);
 
     //CleanUP
     $note = array(
@@ -219,8 +219,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     // Update Note.
     $this->callAPISuccess('note', 'create', $params);
     $note = $this->callAPISuccess('Note', 'Get', array());
-    $this->assertEquals($note['id'], $this->_noteID, 'in line ' . __LINE__);
-    $this->assertEquals($note['values'][$this->_noteID]['entity_id'], $this->_contactID, 'in line ' . __LINE__);
+    $this->assertEquals($note['id'], $this->_noteID);
+    $this->assertEquals($note['values'][$this->_noteID]['entity_id'], $this->_contactID);
     $this->assertEquals($note['values'][$this->_noteID]['entity_table'], 'civicrm_contact');
     $this->assertEquals('Hello World', $note['values'][$this->_noteID]['subject']);
     $this->assertEquals('Note1', $note['values'][$this->_noteID]['note']);
