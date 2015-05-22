@@ -4494,8 +4494,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
 
-  public function getPermissionedFTQuery(&$query) {
+  public function getPermissionedFTQuery(&$query, $alias = NULL) {
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    if ($alias) {
+      $temp = $query->_aliases['civicrm_line_item'];
+      $query->_aliases['civicrm_line_item'] = $alias;
+    }
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
     
     $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from} 
@@ -4506,8 +4510,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
                       AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")
                       AND {$query->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")  
               GROUP BY {$query->_aliases['civicrm_contribution']}.id";
+    CRM_Core_DAO::executeQuery($sql);
     $query->_from .= " 
               INNER JOIN civicrm_contribution_temp temp ON {$query->_aliases['civicrm_contribution']}.id = temp.id ";
+    if (isset($temp)) {
+      $query->_aliases['civicrm_line_item'] = $temp;
+    }
   }
 
 }
