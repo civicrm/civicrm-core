@@ -50,7 +50,7 @@
       <td>
         <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contact_id"}" title="{ts}View contact record{/ts}">{$displayName}</a></strong>
         <div>
-            <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$id&cid=$contact_id"}"><span class="icon ui-icon-print"></span> {ts}Print Name Badge{/ts}</a>
+            <a class="action-item crm-hover-button no-popup" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$id&cid=$contact_id"}"><span class="icon ui-icon-print"></span> {ts}Print Name Badge{/ts}</a>
         </div>
       </td>
   </tr>
