@@ -4747,6 +4747,13 @@ SELECT COUNT( conts.total_amount ) as total_count,
     if ($context == 'search') {
       $where .= " AND contact_a.is_deleted = 0 ";
     }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    if (!empty($financialTypes)) {
+      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ") AND li.id IS NULL";
+    }
+    else {
+      $where .= " AND civicrm_contribution.financial_type_id IN (0) AND li.financial_type_id IN (0)";
+    }
 
     // make sure contribution is completed - CRM-4989
     $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
@@ -4756,7 +4763,9 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
     $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
       civicrm_contribution.currency $from $completedWhere";
-
+    $from .= " LEFT JOIN civicrm_line_item li
+                      ON civicrm_contribution.id = li.contribution_id AND
+                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',' , array_keys($financialTypes)) . ") ";
     $query = "$select FROM (
       $innerQuery GROUP BY civicrm_contribution.id
     ) as conts
