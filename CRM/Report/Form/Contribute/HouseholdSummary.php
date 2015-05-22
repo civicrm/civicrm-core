@@ -251,10 +251,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
                       ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.$this->otherContact )
             {$this->_aclFrom}
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} ON
-                      ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0 
-            LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
-                      ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id 
-                      AND {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution' ";
+                      ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
 
     if ($this->_addressField) {
       $this->_from .= "
@@ -268,6 +265,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
                       {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                       {$this->_aliases['civicrm_email']}.is_primary = 1\n ";
     }
+    $this->getPermissionedFTQuery($this);
   }
 
   public function where() {
@@ -317,9 +315,6 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
-    $this->_where .= " AND {$this->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
   }
 
   public function groupBy() {
