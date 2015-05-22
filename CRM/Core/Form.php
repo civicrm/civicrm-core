@@ -1263,7 +1263,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         break;
 
       case 'hidden':
-        $this->add('hidden', $name, $label, $props, $required);
+        $this->add('hidden', $name, NULL, $props, $required);
         break;
 
       case 'TextArea':
