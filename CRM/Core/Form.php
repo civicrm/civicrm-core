@@ -620,11 +620,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $title
    *   The title of the form.
-   *
-   * @return void
    */
   public function setTitle($title) {
     $this->_title = $title;
+  }
+
+  /**
+   * Assign billing type id to bltID.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function assignBillingType() {
+    $this->_bltID = CRM_Core_BAO_Location::getBillingLocationId();
+    $this->set('bltID', $this->_bltID);
+    $this->assign('bltID', $this->_bltID);
   }
 
   /**
