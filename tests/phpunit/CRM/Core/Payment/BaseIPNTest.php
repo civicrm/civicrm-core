@@ -117,8 +117,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpMembershipObjects();
     $this->_setUpRecurringContribution();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertFalse(empty($this->objects['membership']), 'in line ' . __LINE__);
-    $this->assertArrayHasKey($this->_membershipTypeID, $this->objects['membership'], 'in line ' . __LINE__);
+    $this->assertFalse(empty($this->objects['membership']));
+    $this->assertArrayHasKey($this->_membershipTypeID, $this->objects['membership']);
     $this->assertTrue(is_a($this->objects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($this->objects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($this->objects['contributionRecur']), __LINE__);
@@ -136,8 +136,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $contribution->find(TRUE);
     $contribution->loadRelatedObjects($this->input, $this->ids, FALSE, TRUE);
-    $this->assertFalse(empty($contribution->_relatedObjects['membership']), 'in line ' . __LINE__);
-    $this->assertArrayHasKey($this->_membershipTypeID, $contribution->_relatedObjects['membership'], 'in line ' . __LINE__);
+    $this->assertFalse(empty($contribution->_relatedObjects['membership']));
+    $this->assertArrayHasKey($this->_membershipTypeID, $contribution->_relatedObjects['membership']);
     $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($contribution->_relatedObjects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($contribution->_relatedObjects['contributionRecur']), __LINE__);
@@ -177,7 +177,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function testLoadParticipantObjects() {
     $this->_setUpParticipantObjects();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertFalse(empty($this->objects['participant']), 'in line ' . __LINE__);
+    $this->assertFalse(empty($this->objects['participant']));
     $this->assertTrue(is_a($this->objects['participant'], 'CRM_Event_BAO_Participant'));
     $this->assertTrue(is_a($this->objects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($this->objects['event']));
@@ -258,7 +258,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function testLoadPledgeObjects() {
     $this->_setUpPledgeObjects();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertFalse(empty($this->objects['pledge_payment'][0]), 'in line ' . __LINE__);
+    $this->assertFalse(empty($this->objects['pledge_payment'][0]));
     $this->assertTrue(is_a($this->objects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
     $this->assertTrue(is_a($this->objects['pledge_payment'][0], 'CRM_Pledge_BAO_PledgePayment'));

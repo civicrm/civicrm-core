@@ -65,12 +65,12 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'id' => $id,
     );
     $membershiptype = $this->callAPIAndDocument('membership_type', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($membershiptype['values'][$id]['name'], 'General', 'In line ' . __LINE__ . " id is " . $id);
-    $this->assertEquals($membershiptype['values'][$id]['member_of_contact_id'], $this->_contactID, 'In line ' . __LINE__);
-    $this->assertEquals($membershiptype['values'][$id]['financial_type_id'], 1, 'In line ' . __LINE__);
-    $this->assertEquals($membershiptype['values'][$id]['duration_unit'], 'year', 'In line ' . __LINE__);
-    $this->assertEquals($membershiptype['values'][$id]['duration_interval'], '1', 'In line ' . __LINE__);
-    $this->assertEquals($membershiptype['values'][$id]['period_type'], 'rolling', 'In line ' . __LINE__);
+    $this->assertEquals($membershiptype['values'][$id]['name'], 'General');
+    $this->assertEquals($membershiptype['values'][$id]['member_of_contact_id'], $this->_contactID);
+    $this->assertEquals($membershiptype['values'][$id]['financial_type_id'], 1);
+    $this->assertEquals($membershiptype['values'][$id]['duration_unit'], 'year');
+    $this->assertEquals($membershiptype['values'][$id]['duration_interval'], '1');
+    $this->assertEquals($membershiptype['values'][$id]['period_type'], 'rolling');
     $this->membershipTypeDelete($params);
   }
 
