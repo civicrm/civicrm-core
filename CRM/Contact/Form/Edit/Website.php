@@ -59,18 +59,13 @@ class CRM_Contact_Form_Edit_Website {
     $form->applyFilter('__ALL__', 'trim');
 
     //Website type select
-    $form->addSelect("website[$blockId][website_type_id]", array('entity' => 'website', 'class' => 'eight'));
-
+    $form->addField("website[$blockId][website_type_id]", array('entity' => 'website', 'class' => 'eight'));
     //Website box
-    $form->addElement('text', "website[$blockId][url]", ts('Website'),
-      array_merge(
-        CRM_Core_DAO::getAttribute('CRM_Core_DAO_Website', 'url'),
-        array(
-          'onfocus' => "if (!this.value) {  this.value='http://';} else return false",
-          'onblur' => "if ( this.value == 'http://') {  this.value='';} else return false",
-        )
-      )
-    );
+    $form->addField("website[$blockId][url]", array(
+      'entity' => 'website',
+      'onfocus' => "if (!this.value) {  this.value='http://';} else return false",
+      'onblur' => "if ( this.value == 'http://') {  this.value='';} else return false",
+      ));
 
     $form->addRule("website[$blockId][url]", ts('Enter a valid web location beginning with \'http://\' or \'https://\'. EXAMPLE: http://www.mysite.org/'), 'url');
   }
