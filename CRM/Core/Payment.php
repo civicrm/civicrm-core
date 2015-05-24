@@ -713,6 +713,17 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Some processors replace the form submit button with their own.
+   *
+   * Returning false here will leave the button off front end forms.
+   *
+   * At this stage there is zero cross-over between back-office processors and processors that suppress the submit.
+   */
+  public function isSuppressSubmitButtons() {
+    return FALSE;
+  }
+
+  /**
    * Get url for users to manage this recurring contribution for this processor.
    *
    * @param int $entityID

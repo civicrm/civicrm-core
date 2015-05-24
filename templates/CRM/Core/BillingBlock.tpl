@@ -200,6 +200,29 @@
       });
     });
     {/literal}
+
+    function toggleConfirmButton() {
+      var suppressSubmitButton = "{/literal}{$suppressSubmitButton}{literal}";
+      var elementObj = cj('input[name="payment_processor"]');
+      if ( elementObj.attr('type') == 'hidden' ) {
+        var processorTypeId = elementObj.val( );
+      }
+      else {
+        var processorTypeId = elementObj.filter(':checked').val();
+      }
+
+      if (suppressSubmitButton) {
+        cj("#crm-submit-buttons").hide();
+      }
+      else {
+        cj("#crm-submit-buttons").show();
+      }
+    }
+
+    cj('input[name="payment_processor_id"]').change( function() {
+      toggleConfirmButton();
+    });
+
   </script>
 {/if}
 {/crmRegion}
