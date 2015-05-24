@@ -62,7 +62,6 @@ class CRM_Core_Payment_Form {
       $form->assign('paymentTypeLabel', $paymentTypeLabel);
 
       $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
-      $form->billingPane = array($paymentTypeName => $paymentTypeLabel);
       $form->assign('paymentFields', $paymentFields);
     }
 

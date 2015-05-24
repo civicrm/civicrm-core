@@ -162,17 +162,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_honoreeProfileType;
 
   /**
-   * Array of billing panes to be displayed by billingBlock.tpl.
-   * Currently this is likely to look like
-   * array('Credit Card' => ts('Credit Card') or
-   * array('Direct Debit => ts('Direct Debit')
-   * @todo billing details (address stuff) to be added when we stop hard coding the panes in billingBlock.tpl
-   *
-   * @var array
-   */
-  public $billingPane = array();
-
-  /**
    * Array of the payment fields to be displayed in the payment fieldset (pane) in billingBlock.tpl
    * this contains all the information to describe these fields from quickform. See CRM_Core_Form_Payment getPaymentFormFieldsMetadata
    *
@@ -580,15 +569,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    $billingPanes = array();
     if ($this->_mode) {
       if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE) == TRUE) {
-        foreach ($this->billingPane as $name => $label) {
-          if (!empty($this->billingFieldSets[$name]['fields'])) {
-            // @todo reduce variation so we don't have to convert 'credit_card' to 'CreditCard'
-            $billingPanes[$label] = $this->generatePane(CRM_Utils_String::convertStringToCamel($name), $defaults);
-          }
-        }
         if (!empty($this->_recurPaymentProcessors)) {
           CRM_Contribute_Form_Contribution_Main::buildRecur($this);
           $this->setDefaults(array('is_recur' => 0));
@@ -604,7 +586,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $qfKey = $this->controller->_key;
     $this->assign('qfKey', $qfKey);
-    $this->assign('billingPanes', $billingPanes);
     $this->assign('allPanes', $allPanes);
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution', 'formRule'), $this);
