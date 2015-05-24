@@ -413,22 +413,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * Assign billing type id to bltID.
-   *
-   * @throws CRM_Core_Exception
-   * @return void
-   */
-  public function assignBillingType() {
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $this->_bltID = array_search('Billing', $locationTypes);
-    if (!$this->_bltID) {
-      throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
-    }
-    $this->set('bltID', $this->_bltID);
-    $this->assign('bltID', $this->_bltID);
-  }
-
-  /**
    * Assign $this->processors, $this->recurPaymentProcessors, and related Smarty variables
    */
   public function assignProcessors() {
