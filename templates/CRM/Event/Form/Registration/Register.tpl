@@ -164,27 +164,6 @@
   </div>
   <script type="text/javascript">
     {literal}
-    function toggleConfirmButton() {
-      var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
-      var elementObj = cj('input[name="payment_processor_id"]');
-      if (elementObj.attr('type') == 'hidden') {
-        var processorTypeId = elementObj.val();
-      }
-      else {
-        var processorTypeId = elementObj.filter(':checked').val();
-      }
-
-      if (payPalExpressId != 0 && payPalExpressId == processorTypeId) {
-        cj("#crm-submit-buttons").hide();
-      }
-      else {
-        cj("#crm-submit-buttons").show();
-      }
-    }
-
-    cj('input[name="payment_processor_id"]').change(function () {
-      toggleConfirmButton();
-    });
 
     cj("#additional_participants").change(function () {
       skipPaymentMethod();

@@ -445,6 +445,19 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Paypal express replaces the submit button with it's own.
+   *
+   * @return bool
+   *   Should the form button by suppressed?
+   */
+  public function isSuppressSubmitButtons() {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Express') {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * @param string $message
    * @param array $params
    *

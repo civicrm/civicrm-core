@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -58,10 +56,12 @@ class CRM_Core_Payment_ProcessorForm {
     }
 
     $form->set('paymentProcessor', $form->_paymentProcessor);
+    $form->_paymentObject = CRM_Core_Payment::singleton($mode, $form->_paymentProcessor, $form);
+
+    $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
-      $form->_paymentObject = CRM_Core_Payment::singleton($mode, $form->_paymentProcessor, $form);
       $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL();
     }
 
