@@ -1595,6 +1595,11 @@ FROM   civicrm_membership_type
    * @return null|string
    */
   public static function getContactMembershipCount($contactID, $activeOnly = FALSE) {
+    CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($membershipTypes);
+    $addWhere = " AND membership_type_id IN (0)";
+    if (!empty($membershipTypes)) {
+      $addWhere = " AND membership_type_id IN (" . implode(',' , array_keys($membershipTypes)) . ")";
+    }
     $select = "SELECT count(*) FROM civicrm_membership ";
     $where = "WHERE civicrm_membership.contact_id = {$contactID} AND civicrm_membership.is_test = 0 ";
 
@@ -1604,7 +1609,7 @@ FROM   civicrm_membership_type
       $where .= " and civicrm_membership_status.is_current_member = 1";
     }
 
-    $query = $select . $where;
+    $query = $select . $where . $addWhere;
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
