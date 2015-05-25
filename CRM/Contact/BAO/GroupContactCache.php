@@ -510,7 +510,15 @@ WHERE  id = %1
           );
       }
       $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
-      $sql = $searchSQL . " AND contact_a.id NOT IN (
+
+      if (empty($customClass->where())) {
+        $searchSQL .= " WHERE ";
+      }
+      else {
+        $searchSQL .= " AND ";
+      }
+
+      $sql = $searchSQL . " contact_a.id NOT IN (
                               SELECT contact_id FROM civicrm_group_contact
                               WHERE civicrm_group_contact.status = 'Removed'
                               AND   civicrm_group_contact.group_id = $groupID ) ";
