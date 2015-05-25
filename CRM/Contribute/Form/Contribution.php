@@ -1550,6 +1550,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($paymentParams['amount'] > 0.0) {
       // force a reget of the payment processor in case the form changed it, CRM-7179
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
+      unset($paymentParams['contribution_status_id']);
       $result = $payment->doDirectPayment($paymentParams);
     }
 
@@ -1574,6 +1575,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($result) {
+      if (CRM_Utils_Array::value('contribution_status_id', $result) == 1) {
+        civicrm_api3('contribution', 'completetransaction', array(
+          'id' => $paymentParams['contributionID'],
+          'trxn_id' => $result['trxn_id'],
+        ));
+      }
       $this->_params = array_merge($this->_params, $result);
     }
 
