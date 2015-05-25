@@ -625,6 +625,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
     if (!CRM_Core_Permission::check('edit contributions of type ' . $finType)) {
       unset($links[CRM_Core_Action::UPDATE]);
+      unset($links[CRM_Core_Action::RENEW]);
+      unset($links[CRM_Core_Action::FOLLOWUP]);
     }
     if (!CRM_Core_Permission::check('delete contributions of type ' . $finType)) {
       unset($links[CRM_Core_Action::DELETE]);
