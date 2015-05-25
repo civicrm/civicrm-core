@@ -227,7 +227,15 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
       }
       if (is_object($payment)) {
+        unset($paymentParams['contribution_status_id']);
         $result = $payment->doDirectPayment($paymentParams);
+        if ($paymentParams['contribution_status_id'] == 1) {
+          civicrm_api3('contribution', 'completetransaction', array(
+            'id' => $paymentParams['contributionID'],
+            'trxn_id' => $result['trxn_id'],
+          ));
+        }
+
       }
       else {
         CRM_Core_Error::fatal($paymentObjError);
@@ -278,7 +286,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
 
       // check if pending was set to true by payment processor
-      $pending = FALSE;
+      $pending = (CRM_Utils_Array::value('contribution_status_id', $result) == 1 ? FALSE : TRUE);
       if (CRM_Utils_Array::value('contribution_status_pending',
           $form->_params
         ) || (is_array($result) && CRM_Utils_Array::value('payment_status_id', $result) == 2)) {
