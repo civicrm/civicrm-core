@@ -119,13 +119,14 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         //('CancelSubscriptionSupported'));
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported(
           $membership[$dao->id]['membership_id']);
-
-        $membership[$dao->id]['action'] = CRM_Core_Action::formLink(self::links('all',
+        $links = self::links('all',
             NULL,
             NULL,
             $isCancelSupported,
             $isUpdateBilling
-          ),
+        );
+        self::getPermissionedLinks($dao->membership_type_id, $links);
+        $membership[$dao->id]['action'] = CRM_Core_Action::formLink($links,
           $currentMask,
           array(
             'id' => $dao->id,
@@ -139,7 +140,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         );
       }
       else {
-        $membership[$dao->id]['action'] = CRM_Core_Action::formLink(self::links('view'),
+        $links = self::links('view');
+        self::getPermissionedLinks($dao->membership_type_id, $links);
+        $membership[$dao->id]['action'] = CRM_Core_Action::formLink($links,
           $mask,
           array(
             'id' => $dao->id,
@@ -615,6 +618,17 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    */
   public function getBAOName() {
     return 'CRM_Member_BAO_Membership';
+  }
+
+  static function getPermissionedLinks($memTypeID, &$links) {
+    $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeID, 'financial_type_id');
+    $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
+    if (!CRM_Core_Permission::check('edit contributions of type ' . $finType)) {
+      unset($links[CRM_Core_Action::UPDATE]);
+    }
+    if (!CRM_Core_Permission::check('delete contributions of type ' . $finType)) {
+      unset($links[CRM_Core_Action::DELETE]);
+    }
   }
 
 }
