@@ -18,7 +18,6 @@
 .crmCaseType tr.addRow td {
     background: #ddddff;
     padding: 0.5em 1em;
-    text-align: center;
 }
 
 .crmCaseType input.number {
