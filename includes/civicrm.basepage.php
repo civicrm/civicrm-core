@@ -135,14 +135,26 @@ class CiviCRM_For_WordPress_Basepage {
         $this->basepage_markup = ob_get_clean(); // save the output and flush the buffer
 
         /**
-         * CMW: the following only works if the loop is not run again before the
-         * page is rendered. It is probably better to store the title and use a
-         * filter when the page is rendered.
+         * The following logic is in response to some of the complexities of how
+         * titles are handled in WordPress, particularly when there are SEO
+         * plugins present that modify the title for Open Graph purposes. There
+         * have also been issues with the default WordPress themes, which modify
+         * the title using the 'wp_title' filter.
+         *
+         * First, we try and set the title of the page object, which will work
+         * if the loop is not run subsequently and if there are no additional
+         * filters on the title.
+         *
+         * Second, we store the CiviCRM title so that we can construct the base
+         * page title if other plugins modify it.
          */
 
         // override post title
         global $civicrm_wp_title;
         $post->post_title = $civicrm_wp_title;
+
+        // because the above seems unreliable, store title for later use
+        $this->basepage_title = $civicrm_wp_title;
 
         // disallow commenting
         $post->comment_status = 'closed';
@@ -153,8 +165,11 @@ class CiviCRM_For_WordPress_Basepage {
     // reset loop
     rewind_posts();
 
-    // override page title
-    add_filter( 'single_post_title', array( $this->civi, 'single_page_title' ), 50, 2 );
+    // override page title with high priority
+    add_filter( 'wp_title', array( $this, 'wp_page_title' ), 100, 3 );
+
+    // add compatibility with WordPress SEO plugin's Open Graph title
+    add_filter( 'wpseo_opengraph_title', array( $this, 'wpseo_page_title' ), 100, 1 );
 
     // include this content when base page is rendered
     add_filter( 'the_content', array( $this, 'basepage_render' ) );
@@ -170,6 +185,64 @@ class CiviCRM_For_WordPress_Basepage {
 
     // broadcast this as well
     do_action( 'civicrm_basepage_parsed' );
+
+  }
+
+
+  /**
+   * Get CiviCRM basepage title for <title> element
+   *
+   * Callback method for 'wp_title' hook, called at the end of function wp_title
+   *
+   * @param string $title Title that might have already been set
+   * @param string $separator Separator determined in theme (but defaults to WordPress default)
+   * @param string $separator_location Whether the separator should be left or right
+   */
+  public function wp_page_title( $title, $separator = '&raquo;', $separator_location = '' ) {
+
+    // if feed, return just the title
+    if ( is_feed() ) return $this->basepage_title;
+
+    // set default separator location, if it isn't defined
+    if ( '' === trim( $separator_location ) ) {
+      $separator_location = ( is_rtl() ) ? 'left' : 'right';
+    }
+
+    // if we have WP SEO present, use its separator
+    if ( class_exists( 'WPSEO_Options' ) ) {
+      $separator_code = WPSEO_Options::get_default( 'wpseo_titles', 'separator' );
+      $separator_array = WPSEO_Option_Titles::get_instance()->get_separator_options();
+      if ( array_key_exists( $separator_code, $separator_array ) ) {
+      	$separator = $separator_array[$separator_code];
+      }
+    }
+
+    // construct title depending on separator location
+    if ( $separator_location == 'right' ) {
+	  $title = $this->basepage_title . " $separator " . get_bloginfo( 'name', 'display' );
+    } else {
+	  $title = get_bloginfo( 'name', 'display' ) . " $separator " . $this->basepage_title;
+    }
+
+    // return modified title
+    return $title;
+
+  }
+
+
+  /**
+   * Get CiviCRM base page title for Open Graph elements
+   *
+   * Callback method for 'wpseo_opengraph_title' hook, to provide compatibility
+   * with the WordPress SEO plugin.
+   *
+   * @param string $post_title The title of the WordPress page or post
+   * @return string $basepage_title The title of the CiviCRM entity
+   */
+  public function wpseo_page_title( $post_title ) {
+
+    // hand back our base page title
+    return $this->basepage_title;
 
   }
 
