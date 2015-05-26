@@ -1,7 +1,18 @@
 module.exports = function(config) {
   config.set({
     autoWatch: true,
-    browsers: ['PhantomJS'],
+    browsers: ['PhantomJS', 'PhantomJS_custom'],
+    customLaunchers: {
+      'PhantomJS_custom': {
+        base: 'PhantomJS',
+        options: {
+            windowName: 'my-window',
+            settings: {
+                webSecurityEnabled: false
+            }
+        }
+      }
+    },
     exclude: [
     ],
     files: [
