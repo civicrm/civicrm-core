@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to print contribution records
+ * This class provides the functionality to print contribution records.
  */
 class CRM_Contribute_Form_Task_Print extends CRM_Contribute_Form_Task {
 
