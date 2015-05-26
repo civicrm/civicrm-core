@@ -412,15 +412,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
               !empty($this->_params['case_type_id_value'])
             ) {
               foreach ($this->_params['case_type_id_value'] as $key => $value) {
-                if (strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) === FALSE) {
-                  $value = CRM_Core_DAO::VALUE_SEPARATOR . $value .
-                    CRM_Core_DAO::VALUE_SEPARATOR;
-
-                  $this->_params['case_type_id_value'][$key] = "'{$value}'";
-                }
-                else {
-                  $this->_params['case_type_id_value'][$key] = $value;
-                }
+                $this->_params['case_type_id_value'][$key] = $value;
               }
             }
 
@@ -471,16 +463,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $sql = "{$select} {$this->_from} {$this->_where}";
     $countryCount = CRM_Core_DAO::singleValueQuery($sql);
 
-    //CaseType statistics
-    if (array_key_exists('filters', $statistics)) {
-      foreach ($statistics['filters'] as $id => $value) {
-        if ($value['title'] == 'Case Type') {
-          $statistics['filters'][$id]['value'] = 'Is ' .
-            $this->case_types[substr($statistics['filters'][$id]['value'], -3, -2
-            )];
-        }
-      }
-    }
     $statistics['counts']['case'] = array(
       'title' => ts('Total Number of Cases '),
       'value' => isset($statistics['counts']['rowsFound']) ? $statistics['counts']['rowsFound']['value'] : count($rows),
