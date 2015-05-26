@@ -75,15 +75,11 @@ class CRM_Core_ClassLoader {
    * @api
    */
   function register($prepend = FALSE) {
-    
     if ($this->_registered) {
       return;
     }
-    
     global $civicrm_root;
-    
     $civicrm_base_path = dirname(dirname(__DIR__));
-
     require_once dirname(dirname(__DIR__)) . '/packages/vendor/autoload.php';
 
     // we do this to prevent a autoloader errors with joomla / 3rd party packages
@@ -112,9 +108,8 @@ class CRM_Core_ClassLoader {
     $extensions_container = new CRM_Extension_Container_Basic($civicrm_root, '', null);
     $extensions_container->getKeys();
     $extensions_path = array();
-    foreach ($extensions_container->relPaths as $key => $rel_path)
-    {
-        $extensions_path[$rel_path] = $extensions_container->getPath($key);
+    foreach ($extensions_container->relPaths as $key => $rel_path) {
+      $extensions_path[$rel_path] = $extensions_container->getPath($key);
     }
     set_include_path(implode(PATH_SEPARATOR, $extensions_path) . PATH_SEPARATOR . get_include_path());
   }
