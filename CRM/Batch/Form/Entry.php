@@ -288,7 +288,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     //CRM-16480 if contact is selected, validate financial type and amount field.
     foreach ($params['field'] as $key => $value) {
-      foreach($fields as $field => $label) {
+      foreach ($fields as $field => $label) {
         if (!empty($params['primary_contact_id'][$key]) && empty($value[$field])) {
           $errors["field[$key][$field]"] = ts('%1 is a required field.', array(1 => $label));
         }
