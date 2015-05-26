@@ -521,6 +521,24 @@ HTACCESS;
   }
 
   /**
+   * Determine if a path is absolute.
+   *
+   * @return bool
+   *   TRUE if absolute. FALSE if relative.
+   */
+  public static function isAbsolute($path) {
+    if (substr($path, 0, 1) === DIRECTORY_SEPARATOR) {
+      return TRUE;
+    }
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      if (preg_match('!^[a-zA-Z]:[/\\\\]!', $path)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * @param $directory
    *
    * @return string
@@ -532,7 +550,7 @@ HTACCESS;
     }
 
     // check if directory is relative, if so return immediately
-    if (substr($directory, 0, 1) != DIRECTORY_SEPARATOR) {
+    if (!self::isAbsolute($directory)) {
       return $directory;
     }
 
@@ -580,6 +598,10 @@ HTACCESS;
    * @return string
    */
   public static function relativize($directory, $basePath) {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $directory = strtr($directory, '\\', '/');
+      $basePath = strtr($basePath, '\\', '/');
+    }
     if (substr($directory, 0, strlen($basePath)) == $basePath) {
       return substr($directory, strlen($basePath));
     }
