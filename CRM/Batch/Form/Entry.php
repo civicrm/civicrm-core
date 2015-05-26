@@ -290,7 +290,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     foreach ($params['field'] as $key => $value) {
       foreach($fields as $field => $label) {
         if (!empty($params['primary_contact_id'][$key]) && empty($value[$field])) {
-          $errors["field[$key][$field]"] = ts("$label is a required field.");
+          $errors["field[$key][$field]"] = ts('%1 is a required field.', array(1 => $label));
         }
       }
     }
