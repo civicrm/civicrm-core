@@ -626,15 +626,11 @@ abstract class CRM_Core_Payment {
     // possible we may get more. Hence, iterate through all instances ..
 
     while ($dao->fetch()) {
-      // Check pp is extension
+      // Check pp is extension - is this still required - surely the singleton below handles it.
       $ext = CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($dao->class_name)) {
         $paymentClass = $ext->keyToClass($dao->class_name, 'payment');
         require_once $ext->classToPath($paymentClass);
-      }
-      else {
-        // Legacy or extension as module instance
-        $paymentClass = 'CRM_Core_' . $dao->class_name;
       }
 
       $processorInstance = Civi\Payment\System::singleton()->getById($dao->processor_id);
