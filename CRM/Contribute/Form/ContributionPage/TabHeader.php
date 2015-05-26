@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Helper class to build navigation links
+ * Helper class to build navigation links.
  */
 class CRM_Contribute_Form_ContributionPage_TabHeader {
   /**
