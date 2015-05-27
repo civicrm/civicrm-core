@@ -89,7 +89,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     );
     // This means we can test failing transactions by setting a past year in expiry. A full expiry check would
     // be more complete.
-    if (!empty($params['credit_card_exp_date']) && date('Y') >
+    if (!empty($params['credit_card_exp_date']['Y']) && date('Y') >
       CRM_Core_Payment_Form::getCreditCardExpirationYear($params)) {
       $error = new CRM_Core_Error(ts('transaction failed'));
       return $error;
