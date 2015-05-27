@@ -1739,8 +1739,8 @@ class CRM_Report_Form extends CRM_Core_Form {
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
           $clause
-            = "{$field['dbAlias']} REGEXP '[[:<:]]" . implode('|', $value) .
-            "[[:>:]]'";
+            = "{$field['dbAlias']} REGEXP '[[:cntrl:]]" . implode('|', $value) .
+            "[[:cntrl:]]'";
         }
         break;
 
@@ -1749,8 +1749,8 @@ class CRM_Report_Form extends CRM_Core_Form {
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
           $clause
-            = "( {$field['dbAlias']} NOT REGEXP '[[:<:]]" . implode('|', $value) .
-            "[[:>:]]' OR {$field['dbAlias']} IS NULL )";
+            = "( {$field['dbAlias']} NOT REGEXP '[[:cntrl:]]" . implode('|', $value) .
+            "[[:cntrl:]]' OR {$field['dbAlias']} IS NULL )";
         }
         break;
 
