@@ -652,9 +652,13 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       CRM_Core_Error::fatal(ts('Current filter criteria didn\'t have any target contact to add to group'));
     }
 
-    $query = "{$this->_select}
+    $new_select = 'AS addtogroup_contact_id';
+    $select = str_ireplace('AS civicrm_contact_contact_target_id', $new_select, $this->_select);
+    $new_having = ' addtogroup_contact_id';
+    $having = str_ireplace(' civicrm_contact_contact_target_id', $new_having, $this->_having);
+    $query = "$select
 FROM civireport_activity_temp_target tar
-GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
+GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $select = 'AS addtogroup_contact_id';
     $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
     $dao = CRM_Core_DAO::executeQuery($query);
