@@ -44,9 +44,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   );
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
-  /**
-   * Class constructor.
-   */
   public function __construct() {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
@@ -88,7 +85,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
-        'grouping' => 'conact_a_fields',
+        'grouping' => 'contact_a_fields',
       ),
       'civicrm_contact_b' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -127,7 +124,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
-        'grouping' => 'conact_b_fields',
+        'grouping' => 'contact_b_fields',
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
@@ -137,7 +134,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'email',
           ),
         ),
-        'grouping' => 'conact_a_fields',
+        'grouping' => 'contact_a_fields',
       ),
       'civicrm_email_b' => array(
         'dao' => 'CRM_Core_DAO_Email',
@@ -148,7 +145,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'email',
           ),
         ),
-        'grouping' => 'conact_b_fields',
+        'grouping' => 'contact_b_fields',
       ),
       'civicrm_phone' => array(
         'dao' => 'CRM_Core_DAO_Phone',
@@ -163,7 +160,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'phone_ext',
           ),
         ),
-        'grouping' => 'conact_a_fields',
+        'grouping' => 'contact_a_fields',
       ),
       'civicrm_phone_b' => array(
         'dao' => 'CRM_Core_DAO_Phone',
@@ -178,7 +175,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'name' => 'phone_ext',
           ),
         ),
-        'grouping' => 'conact_b_fields',
+        'grouping' => 'contact_b_fields',
       ),
       'civicrm_relationship_type' => array(
         'dao' => 'CRM_Contact_DAO_RelationshipType',
@@ -222,21 +219,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             ),
             'type' => CRM_Utils_Type::T_INT,
           ),
-            /*
-             *  This is as pseudo field.  The where function will convert it to look to see if the start and end dates
-             * make the relationship a valid one. 
-             */
-          'is_valid' => array(
-            'title' => ts('Relationship Dates Valid'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array(
-              '' => '- Any -',
-              1 => 'Valid Dates',
-              0 => 'Invalid Dates',
-            ),
-            'type' => CRM_Utils_Type::T_INT,
-          ),
-         'relationship_type_id' => array(
+          'relationship_type_id' => array(
             'title' => ts('Relationship'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => array(
@@ -245,16 +228,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
           ),
-            'start_date' => array(
-            'title' => ts('Start Date'),
-            'type' => CRM_Utils_Type::T_DATE,
-            ),
-          'end_date' => array(
-            'title' => ts('End Date'),
-            'type' => CRM_Utils_Type::T_DATE,
-            ),
-
-
         ),
         'grouping' => 'relation-fields',
       ),
@@ -447,21 +420,13 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                 }
               }
               else {
-                  if ($fieldName == "is_valid")
-                  {
-                      /*
-                       * We have a pseudofilter which we shall translate
-                       */
-                      $clause = $this->buildValidityQuery(CRM_Utils_Array::value("{$fieldName}_value", $this->_params));
-                  } else {
-  
-                  $clause = $this->whereClause($field,
-                    $op,
-                    CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                    CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                    CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-                    );
-                  }
+
+                $clause = $this->whereClause($field,
+                  $op,
+                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                );
               }
             }
           }
@@ -592,15 +557,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   }
 
   /**
-   * Alter display of rows.
-   *
-   * Iterate through the rows retrieved via SQL and make changes for display purposes,
-   * such as rendering contacts as links.
-   *
-   * @param array $rows
-   *   Rows generated by SQL, with an array for each row.
+   * @param $rows
    */
   public function alterDisplay(&$rows) {
+    // custom code to alter rows
     $entryFound = FALSE;
 
     foreach ($rows as $rowNum => $row) {
@@ -668,24 +628,5 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       }
     }
   }
-  function buildValidityQuery($valid) {
-      /*
-       * Parameters $valid - set to 1 if we are looking for a valid relationship, 0 if not
 
-       * 
-       *  returns the select clause
-       */
-      $clause = NULL;
-      if ($valid)
-        {
-              $clause = "((start_date <= CURDATE() OR start_date is null) AND (end_date >= CURDATE() OR end_date is null))";
-        }
-      if (!$valid)
-      {
-              $clause = "(start_date >= CURDATE() OR end_date < CURDATE())";
-           
-      }
-      return $clause;
-
-  }
 }

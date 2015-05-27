@@ -53,7 +53,9 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     }
     $dao = new CRM_Core_DAO_UFMatch();
     $dao->copyValues($params);
-    $dao->save();
+    if (!$dao->find(TRUE)) {
+      $dao->save();
+    }
     CRM_Utils_Hook::post($hook, 'UFMatch', $dao->id, $dao);
     return $dao;
   }

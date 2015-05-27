@@ -478,13 +478,13 @@ ORDER BY parent_id, weight";
     $i18n = CRM_Core_I18n::singleton();
 
     $name = $i18n->crm_translate($value['attributes']['label'], array('context' => 'menu'));
-    $url = $value['attributes']['url'];
-    $permission = $value['attributes']['permission'];
-    $operator = $value['attributes']['operator'];
-    $parentID = $value['attributes']['parentID'];
-    $navID = $value['attributes']['navID'];
-    $active = $value['attributes']['active'];
-    $menuName = $value['attributes']['name'];
+    $url = CRM_Utils_Array::value('url', $value['attributes']);
+    $permission = CRM_Utils_Array::value('permission', $value['attributes']);
+    $operator = CRM_Utils_Array::value('operator', $value['attributes']);
+    $parentID = CRM_Utils_Array::value('parentID', $value['attributes']);
+    $navID = CRM_Utils_Array::value('navID', $value['attributes']);
+    $active = CRM_Utils_Array::value('active', $value['attributes']);
+    $menuName = CRM_Utils_Array::value('name', $value['attributes']);
     $target = CRM_Utils_Array::value('target', $value['attributes']);
 
     if (in_array($parentID, $skipMenuItems) || !$active) {

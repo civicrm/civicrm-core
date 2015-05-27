@@ -281,7 +281,20 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $errors = array();
     $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
 
+    //CRM-16480 if contact is selected, validate financial type and amount field.
+    foreach ($params['field'] as $key => $value) {
+      if (!empty($params['primary_contact_id'][$key]) && empty($value['total_amount'])) {
+        $errors["field[$key][total_amount]"] = ts('Amount is a required field.');
+      }
+      if (!empty($params['primary_contact_id'][$key]) && empty($value['financial_type'])) {
+        $errors["field[$key][financial_type]"] = ts('Financial Type is a required field.');
+      }
+    }
+
     if (!empty($params['_qf_Entry_upload_force'])) {
+      if (!empty($errors)) {
+        return $errors;
+      }
       return TRUE;
     }
 
@@ -314,7 +327,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
       }
     }
-    if ($batchTotal != $self->_batchInfo['total']) {
+    if ((string) $batchTotal != $self->_batchInfo['total']) {
       $self->assign('batchAmountMismatch', TRUE);
       $errors['_qf_defaults'] = ts('Total for amounts entered below does not match the expected batch total.');
     }

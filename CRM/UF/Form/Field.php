@@ -599,7 +599,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another profile field.'), '', 'info');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field/add',
         "reset=1&action=add&gid={$this->_gid}&sbr={$showBestResult}"
       ));
@@ -751,7 +750,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
       }
       if ($primaryOfSameTypeFound) {
-        $errors['field_name'] = ts('You have already added a primary location field of this type: %1', $primaryOfSameTypeFound);
+        $errors['field_name'] = ts('You have already added a primary location field of this type: %1', array(1 => $primaryOfSameTypeFound));
       }
     }
   }

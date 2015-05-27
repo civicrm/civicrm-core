@@ -140,12 +140,12 @@ function civicrm_api3_job_geocode($params) {
  */
 function _civicrm_api3_job_geocode_spec(&$params) {
   $params['start'] = array(
-    'title' => 'Start Date',
-    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+    'title' => 'Starting Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
   );
   $params['end'] = array(
-    'title' => 'End Date',
-    'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+    'title' => 'Ending Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
   );
   $params['geocoding'] = array(
     'title' => 'Geocode address?',

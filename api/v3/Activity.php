@@ -483,6 +483,13 @@ function _civicrm_api3_activity_getlist_output($result, $request) {
           1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $row['source_contact_id'], 'display_name'),
         ));
       }
+      // Add repeating info
+      $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($row['id'], 'civicrm_activity');
+      $data['extra']['is_recur'] = FALSE;
+      if ($repeat) {
+        $data['suffix'] = ts('(%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
+        $data['extra']['is_recur'] = TRUE;
+      }
       $output[] = $data;
     }
   }

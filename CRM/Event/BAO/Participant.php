@@ -2047,10 +2047,12 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 
     // update participant fee_amount column
     $partUpdateFeeAmt['id'] = $participantId;
-    foreach ($lineItems as $lineValue) {
-      if ($lineValue['price_field_value_id']) {
-        $line[$lineValue['price_field_value_id']] = $lineValue['label'] . ' - ' . $lineValue['qty'];
-      }
+    $getUpdatedLineItems = "SELECT *
+FROM civicrm_line_item
+WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND qty > 0)";
+    $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
+    while ($getUpdatedLineItemsDAO->fetch()) {
+      $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
     }
 
     $partUpdateFeeAmt['fee_level'] = implode(', ', $line);

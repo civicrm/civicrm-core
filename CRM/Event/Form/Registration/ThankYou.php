@@ -60,6 +60,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assign('participantInfo', $participantInfo);
     $customGroup = $this->get('customProfile');
     $this->assign('customProfile', $customGroup);
+    $this->assign('individual', $this->get('individual'));
 
     CRM_Event_Form_Registration_Confirm::assignProfiles($this);
 

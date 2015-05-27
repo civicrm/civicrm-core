@@ -327,7 +327,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       //get the valid recurring processors.
       $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
       $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
-      $recurProcessor = array_intersect_assoc($this->_processors, $recurring);
+      $recurProcessor = array_intersect_key($this->_processors, $recurring);
       if (!empty($recurProcessor)) {
         $autoRenew = array();
         if (!empty($membershipType)) {

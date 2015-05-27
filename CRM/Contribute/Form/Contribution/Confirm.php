@@ -505,6 +505,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $params['selectMembership'],
           FALSE
         );
+        if (!empty($params['auto_renew'])) {
+          $this->assign('auto_renew', TRUE);
+        }
       }
       else {
         $this->assign('membershipBlock', FALSE);
@@ -679,7 +682,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   public function postProcess() {
     $contactID = $this->getContactID();
     $isPayLater = $this->_params['is_pay_later'];
-    if ($this->_params['payment_processor'] == 0) {
+    if (isset($this->_params['payment_processor']) && $this->_params['payment_processor'] == 0) {
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
     }
     // add a description field at the very beginning
@@ -1562,6 +1565,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       && $form->_membershipBlock['is_separate_payment'] === '0'
       && isset($params['selectMembership'])
       && $form->_values['is_allow_other_amount'] == '1'
+      // CRM-16331
+      && !empty($form->_membershipTypeValues)
+      && !empty($form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'])
     ) {
       $recurParams['amount'] = $form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'];
     }
@@ -1619,6 +1625,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Add on behalf of organization and it's location.
    *
+   * This situation occurs when on behalf of is enabled for the contribution page and the person
+   * signing up does so on behalf of an organization.
+   *
    * @param array $behalfOrganization
    *   array of organization info.
    * @param int $contactID
@@ -1628,7 +1637,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $values
    *   form values array.
    * @param array $params
-   * @param null $fields
+   * @param array $fields
+   *   Array of fields from the onbehalf profile relevant to the organization.
    */
   public static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
     $isCurrentEmployer = FALSE;
