@@ -263,17 +263,20 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
 
   public static function checkPermissionedLineItems($id, $op, $force = TRUE) {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
+    $flag = FALSE;
     foreach ($lineItems as $items) { 
       if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
         if ($force) {
           CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
           break;
         }
-        return FALSE;
+        $flag = FALSE;
+        break;
       }
       else {
-        return TRUE;
+        $flag = TRUE;
       }
     }
+    return $flag;
   }
 }
