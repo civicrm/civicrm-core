@@ -41,7 +41,20 @@
  * @return array
  *   Api result array
  */
-function civicrm_api3_order_create(&$params) {}
+function civicrm_api3_order_create(&$params) {
+  $contribution = array();
+  $entityResult = civicrm_api3($entity, 'create', $entityParams);
+  $contribution = civicrm_api3('Contribution', 'create', $params);
+  // add payments
+  if (CRM_Utils_Array::value('id', $contribution)) {
+    $paymentParams = array(
+      'contribution_id' => $contribution['id'],
+      $entity . '_id' => $entityResult['id'],
+    );
+    $payments = civicrm_api3($entity . '_payment', 'create', $paymentParams);
+  }
+  return civicrm_api3_create_success($result['values'], $params, 'Order', 'create');
+}
 
 /**
  * Delete a Order.
