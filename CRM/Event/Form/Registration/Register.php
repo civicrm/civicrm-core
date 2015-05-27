@@ -199,7 +199,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $pid => $value) {
         if (!empty($value['is_default'])) {
-          $this->_defaults['payment_processor'] = $pid;
+          $this->_defaults['payment_processor_id'] = $pid;
         }
       }
     }
@@ -442,14 +442,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if ($this->_values['event']['is_monetary']) {
       if (count($pps) > 1) {
-        $this->addRadio('payment_processor', ts('Payment Method'), $pps,
+        $this->addRadio('payment_processor_id', ts('Payment Method'), $pps,
           NULL, "&nbsp;"
         );
       }
       elseif (!empty($pps)) {
         $ppKeys = array_keys($pps);
         $currentPP = array_pop($ppKeys);
-        $this->addElement('hidden', 'payment_processor', $currentPP);
+        $this->addElement('hidden', 'payment_processor_id', $currentPP);
       }
     }
 
@@ -894,8 +894,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     if ($self->_values['event']['is_monetary']) {
-      if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 && !isset($fields['payment_processor'])) {
-        $errors['payment_processor'] = ts('Please select a Payment Method');
+      if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 && !isset
+        ($fields['payment_processor_id'])) {
+        $errors['payment_processor_id'] = ts('Please select a Payment Method');
       }
       // return if this is express mode
       if ($self->_paymentProcessor &&
@@ -992,7 +993,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $params['is_primary'] = 1;
 
     if ($this->_values['event']['is_pay_later']
-      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor'] == 0)
+      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor_id'] == 0)
     ) {
       $params['is_pay_later'] = 1;
     }

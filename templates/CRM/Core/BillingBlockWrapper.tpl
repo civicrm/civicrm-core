@@ -29,3 +29,4 @@ This allows the billing block to change when the card type changes *}
 <div id="billing-payment-block">
   {include file="CRM/Core/BillingBlock.tpl"}
 </div>
+{include file="CRM/common/paymentBlock.tpl"}

@@ -24,21 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Callback snippet: Load payment processor *}
-{if $snippet}
-  {include file="CRM/Core/BillingBlock.tpl"}
-  <div id="paypalExpress">
-    {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
-    {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
-      {assign var=expressButtonName value='_qf_Register_upload_express'}
-      <fieldset class="crm-group payPalExpress-group">
-        <legend>{ts}Checkout with PayPal{/ts}</legend>
-        <div class="description">{ts}Click the PayPal button to continue.{/ts}</div>
-        <div>{$form.$expressButtonName.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span>
-        </div>
-      </fieldset>
-    {/if}
-  </div>
-{else}
+
   {if $action & 1024}
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
   {/if}
@@ -141,12 +127,12 @@
       </fieldset>
     {/if}
 
-    {if $form.payment_processor.label}
+    {if $form.payment_processor_id.label}
       <fieldset class="crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
         <div class="crm-section payment_processor-section">
-          <div class="label">{$form.payment_processor.label}</div>
-          <div class="content">{$form.payment_processor.html}</div>
+          <div class="label">{$form.payment_processor_id.label}</div>
+          <div class="content">{$form.payment_processor_id.html}</div>
           <div class="clear"></div>
         </div>
       </fieldset>
@@ -180,7 +166,7 @@
     {literal}
     function toggleConfirmButton() {
       var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
-      var elementObj = cj('input[name="payment_processor"]');
+      var elementObj = cj('input[name="payment_processor_id"]');
       if (elementObj.attr('type') == 'hidden') {
         var processorTypeId = elementObj.val();
       }
@@ -196,7 +182,7 @@
       }
     }
 
-    cj('input[name="payment_processor"]').change(function () {
+    cj('input[name="payment_processor_id"]').change(function () {
       toggleConfirmButton();
     });
 
@@ -235,7 +221,7 @@
         payment_processor.hide();
         payment_information.hide();
         // also unset selected payment methods
-        cj('input[name="payment_processor"]').removeProp('checked');
+        cj('input[name="payment_processor_id"]').removeProp('checked');
       }
       else {
         payment_options.show();
@@ -370,7 +356,7 @@
       }
     }
   }
-  {/literal}{/if}{literal}
+  {/literal}{literal}
 
 </script>
 {/literal}
