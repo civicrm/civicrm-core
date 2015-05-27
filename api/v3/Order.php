@@ -64,7 +64,10 @@ function civicrm_api3_order_create(&$params) {
  *
  * @return array
  */
-function civicrm_api3_order_delete($params) {}
+function civicrm_api3_order_delete($params) {
+  $result = civicrm_api3('Contribution', 'delete', $params);
+  return civicrm_api3_create_success($result['values'], $params, 'Order', 'delete'); 
+}
 
 /**
  * Retrieve a set of Order.
@@ -103,4 +106,21 @@ function _civicrm_api3_order_get_spec(&$params) {
     'title' => 'Contribution ID',
     'type' => CRM_Utils_Type::T_INT,
   );
+}
+
+/**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_order_delete_spec(&$params) {
+  $params['contribution_id'] = array(
+    'api.required' => 1 ,
+    'title' => 'Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['id']['api.aliases'] = array('contribution_id');
 }
