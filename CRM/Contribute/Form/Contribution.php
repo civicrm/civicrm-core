@@ -575,7 +575,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $billingPanes = array();
     if ($this->_mode) {
-      if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE) == TRUE) {
+      if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE) == TRUE) {
         $buildRecurBlock = TRUE;
         foreach ($this->billingPane as $name => $label) {
           if (!empty($this->billingFieldSets[$name]['fields'])) {
