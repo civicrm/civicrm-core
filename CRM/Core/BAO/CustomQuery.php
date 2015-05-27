@@ -413,7 +413,7 @@ SELECT label, value
                 $op  = 'RLIKE';
 
               }
-			  elseif ($wildcard) {
+              elseif ($wildcard) {
                 $val = "[[:cntrl:]]%$val%[[:cntrl:]]";
                 $op = 'LIKE';
               }
