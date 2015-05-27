@@ -109,7 +109,7 @@ function _civicrm_api3_order_get_spec(&$params) {
 }
 
 /**
- * Adjust Metadata for Get action.
+ * Adjust Metadata for Delete action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
