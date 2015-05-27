@@ -407,12 +407,13 @@ SELECT label, value
                 'Multi-Select State/Province',
                 'Multi-Select Country',
               );
-               
+
               if (in_array($field['html_type'], $specialHTMLType)) {
-                $val = "[[:cntrl:]]".$val."[[:cntrl:]]";
+                $val = "[[:cntrl:]]" . $val . "[[:cntrl:]]";
                 $op  = 'RLIKE';
 
-              } elseif ($wildcard) {
+              }
+			  elseif ($wildcard) {
                 $val = "[[:cntrl:]]%$val%[[:cntrl:]]";
                 $op = 'LIKE';
               }
