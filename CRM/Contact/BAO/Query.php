@@ -2081,35 +2081,16 @@ class CRM_Contact_BAO_Query {
         TRUE
       );
     }
-    elseif ($name === 'birth_date') {
-      $date = CRM_Utils_Date::processDate($value);
-      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
-
-      if ($date) {
-        $date = CRM_Utils_Date::customFormat($date);
-        $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
-      }
-      else {
-        $this->_qill[$grouping][] = "$field[title] $op";
-      }
-      self::$_openedPanes[ts('Demographics')] = TRUE;
-    }
-    elseif ($name === 'deceased_date') {
-      $date = CRM_Utils_Date::processDate($value);
-      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
-      if ($date) {
-        $date = CRM_Utils_Date::customFormat($date);
-        $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
-      }
-      else {
-        $this->_qill[$grouping][] = "$field[title] $op";
-      }
-      self::$_openedPanes[ts('Demographics')] = TRUE;
-    }
     elseif ($name === 'is_deceased') {
       $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $value);
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
       self::$_openedPanes[ts('Demographics')] = TRUE;
+    }
+    elseif ($name === 'created_date' || $name === 'modified_date' || $name === 'deceased_date' || $name === 'birth_date') {
+      $this->dateQueryBuilder($values, 'contact_a', $name ,$name , $field['title']);
+      if ($name === 'deceased_date' || $name === 'birth_date') {
+        self::$_openedPanes[ts('Demographics')] = TRUE;
+      }
     }
     elseif ($name === 'contact_id') {
       if (is_int($value)) {
@@ -5059,16 +5040,16 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     }
 
     if ($name == $fieldName) {
-      // $op = '=';
-      $phrase = $op;
+      //In Get API, for operators other then '=' the $value is in array(op => value) format
+      if (is_array($value) && !empty($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $op = key($value);
+        $value = $value[$op];
+      }
 
       $date = CRM_Utils_Date::processDate($value);
-
       if (!$appendTimeStamp) {
         $date = substr($date, 0, 8);
       }
-
-      $format = CRM_Utils_Date::customFormat($date);
 
       if ($date) {
         $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op '$date'";
@@ -5077,7 +5058,10 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op";
       }
       $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
-      $this->_qill[$grouping][] = "$fieldTitle - $phrase \"$format\"";
+
+      $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+      $format = CRM_Utils_Date::customFormat($date);
+      $this->_qill[$grouping][] = "$fieldTitle $op \"$format\"";
     }
   }
 
