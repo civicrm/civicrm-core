@@ -83,16 +83,15 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
     $form->addDate('start_date', ts('Contribution Date From'), FALSE, array('formatType' => 'custom'));
     $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
 
-    $financial_types = CRM_Contribute_PseudoConstant::financialType();
-    foreach ($financial_types as $financial_type_id => $financial_type) {
-      $form->addElement('checkbox', "financial_type_id[{$financial_type_id}]", 'Financial Type', $financial_type);
-    }
+    $form->addSelect('financial_type_id',
+      array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search')
+    );
 
     /**
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array('min_amount', 'max_amount', 'start_date', 'end_date', 'financial_type_id'));
+    $form->assign('elements', array('min_amount', 'max_amount', 'start_date', 'end_date'));
   }
 
   /**
@@ -223,7 +222,7 @@ civicrm_contact AS contact_a
     }
 
     if (!empty($this->_formValues['financial_type_id'])) {
-      $financial_type_ids = implode(',', array_keys($this->_formValues['financial_type_id']));
+      $financial_type_ids = implode(',', array_values($this->_formValues['financial_type_id']));
       $clauses[] = "contrib.financial_type_id IN ($financial_type_ids)";
     }
 
