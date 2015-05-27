@@ -80,7 +80,7 @@
       <td>{$form.contact_id.html}</td>
     {/if}
     {if $contributionMode}
-    <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
+      <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
     {/if}
     <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
       <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
@@ -214,6 +214,7 @@
 
   </table>
 
+  <div id="billing-payment-block">
   <div class="accordion ui-accordion ui-widget ui-helper-reset">
     {* Billing Pane is the only billing pane currently *}
     {foreach from=$billingPanes key=paneName item=paneValue}
@@ -227,6 +228,8 @@
       </div>
     {/foreach}
   </div>
+  </div>
+  {include file="CRM/common/paymentBlock.tpl"}
 
     <!-- start of soft credit -->
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">

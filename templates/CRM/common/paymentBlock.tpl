@@ -36,7 +36,7 @@ function buildPaymentBlock(type) {
   }
   {/literal}{/if}{literal}
 
-  var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
+  var dataUrl = {/literal}"{crmURL p='civicrm/payment/form' h=0 q='snippet=4&processor_id='}"{literal} + type;
 
   {/literal}
     {if $urlPathVar}
@@ -47,9 +47,6 @@ function buildPaymentBlock(type) {
             dataUrl = dataUrl + '&id=' + '{$contributionPageID}'
         {/if}
 
-    {if $qfKey}
-      dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
-    {/if}
   {literal}
 
   var response = cj.ajax({
@@ -63,7 +60,7 @@ function buildPaymentBlock(type) {
 CRM.$(function($) {
     $('.crm-group.payment_options-group').show();
 
-    $('input[name="payment_processor"]').change( function() {
+    $('#payment_processor_id').change( function() {
         buildPaymentBlock( $(this).val() );
     });
 });
