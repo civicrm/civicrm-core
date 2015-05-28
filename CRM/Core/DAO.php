@@ -2323,7 +2323,8 @@ SELECT contact_id
               return (sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
             }
             else {
-              return NULL; // not yet implemented (tests required to implement)
+              // CRM-16581 // TO DO (write some tests?)
+              return (sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
             }
         }
       }

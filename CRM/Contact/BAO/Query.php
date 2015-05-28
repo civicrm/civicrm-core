@@ -1496,7 +1496,7 @@ class CRM_Contact_BAO_Query {
       else {
         $values = CRM_Contact_BAO_Query::fixWhereValues($id, $values, $wildcard, $useEquals, $apiEntity);
 
-        if (!$values) {
+        if (!$values) { 
           continue;
         }
         $params[] = $values;
@@ -1523,8 +1523,15 @@ class CRM_Contact_BAO_Query {
     // Change camelCase EntityName to lowercase with underscores
     $apiEntity = _civicrm_api_get_entity_name_from_camel($apiEntity);
 
-    if (CRM_Utils_System::isNull($values)) {
-      return $result;
+    foreach ($values as $key => $value) {
+      $value = trim($value);
+      if (empty($value)) {
+        $result = array($id, $key, $value, 0, $wildcard);
+        return $result;
+      }
+      elseif (CRM_Utils_System::isNull($values)) {
+        return $result;
+      }
     }
 
     if (!$skipWhere) {
