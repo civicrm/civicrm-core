@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing a Contribution
- *
+ * This class generates form components for processing a Contribution.
  */
 class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_ContributionBase {
 
@@ -66,8 +63,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -79,18 +74,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->assign('isShare', CRM_Utils_Array::value('is_share', $this->_values));
     $this->assign('isConfirmEnabled', CRM_Utils_Array::value('is_confirm_enabled', $this->_values));
 
-    // make sure we have right permission to edit this user
-    $csContactID = $this->getContactID();
-    $reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $mainDisplay = CRM_Utils_Request::retrieve('_qf_Main_display', 'Boolean', CRM_Core_DAO::$_nullObject);
-
-    if ($reset) {
-      $this->assign('reset', $reset);
-    }
-
-    if ($mainDisplay) {
-      $this->assign('mainDisplay', $mainDisplay);
-    }
+    $this->assign('reset', CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject));
+    $this->assign('mainDisplay', CRM_Utils_Request::retrieve('_qf_Main_display', 'Boolean',
+      CRM_Core_DAO::$_nullObject));
 
     // Possible values for 'is_for_organization':
     // * 0 - org profile disabled
@@ -192,10 +178,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Set the default values.
-   *
-   * @return void
-   */
-  /**
    */
   public function setDefaultValues() {
     // check if the user is registered and we have a contact ID
@@ -264,12 +246,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     //build set default for pledge overdue payment.
     if (!empty($this->_values['pledge_id'])) {
-      //get all pledge payment records of current pledge id.
-      $pledgePayments = array();
-
       //used to record completed pledge payment ids used later for honor default
       $completedContributionIds = array();
-
       $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($this->_values['pledge_id']);
 
       $duePayment = FALSE;
@@ -379,8 +357,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // build profiles first so that we can determine address fields etc
@@ -458,7 +434,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    $contactID = $this->getContactID();
     if ($this->getContactID() === '0') {
       $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
     }
@@ -736,7 +711,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param CRM_Core_Form $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -1142,9 +1117,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
