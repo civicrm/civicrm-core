@@ -205,6 +205,12 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     // first we need to find custom value table, from custom group ID
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name');
 
+    CRM_Utils_Hook::custom_pre('delete',
+      $customGroupID,
+      NULL,
+      $customValueID
+    );
+
     // delete custom value from corresponding custom value table
     $sql = "DELETE FROM {$tableName} WHERE id = {$customValueID}";
     CRM_Core_DAO::executeQuery($sql);

@@ -238,6 +238,13 @@ class CRM_Core_BAO_CustomValueTable {
           else {
             $query = "$sqlOP SET $setClause $where";
           }
+
+          CRM_Utils_Hook::custom_pre($hookOP,
+            $hookID,
+            $entityID,
+            $fields
+          );
+
           $dao = CRM_Core_DAO::executeQuery($query, $params);
 
           CRM_Utils_Hook::custom($hookOP,
