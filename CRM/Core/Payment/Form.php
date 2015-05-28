@@ -57,11 +57,6 @@ class CRM_Core_Payment_Form {
     if ($processor != NULL) {
       // ie it is pay later
       $paymentFields = self::getPaymentFields($processor);
-      if (in_array('cvv2', $paymentFields) && $isBackOffice) {
-        if (!civicrm_api3('setting', 'getvalue', array('name' => 'cvv_backoffice_required', 'group' => 'Contribute Preferences'))) {
-          unset($paymentFields[array_search('cvv2', $paymentFields)]);
-        }
-      }
       $paymentTypeName = self::getPaymentTypeName($processor);
       $paymentTypeLabel = self::getPaymentTypeLabel($processor);
       //@todo if we switch to iterating through $form->billingFieldSets we won't need to assign these directly
@@ -69,6 +64,12 @@ class CRM_Core_Payment_Form {
       $form->assign('paymentTypeLabel', $paymentTypeLabel);
 
       $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
+      if (in_array('cvv2', $paymentFields) && $isBackOffice) {
+        if (!civicrm_api3('setting', 'getvalue', array('name' => 'cvv_backoffice_required', 'group' => 'Contribute Preferences'))) {
+          $form->billingFieldSets[$paymentTypeName]['fields'][array_search('cvv2', $paymentFields)]['required'] = 0;
+        }
+      }
+
       $form->billingPane = array($paymentTypeName => $paymentTypeLabel);
       $form->assign('paymentFields', $paymentFields);
     }
