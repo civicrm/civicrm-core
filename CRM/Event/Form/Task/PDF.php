@@ -34,14 +34,14 @@
  */
 
 /**
- * This class provides the functionality to email a group of
- * contacts.
+ * This class provides the functionality to create PDF letter for a group of
+ * participants or a single participant.
  */
 class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
 
   /**
    * Are we operating in "single mode", i.e. printing letter to one
-   * specific contact?
+   * specific participant?
    *
    * @var boolean
    */
