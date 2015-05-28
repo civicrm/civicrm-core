@@ -70,6 +70,24 @@ function civicrm_api3_order_delete($params) {
 }
 
 /**
+ * Cancel a Order.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @return array
+ */
+function civicrm_api3_order_cancel($params) {
+  $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+  $params['contribution_status_id'] = array_search('Cancelled', $contributionStatuses);
+  $result = civicrm_api3('Contribution', 'create', $params);
+  if (!$result['is_error']) {
+    CRM_Contribute_BAO_Contribution::transitionComponents($params);
+  }
+  return civicrm_api3_create_success($result['values'], $params, 'Order', 'cancel'); 
+}
+
+/**
  * Retrieve a set of Order.
  *
  * @param array $params
