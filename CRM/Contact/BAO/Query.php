@@ -2092,7 +2092,7 @@ class CRM_Contact_BAO_Query {
         $appendDateTime = FALSE;
         self::$_openedPanes[ts('Demographics')] = TRUE;
       }
-      $this->dateQueryBuilder($values, 'contact_a', $name ,$name ,$field['title'] ,$appendDateTime);
+      $this->dateQueryBuilder($values, 'contact_a', $name, $name, $field['title'], $appendDateTime);
     }
     elseif ($name === 'contact_id') {
       if (is_int($value)) {
