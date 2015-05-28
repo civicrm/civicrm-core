@@ -1105,7 +1105,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   The custom field value.
    * @param int $id
    *   The custom field id.
-   * @param int $options
+   * @param array $options
    *   The assoc array of option name/value pairs.
    *
    * @param int $contactID
