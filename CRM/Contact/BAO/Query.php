@@ -2087,10 +2087,12 @@ class CRM_Contact_BAO_Query {
       self::$_openedPanes[ts('Demographics')] = TRUE;
     }
     elseif ($name === 'created_date' || $name === 'modified_date' || $name === 'deceased_date' || $name === 'birth_date') {
-      $this->dateQueryBuilder($values, 'contact_a', $name ,$name , $field['title']);
+      $appendDateTime = TRUE;
       if ($name === 'deceased_date' || $name === 'birth_date') {
+        $appendDateTime = FALSE;
         self::$_openedPanes[ts('Demographics')] = TRUE;
       }
+      $this->dateQueryBuilder($values, 'contact_a', $name ,$name ,$field['title'], $appendDateTime);
     }
     elseif ($name === 'contact_id') {
       if (is_int($value)) {
@@ -5045,14 +5047,27 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $op = key($value);
         $value = $value[$op];
       }
+        print_r(strpos($op, 'IN') );
 
-      $date = CRM_Utils_Date::processDate($value);
-      if (!$appendTimeStamp) {
-        $date = substr($date, 0, 8);
+      if ($op == 'IN' || $op == 'NOT IN') {
+        foreach ($value as &$date) {
+          $date = CRM_Utils_Date::processDate($date);
+          if (!$appendTimeStamp) {
+            $date = substr($date, 0, 8);
+          }
+        }
+        $date = "('" . implode("','", $value) . "')";
+      }
+      else {
+        $date = CRM_Utils_Date::processDate($value);
+        if (!$appendTimeStamp) {
+          $date = substr($date, 0, 8);
+        }
+        $date = "'$date'";
       }
 
       if ($date) {
-        $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op '$date'";
+        $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op $date";
       }
       else {
         $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op";
