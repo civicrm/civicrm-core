@@ -5047,16 +5047,18 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $op = key($value);
         $value = $value[$op];
       }
-        print_r(strpos($op, 'IN') );
 
-      if ($op == 'IN' || $op == 'NOT IN') {
+      if (strstr($op, 'IN')) {
+        $format = array();
         foreach ($value as &$date) {
           $date = CRM_Utils_Date::processDate($date);
           if (!$appendTimeStamp) {
             $date = substr($date, 0, 8);
           }
+          $format[] = CRM_Utils_Date::customFormat($date);
         }
         $date = "('" . implode("','", $value) . "')";
+        $format = implode(', ', $format);
       }
       else {
         $date = CRM_Utils_Date::processDate($value);
@@ -5064,6 +5066,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
           $date = substr($date, 0, 8);
         }
         $date = "'$date'";
+        $format = CRM_Utils_Date::customFormat($date);
       }
 
       if ($date) {
@@ -5075,7 +5078,6 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
 
       $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
-      $format = CRM_Utils_Date::customFormat($date);
       $this->_qill[$grouping][] = "$fieldTitle $op \"$format\"";
     }
   }
