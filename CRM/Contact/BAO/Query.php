@@ -1523,7 +1523,7 @@ class CRM_Contact_BAO_Query {
     // Change camelCase EntityName to lowercase with underscores
     $apiEntity = _civicrm_api_get_entity_name_from_camel($apiEntity);
 
-    if(isset($values) && is_array($values)) {
+    if (isset($values) && is_array($values)) {
       foreach ($values as $key => $value) {
         $value = trim($value);
         if (empty($value)) {
