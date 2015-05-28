@@ -1061,10 +1061,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           // CRM-14983: verify if values are comma separated convert to array
-          if (!is_array($value) && (strpos($value, ',') !== FALSE || strstr($value, '(')) && empty($isCustomField) && $params['operator'][$key][$k] == 'IN') {
-            preg_match('#\((.*?)\)#', $value, $match);
-            $tmpArray = explode(',', $match[1]);
-            $value = array_combine(array_values($tmpArray), array_values($tmpArray));
+          if (strstr($params['operator'][$key][$k], 'IN') && !is_array($value) && (strpos($value, ',') !== FALSE || strstr($value, '(') || !empty($value)) && empty($isCustomField)) {
+            $value = explode(',', str_replace(array('(', ')'), '', $value));
           }
 
           if ($row) {
