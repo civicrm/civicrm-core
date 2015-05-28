@@ -32,7 +32,7 @@
       </legend>
       {crmRegion name="billing-block-pre"}
         {* todo move this region assignment to paypal processor *}
-        {include file= "CRM/Financial/PaypalPro.tpl"}
+        {include file= "CRM/Financial/Form/PaypalPro.tpl"}
       {/crmRegion}
       <div class="crm-section billing_mode-section {$paymentTypeName}_info-section">
         {foreach from=$paymentFields item=paymentField}
@@ -208,6 +208,6 @@
   {crmRegion name="billing-block-post"}
     {* Payment processors sometimes need to append something to the end of the billing block. We create a region for
        clarity  - the plan is to move to assigning this through the payment processor to this region *}
-    {include file= "CRM/Financial/PaypalExpress.tpl"}
+    {include file= "CRM/Financial/Form/PaypalExpress.tpl"}
   {/crmRegion}
 {/if}

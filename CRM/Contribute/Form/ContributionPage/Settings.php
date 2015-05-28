@@ -29,15 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_ContributionPage {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
