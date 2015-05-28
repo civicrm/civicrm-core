@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to create PDF letter for a group of
- * contacts or a single contact.
+ * This class provides the functionality to create PDF letter for a group of contacts or a single contact.
  */
 class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 

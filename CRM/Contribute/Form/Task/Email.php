@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: Email.php 45499 2013-02-08 12:31:05Z kurund $
- *
  */
 
 /**
- * This class provides the functionality to email a group of
- * contacts.
+ * This class provides the functionality to email a group of contacts.
  */
 class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
 

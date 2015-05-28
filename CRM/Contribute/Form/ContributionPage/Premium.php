@@ -29,21 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form to process actions on Premiums
+ * Form to process actions on Premiums.
  */
 class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_ContributionPage {
 
   /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = array();

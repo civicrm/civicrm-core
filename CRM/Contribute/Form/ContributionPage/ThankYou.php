@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form to configure thank-you messages and receipting features for an online contribution page
+ * Form to configure thank-you messages and receipting features for an online contribution page.
  */
 class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_ContributionPage {
 
