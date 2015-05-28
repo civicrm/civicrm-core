@@ -423,6 +423,26 @@ abstract class CRM_Utils_Hook {
       ->invoke(5, $formName, $fields, $files, $form, $errors, self::$_nullObject, 'civicrm_validateForm');
   }
 
+   /**
+   * This hook is called before a db write on a custom table.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $groupID
+   *   The custom group ID.
+   * @param object $entityID
+   *   The entityID of the row in the custom table.
+   * @param array $params
+   *   The parameters that were sent into the calling function.
+   *
+   * @return null
+   *   the return value is ignored
+   */
+  public static function custom_pre($op, $groupID, $entityID, &$params) {
+    return self::singleton()
+      ->invoke(4, $op, $groupID, $entityID, $params, self::$_nullObject, self::$_nullObject, 'civicrm_custom_pre');
+  }
+
   /**
    * This hook is called after a db write on a custom table.
    *
