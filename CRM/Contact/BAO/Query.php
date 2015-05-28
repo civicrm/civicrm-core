@@ -1496,7 +1496,7 @@ class CRM_Contact_BAO_Query {
       else {
         $values = CRM_Contact_BAO_Query::fixWhereValues($id, $values, $wildcard, $useEquals, $apiEntity);
 
-        if (!$values) { 
+        if (!$values) {
           continue;
         }
         $params[] = $values;
