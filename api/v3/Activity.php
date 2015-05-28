@@ -190,7 +190,7 @@ function _civicrm_api3_activity_create_spec(&$params) {
     'title' => 'Activity Assignee',
     'description' => 'Contact(s) assigned to this activity.',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
     'FKApiName' => 'Contact',
   );
   $params['target_contact_id'] = array(
@@ -198,7 +198,7 @@ function _civicrm_api3_activity_create_spec(&$params) {
     'title' => 'Activity Target',
     'description' => 'Contact(s) participating in this activity.',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
     'FKApiName' => 'Contact',
   );
 
@@ -207,7 +207,7 @@ function _civicrm_api3_activity_create_spec(&$params) {
     'title' => 'Activity Source Contact',
     'description' => 'Person who created this activity. Defaults to current user.',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
     'api.default' => 'user_contact_id',
     'FKApiName' => 'Contact',
   );
