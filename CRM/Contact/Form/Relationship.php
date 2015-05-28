@@ -388,6 +388,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Store the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
 
+    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
+    $params['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_a_b', $params, 0);
+    $params['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_b_a', $params, 0);
+
     // action is taken depending upon the mode
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contact_BAO_Relationship::del($this->_relationshipId);
