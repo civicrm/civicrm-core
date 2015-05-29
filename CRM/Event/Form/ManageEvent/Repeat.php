@@ -102,6 +102,10 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       $params['excludeDateRangeColumns'] = array('start_date', 'end_date');
       $params['entity_table'] = 'civicrm_event';
       $params['entity_id'] = $this->_id;
+
+      // CRM-16568 - check if parent exist for the event.
+      $parentId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
+      $params['parent_entity_id'] = !empty($parentId) ? $parentId : $params['entity_id'];
       //Unset event id
       unset($params['id']);
 
