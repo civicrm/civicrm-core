@@ -2095,10 +2095,20 @@ class CRM_Contact_BAO_Query {
         TRUE
       );
     }
+    elseif ($name === 'modified_date' || $name === 'created_date') {
+      $date = CRM_Utils_Date::processDate($value);
+      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
+      if ($date) {
+        $date = CRM_Utils_Date::customFormat($date);
+        $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
+      }
+      else {
+        $this->_qill[$grouping][] = "$field[title] $op";
+      }
+    }
     elseif ($name === 'birth_date') {
       $date = CRM_Utils_Date::processDate($value);
       $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
-
       if ($date) {
         $date = CRM_Utils_Date::customFormat($date);
         $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
