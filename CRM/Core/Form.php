@@ -1603,7 +1603,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $userID = $this->getLoggedInUserContactID();
 
-    if ($tempID == $userID) {
+    if (!is_null($tempID) && $tempID === $userID) {
       return (int) $userID;
     }
 
