@@ -1621,7 +1621,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       return $tempID;
     }
 
-    return $userID;
+    return is_numeric($userID) ? $userID : NULL;
   }
 
   /**
@@ -1847,7 +1847,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
             if (!$options) {
               $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
             }
-          } 
+          }
           else {
             $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
             $targetField->setAttribute('disabled', 'disabled');
