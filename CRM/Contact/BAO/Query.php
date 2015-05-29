@@ -1526,7 +1526,7 @@ class CRM_Contact_BAO_Query {
     //Find empty string criteria values e.g. > "" or != ""
     if (isset($values) && is_array($values)) {
       foreach ($values as $key => $value) {
-        if(!is_array($value)) {
+        if (!is_array($value)) {
           $value = trim($value);
           if (empty($value)) {
             $result = array($id, $key, $value, 0, $wildcard);
@@ -1535,7 +1535,7 @@ class CRM_Contact_BAO_Query {
         }
       }
     }
-    
+
     // Skip nested empty strings as not supported
     if (CRM_Utils_System::isNull($values)) {
       return $result;
