@@ -53,7 +53,11 @@
 {/crmRegion}
 
 
-{crmRegion name='page-footer' allowCmsOverride=0}{/crmRegion}
+{crmRegion name='page-footer' allowCmsOverride=0}
+  <script type="text/javascript">
+    window.print();
+  </script>
+{/crmRegion}
 </div> {* end crm-container div *}
 </body>
 </html>
