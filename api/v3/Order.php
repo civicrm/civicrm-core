@@ -43,14 +43,39 @@
  */
 function civicrm_api3_order_create(&$params) {
   $contribution = array();
-  $entityResult = civicrm_api3($entity, 'create', $entityParams);
+  $entity = NULL;
+  if (CRM_Utils_Array::value('line_items', $params)) {
+    $entityParams = CRM_Utils_Array::value('params', $params['line_items'], array());
+    if (CRM_Utils_Array::value('line_item', $params['line_items'])) {
+      $params['line_item'] = $params['line_items']['line_item'];
+      if (!empty($params['line_item'])) {
+        $entity = str_replace('civicrm_', '', $params['line_item']['entity_table']);
+      }
+    }
+    if ($entityParams) {
+    }
+    else {
+      if (in_array($entity, array('participant', 'membership'))) {
+        $entityResult = civicrm_api3($entity, 'create', $entityParams);
+        $params['contribution_mode'] = $entity;
+        $params[$entity . '_id'] = $entityResult['id'];
+      }
+      else {
+        // pledge payment
+      }
+    }
+  }  
   $contribution = civicrm_api3('Contribution', 'create', $params);
   // add payments
-  if (CRM_Utils_Array::value('id', $contribution)) {
+  if ($entity && CRM_Utils_Array::value('id', $contribution)) {
     $paymentParams = array(
       'contribution_id' => $contribution['id'],
       $entity . '_id' => $entityResult['id'],
     );
+    // if entity is pledge then build pledge param
+    if ($entity == 'pledge') {
+      $paymentParams += $entityParams;
+    }
     $payments = civicrm_api3($entity . '_payment', 'create', $paymentParams);
   }
   return civicrm_api3_create_success($result['values'], $params, 'Order', 'create');
