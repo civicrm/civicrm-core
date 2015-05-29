@@ -441,7 +441,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
    */
   public function getPriceLevels() {
     $query = "
-SELECT CONCAT(cv.label, ' (', ps.title, ')') label, cv.id
+SELECT CONCAT(cv.label, ' (', ps.title, ' - ', cf.label , ')') label, cv.id
 FROM civicrm_price_field_value cv
 LEFT JOIN civicrm_price_field cf
   ON cv.price_field_id = cf.id
