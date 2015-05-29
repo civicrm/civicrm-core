@@ -26,7 +26,7 @@
 {literal}
 <script type="text/javascript">
 
-function buildPaymentBlock( type ) {
+function buildPaymentBlock(type) {
   {/literal}{if !$isBillingAddressRequiredForPayLater}{literal}
   if (type == 0) {
     if (cj("#billing-payment-block").length) {

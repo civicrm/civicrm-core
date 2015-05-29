@@ -577,7 +577,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @param $submittedValues
+   * @param array $submittedValues
    *
    * @return mixed
    */

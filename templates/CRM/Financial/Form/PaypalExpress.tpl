@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
@@ -23,72 +22,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- */
-
-/**
- * This class provides the functionality to email a group of contacts.
- */
-class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
-
-  /**
-   * Are we operating in "single mode", i.e. sending email to one
-   * specific contact?
-   *
-   * @var boolean
-   */
-  public $_single = FALSE;
-
-  public $_noEmails = FALSE;
-
-  /**
-   * All the existing templates in the system.
-   *
-   * @var array
-   */
-  public $_templates = NULL;
-
-  /**
-   * Build all the data structures needed to build the form.
-   *
-   * @return void
-   */
-  public function preProcess() {
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
-    parent::preProcess();
-
-    // we have all the contribution ids, so now we get the contact ids
-    parent::setContactIDs();
-
-    $this->assign('single', $this->_single);
-  }
-
-  /**
-   * Build the form object.
-   *
-   *
-   * @return void
-   */
-  public function buildQuickForm() {
-    //enable form element
-    $this->assign('emailTask', TRUE);
-
-    CRM_Contact_Form_Task_EmailCommon::buildQuickForm($this);
-  }
-
-  /**
-   * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
-   */
-  public function postProcess() {
-    CRM_Contact_Form_Task_EmailCommon::postProcess($this);
-  }
-
-}
+*}
+{if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
+  <div id="paypalExpress">
+    {assign var=expressButtonName value='_qf_Main_upload_express'}
+    <fieldset class="crm-group paypal_checkout-group">
+      <legend>{ts}Checkout with PayPal{/ts}</legend>
+      <div class="section">
+        <div class="crm-section paypalButtonInfo-section">
+          <div class="content">
+            <span class="description">{ts}Click the PayPal button to continue.{/ts}</span>
+          </div>
+          <div class="clear"></div>
+        </div>
+        <div class="crm-section {$expressButtonName}-section">
+          <div class="content">
+            {$form.$expressButtonName.html} <span class="description">Checkout securely. Pay without sharing your financial information. </span>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+{/if}

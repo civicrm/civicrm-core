@@ -183,7 +183,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    *   associated array with payment processor related fields
    */
-  public static function getPayment($paymentProcessorID, $mode) {
+  public static function getPayment($paymentProcessorID, $mode = 'based_on_id') {
     if (!$paymentProcessorID) {
       CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
     }

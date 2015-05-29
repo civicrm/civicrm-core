@@ -457,4 +457,23 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
   }
 
+  /**
+   * CRM-16285 - Function to handle validation errors on form, for recurring contribution field.
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param $self
+   */
+  public static function validateRecurContribution($fields, $files, $self, &$errors) {
+    if (!empty($fields['is_recur'])) {
+      if ($fields['frequency_interval'] <= 0) {
+        $errors['frequency_interval'] = ts('Please enter a number for how often you want to make this recurring contribution (EXAMPLE: Every 3 months).');
+      }
+      if ($fields['frequency_unit'] == '0') {
+        $errors['frequency_unit'] = ts('Please select a period (e.g. months, years ...) for how often you want to make this recurring contribution (EXAMPLE: Every 3 MONTHS).');
+      }
+    }
+  }
+
 }

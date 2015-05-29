@@ -29,14 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * Used for displaying results
- *
- *
  */
 class CRM_Contribute_Form_Task_Result extends CRM_Contribute_Form_Task {
 
@@ -50,8 +46,6 @@ class CRM_Contribute_Form_Task_Result extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addButtons(array(
