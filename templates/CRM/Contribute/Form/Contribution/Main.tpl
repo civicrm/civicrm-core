@@ -499,13 +499,13 @@
 
   function skipPaymentMethod() {
     var flag = false;
-    cj('.price-set-option-content input').each( function(){
+    cj('.price-set-option-content input[data-amount]').each( function(){
       currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
       if( cj(this).is(':checked') && currentTotal == 0 ) {
           flag = true;
       }
     });
-    cj('.price-set-option-content input').change( function () {
+    cj('.price-set-option-content input[data-amount]').change( function () {
       if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
         flag = true;
       } else {
