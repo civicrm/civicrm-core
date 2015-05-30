@@ -106,6 +106,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
       break;
 
     case CRM_Utils_Type::T_DATE:
+    case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
       $value = CRM_Utils_Type::escape($value, "Date", FALSE);
       if (!$value) {
         return civicrm_api3_create_error("Param '$field' is not a date. format YYYYMMDD or YYYYMMDDHHMMSS");
