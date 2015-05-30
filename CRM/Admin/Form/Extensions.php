@@ -100,35 +100,40 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * @return void
    */
   public function buildQuickForm() {
-
-    $info = CRM_Extension_System::singleton()->getMapper()->keyToInfo($this->_key);
-    $extInfo = CRM_Admin_Page_Extensions::createExtendedInfo($info);
-    $extName = $extInfo['name'];
-
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
         $buttonName = ts('Install');
-        $title = ts('Install ' . $extName . '?');
+        $title = ts('Install "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
 
       case CRM_Core_Action::UPDATE:
         $buttonName = ts('Download and Install');
-        $title = ts('Download and Install ' . $extName . '?');
+        $title = ts('Download and Install "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
 
       case CRM_Core_Action::DELETE:
         $buttonName = ts('Uninstall');
-        $title = ts('Uninstall ' . $extName . '?');
+        $title = ts('Uninstall "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
 
       case CRM_Core_Action::ENABLE:
         $buttonName = ts('Enable');
-        $title = ts('Enable ' . $extName . '?');
+        $title = ts('Enable "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
 
       case CRM_Core_Action::DISABLE:
         $buttonName = ts('Disable');
-        $title = ts('Disable ' . $extName . '?');
+        $title = ts('Disable "%1"?', array(
+          1 => $this->_key,
+        ));
         break;
     }
 
