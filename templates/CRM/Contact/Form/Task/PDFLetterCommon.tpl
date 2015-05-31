@@ -128,6 +128,11 @@ CRM.$(function($) {
   $('#format_id', $form).on('change', function() {
     selectFormat($(this).val());
   });
+  // After the pdf downloads, the user has to manually close the dialog (which would be nice to fix)
+  // But at least we can trigger the underlying list of activities to refresh
+  $form.closest('.ui-dialog-content.crm-ajax-container').on('dialogbeforeclose', function() {
+    $(this).trigger('crmFormSuccess');
+  });
 });
 
 var currentWidth;
