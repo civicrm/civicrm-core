@@ -1464,8 +1464,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     // Hence we can't just call CRM_Member_BAO_Membership::getValues below with the active flag, is it would completely miss pending relatioships.
     $query = 'SELECT * FROM `civicrm_membership_status`';
     if ($active) {
-    $query .= 'WHERE `is_current_member` = 1 OR
-      `id` = 5';
+      $query .= 'WHERE `is_current_member` = 1 OR `id` = 5';
     }
 
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -1492,7 +1491,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           continue;
         }
 
-        $membershipStatusId = $memberships[$key]['status_id'] ;
+        $membershipStatusId = $memberships[$key]['status_id'];
         if (!isset($membershipStatusRecordIds[$membershipStatusId])) {
           unset($memberships[$key]);
         }
