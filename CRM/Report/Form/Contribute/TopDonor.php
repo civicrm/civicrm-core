@@ -311,11 +311,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
                          AND {$this->_aliases['civicrm_email']}.is_primary = 1
              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                            {$this->_aliases['civicrm_phone']}.is_primary = 1
-             LEFT JOIN civicrm_line_item   {$this->_aliases['civicrm_line_item']}
-                         ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id AND
-                            {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'
-  ";
+                            {$this->_aliases['civicrm_phone']}.is_primary = 1";
     $this->addAddressFromClause();
   }
 
@@ -370,9 +366,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
-    $this->_where .= " AND {$this->_aliases['civicrm_line_item']}.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
   }
 
   public function groupBy() {
@@ -389,6 +382,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->select();
 
     $this->from();
+    $this->getPermissionedFTQuery($this);
 
     $this->where();
 
