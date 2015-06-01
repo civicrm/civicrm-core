@@ -1802,13 +1802,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
-      return $tempID;
+      return (int) $tempID;
     }
 
     $userID = $this->getLoggedInUserContactID();
 
     if ($tempID == $userID) {
-      return $userID;
+      return (int) $userID;
     }
 
     //check if this is a checksum authentication

@@ -261,7 +261,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       );
 
       $config = CRM_Core_Config::singleton();
-      if ($config->mapAPIKey && $config->mapProvider) {
+      //CRM-16552: mapAPIKey is not mandatory as google no longer requires an API Key
+      if ($config->mapProvider && ($config->mapAPIKey || $config->mapProvider == 'Google')) {
         self::$_links[CRM_Core_Action::MAP] = array(
           'name' => ts('Map'),
           'url' => 'civicrm/contact/map',
