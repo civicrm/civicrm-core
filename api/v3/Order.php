@@ -29,6 +29,7 @@
  * 1. Add failure function in each api call
  * 2. Add Validation mentioned in wiki for create/update call
  * 3. Add code for Update call
+ * 4. Change the code to use multiple line items for contribution, membership and participant 
  */
 /**
  * This api exposes CiviCRM Order records.
