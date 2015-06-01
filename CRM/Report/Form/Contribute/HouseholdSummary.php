@@ -267,7 +267,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     }
     $this->getPermissionedFTQuery($this);
   }
-
+  
   public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
