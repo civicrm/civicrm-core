@@ -434,9 +434,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    if ($this->getContactID() === '0') {
+    $contactID = $this->getContactID();
+    if ($this->getContactID() === 0) {
       $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
     }
+
     //build pledge block.
     $this->_useForMember = 0;
     //don't build membership block when pledge_id is passed
