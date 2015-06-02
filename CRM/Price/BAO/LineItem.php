@@ -143,13 +143,13 @@ AND li.entity_id = {$entityId}
    * @param null $isQuick
    * @param bool $isQtyZero
    * @param bool $relatedEntity
-   * @param bool $invoice
    *
    * @param string $overrideWhereClause
    *   E.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
    *   this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
    *   when we don't want it's entity-id magix
    *
+   * @param bool $invoice
    * @return array
    *   Array of line items
    */
