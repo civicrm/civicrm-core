@@ -1586,20 +1586,37 @@ class CRM_Contact_BAO_Query {
     elseif ($id == 'group') {
       if (is_array($values)) {
         foreach ($values as $groupIds => $val) {
-          $matches = array();
-          if (preg_match('/-(\d+)$/', $groupIds, $matches)) {
-            if (strlen($matches[1]) > 0) {
-              $values[$matches[1]] = 1;
-              unset($values[$groupIds]);
+          if (strpos($val, '_')) {
+            // we have a group_name_id format
+            unset($values[$groupIds]);
+            $exploded_string = explode('_', $val);
+            $group_id = array_pop($exploded_string);
+            $values[$group_id] = 1;
+          }
+          else {
+            $matches = array();
+            if (preg_match('/-(\d+)$/', $groupIds, $matches)) {
+              if (strlen($matches[1]) > 0) {
+                $values[$matches[1]] = 1;
+                unset($values[$groupIds]);
+              }
             }
           }
         }
       }
       else {
-        $groupIds = explode(',', $values);
-        unset($values);
-        foreach ($groupIds as $groupId) {
-          $values[$groupId] = 1;
+        if(strpos($values, '_')) {
+          // we have a group_name_id format
+          $exploded_string = explode('_', $values);
+          unset($values);
+          $groupIds = array_pop($exploded_string);
+          $values[$groupIds] = 1;
+        } else {
+          $groupIds = explode(',', $values);
+          unset($values);
+          foreach ($groupIds as $groupId) {
+            $values[$groupId] = 1;
+          }
         }
       }
 
