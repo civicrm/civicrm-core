@@ -736,17 +736,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // add a description field at the very beginning
     $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
 
-    // also add accounting code
-    $this->_params['accountingCode'] = CRM_Utils_Array::value('accountingCode',
-      $this->_values
-    );
+    $this->_params['accountingCode'] = CRM_Utils_Array::value('accountingCode', $this->_values);
 
     // fix currency ID
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     //carry payment processor id.
-    if ($paymentProcessorId = CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
-      $this->_params['payment_processor_id'] = $paymentProcessorId;
+    if (CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
+      $this->_params['payment_processor_id'] = $this->_paymentProcessor['id'];
     }
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
