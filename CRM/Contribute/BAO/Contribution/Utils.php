@@ -234,6 +234,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
             'id' => $paymentParams['contributionID'],
             'trxn_id' => $result['trxn_id'],
           ));
+          $contribution->contribution_status_id = 1;
+          $contribution->trxn_id = !empty($result['trxn_id']) ? $result['trxn_id'] :$contribution->trxn_id;
         }
 
       }

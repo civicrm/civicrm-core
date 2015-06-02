@@ -1229,6 +1229,7 @@ AND civicrm_membership.is_test = %2";
   ) {
     $tempParams  = $membershipParams;
     $paymentDone = FALSE;
+    $paymentCompletedByProcessor = FALSE;
     $result      = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $form->assign('membership_assign', TRUE);
@@ -1267,6 +1268,9 @@ AND civicrm_membership.is_test = %2";
         $contributionTypeId,
         'membership'
       );
+      if ($result[1]->contribution_status_id ==1) {
+        $paymentCompletedByProcessor = TRUE;
+      }
     }
     else {
       // we need to explicitly create a CMS user in case of free memberships
@@ -1375,7 +1379,8 @@ AND civicrm_membership.is_test = %2";
           $membership = self::renewMembership($contactID, $memType,
             $isTest, $form, NULL,
             CRM_Utils_Array::value('cms_contactID', $membershipParams),
-            $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1)
+            $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1),
+            $paymentCompletedByProcessor
           );
 
           $createdMemberships[$memType] = $membership;
