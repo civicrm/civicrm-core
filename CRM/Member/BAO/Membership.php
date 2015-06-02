@@ -1540,7 +1540,7 @@ AND civicrm_membership.is_test = %2";
             && $form->_contributeMode == 'direct'
           )
         ) &&
-        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
+        (isset($form->_values) && ($form->_values['is_monetary'] && $form->_amount > 0.0) ||
          CRM_Utils_Array::value('separate_membership_payment', $form->_params) ||
          CRM_Utils_Array::value('record_contribution', $form->_params)
         )
@@ -2680,6 +2680,7 @@ WHERE      civicrm_membership.is_test = 0";
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
       'honor_contact_id', 'honor_type_id',
       'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later',
+      'contribution_recur_id'
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);
