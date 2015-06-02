@@ -143,6 +143,7 @@ AND li.entity_id = {$entityId}
    * @param null $isQuick
    * @param bool $isQtyZero
    * @param bool $relatedEntity
+   * @param bool $invoice
    *
    * @param string $overrideWhereClause
    *   E.g "WHERE contribution id = 7 " per the getLineItemsByContributionID wrapper.
@@ -152,7 +153,7 @@ AND li.entity_id = {$entityId}
    * @return array
    *   Array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '', $invoice = FALSE) {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -187,7 +188,8 @@ AND li.entity_id = {$entityId}
     $whereClause = "
       WHERE     %2.id = %1";
 
-    if ($entity == 'participant') {
+    // CRM-16250 get additional participant's fee selection details only for invoice PDF (if any)
+    if ($entity == 'participant' && $invoice) {
       $additionalParticipantIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
       if (!empty($additionalParticipantIDs)) {
         $whereClause = "WHERE %2.id IN (%1, " . implode(', ', $additionalParticipantIDs) . ")";
