@@ -59,8 +59,8 @@ function buildPaymentBlock(type) {
 
 CRM.$(function($) {
     $('.crm-group.payment_options-group').show();
-
-    $('#payment_processor_id').change( function() {
+    // FIXME: This code is getting re-loaded and re-run every time, using .off() as a temporary fix
+    $('[name=payment_processor_id]').off('.paymentBlock').on('change.paymentBlock', function() {
         buildPaymentBlock( $(this).val() );
     });
 });
