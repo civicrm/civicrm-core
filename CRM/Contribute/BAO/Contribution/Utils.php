@@ -100,7 +100,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     //fix for CRM-2062
     //fix for CRM-16317
 
-    $now = $form->_params['receive_date'] = date('YmdHis');
+    $form->_params['receive_date'] = date('YmdHis');
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
     );
