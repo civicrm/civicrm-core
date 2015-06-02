@@ -327,7 +327,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       else {
         $eid = $contribution->_relatedObjects['participant']->id;
         $etable = 'participant';
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, $etable);
+        $lineItem = CRM_Price_BAO_LineItem::getLineItems($eid, $etable, NULL, TRUE, FALSE, '', TRUE);
       }
 
       //TO DO: Need to do changes for partially paid to display amount due on PDF invoice
