@@ -1520,19 +1520,24 @@ AND civicrm_membership.is_test = %2";
    * @param int $membershipID
    *   Membership ID, this should always be passed in & optionality should be removed.
    *
-   * @throws CRM_Core_Exception
+   * @param bool $isPending
+   *   Is the transaction pending. We are working towards this ALWAYS being true and completion being done
+   *   in the complete transaction function, called by all types of payment processor (removing assumptions
+   *   about what they do & always doing a pending + a complete at the appropriate time).
    *
+   * @return
    */
   public static function renewMembershipFormWrapper(
     $contactID,
     $membershipTypeID,
     $is_test,
     &$form,
-    $changeToday = NULL,
-    $modifiedID = NULL,
-    $customFieldsFormatted = NULL,
-    $numRenewTerms = 1,
-    $membershipID = NULL
+    $changeToday,
+    $modifiedID,
+    $customFieldsFormatted,
+    $numRenewTerms,
+    $membershipID,
+    $isPending
   ) {
     $statusFormat = '%Y-%m-%d';
     $format = '%Y%m%d';
@@ -1548,8 +1553,10 @@ AND civicrm_membership.is_test = %2";
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
 
     // check is it pending. - CRM-4555
-    list($pending, $contributionRecurID, $changeToday, $membershipSource, $isPayLater, $campaignId) = self::extractFormValues($form, $changeToday, $membershipTypeDetails);
-    list($membership, $renewalMode, $dates) = self::renewMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $allStatus, $membershipTypeDetails, $contributionRecurID, $format, $membershipSource, $ids, $statusFormat, $isPayLater, $campaignId);
+    list($contributionRecurID, $changeToday, $membershipSource, $isPayLater, $campaignId) = self::extractFormValues($form, $changeToday);
+    list($membership, $renewalMode, $dates) = self::renewMembership($contactID, $membershipTypeID, $is_test,
+      $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $isPending, $allStatus,
+      $membershipTypeDetails, $contributionRecurID, $format, $membershipSource, $ids, $statusFormat, $isPayLater, $campaignId);
     $form->set('renewal_mode', $renewalMode);
     if (!empty($dates)) {
       $form->assign('mem_start_date',
@@ -2303,7 +2310,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       $isTest, $form, NULL,
       CRM_Utils_Array::value('cms_contactID', $membershipParams),
       $customFieldsFormatted, $numTerms,
-      $membershipID
+      $membershipID,
+      self::extractPendingFormValue($form, $memType)
     );
 
     if (!empty($membershipContribution)) {
@@ -2332,15 +2340,19 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * Extract relevant values from the form so we can separate form logic from BAO logcis.
+   * Determine if the form has a pending status.
+   *
+   * This is an interim refactoring step. This information should be extracted at the form layer.
+   *
+   * @deprecated
    *
    * @param CRM_Core_Form $form
-   * @param $changeToday
-   * @param $membershipTypeDetails
+   * @param int $membershipID
    *
-   * @return array
+   * @return bool
    */
-  public static function extractFormValues($form, $changeToday, $membershipTypeDetails) {
+  public static function extractPendingFormValue($form, $membershipID) {
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipID);
     $pending = FALSE;
     //@todo this is a BAO function & should not inspect the form - the form should do this
     // & pass required params to the BAO
@@ -2354,6 +2366,18 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         $pending = TRUE;
       }
     }
+    return $pending;
+  }
+
+  /**
+   * Extract relevant values from the form so we can separate form logic from BAO logcis.
+   *
+   * @param CRM_Core_Form $form
+   * @param $changeToday
+   *
+   * @return array
+   */
+  public static function extractFormValues($form, $changeToday) {
     $contributionRecurID = isset($form->_params['contributionRecurID']) ? $form->_params['contributionRecurID'] : NULL;
 
     //we renew expired membership, CRM-6277
@@ -2384,7 +2408,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         $campaignId = CRM_Utils_Array::value('campaign_id', $form->_values);
       }
     }
-    return array($pending, $contributionRecurID, $changeToday, $membershipSource, $isPayLater, $campaignId);
+    return array($contributionRecurID, $changeToday, $membershipSource, $isPayLater, $campaignId);
   }
 
   /**
