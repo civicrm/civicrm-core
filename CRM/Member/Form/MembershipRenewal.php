@@ -72,6 +72,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   protected $_context;
 
+  public $_contributeMode = 'direct';
+
   /**
    * An array to hold a list of datefields on the form
    * so that they can be converted to ISO in a consistent manner
@@ -553,14 +555,18 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $this->_params = $formValues = $this->controller->exportValues($this->_name);
 
     $this->storeContactFields($formValues);
-    // use values from screen
+
 
     if ($formValues['membership_type_id'][1] <> 0) {
-      $defaults['receipt_text_renewal'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $formValues['membership_type_id'][1],
-        'receipt_text_renewal'
-      );
+      $membershipTypeDetail = civicrm_api3('membership_type', 'getsingle', array('id' => $formValues['membership_type_id'][1]));
+      $defaults['receipt_text_renewal'] = CRM_Utils_Array::value('receipt_text_renewal', $membershipTypeDetail);
+      if ($this->_mode && CRM_Utils_Array::value('auto_renew', $this->_params)) {
+        $this->_params['frequency_interval'] = $membershipTypeDetail['duration_interval'];
+        $this->_params['frequency_unit'] = $membershipTypeDetail['duration_unit'];
+        $this->_params['is_recur'] = TRUE;
+      }
     }
+    // use values from screen
 
     $now = CRM_Utils_Date::getToday( null, 'YmdHis');
     $this->convertDateFieldsToMySQL($formValues);
@@ -660,8 +666,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+      if (!empty($this->_params['is_recur'])) {
+        $paymentParams['contributionRecurID'] = $this->processRecur($this->_params, $paymentParams['contactID'], $formValues['financial_type_id']);
+        civicrm_api3('membership', 'create', array('id' => $this->_id, 'contribution_recur_id' => $paymentParams['contributionRecurID']));
+      }
 
-      $result = &$payment->doDirectPayment($paymentParams);
+      $result = $payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {
         CRM_Core_Error::displaySessionError($result);
@@ -723,7 +733,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $renewMembership = CRM_Member_BAO_Membership::renewMembership($this->_contactID,
       $formValues['membership_type_id'][1],
       $isTestMembership, $this, NULL, NULL,
-      $customFieldsFormatted, $numRenewTerms
+      $customFieldsFormatted, $numRenewTerms,
+      (CRM_Utils_Array::value('contribution_status_id', $result) == 1) ? TRUE : FALSE
     );
 
     $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
@@ -774,6 +785,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // temporary variable to avoid e-notice & to make it clear to future refactorer that
       // this function is NOT reliant on that var being set
       $temporaryParams = array_merge($formValues, array('membership_id' => $renewMembership->id));
+      if (!empty($paymentParams['contributionRecurID'])) {
+        $temporaryParams['contribution_recur_id'] = $paymentParams['contributionRecurID'];
+        $temporaryParams['is_recur'] = TRUE;
+      }
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
@@ -892,6 +907,48 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+  }
+
+  /**
+   * Create the recurring record.
+   *
+   * @param array $params
+   * @param int $contactID
+   *
+   * @return mixed
+   */
+  protected function processRecur(&$params, $contactID) {
+    $recurParams = array();
+    $recurParams['contact_id'] = $contactID;
+    $recurParams['amount'] = CRM_Utils_Array::value('amount', $params);
+    $recurParams['auto_renew'] = CRM_Utils_Array::value('auto_renew', $params);
+    $recurParams['frequency_unit'] = CRM_Utils_Array::value('frequency_unit', $params);
+    $recurParams['frequency_interval'] = CRM_Utils_Array::value('frequency_interval', $params);
+    $recurParams['installments'] = CRM_Utils_Array::value('installments', $params);
+    $recurParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
+
+    $recurParams['is_test'] = 0;
+    if (($this->_action & CRM_Core_Action::PREVIEW) ||
+      (isset($this->_mode) && ($this->_mode == 'test'))
+    ) {
+      $recurParams['is_test'] = 1;
+    }
+
+    $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
+    if (CRM_Utils_Array::value('receive_date', $params)) {
+      $recurParams['start_date'] = $params['receive_date'];
+    }
+    $recurParams['invoice_id'] = CRM_Utils_Array::value('invoiceID', $params);
+    $recurParams['contribution_status_id'] = 2;
+    $recurParams['payment_processor_id'] = CRM_Utils_Array::value('payment_processor_id', $params);
+    $recurParams['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $params);
+    // we need to add a unique trxn_id to avoid a unique key error
+    // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
+    $recurParams['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params, $params['invoiceID']);
+
+    $recurParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $params);
+    $result = civicrm_api3('contribution_recur', 'create', $recurParams);
+    return $result['id'];
   }
 }
 
