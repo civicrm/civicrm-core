@@ -613,7 +613,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $formValues['membership_type_id'][1],
       $isTestMembership, $this, NULL, NULL,
       $customFieldsFormatted, $numRenewTerms,
-      $this->_membershipId
+      $this->_membershipId,
+      CRM_Member_BAO_Membership::extractPendingFormValue($this, $formValues['membership_type_id'][1])
     );
 
     $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
