@@ -1586,14 +1586,23 @@ class CRM_Contact_BAO_Query {
     elseif ($id == 'group') {
       if (is_array($values)) {
         foreach ($values as $groupIds => $val) {
-          if (strpos($val, '_')) {
-            // we have a group_name_id format
+          if (!is_numeric($val) || strpos($val, '_')) {
             unset($values[$groupIds]);
+            // we have a group_name_id format
             $exploded_string = explode('_', $val);
             $group_id = array_pop($exploded_string);
-            $values[$group_id] = 1;
+            if (!is_numeric($group_id)) {
+              // we've got a group that doesn't have an id at the end
+              // get group id from name
+              $result = civicrm_api3('Group', 'get', array('sequential' => 1, 'return' => "id", 'name' => $val));
+              $values[$result['id']] = 1;
+            }
+            else {
+              $values[$group_id] = 1;
+            }
           }
           else {
+            // just found ID
             $matches = array();
             if (preg_match('/-(\d+)$/', $groupIds, $matches)) {
               if (strlen($matches[1]) > 0) {
@@ -1605,13 +1614,23 @@ class CRM_Contact_BAO_Query {
         }
       }
       else {
-        if(strpos($values, '_')) {
+        $original_string = $values;
+        if (!is_numeric($values) || strpos($values, '_')) {
           // we have a group_name_id format
           $exploded_string = explode('_', $values);
           unset($values);
           $groupIds = array_pop($exploded_string);
-          $values[$groupIds] = 1;
-        } else {
+          if (!is_numeric($groupIds)) {
+            // we've got a group that doesn't have its id at the end
+            // get group id from name
+            $result = civicrm_api3('Group', 'get', array('sequential' => 1, 'return' => "id", 'name' => $original_string));
+            $values[$result['id']] = 1;
+          }
+          else {
+            $values[$groupIds] = 1;
+          }
+        }
+        else {
           $groupIds = explode(',', $values);
           unset($values);
           foreach ($groupIds as $groupId) {
