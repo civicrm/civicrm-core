@@ -31,8 +31,6 @@
         {$paymentTypeLabel}
       </legend>
       {crmRegion name="billing-block-pre"}
-        {* todo move this region assignment to paypal processor *}
-        {include file= "CRM/Financial/Form/PaypalPro.tpl"}
       {/crmRegion}
       <div class="crm-section billing_mode-section {$paymentTypeName}_info-section">
         {foreach from=$paymentFields item=paymentField}
@@ -199,36 +197,34 @@
         $('#credit_card_number').val(cc);
       });
     });
-    {/literal}
 
-    function toggleConfirmButton() {
-      var suppressSubmitButton = "{/literal}{$suppressSubmitButton}{literal}";
-      var elementObj = cj('input[name="payment_processor"]');
-      if ( elementObj.attr('type') == 'hidden' ) {
-        var processorTypeId = elementObj.val( );
-      }
-      else {
-        var processorTypeId = elementObj.filter(':checked').val();
-      }
+    $('input[name="payment_processor_id"]').change( function() {
+      function toggleConfirmButton() {
+        var suppressSubmitButton = {/literal}"{$suppressSubmitButton}"{literal};
+        var elementObj = $('input[name="payment_processor"]');
+        if ( elementObj.attr('type') == 'hidden' ) {
+          var processorTypeId = elementObj.val( );
+        }
+        else {
+          var processorTypeId = elementObj.filter(':checked').val();
+        }
 
-      if (suppressSubmitButton) {
-        cj("#crm-submit-buttons").hide();
+        if (suppressSubmitButton) {
+          $("#crm-submit-buttons").hide();
+        }
+        else {
+          $("#crm-submit-buttons").show();
+        }
       }
-      else {
-        cj("#crm-submit-buttons").show();
-      }
-    }
-
-    cj('input[name="payment_processor_id"]').change( function() {
       toggleConfirmButton();
     });
 
   </script>
+  {/literal}
 {/if}
 {/crmRegion}
 {crmRegion name="billing-block-post"}
   {* Payment processors sometimes need to append something to the end of the billing block. We create a region for
      clarity  - the plan is to move to assigning this through the payment processor to this region *}
-  {include file= "CRM/Financial/Form/PaypalExpress.tpl"}
 {/crmRegion}
 

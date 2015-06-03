@@ -25,14 +25,16 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Payment\System;
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 
+
 /**
- * base class for building payment block for online contribution / event pages
+ * Base class for building payment block for online contribution / event pages.
  */
 class CRM_Core_Payment_ProcessorForm {
 
@@ -56,7 +58,7 @@ class CRM_Core_Payment_ProcessorForm {
     }
 
     $form->set('paymentProcessor', $form->_paymentProcessor);
-    $form->_paymentObject = CRM_Core_Payment::singleton($mode, $form->_paymentProcessor, $form);
+    $form->_paymentObject = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 

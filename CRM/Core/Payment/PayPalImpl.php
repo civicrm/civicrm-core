@@ -96,6 +96,16 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   public function buildForm(&$form) {
     if ($this->_processorName == 'PayPal Express' || $this->_processorName == 'PayPal Pro') {
       $this->addPaypalExpressCode($form);
+      if ($this->_processorName == 'PayPal Express') {
+        CRM_Core_Region::instance('billing-block-post')->add(array(
+          'template' => 'CRM/Financial/Form/PaypalExpress.tpl',
+        ));
+      }
+      if ($this->_processorName == 'PayPal Pro') {
+        CRM_Core_Region::instance('billing-block-pre')->add(array(
+          'template' => 'CRM/Financial/Form/PaypalPro.tpl',
+        ));
+      }
     }
     return FALSE;
   }
@@ -106,14 +116,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @param $form
    */
-  protected static function addPaypalExpressCode(&$form) {
+  protected function addPaypalExpressCode(&$form) {
     if (empty($form->isBackOffice)) {
       $form->_expressButtonName = $form->getButtonName('upload', 'express');
       $form->assign('expressButtonName', $form->_expressButtonName);
       $form->add(
         'image',
         $form->_expressButtonName,
-        $form->_paymentProcessor['url_button'],
+        $this->_paymentProcessor['url_button'],
         array('class' => 'crm-form-submit')
       );
     }

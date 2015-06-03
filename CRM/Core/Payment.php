@@ -111,7 +111,7 @@ abstract class CRM_Core_Payment {
    *   Should form building stop at this point?
    */
   public function buildForm(&$form) {
-     return FALSE;
+    return FALSE;
   }
 
   /**
