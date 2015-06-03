@@ -56,7 +56,7 @@
   </item>
   <item>
      <path>civicrm/case/addToCase</path>
-     <title>Build Activity To Case</title>
+     <title>File on Case</title>
      <page_callback>CRM_Case_Form_ActivityToCase</page_callback>
   </item>
   <item>

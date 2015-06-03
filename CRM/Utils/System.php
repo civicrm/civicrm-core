@@ -642,7 +642,7 @@ class CRM_Utils_System {
   /**
    * Authenticate the user against the uf db.
    *
-   * In case of succesful authentication, returns an array consisting of
+   * In case of successful authentication, returns an array consisting of
    * (contactID, ufID, unique string). Returns FALSE if authentication is
    * unsuccessful.
    *

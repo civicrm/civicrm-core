@@ -187,23 +187,38 @@ function _civicrm_api3_activity_create_spec(&$params) {
 
   $params['assignee_contact_id'] = array(
     'name' => 'assignee_id',
-    'title' => 'assigned to',
+    'title' => 'Activity Assignee',
+    'description' => 'Contact(s) assigned to this activity.',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
   );
   $params['target_contact_id'] = array(
     'name' => 'target_id',
     'title' => 'Activity Target',
+    'description' => 'Contact(s) participating in this activity.',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
   );
 
   $params['source_contact_id'] = array(
     'name' => 'source_contact_id',
     'title' => 'Activity Source Contact',
+    'description' => 'Person who created this activity. Defaults to current user.',
     'type' => 1,
-    'FKClassName' => 'CRM_Activity_DAO_ActivityContact',
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
     'api.default' => 'user_contact_id',
+    'FKApiName' => 'Contact',
+  );
+
+  $params['case_id'] = array(
+    'name' => 'case_id',
+    'title' => 'Case ID',
+    'description' => 'For creating an activity as part of a case.',
+    'type' => 1,
+    'FKClassName' => 'CRM_Case_DAO_Case',
+    'FKApiName' => 'Case',
   );
 
 }
@@ -482,6 +497,13 @@ function _civicrm_api3_activity_getlist_output($result, $request) {
         $data['description'][] = ts('By %1', array(
           1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $row['source_contact_id'], 'display_name'),
         ));
+      }
+      // Add repeating info
+      $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($row['id'], 'civicrm_activity');
+      $data['extra']['is_recur'] = FALSE;
+      if ($repeat) {
+        $data['suffix'] = ts('(%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
+        $data['extra']['is_recur'] = TRUE;
       }
       $output[] = $data;
     }

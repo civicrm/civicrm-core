@@ -80,8 +80,15 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           'first_name' => array(
             'title' => ts('First Name'),
           ),
+          'middle_name' => array(
+            'title' => ts('Middle Name'),
+          ),
           'last_name' => array(
             'title' => ts('Last Name'),
+          ),
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
           ),
           'job_title' => array(
             'title' => ts('Job Title'),
@@ -90,9 +97,12 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           'gender_id' => array(
             'title' => ts('Gender'),
           ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+          ),
+          'age' => array(
+            'title' => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
           ),
           'contact_type' => array(
             'title' => ts('Contact Type'),
@@ -103,7 +113,29 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
         ),
         'filters' => array(
           'sort_name' => array('title' => ts('Employee Name')),
-          'id' => array('no_display' => TRUE),
+          'source' => array(
+            'title' => ts('Contact Source'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'id' => array(
+            'title' => ts('Contact ID'),
+            'no_display' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
         ),
         'grouping' => 'contact-fields',
       ),
@@ -252,7 +284,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
-            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type']);
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
@@ -350,6 +382,15 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
         if ($value = $row['civicrm_contact_gender_id']) {
           $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
           $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
+        }
+        $entryFound = TRUE;
+      }
+
+      // display birthday in the configured custom format
+      if (array_key_exists('civicrm_contact_birth_date', $row)) {
+        $birthDate = $row['civicrm_contact_birth_date'];
+        if ($birthDate) {
+          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
         }
         $entryFound = TRUE;
       }

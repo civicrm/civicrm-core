@@ -86,7 +86,15 @@ CRM.$(function($) {
   var recurringLabel = $('label[for=event_include_repeating_events]').html();
   // Conditional rule for recurring checkbox
   function toggleRecurrigCheckbox() {
-    if ($(this).val() && $(this).select2('data')['api.RecurringEntity.getcount']) {
+    var isRepeating = false;
+    if ($(this).val()) {
+      // Workaround: In some cases this code gets called before the select2 initialization.
+      if (!$(this).data('select2')) {
+        $(this).crmEntityRef();
+      }
+      isRepeating = $(this).select2('data').extra.is_recur;
+    }
+    if (isRepeating) {
       $('.crm-event-form-block-event_include_repeating_events').show();
       $('label[for=event_include_repeating_events]').html(recurringLabel.replace('%1', $(this).select2('data').label));
     } else {

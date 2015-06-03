@@ -112,11 +112,6 @@ class CRM_Contact_Task {
           'class' => 'CRM_Contact_Form_Task_Email',
           'result' => TRUE,
         ),
-        self::SMS_CONTACTS => array(
-          'title' => ts('Send SMS to Contacts'),
-          'class' => 'CRM_Contact_Form_Task_SMS',
-          'result' => TRUE,
-        ),
         self::DELETE_CONTACTS => array(
           'title' => ts('Delete Contacts'),
           'class' => 'CRM_Contact_Form_Task_Delete',
@@ -178,6 +173,16 @@ class CRM_Contact_Task {
           'result' => FALSE,
         ),
       );
+
+      //CRM-16329, if SMS provider is configured show sms action.
+      $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
+      if ($providersCount) {
+        self::$_tasks[self::SMS_CONTACTS] = array(
+          'title' => ts('Send SMS to Contacts'),
+          'class' => 'CRM_Contact_Form_Task_SMS',
+          'result' => TRUE,
+        );
+      }
 
       if (CRM_Contact_BAO_ContactType::isActive('Household')) {
         $label = CRM_Contact_BAO_ContactType::getLabel('Household');

@@ -67,16 +67,6 @@
         {/if}
 
         {include file="CRM/Price/Form/PriceSet.tpl" extends="Membership"}
-        <div id="allow_auto_renew">
-            <div class='crm-section auto-renew'>
-                <div class='label'></div>
-                <div class ='content'>
-                    {if isset($form.auto_renew) }
-                        {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
-                    {/if}
-                </div>
-            </div>
-         </div>
         </fieldset>
     </div>
 {elseif $lineItem and $priceSetID AND !$is_quick_config}

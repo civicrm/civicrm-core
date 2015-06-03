@@ -50,11 +50,7 @@
             {foreach from=$records key=recId item=rows}
               <tr class="{cycle values="odd-row,even-row"}">
                 {foreach from=$headers key=hrecId item=head}
-                  {if $dateFieldsVals.$hrecId.$recId}
-                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId|crmDate:"%b %d, %Y %l:%M %P"}</td>
-                  {else}
-                    <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
-                  {/if}
+                  <td {crmAttributes a=$attributes.$hrecId.$recId}>{$rows.$hrecId}</td>
                 {/foreach}
                 <td>{$rows.action}</td>
                 {foreach from=$dateFieldsVals key=fid item=rec}
@@ -77,12 +73,15 @@
   {/if}
 
   {if !$reachedMax}
-    {if $pageViewType eq 'customDataView'}
-      <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single&mode=add"}"
-       class="button action-item"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
-    {else}
-      <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
-       class="button action-item"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Record{/ts}</span></a>
-    {/if}
+    <div class="action-link">
+      {if $pageViewType eq 'customDataView'}
+        <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single&mode=add"}"
+         class="button action-item"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
+      {else}
+        <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
+         class="button action-item"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Record{/ts}</span></a>
+      {/if}
+    </div>
+    <br />
   {/if}
 {/if}

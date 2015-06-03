@@ -74,10 +74,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $return = $lineItemBAO->save();
 
     if ($id) {
-      CRM_Utils_Hook::post('edit', 'LineItem', $id, $params);
+      CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO);
     }
     else {
-      CRM_Utils_Hook::post('create', 'LineItem', $params['entity_id'], $params);
+      CRM_Utils_Hook::post('create', 'LineItem', $lineItemBAO->id, $lineItemBAO);
     }
 
     return $return;

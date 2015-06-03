@@ -1661,23 +1661,6 @@ input.crm-form-entityref {
   padding: 3px;
 }
 
-/* class for text area resizer jquery plugin*/
-div.grippie {
-  background: #EEEEEE url('../i/grippie.png') no-repeat scroll center 2px;
-  border-color: #DDDDDD;
-  border-style: solid;
-  border-width: 0pt 1px 1px;
-  cursor: s-resize;
-  height: 9px;
-  overflow: hidden;
-}
-.crm-container .resizable-textarea textarea {
-  display: block;
-  margin-bottom: 0pt;
-  width: 95%;
-  height: 20%;
-}
-
 .crm-container ul li.crm-tab-button {
   border-bottom: 0 none;
   float: left;
@@ -2662,18 +2645,15 @@ div.crm-container form {
 
 .crm-container .dataTables_processing {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 250px;
-  height: 30px;
-  margin-left: -125px;
-  margin-top: -15px;
-  padding: 14px 0 2px 0;
-  border: 1px solid #ddd;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-  background-color: white;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: url("../i/loading-overlay.gif") center center no-repeat white;
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .crm-container .dataTables_length {

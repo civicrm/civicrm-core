@@ -109,7 +109,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if username and email exists in the drupal db.
+   * Check if username and email exists in the Joomla db.
    *
    * @param array $params
    *   Array of name and mail values.
@@ -143,7 +143,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $db->setQuery($query, 0, 10);
     $users = $db->loadAssocList();
 
-    $row = array();;
+    $row = array();
     if (count($users)) {
       $row = $users[0];
     }
@@ -323,7 +323,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function setEmail(&$user) {
     global $database;
-    $query = "SELECT email FROM #__users WHERE id='$user->id'";
+    $query = $db->getQuery(TRUE);
+    $query->select($db->quoteName('email'))
+          ->from($db->quoteName('#__users'))
+          ->where($db->quoteName('id') . ' = ' . $user->id);
     $database->setQuery($query);
     $user->email = $database->loadResult();
   }
@@ -383,17 +386,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         (version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.1', 'lt'))
       ) {
         // now check password
-        if (strpos($dbPassword, ':') === FALSE) {
-          if ($dbPassword != md5($password)) {
-            return FALSE;
-          }
-        }
-        else {
-          list($hash, $salt) = explode(':', $dbPassword);
-          $cryptpass = md5($password . $salt);
-          if ($hash != $cryptpass) {
-            return FALSE;
-          }
+        list($hash, $salt) = explode(':', $dbPassword);
+        $cryptpass = md5($password . $salt);
+        if ($hash != $cryptpass) {
+          return FALSE;
         }
       }
       else {

@@ -212,7 +212,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     }
     $this->assign('localExtensionRows', $localExtensionRows);
 
-    // build list of availabe downloads
+    // build list of available downloads
     $remoteExtensionRows = array();
     foreach (CRM_Extension_System::singleton()->getBrowser()->getExtensions() as $info) {
       $row = (array) $info;

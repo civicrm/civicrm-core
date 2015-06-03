@@ -727,7 +727,7 @@ class CRM_Utils_Date {
    *                             format is 2007-12-21 )
    *
    * @return string
-   *   Return the customized todays date (Y-m-d)
+   *   Return the customized today's date (Y-m-d)
    */
   public static function getToday($dayParams = NULL, $format = "Y-m-d") {
     if (is_null($dayParams) || empty($dayParams)) {
@@ -1395,7 +1395,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
-            $from = self::intervalAdd('month', -1, $to);
+            $from = self::intervalAdd('day', -30, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
 

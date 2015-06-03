@@ -42,7 +42,7 @@
 class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
   /**
-   * Array of supported links, currenly null
+   * Array of supported links, currently null
    *
    * @var array
    */

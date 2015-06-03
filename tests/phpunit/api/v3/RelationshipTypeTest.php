@@ -121,7 +121,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'sequential' => 1,
     );
     $result = $this->callAPIAndDocument('relationship_type', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($result['values'][0]['id']);
     unset($params['sequential']);
     //assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Contact_DAO_RelationshipType', $result['id'], $params);

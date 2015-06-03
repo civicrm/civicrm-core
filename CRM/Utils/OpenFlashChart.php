@@ -271,8 +271,8 @@ class CRM_Utils_OpenFlashChart {
     // $params['values'] should contains the values for each
     // criteria defined in $params['criteria']
     $values = CRM_Utils_Array::value('values', $params);
-    $criterias = CRM_Utils_Array::value('criteria', $params);
-    if (!is_array($values) || empty($values) || !is_array($criterias) || empty($criterias)) {
+    $criteria = CRM_Utils_Array::value('criteria', $params);
+    if (!is_array($values) || empty($values) || !is_array($criteria) || empty($criteria)) {
       return $chart;
     }
 
@@ -285,7 +285,7 @@ class CRM_Utils_OpenFlashChart {
       }
 
       $xValueLabels[] = (string) $xVal;
-      foreach ($criterias as $criteria) {
+      foreach ($criteria as $criteria) {
         $xReferences[$criteria][$xVal] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
         $yValues[] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
       }
@@ -307,7 +307,7 @@ class CRM_Utils_OpenFlashChart {
     $count = 0;
     foreach ($xReferences as $criteria => $values) {
       $toolTipVal = $tooltip;
-      // for seperate tooltip for each criteria
+      // for separate tooltip for each criteria
       if (is_array($tooltip)) {
         $toolTipVal = CRM_Utils_Array::value($criteria, $tooltip, "$symbol #val#");
       }
@@ -316,7 +316,7 @@ class CRM_Utils_OpenFlashChart {
       $xValues[$count] = new bar_3d();
       // set colour pattel
       $xValues[$count]->set_colour(self::$_colours[$count]);
-      // define colur pattel with bar criterias
+      // define colur pattel with bar criteria
       $xValues[$count]->key((string) $criteria, 12);
       // define bar chart values
       $xValues[$count]->set_values(array_values($values));

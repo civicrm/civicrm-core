@@ -867,6 +867,21 @@ LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table 
   }
 
   /**
+   * React to a financial transaction (payment) failure.
+   *
+   * Prior to CRM-16417 these were simply removed from the database but it has been agreed that seeing attempted
+   * payments is important for forensic and outreach reasons.
+   *
+   * This function updates the financial transaction records to failed.
+   *
+   * @todo in principle we also think it makes sense to add an activity - this part would be a second step as
+   * the first change is likely to go into the LTS.
+   */
+  public static function failPayment($contributionID, $message) {
+
+  }
+
+  /**
    * Check if there is a contribution with the same trxn_id or invoice_id.
    *
    * @param array $input
@@ -2207,10 +2222,7 @@ WHERE  contribution_id = %1 ";
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if ($recur && !empty($this->_relatedObjects['paymentProcessor'])) {
-      $paymentObject = &CRM_Core_Payment::singleton(
-        $this->is_test ? 'test' : 'live',
-        $this->_relatedObjects['paymentProcessor']
-      );
+      $paymentObject = Civi\Payment\System::singleton()->getByProcessor($this->_relatedObjects['paymentProcessor']);
 
       $entityID = $entity = NULL;
       if (isset($ids['contribution'])) {
@@ -2751,7 +2763,7 @@ WHERE  contribution_id = %1 ";
         $balanceTrxnParams['total_amount'] = $partialAmtTotal;
         $balanceTrxnParams['to_financial_account_id'] = $toFinancialAccount;
         $balanceTrxnParams['contribution_id'] = $params['contribution']->id;
-        $balanceTrxnParams['trxn_date'] = date('YmdHis');
+        $balanceTrxnParams['trxn_date'] = !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis');
         $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
         $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('net_amount', $params);
         $balanceTrxnParams['currency'] = $params['contribution']->currency;
@@ -2804,7 +2816,7 @@ WHERE  contribution_id = %1 ";
       $trxnParams = array(
         'contribution_id' => $params['contribution']->id,
         'to_financial_account_id' => $params['to_financial_account_id'],
-        'trxn_date' => date('YmdHis'),
+        'trxn_date' => !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis'),
         'total_amount' => $totalAmount,
         'fee_amount' => CRM_Utils_Array::value('fee_amount', $params),
         'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),
@@ -2948,7 +2960,7 @@ WHERE  contribution_id = %1 ";
         $params['entity_id'] = $financialTxn->id;
       }
     }
-    // record line items and finacial items
+    // record line items and financial items
     if (empty($params['skipLineItem'])) {
       CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
     }
@@ -3743,6 +3755,75 @@ WHERE con.id = {$contributionId}
     $result = CRM_Core_DAO::executeQuery($sql, $params);
     if ($result->N > 1) {
       $errors['financial_type_id'] = ts('One or more line items have a different financial type than the contribution. Editing the financial type is not yet supported in this situation.');
+    }
+  }
+
+  /**
+   * Update related pledge payment payments.
+   *
+   * This function has been refactored out of the back office contribution form and may
+   * still overlap with other functions.
+   *
+   * @param string $action
+   * @param int $pledgePaymentID
+   * @param int $contributionID
+   * @param bool $adjustTotalAmount
+   * @param float $total_amount
+   * @param float $original_total_amount
+   * @param int $contribution_status_id
+   * @param int $original_contribution_status_id
+   */
+  public static function updateRelatedPledge(
+    $action,
+    $pledgePaymentID,
+    $contributionID,
+    $adjustTotalAmount,
+    $total_amount,
+    $original_total_amount,
+    $contribution_status_id,
+    $original_contribution_status_id
+  ) {
+    if (!$pledgePaymentID || $action & CRM_Core_Action::ADD && !$contributionID) {
+      return;
+    }
+
+    if ($pledgePaymentID) {
+      //store contribution id in payment record.
+      CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $pledgePaymentID, 'contribution_id', $contributionID);
+    }
+    else {
+      $pledgePaymentID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
+        $contributionID,
+        'id',
+        'contribution_id'
+      );
+    }
+    $pledgeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
+      $contributionID,
+      'pledge_id',
+      'contribution_id'
+    );
+
+    $updatePledgePaymentStatus = FALSE;
+
+    // If either the status or the amount has changed we update the pledge status.
+    if ($action & CRM_Core_Action::ADD) {
+      $updatePledgePaymentStatus = TRUE;
+    }
+    elseif ($action & CRM_Core_Action::UPDATE && (($original_contribution_status_id != $contribution_status_id) ||
+        ($original_total_amount != $total_amount))
+    ) {
+      $updatePledgePaymentStatus = TRUE;
+    }
+
+    if ($updatePledgePaymentStatus) {
+      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID,
+        array($pledgePaymentID),
+        $contribution_status_id,
+        NULL,
+        $total_amount,
+        $adjustTotalAmount
+      );
     }
   }
 

@@ -92,13 +92,10 @@
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helphtml">
      <input class="crm-token-selector big" data-field="html_message" />
-     {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
+     {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
    </div>
     <div class="clear"></div>
     <div class='html'>
-  {if $editor EQ 'textarea'}
-      <div class="help description">{ts}NOTE: If you are composing HTML-formatted messages, you may want to enable a Rich Text (WYSIWYG) editor (Administer &raquo; Customize Data & Screens &raquo; Display Preferences).{/ts}</div>
-  {/if}
   {$form.html_message.html}<br />
     </div>
 
@@ -127,6 +124,11 @@ CRM.$(function($) {
   var $form = $('form.{/literal}{$form.formClass}{literal}');
   $('#format_id', $form).on('change', function() {
     selectFormat($(this).val());
+  });
+  // After the pdf downloads, the user has to manually close the dialog (which would be nice to fix)
+  // But at least we can trigger the underlying list of activities to refresh
+  $form.closest('.ui-dialog-content.crm-ajax-container').on('dialogbeforeclose', function() {
+    $(this).trigger('crmFormSuccess');
   });
 });
 

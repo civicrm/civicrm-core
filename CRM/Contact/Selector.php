@@ -261,7 +261,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       );
 
       $config = CRM_Core_Config::singleton();
-      if ($config->mapAPIKey && $config->mapProvider) {
+      //CRM-16552: mapAPIKey is not mandatory as google no longer requires an API Key
+      if ($config->mapProvider && ($config->mapAPIKey || $config->mapProvider == 'Google')) {
         self::$_links[CRM_Core_Action::MAP] = array(
           'name' => ts('Map'),
           'url' => 'civicrm/contact/map',
@@ -582,6 +583,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             if ($id == 'Primary') {
               $locationTypeName = 1;
             }
+            elseif ($fieldName == 'url') {
+              $locationTypeName = "website-{$id}";
+            }
             else {
               $locationTypeName = CRM_Utils_Array::value($id, $locationTypes);
               if (!$locationTypeName) {
@@ -691,7 +695,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         }
         elseif (strpos($property, '-url') !== FALSE) {
           $websiteUrl = '';
-          $websiteKey = 'website-1';
+          $websiteKey = str_replace('-url', '', $property);
           $propertyArray = explode('-', $property);
           $websiteFld = $websiteKey . '-' . array_pop($propertyArray);
           if (!empty($result->$websiteFld)) {

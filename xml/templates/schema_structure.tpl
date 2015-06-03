@@ -84,4 +84,24 @@ class CRM_Core_I18n_SchemaStructure
         {rdelim}
         return $result;
     {rdelim}
+    static function &widgets()
+    {ldelim}
+        static $result = null;
+        if (!$result) {ldelim}
+          $result = array(
+            {foreach from=$widgets key=table item=columns}
+              '{$table}' => array(
+                {foreach from=$columns key=column item=widget}
+                  '{$column}' => array(
+                    {foreach from=$widget key=name item=value}
+                      '{$name}' => "{$value}",
+                    {/foreach}
+                  ),
+                {/foreach}
+              ),
+            {/foreach}
+          );
+        {rdelim}
+        return $result;
+    {rdelim}
 {rdelim}

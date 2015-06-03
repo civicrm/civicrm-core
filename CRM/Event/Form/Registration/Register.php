@@ -430,7 +430,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $pps[$key] = $name['name'];
       }
     }
-    if ($this->getContactID() === '0' && !$this->_values['event']['is_multiple_registrations']) {
+    if ($this->getContactID() === 0 && !$this->_values['event']['is_multiple_registrations']) {
       //@todo we are blocking for multiple registrations because we haven't tested
       $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
     }
@@ -548,6 +548,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     $this->addFormRule(array('CRM_Event_Form_Registration_Register', 'formRule'), $this);
+    $this->unsavedChangesWarn = TRUE;
 
     // add pcp fields
     if ($this->_pcpId) {
@@ -1330,7 +1331,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
-    // update status and send mail to cancelled additonal participants, CRM-4320
+    // update status and send mail to cancelled additional participants, CRM-4320
     if ($this->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
       $cancelledId = array_search('Cancelled',
         CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")

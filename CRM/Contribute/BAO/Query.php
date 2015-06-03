@@ -336,8 +336,9 @@ class CRM_Contribute_BAO_Query {
       case 'contribution_source':
       case 'contribution_trxn_id':
       case 'contribution_check_number':
+      case 'contribution_contact_id':
       case (strpos($name, '_amount') !== FALSE):
-      case (strpos($name, '_date') !== FALSE):
+      case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
         $qillName = $name;
         $pseudoExtraParam = NULL;
         if ((strpos($name, '_amount') !== FALSE) || (strpos($name, '_date') !== FALSE) || in_array($name,
@@ -348,11 +349,12 @@ class CRM_Contribute_BAO_Query {
               'contribution_trxn_id',
               'contribution_check_number',
               'contribution_payment_instrument_id',
+              'contribution_contact_id',
             )
           )
         ) {
           $name = str_replace('contribution_', '', $name);
-          if (!in_array($name, array('source', 'id'))) {
+          if (!in_array($name, array('source', 'id', 'contact_id'))) {
             $qillName = str_replace('contribution_', '', $qillName);
           }
         }
@@ -859,11 +861,8 @@ class CRM_Contribute_BAO_Query {
 
     $form->add('select', 'contribution_page_id',
       ts('Contribution Page'),
-      array(
-        '' => ts('- any -'),
-      ) +
       CRM_Contribute_PseudoConstant::contributionPage(),
-      FALSE, array('class' => 'crm-select2')
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
     );
 
     $form->addSelect('payment_instrument_id',

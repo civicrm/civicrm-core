@@ -94,6 +94,12 @@
         <td>{include file="CRM/common/jcalendar.tpl" elementName=renewal_date}</td>
       </tr>
       {if $membershipMode}
+        {if !empty($form.auto_renew)}
+          <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
+            <td class="label"> {$form.auto_renew.label} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
+            <td> {$form.auto_renew.html} </td>
+          </tr>
+        {/if}
         <tr class="crm-member-membershiprenew-form-block-financial_type_id">
           <td class="label">{$form.financial_type_id.label}</td>
           <td>{$form.financial_type_id.html}<br/>
@@ -127,108 +133,14 @@
                       class="description">{ts}Extend the membership end date by this many membership periods. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
                   </td>
                 </tr>
-                {if $context neq 'standalone'}
-                  <tr class="crm-membership-form-block-contribution-contact">
-                    <td class="label">{$form.contribution_contact.label}</td>
-                    <td>{$form.contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
-                  </tr>
-                  <tr id="record-different-contact">
-                    <td>&nbsp;</td>
-                    <td>
-                      <table class="compressed">
-                        <tr class="crm-membership-form-block-soft-credit-type">
-                          <td class="label">{$form.soft_credit_type_id.label}</td>
-                          <td>{$form.soft_credit_type_id.html}</td>
-                        </tr>
-                        <tr class="crm-membership-form-block-soft-credit-contact-id">
-                          <td class="label">{$form.soft_credit_contact_id.label}</td>
-                          <td>{$form.soft_credit_contact_id.html}</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                {/if}
-                <tr class="crm-member-membershiprenew-form-block-financial_type_id">
-                  <td class="label">{$form.financial_type_id.label}</td>
-                  <td>{$form.financial_type_id.html}<br/>
-                    <span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span>
-                  </td>
-                </tr>
-                <tr class="crm-member-membershiprenew-form-block-total_amount">
-                  <td class="label">{$form.total_amount.label}</td>
-                  <td>{$form.total_amount.html}<br/>
-                    <span
-                      class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span>
-                  </td>
-                </tr>
-                <tr class="crm-membershiprenew-form-block-receive_date">
-                  <td class="label">{$form.receive_date.label}</td>
-                  <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
-                </tr>
-                <tr class="crm-member-membershiprenew-form-block-payment_instrument_id">
-                  <td class="label">{$form.payment_instrument_id.label}<span class='marker'>*</span></td>
-                  <td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
-                </tr>
-                <tr id="checkNumber" class="crm-member-membershiprenew-form-block-check_number">
-                  <td class="label">{$form.check_number.label}</td>
-                  <td>{$form.check_number.html|crmAddClass:six}</td>
-                </tr>
-                <tr class="crm-member-membershiprenew-form-block-trxn_id">
-                  <td class="label">{$form.trxn_id.label}</td>
-                  <td>{$form.trxn_id.html}</td>
-                </tr>
-                <tr class="crm-member-membershiprenew-form-block-contribution_status_id">
-                  <td class="label">{$form.contribution_status_id.label}</td>
-                  <td>{$form.contribution_status_id.html}</td>
-                </tr>
-              </table>
-            </fieldset>
-          </td>
-        </tr>
-      {else}
-        <tr class="crm-member-membershiprenew-form-block-total_amount">
-          <td class="label">{$form.total_amount.label}</td>
-          <td>{$form.total_amount.html}<br/>
-            <span
-              class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span>
-          </td>
-        </tr>
       {/if}
-    </table>
-    {if $membershipMode}
-      {if $context neq 'standalone'}
-        <table class="form-layout-compressed">
-          <tr class="crm-membership-form-block-contribution-contact">
-            <td class="label">{$form.contribution_contact.label}</td>
-            <td>{$form.contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
-          </tr>
-          <tr id="record-different-contact">
-            <td>&nbsp;</td>
-            <td>
-              <table class="form-layout-compressed">
-                <tr class="crm-membership-form-block-soft-credit-type">
-                  <td class="label">{$form.soft_credit_type_id.label}</td>
-                  <td>{$form.soft_credit_type_id.html}</td>
-                </tr>
-                <tr class="crm-membership-form-soft-credit-contact-id">
-                  <td class="label">{$form.soft_credit_contact_id.label}</td>
-                  <td>{$form.soft_credit_contact_id.html}</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      {/if}
-      <div class="spacer"></div>
-      {include file='CRM/Core/BillingBlock.tpl'}
-    {/if}
-    {if $email and $outBound_option != 2}
+      {include file="CRM/Member/Form/MembershipCommon.tpl"}
+      {if $emailExists and $outBound_option != 2}
       <table class="form-layout">
-        <tr class="crm-member-membershiprenew-form-block-send_receipt">
+        <tr class="crm-{$formClass}-form-block-send_receipt">
           <td class="label">{$form.send_receipt.label}</td>
           <td>{$form.send_receipt.html}<br/>
-            <span
-              class="description">{ts 1=$email}Automatically email a membership confirmation and receipt to %1?{/ts}</span>
+            <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1?{/ts}</span>
           </td>
         </tr>
         <tr id="fromEmail">
@@ -393,13 +305,13 @@
 
     // show/hide different contact section
     setDifferentContactBlock();
-    cj('#contribution_contact').change(function () {
+    cj('#is_different_contribution_contact').change(function () {
       setDifferentContactBlock();
     });
 
     function setDifferentContactBlock() {
       //get the
-      if (cj('#contribution_contact').prop('checked')) {
+      if (cj('#is_different_contribution_contact').prop('checked')) {
         cj('#record-different-contact').show();
       }
       else {

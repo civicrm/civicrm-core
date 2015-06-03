@@ -35,6 +35,51 @@ else
 fi
 
 #################################################
+## Prompt user for input, and set the named global variable to the selected value.
+## usage: prompt variable_name [prompt message] [option][option][...]
+## example:
+##   prompt your_name "What's your name?" Bob Sally John Mary
+function prompt() {
+
+  local variable_name=$1
+  shift
+
+  local prompt
+  local option_key
+  local input
+  local is_answered
+
+  prompt=$1
+  shift
+
+  # Initialize a counter for the options array.
+  option_key=1
+  # Add all options to the options array.
+  for option in "$@"; do
+    prompt="${prompt}\n${option_key}: ${option}";
+    options[$option_key]=$option
+    let "option_key=option_key+1"
+  done
+
+  # As long as we don't have a valid selection, keep prompting.
+  while [[ -z "$input" ]]; do
+    echo -e $prompt
+    # If this is a second attempt, remind the user to select a valid value.
+    if [ $is_answered ]; then
+      echo "Please enter one of the provided integer values."
+    fi
+    read input
+    is_answered=1
+    if [[ "$input" > "$option_key" || "$input" < "1" ]]; then
+      # Unset any invalid input.
+      unset input
+    fi
+  done
+  # Set the named global variable to the selected string value.
+  eval $variable_name=\${options[$input]}
+}
+
+#################################################
 ## Git setup
 function do_git_config() {
   git config --global user.name "$git_author_name"
@@ -141,27 +186,115 @@ function do_distmaker() {
 ## Publish files
 function do_publish() {
   # publish to sf.net
-  cd $workdir/$version/tarballs
+  pushd $workdir/$version/tarballs
 
-  $cmd_md5sum *.tar.gz *.tgz *.zip > civicrm-$version.MD5SUMS
-  echo $gpg_pass | $cmd_gpg --armor --batch --passphrase-fd 0 --sign civicrm-$version.MD5SUMS
+    $cmd_md5sum *.tar.gz *.tgz *.zip > civicrm-$version.MD5SUMS
+    echo $gpg_pass | $cmd_gpg --armor --batch --passphrase-fd 0 --sign civicrm-$version.MD5SUMS
 
-  if [ "$is_stable" ]; then
-    echo mkdir ${publish_stable_dir}/$version | $cmd_sftp ${publish_ssh}
-    $cmd_rsync -aP --exclude='*starterkit.tgz' *.tar.gz *.zip *MD5SUMS* ${publish_ssh}:${publish_stable_dir}/$version
+    if [ "$is_stable" ]; then
+      echo mkdir ${publish_stable_dir}/$version | $cmd_sftp ${publish_ssh}
+      $cmd_rsync -aP --exclude='*starterkit.tgz' *.tar.gz *.zip *MD5SUMS* ${publish_ssh}:${publish_stable_dir}/$version
+    else
+      echo mkdir ${publish_latest_dir}/$version | $cmd_sftp ${publish_ssh}
+      $cmd_rsync -aP --exclude='*starterkit.tgz' *.tar.gz *.zip *MD5SUMS* ${publish_ssh}:${publish_latest_dir}/$version
+    fi
+
+    mv *.tar.gz *.tgz *.zip *MD5SUMS* $build_dest
+
+  popd
+}
+
+#################################################
+## Publish version data to versions.json
+function do_publish_versions() {
+  # Turn off command echoing, because it makes input prompts hard to read.
+  set +x
+
+  # Quit if versions.json is missing.
+  if [ ! -f $latest/versions.json ]; then
+    echo "Cannot find $latest/versions.json, so not updating it."
+    return 0;
+  fi
+
+  major_version=`echo $version | awk -F '.' '{print $1"."$2}'`
+  json=`cat $latest/versions.json`
+
+  # Ask for the status of this release.
+  prompt status "What is the status of the major version for this release?" testing stable lts
+
+  # Rather complex steps to reconcile new release status with previous releases.
+  if [[ "$status" == "lts" ]]; then
+    # If it's LTS, ask what status to use for the current LTS, if any.
+    older_lts_version=$(php -r "
+      require 'releaser_json.php';
+      print_previous_status_version('$json', 'lts', '$major_version');
+    ")
+    if [[ -n "$older_lts_version" ]]; then
+      prompt new_status_for_older_lts "Since this release is lts, what should be the new status for the current lts version ($older_lts_version)?" lts eol
+      # Assign the selected status to the current LTS version.
+      json=$(php -r "
+        require 'releaser_json.php';
+        update_version_status('$json', '$older_lts_version', '$new_status_for_older_lts');
+      ")
+    fi
+  elif [[ "$status" == "stable" ]]; then
+    # If it's stable, ask what status to use for the current stable, if any.
+    older_stable_version=$(php -r "
+      require 'releaser_json.php';
+      print_previous_status_version('$json', 'stable', '$major_version');
+    ")
+    if [[ -n "$older_stable_version" ]]; then
+      prompt new_status_for_older_stable "Since this release is stable, what should be the new status for the current stable version ($older_stable_version)?" stable lts eol
+      # Assign the selected status to the current stable version.
+      json=$(php -r "
+        require 'releaser_json.php';
+        update_version_status('$json', '$older_stable_version', '$new_status_for_older_stable');
+      ")
+      if [[ "$new_status_for_older_stable" == "lts" ]]; then
+        # But now, if we've bumped 'stable' to 'lts', we have to ask what status
+        # to use for an older existing LTS release, if any.
+        older_lts_version=$(php -r "
+          require 'releaser_json.php';
+          print_previous_status_version('$json', 'lts', '$older_stable_version');
+        ")
+        if [[ -n "$older_lts_version" ]]; then
+          prompt new_status_for_older_lts "Since $older_stable_version is now lts, what should be the new status for the current lts version ($older_lts_version)?" lts eol
+          # Assign the selected status to the older existing LTS release.
+          json=$(php -r "
+            require 'releaser_json.php';
+            update_version_status('$json', '$older_lts_version', '$new_status_for_older_lts');
+          ")
+        fi
+      fi
+    fi
+  fi
+
+  # Ask if this is a security release.
+  prompt is_security "Is this a security release?" Yes No
+  if [[ "$is_security" == "Yes" ]]; then
+    is_security="true"
   else
-    echo mkdir ${publish_latest_dir}/$version | $cmd_sftp ${publish_ssh}
-    $cmd_rsync -aP --exclude='*starterkit.tgz' *.tar.gz *.zip *MD5SUMS* ${publish_ssh}:${publish_latest_dir}/$version
+    is_security="false"
   fi
 
-  mv *.tar.gz *.tgz *.zip *MD5SUMS* $build_dest
+  # Update status for this release's major version.
+  json=$(php -r "
+    require 'releaser_json.php';
+    update_version_status('$json', '$major_version', '$status');
+  ")
 
-  # publish to latest.civicrm.org
-  # FIXME: isn't this racy when doing concurrent security releases
-  if [ "$is_stable" ]; then
-    echo $version > $latest/stable.txt
-  fi
-  echo $version > $latest/latest.txt
+  # Add the new release to JSON data.
+  release_date=$(date +%Y-%m-%d);
+  # Create json string for release properties; `tr` is just to let us use
+  # (json-invalid) single quotes, which are easier to read in bash.
+  release_json=$(echo "{'version':'$version','date':'$release_date','security':'$is_security'}" | tr \' \")
+  json=$(php -r"
+    require 'releaser_json.php';
+    add_release('$json', '$major_version', '$release_json');
+  ")
+
+  # Write modified JSON data to versions.json.
+  echo $json > $latest/versions.json
 }
 
 #################################################
@@ -231,6 +364,7 @@ for ACT in "$@" ; do
       set -ex
       do_git_tag_push
       do_publish
+      do_publish_versions
       set +x
       ;;
     --update)

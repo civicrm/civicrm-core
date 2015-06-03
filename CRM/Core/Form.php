@@ -271,6 +271,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $type, $name, $label = '',
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
+    if ($type == 'wysiwyg') {
+      $attributes = ($attributes ? $attributes : array()) + array('class' => '');
+      $attributes['class'] .= ' crm-form-wysiwyg';
+      $type = "textarea";
+    }
     if ($type == 'select' && is_array($extra)) {
       // Normalize this property
       if (!empty($extra['multiple'])) {
@@ -483,7 +488,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // call the form hook
-    // also call the hook function so any modules can set thier own custom defaults
+    // also call the hook function so any modules can set their own custom defaults
     // the user can do both the form and set default values with this hook
     CRM_Utils_Hook::buildForm(get_class($this), $this);
 
@@ -615,11 +620,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $title
    *   The title of the form.
-   *
-   * @return void
    */
   public function setTitle($title) {
     $this->_title = $title;
+  }
+
+  /**
+   * Assign billing type id to bltID.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function assignBillingType() {
+    $this->_bltID = CRM_Core_BAO_Location::getBillingLocationId();
+    $this->set('bltID', $this->_bltID);
+    $this->assign('bltID', $this->_bltID);
   }
 
   /**
@@ -1177,8 +1191,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Get field metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
-
-    $label = CRM_Utils_Array::value('label', $props, $fieldSpec['title']);
+    $label = CRM_Utils_Array::value('label', $props, isset($fieldSpec['title']) ? $fieldSpec['title'] : NULL);
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $props['context'] == 'search') {
@@ -1193,7 +1206,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           'Select Country',
           'Multi-Select Country',
           'AdvMulti-Select',
-          'CheckBox',
+          'CheckBoxGroup',
+          'RadioGroup',
           'Radio',
     )));
 
@@ -1205,21 +1219,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         unset($props['options']);
       }
       else {
-        $options = $fieldSpec['options'];
+        $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
-
-      // The placeholder is only used for select-elements.
-      if (!array_key_exists('placeholder', $props)) {
-        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
-      }
-
+      //@TODO AdvMulti-Select is deprecated, drop support.
       if ($props['context'] == 'search' || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
         $widget = 'Select';
-      }
-      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
-      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
-        $props['class'] .= ' huge';
-        $props['multiple'] = 'multiple';
       }
       // Set default options-url value.
       if ((!isset($props['options-url']))) {
@@ -1236,25 +1240,64 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
     }
+    //Use select2 library for following widgets.
+    $isSelect2 = (in_array($widget, array(
+          'Select',
+          'Multi-Select',
+          'Select State/Province',
+          'Multi-Select State/Province',
+          'Select Country',
+          'Multi-Select Country',
+    )));
+    if ($isSelect2) {
+      $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
+      if ($props['context'] == 'search' || strpos($widget, 'Multi') !== FALSE) {
+        $props['class'] .= ' huge';
+        $props['multiple'] = 'multiple';
+      }
+      // The placeholder is only used for select-elements.
+      if (!array_key_exists('placeholder', $props)) {
+        $props['placeholder'] = $required ? ts('- select -') : $props['context'] == 'search' ? ts('- any -') : ts('- none -');
+      }
+    }
     $props += CRM_Utils_Array::value('html', $fieldSpec, array());
     CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type');
-    // TODO: refactor switch statement, to seperate methods.
+    // TODO: refactor switch statement, to separate methods.
     switch ($widget) {
       case 'Text':
       case 'Link':
         //TODO: Autodetect ranges
+        $props['size'] = isset($props['size']) ? $props['size'] : 60;
         $this->add('text', $name, $label, $props, $required);
         break;
 
       case 'hidden':
-        $this->add('hidden', $name, $label, $props, $required);
+        $this->add('hidden', $name, NULL, $props, $required);
         break;
 
-      //case 'TextArea':
-      //case 'Select Date':
-      //TODO: Add date formats
-      //TODO: Add javascript template for dates.
-      // case 'Radio':
+      case 'TextArea':
+        //Set default columns and rows for textarea.
+        $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
+        $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
+        $this->addElement('textarea', $name, $label, $props, $required);
+        break;
+
+      case 'Select Date':
+        //TODO: add range support
+        //TODO: Add date formats
+        //TODO: Add javascript template for dates.
+        $this->addDate($name, $label, $required, $props);
+        break;
+
+      case 'Radio':
+        $separator = isset($props['separator']) ? $props['separator'] : NULL;
+        unset($props['separator']);
+        if (!isset($props['allowClear'])) {
+          $props['allowClear'] = !$required;
+        }
+        $this->addRadio($name, $label, $options, $props, $separator, $required);
+        break;
+
       case 'Select':
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
@@ -1263,8 +1306,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         // TODO: Add and/or option for fields that store multiple values
         break;
 
+      case 'CheckBoxGroup':
+        $this->addCheckBox($name, $label, array_flip($options), $required, $props);
+        break;
+
+      case 'RadioGroup':
+        $this->addRadio($name, $label, $options, $props, NULL, $required);
+        break;
+
       //case 'AdvMulti-Select':
-      //case 'CheckBox':
+      case 'CheckBox':
+        $text = isset($props['text']) ? $props['text'] : NULL;
+        unset($props['text']);
+        $this->addElement('checkbox', $name, $label, $text, $props);
+        break;
+
       case 'File':
         // We should not build upload file in search mode.
         if (isset($props['context']) && $props['context'] == 'search') {
@@ -1320,50 +1376,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //CRM-15427
       'data-default' => $default,
     ));
-  }
-
-  /**
-   * @param string $name
-   * @param $label
-   * @param $attributes
-   * @param bool $forceTextarea
-   */
-  public function addWysiwyg($name, $label, $attributes, $forceTextarea = FALSE) {
-    // 1. Get configuration option for editor (tinymce, ckeditor, pure textarea)
-    // 2. Based on the option, initialise proper editor
-    $editorID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'editor_id'
-    );
-    $editor = strtolower(CRM_Utils_Array::value($editorID,
-      CRM_Core_OptionGroup::values('wysiwyg_editor')
-    ));
-    if (!$editor || $forceTextarea) {
-      $editor = 'textarea';
-    }
-    if ($editor == 'joomla default editor') {
-      $editor = 'joomlaeditor';
-    }
-
-    if ($editor == 'drupal default editor') {
-      $editor = 'drupalwysiwyg';
-    }
-
-    //lets add the editor as a attribute
-    $attributes['editor'] = $editor;
-
-    $this->addElement($editor, $name, $label, $attributes);
-    $this->assign('editor', $editor);
-
-    // include wysiwyg editor js files
-    // FIXME: This code does not make any sense
-    $includeWysiwygEditor = FALSE;
-    $includeWysiwygEditor = $this->get('includeWysiwygEditor');
-    if (!$includeWysiwygEditor) {
-      $includeWysiwygEditor = TRUE;
-      $this->set('includeWysiwygEditor', $includeWysiwygEditor);
-    }
-
-    $this->assign('includeWysiwygEditor', $includeWysiwygEditor);
   }
 
   /**
@@ -1790,13 +1802,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
-      return $tempID;
+      return (int) $tempID;
     }
 
     $userID = $this->getLoggedInUserContactID();
 
     if ($tempID == $userID) {
-      return $userID;
+      return (int) $userID;
     }
 
     //check if this is a checksum authentication

@@ -39,7 +39,7 @@
 class CRM_Core_Payment_ProcessorForm {
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
    * @param null $type
    * @param null $mode
    *
@@ -90,7 +90,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     if (!empty($form->_membershipBlock) && !empty($form->_membershipBlock['is_separate_payment']) &&
       (!empty($form->_paymentProcessor['class_name']) &&
-        !(CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor) & CRM_Core_Payment::BILLING_MODE_FORM)
+        !$form->_paymentObject->supports('MultipleConcurrentPayments')
       )
     ) {
 

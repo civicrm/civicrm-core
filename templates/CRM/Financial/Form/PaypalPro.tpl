@@ -23,17 +23,16 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-
-{* include wysiysg editor files *}
-{if $includeWysiwygEditor}
-    {if $defaultWysiwygEditor eq 1}
-        <script>
-          {* this version of tinymce requires jquery *}
-          if (typeof window.jQuery !== 'function') window.jQuery = CRM.$;
-        </script>
-        <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>
-        <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
-    {elseif $defaultWysiwygEditor eq 2}
-        <script type="text/javascript" src="{$config->resourceBase}packages/ckeditor/ckeditor.js"></script>
-    {/if}
+{if $form.$expressButtonName}
+  <div class="crm-section no-label paypal_button_info-section">
+    <div class="content description">
+      {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click <strong>Continue</strong> at the bottom of the page.{/ts}
+    </div>
+  </div>
+  <div class="crm-section no-label {$form.$expressButtonName.name}-section">
+    <div class="content description">
+      {$form.$expressButtonName.html}
+      <div class="description">Save time. Checkout securely. Pay without sharing your financial information.</div>
+    </div>
+  </div>
 {/if}

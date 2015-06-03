@@ -259,6 +259,13 @@ function _civicrm_api3_event_getlist_output($result, $request) {
       if (!empty($row['summary'])) {
         $data['description'][] = $row['summary'];
       }
+      // Add repeating info
+      $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($row['id'], 'civicrm_event');
+      $data['extra']['is_recur'] = FALSE;
+      if ($repeat) {
+        $data['suffix'] = ts('(%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
+        $data['extra']['is_recur'] = TRUE;
+      }
       $output[] = $data;
     }
   }

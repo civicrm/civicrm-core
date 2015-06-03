@@ -54,8 +54,10 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     }
 
     $this->clickLink("xpath=//tr[@id='rowid{$contriIDOff}']/td[11]/span/a[2]", "total_amount", FALSE);
+    $this->waitForAjaxContent();
     $this->type("total_amount", "90");
     $this->clickLink('_qf_Contribution_upload', '', FALSE);
+    $this->waitForAjaxContent();
     $this->waitForText('crm-notification-container', "The sum of fee amount and net amount must be equal to total amount");
     $this->type("net_amount", "90");
     $this->clickLink('_qf_Contribution_upload', '', FALSE);
@@ -177,10 +179,10 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
     //Assertions
     $actualAmount = $this->_getPremiumActualCost($contId, $to, $from, $cost2, "'civicrm_contribution'");
-    $this->assertEquals($actualAmount, NULL, "Verify actual cost for changed premium");
+    $this->assertEquals($actualAmount, $cost2, "Verify actual cost for changed premium");
 
     $deletedAmount = $this->_getPremiumActualCost($contId, $from, $to, $cost, "'civicrm_contribution'");
-    $this->assertEquals($deletedAmount, NULL, "Verify actual cost for deleted premium");
+    $this->assertEquals($deletedAmount, $cost, "Verify actual cost for deleted premium");
   }
 
   public function testDeletePremium() {
@@ -242,7 +244,7 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
 
     //Assertions
     $actualAmount = $this->_getPremiumActualCost($contId, $from, $to, NULL, "'civicrm_contribution'");
-    $this->assertEquals($actualAmount, NULL, "Verify actual cost for deleted premium");
+    $this->assertEquals($actualAmount, $cost, "Verify actual cost for deleted premium");
   }
 
   public function testChangePaymentInstrument() {

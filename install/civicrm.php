@@ -36,6 +36,13 @@ function civicrm_setup($filesDirectory) {
   global $crmPath, $sqlPath, $pkgPath, $tplPath;
   global $compileDir;
 
+  // Setup classloader
+  // This is needed to allow CiviCRM to be installed by drush.
+  // TODO: move to civicrm.drush.inc drush_civicrm_install()
+  global $crmPath;
+  require_once $crmPath . '/CRM/Core/ClassLoader.php';
+  CRM_Core_ClassLoader::singleton()->register();
+
   $sqlPath = $crmPath . DIRECTORY_SEPARATOR . 'sql';
   $tplPath = $crmPath . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'common' . DIRECTORY_SEPARATOR;
 
@@ -228,7 +235,8 @@ function civicrm_config(&$config) {
     $params['crmRoot'] = addslashes($params['crmRoot']);
   }
 
-  $params['siteKey'] = md5(uniqid('', TRUE) . $params['baseURL']);
+  $params['siteKey'] = md5(rand() . mt_rand() . rand() . uniqid('', TRUE) . $params['baseURL']);
+  // Would prefer openssl_random_pseudo_bytes(), but I don't think it's universally available.
 
   $str = file_get_contents($tplPath . 'civicrm.settings.php.template');
   foreach ($params as $key => $value) {

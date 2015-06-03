@@ -346,7 +346,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//div[@id='root-menu-div']//a[text()='Message Templates']");
 
     // Verify message templates
-    $this->click("//a[contains(text(),'System Workflow Messages')]");
+    $this->click("xpath=//div[@id='mainTabContainer']/ul//li/a[contains(text(),'System Workflow Messages')]");
     $this->assertTextPresent("Contributions - Receipt (on-line)");
     $this->assertTextPresent("Events - Registration Confirmation and Receipt (off-line)");
     $this->assertTextPresent("Memberships - Signup and Renewal Receipts (off-line)");

@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form to process actions on the group aspect of Custom Data
+ * Contribution Page form.
  */
 class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 

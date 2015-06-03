@@ -45,7 +45,7 @@
   <table class="form-layout">
   <tr>
     <td colspan="2">
-      <div class="status">{ts 1=$delName}Are you sure you want to delete '%1'?{/ts}</div>
+      <div class="status">{ts}Are you sure you want to delete {/ts}{if $delName}'{$delName}'{/if}?</div>
     </td>
   </tr>
   {elseif $action eq 1 or $action eq 2  or $action eq 4 or $context eq 'search' or $context eq 'smog'}
@@ -155,13 +155,11 @@
     <td class="label">{$form.details.label}</td>
     {if $activityTypeName eq "Print PDF Letter"}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-      {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+      {$form.details.html}
       </td>
       {else}
       <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-       {if $defaultWysiwygEditor eq 0}{$form.details.html|crmStripAlternatives|crmAddClass:huge}{else}{$form.details.html|crmStripAlternatives}{/if}
+       {$form.details.html|crmStripAlternatives}
       </td>
     {/if}
   </tr>

@@ -30,9 +30,10 @@
       <legend>
         {$paymentTypeLabel}
       </legend>
-      {if $form.$expressButtonName}
-        {include file= "CRM/Core/paypalexpress.tpl"}
-      {/if}
+      {crmRegion name="billing-block-pre"}
+        {* todo move this region assignment to paypal processor *}
+        {include file= "CRM/Financial/Form/PaypalPro.tpl"}
+      {/crmRegion}
       <div class="crm-section billing_mode-section {$paymentTypeName}_info-section">
         {foreach from=$paymentFields item=paymentField}
           <div class="crm-section {$form.$paymentField.name}-section">
@@ -161,9 +162,6 @@
           if ($('#billingcheckbox').prop('checked')) {
             $(orig_id + ' option').prop('selected', false);
             $(orig_id + ' option[value="' + $(id).val() + '"]').prop('selected', true);
-          }
-
-          if (orig_id == '#billing_country_id-5') {
             $(orig_id).change();
           }
         });
@@ -186,6 +184,7 @@
             orig_id = select_ids[id];
             $(orig_id + ' option').prop('selected', false);
             $(orig_id + ' option[value="' + $(id).val() + '"]').prop('selected', true);
+            $(orig_id).change();
           }
         } else {
           $('.billing_name_address-group').show(200);
@@ -203,5 +202,12 @@
     {/literal}
   </script>
 {/if}
-
 {/crmRegion}
+
+{if $is_monetary}
+  {crmRegion name="billing-block-post"}
+    {* Payment processors sometimes need to append something to the end of the billing block. We create a region for
+       clarity  - the plan is to move to assigning this through the payment processor to this region *}
+    {include file= "CRM/Financial/Form/PaypalExpress.tpl"}
+  {/crmRegion}
+{/if}
