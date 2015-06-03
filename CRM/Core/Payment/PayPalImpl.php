@@ -86,6 +86,40 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Opportunity for the payment processor to override the entire form build.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @return bool
+   *   Should form building stop at this point?
+   */
+  public function buildForm(&$form) {
+    if ($this->_processorName == 'PayPal Express' || $this->_processorName == 'PayPal Pro') {
+      $this->addPaypalExpressCode($form);
+    }
+    return FALSE;
+  }
+
+  /**
+   * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
+   * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
+   *
+   * @param $form
+   */
+  protected static function addPaypalExpressCode(&$form) {
+    if (empty($form->isBackOffice)) {
+      $form->_expressButtonName = $form->getButtonName('upload', 'express');
+      $form->assign('expressButtonName', $form->_expressButtonName);
+      $form->add(
+        'image',
+        $form->_expressButtonName,
+        $form->_paymentProcessor['url_button'],
+        array('class' => 'crm-form-submit')
+      );
+    }
+  }
+
+  /**
    * Express checkout code. Check PayPal documentation for more information
    *
    * @param array $params

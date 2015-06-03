@@ -226,11 +226,9 @@
   </script>
 {/if}
 {/crmRegion}
+{crmRegion name="billing-block-post"}
+  {* Payment processors sometimes need to append something to the end of the billing block. We create a region for
+     clarity  - the plan is to move to assigning this through the payment processor to this region *}
+  {include file= "CRM/Financial/Form/PaypalExpress.tpl"}
+{/crmRegion}
 
-{if $is_monetary}
-  {crmRegion name="billing-block-post"}
-    {* Payment processors sometimes need to append something to the end of the billing block. We create a region for
-       clarity  - the plan is to move to assigning this through the payment processor to this region *}
-    {include file= "CRM/Financial/Form/PaypalExpress.tpl"}
-  {/crmRegion}
-{/if}
