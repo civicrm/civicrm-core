@@ -263,14 +263,15 @@ class CRM_Core_Payment_Form {
     // $processor->buildForm appears to be an undocumented (possibly unused) option for payment processors
     // which was previously available only in some form flows
     if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->isSupported('buildForm')) {
-      $form->_paymentProcessor['object']->buildForm($form);
-      return NULL;
+      if ($form->_paymentProcessor['object']->buildForm($form)) {
+        return NULL;
+      }
     }
+
 
     self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional));
     self::addCommonFields($form, !$isBillingDataOptional, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
-    self::addPaypalExpressCode($form);
     return (!empty($form->_paymentFields));
   }
 
@@ -290,27 +291,6 @@ class CRM_Core_Payment_Form {
             $rule['rule_parameters']
           );
         }
-      }
-    }
-  }
-
-  /**
-   * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
-   * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
-   *
-   * @param $form
-   */
-  protected static function addPaypalExpressCode(&$form) {
-    if (empty($form->isBackOffice)) {
-      if (CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor) == 3
-      ) {
-        $form->_expressButtonName = $form->getButtonName('upload', 'express');
-        $form->assign('expressButtonName', $form->_expressButtonName);
-        $form->add('image',
-          $form->_expressButtonName,
-          $form->_paymentProcessor['url_button'],
-          array('class' => 'crm-form-submit')
-        );
       }
     }
   }
