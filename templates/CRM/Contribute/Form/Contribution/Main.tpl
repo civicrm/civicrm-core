@@ -389,7 +389,6 @@
   {literal}
 
   CRM.$(function($) {
-    toggleConfirmButton();
     enableHonorType();
     showRecurHelp();
     skipPaymentMethod();

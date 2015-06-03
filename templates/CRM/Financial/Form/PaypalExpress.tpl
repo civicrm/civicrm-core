@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
+
   <div id="paypalExpress">
     {assign var=expressButtonName value='_qf_Main_upload_express'}
     <fieldset class="crm-group paypal_checkout-group">
@@ -44,4 +44,3 @@
       </div>
     </fieldset>
   </div>
-{/if}

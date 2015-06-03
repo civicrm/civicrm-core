@@ -170,7 +170,6 @@
     });
 
     CRM.$(function($) {
-      toggleConfirmButton();
       skipPaymentMethod();
     });
 

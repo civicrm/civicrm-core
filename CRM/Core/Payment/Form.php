@@ -268,7 +268,6 @@ class CRM_Core_Payment_Form {
       }
     }
 
-
     self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional));
     self::addCommonFields($form, !$isBillingDataOptional, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
