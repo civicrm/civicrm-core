@@ -115,7 +115,7 @@
 {* credit card block when it is live or test mode*}
 {if $participantMode and $paid}
   <div class="spacer"></div>
-  {include file='CRM/Core/BillingBlock.tpl'}
+  {include file='CRM/Core/BillingBlockWrapper.tpl'}
 {/if}
 {if ($email OR $batchEmail) and $outBound_option != 2}
     <fieldset id="send_confirmation_receipt"><legend>{if $paid}{ts}Registration Confirmation and Receipt{/ts}{else}{ts}Registration Confirmation{/ts}{/if}</legend>

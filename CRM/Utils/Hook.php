@@ -1839,7 +1839,7 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public static function alterDisplayName($displayName, $contactId, $dao) {
+  public static function alterDisplayName(&$displayName, $contactId, $dao) {
     return self::singleton()->invoke(3,
       $displayName, $contactId, $dao, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, 'civicrm_contact_get_displayname'
@@ -1925,6 +1925,18 @@ abstract class CRM_Utils_Hook {
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_fileSearches'
     );
+  }
+
+  /**
+   * Check system status.
+   *
+   * @param array $messages
+   *   Array<CRM_Utils_Check_Message>. A list of messages regarding system status.
+   * @return mixed
+   */
+  public static function check(&$messages) {
+    return self::singleton()
+      ->invoke(1, $messages, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_check');
   }
 
 }

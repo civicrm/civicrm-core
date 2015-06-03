@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
@@ -23,48 +22,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
- */
-
-/**
- * form helper class for an Website object
- */
-class CRM_Contact_Form_Edit_Website {
-
-  /**
-   * Build the form object elements for an Website object.
-   *
-   * @param CRM_Core_Form $form
-   *   Reference to the form object.
-   * @param int $blockCount
-   *   Block number to build.
-   *
-   * @return void
-   */
-  public static function buildQuickForm(&$form, $blockCount = NULL) {
-    if (!$blockCount) {
-      $blockId = ($form->get('Website_Block_Count')) ? $form->get('Website_Block_Count') : 1;
-    }
-    else {
-      $blockId = $blockCount;
-    }
-
-    $form->applyFilter('__ALL__', 'trim');
-
-    //Website type select
-    $form->addField("website[$blockId][website_type_id]", array('entity' => 'website', 'class' => 'eight'));
-
-    //Website box
-    $form->addField("website[$blockId][url]", array('entity' => 'website'));
-    $form->addRule("website[$blockId][url]", ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
-
-  }
-
-}
+*}
+{if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
+  <div id="paypalExpress">
+    {assign var=expressButtonName value='_qf_Main_upload_express'}
+    <fieldset class="crm-group paypal_checkout-group">
+      <legend>{ts}Checkout with PayPal{/ts}</legend>
+      <div class="section">
+        <div class="crm-section paypalButtonInfo-section">
+          <div class="content">
+            <span class="description">{ts}Click the PayPal button to continue.{/ts}</span>
+          </div>
+          <div class="clear"></div>
+        </div>
+        <div class="crm-section {$expressButtonName}-section">
+          <div class="content">
+            {$form.$expressButtonName.html} <span class="description">Checkout securely. Pay without sharing your financial information. </span>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+{/if}

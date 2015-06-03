@@ -32,39 +32,42 @@
  * $Id$
  *
  */
-
-/**
- * form helper class for an Website object
- */
-class CRM_Contact_Form_Edit_Website {
-
+class CRM_Financial_Form_Payment extends CRM_Core_Form {
   /**
-   * Build the form object elements for an Website object.
-   *
-   * @param CRM_Core_Form $form
-   *   Reference to the form object.
-   * @param int $blockCount
-   *   Block number to build.
+   * Set variables up before form is built.
    *
    * @return void
    */
-  public static function buildQuickForm(&$form, $blockCount = NULL) {
-    if (!$blockCount) {
-      $blockId = ($form->get('Website_Block_Count')) ? $form->get('Website_Block_Count') : 1;
-    }
-    else {
-      $blockId = $blockCount;
-    }
+  public function preProcess() {
+    parent::preProcess();
+    $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
+      TRUE);
 
-    $form->applyFilter('__ALL__', 'trim');
+    $this->assignBillingType();
 
-    //Website type select
-    $form->addField("website[$blockId][website_type_id]", array('entity' => 'website', 'class' => 'eight'));
+    // @todo - round about way to load it - just load as an object using civi\payment\system::getByProcessor
+    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID, 'unused');
+    CRM_Core_Payment_ProcessorForm::preProcess($this);
 
-    //Website box
-    $form->addField("website[$blockId][url]", array('entity' => 'website'));
-    $form->addRule("website[$blockId][url]", ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
+    //@todo - figure out how to deal with payment express.
+    //get payPal express id and make it available to template
+    //$payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
+    // $this->assign('payPalExpressId', $payPalExpressId);
 
+    // Add JS to show icons for the accepted credit cards
+
+    $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10)
+      // workaround for CRM-13634
+      // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));
+      ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';');
+
+    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+  }
+
+  public function buildQuickForm() {
+    CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
   }
 
 }

@@ -955,6 +955,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }
     }
+
+    //CRM-16285 - Function to handle validation errors on form, for recurring contribution field.
+    CRM_Contribute_BAO_ContributionRecur::validateRecurContribution($fields, $files, $self, $errors);
+
     // Form rule for status http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
     if ($self->_id && $self->_values['contribution_status_id'] != $fields['contribution_status_id']) {
       CRM_Contribute_BAO_Contribution::checkStatusValidation($self->_values, $fields, $errors);

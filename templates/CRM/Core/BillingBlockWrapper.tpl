@@ -24,14 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 
-<div class="crm-section no-label paypal_button_info-section">
-  <div class="content description">
-    {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click <strong>Continue</strong> at the bottom of the page.{/ts}
-  </div>
-</div>
-<div class="crm-section no-label {$form.$expressButtonName.name}-section">
-  <div class="content description">
-    {$form.$expressButtonName.html}
-    <div class="description">Save time. Checkout securely. Pay without sharing your financial information.</div>
-  </div>
+{* wrapper for the billing block including the div to make the block swappable & the js to make that happen
+This allows the billing block to change when the card type changes *}
+<div id="billing-payment-block">
+  {include file="CRM/Core/BillingBlock.tpl"}
 </div>

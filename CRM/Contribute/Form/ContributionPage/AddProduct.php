@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -43,10 +41,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   protected $_pid;
 
   /**
-   * Pre  process the form.
-   *
-   *
-   * @return void
+   * Pre process the form.
    */
   public function preProcess() {
     parent::preProcess();
