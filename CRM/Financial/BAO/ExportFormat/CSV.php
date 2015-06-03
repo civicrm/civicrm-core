@@ -174,6 +174,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    * @param array $export
    */
   public function makeCSV($export) {
+    // getting data from admin page
+    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+
     foreach ($export as $batchId => $dao) {
       $financialItems = array();
       $this->_batchIds = $batchId;
@@ -194,11 +197,13 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
           $creditAccount = $dao->from_credit_account;
         }
 
+        $invoiceNo = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $dao->contribution_id;
+
         $financialItems[] = array(
           'Batch ID' => $dao->batch_id,
-          'Invoice ID' => $dao->contribution_id,
+          'Invoice No' => $invoiceNo,
           'Contact ID' => $dao->contact_id,
-          'Internal ID' => $dao->financial_trxn_id,
+          'Financial Trxn ID/Internal ID' => $dao->financial_trxn_id,
           'Transaction Date' => $dao->trxn_date,
           'Debit Account' => $dao->to_account_code,
           'Debit Account Name' => $dao->to_account_name,
