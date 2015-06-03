@@ -99,8 +99,9 @@
   </tr>
   <tr class="crm-membership-form-block-billing">
     <td colspan="2">
-      {include file='CRM/Core/BillingBlock.tpl'}
+      {include file='CRM/Core/BillingBlockWrapper.tpl'}
     </td>
   </tr>
+
   <div class="spacer"></div>
 {/if}

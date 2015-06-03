@@ -29,11 +29,11 @@ Required vars: caseType
   <tfoot>
   <tr class="addRow">
     <td colspan="3">
-      {{ts('Add activity type:')}}
       <span crm-add-name
            crm-options="activityTypeNames"
            crm-var="newActivity"
            crm-on-add="addActivityType(newActivity)"
+           placeholder="{{ts('Add activity type')}}"
               />
     </td>
   </tr>

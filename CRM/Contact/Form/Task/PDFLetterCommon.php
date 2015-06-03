@@ -395,6 +395,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
     if ($form->_cid) {
       $activity = CRM_Activity_BAO_Activity::create($activityParams);
+      if (!empty($form->_caseId)) {
+        $caseActivityParams = array('activity_id' => $activity->id, 'case_id' => $form->_caseId);
+        CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
+      }
     }
     else {
       // create  Print PDF activity for each selected contact. CRM-6886

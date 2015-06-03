@@ -2196,10 +2196,7 @@ WHERE  contribution_id = %1 ";
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if ($recur && !empty($this->_relatedObjects['paymentProcessor'])) {
-      $paymentObject = &CRM_Core_Payment::singleton(
-        $this->is_test ? 'test' : 'live',
-        $this->_relatedObjects['paymentProcessor']
-      );
+      $paymentObject = Civi\Payment\System::singleton()->getByProcessor($this->_relatedObjects['paymentProcessor']);
 
       $entityID = $entity = NULL;
       if (isset($ids['contribution'])) {
