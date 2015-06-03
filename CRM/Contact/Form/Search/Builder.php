@@ -269,7 +269,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
               // Validate each value in parenthesis to avoid db errors
               if (empty($errorMsg)) {
                 $parenValues = array();
-                $parenValues = is_array($v[2]) ? $v[2] : explode(',', trim($inVal, "(..)"));
+                $parenValues = is_array($v[2]) ? (array_key_exists($v[1], $v[2])) ? $v[2][$v[1]] : $v[2] : explode(',', trim($inVal, "(..)"));
                 foreach ($parenValues as $val) {
                   if ($type == 'Date' || $type == 'Timestamp') {
                     $val = CRM_Utils_Date::processDate($val);
