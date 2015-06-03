@@ -547,6 +547,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @static
    */
   static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
+    // build amount only when needed, skip in case of event full and waitlisting is enabled
+    // and few other conditions check preProcess()
+    if (property_exists($form, '_noFees') && $form->_noFees) {
+      return;
+    }
+
     //if payment done, no need to build the fee block.
     if (!empty($form->_paymentId)) {
       //fix to display line item in update mode.
