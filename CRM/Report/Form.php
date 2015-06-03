@@ -4521,6 +4521,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
                       AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ")
                       AND {$query->_aliases['civicrm_line_item']}.id IS NULL
               GROUP BY {$query->_aliases['civicrm_contribution']}.id";
+    CRM_Core_DAO::executeQuery($sql);
     $query->_from .= " 
               INNER JOIN civicrm_contribution_temp temp ON {$query->_aliases['civicrm_contribution']}.id = temp.id ";
     if (isset($temp)) {
