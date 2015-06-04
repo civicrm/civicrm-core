@@ -142,6 +142,7 @@ WHERE  option_group_id = %1";
       CRM_Utils_System::setTitle($newTitle);
       $this->assign('reusedNames', $reusedNames);
     }
+    $this->assign('optionGroupID', $optionGroupID);
   }
 
   /**

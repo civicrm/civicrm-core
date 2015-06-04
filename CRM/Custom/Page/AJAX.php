@@ -47,9 +47,8 @@ class CRM_Custom_Page_AJAX {
       0 => 'options.label',
       1 => 'options.value',
       2 => '',
-      3 => 'options.weight',
+      3 => '',
       4 => '',
-      5 => '',
     );
 
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -72,7 +71,6 @@ class CRM_Custom_Page_AJAX {
       'label',
       'value',
       'is_default',
-      'weight',
       'is_active',
       'links',
       'class',
@@ -81,6 +79,44 @@ class CRM_Custom_Page_AJAX {
     header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($options, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Fix Ordering of options
+   *
+   */
+
+  public static function fixOrdering() {
+    $params = $_REQUEST;
+
+    $queryParams = array(
+      1 => array($params['start'], 'Integer'),
+      2 => array($params['end'], 'Integer'),
+      3 => array($params['gid'], 'Integer'),
+    );
+    $dao = "SELECT id FROM civicrm_option_value WHERE weight = %1 AND option_group_id = %3";
+    $startid = CRM_Core_DAO::singleValueQuery($dao, $queryParams);
+
+    $dao2 = "SELECT id FROM civicrm_option_value WHERE weight = %2 AND option_group_id = %3";
+    $endid = CRM_Core_DAO::singleValueQuery($dao2, $queryParams);
+
+    $query = "UPDATE civicrm_option_value SET weight = %2 WHERE id = $startid";
+    CRM_Core_DAO::executeQuery($query, $queryParams);
+
+    // increment or decrement the rest by one
+    if ($params['start'] < $params['end']) {
+      $updateRows = "UPDATE civicrm_option_value
+                  SET weight = weight - 1
+                  WHERE weight > %1 AND weight < %2 AND option_group_id = %3
+                  OR id = $endid";
+    }
+    else {
+      $updateRows = "UPDATE civicrm_option_value
+                  SET weight = weight + 1
+                  WHERE weight < %1 AND weight > %2 AND option_group_id = %3
+                  OR id = $endid";
+    }
+    CRM_Core_DAO::executeQuery($updateRows, $queryParams);
   }
 
 }

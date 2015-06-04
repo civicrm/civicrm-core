@@ -43,7 +43,6 @@
             <th class='crm-custom_option-label'>{ts}Label{/ts}</th>
             <th class='crm-custom_option-value'>{ts}Value{/ts}</th>
             <th class='crm-custom_option-default_value'>{ts}Default{/ts}</th>
-            <th class='nowrap crm-custom_option-weight'>{ts}Order{/ts}</th>
             <th class='crm-custom_option-is_active  nosort'>{ts}Enabled?{/ts}</th>
             <th class='crm-custom_option-links'>&nbsp;</th>
             <th class='hiddenElement'>&nbsp;</th>
@@ -71,7 +70,6 @@
                               {sClass:'crm-custom_option-label'},
                               {sClass:'crm-custom_option-value'},
                               {sClass:'crm-custom_option-default_value', bSortable:false},
-                              {sClass:'crm-custom_option-weight'},
                               {sClass:'crm-custom_option-is_active', bSortable:false},
                               {sClass:'crm-custom_option-links', bSortable:false},
                               {sClass:'hiddenElement', bSortable:false}
@@ -100,9 +98,13 @@
                 var id = $('td:last', nRow).text().split(',')[0];
                 var cl = $('td:last', nRow).text().split(',')[1];
                 $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
+                $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-label" />');
                 $('td:eq(2)', nRow).addClass('crmf-default_value');
-                $('td:eq(3)', nRow).addClass('crmf-weight');
                 return nRow;
+              },
+              "fnDrawCallback": function() {
+                // FIXME: trigger crmLoad and crmEditable would happen automatically
+                $('.crm-editable').crmEditable();
               },
 
               "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -116,6 +118,31 @@
               }
           });
         }
+
+        var startPosition;
+        var endPosition;
+        var gid = {/literal}'{$optionGroupID}'{literal};
+
+        $("table.crm-option-selector tbody").sortable({
+          cursor: "move",
+          start:function(event, ui) {
+            var oSettings = $('table.crm-option-selector').dataTable().fnSettings();
+            var index = oSettings._iDisplayStart;
+            startPosition = index + ui.item.prevAll().length + 1;
+          },
+          update: function(event, ui) {
+            var oSettings = $('table.crm-option-selector').dataTable().fnSettings();
+            var index = oSettings._iDisplayStart;
+            endPosition = index + ui.item.prevAll().length + 1;
+
+            $.getJSON(CRM.url('civicrm/ajax/reorder'), {
+              returnFormat:'JSON',
+              start:startPosition,
+              end: endPosition,
+              gid: gid
+            })
+          }
+        });
       });
 
       </script>
