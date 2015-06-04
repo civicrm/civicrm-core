@@ -5698,12 +5698,15 @@ AND   displayRelType.is_active = 1
       $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
     }
 
+    //API usually have fieldValue format as array(operator => array(values)),
+    //so we need to separate operator out of fieldValue param
+    if (is_array($fieldValue) && in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($fieldValue);
+      $fieldValue = $fieldValue[$op];
+    }
+
     if (is_array($fieldValue)) {
       $qillString = array();
-      if (in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-        $op = key($fieldValue);
-        $fieldValue = $fieldValue[$op];
-      }
       if (!empty($pseduoOptions)) {
         foreach ((array) $fieldValue as $val) {
           $qillString[] = $pseduoOptions[$val];
