@@ -2061,9 +2061,10 @@ input.crm-form-entityref {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
 
-/* No button styling for PayPal Express buttons */
-#crm-container input#_qf_Register_upload_express,
-#crm-container input#_qf_Main_upload_express {
+/* No crm-button styling for PayPal Express buttons */
+.crm-container input#_qf_Register_upload_express,
+.crm-container input#_qf_Payment_upload_express,
+.crm-container input#_qf_Main_upload_express {
   background: none;
   margin: 0;
   padding: 0;
