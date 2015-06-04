@@ -213,6 +213,10 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_contribution_soft_contact'] = 1;
       $query->_tables['civicrm_contribution_soft_phone'] = 1;
     }
+    if (!empty($query->_returnProperties['contribution_campaign_title'])) {
+      $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
+      $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
+    }
     // LCD 716 END
   }
 
@@ -640,6 +644,10 @@ class CRM_Contribute_BAO_Query {
         $from .= " $side  JOIN civicrm_membership ON civicrm_membership_payment.membership_id = civicrm_membership.id ";
         break;
 
+      case 'civicrm_campaign':
+        $from = " $side  JOIN civicrm_campaign ON civicrm_campaign.id = civicrm_contribution.campaign_id";
+        break;
+
       case 'contribution_participant':
         $from = " $side  JOIN civicrm_participant_payment ON civicrm_participant_payment.contribution_id = civicrm_contribution.id";
         $from .= " $side  JOIN civicrm_participant ON civicrm_participant_payment.participant_id = civicrm_participant.id ";
@@ -801,6 +809,7 @@ class CRM_Contribute_BAO_Query {
         'amount_level' => 1,
         'contribution_note' => 1,
         'contribution_batch' => 1,
+        'contribution_campaign_title' => 1,
         'contribution_campaign_id' => 1,
       );
       if (self::isSoftCreditOptionEnabled()) {
