@@ -543,9 +543,11 @@
 {if $buildPriceSet}{literal}buildAmount( );{/literal}{/if}
 
 {literal}
-function buildAmount( priceSetId ) {
-  if (!priceSetId) priceSetId = cj("#price_set_id").val( );
 
+// CRM-16451: set financial type of 'Price Set' in back office contribution
+// instead of selecting manually
+function buildAmount( priceSetId, financialtypeIds ) {
+  if (!priceSetId) priceSetId = cj("#price_set_id").val( );
   var fname = '#priceset';
   if (!priceSetId) {
     // hide price set fields.
@@ -556,6 +558,10 @@ function buildAmount( priceSetId ) {
     cj("#totalAmount").show( );
     var choose = "{/literal}{ts}Choose price set{/ts}{literal}";
     cj("#price_set_id option[value='']").html( choose );
+
+    cj('label[for="total_amount"]').text('{/literal}{ts}Total Amount{/ts}{literal}');
+    cj(".crm-contribution-form-block-financial_type_id").show();
+    cj("#financial_type_id option[value='']").attr('selected', true);
 
     //we might want to build recur block.
     if (cj("#is_recur")) buildRecurBlock( null );
@@ -586,6 +592,10 @@ function buildAmount( priceSetId ) {
   cj( "#totalAmount").hide( );
   var manual = "{/literal}{ts}Manual contribution amount{/ts}{literal}";
   cj("#price_set_id option[value='']").html( manual );
+
+  cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');
+  cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
+  cj(".crm-contribution-form-block-financial_type_id").css("display", "none");
 }
 
 function adjustPayment( ) {
