@@ -161,7 +161,7 @@ class CRM_Core_BAO_CustomOption {
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     $links = CRM_Custom_Page_Option::actionLinks();
 
-    $fields = array('id', 'label', 'value', 'weight');
+    $fields = array('id', 'label', 'value');
     $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
       $options[$dao->id] = array();
@@ -214,14 +214,6 @@ class CRM_Core_BAO_CustomOption {
           $dao->id
         );
     }
-    // Add order changing widget to selector
-    $returnURL = CRM_Utils_System::url('civicrm/admin/custom/group/field/option',
-      "reset=1&action=browse&gid={$params['gid']}&fid={$params['fid']}"
-    );
-    $filter = "option_group_id = {$optionGroupID}";
-    CRM_Utils_Weight::addOrder($options, 'CRM_Core_DAO_OptionValue',
-      'id', $returnURL, $filter
-    );
 
     return $options;
   }
