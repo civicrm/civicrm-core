@@ -88,6 +88,8 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
     }
 
     $this->assign('contactType', $this->_contactType);
+
+    $this->setAction(CRM_Core_Action::UPDATE);
   }
 
   /**
