@@ -32,7 +32,7 @@
       </legend>
       {if $form.$expressButtonName}
         {include file= "CRM/Core/paypalexpress.tpl"}
-      {/if}
+      {elseif $paymentProcessor.billing_mode & 1}
       <div class="crm-section billing_mode-section {$paymentTypeName}_info-section">
         {foreach from=$paymentFields item=paymentField}
           <div class="crm-section {$form.$paymentField.name}-section">
@@ -49,9 +49,10 @@
           </div>
         {/foreach}
       </div>
+     {/if}
     </fieldset>
   {/if}
-  {if $billingDetailsFields|@count}
+  {if $billingDetailsFields|@count && !$form.$expressButtonName}
     {if $profileAddressFields}
       <input type="checkbox" id="billingcheckbox" value="0">
       <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>
