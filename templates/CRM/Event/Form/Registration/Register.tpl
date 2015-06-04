@@ -67,7 +67,7 @@
 
     {if $form.additional_participants.html}
       <div class="crm-section additional_participants-section" id="noOfparticipants">
-        <div class="label">{$form.additional_participants.label}</div>
+        <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
         <div class="content">
           {$form.additional_participants.html}{if $contact_id || $contact_id == NULL} &nbsp; ({ts}including yourself{/ts}){/if}
           <br/>
