@@ -1,7 +1,5 @@
 {include file="CRM/common/TrackingFields.tpl"}
 
-{capture assign='reqMark'}<span class="marker"  title="{ts}This field is required.{/ts}">*</span>{/capture}
-
 {if $contact}
 <div class="messages status no-popup">
     {ts 1=$contact.display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/event/cart_checkout' q="&cid=0&reset=1"}" title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$contact.display_name}Not %1, or want to register a different person{/ts}</a>?)</div>
