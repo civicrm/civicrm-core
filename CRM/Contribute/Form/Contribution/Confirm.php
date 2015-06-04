@@ -730,7 +730,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   public function postProcess() {
     $contactID = $this->getContactID();
     $isPayLater = $this->_params['is_pay_later'];
-    if (isset($this->_params['payment_processor']) && $this->_params['payment_processor'] == 0) {
+    if (isset($this->_params['payment_processor_id']) && $this->_params['payment_processor_id'] == 0) {
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
     }
     // add a description field at the very beginning
@@ -2043,8 +2043,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->_values['fee'] = $priceSetFields['fields'];
     $form->_priceSetId = $priceSetID;
     $form->setFormAmountFields($priceSetID);
-    if (!empty($params['payment_processor'])) {
-      $form->_paymentProcessor = civicrm_api3('payment_processor', 'getsingle', array('id' => $params['payment_processor']));
+    if (!empty($params['payment_processor_id'])) {
+      $form->_paymentProcessor = civicrm_api3('payment_processor', 'getsingle', array(
+        'id' => $params['payment_processor_id'],
+      ));
       if ($form->_paymentProcessor['billing_mode'] == 1) {
         $form->_contributeMode = 'direct';
       }
@@ -2053,7 +2055,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     else {
-      $form->_params['payment_processor'] = 0;
+      $form->_params['payment_processor_id'] = 0;
     }
     $priceFields = $priceFields[$priceSetID]['fields'];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
@@ -2074,7 +2076,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public static function getFormParams($id, array $params) {
     if (!isset($params['is_pay_later'])) {
-      if (!empty($params['payment_processor'])) {
+      if (!empty($params['payment_processor_id'])) {
         $params['is_pay_later'] = 0;
       }
       else {

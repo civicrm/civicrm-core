@@ -26,47 +26,37 @@
 {literal}
 <script type="text/javascript">
 
-function buildPaymentBlock(type) {
-  {/literal}{if !$isBillingAddressRequiredForPayLater}{literal}
-  if (type == 0) {
-    if (cj("#billing-payment-block").length) {
-      cj("#billing-payment-block").html('');
+  CRM.$(function($) {
+    function buildPaymentBlock(type) {
+      {/literal}{if !$isBillingAddressRequiredForPayLater}{literal}
+      if (type == 0) {
+        $("#billing-payment-block").html('');
+        return;
+      }
+      {/literal}{/if}
+
+      {if $contributionPageID}
+        {capture assign='contributionPageID'}id={$contributionPageID}&{/capture}
+      {else}
+        {capture assign='contributionPageID'}{/capture}
+      {/if}
+      {if $urlPathVar}
+        {capture assign='urlPathVar'}{$urlPathVar}&{/capture}
+      {else}
+        {capture assign='urlPathVar'}{/capture}
+      {/if}
+
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="`$urlPathVar``$contributionPageID`processor_id="}" + type;
+
+      {literal}
+      CRM.loadPage(dataUrl, {target: '#billing-payment-block'});
     }
-    return;
-  }
-  {/literal}{/if}{literal}
-
-  var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
-
-  {/literal}
-    {if $urlPathVar}
-      dataUrl = dataUrl + '&' + '{$urlPathVar}'
-    {/if}
-
-    {if $contributionPageID}
-            dataUrl = dataUrl + '&id=' + '{$contributionPageID}'
-        {/if}
-
-    {if $qfKey}
-      dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
-    {/if}
-  {literal}
-
-  var response = cj.ajax({
-                        url: dataUrl,
-                        async: false
-                        }).responseText;
-
-  cj('#billing-payment-block').html(response).trigger('crmLoad').trigger('crmFormLoad');
-}
-
-CRM.$(function($) {
+  
     $('.crm-group.payment_options-group').show();
-
-    $('input[name="payment_processor"]').change( function() {
-        buildPaymentBlock( $(this).val() );
+    $('[name=payment_processor_id]').on('change.paymentBlock', function() {
+        buildPaymentBlock($(this).val());
     });
-});
+  });
 
 </script>
 {/literal}

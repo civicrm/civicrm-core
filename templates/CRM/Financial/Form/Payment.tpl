@@ -24,4 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 
-{include file="CRM/Core/BillingBlockWrapper.tpl"}
+<div id="billing-payment-block">
+  {include file="CRM/Core/BillingBlock.tpl"}
+</div>

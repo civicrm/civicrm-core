@@ -27,36 +27,6 @@
 {if $snippet and !empty($isOnBehalfCallback)}
   {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl" context="front-end"}
 
-{* Callback snippet: Load payment processor *}
-{elseif $snippet}
-{include file="CRM/Core/BillingBlock.tpl"}
-  {if $is_monetary}
-  {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
-    {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
-    <div id="paypalExpress">
-      {assign var=expressButtonName value='_qf_Main_upload_express'}
-      <fieldset class="crm-group paypal_checkout-group">
-        <legend>{ts}Checkout with PayPal{/ts}</legend>
-        <div class="section">
-          <div class="crm-section paypalButtonInfo-section">
-            <div class="content">
-              <span class="description">{ts}Click the PayPal button to continue.{/ts}</span>
-            </div>
-            <div class="clear"></div>
-          </div>
-          <div class="crm-section {$expressButtonName}-section">
-            <div class="content">
-              {$form.$expressButtonName.html} <span class="description">Checkout securely. Pay without sharing your financial information. </span>
-            </div>
-            <div class="clear"></div>
-          </div>
-        </div>
-      </fieldset>
-    </div>
-    {/if}
-  {/if}
-
-{* Main Form *}
 {else}
   {literal}
   <script type="text/javascript">
@@ -259,13 +229,13 @@
   </fieldset>
   {/if}
 
-  {if $form.payment_processor.label}
+  {if $form.payment_processor_id.label}
   {* PP selection only works with JS enabled, so we hide it initially *}
   <fieldset class="crm-group payment_options-group" style="display:none;">
     <legend>{ts}Payment Options{/ts}</legend>
     <div class="crm-section payment_processor-section">
-      <div class="label">{$form.payment_processor.label}</div>
-      <div class="content">{$form.payment_processor.html}</div>
+      <div class="label">{$form.payment_processor_id.label}</div>
+      <div class="content">{$form.payment_processor_id.html}</div>
       <div class="clear"></div>
     </div>
   </fieldset>
@@ -287,7 +257,7 @@
   <div id="billing-payment-block">
     {* If we have a payment processor, load it - otherwise it happens via ajax *}
     {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
-      {include file="CRM/Contribute/Form/Contribution/Main.tpl" snippet=4}
+      {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
     {/if}
   </div>
   {include file="CRM/common/paymentBlock.tpl"}
@@ -475,16 +445,16 @@
       payment_information.show();
     }
   }
-  
+
   function skipPaymentMethod() {
     var flag = false;
-    cj('.price-set-option-content input').each( function(){
+    cj('.price-set-option-content input[data-amount]').each( function(){
       currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
       if( cj(this).is(':checked') && currentTotal == 0 ) {
           flag = true;
       }
     });
-    cj('.price-set-option-content input').change( function () {
+    cj('.price-set-option-content input[data-amount]').change( function () {
       if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
         flag = true;
       } else {
