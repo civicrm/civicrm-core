@@ -470,6 +470,20 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Process incoming notification.
+   *
+   * This is only supported for paypal pro at the moment & no specific plans to add this path to core
+   * for paypal standard as the goal must be to separate the 2.
+   *
+   * We don't need to handle paypal standard using this path as there has never been any historic support
+   * for paypal standard to call civicrm/payment/ipn as a path.
+   */
+  static public function handlePaymentNotification() {
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
+    $paypalIPN->main();
+  }
+
+  /**
    * @param string $message
    * @param array $params
    *

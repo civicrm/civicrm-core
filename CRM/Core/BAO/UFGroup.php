@@ -1835,14 +1835,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $selectAttributes = array('class' => 'crm-select2', 'placeholder' => TRUE);
 
     if ($fieldName == 'image_URL' && $mode == CRM_Profile_Form::MODE_EDIT) {
-      $deleteExtra = ts('Are you sure you want to delete contact image.');
+      $deleteExtra = json_encode(ts('Are you sure you want to delete contact image.'));
       $deleteURL = array(
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
           'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete',
-          'extra' =>
-          'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
         ),
       );
       $deleteURL = CRM_Core_Action::formLink($deleteURL,

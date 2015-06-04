@@ -149,10 +149,11 @@ AND li.entity_id = {$entityId}
    *   this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
    *   when we don't want it's entity-id magix
    *
+   * @param bool $invoice
    * @return array
    *   Array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '', $invoice = FALSE) {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -187,7 +188,8 @@ AND li.entity_id = {$entityId}
     $whereClause = "
       WHERE     %2.id = %1";
 
-    if ($entity == 'participant') {
+    // CRM-16250 get additional participant's fee selection details only for invoice PDF (if any)
+    if ($entity == 'participant' && $invoice) {
       $additionalParticipantIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
       if (!empty($additionalParticipantIDs)) {
         $whereClause = "WHERE %2.id IN (%1, " . implode(', ', $additionalParticipantIDs) . ")";
