@@ -85,7 +85,6 @@ class CRM_Custom_Page_AJAX {
    * Fix Ordering of options
    *
    */
-
   public static function fixOrdering() {
     $params = $_REQUEST;
 
