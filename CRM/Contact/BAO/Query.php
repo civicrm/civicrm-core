@@ -497,6 +497,15 @@ class CRM_Contact_BAO_Query {
 
     $this->selectClause();
     $this->_whereClause = $this->whereClause();
+    if (array_key_exists('civicrm_contribution', $this->_whereTables)) {
+      $component = 'contribution';
+    }
+    if (array_key_exists('civicrm_membership', $this->_whereTables)) {
+      $component = 'membership';
+    }
+    if (isset($component)) {
+      CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
+    }
 
     $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
     $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
@@ -4764,6 +4773,13 @@ SELECT COUNT( conts.total_amount ) as total_count,
     if ($context == 'search') {
       $where .= " AND contact_a.is_deleted = 0 ";
     }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    if (!empty($financialTypes)) {
+      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ") AND li.id IS NULL";
+    }
+    else {
+      $where .= " AND civicrm_contribution.financial_type_id IN (0) AND li.financial_type_id IN (0)";
+    }
 
     // make sure contribution is completed - CRM-4989
     $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
@@ -4771,7 +4787,9 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $summary = array();
     $summary['total'] = array();
     $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
-
+    $from .= "LEFT JOIN civicrm_line_item li
+                      ON civicrm_contribution.id = li.contribution_id AND
+                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',' , array_keys($financialTypes)) . ")";
     $query = "$select FROM (
       SELECT civicrm_contribution.total_amount, civicrm_contribution.currency $from $completedWhere
       GROUP BY civicrm_contribution.id

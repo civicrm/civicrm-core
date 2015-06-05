@@ -436,7 +436,7 @@ class CRM_Member_BAO_Query {
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
-    foreach (CRM_Member_PseudoConstant::membershipType() as $id => $Name) {
+    foreach (CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes() as $id => $Name) {
       $form->_membershipType = &$form->addElement('checkbox', "member_membership_type_id[$id]", NULL, $Name);
     }
 

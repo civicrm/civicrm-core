@@ -52,6 +52,19 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('context', $context);
 
     CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $financialTypeID = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
+      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'view');
+      if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'edit', FALSE)) {
+        $this->assign('canEdit', TRUE);
+      }
+      if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'delete', FALSE)) {
+        $this->assign('canDelete', TRUE);
+      }
+      if (!CRM_Core_Permission::check('view contributions of type ' . $financialTypeID)) {
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      }
+    }
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
     $cancelledStatus = TRUE;
     $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');

@@ -81,6 +81,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
         ),
         'grouping' => 'household-fields',
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
       'civicrm_relationship' => array(
         'dao' => 'CRM_Contact_DAO_Relationship',
         'fields' => array(
@@ -262,8 +265,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
                       {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                       {$this->_aliases['civicrm_email']}.is_primary = 1\n ";
     }
+    $this->getPermissionedFTQuery($this);
   }
-
+  
   public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {

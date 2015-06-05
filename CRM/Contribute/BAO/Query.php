@@ -317,7 +317,7 @@ class CRM_Contribute_BAO_Query {
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.receipt_date", $op);
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
-
+        
       case 'financial_type':
       case 'contribution_page':
       case 'payment_instrument':
@@ -327,8 +327,9 @@ class CRM_Contribute_BAO_Query {
       case 'financial_type_id':
       case 'payment_instrument_id':
       case 'contribution_payment_instrument_id':
+        CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", 'IN', array_keys($financialTypes), 'String');
       case 'contribution_page_id':
-      case 'contribution_status_id':
       case 'contribution_id':
       case 'contribution_currency_type':
       case 'contribution_currency':
@@ -515,6 +516,8 @@ class CRM_Contribute_BAO_Query {
       default:
         //all other elements are handle in this case
         $fldName = substr($name, 13);
+        CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.financial_type_id", 'IN', array_keys($financialTypes), 'String');
         if (!isset($fields[$fldName])) {
           // CRM-12597
           CRM_Core_Session::setStatus(ts(
@@ -851,8 +854,9 @@ class CRM_Contribute_BAO_Query {
     );
 
     // CRM-13848
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'view');
     $form->addSelect('financial_type_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search')
+      array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => $financialTypes)
     );
 
     $form->add('select', 'contribution_page_id',
