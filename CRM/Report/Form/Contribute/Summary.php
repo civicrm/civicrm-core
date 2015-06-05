@@ -118,7 +118,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'dao' => 'CRM_Contribute_DAO_Contribution',
           //'bao'           => 'CRM_Contribute_BAO_Contribution',
         'fields' => array(
-         'contribution_status_id' => array(
+          'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
           ),
           'contribution_source' => array('title' => ts('Source')),
