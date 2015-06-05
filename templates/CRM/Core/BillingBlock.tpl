@@ -25,14 +25,15 @@
 *}
 {crmRegion name="billing-block"}
 <div id="payment_information">
-  {if $paymentFields|@count}
+  {if $form.$expressButtonName}
+    {if $paymentProcessor.payment_processor_type NEQ 'PayPal_Express'}
+       {include file= "CRM/Core/paypalexpress.tpl"}
+    {/if}
+  {else $paymentFields|@count}
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>
         {$paymentTypeLabel}
       </legend>
-      {if $form.$expressButtonName}
-        {include file= "CRM/Core/paypalexpress.tpl"}
-      {/if}
       <div class="crm-section billing_mode-section {$paymentTypeName}_info-section">
         {foreach from=$paymentFields item=paymentField}
           <div class="crm-section {$form.$paymentField.name}-section">
@@ -50,7 +51,6 @@
         {/foreach}
       </div>
     </fieldset>
-  {/if}
   {if $billingDetailsFields|@count}
     {if $profileAddressFields}
       <input type="checkbox" id="billingcheckbox" value="0">
@@ -73,6 +73,7 @@
       </div>
     </fieldset>
   {/if}
+{/if}
 </div>
 {if $profileAddressFields}
   <script type="text/javascript">
