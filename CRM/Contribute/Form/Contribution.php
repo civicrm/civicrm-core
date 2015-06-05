@@ -953,7 +953,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $sum = CRM_Utils_Money::format($sum - $self->_values['tax_amount'], NULL, '%a');
         }
       }
-      if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
+      if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != CRM_Utils_Rule::cleanMoney($sum)) {
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }
     }

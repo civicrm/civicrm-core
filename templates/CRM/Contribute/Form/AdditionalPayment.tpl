@@ -264,8 +264,8 @@ cj('#fee_amount').change( function() {
   var totalAmount = cj('#total_amount').val();
   var feeAmount = cj('#fee_amount').val();
   var netAmount = totalAmount.replace(/,/g, '') - feeAmount.replace(/,/g, '');
-  if (!cj('#net_amount').val()) {
-    cj('#net_amount').val(netAmount);
+  if (!cj('#net_amount').val() && totalAmount) {
+    cj('#net_amount').val(CRM.formatMoney(netAmount, true));
   }
 });
     </script>
