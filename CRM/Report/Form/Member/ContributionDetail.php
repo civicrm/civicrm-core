@@ -468,7 +468,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
     //for premiums
     if (!empty($this->_params['fields']['product_name']) ||
-      !empty($this->_params['fields']['product_option'])
+      !empty($this->_params['fields']['product_option']) ||
+      !empty($this->_params['fields']['fulfilled_date'])
     ) {
       $this->_from .= "
                  LEFT JOIN  civicrm_contribution_product {$this->_aliases['civicrm_contribution_product']}
