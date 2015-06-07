@@ -238,6 +238,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           'product_option' => array(
             'title' => ts('Premium Option'),
           ),
+          'fulfilled_date' => array(
+            'title' => ts('Premium Fulfilled Date'),
+          ),
           'contribution_id' => array(
             'no_display' => TRUE,
           ),
