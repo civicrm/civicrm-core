@@ -144,7 +144,6 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     // notice on site running EOL version that doesn't have a security release
     $data[] = array('4.2.19', $this->sampleVersionInfo, '4.5.5');
 
-
     return $data;
   }
 

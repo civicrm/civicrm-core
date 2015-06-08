@@ -191,7 +191,7 @@ class CRM_Utils_VersionCheck {
 
     if ($this->versionInfo && $this->localVersion) {
       if (isset($this->versionInfo[$this->localMajorVersion])) {
-        switch(CRM_Utils_Array::value('status', $this->versionInfo[$this->localMajorVersion])) {
+        switch (CRM_Utils_Array::value('status', $this->versionInfo[$this->localMajorVersion])) {
           case 'stable':
           case 'lts':
           case 'testing':
@@ -261,7 +261,7 @@ class CRM_Utils_VersionCheck {
         if (version_compare($this->localVersion, $release['version']) < 0) {
           if (!$this->ignoreDate || $this->ignoreDate < $release['date']) {
             $newerVersion['newest'] = $release['version'];
-            if (CRM_Utils_Array::value('security',$release)) {
+            if (CRM_Utils_Array::value('security', $release)) {
               $newerVersion['security'] = $release['version'];
             }
           }
