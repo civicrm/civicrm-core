@@ -122,7 +122,7 @@ class CRM_Utils_Check_Message {
 
   /**
    * Set optional additional help text
-   * @param string help
+   * @param string $help
    */
   public function addHelp($help) {
     $this->help = $help;

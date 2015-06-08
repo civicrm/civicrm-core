@@ -85,10 +85,10 @@ function _civicrm_api3_system_flush_spec(&$params) {
 function _civicrm_api3_system_check_spec(&$spec) {
   // $spec['magicword']['api.required'] = 1;
   $spec['show_hushed'] = array(
-    'api.default' => false,
-    'title' => 'show hushed',
+    'api.default' => FALSE,
+    'title' => 'Show hushed',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-    );
+  );
 }
 
 /**
@@ -105,7 +105,7 @@ function _civicrm_api3_system_check_spec(&$spec) {
 function civicrm_api3_system_check($params) {
   $returnValues = array();
   $messages = CRM_Utils_Check::singleton()->checkAll(CRM_Utils_Array::value('show_hushed', $params));
-  foreach ( $messages as $msg) {
+  foreach ($messages as $msg) {
     $returnValues[] = $msg->toArray();
   }
 

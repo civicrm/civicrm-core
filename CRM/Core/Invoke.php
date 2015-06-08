@@ -348,16 +348,16 @@ class CRM_Core_Invoke {
    *
    * @param CRM_Core_Smarty $template
    */
-   public static function statusCheck($template) {
-     if (CRM_Core_Config::isUpgradeMode()) {
-       return;
-     }
-     $statusSeverity = 0;
-     $statusMessage = ts('System status OK');
-     // TODO: get status from CRM_Utils_Check, if cached
-     $template->assign('footer_status_severity', $statusSeverity);
-     $template->assign('footer_status_message', $statusMessage);
-   }
+  public static function statusCheck($template) {
+    if (CRM_Core_Config::isUpgradeMode()) {
+      return;
+    }
+    $statusSeverity = 0;
+    $statusMessage = ts('System status OK');
+    // TODO: get status from CRM_Utils_Check, if cached
+    $template->assign('footer_status_severity', $statusSeverity);
+    $template->assign('footer_status_message', $statusMessage);
+  }
 
   /**
    * @param bool $triggerRebuild
