@@ -98,7 +98,7 @@
   </tr>
 </table>
   {if $hookCaseSummary}
-  <div id="caseSummary">
+  <div id="caseSummary" class="crm-clearfix">
     {foreach from=$hookCaseSummary item=val key=div_id}
       <div id="{$div_id}"><label>{$val.label}</label><div class="value">{$val.value}</div></div>
     {/foreach}
