@@ -130,7 +130,6 @@ class CRM_Utils_Check_Env {
    * Check that domain email and org name are set
    * @return array
    */
-
   public function checkDomainNameEmail() {
     $messages = array();
 
@@ -170,7 +169,6 @@ class CRM_Utils_Check_Env {
    * Checks if a default bounce handling mailbox is set up
    * @return array
    */
-
   public function checkDefaultMailbox() {
     $messages = array();
     $config = CRM_Core_Config::singleton();
@@ -196,7 +194,6 @@ class CRM_Utils_Check_Env {
    * Checks if cron has run in a reasonable amount of time
    * @return array
    */
-
   public function checkLastCron() {
     $messages = array();
 
@@ -249,12 +246,11 @@ class CRM_Utils_Check_Env {
    * Checks if new versions are available
    * @return array
    */
-
   public function checkVersion() {
     $messages = array();
 
     if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1)) {
-      $vc =   CRM_Utils_VersionCheck::singleton();
+      $vc = CRM_Utils_VersionCheck::singleton();
       $newerVersion = $vc->isNewerVersionAvailable();
 
       if ($newerVersion['version']) {
@@ -315,7 +311,6 @@ class CRM_Utils_Check_Env {
    * Checks if extensions are set up properly
    * @return array
    */
-
   public function checkExtensions() {
     $messages = array();
     $extensionSystem = CRM_Extension_System::singleton();
@@ -419,7 +414,9 @@ class CRM_Utils_Check_Env {
     elseif (!empty($okextensions)) {
       $msg .= '  ' . ts('Other extensions are up-to-date:') . ' ' . implode(', ', $okextensions);
     }
-    $returnValues = array( // OK, return several data rows
+
+    // OK, return several data rows
+    $returnValues = array(
       array('status' => $return, 'message' => $msg),
     );
 
@@ -457,7 +454,6 @@ class CRM_Utils_Check_Env {
    * Checks if CiviCRM database version is up-to-date
    * @return array
    */
-
   public function checkDbVersion() {
     $messages = array();
     $dbVersion = CRM_Core_BAO_Domain::version();
@@ -524,7 +520,6 @@ class CRM_Utils_Check_Env {
    * ensure that all CiviCRM tables are InnoDB
    * @return array
    */
-
   public function checkDbEngine() {
     $messages = array();
 
