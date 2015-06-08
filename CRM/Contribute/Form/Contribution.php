@@ -781,11 +781,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $hasPriceSets = FALSE;
       if ($buildPriceSet) {
         $hasPriceSets = TRUE;
+        // CRM-16451: set financial type of 'Price Set' in back office contribution
+        // instead of selecting manually
+        $financialTypeIds = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviContribute', 'financial_type_id');
         $element = $this->add('select', 'price_set_id', ts('Choose price set'),
           array(
             '' => ts('Choose price set'),
           ) + $priceSets,
-          NULL, array('onchange' => "buildAmount( this.value );")
+          NULL, array('onchange' => "buildAmount( this.value, " . json_encode($financialTypeIds) . ");")
         );
         if ($this->_online && !($this->_action & CRM_Core_Action::UPDATE)) {
           $element->freeze();

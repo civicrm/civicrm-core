@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -17,7 +17,8 @@
  | See the GNU Affero General Public License for more details.        |
  |                                                                    |
  | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
@@ -331,7 +332,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @return bool TRUE for success
    */
-  static function updateSavedSearch(CRM_Queue_TaskContext $ctx) {
+  public static function updateSavedSearch(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT id, form_values FROM civicrm_saved_search";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
@@ -341,22 +342,22 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         if (preg_match('/^custom_/', $field) && is_array($data_value) && !array_key_exists("${field}_operator", $formValues)) {
           // Now check for CiviCRM_OP_OR as either key or value in the data_value array.
           // This is the conclusive evidence of an old-style data format.
-          if(array_key_exists('CiviCRM_OP_OR', $data_value) || FALSE !== array_search('CiviCRM_OP_OR', $data_value)) {
+          if (array_key_exists('CiviCRM_OP_OR', $data_value) || FALSE !== array_search('CiviCRM_OP_OR', $data_value)) {
             // We have old style data. Mark this record to be updated.
             $update = TRUE;
             $op = 'and';
-            if(!preg_match('/^custom_([0-9]+)/', $field, $matches)) {
+            if (!preg_match('/^custom_([0-9]+)/', $field, $matches)) {
               // fatal error?
               continue;
             }
-            $fieldID= $matches[1];
+            $fieldID = $matches[1];
             if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
               // This indicates data structure identified by jamie in the form:
               // value1 => 1, value2 => , value3 => 1.
               $data_value = array_keys($data_value, 1);
 
               // If CiviCRM_OP_OR - change OP from default to OR
-              if($data_value['CiviCRM_OP_OR'] == 1) {
+              if ($data_value['CiviCRM_OP_OR'] == 1) {
                 $op = 'or';
               }
               unset($data_value['CiviCRM_OP_OR']);

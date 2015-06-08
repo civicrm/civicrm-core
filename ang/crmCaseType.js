@@ -39,7 +39,7 @@
         controller: 'CaseTypeListCtrl',
         resolve: {
           caseTypes: function($route, crmApi) {
-            return crmApi('CaseType', 'get', {});
+            return crmApi('CaseType', 'get', {options: {limit: 0}});
           }
         }
       });
