@@ -667,11 +667,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // as the array is not actually 'returnProperties' after the sql query is formed - making the alterations to it confusing
     foreach ($returnProperties as $key => $value) {
       $outputColumns[$key] = $value;
-      if (substr($key, -11) == 'campaign_id') {
-        // the field $dao->x_campaign_id_id holds the id whereas the field $dao->campaign_id
-        // we want to insert it directly after campaign id
-        $outputColumns[$key . '_id'] = 1;
-      }
     }
     while (1) {
       $limitQuery = "{$queryString} LIMIT {$offset}, {$rowCount}";
@@ -704,10 +699,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           if ($setHeader) {
             $sqlDone = FALSE;
             // Split campaign into 2 fields for id and title
-            if (substr($field, -11) == 'campaign_id') {
+            if (substr($field, -14) == 'campaign_title') {
               $headerRows[] = ts('Campaign Title');
             }
-            elseif (substr($field, -14) == 'campaign_id_id') {
+            elseif (substr($field, -11) == 'campaign_id') {
               $headerRows[] = ts('Campaign ID');
             }
             elseif (isset($query->_fields[$field]['title'])) {
@@ -1343,7 +1338,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if (substr($fieldName, -11) == 'campaign_id') {
       // CRM-14398
       $sqlColumns[$fieldName] = "$fieldName varchar(128)";
-      $sqlColumns[$fieldName . '_id'] = "{$fieldName}_id varchar(16)";
       return;
     }
 
