@@ -60,7 +60,7 @@
     "jQueryUI": true,
     "language": {ldelim}
       "emptyTable": "{ts escape='js'}None found.{/ts}",
-      "info":  "{ts escape='js' '1=_START_ 2=_END_ 3=_TOTAL_}Showing %1 to %2 of %3 entries{/ts}",
+      "info":  "{ts escape='js' 1=_START_ 2=_END_ 3=_TOTAL_}Showing %1 to %2 of %3 entries{/ts}",
       "infoEmpty": "{ts escape='js'}Showing 0 to 0 of 0 entries{/ts}",
       "infoFiltered": "{ts escape='js' 1=_MAX_}(filtered from %1 total entries){/ts}",
       "infoPostFix": "",

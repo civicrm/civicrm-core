@@ -1160,6 +1160,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $orderBy = " ORDER BY $sortBy ";
     }
 
+    $page = CRM_Utils_Array::value('page', $params);
+    $rp = CRM_Utils_Array::value('rp', $params);
+
     if (!$page) {
       $page = 1;
     }
@@ -1170,12 +1173,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $limit = " LIMIT $start, $rp";
 
     $query = $select . $from . $where . $groupBy . $orderBy . $limit;
-    $params = array(1 => array($caseID, 'Integer'));
+    $queryParams = array(1 => array($caseID, 'Integer'));
 
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    $page = CRM_Utils_Array::value('page', $params);
-    $rp = CRM_Utils_Array::value('rp', $params);
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
 
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
     $activityStatuses = CRM_Core_PseudoConstant::activityStatus();
@@ -1235,8 +1235,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     }
 
     $caseActivities = array();
+    $caseCount = 0;
 
     while ($dao->fetch()) {
+      $caseCount++;
       $caseActivity = array();
       $caseActivityId = $dao->id;
 
@@ -1322,8 +1324,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $url = "";
       $css = 'class="action-item crm-hover-button"';
       if ($allowView) {
-        $url = CRM_Utils_System::url('civicrm/case/activity/view', array('cid' => $contactID, 'aid' => $caseActivityId));
-        //$subject = '<a class="crm-popup medium-popup" href="' . $url . '" title="' . $viewTitle . '">' . $subject . '</a>';
+        $viewUrl = CRM_Utils_System::url('civicrm/case/activity/view', array('cid' => $contactID, 'aid' => $caseActivityId));
+        $url = '<a ' . str_replace('action-item', 'action-item medium-pop-up', $css) . 'href="' . $viewUrl . '" title="' . $viewTitle . '">' . ts('View') . '</a>';
       }
       $additionalUrl = "&id={$caseActivityId}";
       if (!$dao->deleted) {
@@ -1331,7 +1333,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         if (!in_array($dao->type, $emailActivityTypeIDs)) {
           //hide Edit link if activity type is NOT editable (special case activities).CRM-5871
           if ($allowEdit) {
-            $url = '<a ' . $css . ' href="' . $editUrl . $additionalUrl . '">' . ts('Edit') . '</a> ';
+            $url .= '<a ' . $css . ' href="' . $editUrl . $additionalUrl . '">' . ts('Edit') . '</a> ';
           }
         }
         if ($allowDelete) {
@@ -1375,8 +1377,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     $caseActivitiesDT = array();
     $caseActivitiesDT['data'] = $caseActivities;
-    $caseActivitiesDT['recordsTotal'] = $params['total'];
-    $caseActivitiesDT['recordsFiltered'] = $params['total'];
+    $caseActivitiesDT['recordsTotal'] = $caseCount;
+    $caseActivitiesDT['recordsFiltered'] = $caseCount;
 
     return $caseActivitiesDT;
   }
