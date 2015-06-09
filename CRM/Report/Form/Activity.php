@@ -518,7 +518,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
       $this->_aliases['civicrm_contact'] = 'civicrm_contact_source';
     }
-    $this->_from .= "INNER JOIN civicrm_option_value {$this->_aliases['civicrm_option_value']}
+    $this->_from .= " INNER JOIN civicrm_option_value {$this->_aliases['civicrm_option_value']}
             ON {$this->_aliases['civicrm_option_value']}.option_group_id = {$activityTypeId}
             AND {$this->_aliases['civicrm_option_value']}.value = {$this->_aliases['civicrm_activity']}.activity_type_id";
     $this->addAddressFromClause();
