@@ -145,6 +145,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
+    $this->preventAjaxSubmit();
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $this->assign('isAdmin', 1);
     }
@@ -634,8 +635,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *   Name of file which is in pdf format
    */
   static public function putFile($html) {
-    require_once "packages/dompdf/dompdf_config.inc.php";
-    spl_autoload_register('DOMPDF_autoload');
+    require_once "vendor/dompdf/dompdf/dompdf_config.inc.php";
     $doc = new DOMPDF();
     $doc->load_html($html);
     $doc->render();
