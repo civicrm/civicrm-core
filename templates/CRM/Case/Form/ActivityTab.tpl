@@ -95,7 +95,7 @@
               d.reporter_id = $("select#reporter_id_" + caseId).val(),
               d.activity_type_id = $("select#activity_type_filter_id_" + caseId).val(),
               d.activity_date_low = $("#activity_date_low_" + caseId).val(),
-              d.activity_date_high = $("#activity_date_high_" + caseId).val()
+              d.activity_date_high = $("#activity_date_high_" + caseId).val(),
               d.activity_deleted = ($("#activity_deleted_1").prop('checked')) ? 1 : 0; 
             }
           }
