@@ -175,7 +175,7 @@ class Container {
        INNER JOIN civicrm_custom_group grp ON fld.custom_group_id = grp.id
        WHERE fld.data_type = "File"
       ',
-      array('civicrm_activity', 'civicrm_mailing', 'civicrm_contact')
+      array('civicrm_activity', 'civicrm_mailing', 'civicrm_contact', 'civicrm_grant')
     ));
 
     $kernel->setApiProviders(array(
