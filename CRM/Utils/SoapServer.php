@@ -91,6 +91,11 @@ class CRM_Utils_SoapServer {
    * @access public
    */
   public function verify($key) {
+    // CRM-8638: CRM_Core_Session uses Drupal's session handler, so the CMS
+    // must first be bootstrapped in order to recover session values
+    if (!CRM_Utils_System::loadBootStrap(array(), FALSE, FALSE)) {
+      throw new SoapFault('Server', 'Unable to bootstrap system');
+    }
     $session = CRM_Core_Session::singleton();
 
     $soap_key = $session->get('soap_key');
@@ -122,14 +127,10 @@ class CRM_Utils_SoapServer {
    * @access public
    * @static
    */
-  public function authenticate($name, $pass, $loadCMSBootstrap = FALSE) {
+  public function authenticate($name, $pass) {
     require_once (str_replace('_', DIRECTORY_SEPARATOR, $this->ufClass) . '.php');
 
-    if ($this->ufClass == 'CRM_Utils_System_Joomla' || $this->ufClass == 'CRM_Utils_System_WordPress'){
-      $loadCMSBootstrap = TRUE;
-    }
-        
-    eval('$result =& ' . $this->ufClass . '::authenticate($name, $pass, $loadCMSBootstrap );');
+    eval('$result =& ' . $this->ufClass . '::authenticate($name, $pass, TRUE );');
 
     if (empty($result)) {
       throw new SoapFault('Client', 'Invalid login');
