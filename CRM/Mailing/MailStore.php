@@ -109,11 +109,10 @@ class CRM_Mailing_MailStore {
    *   array of ezcMail objects
    */
   public function fetchNext($count = 1) {
+    $offset = 1;
     if (isset($this->_transport->options->uidReferencing) and $this->_transport->options->uidReferencing) {
-      $offset = array_shift($this->_transport->listUniqueIdentifiers());
-    }
-    else {
-      $offset = 1;
+      $offset = $this->_transport->listUniqueIdentifiers();
+      $offset = array_shift($offset);
     }
     try {
       $set = $this->_transport->fetchFromOffset($offset, $count);
