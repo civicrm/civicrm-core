@@ -627,9 +627,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         // CRM-15881 UPDATES
         // changed FROM "...relationship->relationship_type_id == 4..." TO "...relationship->relationship_type_id == 5..."
         // As the system should be looking for type "employer of" (id 5) and not "sibling of" (id 4)
-        if ($relationship->relationship_type_id == 5 && $relationship->contact_id_b == $sharedContact->employer_id) {
+        // As suggested by @davecivicrm, the employee relationship type id is fetched using the CRM_Core_DAO::getFieldValue() class and method, since these ids differ from system to system.
+        $employerRelTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
+
+        if ($relationship->relationship_type_id == $employerRelTypeId && $relationship->contact_id_b == $sharedContact->employer_id) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
         }
+
       }
     }
     return $relationship;
@@ -1462,12 +1466,17 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     // CRM-15829 UPDATES
     // If we're looking for active memberships we must consider pending (id: 5) ones too.
     // Hence we can't just call CRM_Member_BAO_Membership::getValues below with the active flag, is it would completely miss pending relatioships.
+    // As suggested by @davecivicrm, the pending status id is fetched using the CRM_Member_PseudoConstant::membershipStatus() class and method, since these ids differ from system to system.
+    $pendingStatusId = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
+
     $query = 'SELECT * FROM `civicrm_membership_status`';
     if ($active) {
-      $query .= 'WHERE `is_current_member` = 1 OR `id` = 5';
+      $query .= 'WHERE `is_current_member` = 1 OR `id` = %1 ';
     }
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $params[1] = array($pendingStatusId, 'String');
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+
     while ($dao->fetch()) {
       $membershipStatusRecordIds[$dao->id] = $dao->id;
     }
