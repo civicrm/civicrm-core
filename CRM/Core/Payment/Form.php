@@ -260,12 +260,8 @@ class CRM_Core_Payment_Form {
       $form->assign('profileAddressFields', $profileAddressFields);
     }
 
-    // $processor->buildForm appears to be an undocumented (possibly unused) option for payment processors
-    // which was previously available only in some form flows
-    if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->isSupported('buildForm')) {
-      if ($form->_paymentProcessor['object']->buildForm($form)) {
-        return NULL;
-      }
+    if ($processor['object']->buildForm($form)) {
+      return NULL;
     }
 
     self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional));

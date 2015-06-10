@@ -1143,7 +1143,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params,
       CRM_Core_Config::singleton()->defaultCurrency
     );
-    $this->_params['payment_action'] = 'Sale';
+
     if (!empty($this->_params['receive_date'])) {
       $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['receive_date'], $this->_params['receive_date_time']);
     }

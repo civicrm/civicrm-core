@@ -534,7 +534,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $formValues['total_amount'];
       $this->_params['currencyID'] = $config->defaultCurrency;
-      $this->_params['payment_action'] = 'Sale';
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
 
       // at this point we've created a contact and stored its address etc
