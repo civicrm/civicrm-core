@@ -631,7 +631,7 @@ WHERE  v.option_group_id = g.id
                  'description',
                ) as $fld) {
         $row[$fld] = $dao->$fld;
-      if ($localize && in_array($fld, array('label', 'description'))) {
+        if ($localize && in_array($fld, array('label', 'description'))) {
           $row[$fld] = ts($row[$fld]);
         }
       }
