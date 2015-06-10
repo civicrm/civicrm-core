@@ -491,6 +491,65 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get base url dependent on component.
+   *
+   * @return string|void
+   */
+  protected function getBaseReturnUrl() {
+    if ($this->_component == 'event') {
+      $baseURL = 'civicrm/event/register';
+    }
+    else {
+      $baseURL = 'civicrm/contribute/transact';
+    }
+    return $baseURL;
+  }
+
+  /**
+   * Get url to return to after cancelled or failed transaction
+   *
+   * @param $qfKey
+   * @param $participantID
+   *
+   * @return string cancel url
+   */
+  protected function getCancelUrl($qfKey, $participantID) {
+    if ($this->_component == 'event') {
+      return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+        'reset' => 1,
+        'cc' => 'fail',
+        'participantId' => $participantID,
+      ),
+        TRUE, NULL, FALSE
+      );
+    }
+
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+      '_qf_Main_display' => 1,
+      'qfKey' => $qfKey,
+      'cancel' => 1,
+    ),
+      TRUE, NULL, FALSE
+    );
+  }
+
+  /**
+   * Get URL to return the browser to on success
+   *
+   * @param $qfKey
+   *
+   * @return string
+   */
+  protected function getReturnSuccessUrl($qfKey) {
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+      '_qf_ThankYou_display' => 1,
+      'qfKey' => $qfKey
+    ),
+      TRUE, NULL, FALSE
+    );
+  }
+
+  /**
    * Calling this from outside the payment subsystem is deprecated - use doPayment.
    *
    * Does a server to server payment transaction.

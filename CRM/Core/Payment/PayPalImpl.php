@@ -99,6 +99,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       if ($this->_processorName == 'PayPal Express') {
         CRM_Core_Region::instance('billing-block-post')->add(array(
           'template' => 'CRM/Financial/Form/PaypalExpress.tpl',
+          'name' => 'paypal_express',
         ));
       }
       if ($this->_processorName == 'PayPal Pro') {
@@ -143,13 +144,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $this->initialize($args, 'SetExpressCheckout');
 
-    $args['paymentAction'] = $params['payment_action'];
+    $args['paymentAction'] = 'Sale';
     $args['amt'] = $params['amount'];
     $args['currencyCode'] = $params['currencyID'];
     $args['desc'] = CRM_Utils_Array::value('description', $params);
     $args['invnum'] = $params['invoiceID'];
-    $args['returnURL'] = $params['returnURL'];
-    $args['cancelURL'] = $params['cancelURL'];
+    $args['returnURL'] = $this->getReturnSuccessUrl($params['qfKey']);
+    $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], NULL);
     $args['version'] = '56.0';
 
     //LCD if recurring, collect additional data and set some values
@@ -230,15 +231,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args = array();
 
     $this->initialize($args, 'DoExpressCheckoutPayment');
-
     $args['token'] = $params['token'];
-    $args['paymentAction'] = $params['payment_action'];
+    $args['paymentAction'] = 'Sale';
     $args['amt'] = $params['amount'];
     $args['currencyCode'] = $params['currencyID'];
     $args['payerID'] = $params['payer_id'];
     $args['invnum'] = $params['invoiceID'];
-    $args['returnURL'] = CRM_Utils_Array::value('returnURL', $params);
-    $args['cancelURL'] = CRM_Utils_Array::value('cancelURL', $params);
+    $args['returnURL'] = $this->getReturnSuccessUrl($params['qfKey']);
+    $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], NULL);
     $args['desc'] = $params['description'];
 
     // add CiviCRM BN code
@@ -280,7 +280,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $start_date = date('Y-m-d\T00:00:00\Z', $start_time);
 
     $args['token'] = $params['token'];
-    $args['paymentAction'] = $params['payment_action'];
+    $args['paymentAction'] = 'Sale';
     $args['amt'] = $params['amount'];
     $args['currencyCode'] = $params['currencyID'];
     $args['payerID'] = $params['payer_id'];
@@ -354,7 +354,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $this->initialize($args, 'DoDirectPayment');
 
-    $args['paymentAction'] = $params['payment_action'];
+    $args['paymentAction'] = 'Sale';
     $args['amt'] = $params['amount'];
     $args['currencyCode'] = $params['currencyID'];
     $args['invnum'] = $params['invoiceID'];
