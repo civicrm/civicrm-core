@@ -303,7 +303,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    */
   public function browse($action = NULL) {
     $ufGroup = array();
-    $allUFGroups = array();
     $allUFGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup();
     if (empty($allUFGroups)) {
       return;
@@ -342,35 +341,15 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       }
 
       $groupTypes = self::extractGroupTypes($value['group_type']);
-      $groupComponents = array('Contribution', 'Membership', 'Activity', 'Participant', 'Case');
 
-      // drop Create, Edit and View mode links if profile group_type is Contribution, Membership, Activities or Participant
+      // drop Create, Edit and View mode links if profile group_type is one of the following:
+      $groupComponents = array('Contribution', 'Membership', 'Activity', 'Participant', 'Case');
       $componentFound = array_intersect($groupComponents, array_keys($groupTypes));
       if (!empty($componentFound)) {
         $action -= CRM_Core_Action::ADD;
       }
 
-      $groupTypesString = '';
-      if (!empty($groupTypes)) {
-        $groupTypesStrings = array();
-        foreach ($groupTypes as $groupType => $typeValues) {
-          if (is_array($typeValues)) {
-            if ($groupType == 'Participant') {
-              foreach ($typeValues as $subType => $subTypeValues) {
-                $groupTypesStrings[] = $subType . '::' . implode(': ', $subTypeValues);
-              }
-            }
-            else {
-              $groupTypesStrings[] = $groupType . '::' . implode(': ', current($typeValues));
-            }
-          }
-          else {
-            $groupTypesStrings[] = $groupType;
-          }
-        }
-        $groupTypesString = implode(', ', $groupTypesStrings);
-      }
-      $ufGroup[$id]['group_type'] = $groupTypesString;
+      $ufGroup[$id]['group_type'] = self::formatGroupTypes($groupTypes);
 
       $ufGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         array('id' => $id),
@@ -499,6 +478,37 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       }
     }
     return $returnGroupTypes;
+  }
+
+  /**
+   * Format 'group_type' field for display
+   *
+   * @param array $groupTypes
+   *   output from self::extractGroupTypes
+   * @return string
+   */
+  public static function formatGroupTypes($groupTypes) {
+    $groupTypesString = '';
+    if (!empty($groupTypes)) {
+      $groupTypesStrings = array();
+      foreach ($groupTypes as $groupType => $typeValues) {
+        if (is_array($typeValues)) {
+          if ($groupType == 'Participant') {
+            foreach ($typeValues as $subType => $subTypeValues) {
+              $groupTypesStrings[] = $subType . '::' . implode(': ', $subTypeValues);
+            }
+          }
+          else {
+            $groupTypesStrings[] = $groupType . '::' . implode(': ', current($typeValues));
+          }
+        }
+        else {
+          $groupTypesStrings[] = $groupType;
+        }
+      }
+      $groupTypesString = implode(', ', $groupTypesStrings);
+    }
+    return $groupTypesString;
   }
 
 }
