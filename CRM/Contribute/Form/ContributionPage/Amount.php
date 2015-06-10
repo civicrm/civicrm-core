@@ -652,7 +652,7 @@ SELECT id
               if (!$priceFieldID = CRM_Utils_Array::value('id', $editedResults)) {
                 $fieldParams = array(
                   'name' => 'other_amount',
-                  'label' => 'Other Amount',
+                  'label' => ts('Other Amount'),
                   'price_set_id' => $priceSetId,
                   'html_type' => 'Text',
                   'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $this->_values),
@@ -667,7 +667,7 @@ SELECT id
                 }
                 else {
                   $fieldParams['is_required'] = 0;
-                  $fieldParams['option_label'][1] = $fieldParams['label'] = 'Other Amount';
+                  $fieldParams['option_label'][1] = $fieldParams['label'] = ts('Other Amount');
                 }
 
                 $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
@@ -705,7 +705,7 @@ SELECT id
               }
               else {
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceField', $priceFieldID, 'is_required', 0);
-                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', 'Other Amount');
+                CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', ts('Other Amount'));
               }
             }
           }
