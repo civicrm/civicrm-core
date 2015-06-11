@@ -384,7 +384,9 @@ class CRM_Utils_REST {
       return $result;
     }
 
-    if ($_SERVER['REQUEST_METHOD'] == 'GET' && strtolower(substr($args[2], 0, 3)) != 'get') {
+    if ($_SERVER['REQUEST_METHOD'] == 'GET' &&
+       strtolower(substr($args[2], 0, 3)) != 'get' &&
+       strtolower($args[2] != 'check')) {
       // get only valid for non destructive methods
       require_once 'api/v3/utils.php';
       return civicrm_api3_create_error("SECURITY: All requests that modify the database must be http POST, not GET.",
