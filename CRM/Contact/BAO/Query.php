@@ -4192,6 +4192,7 @@ civicrm_relationship.is_permission_a_b = 0
       $whereClause = '';
       if (!empty($where[$grouping])) {
         $whereClause = ' WHERE ' . implode(' AND ', $where[$grouping]);
+        $whereClause = str_replace('contact_b', 'c', $whereClause);
       }
       $sql = "
         CREATE TEMPORARY TABLE {$relationshipTempTable}
