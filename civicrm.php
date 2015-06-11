@@ -113,7 +113,9 @@ class CiviCRM_For_WordPress {
    * Declare our properties
    */
 
-  // plugin instance
+  /**
+   * @var CiviCRM_For_WordPress
+   */
   private static $instance;
 
   // plugin context (broad)
@@ -122,16 +124,24 @@ class CiviCRM_For_WordPress {
   // plugin context (specific)
   static $context;
 
-  // shortcodes object
+  /**
+   * @var CiviCRM_For_WordPress_Shortcodes
+   */
   public $shortcodes;
 
-  // shortcodes modal object
+  /**
+   * @var CiviCRM_For_WordPress_Shortcodes_Modal
+   */
   public $modal;
 
-  // basepage object
+  /**
+   * @var CiviCRM_For_WordPress_Basepage
+   */
   public $basepage;
 
-  // users object
+  /**
+   * @var CiviCRM_For_WordPress_Users
+   */
   public $users;
 
 
@@ -348,7 +358,8 @@ class CiviCRM_For_WordPress {
    * (c) 'nonpage'
    * (d) 'shortcode'
    *
-   * @param $context One of the four context codes above
+   * @param string $context
+   *   One of the four context codes above
    * @return void
    */
   public function civicrm_context_set( $context ) {
@@ -364,7 +375,8 @@ class CiviCRM_For_WordPress {
    *
    * @see $this->civicrm_context_set()
    *
-   * @return string $context The context in which Civi is displayed in WordPress
+   * @return string
+   *   The context in which Civi is displayed in WordPress
    */
   public function civicrm_context_get() {
 
@@ -506,6 +518,9 @@ class CiviCRM_For_WordPress {
 
     // set page title
     add_filter( 'admin_title', array( $this, 'set_admin_title' ) );
+
+    // print CiviCRM's header
+    add_action('admin_head', array( $this, 'wp_head' ), 50);
 
     // if settings file does not exist, show notice with link to installer
     if ( ! CIVICRM_INSTALLED ) {
@@ -726,9 +741,6 @@ class CiviCRM_For_WordPress {
 
       // add core resources prior to page load
       add_action( 'load-' . $menu_page, array( $this, 'admin_page_load' ) );
-
-      // add CiviCRM scripts and styles to admin head
-      add_action( 'admin_head-' . $menu_page, array( $this, 'wp_head' ), 50 );
 
     } else {
 
