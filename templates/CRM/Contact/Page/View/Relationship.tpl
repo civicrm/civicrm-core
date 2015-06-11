@@ -58,8 +58,8 @@
     CRM.$(function($) {
       // Changing relationships may affect related members and contributions. Ensure they are refreshed.
       $('#contact-summary-relationship-tab').on('crmPopupFormSuccess', function() {
-        CRM.tabHeader.resetTab('tab_contribute');
-        CRM.tabHeader.resetTab('tab_member');
+        CRM.tabHeader.resetTab('#tab_contribute');
+        CRM.tabHeader.resetTab('#tab_member');
       });
     });
   </script>
