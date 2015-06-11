@@ -58,8 +58,12 @@
     CRM.$(function($) {
       // Changing relationships may affect related members and contributions. Ensure they are refreshed.
       $('#contact-summary-relationship-tab').on('crmPopupFormSuccess', function() {
-        CRM.tabHeader.resetTab('tab_contribute');
-        CRM.tabHeader.resetTab('tab_member');
+        CRM.tabHeader.resetTab('#tab_contribute');
+        CRM.tabHeader.resetTab('#tab_member');
+        $.getJSON(CRM.url('civicrm/contact/view/membership', {reset: 1, force: 1, snippet:'json', cid: {/literal}{$contactId}{literal}})).done(function ( response ) {
+          CRM.tabHeader.updateCount($('#tab_member'), response.tabCount);
+          CRM.tabHeader.updateCount($('#tab_contribute'), response.updateTabs['#tab_contribute']);
+        });
       });
     });
   </script>
