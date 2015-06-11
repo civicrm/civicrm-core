@@ -159,6 +159,7 @@ function _civicrm_api3_generic_getlist_params(&$request) {
  *
  * @param array $result
  * @param array $request
+ * @param string $entity
  * @param array $fields
  *
  * @return array
