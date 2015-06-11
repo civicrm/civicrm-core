@@ -534,7 +534,7 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get URL to return the browser to on success
+   * Get URL to return the browser to on success.
    *
    * @param $qfKey
    *
@@ -547,6 +547,66 @@ abstract class CRM_Core_Payment {
     ),
       TRUE, NULL, FALSE
     );
+  }
+
+  /**
+   * Get URL to return the browser to on failure.
+   *
+   * @param string $key
+   * @param int $participantID
+   * @param int $eventID
+   *
+   * @return string
+   *   URL for a failing transactor to be redirected to.
+   */
+  protected function getReturnFailUrl($key, $participantID = NULL, $eventID = NULL) {
+    $test =  $this->_is_test ? '&action=preview' : '';
+    if ($this->_component == "event") {
+      return CRM_Utils_System::url('civicrm/event/register',
+        "reset=1&cc=fail&participantId={$participantID}&id={$eventID}{$test}&qfKey={$key}",
+        FALSE, NULL, FALSE
+      );
+    }
+    else {
+      return CRM_Utils_System::url('civicrm/contribute/transact',
+        "_qf_Main_display=1&cancel=1&qfKey={$key}{$test}",
+        FALSE, NULL, FALSE
+      );
+    }
+  }
+
+  /**
+   * Get URl for when the back button is pressed.
+   *
+   * @param $qfKey
+   *
+   * @return string url
+   */
+  protected function getGoBackUrl($qfKey) {
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+      '_qf_Confirm_display' => 'true',
+      'qfKey' => $qfKey
+    ),
+      TRUE, NULL, FALSE
+    );
+  }
+
+  /**
+   * Get the notify (aka ipn, web hook or silent post) url.
+   *
+   * If there is no '.' in it we assume that we are dealing with localhost or
+   * similar and it is unreachable from the web & hence invalid.
+   *
+   * @return string
+   *   URL to notify outcome of transaction.
+   */
+  protected function getNotifyUrl() {
+    $url = CRM_Utils_System::url(
+      'civicrm/payment/ipn/' . $this->_paymentProcessor['id'],
+      array(),
+      TRUE
+    );
+    return (stristr($url, '.')) ? $url : '';
   }
 
   /**
