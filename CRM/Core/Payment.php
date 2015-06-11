@@ -543,7 +543,7 @@ abstract class CRM_Core_Payment {
   protected function getReturnSuccessUrl($qfKey) {
     return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
       '_qf_ThankYou_display' => 1,
-      'qfKey' => $qfKey
+      'qfKey' => $qfKey,
     ),
       TRUE, NULL, FALSE
     );
