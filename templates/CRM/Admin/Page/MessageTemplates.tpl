@@ -101,7 +101,12 @@
           <div class="help">
           {if $type eq 'userTemplates'}
             {capture assign=schedRemURL}{crmURL p='civicrm/admin/scheduleReminders' q="reset=1"}{/capture}
-            {ts 1=$schedRemURL}User-driven message templates allow you to save and re-use messages with layouts. They are useful if you need to send similar emails or letters to contacts on a recurring basis. You can also use them in CiviMail mailings. Messages used for membership renewal reminders, as well as event and activity related reminders should be created via <a href="%1">Scheduled Reminders</a>.{/ts} {help id="id-intro"}
+            {ts 1=$schedRemURL}Message templates allow you to easily create similar emails or letters on a recurring basis. Messages used for membership renewal reminders, as well as event and activity related reminders should be created via <a href="%1">Schedule Reminders</a>.{/ts}
+            {if array_search('CiviMail', $config->enableComponents)}
+              {capture assign=automatedMsgURL}{crmURL p='civicrm/admin/component' q="reset=1"}{/capture}
+              {ts 1=$automatedMsgURL}You can also use message templates for CiviMail (bulk email) content. However, subscribe, unsubscribe and opt-out messages are configured at <a href="%1">Administer > CiviMail > Headers, Footers and Automated Messages</a>.{/ts}
+            {/if}
+            {help id="id-intro"}
           {else}
             {ts}System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts} {help id="id-system-workflow"}
           {/if}
