@@ -748,13 +748,19 @@ ORDER BY parent_id, weight";
 
     // this means node is moved to last position, so you need to get the weight of last element + 1
     if (!$newWeight) {
-      $lastPosition = $position - 1;
-      $sql = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
-      $params = array(1 => array($lastPosition, 'Positive'));
-      $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
+      // If this is not the first item being added to a parent
+      if ($position) {
+        $lastPosition = $position - 1;
+        $sql = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
+        $params = array(1 => array($lastPosition, 'Positive'));
+        $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
 
-      // since last node increment + 1
-      $newWeight = $newWeight + 1;
+        // since last node increment + 1
+        $newWeight = $newWeight + 1;
+      }
+      else {
+        $newWeight = '0';
+      }
 
       // since this is a last node we don't need to increment other nodes
       $incrementOtherNodes = FALSE;
