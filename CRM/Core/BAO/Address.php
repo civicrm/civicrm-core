@@ -1162,8 +1162,7 @@ SELECT is_primary,
 
     // If already there is a relationship record of $relParam criteria, avoid creating relationship again or else
     // it will casue CRM-16588 as the Duplicate Relationship Exception will revert other contact field values on update
-    $relationship = civicrm_api3('relationship', 'get', $relParam);
-    if (!empty($relationship['values'])) {
+    if (CRM_Contact_BAO_Relationship::checkDuplicateRelationship($relParam, $currentContactId, $sharedContactId)) {
       return;
     }
 
