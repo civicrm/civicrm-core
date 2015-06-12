@@ -560,7 +560,7 @@ abstract class CRM_Core_Payment {
    *   URL for a failing transactor to be redirected to.
    */
   protected function getReturnFailUrl($key, $participantID = NULL, $eventID = NULL) {
-    $test =  $this->_is_test ? '&action=preview' : '';
+    $test = $this->_is_test ? '&action=preview' : '';
     if ($this->_component == "event") {
       return CRM_Utils_System::url('civicrm/event/register',
         "reset=1&cc=fail&participantId={$participantID}&id={$eventID}{$test}&qfKey={$key}",
@@ -585,7 +585,7 @@ abstract class CRM_Core_Payment {
   protected function getGoBackUrl($qfKey) {
     return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
       '_qf_Confirm_display' => 'true',
-      'qfKey' => $qfKey
+      'qfKey' => $qfKey,
     ),
       TRUE, NULL, FALSE
     );
