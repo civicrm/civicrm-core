@@ -203,8 +203,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'table_name'
       );
 
-      //CRM-16659: if option_value then create an option group for the field.
-      if ($params['option_type'] == 1 && !empty($params['option_value'])) {
+      //CRM-16659: if option_value then create an option group for this custom field.
+      if ($params['option_type'] == 1 && (empty($params['option_group_id']) || !empty($params['option_value']))) {
         // first create an option group for this custom group
         $optionGroup = new CRM_Core_DAO_OptionGroup();
         $optionGroup->name = "{$columnName}_" . date('YmdHis');
