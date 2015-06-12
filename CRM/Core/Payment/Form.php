@@ -260,7 +260,7 @@ class CRM_Core_Payment_Form {
       $form->assign('profileAddressFields', $profileAddressFields);
     }
 
-    if ($processor['object']->buildForm($form)) {
+    if (!empty($processor['object']) && $processor['object']->buildForm($form)) {
       return NULL;
     }
 
