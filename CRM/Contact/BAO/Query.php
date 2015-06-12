@@ -2081,35 +2081,18 @@ class CRM_Contact_BAO_Query {
         TRUE
       );
     }
-    elseif ($name === 'birth_date') {
-      $date = CRM_Utils_Date::processDate($value);
-      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
-
-      if ($date) {
-        $date = CRM_Utils_Date::customFormat($date);
-        $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
-      }
-      else {
-        $this->_qill[$grouping][] = "$field[title] $op";
-      }
-      self::$_openedPanes[ts('Demographics')] = TRUE;
-    }
-    elseif ($name === 'deceased_date') {
-      $date = CRM_Utils_Date::processDate($value);
-      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
-      if ($date) {
-        $date = CRM_Utils_Date::customFormat($date);
-        $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
-      }
-      else {
-        $this->_qill[$grouping][] = "$field[title] $op";
-      }
-      self::$_openedPanes[ts('Demographics')] = TRUE;
-    }
     elseif ($name === 'is_deceased') {
       $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $value);
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
       self::$_openedPanes[ts('Demographics')] = TRUE;
+    }
+    elseif ($name === 'created_date' || $name === 'modified_date' || $name === 'deceased_date' || $name === 'birth_date') {
+      $appendDateTime = TRUE;
+      if ($name === 'deceased_date' || $name === 'birth_date') {
+        $appendDateTime = FALSE;
+        self::$_openedPanes[ts('Demographics')] = TRUE;
+      }
+      $this->dateQueryBuilder($values, 'contact_a', $name, $name, $field['title'], $appendDateTime);
     }
     elseif ($name === 'contact_id') {
       if (is_int($value)) {
@@ -2185,7 +2168,45 @@ class CRM_Contact_BAO_Query {
       $this->_where[$grouping][] = self::buildClause("contact_a.is_deleted", $op, $value);
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
-    else {
+    elseif (!empty($field['where'])) {
+      $type = NULL;
+      if (!empty($field['type'])) {
+        $type = CRM_Utils_Type::typeToString($field['type']);
+      }
+
+      list($tableName, $fieldName) = explode('.', $field['where'], 2);
+
+      if (isset($locType[1]) &&
+        is_numeric($locType[1])
+      ) {
+        $setTables = FALSE;
+
+        //get the location name
+        list($tName, $fldName) = self::getLocationTableName($field['where'], $locType);
+
+        $fieldName = "LOWER(`$tName`.$fldName)";
+
+        // we set both _tables & whereTables because whereTables doesn't seem to do what the name implies it should
+        $this->_tables[$tName] = $this->_whereTables[$tName] = 1;
+
+      }
+      else {
+        if ($tableName == 'civicrm_contact') {
+          $fieldName = "LOWER(contact_a.{$fieldName})";
+        }
+        else {
+          if ($op != 'IN' && !is_numeric($value)) {
+            $fieldName = "LOWER({$field['where']})";
+          }
+          else {
+            $fieldName = "{$field['where']}";
+          }
+        }
+      }
+
+      list($qillop, $qillVal) = self::buildQillForFieldValue(NULL, $field['title'], $value, $op);
+      $this->_qill[$grouping][] = "$field[title] $qillop '$qillVal'";
+
       if (is_array($value)) {
         // traditionally an array being passed has been a fatal error. We can take advantage of this to add support
         // for api style operators for functions that hit this point without worrying about regression
@@ -2194,16 +2215,20 @@ class CRM_Contact_BAO_Query {
         $operations = array_keys($value);
         foreach ($operations as $operator) {
           if (!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
+            //Via Contact get api value is not in array(operator => array(values)) format ONLY for IN/NOT IN operators
+            //so this condition will satisfy the search for now
+            if (strstr('IN', $op)) {
+              $value = array($op => $value);
+            }
             // we don't know when this might happen
-            CRM_Core_Error::fatal();
+            else {
+              CRM_Core_Error::fatal(ts("%1 is not a valid operator", array(1 => $operator)));
+            }
           }
         }
-        $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($name, $value, NULL);
-        //since this is not currently being called by the form layer we can skip worrying about the 'qill' for now
-        return;
+        $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($fieldName, $value, $type);
       }
-
-      if (!empty($field['where'])) {
+      else {
         if ($op != 'IN') {
           $value = $strtolower($value);
         }
@@ -2212,43 +2237,7 @@ class CRM_Contact_BAO_Query {
           $op = 'LIKE';
         }
 
-        if (isset($locType[1]) &&
-          is_numeric($locType[1])
-        ) {
-          $setTables = FALSE;
-
-          //get the location name
-          list($tName, $fldName) = self::getLocationTableName($field['where'], $locType);
-
-          $where = "`$tName`.$fldName";
-
-          $this->_where[$grouping][] = self::buildClause("LOWER($where)", $op, $value);
-          // we set both _tables & whereTables because whereTables doesn't seem to do what the name implies it should
-          $this->_tables[$tName] = $this->_whereTables[$tName] = 1;
-          $this->_qill[$grouping][] = "$field[title] $op '$value'";
-        }
-        else {
-          list($tableName, $fieldName) = explode('.', $field['where'], 2);
-          if ($tableName == 'civicrm_contact') {
-            $fieldName = "LOWER(contact_a.{$fieldName})";
-          }
-          else {
-            if ($op != 'IN' && !is_numeric($value)) {
-              $fieldName = "LOWER({$field['where']})";
-            }
-            else {
-              $fieldName = "{$field['where']}";
-            }
-          }
-
-          $type = NULL;
-          if (!empty($field['type'])) {
-            $type = CRM_Utils_Type::typeToString($field['type']);
-          }
-
-          $this->_where[$grouping][] = self::buildClause($fieldName, $op, $value, $type);
-          $this->_qill[$grouping][] = "$field[title] $op $value";
-        }
+        $this->_where[$grouping][] = self::buildClause($fieldName, $op, $value, $type);
       }
     }
 
@@ -4984,14 +4973,10 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
   ) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    if (!$value) {
-      return;
-    }
-
     if ($name == "{$fieldName}_low" ||
       $name == "{$fieldName}_high"
     ) {
-      if (isset($this->_rangeCache[$fieldName])) {
+      if (isset($this->_rangeCache[$fieldName]) || !$value) {
         return;
       }
       $this->_rangeCache[$fieldName] = 1;
@@ -5060,25 +5045,45 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     }
 
     if ($name == $fieldName) {
-      // $op = '=';
-      $phrase = $op;
-
-      $date = CRM_Utils_Date::processDate($value);
-
-      if (!$appendTimeStamp) {
-        $date = substr($date, 0, 8);
+      //In Get API, for operators other then '=' the $value is in array(op => value) format
+      if (is_array($value) && !empty($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $op = key($value);
+        $value = $value[$op];
       }
 
-      $format = CRM_Utils_Date::customFormat($date);
+      $date = $format = NULL;
+      if (strstr($op, 'IN')) {
+        $format = array();
+        foreach ($value as &$date) {
+          $date = CRM_Utils_Date::processDate($date);
+          if (!$appendTimeStamp) {
+            $date = substr($date, 0, 8);
+          }
+          $format[] = CRM_Utils_Date::customFormat($date);
+        }
+        $date = "('" . implode("','", $value) . "')";
+        $format = implode(', ', $format);
+      }
+      elseif ($value) {
+        $date = CRM_Utils_Date::processDate($value);
+        if (!$appendTimeStamp) {
+          $date = substr($date, 0, 8);
+        }
+        $format = CRM_Utils_Date::customFormat($date);
+        $date = "'$date'";
+      }
 
       if ($date) {
-        $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op '$date'";
+        $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op $date";
       }
       else {
         $this->_where[$grouping][] = "{$tableName}.{$dbFieldName} $op";
       }
+
       $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
-      $this->_qill[$grouping][] = "$fieldTitle - $phrase \"$format\"";
+
+      $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+      $this->_qill[$grouping][] = "$fieldTitle $op $format";
     }
   }
 
@@ -5681,7 +5686,7 @@ AND   displayRelType.is_active = 1
    *
    * @return array
    */
-  public static function buildQillForFieldValue($daoName, $fieldName, $fieldValue, $op, $pseduoExtraParam = array()) {
+  public static function buildQillForFieldValue($daoName = NULL, $fieldName, $fieldValue, $op, $pseduoExtraParam = array()) {
     $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();
 
     if ($fieldName == 'activity_type_id') {
@@ -5690,35 +5695,31 @@ AND   displayRelType.is_active = 1
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
       $pseduoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
     }
-    else {
+    elseif ($daoName) {
       $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
     }
 
-    //For those $fieldName which don't have any associated pseudoconstant defined
-    if (empty($pseduoOptions)) {
-      if (is_array($fieldValue)) {
-        $op = key($fieldValue);
-        $fieldValue = $fieldValue[$op];
-        if (is_array($fieldValue)) {
-          $fieldValue = implode(', ', $fieldValue);
-        }
-      }
+    //API usually have fieldValue format as array(operator => array(values)),
+    //so we need to separate operator out of fieldValue param
+    if (is_array($fieldValue) && in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($fieldValue);
+      $fieldValue = $fieldValue[$op];
     }
-    elseif (is_array($fieldValue)) {
+
+    if (is_array($fieldValue)) {
       $qillString = array();
-      if (in_array(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-        $op = key($fieldValue);
-        $fieldValue = $fieldValue[$op];
+      if (!empty($pseduoOptions)) {
+        foreach ((array) $fieldValue as $val) {
+          $qillString[] = $pseduoOptions[$val];
+        }
+        $fieldValue = implode(', ', $qillString);
       }
-      foreach ((array) $fieldValue as $val) {
-        $qillString[] = $pseduoOptions[$val];
+      else {
+        $fieldValue = implode(', ', $fieldValue);
       }
-      $fieldValue = implode(', ', $qillString);
     }
-    else {
-      if (array_key_exists($fieldValue, $pseduoOptions)) {
-        $fieldValue = $pseduoOptions[$fieldValue];
-      }
+    elseif (!empty($pseduoOptions) && array_key_exists($fieldValue, $pseduoOptions)) {
+      $fieldValue = $pseduoOptions[$fieldValue];
     }
 
     return array(CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue);
