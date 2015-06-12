@@ -227,12 +227,12 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
     //when the context is search add base group's.
     if ($this->_searchBasedMailing) {
-      //get the static groups
-      $staticGroups = CRM_Core_PseudoConstant::staticGroup(FALSE, 'Mailing');
+      //CRM-16600 Include Smart Groups in Unsubscribe list as that matches
+      //all other practices in CiviMail
       $this->add('select', 'baseGroup',
         ts('Unsubscription Group'),
         array(
-          '' => ts('- select -')) + $staticGroups,
+          '' => ts('- select -')) + $groups,
         TRUE
       );
     }
