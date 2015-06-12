@@ -185,7 +185,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       // call the function to create shared relationships
       // we only create create relationship if address is shared by Individual
-      if ($address->master_id != 'null') {
+      if (!CRM_Utils_System::isNull($address->master_id)) {
         self::processSharedAddressRelationship($address->master_id, $params);
       }
 
@@ -1115,9 +1115,6 @@ SELECT is_primary,
    * @return void
    */
   public static function processSharedAddressRelationship($masterAddressId, $params) {
-    if (!$masterAddressId) {
-      return;
-    }
     // get the contact type of contact being edited / created
     $currentContactType = CRM_Contact_BAO_Contact::getContactType($params['contact_id']);
     $currentContactId = $params['contact_id'];
@@ -1129,13 +1126,11 @@ SELECT is_primary,
 
     // get the contact id and contact type of shared contact
     // check the contact type of shared contact, return if it is of type Individual
-
     $query = 'SELECT cc.id, cc.contact_type
                  FROM civicrm_contact cc INNER JOIN civicrm_address ca ON cc.id = ca.contact_id
                  WHERE ca.id = %1';
 
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($masterAddressId, 'Integer')));
-
     $dao->fetch();
 
     // if current contact is not of type individual return, since we don't create relationship between
@@ -1150,25 +1145,30 @@ SELECT is_primary,
     if ($sharedContactType == 'Organization') {
       return CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($currentContactId, $sharedContactId);
     }
-    else {
-      // get the relationship type id of "Household Member of"
-      $relationshipType = 'Household Member of';
-    }
 
-    $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $relationshipType, 'id', 'name_a_b');
+    // get the relationship type id of "Household Member of"
+    $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Household Member of', 'id', 'name_a_b');
 
     if (!$relTypeId) {
-      CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type '%1'", array(1 => $relationshipType)));
+      CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type 'Household Member of'"));
+    }
+
+    $relParam = array(
+      'is_active' => TRUE,
+      'relationship_type_id' => $relTypeId,
+      'contact_id_a' => $currentContactId,
+      'contact_id_b' => $sharedContactId,
+    );
+
+    // If already there is a relationship record of $relParam criteria, avoid creating relationship again or else
+    // it will casue CRM-16588 as the Duplicate Relationship Exception will revert other contact field values on update
+    if (CRM_Contact_BAO_Relationship::checkDuplicateRelationship($relParam, $currentContactId, $sharedContactId)) {
+      return;
     }
 
     try {
       // create relationship
-      civicrm_api3('relationship', 'create', array(
-        'is_active' => TRUE,
-        'relationship_type_id' => $relTypeId,
-        'contact_id_a' => $currentContactId,
-        'contact_id_b' => $sharedContactId,
-      ));
+      civicrm_api3('relationship', 'create', $relParam);
     }
     catch (CiviCRM_API3_Exception $e) {
       // We catch and ignore here because this has historically been a best-effort relationship create call.
