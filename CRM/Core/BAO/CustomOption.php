@@ -137,7 +137,6 @@ class CRM_Core_BAO_CustomOption {
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
 
     $field = CRM_Core_BAO_CustomField::getFieldObject($params['fid']);
 
@@ -151,11 +150,7 @@ class CRM_Core_BAO_CustomOption {
     $params['total'] = CRM_Core_DAO::singleValueQuery($total, $queryParams);
 
     $limit = " LIMIT {$params['offset']}, {$params['rowCount']} ";
-
     $orderBy = ' ORDER BY options.weight asc';
-    if (!empty($params['sort'])) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
-    }
 
     $query = "SELECT * FROM civicrm_option_value as options WHERE option_group_id = %1 {$orderBy} {$limit}";
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);

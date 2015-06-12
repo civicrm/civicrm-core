@@ -43,23 +43,9 @@ class CRM_Custom_Page_AJAX {
   public static function getOptionList() {
     $params = $_REQUEST;
 
-    $sortMapper = array(
-      0 => 'options.label',
-      1 => 'options.value',
-      2 => '',
-      3 => '',
-      4 => '',
-    );
-
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
     $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
-
-    if ($sort && $sortOrder) {
-      $params['sortBy'] = $sort . ' ' . $sortOrder;
-    }
 
     $params['page'] = ($offset / $rowCount) + 1;
     $params['rp'] = $rowCount;
@@ -116,6 +102,7 @@ class CRM_Custom_Page_AJAX {
                   OR id = $endid";
     }
     CRM_Core_DAO::executeQuery($updateRows, $queryParams);
+    CRM_Utils_JSON::output(TRUE);
   }
 
 }

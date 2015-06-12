@@ -43,7 +43,7 @@
             <th class='crm-custom_option-label'>{ts}Label{/ts}</th>
             <th class='crm-custom_option-value'>{ts}Value{/ts}</th>
             <th class='crm-custom_option-default_value'>{ts}Default{/ts}</th>
-            <th class='crm-custom_option-is_active  nosort'>{ts}Enabled?{/ts}</th>
+            <th class='crm-custom_option-is_active'>{ts}Enabled?{/ts}</th>
             <th class='crm-custom_option-links'>&nbsp;</th>
             <th class='hiddenElement'>&nbsp;</th>
           </tr>
@@ -69,10 +69,10 @@
               "aoColumns"  : [
                               {sClass:'crm-custom_option-label'},
                               {sClass:'crm-custom_option-value'},
-                              {sClass:'crm-custom_option-default_value', bSortable:false},
-                              {sClass:'crm-custom_option-is_active', bSortable:false},
-                              {sClass:'crm-custom_option-links', bSortable:false},
-                              {sClass:'hiddenElement', bSortable:false}
+                              {sClass:'crm-custom_option-default_value'},
+                              {sClass:'crm-custom_option-is_active'},
+                              {sClass:'crm-custom_option-links'},
+                              {sClass:'hiddenElement'}
                              ],
               "bProcessing": true,
               "asStripClasses" : [ "odd-row", "even-row" ],
@@ -80,6 +80,7 @@
               "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
               "bServerSide": true,
               "bJQueryUI": true,
+              "bSort" : false,
               "sAjaxSource": sourceUrl,
               "iDisplayLength": 10,
               "oLanguage": {
@@ -98,7 +99,8 @@
                 var id = $('td:last', nRow).text().split(',')[0];
                 var cl = $('td:last', nRow).text().split(',')[1];
                 $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
-                $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-label" />');
+                $('td:eq(0)', nRow).wrapInner('<div class="crm-editable crmf-label" />');
+                $('td:eq(0)', nRow).prepend('<div style="cursor:move" class="icon ui-icon-grip-dotted-vertical">');
                 $('td:eq(2)', nRow).addClass('crmf-default_value');
                 return nRow;
               },
@@ -119,11 +121,13 @@
           });
         }
 
+
         var startPosition;
         var endPosition;
         var gid = {/literal}'{$optionGroupID}'{literal};
 
         $("table.crm-option-selector tbody").sortable({
+          handle: ".ui-icon-grip-dotted-vertical",
           cursor: "move",
           start:function(event, ui) {
             var oSettings = $('table.crm-option-selector').dataTable().fnSettings();
@@ -141,6 +145,10 @@
               end: endPosition,
               gid: gid
             })
+            .success(function() {
+              oSettings.oApi._fnDraw(oSettings);
+              CRM.status(ts('Saved'));
+            });
           }
         });
       });
