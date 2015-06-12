@@ -146,8 +146,7 @@ class CRM_Core_Page_AJAX_Location {
         $elements["onbehalf_{$field}-{$locTypeId}"] = array(
           'type' => $type,
           'value' => isset($location['address'][1]) ? CRM_Utils_Array::value($addField,
-            $location['address'][1]) :
-        NULL,
+            $location['address'][1]) : NULL,
         );
         unset($profileFields["{$field}-{$locTypeId}"]);
       }
