@@ -99,8 +99,8 @@
                 var id = $('td:last', nRow).text().split(',')[0];
                 var cl = $('td:last', nRow).text().split(',')[1];
                 $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
-                $('td:eq(0)', nRow).wrapInner('<div class="crm-editable crmf-label" />');
-                $('td:eq(0)', nRow).prepend('<div style="cursor:move" class="icon ui-icon-grip-dotted-vertical">');
+                $('td:eq(0)', nRow).wrapInner('<div style="margin-left: 10px;" class="crm-editable crmf-label" />');
+                $('td:eq(0)', nRow).prepend('<div style="cursor:move; position: relative; left: -7px;" class="icon ui-icon-arrowthick-2-n-s" />');
                 $('td:eq(2)', nRow).addClass('crmf-default_value');
                 return nRow;
               },
@@ -127,7 +127,7 @@
         var gid = {/literal}'{$optionGroupID}'{literal};
 
         $("table.crm-option-selector tbody").sortable({
-          handle: ".ui-icon-grip-dotted-vertical",
+          handle: ".ui-icon-arrowthick-2-n-s",
           cursor: "move",
           start:function(event, ui) {
             var oSettings = $('table.crm-option-selector').dataTable().fnSettings();
@@ -139,15 +139,16 @@
             var index = oSettings._iDisplayStart;
             endPosition = index + ui.item.prevAll().length + 1;
 
-            $.getJSON(CRM.url('civicrm/ajax/reorder'), {
+            CRM.status({}, $.getJSON(CRM.url('civicrm/ajax/reorder'), {
               returnFormat:'JSON',
               start:startPosition,
               end: endPosition,
               gid: gid
-            })
+            }))
             .success(function() {
-              oSettings.oApi._fnDraw(oSettings);
-              CRM.status(ts('Saved'));
+              $("table.crm-option-selector tbody tr").each(function(i) {
+                $(this).removeClass('odd even').addClass(i % 2 ? 'even' : 'odd');
+              });
             });
           }
         });
