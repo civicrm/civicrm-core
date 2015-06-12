@@ -1088,7 +1088,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @return int|mixed|null|string
    */
   public static function computeAmount($params, $formValues) {
-
+    $amount = 0;
     // First clean up the other amount field if present.
     if (isset($params['amount_other'])) {
       $params['amount_other'] = CRM_Utils_Rule::cleanMoney($params['amount_other']);
@@ -1098,7 +1098,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $amount = $params['amount_other'];
     }
     elseif (!empty($params['pledge_amount'])) {
-      $amount = 0;
       foreach ($params['pledge_amount'] as $paymentId => $dontCare) {
         $amount += CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment', $paymentId, 'scheduled_amount');
       }
