@@ -96,11 +96,11 @@
       minimumInputLength: 1,
       ajax: {
         url: pcpURL,
-        data: function(term) {
-          return {term: term};
+        data: function(term, page) {
+          return {term: term, page: page};
         },
         results: function(response) {
-          return {results: response};
+          return response;
         }
       },
       initSelection: function(el, callback) {
