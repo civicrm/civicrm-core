@@ -1137,7 +1137,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if ($this->_values['event']['is_monetary']) {
         $params['ip_address'] = CRM_Utils_System::ipAddress();
         $params['currencyID'] = $config->defaultCurrency;
-        $params['payment_action'] = 'Sale';
         $params['invoiceID'] = $invoiceID;
       }
       $this->_params = $this->get('params');
@@ -1186,9 +1185,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             TRUE, NULL, FALSE
           );
           $params['invoiceID'] = $invoiceID;
-
-          //default action is Sale
-          $params['payment_action'] = 'Sale';
 
           $token = $payment->setExpressCheckout($params);
           if (is_a($token, 'CRM_Core_Error')) {

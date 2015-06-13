@@ -387,30 +387,7 @@
   {/if}
   {literal}
 
-  function toggleConfirmButton() {
-    var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
-    var elementObj = cj('input[name="payment_processor"]');
-    if ( elementObj.attr('type') == 'hidden' ) {
-      var processorTypeId = elementObj.val( );
-    }
-    else {
-      var processorTypeId = elementObj.filter(':checked').val();
-    }
-
-    if (payPalExpressId !=0 && payPalExpressId == processorTypeId) {
-      cj("#crm-submit-buttons").hide();
-    }
-    else {
-      cj("#crm-submit-buttons").show();
-    }
-  }
-
-  cj('input[name="payment_processor"]').change( function() {
-    toggleConfirmButton();
-  });
-
   CRM.$(function($) {
-    toggleConfirmButton();
     enableHonorType();
     showRecurHelp();
     skipPaymentMethod();

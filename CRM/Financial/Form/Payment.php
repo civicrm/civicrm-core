@@ -49,11 +49,6 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID, 'unused');
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
-    //@todo - figure out how to deal with payment express.
-    //get payPal express id and make it available to template
-    //$payPalExpressId = ($values['payment_processor_type'] == 'PayPal_Express') ? $values['id'] : 0;
-    // $this->assign('payPalExpressId', $payPalExpressId);
-
     self::addCreditCardJs();
 
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
