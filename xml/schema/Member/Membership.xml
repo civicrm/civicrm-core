@@ -219,7 +219,7 @@
   </field>
   <field>
     <name>contribution_recur_id</name>
-    <title>Memberhip Recurring Contribution</title>
+    <title>Membership Recurring Contribution</title>
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_contribution_recur id. Each membership in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.</comment>
     <add>3.3</add>
