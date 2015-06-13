@@ -246,8 +246,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // we use this here to incorporate any changes made by folks in hooks
         $this->_params['currencyID'] = $config->defaultCurrency;
 
-        $this->_params['payment_action'] = 'Sale';
-
         // also merge all the other values from the profile fields
         $values = $this->controller->exportValues('Main');
         $skipFields = array(
@@ -296,7 +294,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->setFormAmountFields($this->_params['priceSetId']);
       }
       $this->_params['currencyID'] = $config->defaultCurrency;
-      $this->_params['payment_action'] = 'Sale';
     }
 
     $this->_params['is_pay_later'] = $this->get('is_pay_later');

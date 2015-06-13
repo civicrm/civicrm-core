@@ -103,7 +103,6 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     /* unused params: cvv not yet implemented, payment action ingored (should test for 'Sale' value?)
     [cvv2] => 000
     [ip_address] => 192.168.0.103
-    [payment_action] => Sale
     [contact_type] => Individual
     [geo_coord_id] => 1 */
 

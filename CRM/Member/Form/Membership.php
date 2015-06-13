@@ -1483,7 +1483,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->_params['amount'] = $params['total_amount'];
       $this->_params['currencyID'] = $config->defaultCurrency;
       $this->_params['description'] = ts('Office Credit Card Membership Signup Contribution');
-      $this->_params['payment_action'] = 'Sale';
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
       $this->_params['financial_type_id'] = $params['financial_type_id'];
 

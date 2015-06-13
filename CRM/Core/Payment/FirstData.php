@@ -118,7 +118,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $requestFields['transactionorigin'] = "Eci";
     #32 character string
     $requestFields['invoice_number'] = $params['invoiceID'];
-    $requestFields['ordertype'] = $params['payment_action'];
+    $requestFields['ordertype'] = 'Sale';
     $requestFields['comments'] = $params['description'];
     //**********************set 'result' for live testing **************************
     //  $requestFields[       'result'  ]      =    "";  #set to "Good", "Decline" or "Duplicate"
