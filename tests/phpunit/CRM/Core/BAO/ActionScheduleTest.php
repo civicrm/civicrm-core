@@ -1036,7 +1036,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $membership->contact_id, 'reference_date', 'contact_id')
     );
 
-    //change current membership join date that may signifies as memberhip renewal activity
+    //change current membership join date that may signifies as membership renewal activity
     $membership->join_date = '2012-03-29';
     $membership->save();
 
@@ -1118,7 +1118,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertEquals('2012-06-16 01:00:00',
       CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleAfter->id, 'action_date_time', 'action_schedule_id', TRUE));
 
-    //extend MED to 2 weeks after the current MED (that may signifies as memberhip renewal activity)
+    //extend MED to 2 weeks after the current MED (that may signifies as membership renewal activity)
     // and lets assert as of when the new set of reminders will be sent against their respective Schedule Reminders(SR)
     $membership->end_date = '2012-06-20';
     $membership->save();
