@@ -24,9 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/viewing relationships  *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
+
   {if $action eq 4 } {* action = view *}
     <div class="crm-block crm-content-block crm-relationship-view-block">
       <table class="crm-info-panel">
@@ -204,5 +202,3 @@
     </div>
   {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-{/if} {* close of custom data else*}
-

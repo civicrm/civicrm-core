@@ -25,9 +25,7 @@
 *}
 {* this template is used for adding/editing/deleting contributions and pledge payments *}
 
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{elseif $priceSetId}
+{if $priceSetId}
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution"}
 {elseif $showAdditionalInfo and $formType }
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}

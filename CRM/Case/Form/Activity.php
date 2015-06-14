@@ -87,10 +87,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $scheduleStatusId = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
     $this->assign('scheduleStatusId', $scheduleStatusId);
 
-    if ($this->_cdType) {
-      return $result;
-    }
-
     if (!$this->_caseId && $this->_activityId) {
       $this->_caseId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseActivity', $this->_activityId,
         'case_id', 'activity_id'
@@ -245,11 +241,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
       $this->assign('targetContactValues', empty($targetContactValues) ? FALSE : $targetContactValues);
 
-      //return form for ajax
-      if ($this->_cdType) {
-        return $this->_defaults;
-      }
-
       if (isset($this->_encounterMedium)) {
         $this->_defaults['medium_id'] = $this->_encounterMedium;
       }
@@ -288,10 +279,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::DETACH | CRM_Core_Action::RENEW)) {
       return;
-    }
-
-    if ($this->_cdType) {
-      return $result;
     }
 
     $this->assign('urlPath', 'civicrm/case/activity');

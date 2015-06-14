@@ -104,11 +104,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_caseId;
 
   /**
-   * @var mixed
-   */
-  public $_cdType;
-
-  /**
    * Explicitly declare the form context.
    */
   public function getDefaultContext() {
@@ -123,14 +118,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   public function preProcess() {
-    //custom data related code
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
-
     $this->_contactId = $this->get('contactId');
 
     $this->_contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'contact_type');
@@ -218,9 +205,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     $defaults = array();
 
@@ -279,9 +263,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Add the rules for form.
    */
   public function addRules() {
-    if ($this->_cdType) {
-      return;
-    }
 
     if (!($this->_action & CRM_Core_Action::DELETE)) {
       $this->addFormRule(array('CRM_Contact_Form_Relationship', 'dateRule'));
@@ -292,10 +273,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
           array(

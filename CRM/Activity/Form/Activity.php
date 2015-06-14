@@ -225,12 +225,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @return void
    */
   public function preProcess() {
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
     $this->_atypefile = CRM_Utils_Array::value('atypefile', $_GET);
     $this->assign('atypefile', FALSE);
@@ -526,9 +520,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @return void
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     $defaults = $this->_values + CRM_Core_Form_RecurringEntity::setDefaultValues();
     // if we're editing...
@@ -628,10 +619,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         ),
       ));
       return;
-    }
-
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
     //build other activity links

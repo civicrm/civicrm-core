@@ -26,9 +26,6 @@
 {* Step 1 of New Event Wizard, and Edit Event Info form. *}
 
 <div class="crm-block crm-form-block crm-event-manage-eventinfo-form-block">
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
   {assign var=eventID value=$id}
         <div class="crm-submit-buttons">
         {include file="CRM/common/formButtons.tpl" location="top"}
@@ -171,7 +168,6 @@
     {include file="CRM/common/showHide.tpl" elemType="table-row"}
 
     {include file="CRM/Form/validate.tpl"}
-{/if}
 </div>
 {literal}
 <script type="text/javascript">

@@ -170,10 +170,6 @@
 
   {include file="CRM/Event/Form/EventFees.tpl"}
 
-{* Ajax callback for custom data snippet *}
-{elseif $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-
 {* Main event form template *}
 {else}
   {if $participantMode == 'test' }

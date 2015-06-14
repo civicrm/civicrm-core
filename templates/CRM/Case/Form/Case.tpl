@@ -29,10 +29,6 @@
 *}
 <div class="crm-block crm-form-block crm-case-form-block">
 
-{if $cdType }
-   {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
-
 {if $action neq 8 && $action neq 32768}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 {/if}
@@ -147,5 +143,4 @@
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
-{/if}
 </div>
