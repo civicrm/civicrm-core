@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for offline membership form
- *
+ * This class generates form components for offline membership form.
  */
 class CRM_Member_Form_Membership extends CRM_Member_Form {
 
@@ -141,7 +138,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Extract price set fields and values from $params.
    *
-   * @param $params
+   * @param array $params
+   *
    * @return array
    */
   public static function getPriceFieldIDs($params) {
@@ -169,6 +167,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     return $priceFieldIDS;
   }
 
+  /**
+   * Form preProcess function.
+   *
+   * @throws \Exception
+   */
   public function preProcess() {
     //custom data related code
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
@@ -269,8 +272,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * Set default values for the form. MobileProvider that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    */
   public function setDefaultValues() {
     if ($this->_cdType) {
@@ -394,11 +396,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
       $defaults = array_merge($defaults, $billingDefaults);
 
-      //             // hack to simplify credit card entry for testing
-      //             $defaults['credit_card_type']     = 'Visa';
-      //             $defaults['credit_card_number']   = '4807731747657838';
-      //             $defaults['cvv2']                 = '000';
-      //             $defaults['credit_card_exp_date'] = array( 'Y' => '2012', 'M' => '05' );
+      // hack to simplify credit card entry for testing
+      // $defaults['credit_card_type']     = 'Visa';
+      // $defaults['credit_card_number']   = '4807731747657838';
+      // $defaults['cvv2']                 = '000';
+      // $defaults['credit_card_exp_date'] = array( 'Y' => '2012', 'M' => '05' );
     }
 
     $dates = array('join_date', 'start_date', 'end_date');
@@ -652,7 +654,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       );
       $this->add('text', 'trxn_id', ts('Transaction ID'));
       $this->addRule('trxn_id', ts('Transaction ID already exists in Database.'),
-        'objectExists', array('CRM_Contribute_DAO_Contribution', $this->_id, 'trxn_id')
+        'objectExists', array(
+          'CRM_Contribute_DAO_Contribution',
+          $this->_id,
+          'trxn_id',
+        )
       );
 
       $allowStatuses = array();
@@ -749,8 +755,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
    *
-   * @param $files
-   * @param $self
+   * @param array $files
+   * @param CRM_Member_Form_Membership $self
    *
    * @throws CiviCRM_API3_Exception
    * @return bool|array
@@ -889,8 +895,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           }
         }
 
-        //  Default values for start and end dates if not supplied
-        //  on the form
+        // Default values for start and end dates if not supplied on the form.
         $defaultDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
           $joinDate,
           $startDate,
@@ -1149,8 +1154,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
+   * Submit function.
+   *
+   * This is also accessed by unit tests.
+   *
    * @param array $formValues
-
+   *
    * @return array
    */
   public function submit($formValues) {
@@ -1820,6 +1829,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     return $createdMemberships;
   }
 
+  /**
+   * Set context in session.
+   */
   protected function setUserContext() {
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
@@ -1844,13 +1856,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * @param $membership
-   * @param $endDate
-   * @param $receiptSend
+   * Get status message for updating membership.
+   *
+   * @param CRM_Member_BAO_Membership $membership
+   * @param string $endDate
+   * @param bool $receiptSend
+   *
    * @return string
    */
   protected function getStatusMessageForUpdate($membership, $endDate, $receiptSend) {
-    //end date can be modified by hooks, so if end date is set then use it.
+    // End date can be modified by hooks, so if end date is set then use it.
     $endDate = ($membership->end_date) ? $membership->end_date : $endDate;
 
     $statusMsg = ts('Membership for %1 has been updated.', array(1 => $this->_memberDisplayName));
@@ -1866,14 +1881,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * @param $endDate
-   * @param $receiptSend
-   * @param $membershipTypes
-   * @param $createdMemberships
-   * @param $params
-   * @param $calcDates
-   * @param $mailSent
-   * @internal param $membership
+   * Get status message for create action.
+   *
+   * @param string $endDate
+   * @param bool $receiptSend
+   * @param array $membershipTypes
+   * @param array $createdMemberships
+   * @param array $params
+   * @param array $calcDates
+   * @param bool $mailSent
+   *
    * @return array|string
    */
   protected function getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,

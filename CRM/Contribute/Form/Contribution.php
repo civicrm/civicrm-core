@@ -1362,6 +1362,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $existingContribution = civicrm_api3('contribution', 'getsingle', array(
         'id' => $params['id'],
       ));
+      $this->_id = $params['id'];
     }
     else {
       $existingContribution = array();

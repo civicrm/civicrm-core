@@ -453,9 +453,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'billing_country_id-5' => '1228',
     );
     $form->submit($params);
-    // TODO: This will still fail right now.
-    //$this->callAPISuccessGetCount('Membership', array('contact_id' => $this->_individualId), 1);
+    $this->callAPISuccessGetCount('Membership', array('contact_id' => $this->_individualId), 1);
   }
 
 }
-// class CRM_Member_Form_MembershipTest
