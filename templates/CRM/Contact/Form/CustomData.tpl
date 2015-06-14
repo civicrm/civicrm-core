@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for building tabbed custom data *}
-{if $cdType || $postedInfo}
+{if $postedInfo}
    {include file="CRM/Custom/Form/CustomData.tpl"}
    {if $multiRecordDisplay eq 'single'}
      <div class="crm-submit-buttons">{$form.buttons.html}</div>

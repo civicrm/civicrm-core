@@ -25,9 +25,6 @@
 *}
 
 {* this template is used for adding/editing activities for a case. *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 <div class="crm-block crm-form-block crm-case-activity-form-block">
 
   {if $action neq 8 and $action  neq 32768 }
@@ -307,4 +304,3 @@
     {/literal}
   {/if}
 </div>
-{/if} {* end of main if block*}

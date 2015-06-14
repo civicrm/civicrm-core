@@ -102,13 +102,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   );
 
   public function preProcess() {
-    //custom data related code
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      CRM_Custom_Form_CustomData::preProcess($this);
-    }
 
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
     $this->assign('formClass', 'membershiprenew');
@@ -160,9 +153,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    *   Default values.
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     $defaults = parent::setDefaultValues();
     $this->_memType = $defaults['membership_type_id'];
@@ -242,9 +232,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     parent::buildQuickForm();
 

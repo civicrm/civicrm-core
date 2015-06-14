@@ -24,9 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for renewing memberships for a contact  *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
   {if $membershipMode == 'test' }
     {assign var=registerMode value="TEST"}
   {elseif $membershipMode == 'live'}
@@ -320,4 +317,3 @@
     }
   </script>
 {/literal}
-{/if}{* closing of custom data if *}
