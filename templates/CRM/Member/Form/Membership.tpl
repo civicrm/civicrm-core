@@ -290,14 +290,15 @@
         var taxRates = JSON.parse(taxRates);
         var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
         var currency = '{/literal}{$currency}{literal}';
-	var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
-	taxAmount = isNaN (taxAmount) ? 0:taxAmount;
-        if ( term ) {
+        var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
+        taxAmount = isNaN (taxAmount) ? 0:taxAmount;
+        if (term) {
           if (!taxRate) {
             var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
           }
           else {
-      var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number(allMemberships[memType]['total_amount_numeric'] * term );
+            var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number
+           (allMemberships[memType]['total_amount_numeric'] * term );
           }
           cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
         }
