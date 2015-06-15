@@ -213,7 +213,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       )
     );
 
-    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor['object'], TRUE);
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor['object'], TRUE, TRUE);
     $this->addFormRule(array('CRM_Contribute_Form_UpdateBilling', 'formRule'), $this);
   }
 
