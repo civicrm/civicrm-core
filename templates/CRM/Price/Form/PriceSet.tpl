@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="price-set-1"}
 <div id="priceset" class="crm-section price_set-section">
     {if $priceSet.help_pre}
         <div class="messages help">{$priceSet.help_pre}</div>
@@ -129,3 +130,4 @@
     {include file="CRM/Price/Form/Calculate.tpl"}
 {/if}
 </div>
+{/crmRegion}
