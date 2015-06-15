@@ -312,7 +312,7 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $g2contact.status = 'Added'
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $location_filter
                         AND             $email.email IS NOT NULL
                         AND             $email.email != ''
@@ -343,7 +343,7 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $g2contact.status = 'Added'
                         AND             $contact.do_not_sms = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $phone.phone_type_id = {$phoneTypes['Mobile']}
                         AND             $phone.phone IS NOT NULL
                         AND             $phone.phone != ''
@@ -372,7 +372,7 @@ WHERE  c.group_id = {$groupDAO->id}
                                        ($mg.group_type = 'Include')
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $location_filter
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
@@ -398,7 +398,7 @@ WHERE  c.group_id = {$groupDAO->id}
                                        ($mg.group_type = 'Include')
                         AND             $contact.do_not_sms = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $phone.phone_type_id = {$phoneTypes['Mobile']}
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null";
@@ -434,7 +434,7 @@ LEFT  JOIN X_$job_id                      ON X_$job_id.contact_id = c.id
 WHERE      gc.group_id = {$groupDAO->id}
   AND      c.do_not_email = 0
   AND      c.is_opt_out = 0
-  AND      c.is_deceased = 0
+  AND      c.is_deceased <> 1
   AND      $location_filter
   AND      civicrm_email.on_hold = 0
   AND      X_$job_id.contact_id IS null
@@ -451,7 +451,7 @@ LEFT  JOIN X_$job_id                      ON X_$job_id.contact_id = c.id
 WHERE      gc.group_id = {$groupDAO->id}
   AND      c.do_not_sms = 0
   AND      c.is_opt_out = 0
-  AND      c.is_deceased = 0
+  AND      c.is_deceased <> 1
   AND      p.phone_type_id = {$phoneTypes['Mobile']}
   AND      X_$job_id.contact_id IS null";
       }
@@ -498,7 +498,7 @@ AND    $mg.mailing_id = {$mailing_id}
                         AND             $g2contact.status = 'Added'
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $location_filter
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
@@ -523,7 +523,7 @@ AND    $mg.mailing_id = {$mailing_id}
                         AND             $g2contact.status = 'Added'
                         AND             $contact.do_not_sms = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $phone.phone_type_id = {$phoneTypes['Mobile']}
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null";
@@ -939,7 +939,7 @@ INNER JOIN civicrm_contact ON civicrm_email.contact_id = civicrm_contact.id
 WHERE      (civicrm_email.is_bulkmail = 1 OR civicrm_email.is_primary = 1)
 AND        civicrm_contact.id = {$groupContact}
 AND        civicrm_contact.do_not_email = 0
-AND        civicrm_contact.is_deceased = 0
+AND        civicrm_contact.is_deceased <> 1
 AND        civicrm_email.on_hold = 0
 AND        civicrm_contact.is_opt_out = 0
 GROUP BY   civicrm_email.id
