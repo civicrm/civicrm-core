@@ -597,6 +597,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
     }
 
+    // CRM-12675
+    if (! CRM_Core_Permission::check('access CiviContribute')) {
+      $clauses[] = " ({$this->_aliases['civicrm_option_value']}.component_id IS NULL OR {$this->_aliases['civicrm_option_value']}.component_id <> 2) ";
+    }
+
     if (empty($clauses)) {
       $this->_where .= " ";
     }
