@@ -53,6 +53,8 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    * @var array
    */
   public $_templates = NULL;
+  public $_cid = NULL;
+  public $_activityId = NULL;
 
   /**
    * Build all the data structures needed to build the form.
