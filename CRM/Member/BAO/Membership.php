@@ -1541,7 +1541,8 @@ AND civicrm_membership.is_test = %2";
     $modifiedID = NULL,
     $customFieldsFormatted = NULL,
     $numRenewTerms = 1,
-    $membershipID = NULL
+    $membershipID = NULL,
+    $pending = FALSE
   ) {
     $statusFormat = '%Y-%m-%d';
     $format = '%Y%m%d';
@@ -1557,7 +1558,7 @@ AND civicrm_membership.is_test = %2";
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
 
     // check is it pending. - CRM-4555
-    list($pending, $contributionRecurID, $changeToday, $membershipSource, $isPayLater, $campaignId) = self::extractFormValues($form, $changeToday, $membershipTypeDetails);
+    list($pending, $contributionRecurID, $changeToday, $membershipSource, $isPayLater, $campaignId) = self::extractFormValues($form, $changeToday, $membershipTypeDetails, $pending);
     list($membership, $renewalMode, $dates) = self::renewMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $allStatus, $membershipTypeDetails, $contributionRecurID, $format, $membershipSource, $ids, $statusFormat, $isPayLater, $campaignId);
     $form->set('renewal_mode', $renewalMode);
     if (!empty($dates)) {
@@ -2307,11 +2308,14 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @return array
    */
   public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, &$form) {
+    if (!empty($membershipContribution)) {
+      $pending = ($membershipContribution->contribution_status_id == 2) ? TRUE : FALSE;
+    }
     $membership = self::renewMembershipFormWrapper($contactID, $memType,
       $isTest, $form, NULL,
       CRM_Utils_Array::value('cms_contactID', $membershipParams),
       $customFieldsFormatted, $numTerms,
-      $membershipID
+      $membershipID, $pending
     );
 
     if (!empty($membershipContribution)) {
@@ -2348,8 +2352,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return array
    */
-  public static function extractFormValues($form, $changeToday, $membershipTypeDetails) {
-    $pending = FALSE;
+  public static function extractFormValues($form, $changeToday, $membershipTypeDetails, $pending = FALSE) {
     //@todo this is a BAO function & should not inspect the form - the form should do this
     // & pass required params to the BAO
     if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
