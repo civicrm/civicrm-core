@@ -136,7 +136,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleEmptyContact() {
     $params = array(
       'contact_select_id' => 0,
-      'membership_type_id' => array(),
+      'membership_type_id' => array(1 => NULL),
     );
     $files = array();
     $obj = new CRM_Member_Form_Membership();
@@ -425,7 +425,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('m/d/Y', time()),
       'start_date' => '',
       'end_date' => '',
-      'membership_type_id' => array('25'),
+      // This format reflects the 1 being the organisation & the 25 being the type.
+      'membership_type_id' => array(1, 25),
       'auto_renew' => '0',
       'max_related' => '',
       'num_terms' => '1',
