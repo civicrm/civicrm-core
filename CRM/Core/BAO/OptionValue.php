@@ -518,4 +518,38 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     return $options;
   }
 
+  /**
+   * Ensure that declared reserved option values exist.
+   */
+  function ensureOptionValues() {
+    $reservedValues = array(
+      'activity_type' => array(
+        'values' => array(
+          'failed_payment' => array(
+            'name' => 'failed_payment',
+            'label' => 'Failed Payment',
+            'description' => 'Payment transaction has failed',
+            'component_id' => 'CiviContribute',
+          )
+        ),
+      ),
+    );
+
+    foreach ($reservedValues as $optionGroup => $optionValues) {
+      foreach ($optionValues['values']  as $optionValue) {
+        $params = array(
+          'name' => $optionValue['name'],
+          'option_group_id' => $optionGroup,
+        );
+        $result = civicrm_api3('option_value', 'get', $params);
+        }
+      if ($result['count'] == 0) {
+        $params['is_reserved'] = 1;
+        civicrm_api3('option_value', 'create', array_merge($params,
+          $optionValue
+        ));
+      }
+    }
+  }
+
 }
