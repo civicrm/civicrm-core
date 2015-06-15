@@ -5582,7 +5582,7 @@ AND   displayRelType.is_active = 1
         // handles pseudoconstant fixes for all component
         elseif (in_array($value['pseudoField'], array('participant_status', 'participant_role'))) {
           $pseudoOptions = $viewValues = array();
-          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['pseudoField'], array('flip' => 1));
+          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['idCol']);
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $val) as $k => $v) {
             $viewValues[] = $pseudoOptions[$v];
           }
