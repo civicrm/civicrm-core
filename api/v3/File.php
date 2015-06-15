@@ -133,19 +133,5 @@ function civicrm_api3_file_delete($params) {
 
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
 
-  $check = FALSE;
-
-  $entityFileDAO = new CRM_Core_DAO_EntityFile();
-  $entityFileDAO->file_id = $params['id'];
-  if ($entityFileDAO->find()) {
-    $check = $entityFileDAO->delete();
-  }
-
-  $fileDAO = new CRM_Core_DAO_File();
-  $fileDAO->id = $params['id'];
-  if ($fileDAO->find(TRUE)) {
-    $check = $fileDAO->delete();
-  }
-
-  return $check ? NULL : civicrm_api3_create_error('Error while deleting a file.');
+  CRM_Core_BAO_File::deleteEntityFile('*', $params['id']);
 }
