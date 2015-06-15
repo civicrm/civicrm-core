@@ -127,12 +127,6 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     if (defined('CIVICRM_LOCK_DEBUG')) {
       CRM_Core_Error::debug_log_message('trying to construct lock for ' . $this->_name);
     }
-    if (self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
-      return $this->hackyHandleBrokenCode(self::$jobLog);
-    }
-    if (stristr($name, 'data.mailing.job.')) {
-      self::$jobLog = $this->_name;
-    }
     $this->_timeout = $timeout !== NULL ? $timeout : self::TIMEOUT;
   }
 
@@ -145,6 +139,10 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    */
   public function acquire($timeout = NULL) {
     if (!$this->_hasLock) {
+      if (self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
+        return $this->hackyHandleBrokenCode(self::$jobLog);
+      }
+
       $query = "SELECT GET_LOCK( %1, %2 )";
       $params = array(
         1 => array($this->_name, 'String'),
@@ -156,6 +154,9 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
           CRM_Core_Error::debug_log_message('acquire lock for ' . $this->_name);
         }
         $this->_hasLock = TRUE;
+        if (stristr($this->_name, 'data.mailing.job.')) {
+          self::$jobLog = $this->_name;
+        }
       }
       else {
         if (defined('CIVICRM_LOCK_DEBUG')) {
