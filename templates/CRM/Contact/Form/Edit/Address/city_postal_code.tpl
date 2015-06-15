@@ -38,7 +38,7 @@
           {$form.address.$blockId.postal_code.html}&nbsp;&nbsp;
           {if !empty($form.address.$blockId.postal_code_suffix)}
           <td>
-            {$form.address.$blockId.postal_code_suffix.label}<br/>
+            Suffix<br/>
             {$form.address.$blockId.postal_code_suffix.html} {help id="id-postal-code-suffix" file="CRM/Contact/Form/Contact.hlp"}
           <td>
           {/if}
