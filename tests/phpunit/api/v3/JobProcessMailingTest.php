@@ -116,6 +116,10 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       array(
         'recipients' => 20,
         'workers' => 3,
+        // FIXME: lockHold is unrealistic/unrepresentative. In reality, this situation fails because
+        // the data.* locks trample the worker.* locks. However, setting lockHold allows us to
+        // approximate the behavior of what would happen *if* the lock-implementation didn't suffer
+        // trampling effects.
         'lockHold' => 10,
         'mailerBatchLimit' => 4,
         'mailerJobsMax' => 1,
@@ -132,6 +136,10 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       array(// Settings.
         'recipients' => 20,
         'workers' => 3,
+        // FIXME: lockHold is unrealistic/unrepresentative. In reality, this situation fails because
+        // the data.* locks trample the worker.* locks. However, setting lockHold allows us to
+        // approximate the behavior of what would happen *if* the lock-implementation didn't suffer
+        // trampling effects.
         'lockHold' => 10,
         'mailerBatchLimit' => 5,
         'mailerJobsMax' => 2,
@@ -148,7 +156,6 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       array(// Settings.
         'recipients' => 20,
         'workers' => 3,
-        'lockHold' => 10,
         'mailerBatchLimit' => 6,
         'mailerJobsMax' => 3,
       ),
@@ -163,7 +170,6 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       array(// Settings.
         'recipients' => 20,
         'workers' => 4,
-        'lockHold' => 4,
         'mailerBatchLimit' => 6,
         'mailerJobsMax' => 0,
       ),
