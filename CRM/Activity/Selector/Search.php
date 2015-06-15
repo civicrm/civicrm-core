@@ -173,6 +173,17 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
 
     $this->_activityClause = $activityClause;
 
+    // CRM-12675
+    if (! CRM_Core_Permission::check('access CiviContribute')) {
+      $componentRestriction = ' (activity_type.component_id IS NULL OR activity_type.component_id <> 2) ';
+      if (empty($this->_activityClause)) {
+        $this->_activityClause = $componentRestriction;
+      }
+      else {
+        $this->_activityClause .= ' AND ' . $componentRestriction;
+      }
+    }
+
     // type of selector
     $this->_action = $action;
     $this->_query = new CRM_Contact_BAO_Query($this->_queryParams,
