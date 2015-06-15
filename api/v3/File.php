@@ -126,11 +126,16 @@ function civicrm_api3_file_update($params) {
  * @param array $params
  *   Array per getfields metadata.
  *
- * @return bool
+ * @return array
+ *   API Result Array
  */
 function civicrm_api3_file_delete($params) {
 
   civicrm_api3_verify_mandatory($params, NULL, array('id'));
-  CRM_Core_BAO_File::deleteEntityFile('*', $params['id']);
-  return TRUE;
+  if (CRM_Core_BAO_File::deleteEntityFile('*', $params['id'])) {
+    return civicrm_api3_create_success();
+  }
+  else {
+    return civicrm_api3_create_error('Error while deleting a file.');
+  }
 }
