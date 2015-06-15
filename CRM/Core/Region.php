@@ -173,18 +173,29 @@ class CRM_Core_Region {
     $smarty = CRM_Core_Smarty::singleton();
     $html = '';
     foreach ($this->_snippets as $snippet) {
+      $placement = empty($snippet['placement']) ? 'after' : $snippet['placement'];
       if ($snippet['disabled']) {
         continue;
       }
       switch ($snippet['type']) {
         case 'markup':
-          $html .= $snippet['markup'];
+          if ($placement == 'before') {
+            $html = $snippet['markup'] . $html;
+          }
+          else {
+            $html .= $snippet['markup'];
+          }
           break;
 
         case 'template':
           $tmp = $smarty->get_template_vars('snippet');
           $smarty->assign('snippet', $snippet);
-          $html .= $smarty->fetch($snippet['template']);
+          if ($placement == 'before') {
+            $html = $smarty->fetch($snippet['template']) . $html;
+          }
+          else {
+            $html .= $smarty->fetch($snippet['template']);
+          }
           $smarty->assign('snippet', $tmp);
           break;
 
