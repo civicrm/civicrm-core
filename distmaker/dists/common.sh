@@ -69,7 +69,7 @@ function dm_install_core() {
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
-  dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,README,CONTRIBUTORS}.txt
+  dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,README,CONTRIBUTORS}.txt civicrm.config.php
   dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json
 
   mkdir -p "$to/sql"
@@ -176,7 +176,6 @@ function dm_install_wordpress() {
   ${DM_RSYNC:-rsync} -avC \
     --exclude=.git \
     --exclude=.svn \
-    --exclude=civicrm.config.php.wordpress \
     --exclude=.gitignore \
     --exclude=civicrm \
     "$repo/./"  "$to/./"

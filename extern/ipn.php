@@ -33,11 +33,11 @@
 
 session_start();
 
-require_once '../civicrm.config.php';
+require_once '../Civi/Bootstrap.php';
+Civi\Bootstrap::singleton()->boot();
 
 /* Cache the real UF, override it with the SOAP environment */
 
-$config = CRM_Core_Config::singleton();
 $log = new CRM_Utils_SystemLogger();
 if (empty($_GET)) {
   $log->alert('payment_notification processor_name=PayPal', $_REQUEST);

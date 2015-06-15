@@ -33,9 +33,9 @@
 
 session_start();
 
-require_once '../civicrm.config.php';
+require_once '../Civi/Bootstrap.php';
+Civi\Bootstrap::singleton()->boot();
 
-$config = CRM_Core_Config::singleton();
 $log = new CRM_Utils_SystemLogger();
 $log->alert('payment_notification processor_name=Google_Checkout', $_REQUEST);
 

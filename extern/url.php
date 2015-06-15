@@ -1,10 +1,6 @@
 <?php
-require_once '../civicrm.config.php';
-require_once 'CRM/Core/Config.php';
-require_once 'CRM/Core/Error.php';
-require_once 'CRM/Utils/Array.php';
-
-$config = CRM_Core_Config::singleton();
+require_once '../Civi/Bootstrap.php';
+Civi\Bootstrap::singleton()->boot();
 
 // To keep backward compatibility for URLs generated
 // by CiviCRM < 1.7, we check for the q variable as well.
