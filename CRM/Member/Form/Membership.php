@@ -133,7 +133,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
     else {
-      $memTypeSelected = $params['membership_type_id'];
+      $memTypeSelected = array($params['membership_type_id'][1] => $params['membership_type_id'][1]);
     }
     return $memTypeSelected;
   }
