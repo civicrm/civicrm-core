@@ -174,16 +174,22 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $this->_activityClause = $activityClause;
 
     // CRM-12675
-    if (! CRM_Core_Permission::check('access CiviContribute')) {
-      $components = CRM_Core_Component::getNames();
-      $contribute = CRM_Utils_Array::key('CiviContribute', $components);
-      $componentRestriction = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$contribute}) ";
-      if (empty($this->_activityClause)) {
-        $this->_activityClause = $componentRestriction;
+    $components = CRM_Core_Component::getNames();
+    foreach ($components as $componentID => $componentName) {
+      if (! CRM_Core_Permission::check("access $componentName")) {
+        $componentClause[] = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
       }
-      else {
-        $this->_activityClause .= ' AND ' . $componentRestriction;
-      }
+    }
+
+    if (!empty($componentClause)) {
+      $componentRestriction = implode(' AND ', $componentClause);
+    }
+
+    if (empty($this->_activityClause)) {
+      $this->_activityClause = $componentRestriction;
+    }
+    else {
+      $this->_activityClause .= ' AND ' . $componentRestriction;
     }
 
     // type of selector

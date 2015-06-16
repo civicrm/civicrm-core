@@ -117,12 +117,15 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
       // CRM-12675
       $activityClause = NULL;
 
-      if (! CRM_Core_Permission::check('access CiviContribute')) {
-        $components = CRM_Core_Component::getNames();
-        $contribute = CRM_Utils_Array::key('CiviContribute', $components);
-        $activityClause = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$contribute}) ";
+      $components = CRM_Core_Component::getNames();
+      foreach($components as $componentID => $componentName) {
+        if (! CRM_Core_Permission::check("access $componentName")) {
+          $componentClause = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
+        }
       }
-
+      if (!empty($componentClause)) {
+        $activityClause = implode(' AND ', $componentClause);
+      }
       $result = $query->searchQuery(0, 0, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, $activityClause);
 
       while ($result->fetch()) {
