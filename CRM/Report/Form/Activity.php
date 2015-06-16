@@ -600,7 +600,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     // CRM-12675
     $components = CRM_Core_Component::getNames();
     foreach ($components as $componentID => $componentName) {
-      if (! CRM_Core_Permission::check("access $componentName")) {
+      if (!CRM_Core_Permission::check("access $componentName")) {
         $clauses[] = " ({$this->_aliases['civicrm_option_value']}.component_id IS NULL OR {$this->_aliases['civicrm_option_value']}.component_id <> {$componentID}) ";
       }
     }
