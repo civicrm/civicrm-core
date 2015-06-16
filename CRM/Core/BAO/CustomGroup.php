@@ -60,7 +60,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   static function create(&$params) {
     // create custom group dao, populate fields and then save.
     $group = new CRM_Core_DAO_CustomGroup();
-    $group->title = $params['title'];
+    if (isset($params['title'])) {
+      $group->title = $params['title'];
+    }
 
     if (in_array($params['extends'][0],
         array(
@@ -114,7 +116,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $group->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', $oldWeight, CRM_Utils_Array::value('weight', $params, FALSE));
     $fields = array('style', 'collapse_display', 'collapse_adv_display', 'help_pre', 'help_post', 'is_active', 'is_multiple');
     foreach ($fields as $field) {
-      $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
+      if (isset($params[$field])) {
+        $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
+      }
     }
     $group->max_multiple = isset($params['is_multiple']) ? (isset($params['max_multiple']) &&
       $params['max_multiple'] >= '0'
@@ -292,12 +296,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * An array containing all custom groups and their custom fields is returned.
    *
-   * @param string $entityType - of the contact whose contact type is needed
-   * @param object $form - not used but required
-   * @param int    $entityId   - optional - id of entity if we need to populate the tree with custom values.
-   * @param int    $groupId    - optional group id (if we need it for a single group only)
-   *                           - if groupId is 0 it gets for inline groups only
-   *                           - if groupId is -1 we get for all groups
+   * @param string $entityType
+   *   Of the contact whose contact type is needed.
+   * @param CRM_Core_Form $form
+   *   Not used
+   * @param int $entityID
+   * @param int $groupID
    * @param string $subType
    * @param string $subName
    * @param boolean $fromCache
@@ -308,17 +312,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
    *
    * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
-   * The reason for the info array in unclear and it could be determined from parsing the group tree after creation
-   * With caching the performance impact would be small & the function would be cleaner
-   *
-   * @access public
-   *
-   * @static
-   *
+   *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
+   *   With caching the performance impact would be small & the function would be cleaner
    */
   public static function &getTree(
     $entityType,
-    &$form,
+    $form = NULL,
     $entityID = NULL,
     $groupID  = NULL,
     $subType  = NULL,
