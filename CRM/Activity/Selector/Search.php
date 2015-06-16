@@ -176,7 +176,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     // CRM-12675
     $components = CRM_Core_Component::getNames();
     foreach ($components as $componentID => $componentName) {
-      if (! CRM_Core_Permission::check("access $componentName")) {
+      if (!CRM_Core_Permission::check("access $componentName")) {
         $componentClause[] = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
       }
     }
