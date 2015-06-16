@@ -120,14 +120,22 @@ class CRM_ACL_API {
       return $skipDeleteClause ? ' ( 1 ) ' : $deleteClause;
     }
 
+    $user = CRM_Core_Session::getLoggedInContactID();
     if ($contactID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = $user;
     }
 
     if (!$contactID) {
       // anonymous user
       $contactID = 0;
+    }
+    // Check if contact has permissions on self
+    elseif ($contactID == $user) {
+      if (CRM_Core_Permission::check('edit my contact') ||
+        ($type == self::VIEW && CRM_Core_Permission::check('view my contact'))
+      ) {
+        return ' ( 1 ) ';
+      }
     }
 
     return implode(' AND ',
