@@ -1975,11 +1975,11 @@ SET li.qty = {$vals['qty']},
     li.line_total = {$vals['line_total']},
     li.tax_amount = {$taxAmount},
     li.unit_price = {$vals['unit_price']},
-    li.label = '{$vals['label']}'
+    li.label = %1
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
       (price_field_value_id = {$valueId})
 ";
-        CRM_Core_DAO::executeQuery($updateLineItem);
+        CRM_Core_DAO::executeQuery($updateLineItem, array(1 => array($vals['label'], 'String')));
       }
     }
     // insert new 'adjusted amount' transaction entry and update contribution entry.
