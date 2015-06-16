@@ -56,7 +56,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   public static function create(&$params) {
     // create custom group dao, populate fields and then save.
     $group = new CRM_Core_DAO_CustomGroup();
-    $group->title = $params['title'];
+    if (isset($params['title'])) {
+      $group->title = $params['title'];
+    }
 
     if (in_array($params['extends'][0],
       array(
@@ -121,7 +123,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'is_multiple',
     );
     foreach ($fields as $field) {
-      $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
+      if (isset($params[$field])) {
+        $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
+      }
     }
     $group->max_multiple = isset($params['is_multiple']) ? (isset($params['max_multiple']) &&
       $params['max_multiple'] >= '0'
@@ -313,7 +317,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param string $entityType
    *   Of the contact whose contact type is needed.
    * @param CRM_Core_Form $form
-   *   Not used but required.
+   *   Not used
    * @param int $entityID
    * @param int $groupID
    * @param string $subType
@@ -330,11 +334,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
    *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    *   With caching the performance impact would be small & the function would be cleaner
-   *
    */
   public static function &getTree(
     $entityType,
-    &$form,
+    $form = NULL,
     $entityID = NULL,
     $groupID = NULL,
     $subType = NULL,
