@@ -612,11 +612,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
     $select = "SELECT DISTINCT {$this->_aliases['civicrm_contribution']}.id";
 
-    $group = "\nGROUP BY cc.currency";
-
-    $sql = "SELECT COUNT(cc.id) as count, SUM( cc.total_amount ) as amount, ROUND(AVG(cc.total_amount), 2) as avg, cc.currency as currency
+    $sql = "SELECT COUNT(cc.id) as count, SUM(cc.total_amount) as amount, ROUND(AVG(cc.total_amount), 2) as avg, cc.currency as currency
             FROM civicrm_contribution cc
-            WHERE cc.id IN ({$select} {$this->_from} {$this->_where}) {$group}";
+            WHERE cc.id IN ({$select} {$this->_from} {$this->_where}) GROUP BY cc.currency";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $totalAmount = $average = array();
