@@ -667,7 +667,23 @@ class CRM_Core_CodeGen_Specification {
       return $this->value('size', $fieldXML->html);
     }
     // Infer from <length> tag if <size> was not explicitly set or was invalid
-    return $fieldXML->length;
+    // This map is slightly different from CRM_Core_Form_Renderer::$_sizeMapper
+    // Because we usually want fields to render as smaller than their maxlength
+    $sizes = array(
+      2 => 'TWO',
+      4 => 'FOUR',
+      6 => 'SIX',
+      8 => 'EIGHT',
+      16 => 'TWELVE',
+      32 => 'MEDIUM',
+      64 => 'BIG',
+    );
+    foreach ($sizes as $length => $name) {
+      if ($fieldXML->length <= $length) {
+        return "CRM_Utils_Type::$name";
+      }
+    }
+    return 'CRM_Utils_Type::HUGE';
   }
 
 }
