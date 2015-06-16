@@ -901,10 +901,12 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   static function config(&$config) {
-    return self::singleton()->invoke(1, $config,
+    $invoked = self::singleton()->invoke(1, $config,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_config'
     );
+    set_include_path(implode(PATH_SEPARATOR, array_unique(explode(PATH_SEPARATOR, get_include_path()))));
+    return $invoked;
   }
 
   /**

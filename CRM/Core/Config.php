@@ -409,7 +409,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     $enableExtensions = array();
     foreach (array_keys($extensions) as $extension)
     {
-        $enableExtensions[$extension] = $extensionsContainer->getPath($extension);
+        $enableExtensions[$extension] = $extensionsContainer->getPath($extension) . '/';
     }
     set_include_path(implode(PATH_SEPARATOR, $enableExtensions) . PATH_SEPARATOR . get_include_path());
   }
