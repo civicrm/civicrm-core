@@ -1491,6 +1491,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $params['total_amount'];
       $this->_params['currencyID'] = $config->defaultCurrency;
+// Comment needed in order for translators having a 
+//chance of understanding what is going on here! 
+// Is it: Contribution made during signup for a membership made using
+// a credit card belonging to a company's office?
       $this->_params['description'] = ts('Office Credit Card Membership Signup Contribution');
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
       $this->_params['financial_type_id'] = $params['financial_type_id'];
