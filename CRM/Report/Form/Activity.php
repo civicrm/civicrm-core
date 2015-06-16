@@ -598,10 +598,11 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     }
 
     // CRM-12675
-    if (! CRM_Core_Permission::check('access CiviContribute')) {
-      $components = CRM_Core_Component::getNames();
-      $contribute = CRM_Utils_Array::key('CiviContribute', $components);
-      $clauses[] = " ({$this->_aliases['civicrm_option_value']}.component_id IS NULL OR {$this->_aliases['civicrm_option_value']}.component_id <> {$contribute}) ";
+    $components = CRM_Core_Component::getNames();
+    foreach ($components as $componentID => $componentName) {
+      if (! CRM_Core_Permission::check("access $componentName")) {
+        $clauses[] = " ({$this->_aliases['civicrm_option_value']}.component_id IS NULL OR {$this->_aliases['civicrm_option_value']}.component_id <> {$componentID}) ";
+      }
     }
 
     if (empty($clauses)) {
