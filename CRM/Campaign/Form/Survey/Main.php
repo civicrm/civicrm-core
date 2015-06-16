@@ -216,7 +216,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_surveyId,
       'Survey'
     );

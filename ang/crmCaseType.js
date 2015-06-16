@@ -39,7 +39,7 @@
         controller: 'CaseTypeListCtrl',
         resolve: {
           caseTypes: function($route, crmApi) {
-            return crmApi('CaseType', 'get', {});
+            return crmApi('CaseType', 'get', {options: {limit: 0}});
           }
         }
       });
@@ -82,7 +82,7 @@
   crmCaseType.directive('crmAddName', function() {
     return {
       restrict: 'AE',
-      template: '<input class="add-activity" type="hidden" />',
+      template: '<input class="add-activity crm-action-menu action-icon-plus" type="hidden" />',
       link: function(scope, element, attrs) {
         /// Format list of options for select2's "data"
         var getFormattedOptions = function() {
@@ -105,7 +105,8 @@
           data: getFormattedOptions,
           createSearchChoice: function(term) {
             return {id: term, text: term};
-          }
+          },
+          placeholder: attrs.placeholder
         });
         $(input).on('select2-selecting', function(e) {
           scope[attrs.crmVar] = e.val;
@@ -128,6 +129,7 @@
     $scope.activityStatuses = _.values(apiCalls.actStatuses.values);
     $scope.activityTypes = apiCalls.actTypes.values;
     $scope.activityTypeNames = _.pluck(apiCalls.actTypes.values, 'name');
+    $scope.activityTypes = apiCalls.actTypes.values;
     $scope.relationshipTypeNames = _.pluck(apiCalls.relTypes.values, CRM.crmCaseType.REL_TYPE_CNAME); // CRM_Case_XMLProcessor::REL_TYPE_CNAME
     $scope.locks = {caseTypeName: true, activitySetName: true};
 

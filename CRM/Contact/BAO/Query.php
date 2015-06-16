@@ -2735,7 +2735,7 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = self::buildClause("contact_a.contact_type", $op, $contactType);
       }
 
-      $this->_qill[$grouping][] = ts('Contact Type') . ' - ' . implode(' ' . ts('or') . ' ', $quill);
+      $this->_qill[$grouping][] = ts('Contact Type') . " $op " . implode(' ' . ts('or') . ' ', $quill);
 
       if (!empty($subTypes)) {
         $this->includeContactSubTypes($subTypes, $grouping);
@@ -2804,13 +2804,19 @@ class CRM_Contact_BAO_Query {
       $this->_useDistinct = TRUE;
     }
 
-    $groupNames = CRM_Core_PseudoConstant::group();
-    $groupIds = implode(',', array_keys($value));
+    // Replace pseudo operators from search builder
+    $op = str_replace('EMPTY', 'NULL', $op);
 
+    $groupNames = CRM_Core_PseudoConstant::group();
+    $groupIds = '';
     $names = array();
-    foreach ($value as $id => $dontCare) {
-      if (array_key_exists($id, $groupNames) && $dontCare) {
-        $names[] = $groupNames[$id];
+
+    if ($value) {
+      $groupIds = implode(',', array_keys($value));
+      foreach ($value as $id => $dontCare) {
+        if (array_key_exists($id, $groupNames) && $dontCare) {
+          $names[] = $groupNames[$id];
+        }
       }
     }
 
@@ -2855,19 +2861,36 @@ class CRM_Contact_BAO_Query {
 
     if (!$skipGroup) {
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
-      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON ( contact_a.id = {$gcTable}.contact_id AND {$gcTable}.group_id $op ( $groupIds ) )";
+      $joinClause = array("contact_a.id = {$gcTable}.contact_id");
+      if ($groupIds && ($op == 'IN' || $op == 'NOT IN')) {
+        $joinClause[] = "{$gcTable}.group_id IN ( $groupIds )";
+      }
+      // For NOT IN we join on groups the contact IS in, then exclude them in the where clause
+      if ($statii && $op == 'NOT IN') {
+        $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
+      }
+      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
     }
 
-    $qill = ts('Contacts %1', array(1 => $op));
+    if ($op == 'IN') {
+      $qill = ts('In group');
+    }
+    else {
+      $qill = ts('Groups %1', array(1 => $op));
+    }
     $qill .= ' ' . implode(' ' . ts('or') . ' ', $names);
 
     $groupClause = NULL;
 
     if (!$skipGroup) {
-      $groupClause = "{$gcTable}.group_id $op ( $groupIds )";
-      if (!empty($statii)) {
+      $groupClause = "{$gcTable}.group_id $op" . ($groupIds ? " ( $groupIds ) " : '');
+      if (!empty($statii) && $groupIds) {
         $groupClause .= " AND {$gcTable}.status IN (" . implode(', ', $statii) . ")";
-        $qill .= " " . ts('AND') . " " . ts('Group Status') . ' - ' . implode(' ' . ts('or') . ' ', $statii);
+        $qill .= " " . ($op == 'NOT IN' ? ts('WHERE') : ts('AND')) . " " . ts('Group Status') . ' - ' . implode(' ' . ts('or') . ' ', $statii);
+      }
+      // For NOT IN op, params were set in the join
+      if ($op == 'NOT IN') {
+        $groupClause = "{$gcTable}.group_id IS NULL";
       }
     }
 
@@ -2895,7 +2918,7 @@ class CRM_Contact_BAO_Query {
    */
   public function getGroupsFromTypeCriteria($value) {
     $groupIds = array();
-    foreach ($value as $groupTypeValue) {
+    foreach ((array) $value as $groupTypeValue) {
       $groupList = CRM_Core_PseudoConstant::group($groupTypeValue);
       $groupIds = ($groupIds + $groupList);
     }
@@ -2911,7 +2934,7 @@ class CRM_Contact_BAO_Query {
    */
   public function savedSearch(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
-    return $this->addGroupContactCache(array_keys($value));
+    return $this->addGroupContactCache(array_keys((array) $value));
   }
 
   /**
@@ -5559,7 +5582,7 @@ AND   displayRelType.is_active = 1
         // handles pseudoconstant fixes for all component
         elseif (in_array($value['pseudoField'], array('participant_status', 'participant_role'))) {
           $pseudoOptions = $viewValues = array();
-          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['pseudoField'], array('flip' => 1));
+          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['idCol']);
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $val) as $k => $v) {
             $viewValues[] = $pseudoOptions[$v];
           }

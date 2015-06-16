@@ -528,7 +528,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       $isTestMembership,
       $membershipRenewal,
       NULL,
-      NULL
+      NULL,
+      NULL,
+      1,
+      NULL,
+      FALSE
     );
     $endDate = date("Y-m-d", strtotime($membership->end_date . " +1 year"));
 
@@ -602,7 +606,18 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $membershipRenewal = new CRM_Core_Form();
     $membershipRenewal->controller = new CRM_Core_Controller();
-    $MembershipRenew = CRM_Member_BAO_Membership::renewMembershipFormWrapper($contactId, $this->_membershipTypeID, $isTestMembership = 0, $membershipRenewal, NULL, NULL);
+    $MembershipRenew = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
+      $contactId,
+      $this->_membershipTypeID,
+      $isTestMembership = 0,
+      $membershipRenewal,
+      NULL,
+      NULL,
+      NULL,
+      1,
+      NULL,
+      FALSE
+      );
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
       $MembershipRenew->id,

@@ -204,6 +204,7 @@ class CRM_ACL_API {
   ) {
 
     static $cache = array();
+    $groups = array();
     //@todo this is pretty hacky!!!
     //adding a way for unit tests to flush the cache
     if ($flush) {

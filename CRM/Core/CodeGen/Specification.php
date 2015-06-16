@@ -660,35 +660,14 @@ class CRM_Core_CodeGen_Specification {
 
   /**
    * Sets the size property of a textfield.
-   * See constants defined in CRM_Utils_Type for possible values
    */
   protected function getSize($fieldXML) {
     // Extract from <size> tag if supplied
     if (!empty($fieldXML->html) && $this->value('size', $fieldXML->html)) {
-      $const = 'CRM_Utils_Type::' . strtoupper($fieldXML->html->size);
-      if (defined($const)) {
-        return $const;
-      }
+      return $this->value('size', $fieldXML->html);
     }
     // Infer from <length> tag if <size> was not explicitly set or was invalid
-
-    // This map is slightly different from CRM_Core_Form_Renderer::$_sizeMapper
-    // Because we usually want fields to render as smaller than their maxlength
-    $sizes = array(
-      2 => 'TWO',
-      4 => 'FOUR',
-      6 => 'SIX',
-      8 => 'EIGHT',
-      16 => 'TWELVE',
-      32 => 'MEDIUM',
-      64 => 'BIG',
-    );
-    foreach ($sizes as $length => $name) {
-      if ($fieldXML->length <= $length) {
-        return "CRM_Utils_Type::$name";
-      }
-    }
-    return 'CRM_Utils_Type::HUGE';
+    return $fieldXML->length;
   }
 
 }

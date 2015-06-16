@@ -743,6 +743,14 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
+   * Process incoming notification.
+   */
+  static public function handlePaymentNotification() {
+    $ipnClass = new CRM_Core_Payment_AuthorizeNetIPN(array_merge($_GET, $_REQUEST));
+    $ipnClass->main();
+  }
+
+  /**
    * @param string $message
    * @param array $params
    *

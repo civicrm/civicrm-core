@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contribute_Form_AdditionalInfo {
 
@@ -324,7 +322,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       )
     );
     $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       CRM_Utils_Array::value('id', $params, NULL),
       'Contribution'
     );

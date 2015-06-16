@@ -228,7 +228,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         if ($customField) {
           // reset checkbox/radio because a form does not send null checkbox values
           if (in_array($customField['html_type'],
-            array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio')
+            array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio', 'Select')
           )) {
             // only reset on a POST submission if we dont see any value
             $value = NULL;

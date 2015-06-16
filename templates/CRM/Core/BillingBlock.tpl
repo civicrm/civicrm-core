@@ -30,9 +30,8 @@
       <legend>
         {$paymentTypeLabel}
       </legend>
-      {if $form.$expressButtonName}
-        {include file= "CRM/Core/paypalexpress.tpl"}
-      {/if}
+      {crmRegion name="billing-block-pre"}
+      {/crmRegion}
       <div class="crm-section billing_mode-section {$paymentTypeName}_info-section">
         {foreach from=$paymentFields item=paymentField}
           <div class="crm-section {$form.$paymentField.name}-section">
@@ -161,9 +160,6 @@
           if ($('#billingcheckbox').prop('checked')) {
             $(orig_id + ' option').prop('selected', false);
             $(orig_id + ' option[value="' + $(id).val() + '"]').prop('selected', true);
-          }
-
-          if (orig_id == '#billing_country_id-5') {
             $(orig_id).change();
           }
         });
@@ -186,6 +182,7 @@
             orig_id = select_ids[id];
             $(orig_id + ' option').prop('selected', false);
             $(orig_id + ' option[value="' + $(id).val() + '"]').prop('selected', true);
+            $(orig_id).change();
           }
         } else {
           $('.billing_name_address-group').show(200);
@@ -200,8 +197,34 @@
         $('#credit_card_number').val(cc);
       });
     });
-    {/literal}
-  </script>
-{/if}
 
+    $('input[name="payment_processor_id"]').change( function() {
+      function toggleConfirmButton() {
+        var suppressSubmitButton = {/literal}"{$suppressSubmitButton}"{literal};
+        var elementObj = $('input[name="payment_processor"]');
+        if ( elementObj.attr('type') == 'hidden' ) {
+          var processorTypeId = elementObj.val( );
+        }
+        else {
+          var processorTypeId = elementObj.filter(':checked').val();
+        }
+
+        if (suppressSubmitButton) {
+          $("#crm-submit-buttons").hide();
+        }
+        else {
+          $("#crm-submit-buttons").show();
+        }
+      }
+      toggleConfirmButton();
+    });
+
+  </script>
+  {/literal}
+{/if}
 {/crmRegion}
+{crmRegion name="billing-block-post"}
+  {* Payment processors sometimes need to append something to the end of the billing block. We create a region for
+     clarity  - the plan is to move to assigning this through the payment processor to this region *}
+{/crmRegion}
+

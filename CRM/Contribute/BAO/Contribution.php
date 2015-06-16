@@ -858,6 +858,21 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
+   * React to a financial transaction (payment) failure.
+   *
+   * Prior to CRM-16417 these were simply removed from the database but it has been agreed that seeing attempted
+   * payments is important for forensic and outreach reasons.
+   *
+   * This function updates the financial transaction records to failed.
+   *
+   * @todo in principle we also think it makes sense to add an activity - this part would be a second step as
+   * the first change is likely to go into the LTS.
+   */
+  public static function failPayment($contributionID, $message) {
+
+  }
+
+  /**
    * Check if there is a contribution with the same trxn_id or invoice_id.
    *
    * @param array $input
@@ -2181,10 +2196,7 @@ WHERE  contribution_id = %1 ";
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if ($recur && !empty($this->_relatedObjects['paymentProcessor'])) {
-      $paymentObject = &CRM_Core_Payment::singleton(
-        $this->is_test ? 'test' : 'live',
-        $this->_relatedObjects['paymentProcessor']
-      );
+      $paymentObject = Civi\Payment\System::singleton()->getByProcessor($this->_relatedObjects['paymentProcessor']);
 
       $entityID = $entity = NULL;
       if (isset($ids['contribution'])) {
@@ -2725,7 +2737,7 @@ WHERE  contribution_id = %1 ";
         $balanceTrxnParams['total_amount'] = $partialAmtTotal;
         $balanceTrxnParams['to_financial_account_id'] = $toFinancialAccount;
         $balanceTrxnParams['contribution_id'] = $params['contribution']->id;
-        $balanceTrxnParams['trxn_date'] = !empty($params['contribution']->receipt_date) ? $params['contribution']->receipt_date : date('YmdHis');
+        $balanceTrxnParams['trxn_date'] = !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis');
         $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
         $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('net_amount', $params);
         $balanceTrxnParams['currency'] = $params['contribution']->currency;
@@ -2778,7 +2790,7 @@ WHERE  contribution_id = %1 ";
       $trxnParams = array(
         'contribution_id' => $params['contribution']->id,
         'to_financial_account_id' => $params['to_financial_account_id'],
-        'trxn_date' => !empty($params['contribution']->receipt_date) ? $params['contribution']->receipt_date : date('YmdHis'),
+        'trxn_date' => !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis'),
         'total_amount' => $totalAmount,
         'fee_amount' => CRM_Utils_Array::value('fee_amount', $params),
         'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),

@@ -225,14 +225,16 @@
         this.element.dialog('close');
       }
     },
-    _formatUrl: function(url) {
+    _formatUrl: function(url, snippetType) {
       // Strip hash
       url = url.split('#')[0];
       // Add snippet argument to url
-      if (url.search(/[&?]snippet=/) < 0) {
-        url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
-      } else {
-        url = url.replace(/snippet=[^&]*/, 'snippet=json');
+      if (snippetType) {
+        if (url.search(/[&?]snippet=/) < 0) {
+          url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=' + snippetType;
+        } else {
+          url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
+        }
       }
       return url;
     },
@@ -241,7 +243,7 @@
       var that = this;
       $('a.crm-weight-arrow', that.element).click(function(e) {
         if (that.options.block) that.element.block();
-        $.getJSON(that._formatUrl(this.href)).done(function() {
+        $.getJSON(that._formatUrl(this.href, 'json')).done(function() {
           that.refresh();
         });
         e.stopImmediatePropagation();
@@ -250,7 +252,7 @@
     },
     refresh: function() {
       var that = this;
-      var url = this._formatUrl(this.options.url);
+      var url = this._formatUrl(this.options.url, 'json');
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
       if (this.options.block) this.element.block();
       $.getJSON(url, function(data) {
@@ -313,8 +315,13 @@
     // Create new dialog
     if (settings.dialog) {
       settings.dialog = CRM.utils.adjustDialogDefaults(settings.dialog);
-      $('<div id="' + settings.target.substring(1) + '"></div>').dialog(settings.dialog);
+      $('<div id="' + settings.target.substring(1) + '"></div>')
+        .dialog(settings.dialog)
+        .parent().find('.ui-dialog-titlebar')
+        .append($('<a class="crm-dialog-titlebar-print ui-dialog-titlebar-close" title="'+ts('Print window')+'" target="_blank" style="right:3.8em;"/>')
+          .button({icons: {primary: 'ui-icon-print'}, text: false}));
     }
+    // Add handlers to new or existing dialog
     if ($(settings.target).data('uiDialog')) {
       $(settings.target)
         .on('dialogclose', function() {
@@ -327,6 +334,8 @@
           if (e.target === $(settings.target)[0] && data && !settings.dialog.title && data.title) {
             $(this).dialog('option', 'title', data.title);
           }
+          // Update print url
+          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '2'));
         });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
@@ -441,13 +450,16 @@
       }, settings.ajaxForm));
       if (settings.openInline) {
         settings.autoClose = $el.crmSnippet('isOriginalUrl');
-        $(settings.openInline, this).not(exclude + ', .crm-popup').click(function(event) {
+        $(this).on('click', settings.openInline, function(e) {
+          if ($(this).is(exclude + ', .crm-popup')) {
+            return;
+          }
           if ($(this).hasClass('open-inline-noreturn')) {
             // Force reset of original url
             $el.data('civiCrmSnippet')._originalUrl = $(this).attr('href');
           }
           $el.crmSnippet('option', 'url', $(this).attr('href')).crmSnippet('refresh');
-          return false;
+          e.preventDefault();
         });
       }
       // Show form buttons as part of the dialog

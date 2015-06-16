@@ -525,7 +525,7 @@ class CRM_Core_Resources {
     $patterns = (array) $patterns;
     $files = array();
     foreach ($patterns as $pattern) {
-      if ($pattern{0} === '/') {
+      if (CRM_Utils_File::isAbsolute($pattern)) {
         // Absolute path.
         $files = array_merge($files, (array) glob($pattern, $flags));
       }
@@ -707,8 +707,8 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/jquery.form$min.js",
       "packages/jquery/plugins/jquery.timeentry$min.js",
       "packages/jquery/plugins/jquery.blockUI$min.js",
-      "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
-      "packages/jquery/plugins/DataTables/media/css/jquery.dataTables$min.css",
+      "bower_components/datatables/media/js/jquery.dataTables$min.js",
+      "bower_components/datatables/media/css/jquery.dataTables$min.css",
       "bower_components/jquery-validation/dist/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
       "js/Common.js",

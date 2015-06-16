@@ -396,7 +396,6 @@ WHERE  title = %1
 
       $customFields = CRM_Core_BAO_CustomField::getFields('Group');
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $customFields,
         $this->_id,
         'Group'
       );

@@ -335,20 +335,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     $this->assign('relationshipData', $jsData);
 
-    $this->add(
-      'select',
-      'relationship_type_id',
-      ts('Relationship Type'),
-      array('' => ts('- select -')) + $relationshipList,
-      TRUE,
-      array('class' => 'crm-select2 huge')
-    );
+    $this->addField('relationship_type_id', array('options' => array('' => ts('- select -')) + $relationshipList, 'class' => 'huge', 'placeholder' => '- select -'), TRUE);
 
     $label = $this->_action & CRM_Core_Action::ADD ? ts('Contact(s)') : ts('Contact');
-    $contactField = $this->addEntityRef('related_contact_id', $label, array(
-        'multiple' => TRUE,
-        'create' => TRUE,
-      ), TRUE);
+    $contactField = $this->addField('related_contact_id', array('label' => $label, 'name' => 'contact_id_b', 'multiple' => TRUE, 'create' => TRUE), TRUE);
     // This field cannot be updated
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $contactField->freeze();
@@ -356,16 +346,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $this->add('advcheckbox', 'is_current_employer', $this->_contactType == 'Organization' ? ts('Current Employee') : ts('Current Employer'));
 
-    $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'searchDate'));
-    $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'searchDate'));
+    $this->addField('start_date', array('label' => ts('Start Date'), 'formatType' => 'searchDate'));
+    $this->addField('end_date', array('label' => ts('End Date'), 'formatType' => 'searchDate'));
 
-    $this->add('advcheckbox', 'is_active', ts('Enabled?'));
+    $this->addField('is_active', array('label' => ts('Enabled?')));
 
-    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
-    $this->add('checkbox', 'is_permission_a_b');
-    $this->add('checkbox', 'is_permission_b_a');
+    $this->addField('is_permission_a_b');
+    $this->addField('is_permission_b_a');
 
-    $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Relationship', 'description'));
+    $this->addField('description', array('label' => ts('Description')));
 
     CRM_Contact_Form_Edit_Notes::buildQuickForm($this);
 
@@ -399,6 +388,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public function postProcess() {
     // Store the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
+
+    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
+    $params['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_a_b', $params, 0);
+    $params['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_b_a', $params, 0);
 
     // action is taken depending upon the mode
     if ($this->_action & CRM_Core_Action::DELETE) {

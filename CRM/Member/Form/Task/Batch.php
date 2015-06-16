@@ -254,7 +254,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
         }
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
-          $customFields,
           $key,
           'Membership',
           $membershipTypeId

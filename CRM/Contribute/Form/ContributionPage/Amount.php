@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -312,6 +310,17 @@ SELECT id
       $hasMembershipBlk = TRUE;
       if ($membershipBlock->is_separate_payment && empty($fields['amount_block_is_active'])) {
         $errors['amount_block_is_active'] = ts('To disable Contribution Amounts section you need to first disable Separate Membership Payment option from Membership Settings.');
+      }
+
+      //CRM-16165, Don't allow reccuring contribution if membership block contain any renewable membership option
+      $membershipTypes = unserialize($membershipBlock->membership_types);
+      if (!empty($fields['is_recur']) && !empty($membershipTypes)) {
+        if (!$membershipBlock->is_separate_payment) {
+          $errors['is_recur'] = ts('You need to enable Separate Membership Payment when online contribution page is configured for both Membership and Recurring Contribution.');
+        }
+        elseif (count(array_filter($membershipTypes)) != 0) {
+          $errors['is_recur'] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page.');
+        }
       }
     }
 

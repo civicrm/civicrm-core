@@ -52,7 +52,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     // List example directories
     global $civicrm_root;
     $examples = array();
-    foreach (scandir($civicrm_root . 'api/v3/examples') as $item) {
+    foreach (scandir(CRM_Utils_file::addTrailingSlash($civicrm_root, '/') . 'api/v3/examples') as $item) {
       if ($item && strpos($item, '.') === FALSE) {
         $examples[] = $item;
       }
@@ -77,9 +77,10 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
    */
   public static function getExampleFile() {
     global $civicrm_root;
+    $basePath = CRM_Utils_file::addTrailingSlash($civicrm_root, '/');
     if (!empty($_GET['entity']) && strpos($_GET['entity'], '.') === FALSE) {
       $examples = array();
-      foreach (scandir($civicrm_root . 'api/v3/examples/' . $_GET['entity']) as $item) {
+      foreach (scandir($basePath . 'api/v3/examples/' . $_GET['entity']) as $item) {
         $item = str_replace('.php', '', $item);
         if ($item && strpos($item, '.') === FALSE) {
           $examples[] = array('key' => $item, 'value' => $item);
@@ -88,7 +89,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       CRM_Utils_JSON::output($examples);
     }
     if (!empty($_GET['file']) && strpos($_GET['file'], '.') === FALSE) {
-      $fileName = $civicrm_root . 'api/v3/examples/' . $_GET['file'] . '.php';
+      $fileName = $basePath . 'api/v3/examples/' . $_GET['file'] . '.php';
       if (file_exists($fileName)) {
         echo file_get_contents($fileName);
       }

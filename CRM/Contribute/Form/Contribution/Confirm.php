@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -59,12 +57,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $params
    * @param int $contactID
    * @param int $financialTypeID
-   * @param $online
+   * @param bool $online
    * @param int $contributionPageId
-   * @param $nonDeductibleAmount
+   * @param float $nonDeductibleAmount
    * @param int $campaignId
-   * @param $isMonetary
-   * @param $pending
+   * @param bool $isMonetary
+   * @param bool $pending
    * @param $paymentProcessorOutcome
    * @param $receiptDate
    * @param int $recurringContributionID
@@ -155,9 +153,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * CRM-11885
    *  if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep
    * it.
-   * @param $params
-   * @param $financialType
-   * @param $online
+   *
+   * @param array $params
+   * @param CRM_Financial_BAO_FinancialType $financialType
+   * @param bool $online
    *
    * @return array
    */
@@ -204,8 +203,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -248,8 +245,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
         // we use this here to incorporate any changes made by folks in hooks
         $this->_params['currencyID'] = $config->defaultCurrency;
-
-        $this->_params['payment_action'] = 'Sale';
 
         // also merge all the other values from the profile fields
         $values = $this->controller->exportValues('Main');
@@ -299,7 +294,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->setFormAmountFields($this->_params['priceSetId']);
       }
       $this->_params['currencyID'] = $config->defaultCurrency;
-      $this->_params['payment_action'] = 'Sale';
     }
 
     $this->_params['is_pay_later'] = $this->get('is_pay_later');
@@ -497,8 +491,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
@@ -560,6 +552,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $params['selectMembership'],
           FALSE
         );
+        if (!empty($params['auto_renew'])) {
+          $this->assign('auto_renew', TRUE);
+        }
       }
       else {
         $this->assign('membershipBlock', FALSE);
@@ -728,29 +723,24 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $contactID = $this->getContactID();
     $isPayLater = $this->_params['is_pay_later'];
-    if (isset($this->_params['payment_processor']) && $this->_params['payment_processor'] == 0) {
+    if (isset($this->_params['payment_processor_id']) && $this->_params['payment_processor_id'] == 0) {
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
     }
     // add a description field at the very beginning
     $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
 
-    // also add accounting code
-    $this->_params['accountingCode'] = CRM_Utils_Array::value('accountingCode',
-      $this->_values
-    );
+    $this->_params['accountingCode'] = CRM_Utils_Array::value('accountingCode', $this->_values);
 
     // fix currency ID
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     //carry payment processor id.
-    if ($paymentProcessorId = CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
-      $this->_params['payment_processor_id'] = $paymentProcessorId;
+    if (CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
+      $this->_params['payment_processor_id'] = $this->_paymentProcessor['id'];
     }
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
@@ -1142,7 +1132,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Process the form.
    *
    * @param array $premiumParams
-   * @param $contribution
+   * @param CRM_Contribute_BAO_Contribution $contribution
    */
   public function postProcessPremium($premiumParams, $contribution) {
     $hour = $minute = $second = 0;
@@ -1280,7 +1270,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return \CRM_Contribute_DAO_Contribution
    * @throws \Exception
    */
-  public static function processContribution(
+  public static function processFormContribution(
     &$form,
     $params,
     $result,
@@ -1297,6 +1287,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contributeMode = $form->_contributeMode;
     $isMonetary = !empty($form->_values['is_monetary']);
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
+    // How do these vary from params? These are currently passed to
+    // - custom data function....
+    $formParams = $form->_params;
+    $isSeparateMembershipPayment = empty($formParams['separate_membership_payment']) ? FALSE : TRUE;
+    $pledgeID = empty($formParams['pledge_id']) ? NULL : $formParams['pledge_id'];
+    if (!$isSeparateMembershipPayment && !empty($form->_values['pledge_block_id']) &&
+      (!empty($formParams['is_pledge']) || $pledgeID)) {
+      $isPledge = TRUE;
+    }
+    else {
+      $isPledge = FALSE;
+    }
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
@@ -1368,7 +1370,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if ($invoicing) {
-        $totalTaxAmount = 0;
         $dataArray = array();
         foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
           foreach ($lineItemValue as $key => $value) {
@@ -1402,12 +1403,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     CRM_Contribute_Form_Contribution_Confirm::processPcpSoft($params, $contribution);
 
     //handle pledge stuff.
-    if (empty($form->_params['separate_membership_payment']) && !empty($form->_values['pledge_block_id']) &&
-      (!empty($form->_params['is_pledge']) || !empty($form->_values['pledge_id']))
-    ) {
-
-      if (!empty($form->_values['pledge_id'])) {
-
+    if ($isPledge) {
+      if ($pledgeID) {
         //when user doing pledge payments.
         //update the schedule when payment(s) are made
         foreach ($form->_params['pledge_amount'] as $paymentId => $dontCare) {
@@ -1429,7 +1426,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         //update pledge status according to the new payment statuses
-        CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($form->_values['pledge_id']);
+        CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID);
       }
       else {
         //when user creating pledge record.
@@ -1484,7 +1481,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if ($online && $contribution) {
       CRM_Core_BAO_CustomValueTable::postProcess($form->_params,
-        CRM_Core_DAO::$_nullArray,
         'civicrm_contribution',
         $contribution->id,
         'Contribution'
@@ -2044,8 +2040,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->_values['fee'] = $priceSetFields['fields'];
     $form->_priceSetId = $priceSetID;
     $form->setFormAmountFields($priceSetID);
-    if (!empty($params['payment_processor'])) {
-      $form->_paymentProcessor = civicrm_api3('payment_processor', 'getsingle', array('id' => $params['payment_processor']));
+    if (!empty($params['payment_processor_id'])) {
+      $form->_paymentProcessor = civicrm_api3('payment_processor', 'getsingle', array(
+        'id' => $params['payment_processor_id'],
+      ));
       if ($form->_paymentProcessor['billing_mode'] == 1) {
         $form->_contributeMode = 'direct';
       }
@@ -2054,7 +2052,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     else {
-      $form->_params['payment_processor'] = 0;
+      $form->_params['payment_processor_id'] = 0;
     }
     $priceFields = $priceFields[$priceSetID]['fields'];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
@@ -2063,8 +2061,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Helper function for static submit function - set relevant params - help us to build up an array that we can pass
-   * in.
+   * Helper function for static submit function.
+   *
+   * Set relevant params - help us to build up an array that we can pass in.
    *
    * @param int $id
    * @param array $params
@@ -2074,7 +2073,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public static function getFormParams($id, array $params) {
     if (!isset($params['is_pay_later'])) {
-      if (!empty($params['payment_processor'])) {
+      if (!empty($params['payment_processor_id'])) {
         $params['is_pay_later'] = 0;
       }
       else {

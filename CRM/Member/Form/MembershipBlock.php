@@ -243,19 +243,13 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $paymentProcessorId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $paymentProcessorIds);
 
         if (!empty($paymentProcessorId)) {
-          $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
           foreach ($paymentProcessorId as $pid) {
             if ($pid) {
-              $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
-                $pid, 'payment_processor_type_id'
-              );
+              $processor = Civi\Payment\System::singleton()->getById($pid);
+              if (!$processor->supports('MultipleConcurrentPayments')) {
+                $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
+              }
             }
-            if (!($paymentProcessorTypeId == CRM_Utils_Array::key('PayPal', $paymentProcessorType) ||
-              ($paymentProcessorTypeId == CRM_Utils_Array::key('AuthNet', $paymentProcessorType)))
-            ) {
-              $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
-            }
-
           }
         }
       }
@@ -289,12 +283,26 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       }
       else {
         $membershipType = array_values($params['membership_type']);
+        $isRecur = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contributionPageId, 'is_recur');
         if (array_sum($membershipType) == 0) {
           $errors['membership_type'] = ts('Please select at least one Membership Type to include in the Membership section of this page.');
         }
         elseif (array_sum($membershipType) > CRM_Price_Form_Field::NUM_OPTION) {
           // for CRM-13079
           $errors['membership_type'] = ts('You cannot select more than %1 choices. For more complex functionality, please use a Price Set.', array(1 => CRM_Price_Form_Field::NUM_OPTION));
+        }
+        elseif ($isRecur) {
+          if (empty($params['is_separate_payment']) && array_sum($membershipType) != 0) {
+            $errors['is_separate_payment'] = ts('You need to enable Separate Membership Payment when online contribution page is configured for both Membership and Recurring Contribution');
+          }
+          elseif (!empty($params['is_separate_payment'])) {
+            foreach ($params['membership_type'] as $mt => $dontCare) {
+              if (!empty($params["auto_renew_$mt"])) {
+                $errors["auto_renew_$mt"] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page');
+                break;
+              }
+            }
+          }
         }
       }
 

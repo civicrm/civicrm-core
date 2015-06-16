@@ -634,7 +634,20 @@ LIMIT 1;";
     $isNewContribution = FALSE;
     if (empty($contribution->id)) {
       $isNewContribution = TRUE;
+      if (!empty($input['amount']) &&  $input['amount'] != $contribution->total_amount) {
+        $contribution->total_amount = $input['amount'];
+        // The BAO does this stuff but we are actually kinda bypassing it here (bad code! go sit in the corner)
+        // so we have to handle net_amount in this (naughty) code.
+        if (isset($input['fee_amount']) && is_numeric($input['fee_amount'])) {
+          $contribution->fee_amount = $input['fee_amount'];
+        }
+        $contribution->net_amount = $contribution->total_amount - $contribution->fee_amount;
+      }
+      if (!empty($input['campaign_id'])) {
+        $contribution->campaign_id = $input['campaign_id'];
+      }
     }
+
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
         'labelColumn' => 'name',
         'flip' => 1,
@@ -672,6 +685,7 @@ LIMIT 1;";
       $contributionId['id'] = $contribution->id;
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
+
     $contribution->save();
 
     // Add new soft credit against current $contribution.
@@ -1073,12 +1087,23 @@ LIMIT 1;";
 
     $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
+    if (count($lineItems) == 1) {
+      foreach ($lineItems as $index => $lineItem) {
+        if ($lineItem['line_total'] != $contribution->total_amount) {
+          // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
+          // if there is only one line item, and the UI should prevent this situation for those with more than one.
+          $lineItems[$index]['line_total'] = $contribution->total_amount;
+          $lineItems[$index]['unit_price'] = round($contribution->total_amount / $lineItems[$index]['qty'], 2);
+        }
+      }
+    }
     if (!empty($lineItems)) {
       foreach ($lineItems as $key => $value) {
         $priceField = new CRM_Price_DAO_PriceField();
         $priceField->id = $value['price_field_id'];
         $priceField->find(TRUE);
         $lineSets[$priceField->price_set_id][] = $value;
+
         if ($value['entity_table'] == 'civicrm_membership') {
           try {
             civicrm_api3('membership_payment', 'create', array(

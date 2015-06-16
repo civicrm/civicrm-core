@@ -183,7 +183,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    *   associated array with payment processor related fields
    */
-  public static function getPayment($paymentProcessorID, $mode) {
+  public static function getPayment($paymentProcessorID, $mode = 'based_on_id') {
     if (!$paymentProcessorID) {
       CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
     }
@@ -208,6 +208,26 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     else {
       return self::buildPayment($dao, $mode);
     }
+  }
+
+  /**
+   * Given a live processor ID get the test id.
+   *
+   * @param int $id
+   *
+   * @return int
+   *   Test payment processor ID.
+   */
+  public static function getTestProcessorId($id) {
+    $liveProcessorName = civicrm_api3('payment_processor', 'getvalue', array(
+      'id' => $id,
+      'return' => 'name',
+    ));
+    return civicrm_api3('payment_processor', 'getvalue', array(
+      'return' => 'id',
+      'name' => $liveProcessorName,
+      'domain_id' => CRM_Core_Config::domainID(),
+    ));
   }
 
   /**

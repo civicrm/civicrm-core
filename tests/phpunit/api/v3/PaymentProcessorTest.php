@@ -76,7 +76,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   public function testPaymentProcessorCreate() {
     $params = $this->_params;
     $result = $this->callAPIAndDocument('payment_processor', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($result['id']);
 
     //assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Financial_DAO_PaymentProcessor', $result['id'], $params);

@@ -236,7 +236,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor' => 1,
+      'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
@@ -279,7 +279,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
       'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor' => 1,
+      'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
@@ -341,7 +341,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
       'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor' => 1,
+      'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
@@ -349,6 +349,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'is_recur' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
+      'is_pay_later' => 1,
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);

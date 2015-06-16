@@ -620,11 +620,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $title
    *   The title of the form.
-   *
-   * @return void
    */
   public function setTitle($title) {
     $this->_title = $title;
+  }
+
+  /**
+   * Assign billing type id to bltID.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function assignBillingType() {
+    $this->_bltID = CRM_Core_BAO_Location::getBillingLocationId();
+    $this->set('bltID', $this->_bltID);
+    $this->assign('bltID', $this->_bltID);
   }
 
   /**
@@ -1197,7 +1206,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           'Select Country',
           'Multi-Select Country',
           'AdvMulti-Select',
-          'CheckBox',
+          'CheckBoxGroup',
+          'RadioGroup',
           'Radio',
     )));
 
@@ -1262,7 +1272,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         break;
 
       case 'hidden':
-        $this->add('hidden', $name, $label, $props, $required);
+        $this->add('hidden', $name, NULL, $props, $required);
         break;
 
       case 'TextArea':
@@ -1272,9 +1282,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $this->addElement('textarea', $name, $label, $props, $required);
         break;
 
-      //case 'Select Date':
-      //TODO: Add date formats
-      //TODO: Add javascript template for dates.
+      case 'Select Date':
+        //TODO: add range support
+        //TODO: Add date formats
+        //TODO: Add javascript template for dates.
+        $this->addDate($name, $label, $required, $props);
+        break;
+
       case 'Radio':
         $separator = isset($props['separator']) ? $props['separator'] : NULL;
         unset($props['separator']);
@@ -1292,9 +1306,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         // TODO: Add and/or option for fields that store multiple values
         break;
 
+      case 'CheckBoxGroup':
+        $this->addCheckBox($name, $label, array_flip($options), $required, $props);
+        break;
+
+      case 'RadioGroup':
+        $this->addRadio($name, $label, $options, $props, NULL, $required);
+        break;
+
       //case 'AdvMulti-Select':
       case 'CheckBox':
-        $this->add('checkbox', $name, $label, NULL, $required);
+        $text = isset($props['text']) ? $props['text'] : NULL;
+        unset($props['text']);
+        $this->addElement('checkbox', $name, $label, $text, $props);
         break;
 
       case 'File':
@@ -1778,13 +1802,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
-      return $tempID;
+      return (int) $tempID;
     }
 
     $userID = $this->getLoggedInUserContactID();
 
-    if ($tempID == $userID) {
-      return $userID;
+    if (!is_null($tempID) && $tempID === $userID) {
+      return (int) $userID;
     }
 
     //check if this is a checksum authentication
@@ -1801,7 +1825,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       return $tempID;
     }
 
-    return $userID;
+    return is_numeric($userID) ? $userID : NULL;
   }
 
   /**

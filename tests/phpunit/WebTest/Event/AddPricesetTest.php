@@ -622,9 +622,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText("crm-notification-container", "Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -636,7 +636,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       )
     );
     $this->waitForElementPresent("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td");
-    $this->verifyText("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td/table/tbody/tr[2]/td", preg_quote('$ 2,705.00'), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td/table/tbody/tr[2]/td", preg_quote('$ 2,705.00'));
     $expectedLineItems = array(
       2 => array(
         1 => 'Full Conference',
