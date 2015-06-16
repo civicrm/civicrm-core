@@ -304,7 +304,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param int $groupID
    * @param string $subType
    * @param string $subName
-   * @param boolean $fromCache
+   * @param bool $fromCache
+   * @param bool $onlySubType
+   *   Only return specified subtype or return specified subtype + unrestricted fields.
+   * @param bool $returnAll
+   *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
+   *   api - through which it is properly tested - so can be refactored with some comfort.)
    *
    * @return array $groupTree  - array  The returned array is keyed by group id and has the custom group table fields
    * and a subkey 'fields' holding the specific custom fields.
@@ -323,7 +328,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $subType  = NULL,
     $subName  = NULL,
     $fromCache = TRUE,
-    $onlySubType = NULL
+    $onlySubType = NULL,
+    $returnAll = FALSE
   ) {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
@@ -448,8 +454,10 @@ WHERE civicrm_custom_group.is_active = 1
 WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_field.is_active = 1
   AND civicrm_custom_group.extends IN ($in)
-  AND civicrm_custom_group.extends_entity_column_value IS NULL
 ";
+      if (!$returnAll) {
+        $strWhere .= "AND civicrm_custom_group.extends_entity_column_value IS NULL";
+      }
     }
 
     $params = array();
