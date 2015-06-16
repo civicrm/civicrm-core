@@ -1281,8 +1281,11 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
     CRM_Core_DAO::$_nullObject,
     $entity_id,
     $groupID,
-    $subType,
-    $subName
+    NULL,
+    $subName,
+    TRUE,
+    NULL,
+    TRUE
   );
   $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, CRM_Core_DAO::$_nullObject);
   $customValues = array();
