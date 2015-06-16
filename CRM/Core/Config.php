@@ -398,6 +398,20 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     // between CRM_Core_Config and CRM_Core_Component (they
     // are co-dependant)
     $this->componentRegistry = new CRM_Core_Component();
+    
+    // add active extensions path to include_path
+    // previously it was added later for particular extension
+    // in each extension.civix.php script
+    // but doing this earlier allows to use components inside extensions
+    global $civicrm_root;
+    $extensionsContainer = new CRM_Extension_Container_Basic($civicrm_root, $this->resourceBase);
+    $extensions = CRM_Core_PseudoConstant::getExtensions();
+    $enableExtensions = array();
+    foreach (array_keys($extensions) as $extension)
+    {
+        $enableExtensions[$extension] = $extensionsContainer->getPath($extension);
+    }
+    set_include_path(implode(PATH_SEPARATOR, $enableExtensions) . PATH_SEPARATOR . get_include_path());
   }
 
   /**
