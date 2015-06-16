@@ -390,6 +390,30 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   /**
    * Test civicrm_activity_create() with valid parameters and custom data.
    */
+  public function testActivityCreateCustomSubType() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $this->callAPISuccess('CustomGroup', 'create', array(
+      'extends_entity_column_value' => $this->test_activity_type_value,
+      'id' => $ids['custom_group_id'],
+      'extends' => 'Activity',
+      'is_active' => TRUE,
+    ));
+    $params = $this->_params;
+    $params['custom_' . $ids['custom_field_id']] = "custom string";
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'id' => $result['id'],
+    ));
+    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
+   * Test civicrm_activity_create() with valid parameters and custom data.
+   */
   public function testActivityCreateCustomContactRefField() {
 
     $this->callAPISuccess('contact', 'create', array('id' => $this->_contactID, 'sort_name' => 'Contact, Test'));
