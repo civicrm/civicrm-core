@@ -146,7 +146,8 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       }
     }
 
-    if (!empty($this->_userOptions['Permissioned Orgs'])) {
+    // CRM-16512 - Hide related contact table if user lacks permission to view self
+    if (!empty($this->_userOptions['Permissioned Orgs']) && CRM_Core_Permission::check('view my contact')) {
       $dashboardElements[] = array(
         'class' => 'crm-dashboard-permissionedOrgs',
         'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
