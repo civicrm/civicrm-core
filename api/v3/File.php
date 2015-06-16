@@ -136,6 +136,6 @@ function civicrm_api3_file_delete($params) {
     return civicrm_api3_create_success();
   }
   else {
-    return civicrm_api3_create_error('Error while deleting a file.');
+    throw new API_Exception('Error while deleting a file.');
   }
 }
