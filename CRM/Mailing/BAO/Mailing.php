@@ -2652,6 +2652,11 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
     }
 
+    //TODO standardize on this method
+    if (method_exists($form, 'listTokens')) {
+      $tokens = array_merge($form->listTokens(), $tokens);
+    }
+
     //sorted in ascending order tokens by ignoring word case
     $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
@@ -2704,7 +2709,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       else {
         $templates[$prefix] = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
       }
-
       if (!empty($templates[$prefix])) {
         $form->assign('templates', TRUE);
 
@@ -2720,6 +2724,14 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       );
       $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
     }
+
+    // I'm not sure this is ever called.
+    $action = CRM_Utils_Request::retrieve('action', 'String', $form, FALSE);
+    if ((CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Task_PDF') &&
+        $action == CRM_Core_Action::VIEW
+    ) {
+      $form->freeze('html_message');
+    }
   }
 
   /**
@@ -2728,55 +2740,10 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @param CRM_Core_Form $form
    *
    * @return void
+   * @deprecated
    */
   public static function commonLetterCompose(&$form) {
-    //get the tokens.
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    if (CRM_Utils_System::getClassName($form) == 'CRM_Mailing_Form_Upload') {
-      $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
-    }
-    //@todo move this fn onto the form
-    if (CRM_Utils_System::getClassName($form) == 'CRM_Contribute_Form_Task_PDFLetter') {
-      $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
-    }
-
-    if (method_exists($form, 'listTokens')) {
-      $tokens = array_merge($form->listTokens(), $tokens);
-    }
-
-    $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
-
-    $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
-    if (!empty($form->_templates)) {
-      $form->assign('templates', TRUE);
-      $form->add('select', 'template', ts('Select Template'),
-        array(
-          '' => ts('- select -'),
-        ) + $form->_templates, FALSE,
-        array('onChange' => "selectValue( this.value,'' );")
-      );
-      $form->add('checkbox', 'updateTemplate', ts('Update Template'), NULL);
-    }
-
-    $form->add('checkbox', 'saveTemplate', ts('Save As New Template'), NULL, FALSE,
-      array('onclick' => "showSaveDetails(this);")
-    );
-    $form->add('text', 'saveTemplateName', ts('Template Title'));
-
-    $form->add('wysiwyg', 'html_message',
-      ts('Your Letter'),
-      array(
-        'cols' => '80',
-        'rows' => '8',
-        'onkeyup' => "return verify(this)",
-      )
-    );
-    $action = CRM_Utils_Request::retrieve('action', 'String', $form, FALSE);
-    if ((CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Task_PDF') &&
-      $action == CRM_Core_Action::VIEW
-    ) {
-      $form->freeze('html_message');
-    }
+    CRM_Mailing_BAO_Mailing::commonCompose($form);
   }
 
   /**
