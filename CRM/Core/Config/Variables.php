@@ -191,6 +191,13 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
     'M' => 01,
     'd' => 01,
   );
+  
+    /**
+   * Day on which week begins
+   *
+   * @var string
+   */
+  public $weekBegins = 1;
 
   /**
    * String format for monetary amounts
