@@ -400,9 +400,21 @@ SELECT label, value
             else {
               $val = CRM_Utils_Type::escape($strtolower(trim($value)), 'String');
 
-              if ($wildcard) {
-                $val = $strtolower(CRM_Core_DAO::escapeString($val));
-                $val = "%$val%";
+              $specialHTMLType = array(
+                'CheckBox',
+                'Multi-Select',
+                'AdvMulti-Select',
+                'Multi-Select State/Province',
+                'Multi-Select Country',
+              );
+
+              if (in_array($field['html_type'], $specialHTMLType)) {
+                $val = "[[:cntrl:]]" . $val . "[[:cntrl:]]";
+                $op  = 'RLIKE';
+
+              }
+              elseif ($wildcard) {
+                $val = "[[:cntrl:]]%$val%[[:cntrl:]]";
                 $op = 'LIKE';
               }
 
