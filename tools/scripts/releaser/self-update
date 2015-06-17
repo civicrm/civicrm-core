@@ -11,6 +11,6 @@ if [ -z "$git_user" -o -z "$git_branch" ]; then
   exit 1
 fi
 
-wget -O gitify "https://raw.github.com/${git_user}/civicrm-core/${git_branch}/bin/gitify"
+wget -O gitify "https://raw.github.com/${git_user}/civicrm-buildkit/master/bin/gitify"
 wget -O releaser "https://raw.github.com/${git_user}/civicrm-core/${git_branch}/tools/scripts/releaser/releaser"
 wget -O releaser.conf.txt "https://raw.github.com/${git_user}/civicrm-core/${git_branch}/tools/scripts/releaser/releaser.conf.txt"
