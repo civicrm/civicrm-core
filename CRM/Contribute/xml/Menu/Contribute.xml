@@ -304,7 +304,7 @@
     <path>civicrm/contribute/invoice</path>
     <title>PDF Invoice</title>
     <page_callback>CRM_Contribute_Form_Task_Invoice::getPrintPDF</page_callback>
-    <access_arguments>access CiviContribute</access_arguments>
+    <access_callback>CRM_Core_Permission::checkDownloadInvoice</access_callback>
     <page_type>1</page_type>
     <weight>620</weight>
     <component>CiviContribute</component>

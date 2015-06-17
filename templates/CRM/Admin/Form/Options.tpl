@@ -74,6 +74,16 @@
                 <td>{$form.grouping.html}</td>
             </tr>
       {/if}
+
+      {if $form.value.html && $gName neq 'redaction_rule'}
+        <tr class="crm-admin-options-form-block-value">
+          <td class="label">{$form.value.label}</td>
+          <td>{$form.value.html}<br />
+              <span class="description"><div class="icon ui-icon-alert"></div>{ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
+          </td>
+        </tr>
+      {/if}
+
         {if $gName eq 'custom_search'}
            <tr class="crm-admin-options-form-block-search_title">
              <td class="label">{ts}Search Title{/ts}</td>
@@ -82,21 +92,14 @@
              </td>
            </tr>
         {else}
-           {if $gName eq 'redaction_rule'}
-              <tr class="crm-admin-options-form-block-replacement">
-                 <td class="label">{ts}Replacement (prefix){/ts}</td>
-                 <td>{$form.value.html}<br />
-                   <span class="description">{ts}Matched values are replaced with this prefix plus a unique code. EX: If replacement prefix for &quot;Vancouver&quot; is <em>city_</em>, occurrences will be replaced with <em>city_39121</em>.{/ts}</span>
-                 </td>
-              </tr>
-            {elseif $form.value.html}
-              <tr class="crm-admin-options-form-block-value">
-                <td class="label">{$form.value.label}</td>
-                <td>{$form.value.html}<br />
-                    <span class="description"><div class="icon ui-icon-alert"></div>{ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
-                </td>
-              </tr>
-            {/if}
+          {if $gName eq 'redaction_rule'}
+            <tr class="crm-admin-options-form-block-replacement">
+               <td class="label">{ts}Replacement (prefix){/ts}</td>
+               <td>{$form.value.html}<br />
+                 <span class="description">{ts}Matched values are replaced with this prefix plus a unique code. EX: If replacement prefix for &quot;Vancouver&quot; is <em>city_</em>, occurrences will be replaced with <em>city_39121</em>.{/ts}</span>
+               </td>
+            </tr>
+          {/if}
             {if $form.name.html} {* Get the name value also *}
               <tr class="crm-admin-options-form-block-name">
                 <td class="label">{$form.name.label}</td>

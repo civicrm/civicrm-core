@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -17,7 +17,8 @@
  | See the GNU Affero General Public License for more details.        |
  |                                                                    |
  | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
@@ -179,6 +180,44 @@ class CRM_Upgrade_Incremental_php_FourSix {
       CRM_Core_DAO::executeQuery($sql);
     }
 
+    return TRUE;
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_6_1($rev) {
+    // CRM-16289 - Fix invalid data in log_civicrm_case.case_type_id.
+    $this->addTask(ts('Cleanup case type id data in log table.'), 'fixCaseLog');
+  }
+
+  /**
+   * Remove special characters from case_type_id column in log_civicrm_case.
+   *
+   * CRM-16289 - If logging enabled and upgrading from 4.4 or earlier, log_civicrm_case.case_type_id will contain special characters.
+   * This will cause ALTER TABLE to fail when changing this column to an INT
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function fixCaseLog(CRM_Queue_TaskContext $ctx) {
+    $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'log_civicrm_case'";
+    $res = CRM_Core_DAO::singleValueQuery($sql);
+
+    if ($res) {
+      // executeQuery doesn't like running multiple engine changes in one pass, so have to break it up. dgg
+      $query = "ALTER TABLE `log_civicrm_case` ENGINE = InnoDB;";
+      CRM_Core_DAO::executeQuery($query);
+      $query = "UPDATE log_civicrm_case SET case_type_id = replace(case_type_id, 0x01, '');";
+      CRM_Core_DAO::executeQuery($query);
+      $query = "ALTER TABLE `log_civicrm_case` ENGINE = ARCHIVE;";
+      CRM_Core_DAO::executeQuery($query);
+      $query = "ALTER TABLE log_civicrm_case MODIFY `case_type_id` int(10) unsigned DEFAULT NULL COMMENT 'FK to civicrm_case_type.id';";
+      CRM_Core_DAO::executeQuery($query);
+    }
     return TRUE;
   }
 

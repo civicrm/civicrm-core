@@ -34,7 +34,7 @@
  */
 
 /**
- * Auxilary class to provide support to the Contact Form class. Does this by implementing
+ * Auxiliary class to provide support to the Contact Form class. Does this by implementing
  * a small set of static methods
  *
  */

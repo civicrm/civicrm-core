@@ -280,8 +280,25 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   public static function formRule($params, $files, $self) {
     $errors = array();
     $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
+    $fields = array(
+      'total_amount' => 'Amount',
+      'financial_type' => 'Financial Type',
+      'payment_instrument' => 'Paid By',
+    );
+
+    //CRM-16480 if contact is selected, validate financial type and amount field.
+    foreach ($params['field'] as $key => $value) {
+      foreach ($fields as $field => $label) {
+        if (!empty($params['primary_contact_id'][$key]) && empty($value[$field])) {
+          $errors["field[$key][$field]"] = ts('%1 is a required field.', array(1 => $label));
+        }
+      }
+    }
 
     if (!empty($params['_qf_Entry_upload_force'])) {
+      if (!empty($errors)) {
+        return $errors;
+      }
       return TRUE;
     }
 
@@ -306,15 +323,17 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     if ($self->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
       foreach (array_unique($params["open_pledges"]) as $value) {
-        $duplicateRows = array_keys($params["open_pledges"], $value);
-        if (count($duplicateRows) > 1) {
+        if (!empty($value)) {
+          $duplicateRows = array_keys($params["open_pledges"], $value);
+        }
+        if (!empty($duplicateRows) && count($duplicateRows) > 1) {
           foreach ($duplicateRows as $key) {
             $errors["open_pledges[$key]"] = ts('You can not record two payments for the same pledge in a single batch.');
           }
         }
       }
     }
-    if ($batchTotal != $self->_batchInfo['total']) {
+    if ((string) $batchTotal != $self->_batchInfo['total']) {
       $self->assign('batchAmountMismatch', TRUE);
       $errors['_qf_defaults'] = ts('Total for amounts entered below does not match the expected batch total.');
     }
@@ -463,7 +482,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          CRM_Core_DAO::$_nullObject,
           NULL,
           'Contribution'
         );
@@ -674,7 +692,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
-          $customFields,
           $key,
           'Membership',
           $membershipTypeId
@@ -775,8 +792,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $membership = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
             $value['contact_id'],
             $value['membership_type_id'],
-            FALSE, $this, NULL, NULL,
-            $value['custom']
+            FALSE,
+            $this,
+            NULL,
+            NULL,
+            $value['custom'],
+            1,
+            NULL,
+            FALSE
           );
 
           // make contribution entry

@@ -136,12 +136,10 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $fields = array();
 
     $transaction = new CRM_Core_Transaction();
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
-      $fields,
       'civicrm_case',
       $this->_entityID,
       'Case'

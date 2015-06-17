@@ -61,6 +61,8 @@
             <div class="crm-content crm-custom-data crm-contact-reference">
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$element.contact_ref_id`"}" title="view contact">{$element.field_value}</a>
             </div>
+          {elseif $element.field_data_type EQ 'Memo'}
+            <div class="crm-content crm-custom-data">{$element.field_value|nl2br}</div>
           {else}
             <div class="crm-content crm-custom-data">{$element.field_value}</div>
           {/if}

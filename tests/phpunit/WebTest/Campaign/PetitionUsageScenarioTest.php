@@ -121,8 +121,8 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $this->type("petition_title", $title);
 
     $this->click("xpath=//div[@class='crm-accordion-body']/table/tbody/tr[2]/td/a[text()='Search']");
-    $this->waitForElementPresent("xpath=//table[@class='petitions dataTable no-footer']/tbody//tr/td[10]/span[2][text()='more']/ul/li[2]/a[text()='Sign']");
-    $url = $this->getAttribute("xpath=//table[@class='petitions dataTable no-footer']/tbody//tr/td[10]/span[2][text()='more']/ul/li[2]/a[text()='Sign']@href");
+    $this->waitForElementPresent("xpath=//div[@id='petitionList']/div/table/tbody//tr//td[@class=' crm-petition-action']//span[text()='more']/ul//li/a[text()='Sign']");
+    $url = $this->getAttribute("xpath=//div[@id='petitionList']/div/table/tbody//tr//td[@class=' crm-petition-action']//span[text()='more']/ul//li/a[text()='Sign']@href");
 
     ////////////// Retrieve Sign Petition Url /////////////////////////
 

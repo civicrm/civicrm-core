@@ -563,7 +563,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
-        // sort everything BUT the contactType which is sorted seperately by
+        // sort everything BUT the contactType which is sorted separately by
         // an initial commit of CRM-13278 (check ksort above)
         if (!in_array($key, $contactType)) {
           asort($mapperFields[$key]);
@@ -1044,7 +1044,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
           // CRM-14563: we store checkbox, multi-select and adv-multi select custom field using separator, hence it
           // needs special handling.
-          if ($cfID = CRM_Core_BAO_CustomField::getKeyID($v[1])) {
+          if ($cfID = CRM_Core_BAO_CustomField::getKeyID(CRM_Utils_Array::value(1, $v))) {
             $isCustomField = TRUE;
             $customFieldType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
             $specialHTMLType = array(

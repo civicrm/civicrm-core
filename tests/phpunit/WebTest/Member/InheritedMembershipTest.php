@@ -401,7 +401,7 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     // verify membership id and membership activity id with previous one
     // FIXME: These 2 lines are currently failing because the inherited membership and signup activity or being recreated when contact is edited/saved. dgg
     $this->assertEquals($expectedMembershipId, $actualMembershipId1);
-    $this->assertNotEquals($expectedMembershipActivityId, $actualMembershipActivityId1);
+    $this->assertEquals($expectedMembershipActivityId, $actualMembershipActivityId1);
 
     // click through to the relationship view screen after edit
     $this->click('css=li#tab_rel a');

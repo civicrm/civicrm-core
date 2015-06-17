@@ -511,6 +511,50 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $this->assertArrayHasKey('id', $result['values'][0]['children'][0]);
   }
 
+  public function testClone() {
+    // BEGIN SAMPLE DATA
+    $groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
+    $contactIDs['include_me'] = $this->individualCreate(array(
+      'email' => 'include.me@example.org',
+      'first_name' => 'Includer',
+      'last_name' => 'Person',
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'group_id' => $groupIDs['inc'],
+      'contact_id' => $contactIDs['include_me'],
+    ));
+
+    $params = $this->_params;
+    $params['groups']['include'] = array($groupIDs['inc']);
+    $params['groups']['exclude'] = array();
+    $params['mailings']['include'] = array();
+    $params['mailings']['exclude'] = array();
+    // END SAMPLE DATA
+
+    $create = $this->callAPISuccess('Mailing', 'create', $params);
+    $createId = $create['id'];
+    $this->createLoggedInUser();
+    $clone = $this->callAPIAndDocument('Mailing', 'clone', array('id' => $create['id']), __FUNCTION__, __FILE__);
+    $cloneId = $clone['id'];
+
+    $this->assertNotEquals($createId, $cloneId, 'Create and clone should return different records');
+    $this->assertTrue(is_numeric($cloneId));
+
+    $this->assertNotEmpty($clone['values'][$cloneId]['subject']);
+    $this->assertEquals($params['subject'], $clone['values'][$cloneId]['subject'], "Cloned subject should match");
+
+    // created_id is special - populated based on current user (ie the cloner).
+    $this->assertNotEmpty($clone['values'][$cloneId]['created_id']);
+    $this->assertNotEquals($create['values'][$createId]['created_id'], $clone['values'][$cloneId]['created_id'], 'Clone should be created by a different person');
+
+    // Target groups+mailings are special.
+    $cloneGroups = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $cloneId, 'sequential' => 1));
+    $this->assertEquals(1, $cloneGroups['count']);
+    $this->assertEquals($cloneGroups['values'][0]['group_type'], 'Include');
+    $this->assertEquals($cloneGroups['values'][0]['entity_table'], 'civicrm_group');
+    $this->assertEquals($cloneGroups['values'][0]['entity_id'], $groupIDs['inc']);
+  }
+
   //@ todo tests below here are all failure tests which are not hugely useful - need success tests
 
   //------------ civicrm_mailing_event_bounce methods------------

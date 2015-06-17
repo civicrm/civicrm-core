@@ -25,6 +25,8 @@ class Manager {
    *   - partials: array(string $relativeFilePath)
    *     A list of partial-HTML folders (relative to the extension).
    *     This will be mapped to "~/moduleName" by crmResource.
+   *   - settings: array(string $key => mixed $value)
+   *     List of settings to preload.
    */
   protected $modules = NULL;
 
@@ -50,9 +52,12 @@ class Manager {
    *   - partials: array(string $relativeFilePath)
    *     A list of partial-HTML folders (relative to the extension).
    *     This will be mapped to "~/moduleName" by crmResource.
+   *   - settings: array(string $key => mixed $value)
+   *     List of settings to preload.
    */
   public function getModules() {
     if ($this->modules === NULL) {
+      $config = \CRM_Core_Config::singleton();
 
       $angularModules = array();
       $angularModules['angularFileUpload'] = array(
@@ -61,22 +66,25 @@ class Manager {
       );
       $angularModules['crmApp'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmApp.js'),
+        'js' => array('ang/crmApp.js'),
       );
       $angularModules['crmAttachment'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmAttachment.js'),
-        'css' => array('css/angular-crmAttachment.css'),
-        'partials' => array('partials/crmAttachment'),
+        'js' => array('ang/crmAttachment.js'),
+        'css' => array('ang/crmAttachment.css'),
+        'partials' => array('ang/crmAttachment'),
+        'settings' => array(
+          'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
+        ),
       );
       $angularModules['crmAutosave'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crmAutosave.js'),
+        'js' => array('ang/crmAutosave.js'),
       );
       //$angularModules['crmExample'] = array(
       //  'ext' => 'civicrm',
-      //  'js' => array('js/angular-crmExample.js'),
-      //  'partials' => array('partials/crmExample'),
+      //  'js' => array('ang/crmExample.js'),
+      //  'partials' => array('ang/crmExample'),
       //);
       $angularModules['crmResource'] = array(
         'ext' => 'civicrm',
@@ -85,17 +93,25 @@ class Manager {
       );
       $angularModules['crmUi'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crm-ui.js', 'packages/ckeditor/ckeditor.js'),
-        'partials' => array('partials/crmUi'),
+        'js' => array('ang/crmUi.js'),
+        'partials' => array('ang/crmUi'),
+        'settings' => array(
+          'browseUrl' => $config->userFrameworkResourceURL . 'packages/kcfinder/browse.php',
+          'uploadUrl' => $config->userFrameworkResourceURL . 'packages/kcfinder/upload.php',
+        ),
       );
       $angularModules['crmUtil'] = array(
         'ext' => 'civicrm',
-        'js' => array('js/angular-crm-util.js'),
+        'js' => array('ang/crmUtil.js'),
       );
       // https://github.com/jwstadler/angular-jquery-dialog-service
       $angularModules['dialogService'] = array(
         'ext' => 'civicrm',
         'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'),
+      );
+      $angularModules['ngRoute'] = array(
+        'ext' => 'civicrm',
+        'js' => array('bower_components/angular-route/angular-route.min.js'),
       );
       $angularModules['ui.utils'] = array(
         'ext' => 'civicrm',
@@ -255,36 +271,48 @@ class Manager {
   }
 
   /**
-   * @param string $name
-   *   Module name.
+   * Get resources for one or more modules.
+   *
+   * @param string|array $moduleNames
+   *   List of module names.
+   * @param string $resType
+   *   Type of resource ('js', 'css', 'settings').
+   * @param string $refType
+   *   Type of reference to the resource ('cacheUrl', 'rawUrl', 'path', 'settings').
    * @return array
-   *   List of URLs.
-   * @throws \Exception
+   *   List of URLs or paths.
+   * @throws \CRM_Core_Exception
    */
-  public function getScriptUrls($name) {
-    $module = $this->getModule($name);
+  public function getResources($moduleNames, $resType, $refType) {
     $result = array();
-    if (isset($module['js'])) {
-      foreach ($module['js'] as $file) {
-        $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
-      }
-    }
-    return $result;
-  }
+    $moduleNames = (array) $moduleNames;
+    foreach ($moduleNames as $moduleName) {
+      $module = $this->getModule($moduleName);
+      if (isset($module[$resType])) {
+        foreach ($module[$resType] as $file) {
+          switch ($refType) {
+            case 'path':
+              $result[] = $this->res->getPath($module['ext'], $file);
+              break;
 
-  /**
-   * @param string $name
-   *   Module name.
-   * @return array
-   *   List of URLs.
-   * @throws \Exception
-   */
-  public function getStyleUrls($name) {
-    $module = $this->getModule($name);
-    $result = array();
-    if (isset($module['css'])) {
-      foreach ($module['css'] as $file) {
-        $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
+            case 'rawUrl':
+              $result[] = $this->res->getUrl($module['ext'], $file);
+              break;
+
+            case 'cacheUrl':
+              $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
+              break;
+
+            case 'settings':
+              if (!empty($module[$resType])) {
+                $result[$moduleName] = $module[$resType];
+              }
+              break;
+
+            default:
+              throw new \CRM_Core_Exception("Unrecognized resource format");
+          }
+        }
       }
     }
     return $result;

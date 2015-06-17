@@ -172,7 +172,7 @@ class CRM_Core_Form_Date {
       'ending_2.year' => ts('Last 2 Years'),
       'ending.year' => ts('Last 12 Months'),
       'ending.quarter' => ts('Last 3 Months'),
-      'ending.month' => ts('Last Month'),
+      'ending.month' => ts('Last 30 days'),
       'ending.week' => ts('Last 7 days'),
       'previous.day' => ts('Yesterday'),
       'this.year' => ts('This Year'),

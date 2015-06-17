@@ -74,10 +74,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $return = $lineItemBAO->save();
 
     if ($id) {
-      CRM_Utils_Hook::post('edit', 'LineItem', $id, $params);
+      CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO);
     }
     else {
-      CRM_Utils_Hook::post('create', 'LineItem', $params['entity_id'], $params);
+      CRM_Utils_Hook::post('create', 'LineItem', $lineItemBAO->id, $lineItemBAO);
     }
 
     return $return;
@@ -149,10 +149,11 @@ AND li.entity_id = {$entityId}
    *   this function precedes the convenience of the contribution id but since it does quite a bit more than just a db retrieval we need to be able to use it even
    *   when we don't want it's entity-id magix
    *
+   * @param bool $invoice
    * @return array
    *   Array of line items
    */
-  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '') {
+  public static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL, $isQtyZero = TRUE, $relatedEntity = FALSE, $overrideWhereClause = '', $invoice = FALSE) {
     $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -186,6 +187,14 @@ AND li.entity_id = {$entityId}
       LEFT JOIN civicrm_price_field pf ON (pf.id = li.price_field_id )";
     $whereClause = "
       WHERE     %2.id = %1";
+
+    // CRM-16250 get additional participant's fee selection details only for invoice PDF (if any)
+    if ($entity == 'participant' && $invoice) {
+      $additionalParticipantIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
+      if (!empty($additionalParticipantIDs)) {
+        $whereClause = "WHERE %2.id IN (%1, " . implode(', ', $additionalParticipantIDs) . ")";
+      }
+    }
 
     $orderByClause = " ORDER BY pf.weight, pfv.weight";
 
@@ -542,10 +551,10 @@ AND li.entity_id = {$entityId}
       return FALSE;
     }
     if ($lineItemId['html_type'] == 'Text') {
-      $tax = $lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100;
+      $tax = round($lineItemId['tax_amount'] / ($lineItemId['unit_price'] * $lineItemId['qty']) * 100, 2);
     }
     else {
-      $tax = ($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100;
+      $tax = round(($lineItemId['tax_amount'] / $lineItemId['unit_price']) * 100, 2);
     }
     return $tax;
   }

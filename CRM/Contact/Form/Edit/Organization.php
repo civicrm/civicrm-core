@@ -34,7 +34,7 @@
  */
 
 /**
- * Auxilary class to provide support to the Contact Form class. Does this by implementing
+ * Auxiliary class to provide support to the Contact Form class. Does this by implementing
  * a small set of static methods
  *
  */
@@ -53,32 +53,27 @@ class CRM_Contact_Form_Edit_Organization {
    * @return void
    */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
-
     $form->applyFilter('__ALL__', 'trim');
 
     if (!$inlineEditMode || $inlineEditMode == 1) {
       // Organization_name
-      $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name']);
+      $form->addField('organization_name');
     }
 
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // legal_name
-      $form->addElement('text', 'legal_name', ts('Legal Name'), $attributes['legal_name']);
+      $form->addField('legal_name');
 
       // nick_name
-      $form->addElement('text', 'nick_name', ts('Nickname'),
-        CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'nick_name')
-      );
+      $form->addField('nick_name');
 
       // sic_code
-      $form->addElement('text', 'sic_code', ts('SIC Code'), $attributes['sic_code']);
-
-      $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
+      $form->addField('sic_code');
+      $form->addField('contact_source');
     }
 
     if (!$inlineEditMode) {
-      $form->add('text', 'external_identifier', ts('External ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'), FALSE);
+      $form->addField('external_identifier', array('label' => ts('External ID')));
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',

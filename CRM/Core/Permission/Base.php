@@ -256,9 +256,20 @@ class CRM_Core_Permission_Base {
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  public function getAllModulePermissions() {
+  public function getAllModulePermissions($descriptions = FALSE) {
     $permissions = array();
     CRM_Utils_Hook::permission($permissions);
+
+    if ($descriptions) {
+      foreach ($permissions as $permission => $label) {
+        $permissions[$permission] = (is_array($label)) ? $label : array($label);
+      }
+    }
+    else {
+      foreach ($permissions as $permission => $label) {
+        $permissions[$permission] = (is_array($label)) ? array_shift($label) : $label;
+      }
+    }
     return $permissions;
   }
 

@@ -81,7 +81,6 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next_new-bottom');
     //check for field add
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Last Name' has been saved to '$profileTitle'.");
-    $this->waitForText('crm-notification-container', 'You can add another profile field.');
 
     // Add Email field.
     $this->click('field_name[0]');
@@ -97,7 +96,6 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next_new-bottom');
     //check for field add
     $this->waitForText('crm-notification-container', "Your CiviCRM Profile Field 'Email' has been saved to '$profileTitle'.");
-    $this->waitForText('crm-notification-container', 'You can add another profile field.');
 
     // Add Sample Custom Field.
     $this->click('field_name[0]');

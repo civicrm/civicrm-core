@@ -24,27 +24,13 @@
  +--------------------------------------------------------------------+
 *}
 {* Callback snippet: Load payment processor *}
-{if $snippet}
-  {include file="CRM/Core/BillingBlock.tpl"}
-  <div id="paypalExpress">
-    {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
-    {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
-      {assign var=expressButtonName value='_qf_Register_upload_express'}
-      <fieldset class="crm-group payPalExpress-group">
-        <legend>{ts}Checkout with PayPal{/ts}</legend>
-        <div class="description">{ts}Click the PayPal button to continue.{/ts}</div>
-        <div>{$form.$expressButtonName.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span>
-        </div>
-      </fieldset>
-    {/if}
-  </div>
-{else}
+
   {if $action & 1024}
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
   {/if}
 
   {include file="CRM/common/TrackingFields.tpl"}
-  {capture assign='reqMark'}<span class="marker"  title="{ts}This field is required.{/ts}">*</span>{/capture}
+
   <div class="crm-event-id-{$event.id} crm-block crm-event-register-form-block">
 
     {* moved to tpl since need to show only for primary participant page *}
@@ -81,7 +67,7 @@
 
     {if $form.additional_participants.html}
       <div class="crm-section additional_participants-section" id="noOfparticipants">
-        <div class="label">{$form.additional_participants.label}</div>
+        <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
         <div class="content">
           {$form.additional_participants.html}{if $contact_id || $contact_id == NULL} &nbsp; ({ts}including yourself{/ts}){/if}
           <br/>
@@ -141,12 +127,12 @@
       </fieldset>
     {/if}
 
-    {if $form.payment_processor.label}
+    {if $form.payment_processor_id.label}
       <fieldset class="crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
         <div class="crm-section payment_processor-section">
-          <div class="label">{$form.payment_processor.label}</div>
-          <div class="content">{$form.payment_processor.html}</div>
+          <div class="label">{$form.payment_processor_id.label}</div>
+          <div class="content">{$form.payment_processor_id.html}</div>
           <div class="clear"></div>
         </div>
       </fieldset>
@@ -178,34 +164,12 @@
   </div>
   <script type="text/javascript">
     {literal}
-    function toggleConfirmButton() {
-      var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
-      var elementObj = cj('input[name="payment_processor"]');
-      if (elementObj.attr('type') == 'hidden') {
-        var processorTypeId = elementObj.val();
-      }
-      else {
-        var processorTypeId = elementObj.filter(':checked').val();
-      }
-
-      if (payPalExpressId != 0 && payPalExpressId == processorTypeId) {
-        cj("#crm-submit-buttons").hide();
-      }
-      else {
-        cj("#crm-submit-buttons").show();
-      }
-    }
-
-    cj('input[name="payment_processor"]').change(function () {
-      toggleConfirmButton();
-    });
 
     cj("#additional_participants").change(function () {
       skipPaymentMethod();
     });
 
     CRM.$(function($) {
-      toggleConfirmButton();
       skipPaymentMethod();
     });
 
@@ -235,7 +199,7 @@
         payment_processor.hide();
         payment_information.hide();
         // also unset selected payment methods
-        cj('input[name="payment_processor"]').removeProp('checked');
+        cj('input[name="payment_processor_id"]').removeProp('checked');
       }
       else {
         payment_options.show();
@@ -370,7 +334,7 @@
       }
     }
   }
-  {/literal}{/if}{literal}
+  {/literal}{literal}
 
 </script>
 {/literal}

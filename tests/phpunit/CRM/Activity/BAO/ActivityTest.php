@@ -298,7 +298,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities
     // 8 schedule activities that should be shown on dashboard
     $count = 8;
-    $this->assertEquals($count, $activityCount, 'In line ' . __LINE__);
+    $this->assertEquals($count, $activityCount);
   }
 
   /**
@@ -328,7 +328,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
     $count = 2;
-    $this->assertEquals($count, $activityCount, 'In line ' . __LINE__);
+    $this->assertEquals($count, $activityCount);
   }
 
   /**
@@ -357,7 +357,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities, Contact Summary should show all activities
     $count = 5;
-    $this->assertEquals($count, $activityCount, 'In line ' . __LINE__);
+    $this->assertEquals($count, $activityCount);
   }
 
   /**
@@ -385,7 +385,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // this contact does not have any activity
-    $this->assertEquals(0, $activityCount, 'In line ' . __LINE__);
+    $this->assertEquals(0, $activityCount);
   }
 
   /**
@@ -414,7 +414,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities
     // 8 schedule activities that should be shown on dashboard
     $count = 8;
-    $this->assertEquals($count, count($activities), 'In line ' . __LINE__);
+    $this->assertEquals($count, count($activities));
 
     foreach ($activities as $key => $value) {
       $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -450,7 +450,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
     $count = 2;
-    $this->assertEquals($count, count($activities), 'In line ' . __LINE__);
+    $this->assertEquals($count, count($activities));
 
     foreach ($activities as $key => $value) {
       $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -493,7 +493,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities, Contact Summary should show all activities
     $count = 5;
-    $this->assertEquals($count, count($activities), 'In line ' . __LINE__);
+    $this->assertEquals($count, count($activities));
 
     foreach ($activities as $key => $value) {
       $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -546,7 +546,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // This contact does not have any activities
-    $this->assertEquals(0, count($activities), 'In line ' . __LINE__);
+    $this->assertEquals(0, count($activities));
   }
 
 }

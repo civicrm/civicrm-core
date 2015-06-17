@@ -29,15 +29,23 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class generates form components for processing a contribution
+ * CRM-16229 - During the event registration bulk action via search we
+ * need to inherit CRM_Contact_Form_Task so that we can inherit functions
+ * like getContactIds and make use of controller state. But this is not possible
+ * because CRM_Event_Form_Participant inherits this class.
+ * Ideal situation would be something like
+ * CRM_Event_Form_Participant extends CRM_Contact_Form_Task,
+ * CRM_Contribute_Form_AbstractEditPayment
+ * However this is not possible. Currently PHP does not support multiple
+ * inheritance. So work around solution is to extend this class with
+ * CRM_Contact_Form_Task which further extends CRM_Core_Form.
  *
  */
-class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
+class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_mode;
 
   public $_action;
@@ -66,6 +74,14 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
    * @var array
    */
   protected $_paymentProcessors = array();
+
+  /**
+   * Instance of the payment processor object.
+   *
+   * @var CRM_Core_Payment
+   */
+  protected $_paymentObject;
+
   /**
    * The id of the contribution that we are processing.
    *
@@ -189,6 +205,16 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   public $billingFieldSets = array();
 
   /**
+   * Pre process function with common actions.
+   */
+  public function preProcess() {
+    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->assign('contactID', $this->_contactID);
+
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
+  }
+
+  /**
    * @param int $id
    */
   public function showRecordLinkMesssage($id) {
@@ -282,7 +308,7 @@ WHERE  contribution_id = {$id}
    *
    * @return null|string
    */
-  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL) {
+  protected function updateRelatedComponent($contributionId, $statusId, $previousStatusId = NULL, $receiveDate = NULL) {
     $statusMsg = NULL;
     if (!$contributionId || !$statusId) {
       return $statusMsg;
@@ -292,6 +318,7 @@ WHERE  contribution_id = {$id}
       'contribution_id' => $contributionId,
       'contribution_status_id' => $statusId,
       'previous_contribution_status_id' => $previousStatusId,
+      'receive_date' => $receiveDate,
     );
 
     $updateResult = CRM_Contribute_BAO_Contribution::transitionComponents($params);
@@ -386,22 +413,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * Assign billing type id to bltID.
-   *
-   * @throws CRM_Core_Exception
-   * @return void
-   */
-  public function assignBillingType() {
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $this->_bltID = array_search('Billing', $locationTypes);
-    if (!$this->_bltID) {
-      throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
-    }
-    $this->set('bltID', $this->_bltID);
-    $this->assign('bltID', $this->_bltID);
-  }
-
-  /**
    * Assign $this->processors, $this->recurPaymentProcessors, and related Smarty variables
    */
   public function assignProcessors() {
@@ -421,11 +432,14 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
         $this->_processors[$id] = ts($processor['name']);
+        if (!empty($processor['description'])) {
+          $this->_processors[$id] .= ' : ' . ts($processor['description']);
+        }
       }
       //get the valid recurring processors.
       $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
       $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
-      $this->_recurPaymentProcessors = array_intersect_assoc($this->_processors, $recurring);
+      $this->_recurPaymentProcessors = array_intersect_key($this->_processors, $recurring);
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
@@ -563,7 +577,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-   * @param $submittedValues
+   * @param array $submittedValues
    *
    * @return mixed
    */

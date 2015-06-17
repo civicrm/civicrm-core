@@ -116,7 +116,7 @@ class WebTest_Contact_TaskActionAddToGroupTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("toggleSelect");
     $this->click("toggleSelect");
     $this->click("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a");
-    $this->waitForText("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a", "First");
+    $this->waitForText("xpath=//div[@class='crm-content-block']/div/div[2]/div/span[2]/a", "Next >");
     $this->click("toggleSelect");
     $this->waitForText("xpath=//input[@value='ts_sel']/following-sibling::label/span", '50');
     $this->select("task", "label=Add Contacts to Group");

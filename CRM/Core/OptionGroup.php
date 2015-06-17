@@ -89,7 +89,7 @@ class CRM_Core_OptionGroup {
    * This function retrieves all the values for the specific option group by name
    * this is primarily used to create various html based form elements
    * (radio, select, checkbox etc). OptionGroups for most cases have the
-   * 'label' in the label colum and the 'id' or 'name' in the value column
+   * 'label' in the label column and the 'id' or 'name' in the value column
    *
    * @param string $name
    *   name of the option group.
@@ -201,7 +201,7 @@ WHERE  v.option_group_id = g.id
    * This function retrieves all the values for the specific option group by id.
    * this is primarily used to create various html based form elements
    * (radio, select, checkbox etc). OptionGroups for most cases have the
-   * 'label' in the label colum and the 'id' or 'name' in the value column
+   * 'label' in the label column and the 'id' or 'name' in the value column
    *
    * @param int $id
    *   id of the option group.
@@ -591,12 +591,14 @@ SELECT v.label
    * @param string $field
    * @param string $fieldType
    * @param bool $active
+   * @param bool $localize
+   *   if true, localize the results before returning.
    *
    * @return array
    */
   public static function getRowValues(
     $groupName, $fieldValue, $field = 'name',
-    $fieldType = 'String', $active = TRUE
+    $fieldType = 'String', $active = TRUE, $localize = FALSE
   ) {
     $query = "
 SELECT v.id, v.label, v.value, v.name, v.weight, v.description
@@ -629,8 +631,12 @@ WHERE  v.option_group_id = g.id
                  'description',
                ) as $fld) {
         $row[$fld] = $dao->$fld;
+        if ($localize && in_array($fld, array('label', 'description'))) {
+          $row[$fld] = ts($row[$fld]);
+        }
       }
     }
+
     return $row;
   }
 

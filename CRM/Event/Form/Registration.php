@@ -374,15 +374,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           unset($this->_values['additional_custom_post_id']);
         }
       }
-      // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-      // CRM-8108 remove ts from Billing as the location type can not be translated in CiviCRM!
-      //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
-      $this->_bltID = array_search('Billing', $locationTypes);
-      if (!$this->_bltID) {
-        CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
-      }
-      $this->set('bltID', $this->_bltID);
+
+      $this->assignBillingType();
 
       if ($this->_values['event']['is_monetary']) {
         CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
@@ -674,12 +667,20 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (property_exists($form, '_discountId') && $form->_discountId) {
       $discountId = $form->_discountId;
     }
+
+    //CRM-16456 get all price field including expired one.
+    $getAllPriceField = TRUE;
+    $className = CRM_Utils_System::getClassName($form);
+    if ($className == 'CRM_Event_Form_ParticipantFeeSelection' && $form->_action == CRM_Core_Action::UPDATE) {
+      $getAllPriceField = FALSE;
+    }
+
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', TRUE, $priceSetId);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField, $priceSetId);
     }
     else {
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', TRUE);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField);
     }
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'
@@ -755,7 +756,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
-      CRM_Core_DAO::$_nullArray,
       'civicrm_participant',
       $participant->id,
       'Participant'
@@ -1196,6 +1196,8 @@ WHERE  v.option_group_id = g.id
   /**
    * Reset values for all options those are full.
    *
+   * @param array $optionFullIds
+   * @param $form
    */
   public static function resetElementValue($optionFullIds = array(), &$form) {
     if (!is_array($optionFullIds) ||
@@ -1266,6 +1268,7 @@ WHERE  v.option_group_id = g.id
   /**
    * @param string $elementName
    * @param array $optionIds
+   * @param CRM_Core_form $form
    */
   public static function resetSubmittedValue($elementName, $optionIds = array(), &$form) {
     if (empty($elementName) ||

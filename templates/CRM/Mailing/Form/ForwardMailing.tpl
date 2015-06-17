@@ -52,34 +52,3 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
-{literal}
-<script type="text/javascript" >
-var editor = {/literal}"{$editor}"{literal};
-{/literal}
-{if $editor eq "fckeditor"}
-{literal}
-  function FCKeditor_OnComplete( editorInstance )
-  {
-     oEditor = FCKeditorAPI.GetInstance('html_comment');
-    loadEditor();
-    editorInstance.Events.AttachEvent( 'OnFocus') ;
-      }
-{/literal}
-{/if}
-{if $editor eq "tinymce"}
-{literal}
-  function customEvent() {
-    loadEditor();
-    tinyMCE.get('html_comment').onKeyPress.add(function(ed, e) {
-     });
-  }
-
-tinyMCE.init({
-  oninit : "customEvent"
-});
-
-{/literal}
-{/if}
-{literal}
-</script>
-{/literal}

@@ -106,11 +106,13 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     // ensure that role ids are encoded as a string
     if (isset($params['role_id']) && is_array($params['role_id'])) {
-      if (in_array(key($params['role_id']), CRM_Core_DAO::acceptedSQLOperators())) {
+      if (in_array(key($params['role_id']), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
         $op = key($params['role_id']);
         $params['role_id'] = $params['role_id'][$op];
       }
-      $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
+      else {
+        $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
+      }
     }
 
     $participantBAO = new CRM_Event_BAO_Participant();
@@ -2045,10 +2047,12 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
 
     // update participant fee_amount column
     $partUpdateFeeAmt['id'] = $participantId;
-    foreach ($lineItems as $lineValue) {
-      if ($lineValue['price_field_value_id']) {
-        $line[$lineValue['price_field_value_id']] = $lineValue['label'] . ' - ' . $lineValue['qty'];
-      }
+    $getUpdatedLineItems = "SELECT *
+FROM civicrm_line_item
+WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND qty > 0)";
+    $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
+    while ($getUpdatedLineItemsDAO->fetch()) {
+      $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
     }
 
     $partUpdateFeeAmt['fee_level'] = implode(', ', $line);
@@ -2093,7 +2097,8 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       if (!$skip) {
         $updatedContributionDAO->contribution_status_id = $contributionStatusVal;
       }
-      $updatedContributionDAO->total_amount = $updatedAmount;
+      $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
+      $updatedContributionDAO->fee_amount = 0;
       $updatedContributionDAO->tax_amount = $taxAmount;
       $updatedContributionDAO->save();
       // adjusted amount financial_trxn creation

@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -104,8 +102,6 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
 
   /**
    * Process the form when submitted.
-   *
-   * @return void
    */
   public function postProcess() {
     $transaction = new CRM_Core_Transaction();

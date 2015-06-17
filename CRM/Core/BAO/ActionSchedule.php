@@ -1049,7 +1049,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           );
           $rList = implode(',', $rList);
 
-          switch ($recipientOptions[$actionSchedule->recipient]) {
+          switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
             case 'participant_role':
               $where[] = "e.role_id IN ({$rList})";
               break;

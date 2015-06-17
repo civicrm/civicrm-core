@@ -206,7 +206,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         'id' => "tag_{$tagID}",
       );
 
-      $elements[$tagID] = $form->createElement('checkbox', $tagID, '', '', $tagAttribute);
+      $elements[$tagID] = $form->createElement('checkbox', $tagID, '', $varValue['name'], $tagAttribute);
 
       if (array_key_exists('children', $varValue)) {
         self::climbtree($form, $varValue['children'], $elements);

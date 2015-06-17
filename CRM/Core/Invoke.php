@@ -401,6 +401,9 @@ class CRM_Core_Invoke {
     }
     CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    //CRM-16257 update Config.IDS.ini might be an old copy
+    CRM_Core_IDS::createConfigFile(TRUE);
   }
 
 }

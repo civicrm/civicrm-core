@@ -65,6 +65,7 @@ class ManagerTest extends \CiviUnitTestCase {
       'js' => 0,
       'css' => 0,
       'partials' => 0,
+      'settings' => 0,
     );
 
     foreach ($modules as $module) {
@@ -91,11 +92,18 @@ class ManagerTest extends \CiviUnitTestCase {
           $counts['partials']++;
         }
       }
+      if (isset($module['settings'])) {
+        $this->assertTrue(is_array($module['settings']));
+        foreach ($module['settings'] as $name => $value) {
+          $counts['settings']++;
+        }
+      }
     }
 
     $this->assertTrue($counts['js'] > 0, 'Expect to find at least one JS file');
     $this->assertTrue($counts['css'] > 0, 'Expect to find at least one CSS file');
     $this->assertTrue($counts['partials'] > 0, 'Expect to find at least one partial HTML file');
+    $this->assertTrue($counts['settings'] > 1, 'Expect to find at least one setting');
   }
 
   /**
@@ -103,7 +111,7 @@ class ManagerTest extends \CiviUnitTestCase {
    */
   public function testGetPartials() {
     $partials = $this->angular->getPartials('crmMailing');
-    $this->assertRegExp('/\<form.*name="crmMailing"/', $partials['~/crmMailing/edit.html']);
+    $this->assertRegExp('/\<form.*name="crmMailing"/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
     // If crmMailing changes, feel free to use a different example.
   }
 

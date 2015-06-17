@@ -61,8 +61,7 @@ class CRM_Event_Form_EventFees {
     if ($form->_eventId &&
       ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'currency'))
     ) {
-      $config = CRM_Core_Config::singleton();
-      $config->defaultCurrency = $currency;
+      CRM_Core_Config::singleton()->defaultCurrency = $currency;
     }
   }
 
@@ -118,7 +117,7 @@ class CRM_Event_Form_EventFees {
         $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
       }
 
-      list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults();
+      list($defaults[$form->_pId]['receive_date'], $defaults[$form->_pId]['receive_date_time']) = CRM_Utils_Date::setDateDefaults();
     }
 
     //CRM-11601 we should keep the record contribution
@@ -424,7 +423,7 @@ SELECT  id, html_type
           array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
         );
 
-        $form->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDate'));
+        $form->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
         $form->add('select', 'payment_instrument_id',
           ts('Paid By'),

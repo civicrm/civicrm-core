@@ -88,7 +88,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     /*
-     * recurpayment function does not compile an array & then proces it -
+     * recurpayment function does not compile an array & then process it -
      * - the tpl does the transformation so adding call to hook here
      * & giving it a change to act on the params array
      */
@@ -740,6 +740,14 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       return self::error($responseFields['code'], $responseFields['text']);
     }
     return TRUE;
+  }
+
+  /**
+   * Process incoming notification.
+   */
+  static public function handlePaymentNotification() {
+    $ipnClass = new CRM_Core_Payment_AuthorizeNetIPN(array_merge($_GET, $_REQUEST));
+    $ipnClass->main();
   }
 
   /**

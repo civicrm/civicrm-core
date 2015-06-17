@@ -1183,7 +1183,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  * @param string $daoName
  * @param bool $return
  *
- * @daoName string DAO to check params agains
+ * @daoName string DAO to check params against
  *
  * @return bool
  *   Should the missing fields be returned as an array (core error created as default)
@@ -1297,7 +1297,7 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
     return civicrm_api3_create_error('Entity not created (' . $fct_name . ')');
   }
   elseif (is_a($bao, 'CRM_Core_Error')) {
-    //some wierd circular thing means the error takes itself as an argument
+    //some weird circular thing means the error takes itself as an argument
     $msg = $bao->getMessages($bao);
     // the api deals with entities on a one-by-one basis. However, the contribution bao pushes entities
     // onto the error object - presumably because the contribution import is not handling multiple errors correctly
@@ -1413,8 +1413,11 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
     CRM_Core_DAO::$_nullObject,
     $entity_id,
     $groupID,
-    $subType,
-    $subName
+    NULL,
+    $subName,
+    TRUE,
+    NULL,
+    TRUE
   );
   $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, CRM_Core_DAO::$_nullObject);
   $customValues = array();
@@ -2036,7 +2039,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
   }
   if ($fieldValue) {
     if (!CRM_Utils_Rule::xssString($fieldValue)) {
-      throw new API_Exception('Illegal characters in input (potential scripting attack)', array("field" => $fieldName, "error_code" => "xss"));
+      throw new API_Exception('Input contains illegal SCRIPT tag.', array("field" => $fieldName, "error_code" => "xss"));
     }
   }
 }
@@ -2072,7 +2075,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
   if ($fieldValue) {
     foreach ((array) $fieldValue as $value) {
       if (!CRM_Utils_Rule::xssString($fieldValue)) {
-        throw new Exception('Illegal characters in input (potential scripting attack)');
+        throw new Exception('Input contains illegal SCRIPT tag.');
       }
       if ($fieldName == 'currency') {
         //When using IN operator $fieldValue is a array of currency codes

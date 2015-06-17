@@ -568,7 +568,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                   $this->_retCode = CRM_Import_Parser::NO_MATCH;
                 }
                 else {
-                  $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId, FALSE, $this->_dedupeRuleGroupID);
                   $updateflag = FALSE;
                   $this->_retCode = CRM_Import_Parser::VALID;
                 }
@@ -1879,20 +1878,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
         }
+      }
 
-        if ($key == 'birth_date' && $val) {
-          CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key);
-        }
-        elseif ($key == 'deceased_date' && $val) {
-          CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key);
-        }
-        elseif ($key == 'is_deceased' && $val) {
-          $params[$key] = CRM_Utils_String::strtoboolstr($val);
-        }
-        elseif ($key == 'gender') {
-          //CRM-4360
-          $params[$key] = $this->checkGender($val);
-        }
+      if ($key == 'birth_date' && $val) {
+        CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key);
+      }
+      elseif ($key == 'deceased_date' && $val) {
+        CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key);
+      }
+      elseif ($key == 'is_deceased' && $val) {
+        $params[$key] = CRM_Utils_String::strtoboolstr($val);
+      }
+      elseif ($key == 'gender') {
+        //CRM-4360
+        $params[$key] = $this->checkGender($val);
       }
     }
 

@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -17,7 +17,8 @@
  | See the GNU Affero General Public License for more details.        |
  |                                                                    |
  | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
@@ -248,7 +249,7 @@ WHERE id = %2
     CRM_Core_DAO::executeQuery($updatePriceField, array(), TRUE, NULL, FALSE, FALSE);
 
     // as the table 'civicrm_price_field' is localised and column 'count' is dropped
-    // after the views are rebuild, we need to rebuild views to avoid invalid refrence of table.
+    // after the views are rebuild, we need to rebuild views to avoid invalid reference of table.
     if ($upgrade->multilingual) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($upgrade->locales, $rev);
     }

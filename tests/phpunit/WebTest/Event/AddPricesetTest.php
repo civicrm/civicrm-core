@@ -579,6 +579,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_Fee_upload-bottom');
     $this->waitForText("crm-notification-container", "'Fees' information has been saved.");
+    $this->waitForAjaxContent();
 
     $this->openCiviPage('participant/add', 'reset=1&action=add&context=standalone', '_qf_Participant_upload-bottom');
 
@@ -621,9 +622,9 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText("crm-notification-container", "Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@id='Search']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -635,7 +636,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       )
     );
     $this->waitForElementPresent("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td");
-    $this->verifyText("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td/table/tbody/tr[2]/td", preg_quote('$ 2,705.00'), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td/table/tbody/tr[2]/td", preg_quote('$ 2,705.00'));
     $expectedLineItems = array(
       2 => array(
         1 => 'Full Conference',
@@ -711,6 +712,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     // Enter Event Title, Summary and Description
     $this->select("event_type_id", "value=4");
     $this->select("default_role_id", "value=1");
+    $this->waitForAjaxContent();
     $this->type("title", "Test Event");
     $this->type("summary", "This is a great conference. Sign up now!");
 
@@ -730,8 +732,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//table[@id='options']/tbody/tr/td[9]/span[2]");
     $this->click("xpath=//table[@id='options']/tbody/tr/td[9]/span[2]/ul/li[2]/a");
     //assert the message
-    $this->waitForText('price_set_used_by',
-      "it is currently in use by one or more active events or contribution pages or contributions or event templates.");
+    $this->waitForText('price_set_used_by', "it is currently in use by one or more active events or contribution pages or contributions or event templates. If you no longer want to use this price set, click the event title below, and modify the fees for that event.");
 
     //check the delete for priceset
     $this->openCiviPage("admin/price", "reset=1");

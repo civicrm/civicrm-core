@@ -3619,7 +3619,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (5166, 1075, "TR", "Tampere Region"),
 (5167, 1075, "OB", "Ostrobothnia"),
 (5168, 1075, "NK", "North Karelia"),
-(5169, 1075, "NO", "Nothern Ostrobothnia"),
+(5169, 1075, "NO", "Northern Ostrobothnia"),
 (5170, 1075, "NS", "Northern Savo"),
 (5171, 1075, "PH", "Päijät-Häme"),
 (5172, 1075, "SK", "Satakunta"),
@@ -3978,4 +3978,18 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1193, "209", "Sveta Trojica v Slovenskih goricah"),
 (NULL, 1193, "210", "Sveti Jurij v Slovenskih goricah"),
 (NULL, 1193, "211", "Sveti Tomaž"),
-(NULL, 1193, "212", "Vodice");
+(NULL, 1193, "212", "Vodice"),
+
+-- CRM-16452 Missing administrative divisions for Georgia
+(NULL, 1081, "AB", "Abkhazia"),
+(NULL, 1081, "AJ", "Adjara"),
+(NULL, 1081, "TB", "Tbilisi"),
+(NULL, 1081, "GU", "Guria"),
+(NULL, 1081, "IM", "Imereti"),
+(NULL, 1081, "KA", "Kakheti"),
+(NULL, 1081, "KK", "Kvemo Kartli"),
+(NULL, 1081, "MM", "Mtskheta-Mtianeti"),
+(NULL, 1081, "RL", "Racha-Lechkhumi and Kvemo Svaneti"),
+(NULL, 1081, "SZ", "Samegrelo-Zemo Svaneti"),
+(NULL, 1081, "SJ", "Samtskhe-Javakheti"),
+(NULL, 1081, "SK", "Shida Kartli");

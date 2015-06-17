@@ -158,11 +158,11 @@ var submitcount = 0;
 function submitOnce(obj, formId, procText) {
   // if named button clicked, change text
   if (obj.value != null) {
-    obj.value = procText + " ...";
+    cj('input[name=' + obj.name + ']').val(procText + " ...");
   }
   cj(obj).closest('form').attr('data-warn-changes', 'false');
   if (document.getElementById) { // disable submit button for newer browsers
-    obj.disabled = true;
+    cj('input[name=' + obj.name + ']').attr("disabled", true);
     document.getElementById(formId).submit();
     return true;
   }
@@ -429,7 +429,7 @@ CRM.strings = CRM.strings || {};
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
         formatSelection: function(row) {
-          return row.label;
+          return (row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '');
         },
         escapeMarkup: function (m) {return m;},
         initSelection: function($el, callback) {
@@ -662,6 +662,38 @@ CRM.strings = CRM.strings || {};
     });
   };
 
+  $.fn.crmAjaxTable = function() {
+    return $(this).each(function() {
+      //Declare the defaults for DataTables
+      var defaults = {
+        "processing": true,
+        "serverSide": true,
+        "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+        "pageLength": 25,
+        "drawCallback": function(settings) {
+          //Add data attributes to cells
+          $('thead th', settings.nTable).each( function( index ) {
+            $.each(this.attributes, function() {
+              if(this.name.match("^cell-")) {
+                var cellAttr = this.name.substring(5);
+                var cellValue = this.value;
+                $('tbody tr', settings.nTable).each( function() {
+                  $('td:eq('+ index +')', this).attr( cellAttr, cellValue );
+                });
+              }
+            });
+          });
+          //Reload table after draw
+          $(settings.nTable).trigger('crmLoad');
+        }
+      };
+      //Include any table specific data
+      var settings = $.extend(true, defaults, $(this).data('table'));
+      //Make the DataTables call
+      $(this).DataTable(settings);
+    });
+  };
+
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
@@ -670,8 +702,10 @@ CRM.strings = CRM.strings || {};
     else if (row.icon_class) {
       markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' + row.label + '</div>';
-    markup += '<div class="crm-select2-row-description">';
+    markup += '<div><div class="crm-select2-row-label '+(row.label_class || '')+'">' +
+      (row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '') +
+      '</div>' +
+      '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
       markup += '<p>' + text + '</p>';
     });
@@ -822,6 +856,8 @@ CRM.strings = CRM.strings || {};
           }
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      $('table.crm-sortable', e.target).DataTable();
+      $('table.crm-ajax-table', e.target).crmAjaxTable();
       if ($("input:radio[name=radio_ts]").size() == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }
@@ -832,6 +868,16 @@ CRM.strings = CRM.strings || {};
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
       });
+      $('textarea.crm-form-wysiwyg', e.target)
+        .not('.crm-wysiwyg-enabled')
+        .addClass('crm-wysiwyg-enabled')
+        .each(function() {
+          if ($(this).hasClass("collapsed")) {
+            CRM.wysiwyg.createCollapsed(this);
+          } else {
+            CRM.wysiwyg.create(this);
+          }
+        });
     })
     .on('dialogopen', function(e) {
       var $el = $(e.target);
@@ -1328,11 +1374,12 @@ CRM.strings = CRM.strings || {};
   /**
    * Clientside currency formatting
    * @param number value
+   * @param [optional] boolean onlyNumber - if true, we return formatted amount without currency sign
    * @param [optional] string format - currency representation of the number 1234.56
    * @return string
    */
   var currencyTemplate;
-  CRM.formatMoney = function(value, format) {
+  CRM.formatMoney = function(value, onlyNumber, format) {
     var decimal, separator, sign, i, j, result;
     if (value === 'init' && format) {
       currencyTemplate = format;
@@ -1350,6 +1397,9 @@ CRM.strings = CRM.strings || {};
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
     j = ((j = i.length) > 3) ? j % 3 : 0;
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
+    if ( onlyNumber ) {
+      return result;
+    }
     return format.replace(/1.*234.*56/, result);
   };
 
@@ -1368,5 +1418,12 @@ CRM.strings = CRM.strings || {};
   // @see CRM_Core_Resources::addPermissions
   CRM.checkPerm = function(perm) {
     return CRM.permissions[perm];
+  };
+
+  // Round while preserving sigfigs
+  CRM.utils.sigfig = function(n, digits) {
+    var len = ("" + n).length;
+    var scale = Math.pow(10.0, len-digits);
+    return Math.round(n / scale) * scale;
   };
 })(jQuery, _);

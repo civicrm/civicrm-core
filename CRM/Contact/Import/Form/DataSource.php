@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2009.                                       |
+ | Version 3, 19 November 2009 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -59,7 +59,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $daoTestPrivilege = new CRM_Core_DAO();
     $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_one(test int) ENGINE=InnoDB");
     $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_two(test int) ENGINE=InnoDB");
-    $daoTestPrivilege->query("DROP TABLE IF EXISTS import_job_permission_one, import_job_permission_two");
+    $daoTestPrivilege->query("DROP TEMPORARY TABLE IF EXISTS import_job_permission_one, import_job_permission_two");
     unset($errorScope);
 
     if ($daoTestPrivilege->_lastError) {

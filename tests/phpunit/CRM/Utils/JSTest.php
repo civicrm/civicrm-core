@@ -110,4 +110,82 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedStrings, $actualStrings);
   }
 
+  public function dedupeClosureExamples() {
+    // Each example string here is named for its body, eg the body of $a calls "a()".
+    $a = "(function (angular, $, _) {\na();\n})(angular, CRM.$, CRM._);";
+    $b = "(function(angular,$,_){\nb();\n})(angular,CRM.$,CRM._);";
+    $c = "(function( angular, $,_) {\nc();\n})(angular,CRM.$, CRM._);";
+    $d = "(function (angular, $, _, whiz) {\nd();\n})(angular, CRM.$, CRM._, CRM.whizbang);";
+    $m = "alert('i is the trickster (function( angular, $,_) {\nm();\n})(angular,CRM.$, CRM._);)'";
+    // Note: $d has a fundamentally different closure.
+
+    // Each example string here is a deduped combination of others,
+    // eg "$ab" is the deduping of $a+$b.
+    $ab = "(function (angular, $, _) {\na();\n\nb();\n})(angular,CRM.$,CRM._);";
+    $abc = "(function (angular, $, _) {\na();\n\nb();\n\nc();\n})(angular,CRM.$, CRM._);";
+    $cb = "(function( angular, $,_) {\nc();\n\nb();\n})(angular,CRM.$,CRM._);";
+
+    $cases = array();
+    $cases[] = array(array($a), "$a");
+    $cases[] = array(array($b), "$b");
+    $cases[] = array(array($c), "$c");
+    $cases[] = array(array($d), "$d");
+    $cases[] = array(array($m), "$m");
+    $cases[] = array(array($a, $b), "$ab");
+    $cases[] = array(array($a, $m, $b), "$a$m$b");
+    $cases[] = array(array($a, $d), "$a$d");
+    $cases[] = array(array($a, $d, $b), "$a$d$b");
+    $cases[] = array(array($a, $b, $c), "$abc");
+    $cases[] = array(array($a, $b, $d, $c, $b), "$ab$d$cb");
+    return $cases;
+  }
+
+  /**
+   * @param array $scripts
+   * @param string $expectedOutput
+   * @dataProvider dedupeClosureExamples
+   */
+  public function testDedupeClosure($scripts, $expectedOutput) {
+    $actualOutput = CRM_Utils_JS::dedupeClosures(
+      $scripts,
+      array('angular', '$', '_'),
+      array('angular', 'CRM.$', 'CRM._')
+    );
+    $this->assertEquals($expectedOutput, implode("", $actualOutput));
+  }
+
+  public function stripCommentsExamples() {
+    $cases = array();
+    $cases[] = array(
+      "a();\n//# sourceMappingURL=../foo/bar/baz.js\nb();",
+      "a();\n\nb();",
+    );
+    $cases[] = array(
+      "// foo\na();",
+      "\na();",
+    );
+    $cases[] = array(
+      "b();\n  // foo",
+      "b();\n",
+    );
+    $cases[] = array(
+      "/// foo\na();\n\t \t//bar\nb();\n// whiz",
+      "\na();\n\nb();\n",
+    );
+    $cases[] = array(
+      "alert('//# sourceMappingURL=../foo/bar/baz.js');\n//zoop\na();",
+      "alert('//# sourceMappingURL=../foo/bar/baz.js');\n\na();",
+    );
+    return $cases;
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider stripCommentsExamples
+   */
+  public function testStripComments($input, $expectedOutput) {
+    $this->assertEquals($expectedOutput, CRM_Utils_JS::stripComments($input));
+  }
+
 }

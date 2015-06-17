@@ -88,3 +88,23 @@ function civicrm_api3_survey_get($params) {
 function civicrm_api3_survey_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+
+/**
+ * Set default getlist parameters.
+ *
+ * @see _civicrm_api3_generic_getlist_defaults
+ *
+ * @param array $request
+ *
+ * @return array
+ */
+function _civicrm_api3_survey_getlist_defaults(&$request) {
+  return array(
+    'description_field' => array(
+      'campaign_id',
+    ),
+    'params' => array(
+      'is_active' => 1,
+    ),
+  );
+}

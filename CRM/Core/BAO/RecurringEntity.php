@@ -324,7 +324,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function iterates through when object criterias and
+   * This function iterates through when object criteria and
    * generates recursive dates based on that
    *
    * @return array
@@ -530,6 +530,40 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         )
       );
     return $parentId;
+  }
+
+  /**
+   * Finds the position of this entity as well as total count of the repeating set
+   *
+   * @param $entityId
+   * @param $entityTable
+   * @return array|null
+   */
+  static public function getPositionAndCount($entityId, $entityTable) {
+    $position = $count = 0;
+
+    $query = "
+      SELECT entity_id
+      FROM civicrm_recurring_entity
+      WHERE parent_id = (SELECT parent_id FROM civicrm_recurring_entity WHERE entity_id = %1 AND entity_table = %2) AND entity_table = %2";
+
+    $dao = CRM_Core_DAO::executeQuery($query,
+      array(
+        1 => array($entityId, 'Integer'),
+        2 => array($entityTable, 'String'),
+      )
+    );
+
+    while ($dao->fetch()) {
+      ++$count;
+      if ($dao->entity_id <= $entityId) {
+        ++$position;
+      }
+    }
+    if ($count) {
+      return array($position, $count);
+    }
+    return NULL;
   }
 
   /**
@@ -955,11 +989,11 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function takes criterias saved in civicrm_action_schedule table
+   * This function takes criteria saved in civicrm_action_schedule table
    * and creates recursion rule
    *
    * @param array $scheduleReminderDetails
-   *   Array of repeat criterias saved in civicrm_action_schedule table .
+   *   Array of repeat criteria saved in civicrm_action_schedule table .
    *
    * @return object
    *   When object
@@ -1048,8 +1082,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
       if (!empty($scheduleReminderDetails['absolute_date'])) {
         $absoluteDate = CRM_Utils_Date::setDateDefaults($scheduleReminderDetails['absolute_date']);
-        $endDate = new DateTime($absoluteDate[0] . ' ' . $absoluteDate[1]);
-        $endDate->modify('+1 day');
+        // absolute_date column of scheduled-reminder table is of type date (and not datetime)
+        // and we always want the date to be included, and therefore appending 23:59
+        $endDate = new DateTime($absoluteDate[0] . ' ' . '23:59');
         $r->until($endDate);
       }
 

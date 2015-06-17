@@ -96,7 +96,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testCreate() {
     $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($result['values'][0]['id']);
 
     // mutate $params to match expected return value
     unset($this->_params['sequential']);

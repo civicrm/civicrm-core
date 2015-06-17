@@ -679,7 +679,7 @@ SELECT $acl.*
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     // note this also resets any ACL cache

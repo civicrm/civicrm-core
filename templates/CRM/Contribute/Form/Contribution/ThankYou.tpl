@@ -133,7 +133,7 @@
 
         {* Recurring contribution / pledge information *}
         {if $is_recur}
-          {if $membershipBlock} {* Auto-renew membership confirmation *}
+          {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
               {if $frequency_interval > 1}

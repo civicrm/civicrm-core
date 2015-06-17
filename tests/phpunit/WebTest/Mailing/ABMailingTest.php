@@ -125,7 +125,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$MailingSubject} Webtest.$tokens");
 
     $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
-    $this->waitForTextPresent("This is text formatted content for Mailing {$MailingSubject} Webtest.$tokens");
+    $this->waitForTextPresent("This is text formatted content for Mailing {$MailingSubject} Webtest.");
     $this->waitForAjaxContent();
     $this->click("xpath=//button[@title='Close']");
 
@@ -151,13 +151,13 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     //--------- mail delivery verification---------
 
     // click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[@class='crm-mailing-name'][text()='Final ($ABTestName)']/..//td/span/a[text()='Report']");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[@class='crm-mailing-name'][text()='Final ($ABTestName)']/..//td/span/a[text()='Report']");
 
     //get actual number of user for mailing
     $mailedUser = round($totalUser * ($totalUser / 100));
@@ -297,7 +297,7 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     $this->type("xpath=//*[@name='body_text']", "This is text formatted content for Mailing {$MailingSubject} Webtest.$tokens");
 
     $this->click("xpath=//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
-    $this->waitForTextPresent("This is text formatted content for Mailing {$MailingSubject} Webtest.$tokens");
+    $this->waitForTextPresent("This is text formatted content for Mailing {$MailingSubject} Webtest.");
     $this->waitForAjaxContent();
     $this->click("xpath=//button[@title='Close']");
 
@@ -323,13 +323,13 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     //--------- mail delivery verification---------
 
     // click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[@class='crm-mailing-name'][text()='Final ($ABTestName)']/..//td/span/a[text()='Report']");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[@class='crm-mailing-name'][text()='Final ($ABTestName)']/..//td/span/a[text()='Report']");
 
     //get actual number of user for mailing
     $mailedUser = round($totalUser * ($totalUser / 100));
@@ -457,7 +457,6 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     // fill subject for mailing
     $BMailingSubject = substr(sha1(rand()), 0, 7);
     $this->type("xpath=//input[@name='subjectB']", "Test subject {$BMailingSubject} for Webtest");
-    $this->waitForElementPresent("xpath=//div[@id='tab-mailingB']//div[text()='Plain Text']");
 
     // HTML format message
     $BHTMLMessage = "This is HTML formatted content for Mailing {$BMailingSubject} Webtest.";
@@ -470,7 +469,8 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     //$this->click("xpath=//button[@title='Close']");
 
     // Open Plain-text Format pane and type text format msg
-    $this->click("xpath=//div[@id='tab-mailingB']//div[text()='Plain Text']");
+    $this->waitForElementPresent("xpath=//div[@id='tab-mailingB']//div[contains(text(), 'Plain Text')]");
+    $this->click("xpath=//div[@id='tab-mailingB']//div[contains(text(), 'Plain Text')]");
     $this->type("xpath=//div[@id='tab-mailingB']//*[@name='body_text']", "This is text formatted content for Mailing {$BMailingSubject} Webtest.$tokens");
 
     $this->click("xpath=//div[@crm-mailing='abtest.mailings.b']//div[@class='preview-popup']//a[text()='Preview as Plain Text']");
@@ -500,13 +500,13 @@ class WebTest_Mailing_ABMailingTest extends CiviSeleniumTestCase {
     //--------- mail delivery verification---------
 
     // click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[@class='crm-mailing-name'][text()='Final ($ABTestName)']/..//td/span/a[text()='Report']");
 
     // directly send schedule mailing -- not working right now
     $this->openCiviPage("mailing/queue", "reset=1");
 
     //click report link of created mailing
-    $this->clickLink("xpath=//table//tbody/tr[td[1]/text()='Final ($ABTestName)']/descendant::a[text()='Report']");
+    $this->clickLink("xpath=//form[@id='Search']/table/tbody//tr/td[@class='crm-mailing-name'][text()='Final ($ABTestName)']/..//td/span/a[text()='Report']");
 
     //get actual number of user for mailing
     $mailedUser = round($totalUser * ($totalUser / 100));

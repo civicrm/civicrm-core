@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2009.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -113,7 +113,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @param string $table
    *   Name of table from which data imported.
    * @param string $fieldSeparator
-   *   Character that seperates the various columns in the file.
+   *   Character that separates the various columns in the file.
    *
    * @return string
    *   name of the created table

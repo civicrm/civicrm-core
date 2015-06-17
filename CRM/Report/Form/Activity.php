@@ -597,6 +597,14 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
     }
 
+    // CRM-12675
+    $components = CRM_Core_Component::getNames();
+    foreach ($components as $componentID => $componentName) {
+      if (!CRM_Core_Permission::check("access $componentName")) {
+        $clauses[] = " ({$this->_aliases['civicrm_option_value']}.component_id IS NULL OR {$this->_aliases['civicrm_option_value']}.component_id <> {$componentID}) ";
+      }
+    }
+
     if (empty($clauses)) {
       $this->_where .= " ";
     }
@@ -652,9 +660,13 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       CRM_Core_Error::fatal(ts('Current filter criteria didn\'t have any target contact to add to group'));
     }
 
-    $query = "{$this->_select}
+    $new_select = 'AS addtogroup_contact_id';
+    $select = str_ireplace('AS civicrm_contact_contact_target_id', $new_select, $this->_select);
+    $new_having = ' addtogroup_contact_id';
+    $having = str_ireplace(' civicrm_contact_contact_target_id', $new_having, $this->_having);
+    $query = "$select
 FROM civireport_activity_temp_target tar
-GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
+GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $select = 'AS addtogroup_contact_id';
     $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -898,7 +910,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
         }
       }
 
-      if (array_key_exists('civicrm_activity_details', $row)) {
+      if (array_key_exists('civicrm_activity_details', $row) && $this->_outputMode == 'html') {
         if ($value = $row['civicrm_activity_details']) {
           $fullDetails = $rows[$rowNum]['civicrm_activity_details'];
           $rows[$rowNum]['civicrm_activity_details'] = substr($fullDetails, 0, strrpos(substr($fullDetails, 0, 80), ' '));

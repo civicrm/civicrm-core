@@ -92,10 +92,10 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type("sort_name", $sortName);
     $this->select("contact_type", "value=Individual");
-    $this->clickLink("_qf_Basic_refresh", "xpath=//form[@id='Basic']/div[3]/div/div[2]/table/tbody/tr/");
+    $this->clickLink("_qf_Basic_refresh", "xpath=//form[@id='Basic']//div/div//div/table/tbody/tr/");
 
     // click through to the Relationship view screen
-    $this->click("xpath=//form[@id='Basic']/div[3]/div/div[2]/table/tbody/tr/td[11]/span/a[text()='View']");
+    $this->click("xpath=//form[@id='Basic']//div/div//div/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=li#tab_participant a");
 
@@ -301,7 +301,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForElementPresent("event_type_id");
     $this->select2("event_type_id", "Conference");
     $this->click("_qf_Advanced_refresh");
-    $this->waitForElementPresent('search-status');
+    $this->waitForElementPresent("xpath=id('search-status')");
     $this->assertElementContainsText('search-status', '2 Contacts');
   }
 

@@ -167,7 +167,7 @@
         <td>{ts}Online event registration and participant tracking.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/membership/what-is-civimember" text="CiviMember"}</td>
+        <td class="tasklist nowrap">{docURL page="user/membership/introduction-to-memberships" text="CiviMember"}</td>
         <td>{ts}Online signup and membership management.{/ts}</td>
     </tr>
     <tr class="even">

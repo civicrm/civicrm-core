@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Business object for managing custom data groups
- *
+ * Business object for managing custom data groups.
  */
 class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
 
@@ -59,7 +56,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   public static function create(&$params) {
     // create custom group dao, populate fields and then save.
     $group = new CRM_Core_DAO_CustomGroup();
-    $group->title = $params['title'];
+    if (isset($params['title'])) {
+      $group->title = $params['title'];
+    }
 
     if (in_array($params['extends'][0],
       array(
@@ -124,7 +123,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'is_multiple',
     );
     foreach ($fields as $field) {
-      $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
+      if (isset($params[$field])) {
+        $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
+      }
     }
     $group->max_multiple = isset($params['is_multiple']) ? (isset($params['max_multiple']) &&
       $params['max_multiple'] >= '0'
@@ -142,7 +143,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       if ((!empty($params['is_multiple']) || $isMultiple) &&
         ($params['is_multiple'] != $isMultiple)
       ) {
-        $oldTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
+        $oldTableName = CRM_Core_DAO::getFieldValue(
+          'CRM_Core_DAO_CustomGroup',
           $params['id'],
           'table_name'
         );
@@ -244,7 +246,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     // reset the cache
@@ -315,13 +317,17 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param string $entityType
    *   Of the contact whose contact type is needed.
    * @param CRM_Core_Form $form
-   *   Not used but required.
+   *   Not used
    * @param int $entityID
    * @param int $groupID
    * @param string $subType
    * @param string $subName
    * @param bool $fromCache
    * @param bool $onlySubType
+   *   Only return specified subtype or return specified subtype + unrestricted fields.
+   * @param bool $returnAll
+   *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
+   *   api - through which it is properly tested - so can be refactored with some comfort.)
    *
    * @return array
    *   The returned array is keyed by group id and has the custom group table fields
@@ -332,17 +338,17 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
    *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    *   With caching the performance impact would be small & the function would be cleaner
-   *
    */
   public static function &getTree(
     $entityType,
-    &$form,
+    $form = NULL,
     $entityID = NULL,
     $groupID = NULL,
     $subType = NULL,
     $subName = NULL,
     $fromCache = TRUE,
-    $onlySubType = NULL
+    $onlySubType = NULL,
+    $returnAll = FALSE
   ) {
     if ($entityID) {
       $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
@@ -473,8 +479,10 @@ WHERE civicrm_custom_group.is_active = 1
 WHERE civicrm_custom_group.is_active = 1
   AND civicrm_custom_field.is_active = 1
   AND civicrm_custom_group.extends IN ($in)
-  AND civicrm_custom_group.extends_entity_column_value IS NULL
 ";
+      if (!$returnAll) {
+        $strWhere .= "AND civicrm_custom_group.extends_entity_column_value IS NULL";
+      }
     }
 
     $params = array();
@@ -763,9 +771,9 @@ ORDER BY civicrm_custom_group.weight,
    *   (reference) the group tree being build.
    * @param string $table
    *   Table name.
-   * @param unknown_type $groupID
+   * @param int $groupID
    *   Custom group ID.
-   * @param unknown_type $fieldID
+   * @param int $fieldID
    *   Custom field ID.
    */
   static public function buildCustomFieldData($dao, &$groupTree, $table, $groupID, $fieldID) {
@@ -868,7 +876,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return string
    *   title
-   *
    */
   public static function getTitle($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $id, 'title');
@@ -890,8 +897,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return array
    *   array consisting of all group and field details
-   *
-   *
    */
   public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
     // create a new tree
@@ -1168,9 +1173,6 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @param int $entityID
    * @param bool $allSubtypes
-   *
-   * @return void
-   *
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
     $addSubtypeClause = FALSE;
@@ -1230,17 +1232,17 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * Delete the Custom Group.
    *
-   * @param $group
-   *   Object the DAO custom group object.
+   * @param CRM_Core_BAO_CustomGroup $group
+   *   Custom group object.
    * @param bool $force
    *   whether to force the deletion, even if there are custom fields.
    *
    * @return bool
-   *   false if field exists for this group, true if group gets deleted.
+   *   False if field exists for this group, true if group gets deleted.
    */
   public static function deleteGroup($group, $force = FALSE) {
 
-    //check wheter this contain any custom fields
+    //check whether this contain any custom fields
     $customField = new CRM_Core_DAO_CustomField();
     $customField->custom_group_id = $group->id;
     $customField->find();
@@ -1266,8 +1268,10 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * @param $groupTree
-   * @param $defaults
+   * Set defaults.
+   *
+   * @param array $groupTree
+   * @param array $defaults
    * @param bool $viewMode
    * @param bool $inactiveNeeded
    * @param int $action
@@ -1410,7 +1414,9 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * @param $groupTree
+   * PostProcess function.
+   *
+   * @param array $groupTree
    * @param array $params
    * @param bool $skipFile
    */
@@ -1542,8 +1548,6 @@ ORDER BY civicrm_custom_group.weight,
    *   Return inactive custom groups.
    * @param string $prefix
    *   Prefix for custom grouptree assigned to template.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
@@ -1570,8 +1574,7 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
-   * Extract the get params from the url, validate
-   * and store it in session
+   * Extract the get params from the url, validate and store it in session.
    *
    * @param CRM_Core_Form $form
    *   The form object.
@@ -1980,38 +1983,30 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
     switch ($dataType) {
       case 'Date':
-        $customTimeFormat = '';
         $customFormat = NULL;
 
-        switch ($timeFormat) {
-          case 1:
-            $customTimeFormat = '%l:%M %P';
-            break;
-
-          case 2:
-            $customTimeFormat = '%H:%M';
-            break;
-
-          default:
-            // if time is not selected remove time from value
-            $value = substr($value, 0, 10);
-        }
-
-        $supportableFormats = array(
-          'mm/dd' => "%B %E%f $customTimeFormat",
-          'dd-mm' => "%E%f %B $customTimeFormat",
-          'yy' => "%Y $customTimeFormat",
-          'M yy' => "%b %Y $customTimeFormat",
-          'yy-mm' => "%Y-%m $customTimeFormat",
-        );
+        $actualPHPFormats = CRM_Core_SelectValues::datePluginToPHPFormats();
 
         if ($format = CRM_Utils_Array::value('date_format', $field)) {
-          if (array_key_exists($format, $supportableFormats)) {
-            $customFormat = $supportableFormats["$format"];
+          if (array_key_exists($format, $actualPHPFormats)) {
+            $customTimeFormat = (array) CRM_Utils_Array::value($format, $actualPHPFormats);
+            switch ($timeFormat) {
+              case 1:
+                $customTimeFormat[] = 'g:iA';
+                break;
+
+              case 2:
+                $customTimeFormat[] = 'G:i';
+                break;
+
+              default:
+                // if time is not selected remove time from value
+                $value = substr($value, 0, 10);
+            }
+            $customFormat = implode(" ", $customTimeFormat);
           }
         }
-
-        $retValue = CRM_Utils_Date::customFormat($value, $customFormat);
+        $retValue = CRM_Utils_Date::processDate($value, NULL, FALSE, $customFormat);
         break;
 
       case 'Boolean':

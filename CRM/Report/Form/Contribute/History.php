@@ -40,7 +40,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   protected $_phoneField = FALSE;
   protected $_relationshipColumns = array();
 
-  protected $_customGroupExtends = array('Contribution');
+  protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Contribution',
+  );
 
   protected $_referenceYear = array(
     'this_year' => '',
@@ -52,9 +56,8 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
   /**
    */
-  /**
-   */
   public function __construct() {
+    $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $yearsInPast = 4;
     $date = CRM_Core_SelectValues::date('custom', NULL, $yearsInPast, 0);
     $count = $date['maxYear'];
@@ -89,10 +92,29 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
+          'first_name' => array(
+            'title' => ts('First Name'),
+          ),
+          'middle_name' => array(
+            'title' => ts('Middle Name'),
+          ),
+          'last_name' => array(
+            'title' => ts('Last Name'),
+          ),
           'id' => array(
             'no_display' => TRUE,
             'default' => TRUE,
             'required' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+          ),
+          'age' => array(
+            'title' => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
           ),
           'contact_type' => array(
             'title' => ts('Contact Type'),
@@ -102,11 +124,52 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           ),
         ),
         'grouping' => 'contact-fields',
+        'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC',
+          ),
+          'first_name' => array(
+            'name' => 'first_name',
+            'title' => ts('First Name'),
+          ),
+          'gender_id' => array(
+            'name' => 'gender_id',
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'name' => 'birth_date',
+            'title' => ts('Birth Date'),
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
+        ),
         'filters' => array(
           'sort_name' => array('title' => ts('Contact Name')),
           'id' => array(
             'title' => ts('Contact ID'),
             'no_display' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
         ),
       ),
@@ -745,6 +808,15 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
     $last_primary = NULL;
     foreach ($rows as $rowNum => $row) {
+      //handle gender
+      if (array_key_exists('civicrm_contact_gender_id', $row)) {
+        if ($value = $row['civicrm_contact_gender_id']) {
+          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+          $row['civicrm_contact_gender_id'] = $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
+        }
+        $entryFound = TRUE;
+      }
+
       // Highlight primary contact and amount row
       if (is_numeric($rowNum) ||
         ($last_primary && ($rowNum == "{$last_primary}_total"))
@@ -780,6 +852,16 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contribution Details for this Contact.");
       }
+
+      // display birthday in the configured custom format
+      if (array_key_exists('civicrm_contact_birth_date', $row)) {
+        $birthDate = $row['civicrm_contact_birth_date'];
+        if ($birthDate) {
+          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
+        }
+        $entryFound = TRUE;
+      }
+
     }
   }
 

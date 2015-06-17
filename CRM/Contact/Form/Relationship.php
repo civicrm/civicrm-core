@@ -99,7 +99,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_values;
 
   /**
-   * Casid if it called from case context
+   * Case id if it called from case context
    */
   public $_caseId;
 
@@ -107,6 +107,20 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @var mixed
    */
   public $_cdType;
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Relationship';
+  }
 
   public function preProcess() {
     //custom data related code
@@ -297,8 +311,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       );
       return;
     }
-    // Just in case custom data includes a rich text field
-    $this->assign('includeWysiwygEditor', TRUE);
 
     // Select list
     $relationshipList = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactId, $this->_rtype, $this->_relationshipId);
@@ -323,20 +335,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     $this->assign('relationshipData', $jsData);
 
-    $this->add(
-      'select',
-      'relationship_type_id',
-      ts('Relationship Type'),
-      array('' => ts('- select -')) + $relationshipList,
-      TRUE,
-      array('class' => 'crm-select2 huge')
-    );
+    $this->addField('relationship_type_id', array('options' => array('' => ts('- select -')) + $relationshipList, 'class' => 'huge', 'placeholder' => '- select -'), TRUE);
 
     $label = $this->_action & CRM_Core_Action::ADD ? ts('Contact(s)') : ts('Contact');
-    $contactField = $this->addEntityRef('related_contact_id', $label, array(
-        'multiple' => TRUE,
-        'create' => TRUE,
-      ), TRUE);
+    $contactField = $this->addField('related_contact_id', array('label' => $label, 'name' => 'contact_id_b', 'multiple' => TRUE, 'create' => TRUE), TRUE);
     // This field cannot be updated
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $contactField->freeze();
@@ -344,16 +346,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $this->add('advcheckbox', 'is_current_employer', $this->_contactType == 'Organization' ? ts('Current Employee') : ts('Current Employer'));
 
-    $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'searchDate'));
-    $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'searchDate'));
+    $this->addField('start_date', array('label' => ts('Start Date'), 'formatType' => 'searchDate'));
+    $this->addField('end_date', array('label' => ts('End Date'), 'formatType' => 'searchDate'));
 
-    $this->add('advcheckbox', 'is_active', ts('Enabled?'));
+    $this->addField('is_active', array('label' => ts('Enabled?')));
 
-    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
-    $this->add('checkbox', 'is_permission_a_b');
-    $this->add('checkbox', 'is_permission_b_a');
+    $this->addField('is_permission_a_b');
+    $this->addField('is_permission_b_a');
 
-    $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Relationship', 'description'));
+    $this->addField('description', array('label' => ts('Description')));
 
     CRM_Contact_Form_Edit_Notes::buildQuickForm($this);
 
@@ -388,6 +389,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Store the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
 
+    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
+    $params['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_a_b', $params, 0);
+    $params['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_b_a', $params, 0);
+
     // action is taken depending upon the mode
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contact_BAO_Relationship::del($this->_relationshipId);
@@ -409,12 +414,21 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $ids['relationship'] = $this->_relationshipId;
       $relation = CRM_Contact_BAO_Relationship::getRelationshipByID($this->_relationshipId);
       if ($relation->contact_id_a == $this->_contactId) {
+        // I couldn't replicate this path in testing. See below.
         $params['contact_id_a'] = $this->_contactId;
         $params['contact_id_b'] = array($params['related_contact_id']);
+        $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
+        $relationshipIds = $outcome['relationship_ids'];
       }
       else {
+        // The only reason we have changed this to use the api & not the above is that this was broken.
+        // Recommend extracting all of update into a function that uses the api
+        // and ensuring api / bao take care of 'other stuff' in this form
+        // the contact_id_a & b can't be changed on this form so don't really need setting.
         $params['contact_id_b'] = $this->_contactId;
-        $params['contact_id_a'] = array($params['related_contact_id']);
+        $params['contact_id_a'] = $params['related_contact_id'];
+        $result = civicrm_api3('relationship', 'create', $params);
+        $relationshipIds = array($result['id']);
       }
       $ids['contactTarget'] = ($relation->contact_id_a == $this->_contactId) ? $relation->contact_id_b : $relation->contact_id_a;
 
@@ -429,19 +443,21 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
         }
       }
+      if (empty($outcome['saved']) && !empty($update)) {
+        $outcome['saved'] = $update;
+      }
+      $this->setMessage($outcome);
     }
     // Create mode (could be 1 or more relationships)
     else {
       $params['contact_id_' .  $relationshipTypeParts[2]] = explode(',', $params['related_contact_id']);
+      $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
+      $relationshipIds = $outcome['relationship_ids'];
+      if (empty($outcome['saved']) && !empty($update)) {
+        $outcome['saved'] = $update;
+      }
+      $this->setMessage($outcome);
     }
-
-    // Save the relationships.
-    $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $relationshipTypeParts[1]);
-    $relationshipIds = $outcome['relationship_ids'];
-    if (empty($outcome['saved']) && !empty($update)) {
-      $outcome['saved'] = $update;
-    }
-    $this->setMessage($outcome);
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480

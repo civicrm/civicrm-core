@@ -62,7 +62,7 @@ class CRM_Contribute_Task {
    * @return array
    *   the set of tasks for a group of contacts
    */
-  public static function &tasks() {
+  public static function tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(

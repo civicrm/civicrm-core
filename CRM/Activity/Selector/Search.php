@@ -9,7 +9,7 @@
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -17,7 +17,8 @@
  | See the GNU Affero General Public License for more details.        |
  |                                                                    |
  | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
@@ -171,6 +172,24 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $this->_compContext = $compContext;
 
     $this->_activityClause = $activityClause;
+
+    // CRM-12675
+    $components = CRM_Core_Component::getNames();
+    foreach ($components as $componentID => $componentName) {
+      if (!CRM_Core_Permission::check("access $componentName")) {
+        $componentClause[] = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
+      }
+    }
+
+    if (!empty($componentClause)) {
+      $componentRestriction = implode(' AND ', $componentClause);
+      if (empty($this->_activityClause)) {
+        $this->_activityClause = $componentRestriction;
+      }
+      else {
+        $this->_activityClause .= ' AND ' . $componentRestriction;
+      }
+    }
 
     // type of selector
     $this->_action = $action;
@@ -339,15 +358,10 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       }
 
       //Check if recurring activity
-      $isRecurringActivity = CRM_Core_BAO_RecurringEntity::getParentFor($row['activity_id'], 'civicrm_activity');
+      $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($row['activity_id'], 'civicrm_activity');
       $row['repeat'] = '';
-      if ($isRecurringActivity) {
-        if ($row['activity_id'] == $isRecurringActivity) {
-          $row['repeat'] = 'Recurring Activity - (Parent)';
-        }
-        else {
-          $row['repeat'] = 'Recurring Activity - (Child)';
-        }
+      if ($repeat) {
+        $row['repeat'] = ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
       }
       $rows[] = $row;
     }

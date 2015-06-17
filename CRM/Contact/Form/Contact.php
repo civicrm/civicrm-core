@@ -749,14 +749,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $deleteExtra = ts('Are you sure you want to delete contact image.');
+      $deleteExtra = json_encode(ts('Are you sure you want to delete contact image.'));
       $deleteURL = array(
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
           'qs' => 'reset=1&cid=%%id%%&action=delete',
-          'extra' =>
-          'onclick = "if (confirm( \'' . $deleteExtra . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
         ),
       );
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
@@ -786,13 +785,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // subtype is a common field. lets keep it here
     $subtypes = CRM_Contact_BAO_Contact::buildOptions('contact_sub_type', 'create', array('contact_type' => $this->_contactType));
     if (!empty($subtypes)) {
-      $sel = $this->add('select', 'contact_sub_type', ts('Contact Type'),
-        $subtypes, FALSE,
-        array(
-          'id' => 'contact_sub_type',
-          'multiple' => 'multiple',
-          'class' => $buildCustomData . ' crm-select2',
-        )
+      $this->addField('contact_sub_type', array(
+        'label' => ts('Contact Type'),
+        'options' => $subtypes,
+        'class' => $buildCustomData,
+        'multiple' => 'multiple',
+        'options-url' => FALSE,
+          )
       );
     }
 
@@ -818,8 +817,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Contact_Form_Location::buildQuickForm($this);
 
     // add attachment
-    $this->addElement('file', 'image_URL', ts('Browse/Upload Image'), 'size=30 maxlength=60');
-    $this->addUploadElement('image_URL');
+    $this->addField('image_URL', array('maxlength' => '60', 'label' => ts('Browse/Upload Image')));
 
     // add the dedupe button
     $this->addElement('submit',
@@ -947,7 +945,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $customFieldExtends = (CRM_Utils_Array::value('contact_sub_type', $params)) ? $params['contact_sub_type'] : $params['contact_type'];
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_contactId,
       $customFieldExtends,
       TRUE
@@ -1051,8 +1048,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // here we replace the user context with the url to view this contact
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
+      $contactSubTypes = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_contactSubType));
       $resetStr = "reset=1&ct={$contact->contact_type}";
-      $resetStr .= $this->_contactSubType ? "&cst={$this->_contactSubType}" : '';
+      $resetStr .= (count($contactSubTypes) == 1) ? "&cst=" . array_pop($contactSubTypes) : '';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/add', $resetStr));
     }
     else {
@@ -1235,7 +1233,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *   of key value consist of address blocks.
    *
    * @return array
-   *   as array of sucess/fails for each address block
+   *   as array of success/fails for each address block
    */
   public function parseAddress(&$params) {
     $parseSuccess = $parsedFields = array();

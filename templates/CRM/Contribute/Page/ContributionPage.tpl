@@ -50,7 +50,7 @@
              <table id="options" class="display">
                <thead>
                <tr>
-                 <th id="sortable">{ts}Title{/ts}</th>
+                 <th>{ts}Title{/ts}</th>
                <th>{ts}ID{/ts}</th>
                <th>{ts}Enabled?{/ts}</th>
              {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}

@@ -279,7 +279,7 @@ class CRM_Dedupe_Finder {
       if (substr_count($key, '.')) {
         $last = explode('.', $key);
         $last = array_pop($last);
-        // make sure the first occurence is kept, not the last
+        // make sure the first occurrence is kept, not the last
         if (!isset($flat[$last])) {
           $flat[$last] = $value;
         }

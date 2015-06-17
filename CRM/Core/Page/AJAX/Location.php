@@ -145,7 +145,8 @@ class CRM_Core_Page_AJAX_Location {
         }
         $elements["onbehalf_{$field}-{$locTypeId}"] = array(
           'type' => $type,
-          'value' => isset($location['address'][1]) ? $location['address'][1][$addField] : NULL,
+          'value' => isset($location['address'][1]) ? CRM_Utils_Array::value($addField,
+            $location['address'][1]) : NULL,
         );
         unset($profileFields["{$field}-{$locTypeId}"]);
       }
@@ -169,16 +170,13 @@ class CRM_Core_Page_AJAX_Location {
               $elements["onbehalf_{$key}"]['value'][$k] = $v;
             }
           }
-          elseif ($htmlType == 'Multi-Select') {
-            foreach ($defaults[$key] as $k => $v) {
-              $elements["onbehalf_{$key}"]['type'] = $htmlType;
-              $elements["onbehalf_{$key}"]['value'][$k] = $v;
-            }
+          elseif (strstr($htmlType, 'Multi-Select') && $htmlType != 'AdvMulti-Select') {
+            $elements["onbehalf_{$key}"]['type'] = 'Multi-Select';
+            $elements["onbehalf_{$key}"]['value'] = array_values($defaults[$key]);
           }
           elseif ($htmlType == 'Autocomplete-Select') {
             $elements["onbehalf_{$key}"]['type'] = $htmlType;
             $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
-            $elements["onbehalf_{$key}"]['id'] = $defaults["{$key}_id"];
           }
           elseif ($htmlType == 'Select Date') {
             $elements["onbehalf_{$key}"]['type'] = $htmlType;

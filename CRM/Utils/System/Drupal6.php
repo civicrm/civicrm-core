@@ -591,7 +591,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       return $url;
     }
 
-    //upto d6 only, already we have code in place for d7
+    //up to d6 only, already we have code in place for d7
     $config = CRM_Core_Config::singleton();
     if (function_exists('variable_get') &&
       module_exists('locale')

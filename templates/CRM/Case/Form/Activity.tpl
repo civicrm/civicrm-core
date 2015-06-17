@@ -64,8 +64,7 @@
       <tr class="crm-case-activity-form-block-details">
         <td class="label">{ts}Notes{/ts}</td>
         <td class="view-value">
-          {* If using plain textarea, assign class=huge to make input large enough. *}
-          {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+          {$form.details.html}
         </td>
       </tr>
       {* Added Activity Details accordion tab *}
@@ -166,8 +165,7 @@
                 <tr class="crm-case-activity-form-block-details">
                   <td class="label">{$form.details.label}</td>
                   <td class="view-value">
-                  {* If using plain textarea, assign class=huge to make input large enough. *}
-                    {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+                    {$form.details.html}
                   </td>
                 </tr>
               {/if}
