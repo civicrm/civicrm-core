@@ -174,7 +174,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
 
           if (!empty($defaultArray)) {
-            // also add the seperator before and after the value per new conventio (CRM-1604)
+            // also add the separator before and after the value per new convention (CRM-1604)
             $params['default_value'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultArray) . CRM_Core_DAO::VALUE_SEPARATOR;
           }
         }
