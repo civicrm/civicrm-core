@@ -174,7 +174,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $form->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
     $form->assign('totalSelectedContacts', count($form->_contactIds));
 
-    CRM_Mailing_BAO_Mailing::commonLetterCompose($form);
+    CRM_Mailing_BAO_Mailing::commonCompose($form);
 
     $buttons = array();
     if ($form->get('action') != CRM_Core_Action::VIEW) {
