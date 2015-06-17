@@ -306,7 +306,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
       foreach (self::$optionValueFields as $name => $field) {
         if (!isset($values[$name])) {
           $values[$name] = $field['default'];
-          if ($field['metric']) {
+          if (isset($field['metric']) && $field['metric']) {
             $values[$name] = CRM_Utils_PDF_Utils::convertMetric($field['default'],
               self::$optionValueFields['metric']['default'],
               $values['metric'], 3
