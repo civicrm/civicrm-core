@@ -1689,6 +1689,11 @@ AND civicrm_membership.is_test = %2";
         $memParams['start_date'] = CRM_Utils_Date::isoToMysql($membership->start_date);
         $memParams['end_date'] = CRM_Utils_Array::value('end_date', $dates);
         $memParams['membership_type_id'] = $membershipTypeID;
+        // Only set this if not empty as we don't want to overwrite the DB if not set.
+        // (Or we think we don't).
+        if (!empty($form->_params['contributionRecurID'])) {
+          $memParams['contribution_recur_id'] = $form->_params['contributionRecurID'];
+        }
 
         //set the log start date.
         $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
