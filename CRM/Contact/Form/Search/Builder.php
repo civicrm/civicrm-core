@@ -407,6 +407,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     else {
       $this->_sortByCharacter = NULL;
     }
+
     $this->_params = $this->convertFormValues($this->_formValues);
     $this->_returnProperties = &$this->returnProperties();
 
