@@ -118,9 +118,10 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
       $activityClause = NULL;
 
       $components = CRM_Core_Component::getNames();
+      $componentClause = array();
       foreach ($components as $componentID => $componentName) {
         if (!CRM_Core_Permission::check("access $componentName")) {
-          $componentClause = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
+          $componentClause[] = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
         }
       }
       if (!empty($componentClause)) {
