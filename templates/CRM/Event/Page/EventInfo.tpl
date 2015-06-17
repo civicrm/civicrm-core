@@ -46,7 +46,12 @@
           <ul>
             {foreach from=$manageEventLinks item='link'}
               <li>
-                <a href="{crmURL p=$link.url q="reset=1&action=update&id=`$event.id`" fb=1}">{$link.title}</a>
+                {* Schedule Reminders requires a different query string. *}
+                {if $link.url EQ 'civicrm/event/manage/reminder'}
+                  <a href="{crmURL p=$link.url q="reset=1&action=browse&setTab=1&id=`$event.id`" fb=1}">{$link.title}</a>
+                {else}
+                  <a href="{crmURL p=$link.url q="reset=1&action=update&id=`$event.id`" fb=1}">{$link.title}</a>
+                {/if}
               </li>
             {/foreach}
           </ul>
