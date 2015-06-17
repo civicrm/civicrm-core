@@ -383,6 +383,7 @@ SELECT label, value
         }
 
         $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
+        $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
 
         switch ($field['data_type']) {
           case 'String':
@@ -400,6 +401,7 @@ SELECT label, value
             else {
               $val = CRM_Utils_Type::escape($strtolower(trim($value)), 'String');
 
+              // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
               $specialHTMLType = array(
                 'CheckBox',
                 'Multi-Select',
@@ -407,27 +409,30 @@ SELECT label, value
                 'Multi-Select State/Province',
                 'Multi-Select Country',
               );
-
-              if (in_array($field['html_type'], $specialHTMLType)) {
-                $val = "[[:cntrl:]]" . $val . "[[:cntrl:]]";
-                $op  = 'RLIKE';
-
-              }
-              elseif ($wildcard) {
-                $val = "[[:cntrl:]]%$val%[[:cntrl:]]";
-                $op = 'LIKE';
+              if (!empty($val)) {
+                if (in_array($field['html_type'], $specialHTMLType)) {
+                  if (strstr($op, 'IN')) {
+                    $val = str_replace(array('(', ')'), '', str_replace(",", "[[:cntrl:]]|[[:cntrl:]]", $val));
+                  }
+                  $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
+                  $val = "[[:cntrl:]]" . $val . "[[:cntrl:]]";
+                }
+                elseif ($wildcard) {
+                  $val = "[[:cntrl:]]%$val%[[:cntrl:]]";
+                  $op = 'LIKE';
+                }
               }
 
               //FIX for custom data query fired against no value(NULL/NOT NULL)
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($sql, $op, $val, $field['data_type']);
-              $this->_qill[$grouping][] = "$field[label] $op $qillValue";
+              $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
             }
             break;
 
           case 'ContactReference':
             $label = $value ? CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'sort_name') : '';
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = $field['label'] . " $op $label";
+            $this->_qill[$grouping][] = $field['label'] . " $qillOp $label";
             break;
 
           case 'Int':
@@ -436,7 +441,7 @@ SELECT label, value
             }
             else {
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-              $this->_qill[$grouping][] = $field['label'] . " $op $value";
+              $this->_qill[$grouping][] = $field['label'] . " $qillOp $value";
             }
             break;
 
@@ -450,12 +455,12 @@ SELECT label, value
             $value = ($value == 1) ? 1 : 0;
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
             $value = $value ? ts('Yes') : ts('No');
-            $this->_qill[$grouping][] = $field['label'] . " {$op} {$value}";
+            $this->_qill[$grouping][] = $field['label'] . " $qillOp {$value}";
             break;
 
           case 'Link':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = $field['label'] . " $op $value";
+            $this->_qill[$grouping][] = $field['label'] . " $qillOp $value";
             break;
 
           case 'Float':
@@ -464,7 +469,7 @@ SELECT label, value
             }
             else {
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Float');
-              $this->_qill[$grouping][] = $field['label'] . " {$op} {$value}";
+              $this->_qill[$grouping][] = $field['label'] . " $qillOp {$value}";
             }
             break;
 
@@ -480,13 +485,13 @@ SELECT label, value
               $moneyFormat = CRM_Utils_Rule::cleanMoney($value);
               $value = $moneyFormat;
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Float');
-              $this->_qill[$grouping][] = $field['label'] . " {$op} {$value}";
+              $this->_qill[$grouping][] = $field['label'] . " {$qillOp} {$value}";
             }
             break;
 
           case 'Memo':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = "$field[label] $op $value";
+            $this->_qill[$grouping][] = "$field[label] $qillOp $value";
             break;
 
           case 'Date':
@@ -505,7 +510,7 @@ SELECT label, value
 
               $date = CRM_Utils_Date::processDate($value);
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $date, 'String');
-              $this->_qill[$grouping][] = $field['label'] . " {$op} " . CRM_Utils_Date::customFormat($date);
+              $this->_qill[$grouping][] = $field['label'] . " {$qillOp} " . CRM_Utils_Date::customFormat($date);
             }
             else {
               if (is_numeric($fromValue) && strlen($fromValue) == 4) {
@@ -536,7 +541,7 @@ SELECT label, value
           case 'StateProvince':
           case 'Country':
             $this->_where[$grouping][] = "$fieldName {$op} " . CRM_Utils_Type::escape($value, 'Int');
-            $this->_qill[$grouping][] = $field['label'] . " {$op} {$qillValue}";
+            $this->_qill[$grouping][] = $field['label'] . " {$qillOp} {$qillValue}";
             break;
 
           case 'File':
@@ -551,7 +556,7 @@ SELECT label, value
                   break;
               }
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op);
-              $this->_qill[$grouping][] = $field['label'] . " {$op} ";
+              $this->_qill[$grouping][] = $field['label'] . " {$qillOp} ";
             }
             break;
         }
