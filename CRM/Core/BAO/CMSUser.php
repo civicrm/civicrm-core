@@ -94,7 +94,9 @@ class CRM_Core_BAO_CMSUser {
       CRM_Core_Error::fatal('CMS user creation not supported for this framework');
     }
 
-    set_time_limit(300);
+    if (PHP_SAPI != 'cli') {
+      set_time_limit(300);
+    }
 
     if ($config->userSystem->is_drupal == '1') {
       $user = new StdClass();
