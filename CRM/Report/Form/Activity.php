@@ -187,13 +187,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'alias' => 'civicrm_phone_target',
           ),
         ),
-/*        'order_bys' => array(
-          'source_contact_phone' => array(
-            'name' => 'phone',
-            'title' => ts('Source Phone'),
-            'dbAlias' => 'civicrm_phone_contact_source_phone',
-          ),
-        ),*/
       ),
       'civicrm_activity' => array(
         'dao' => 'CRM_Activity_DAO_Activity',
