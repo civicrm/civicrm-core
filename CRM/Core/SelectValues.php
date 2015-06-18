@@ -753,7 +753,7 @@ class CRM_Core_SelectValues {
       "dd-mm" => 'd-m',
       "yy-mm" => 'Y-m',
       "M yy" => 'M Y',
-      "yy" => 'Y'
+      "yy" => 'Y',
     );
     return $dateInputFormats;
   }
@@ -770,11 +770,11 @@ class CRM_Core_SelectValues {
     );
   }
 
-   /**
-   * Day Names.
-   *
-   * @return array
-   */
+  /**
+    * Day Names.
+    *
+    * @return array
+    */
   public static function getDayNames() {
     return array(
       '1' => ts('Sunday'),

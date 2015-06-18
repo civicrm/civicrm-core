@@ -62,7 +62,7 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
     $this->add('date', 'fiscalYearStart', ts('Fiscal Year Start'),
       CRM_Core_SelectValues::date(NULL, 'M d')
     );
-    
+   
     $this->add('select', 'weekBegins', ts('Week Begins'),
       CRM_Core_SelectValues::getDayNames()
     );
