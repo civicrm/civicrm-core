@@ -2323,7 +2323,14 @@ SELECT contact_id
               return (sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
             }
             else {
-              return NULL; // not yet implemented (tests required to implement)
+              // CRM-16581 // TO DO (write some tests?)
+              if ($fieldName === "birth_date" || $fieldName === "created_date" || $fieldName === "modified_date") {
+                $return = sprintf("%s", CRM_Core_DAO::escapeString($criteria));
+              }
+              else {
+                $return = sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria));
+              }
+              return $return;
             }
         }
       }

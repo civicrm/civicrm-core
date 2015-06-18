@@ -1523,6 +1523,20 @@ class CRM_Contact_BAO_Query {
     // Change camelCase EntityName to lowercase with underscores
     $apiEntity = _civicrm_api_get_entity_name_from_camel($apiEntity);
 
+    //Find empty string criteria values e.g. > "" or != ""
+    if (isset($values) && is_array($values)) {
+      foreach ($values as $key => $value) {
+        if (!is_array($value)) {
+          $value = trim($value);
+          if (empty($value)) {
+            $result = array($id, $key, $value, 0, $wildcard);
+            return $result;
+          }
+        }
+      }
+    }
+
+    // Skip nested empty strings as not supported
     if (CRM_Utils_System::isNull($values)) {
       return $result;
     }
@@ -1572,20 +1586,56 @@ class CRM_Contact_BAO_Query {
     elseif ($id == 'group') {
       if (is_array($values)) {
         foreach ($values as $groupIds => $val) {
-          $matches = array();
-          if (preg_match('/-(\d+)$/', $groupIds, $matches)) {
-            if (strlen($matches[1]) > 0) {
-              $values[$matches[1]] = 1;
-              unset($values[$groupIds]);
+          if (!is_numeric($val) || strpos($val, '_')) {
+            unset($values[$groupIds]);
+            // we have a group_name_id format
+            $exploded_string = explode('_', $val);
+            $group_id = array_pop($exploded_string);
+            if (!is_numeric($group_id)) {
+              // we've got a group that doesn't have an id at the end
+              // get group id from name
+              $result = civicrm_api3('Group', 'get', array('sequential' => 1, 'return' => "id", 'name' => $val));
+              $values[$result['id']] = 1;
+            }
+            else {
+              $values[$group_id] = 1;
+            }
+          }
+          else {
+            // just found ID
+            $matches = array();
+            if (preg_match('/-(\d+)$/', $groupIds, $matches)) {
+              if (strlen($matches[1]) > 0) {
+                $values[$matches[1]] = 1;
+                unset($values[$groupIds]);
+              }
             }
           }
         }
       }
       else {
-        $groupIds = explode(',', $values);
-        unset($values);
-        foreach ($groupIds as $groupId) {
-          $values[$groupId] = 1;
+        $original_string = $values;
+        if (!is_numeric($values) || strpos($values, '_')) {
+          // we have a group_name_id format
+          $exploded_string = explode('_', $values);
+          unset($values);
+          $groupIds = array_pop($exploded_string);
+          if (!is_numeric($groupIds)) {
+            // we've got a group that doesn't have its id at the end
+            // get group id from name
+            $result = civicrm_api3('Group', 'get', array('sequential' => 1, 'return' => "id", 'name' => $original_string));
+            $values[$result['id']] = 1;
+          }
+          else {
+            $values[$groupIds] = 1;
+          }
+        }
+        else {
+          $groupIds = explode(',', $values);
+          unset($values);
+          foreach ($groupIds as $groupId) {
+            $values[$groupId] = 1;
+          }
         }
       }
 
@@ -2081,10 +2131,20 @@ class CRM_Contact_BAO_Query {
         TRUE
       );
     }
+    elseif ($name === 'modified_date' || $name === 'created_date') {
+      $date = CRM_Utils_Date::processDate($value);
+      $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
+      if ($date) {
+        $date = CRM_Utils_Date::customFormat($date);
+        $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
+      }
+      else {
+        $this->_qill[$grouping][] = "$field[title] $op";
+      }
+    }
     elseif ($name === 'birth_date') {
       $date = CRM_Utils_Date::processDate($value);
       $this->_where[$grouping][] = self::buildClause("contact_a.{$name}", $op, $date);
-
       if ($date) {
         $date = CRM_Utils_Date::customFormat($date);
         $this->_qill[$grouping][] = "$field[title] $op \"$date\"";
