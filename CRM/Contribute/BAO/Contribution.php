@@ -3014,6 +3014,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
+      if (!empty($trxnParams['payment_instrument_id'])) {
+        $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
+        if ($params['payment_instrument_id'] != array_search('Check', $paymentInstruments)) {
+          $trxnParams['is_payment'] = 1;
+        }
+      }
 
       if (!empty($params['payment_processor'])) {
         $trxnParams['payment_processor_id'] = $params['payment_processor'];
