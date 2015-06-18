@@ -211,7 +211,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     //CRM-16691: Changes made related to settings of 'CVV'.
     $settings = array_intersect_key($params, $this->_settings);
     $result = civicrm_api3('setting', 'create', $settings);
-    CRM_Core_Session::setStatus(" ", ts('Changes Saved'), "success");
+    CRM_Core_Session::setStatus(ts('Your changes have been saved.'), ts('Changes Saved'), "success");
   }
 
 }
