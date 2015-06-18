@@ -177,13 +177,13 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'alias' => 'civicrm_phone_source',
           ),
           'contact_assignee_phone' => array(
-	    'name' => 'phone',
+            'name' => 'phone',
             'title' => ts('Assignee Phone'),
             'alias' => 'civicrm_phone_assignee',
           ),
           'contact_target_phone' => array(
             'name' => 'phone',
-	    'title' => ts('Target Phone'),
+	        'title' => ts('Target Phone'),
             'alias' => 'civicrm_phone_target',
           ),
         ),
@@ -451,12 +451,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         if (strstr($clause, 'civicrm_contact_contact_target') ||
           strstr($clause, 'civicrm_contact_contact_assignee') ||
           strstr($clause, 'civicrm_contact_contact_source') ||
-	  strstr($clause, 'civicrm_phone_contact_source_phone') ||
-	  strstr($clause, 'civicrm_phone_contact_assignee_phone') ||
-	  strstr($clause, 'civicrm_email_contact_source_email') ||
-	  strstr($clause, 'civicrm_email_contact_assignee_email') ||
-	  strstr($clause, 'civicrm_email_contact_target_email') ||
-	  strstr($clause, 'civicrm_phone_contact_target_phone')
+          strstr($clause, 'civicrm_phone_contact_source_phone') ||
+	      strstr($clause, 'civicrm_phone_contact_assignee_phone') ||
+	      strstr($clause, 'civicrm_email_contact_source_email') ||
+	      strstr($clause, 'civicrm_email_contact_assignee_email') ||
+	      strstr($clause, 'civicrm_email_contact_target_email') ||
+	      strstr($clause, 'civicrm_phone_contact_target_phone')
         ) {
           $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR '; ') as $clause";
         }
@@ -855,7 +855,6 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       $onHover = ts('View Contact Summary for this Contact');
       $onHoverAct = ts('View Activity Record');
     }
-    
     foreach ($rows as $rowNum => $row) {
       // if we have an activity type, format the View Activity link for use in various columns
       if ($viewLinks &&
