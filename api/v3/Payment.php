@@ -41,6 +41,8 @@
  *   Array of contributions, if error an array with an error id and error message
  */
 function civicrm_api3_payment_get($params) {
+  
+  require_once 'api/v3/Contribution.php';
 
   $mode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
   $params['is_payment'] = 1;
@@ -51,7 +53,9 @@ function civicrm_api3_payment_get($params) {
     //CRM-8662
     $contribution_details = $query->store($dao);
     $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dao->contribution_id, TRUE);
-    $contribution[$dao->contribution_id] = $contribution_details;
+    $contribution[$dao->contribution_id] = array_merge($contribution_details, $softContribution);
+    // format soft credit for backward compatibility
+    _civicrm_api3_format_soft_credit($contribution[$dao->contribution_id]);
   }
   return civicrm_api3_create_success($contribution, $params, 'Contribution', 'get', $dao);
 }
