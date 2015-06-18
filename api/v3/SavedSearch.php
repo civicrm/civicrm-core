@@ -43,6 +43,11 @@
  * @access public
  */
 function civicrm_api3_saved_search_create($params) {
+  // The create function of the dao expects a 'formValues' that is
+  // not serialized. The get function returns form_values, that is
+  // serialized. For now, I will hack around this problem like this:
+  $params["formValues"] = unserialize($params["form_values"]);
+
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
