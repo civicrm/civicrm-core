@@ -415,8 +415,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         if (strstr($clause, 'civicrm_contact_assignee.') ||
           strstr($clause, 'civicrm_contact_source.') ||
           strstr($clause, 'civicrm_email_assignee.') ||
-          strstr($clause, 'civicrm_email_source.') || 
-  	  strstr($clause, 'civicrm_phone_assignee.') ||
+          strstr($clause, 'civicrm_email_source.') ||
+          strstr($clause, 'civicrm_phone_assignee.') ||
           strstr($clause, 'civicrm_phone_source.')
         ) {
           $removeKeys[] = $key;
