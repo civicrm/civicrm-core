@@ -347,9 +347,10 @@ SELECT label, value
           $value = explode(',', $value);
         }
 
+        $isSerialized = CRM_Core_BAO_CustomField::isSerialized($field);
+
         // Handle multi-select search for any data type
-        if (is_array($value) && !$field['is_search_range']) {
-          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($field);
+        if (is_array($value) && !$field['is_search_range'] && $field['data_type'] != 'String') {
           $wildcard = $isSerialized ? $wildcard : TRUE;
           $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array(
                 'field' => $name,
@@ -373,7 +374,7 @@ SELECT label, value
             $sqlValue = array("$fieldName IN (" . implode(',', $value) . ")");
           }
           $this->_where[$grouping][] = ' ( ' . implode($sqlOP, $sqlValue) . ' ) ';
-          $this->_qill[$grouping][] = "$field[label] $op $qillValue";
+          $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
           continue;
         }
 
@@ -399,32 +400,31 @@ SELECT label, value
               );
             }
             else {
-              $val = CRM_Utils_Type::escape($strtolower(trim($value)), 'String');
+              // fix $value here to escape sql injection attacks
+              if (!is_array($value)) {
+                $value = CRM_Utils_Type::escape($strtolower($value), 'String');
+              }
+              elseif ($isSerialized && strstr($op, 'IN')) {
+                $value = implode(',', $value);
+              }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
-              $specialHTMLType = array(
-                'CheckBox',
-                'Multi-Select',
-                'AdvMulti-Select',
-                'Multi-Select State/Province',
-                'Multi-Select Country',
-              );
-              if (!empty($val)) {
-                if (in_array($field['html_type'], $specialHTMLType)) {
+              if (!empty($value)) {
+                if ($isSerialized) {
                   if (strstr($op, 'IN')) {
-                    $val = str_replace(array('(', ')'), '', str_replace(",", "[[:cntrl:]]|[[:cntrl:]]", $val));
+                    $value = str_replace(array('(', ')'), '', str_replace(",", "[[:cntrl:]]|[[:cntrl:]]", $value));
                   }
                   $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
-                  $val = "[[:cntrl:]]" . $val . "[[:cntrl:]]";
+                  $value = "[[:cntrl:]]" . $value . "[[:cntrl:]]";
                 }
                 elseif ($wildcard) {
-                  $val = "[[:cntrl:]]%$val%[[:cntrl:]]";
+                  $value = "[[:cntrl:]]%$value%[[:cntrl:]]";
                   $op = 'LIKE';
                 }
               }
 
               //FIX for custom data query fired against no value(NULL/NOT NULL)
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($sql, $op, $val, $field['data_type']);
+              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($sql, $op, $value, $field['data_type']);
               $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
             }
             break;
