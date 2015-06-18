@@ -396,11 +396,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
         $dao = new CRM_Contact_DAO_Contact();
         $civiDB = $dao->_database;
       }
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      CRM_Core_TemporaryErrorScope::ignoreException();
       // NOTE: W.r.t Performance using one query to find all details and storing in static array is much faster
       // than firing query for every given table.
       $query = "
-SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT
+SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_TYPE
 FROM   INFORMATION_SCHEMA.COLUMNS
 WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -417,6 +417,9 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           'IS_NULLABLE' => $dao->IS_NULLABLE,
           'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT,
         );
+        if (($first = strpos($dao->COLUMN_TYPE, '(')) != 0) {
+          $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = substr($dao->COLUMN_TYPE, $first, strpos($dao->COLUMN_TYPE, ')'));
+        }
       }
     }
     return $columnSpecs[$table];
@@ -448,7 +451,10 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
       $specDiff = array_diff($civiTableSpecs[$col], $logTableSpecs[$col]);
       if (!empty($specDiff) && $col != 'id' && !array_key_exists($col, $diff['ADD'])) {
         // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
-        if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])) {
+        if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])
+        // We won't alter the log if the length is decreased in case some of the existing data won't fit.
+        || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
+        ) {
           // if data-type is different, surely consider the column
           $diff['MODIFY'][] = $col;
         }
