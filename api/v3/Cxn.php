@@ -75,9 +75,12 @@ function civicrm_api3_cxn_register($params) {
     if (!CRM_Cxn_BAO_Cxn::isAppMetaVerified()) {
       list ($status, $json) = CRM_Utils_HttpClient::singleton()->get($params['app_meta_url']);
       if (CRM_Utils_HttpClient::STATUS_OK != $status) {
-        throw new API_Exception("Failed to download appMeta.");
+        throw new API_Exception("Failed to download appMeta. (Bad HTTP response)");
       }
       $appMeta = json_decode($json, TRUE);
+      if (empty($appMeta)) {
+        throw new API_Exception("Failed to download appMeta. (Malformed)");
+      }
     }
     else {
       // Note: The metadata includes a cert, but the details aren't signed.
