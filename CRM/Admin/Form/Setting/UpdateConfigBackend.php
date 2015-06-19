@@ -115,8 +115,10 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
       // cleanup templates_c directory
       $config->cleanup(1, FALSE);
 
-      // clear db caching
+      // clear all caches
       CRM_Core_Config::clearDBCache();
+      CRM_Utils_System::flushCache();
+
       parent::rebuildMenu();
 
       CRM_Core_BAO_WordReplacement::rebuild();
