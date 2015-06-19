@@ -45,10 +45,21 @@
 function civicrm_api3_saved_search_create($params) {
   // The create function of the dao expects a 'formValues' that is
   // not serialized. The get function returns form_values, that is
-  // serialized. For now, I will hack around this problem like this:
-  $params["formValues"] = unserialize($params["form_values"]);
+  // serialized.
+  // So for the create API, I guess it should work for serialized and
+  // unserialized form_values.
 
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  if (is_array($params["form_values"])) {
+    $params["formValues"] = $params["form_values"];
+  }
+  else {
+    // Assume that form_values is serialized.
+    $params["formValues"] = unserialize($params["form_values"]);
+  }
+
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  _civicrm_api3_saved_search_result_cleanup($result);
+  return $result;
 }
 
 /**
@@ -77,5 +88,18 @@ function civicrm_api3_saved_search_delete($params) {
  * @access public
  */
 function civicrm_api3_saved_search_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  _civicrm_api3_saved_search_result_cleanup($result);
+  return $result;
+}
+
+/**
+ * This function unserializes the form_values in an SavedSearch API result.
+ *
+ * @param array $result API result to be cleaned up.
+ */
+function _civicrm_api3_saved_search_result_cleanup(&$result) {
+  foreach ($result['values'] as $key => $value) {
+    $result['values'][$key]['form_values'] = unserialize($value['form_values']);
+  }
 }
