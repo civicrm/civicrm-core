@@ -217,6 +217,11 @@ class CRM_Contribute_BAO_Query {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
     }
+    //CRM-16116: get financial_type_id
+    if (!empty($query->_returnProperties['financial_type_id'])) {
+      $query->_select['financial_type_id'] = "civicrm_contribution.financial_type_id as financial_type_id";
+      $query->_element['financial_type_id'] = $query->_tables['civicrm_contribution'] = 1;
+    }
     // LCD 716 END
   }
 
