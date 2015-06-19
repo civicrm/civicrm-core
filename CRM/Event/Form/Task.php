@@ -65,7 +65,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
    *
    * @var array
    */
-  protected $_participantIds;
+  public $_participantIds;
 
   /**
    * Build all the data structures needed to build the form.

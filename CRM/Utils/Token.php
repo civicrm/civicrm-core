@@ -859,7 +859,6 @@ class CRM_Utils_Token {
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);
     }
-
     return $value;
   }
 
@@ -1601,6 +1600,25 @@ class CRM_Utils_Token {
   }
 
   /**
+   * store event tokens on the static _tokens array
+   */
+  protected static function _buildEventTokens() {
+    $key = 'event';
+    if (!isset(self::$_tokens[$key]) || self::$_tokens[$key] == NULL) {
+      $eventTokens = array();
+      $tokens = CRM_Core_SelectValues::eventTokens();
+      foreach ($tokens as $token => $dontCare) {
+        $eventTokens[] = substr($token, (strpos($token, '.') + 1), -1);
+      }
+      $customtokens = CRM_CORE_BAO_CustomField::getFields('Event');
+      foreach ($customtokens as $tokenkey => $tokenvalue) {
+        $eventTokens[] = 'custom_' . $tokenkey;
+      }
+      self::$_tokens[$key] = $eventTokens;
+    }
+  }
+
+  /**
    * Replace tokens for an entity.
    * @param string $entity
    * @param array $entityArray
@@ -1697,6 +1715,93 @@ class CRM_Utils_Token {
       unset($knownTokens['contribution']['receive_date']);
     }
     return self::replaceContributionTokens($str, $contribution, $html, $knownTokens, $escapeSmarty);
+  }
+
+  /**
+   * Get replacement strings for any event tokens
+   * @param string $token
+   * @param array $event an api result array for a single event
+   * @param bool $escapeSmarty
+   * @return string token replacement
+   */
+  public static function getEventTokenReplacement($token, $event, $escapeSmarty = FALSE) {
+    $entity = 'event';
+    self::_buildEventTokens();
+
+    $params = array('entity_id' => $event['id'], 'entity_table' => 'civicrm_event');
+
+    switch ($token) {
+      case 'balance':
+        $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($params['entity_id'], 'event');
+        $balancePay = CRM_Utils_Array::value('balance', $info);
+        $balancePay = CRM_Utils_Money::format($balancePay);
+        $value = $balancePay;
+        break;
+
+      case 'title':
+        $value = $event['event_title'];
+        break;
+
+      case 'end_date':
+      case 'start_date':
+        $value = CRM_Utils_Date::customFormat($event[$token], "%d/%m/%Y");
+        break;
+
+      case 'type':
+        $params = array(
+          'option_group_id' => 14,
+          'value' => $event['event_type_id'],
+          'return' => 'label',
+        );
+        $value = civicrm_api3('OptionValue', 'getvalue', $params);
+        break;
+
+      case 'location':
+        $location = CRM_Core_BAO_Location::getValues($params, TRUE);
+        foreach ($location['address'] as $address) {
+          $value = $address['display_text'];
+        }
+        break;
+
+      case 'info_url':
+        $value = CIVICRM_UF_BASEURL . 'civicrm/event/info?reset=1&id=' . $event['id'];
+        break;
+
+      case 'registration_url':
+        $value = CIVICRM_UF_BASEURL . 'civicrm/event/register?reset=1&id=' . $event['id'];
+        break;
+
+      case 'fee_amount':
+        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event['id']);
+        $result = civicrm_api3('PriceFieldValue', 'get', array('price_field_id' => $priceSetId));
+        $value = '';
+        foreach ($result['values'] as $pricefield) {
+          $value .= $pricefield['label'] . ": " . CRM_Utils_Money::format($pricefield['amount']) . "<br>";
+        }
+        break;
+
+      case 'event_id':
+        $value = $event['id'];
+        break;
+
+      case 'event_type':
+        $value = CRM_Utils_Array::value($event['event_type_id'], CRM_Event_PseudoConstant::eventType());
+        break;
+
+      default:
+        if (in_array($token, self::$_tokens[$entity])) {
+          $value = $event[$token];
+        }
+        else {
+          $value = "{$entity}.{$token}";
+        }
+        break;
+    }
+
+    if ($escapeSmarty) {
+      $value = self::tokenEscapeSmarty($value);
+    }
+    return $value;
   }
 
   /**

@@ -530,6 +530,8 @@ class CRM_Core_SelectValues {
       '{event.end_date}' => ts('Event End Date'),
       '{event.event_type}' => ts('Event Type'),
       '{event.summary}' => ts('Event Summary'),
+      // These are location_email and location_contact
+      // Should be cleaned up after ActionSchedule token replacement cleanup.
       '{event.contact_email}' => ts('Event Contact Email'),
       '{event.contact_phone}' => ts('Event Contact Phone'),
       '{event.description}' => ts('Event Description'),

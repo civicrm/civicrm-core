@@ -60,19 +60,16 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
     parent::preProcess();
-
-    // we have all the participant ids, so now we get the contact ids
-    parent::setContactIDs();
-
-    $this->assign('single', $this->_single);
+    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
   }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
+    // We have all the participant ids, so now we get the contact ids.
+    $this->setContactIDs();
     CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
   }
 
@@ -80,7 +77,7 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
+    CRM_Event_Form_Task_PDFLetterCommon::postProcess($this);
   }
 
   /**
@@ -99,6 +96,12 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    */
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
+    $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
+    // unset contact_email and contact_phone tokens.
+    // These are location_email and location_contact
+    // Should be cleaned up after ActionSchedule token replacement cleanup.
+    unset($tokens['{event.contact_email}']);
+    unset($tokens['{event.contact_phone}']);
     return $tokens;
   }
 
