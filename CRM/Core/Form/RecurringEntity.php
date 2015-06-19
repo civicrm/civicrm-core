@@ -170,8 +170,9 @@ class CRM_Core_Form_RecurringEntity {
    * @param CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
-    // For some reason this is using the following as keys rather than the standard numeric keys returned by CRM_Utils_Date
-    $dayOfTheWeek = array(
+    // FIXME: this is using the following as keys rather than the standard numeric keys returned by CRM_Utils_Date
+    $dayOfTheWeek = array();
+    $dayKeys = array(
       'sunday',
       'monday',
       'tuesday',
@@ -180,7 +181,9 @@ class CRM_Core_Form_RecurringEntity {
       'friday',
       'saturday',
     );
-    $dayOfTheWeek = array_combine($dayOfTheWeek, CRM_Utils_Date::getAbbrWeekdayNames());
+    foreach (CRM_Utils_Date::getAbbrWeekdayNames() as $k => $label) {
+      $dayOfTheWeek[$dayKeys[$k]] = $label;
+    }
     $form->add('select', 'repetition_frequency_unit', ts('Repeats every'), CRM_Core_SelectValues::getRecurringFrequencyUnits(), FALSE, array('class' => 'required'));
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
     $form->add('select', 'repetition_frequency_interval', NULL, $numericOptions, FALSE, array('class' => 'required'));
