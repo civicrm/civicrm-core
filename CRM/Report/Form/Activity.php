@@ -183,7 +183,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           ),
           'contact_target_phone' => array(
             'name' => 'phone',
-	        'title' => ts('Target Phone'),
+            'title' => ts('Target Phone'),
             'alias' => 'civicrm_phone_target',
           ),
         ),
