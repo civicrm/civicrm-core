@@ -1042,32 +1042,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             }
           }
 
-          // CRM-14563: we store checkbox, multi-select and adv-multi select custom field using separator, hence it
-          // needs special handling.
-          if ($cfID = CRM_Core_BAO_CustomField::getKeyID(CRM_Utils_Array::value(1, $v))) {
-            $isCustomField = TRUE;
-            $customFieldType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
-            $specialHTMLType = array(
-              'CheckBox',
-              'Multi-Select',
-              'AdvMulti-Select',
-              'Multi-Select State/Province',
-              'Multi-Select Country',
-            );
-
-            // override the operator to handle separator ( note: this might have some performance issues )
-            if (in_array($customFieldType, $specialHTMLType)) {
-              // FIX ME: != and few other operators are not handled
-              $specialOperators = array('=', 'IN', 'LIKE');
-
-              if (in_array($params['operator'][$key][$k], $specialOperators)) {
-                $params['operator'][$key][$k] = 'RLIKE';
-              }
-            }
-          }
-
           // CRM-14983: verify if values are comma separated convert to array
-          if (!is_array($value) && (strpos($value, ',') !== FALSE || strstr($value, '(')) && empty($isCustomField) && $params['operator'][$key][$k] == 'IN') {
+          if (!is_array($value) && (strpos($value, ',') !== FALSE || strstr($value, '(')) && substr($fldName, 0, 7) != 'custom_' && $params['operator'][$key][$k] == 'IN') {
             preg_match('#\((.*?)\)#', $value, $match);
             $tmpArray = explode(',', $match[1]);
             $value = array_combine(array_values($tmpArray), array_values($tmpArray));
