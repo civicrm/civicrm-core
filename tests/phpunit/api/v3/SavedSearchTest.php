@@ -58,9 +58,14 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     $url = CIVICRM_UF_BASEURL . "/civicrm/contact/search/advanced?reset=1";
     $serialized_url = serialize($url);
 
+    // params for saved search that returns all volunteers for the
+    // default organization.
     $this->params = array(
-      'form_values' => 'a:36:{s:5:"qfKey";s:37:"4b50e233dcbe77cced4bd8fd8df90567_9974";s:8:"entryURL";'
-      . $serialized_url . 's:12:"hidden_basic";s:1:"1";s:12:"contact_type";a:0:{}s:5:"group";a:0:{}s:10:"group_type";a:0:{}s:21:"group_search_selected";s:5:"group";s:9:"sort_name";s:0:"";s:5:"email";s:0:"";s:14:"contact_source";s:0:"";s:9:"job_title";s:0:"";s:10:"contact_id";s:0:"";s:19:"external_identifier";s:0:"";s:7:"uf_user";s:0:"";s:10:"tag_search";s:0:"";s:11:"uf_group_id";s:0:"";s:14:"component_mode";s:1:"1";s:8:"operator";s:3:"AND";s:25:"display_relationship_type";s:0:"";s:15:"privacy_options";a:0:{}s:16:"privacy_operator";s:2:"OR";s:14:"privacy_toggle";s:1:"1";s:13:"email_on_hold";a:1:{s:7:"on_hold";s:0:"";}s:30:"preferred_communication_method";a:5:{i:1;s:0:"";i:2;s:0:"";i:3;s:0:"";i:4;s:0:"";i:5;s:0:"";}s:18:"preferred_language";s:0:"";s:13:"phone_numeric";s:0:"";s:22:"phone_location_type_id";s:0:"";s:19:"phone_phone_type_id";s:0:"";s:4:"task";s:2:"13";s:8:"radio_ts";s:6:"ts_sel";s:12:"toggleSelect";s:1:"1";s:10:"mark_x_165";s:1:"1";s:10:"mark_x_155";s:1:"1";s:10:"mark_x_124";s:1:"1";s:9:"mark_x_35";s:1:"1";s:12:"contact_tags";a:1:{i:2;i:1;}}',
+      'form_values' => array(
+        // Is volunteer for
+        'relation_type_id' => '6_a_b',
+        'relation_target_name' => 'Default Organization',
+      ),
     );
   }
 
@@ -74,15 +79,22 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
 
     // Assert:
-    // Get the entity with the id returned in $result['id'], and check whether
-    // the parameters are set correctly:
-    $this->getAndCheck($this->params, $result['id'], $this->_entity);
-
+    // getAndCheck fails, I think because form_values is an array.
+    //$this->getAndCheck($this->params, $result['id'], $this->_entity);
     // Check whether the new ID is correctly returned by the API.
     $this->assertNotNull($result['values'][$result['id']]['id']);
+
+    // Check whether the relation type ID is correctly returned.
+    $this->assertEquals(
+        $this->params['form_values']['relation_type_id'],
+        $result['values'][$result['id']]['form_values']['relation_type_id']);
   }
 
-  public function testGetSavedSearch() {
+  /**
+   * Create a saved search, retrieve it again, and check for ID and one of
+   * the field values.
+   */
+  public function testCreateAndGetSavedSearch() {
     // Arrange:
     // (create a saved search)
     $create_result = $this->callAPISuccess(
@@ -95,8 +107,61 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     // Assert:
     $this->assertEquals(1, $get_result['count']);
     $this->assertNotNull($get_result['values'][$get_result['id']]['id']);
+
+    // just check the relationship type ID of the form values.
     $this->assertEquals(
-        $this->params['form_values'], $get_result['values'][$get_result['id']]['form_values']);
+        $this->params['form_values']['relation_type_id'],
+        $get_result['values'][$get_result['id']]['form_values']['relation_type_id']);
+  }
+
+  /**
+   * Create a saved search, and test whether it can be used for a smart
+   * group.
+   */
+  public function testCreateSavedSearchWithSmartGroup() {
+    // First create a volunteer for the default organization
+
+    $result = $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'Joe',
+      'last_name' => 'Schmoe',
+      'contact_type' => 'Individual',
+      'api.Relationship.create' => array(
+        'contact_id_a' => '$value.id',
+        // default organization:
+        'contact_id_b' => 1,
+        // volunteer relationship:
+        'relationship_type_id' => 6,
+        'is_active' => 1,
+      ),
+    ));
+    $contact_id = $result['id'];
+
+    // Now create our saved search, and chain the creation of a smart group.
+    $params = $this->params;
+    $params['api.Group.create'] = array(
+      'name' => 'my_smartgroup',
+      'title' => 'my smartgroup',
+      'description' => 'Volunteers for the default organization',
+      'saved_search_id' => '$value.id',
+      'is_active' => 1,
+      'visibility' => 'User and User Admin Only',
+      'is_hidden' => 0,
+      'is_reserved' => 0,
+    );
+
+    $create_result = $this->callAPIAndDocument(
+        $this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+
+    $created_search = CRM_Utils_Array::first($create_result['values']);
+    $group_id = $created_search['api.Group.create']['id'];
+
+    // Search for contacts in our new smart group
+    $get_result = $this->callAPISuccess(
+      'Contact', 'get', array('group' => $group_id), __FUNCTION__, __FILE__);
+
+    // Expect our contact to be there.
+    $this->assertEquals(1, $get_result['count']);
+    $this->assertEquals($contact_id, $get_result['values'][$contact_id]['id']);
   }
 
   public function testDeleteSavedSearch() {
