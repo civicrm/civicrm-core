@@ -91,15 +91,36 @@ class CRM_Core_Component {
    */
   public static function &getComponents($force = FALSE) {
     static $_cache = NULL;
+    static $_extensionPaths = NULL;
 
     if (!$_cache || $force) {
       $_cache = array();
+
+      if (!$_extensionPaths) {
+        global $civicrm_root;
+        $config = CRM_Core_Config::singleton();
+        $extensionsContainer = new CRM_Extension_Container_Basic($civicrm_root, $config->resourceBase);
+        $extensions = $extensionsContainer->getKeys();
+        foreach ($extensions as $extension)
+        {
+          $_extensionPaths[$extension] = $extensionsContainer->getPath($extension) . '/';
+        }
+      }
 
       $cr = new CRM_Core_DAO_Component();
       $cr->find(FALSE);
       while ($cr->fetch()) {
         $infoClass = $cr->namespace . '_' . self::COMPONENT_INFO_CLASS;
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php');
+        $filePath = str_replace('_', DIRECTORY_SEPARATOR, $infoClass) . '.php';
+
+        foreach ($_extensionPaths as $extensionPath) {
+          if (file_exists($extensionPath . $filePath)) {
+            set_include_path($extensionPath . PATH_SEPARATOR . get_include_path());
+            break;
+          }
+        }
+
+        require_once ($filePath);
         $infoObject = new $infoClass($cr->name, $cr->namespace, $cr->id);
         if ($infoObject->info['name'] !== $cr->name) {
           CRM_Core_Error::fatal("There is a discrepancy between name in component registry and in info file ({$cr->name}).");
