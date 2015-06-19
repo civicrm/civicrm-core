@@ -83,7 +83,6 @@ class CRM_Utils_Cache {
 
       // a generic method for utilizing any of the available db caches.
       $dbCacheClass = 'CRM_Utils_Cache_' . $className;
-      require_once str_replace('_', DIRECTORY_SEPARATOR, $dbCacheClass) . '.php';
       $settings = self::getCacheSettings($className);
       self::$_singleton = new $dbCacheClass($settings);
     }

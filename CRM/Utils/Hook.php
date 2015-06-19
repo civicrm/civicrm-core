@@ -1939,4 +1939,24 @@ abstract class CRM_Utils_Hook {
       ->invoke(1, $messages, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_check');
   }
 
+  /**
+   * This hook is called when a query string of the CSV Batch export is generated.
+   */
+  public static function batchQuery(&$query) {
+    return self::singleton()->invoke(1, $query, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_batchQuery'
+    );
+  }
+
+  /**
+   * This hook is called when the entries of the CSV Batch export are mapped.
+   */
+  public static function batchItems(&$results, &$items) {
+    return self::singleton()->invoke(2, $results, $items,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_batchItems'
+    );
+  }
+
 }

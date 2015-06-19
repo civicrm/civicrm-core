@@ -462,8 +462,8 @@
           e.preventDefault();
         });
       }
-      // Show form buttons as part of the dialog
       if ($el.data('uiDialog')) {
+        // Show form buttons as part of the dialog
         var buttonContainers = '.crm-submit-buttons, .action-link',
           buttons = [],
           added = [];
@@ -489,6 +489,15 @@
           $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
         });
         $el.dialog('option', 'buttons', buttons);
+
+        // Show done button for non-ajax dialogs (e.g. file downloads)
+        $(this).on('submit', "form[data-no-ajax-submit=true]", function() {
+          $el.dialog('option', 'buttons', [{
+            text: ts('Done'),
+            icons: {primary: 'ui-icon-close'},
+            click: function() {$(this).dialog('close');}
+          }]);
+        });
       }
       // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {

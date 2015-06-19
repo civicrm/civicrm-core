@@ -26,54 +26,141 @@
 {if $action eq 1 or $action eq 2 or $action eq 4 or $action eq 8}
     {include file="CRM/Custom/Form/Option.tpl"}
 {else}
-  {if $customOption}
-    {if $reusedNames}
-        <div class="message status">
-            <div class="icon inform-icon"></div> &nbsp; {ts 1=$reusedNames}These Multiple Choice Options are shared by the following custom fields: %1{/ts}
-        </div>
-    {/if}
+  {if $reusedNames}
+      <div class="message status">
+        <div class="icon inform-icon"></div> &nbsp; {ts 1=$reusedNames}These Multiple Choice Options are shared by the following custom fields: %1{/ts}
+      </div>
+  {/if}
 
-    <div id="field_page">
-      <p></p>
-      <div class="form-item">
-        {strip}
-        {* handle enable/disable actions*}
-         {include file="CRM/common/enableDisableApi.tpl"}
-        <table class="selector row-highlight">
+  <div id="field_page">
+    <p></p>
+    <div class="form-item">
+      {* handle enable/disable actions*}
+      {include file="CRM/common/enableDisableApi.tpl"}
+      <table class="crm-option-selector">
+      <thead>
           <tr class="columnheader">
-            <th>{ts}Label{/ts}</th>
-            <th>{ts}Value{/ts}</th>
-            <th>{ts}Default{/ts}</th>
-            <th>{ts}Order{/ts}</th>
-            <th>{ts}Enabled?{/ts}</th>
-            <th>&nbsp;</th>
+            <th class='crm-custom_option-label'>{ts}Label{/ts}</th>
+            <th class='crm-custom_option-value'>{ts}Value{/ts}</th>
+            <th class='crm-custom_option-default_value'>{ts}Default{/ts}</th>
+            <th class='crm-custom_option-is_active'>{ts}Enabled?{/ts}</th>
+            <th class='crm-custom_option-links'>&nbsp;</th>
+            <th class='hiddenElement'>&nbsp;</th>
           </tr>
-          {foreach from=$customOption item=row key=id}
-            <tr id="OptionValue-{$id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-custom_option{if !$row.is_active} disabled{/if}">
-              <td class="crm-custom_option-label crm-editable crmf-label">{$row.label}</td>
-              <td class="crm-custom_option-value disabled-crm-editable" data-field="value" data-action="update">{$row.value}</td>
-              <td class="crm-custom_option-default_value crmf-default_value">{$row.default_value}</td>
-              <td class="nowrap crm-custom_option-weight crmf-weight">{$row.weight}</td>
-              <td id="row_{$id}_status" class="crm-custom_option-is_active crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-              <td>{$row.action|replace:'xx':$id}</td>
-            </tr>
-          {/foreach}
-          </table>
-        {/strip}
+        </thead>
+      </table>
+      {literal}
+      <script type="text/javascript">
+      CRM.$(function($) {
+        var crmOptionSelector;
 
-        <div class="action-link">
-            {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="circle-plus"}{ts}Add Option{/ts}{/crmButton}
-            {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="close"}{ts}Done{/ts}{/crmButton}
-        </div>
+        buildOptions();
+
+        function buildOptions() {
+          var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/optionlist" h=0 q="snippet=4&fid=$fid&gid=$gid"}'{literal};
+          var $context = $('.crm-ajax-container');
+          var ZeroRecordText = {/literal}'{ts escape="js"}None found.{/ts}'{literal};
+
+          crmOptionSelector = $('table.crm-option-selector', $context).dataTable({
+              "destroy"    : true,
+              "bFilter"    : false,
+              "bAutoWidth" : false,
+              "aaSorting"  : [],
+              "aoColumns"  : [
+                              {sClass:'crm-custom_option-label'},
+                              {sClass:'crm-custom_option-value'},
+                              {sClass:'crm-custom_option-default_value'},
+                              {sClass:'crm-custom_option-is_active'},
+                              {sClass:'crm-custom_option-links'},
+                              {sClass:'hiddenElement'}
+                             ],
+              "bProcessing": true,
+              "asStripClasses" : [ "odd-row", "even-row" ],
+              "sPaginationType": "full_numbers",
+              "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+              "bServerSide": true,
+              "bJQueryUI": true,
+              "bSort" : false,
+              "sAjaxSource": sourceUrl,
+              "iDisplayLength": 10,
+              "oLanguage": {
+                             "sZeroRecords":   ZeroRecordText,
+                             "sProcessing":    {/literal}"{ts escape='js'}Processing...{/ts}"{literal},
+                             "sLengthMenu":    {/literal}"{ts escape='js'}Show _MENU_ entries{/ts}"{literal},
+                             "sInfo":          {/literal}"{ts escape='js'}Showing _START_ to _END_ of _TOTAL_ entries{/ts}"{literal},
+                             "oPaginate": {
+                                  "sFirst":    {/literal}"{ts escape='js'}First{/ts}"{literal},
+                                  "sPrevious": {/literal}"{ts escape='js'}Previous{/ts}"{literal},
+                                  "sNext":     {/literal}"{ts escape='js'}Next{/ts}"{literal},
+                                  "sLast":     {/literal}"{ts escape='js'}Last{/ts}"{literal}
+                              }
+                            },
+              "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                var id = $('td:last', nRow).text().split(',')[0];
+                var cl = $('td:last', nRow).text().split(',')[1];
+                $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
+                $('td:eq(0)', nRow).wrapInner('<div style="margin-left: 10px;" class="crm-editable crmf-label" />');
+                $('td:eq(0)', nRow).prepend('<div style="cursor:move; position: relative; left: -7px;" class="icon ui-icon-arrowthick-2-n-s" />');
+                $('td:eq(2)', nRow).addClass('crmf-default_value');
+                return nRow;
+              },
+              "fnDrawCallback": function() {
+                // FIXME: trigger crmLoad and crmEditable would happen automatically
+                $('.crm-editable').crmEditable();
+              },
+
+              "fnServerData": function ( sSource, aoData, fnCallback ) {
+                  $.ajax( {
+                      "dataType": 'json',
+                      "type": "POST",
+                      "url": sSource,
+                      "data": aoData,
+                      "success": fnCallback
+                  } );
+              }
+          });
+        }
+
+
+        var startPosition;
+        var endPosition;
+        var gid = {/literal}'{$optionGroupID}'{literal};
+
+        $("table.crm-option-selector tbody").sortable({
+          handle: ".ui-icon-arrowthick-2-n-s",
+          cursor: "move",
+          start:function(event, ui) {
+            var oSettings = $('table.crm-option-selector').dataTable().fnSettings();
+            var index = oSettings._iDisplayStart;
+            startPosition = index + ui.item.prevAll().length + 1;
+          },
+          update: function(event, ui) {
+            var oSettings = $('table.crm-option-selector').dataTable().fnSettings();
+            var index = oSettings._iDisplayStart;
+            endPosition = index + ui.item.prevAll().length + 1;
+
+            CRM.status({}, $.getJSON(CRM.url('civicrm/ajax/reorder'), {
+              returnFormat:'JSON',
+              start:startPosition,
+              end: endPosition,
+              gid: gid
+            }))
+            .success(function() {
+              $("table.crm-option-selector tbody tr").each(function(i) {
+                $(this).removeClass('odd even').addClass(i % 2 ? 'even' : 'odd');
+              });
+            });
+          }
+        });
+      });
+
+      </script>
+      {/literal}
+
+      <div class="action-link">
+          {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="circle-plus"}{ts}Add Option{/ts}{/crmButton}
+          {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="close"}{ts}Done{/ts}{/crmButton}
       </div>
     </div>
-
-  {else}
-    {if $action eq 16}
-        <div class="messages status no-popup">
-           <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
-           {ts}None found.{/ts}
-        </div>
-    {/if}
-  {/if}
+  </div>
 {/if}

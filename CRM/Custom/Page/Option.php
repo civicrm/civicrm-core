@@ -114,19 +114,6 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    * @return void
    */
   public function browse() {
-    //get the default value from custom fields
-    $customFieldBAO = new CRM_Core_BAO_CustomField();
-    $customFieldBAO->id = $this->_fid;
-    if ($customFieldBAO->find(TRUE)) {
-      $defaultValue = $customFieldBAO->default_value;
-      $fieldHtmlType = $customFieldBAO->html_type;
-    }
-    else {
-      CRM_Core_Error::fatal();
-    }
-    $defVal = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-      substr($defaultValue, 1, -1)
-    );
 
     // get the option group id
     $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
@@ -155,79 +142,7 @@ WHERE  option_group_id = %1";
       CRM_Utils_System::setTitle($newTitle);
       $this->assign('reusedNames', $reusedNames);
     }
-
-    $query = "
-SELECT   *
-  FROM   civicrm_option_value
- WHERE   option_group_id = %1
-ORDER BY weight, label
-";
-    $params = array(1 => array($optionGroupID, 'Integer'));
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    $customOption = array();
-    $fields = array('label', 'value', 'is_active', 'weight');
-    $config = CRM_Core_Config::singleton();
-    while ($dao->fetch()) {
-      $customOption[$dao->id] = array();
-      foreach ($fields as $field) {
-        $customOption[$dao->id][$field] = $dao->$field;
-      }
-
-      $action = array_sum(array_keys($this->actionLinks()));
-
-      // update enable/disable links depending on custom_field properties.
-      if ($dao->is_active) {
-        $action -= CRM_Core_Action::ENABLE;
-      }
-      else {
-        $action -= CRM_Core_Action::DISABLE;
-      }
-
-      if ($fieldHtmlType == 'CheckBox' ||
-        $fieldHtmlType == 'AdvMulti-Select' ||
-        $fieldHtmlType == 'Multi-Select'
-      ) {
-        if (in_array($dao->value, $defVal)) {
-          $customOption[$dao->id]['default_value'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
-        }
-        else {
-          $customOption[$dao->id]['default_value'] = '';
-        }
-      }
-      else {
-        if ($defaultValue == $dao->value) {
-          $customOption[$dao->id]['default_value'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
-        }
-        else {
-          $customOption[$dao->id]['default_value'] = '';
-        }
-      }
-
-      $customOption[$dao->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(),
-        $action,
-        array(
-          'id' => $dao->id,
-          'fid' => $this->_fid,
-          'gid' => $this->_gid,
-        ),
-        ts('more'),
-        FALSE,
-        'customOption.row.actions',
-        'customOption',
-        $dao->id
-      );
-    }
-
-    // Add order changing widget to selector
-    $returnURL = CRM_Utils_System::url('civicrm/admin/custom/group/field/option',
-      "reset=1&action=browse&gid={$this->_gid}&fid={$this->_fid}"
-    );
-    $filter = "option_group_id = {$optionGroupID}";
-    CRM_Utils_Weight::addOrder($customOption, 'CRM_Core_DAO_OptionValue',
-      'id', $returnURL, $filter
-    );
-    $this->assign('customOption', $customOption);
+    $this->assign('optionGroupID', $optionGroupID);
   }
 
   /**

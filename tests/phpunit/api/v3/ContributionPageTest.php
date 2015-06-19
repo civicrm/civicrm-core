@@ -349,7 +349,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'is_recur' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
-      'is_pay_later' => 1,
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);

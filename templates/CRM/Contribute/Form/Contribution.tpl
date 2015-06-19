@@ -245,7 +245,7 @@
               <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
                 {$form.pcp_made_through_id.html} &nbsp;
-                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</span>
+                <div class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</div>
 
                 <div class="spacer"></div>
                  <div class="crm-contribution-form-block-pcp_details">
@@ -257,15 +257,15 @@
                     <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
                       <td class="label">{$form.pcp_roll_nickname.label}</td>
                       <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
-                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
+                        <div class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</div>
                       </td>
                     </tr>
                     <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
                       <td class="label" style="vertical-align: top">{$form.pcp_personal_note.label}</td>
                       <td>
                         {$form.pcp_personal_note.html}
-                        <span
-                          class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</span>
+                        <div
+                          class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</div>
                       </td>
                     </tr>
                   </table>
@@ -275,6 +275,7 @@
           </table>
         </div>
       </div>
+      {include file="CRM/Contribute/Form/PCP.js.tpl"}
     {/if}
     <!-- end of PCP -->
 
@@ -608,8 +609,8 @@ cj('#fee_amount').change( function() {
   var totalAmount = cj('#total_amount').val();
   var feeAmount = cj('#fee_amount').val();
   var netAmount = totalAmount.replace(/,/g, '') - feeAmount.replace(/,/g, '');
-  if (!cj('#net_amount').val()) {
-    cj('#net_amount').val(netAmount);
+  if (!cj('#net_amount').val() && totalAmount) {
+    cj('#net_amount').val(CRM.formatMoney(netAmount, true));
   }
 });
 

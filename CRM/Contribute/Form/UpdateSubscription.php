@@ -82,6 +82,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
     }
+    elseif ($this->_crid) {
+      $this->_coid = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_crid, 'id', 'contribution_recur_id');
+    }
 
     if ((!$this->_crid && !$this->_coid) ||
       ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)
@@ -103,8 +106,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $this->assign('self_service', $this->_selfService);
 
     if (!$this->_paymentProcessorObj->isSupported('changeSubscriptionAmount')) {
-      $userAlert = "<span class='font-red'>" . ts('Updates made using this form will change the recurring contribution information stored in your CiviCRM database, but will NOT be sent to the payment processor. You must enter the same changes using the payment processor web site.',
-          array(1 => $this->_paymentProcessorObj->_processorName)) . '</span>';
+      $userAlert = ts('Updates made using this form will change the recurring contribution information stored in your CiviCRM database, but will NOT be sent to the payment processor. You must enter the same changes using the payment processor web site.');
       CRM_Core_Session::setStatus($userAlert, ts('Warning'), 'alert');
     }
 
@@ -146,12 +148,14 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    // define the fields
-    $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE,
-      array(
-        'size' => 20,
-      ), TRUE,
-      'currency', $this->_subscriptionDetails->currency, TRUE
+    // CRM-16398: If current recurring contribution got > 1 lineitems then make amount field readonly
+    $amtAttr = array('size' => 20);
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_coid);
+    if (count($lineItems) > 1) {
+      $amtAttr += array('readonly' => TRUE);
+    }
+    $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE, $amtAttr,
+      TRUE, 'currency', $this->_subscriptionDetails->currency, TRUE
     );
 
     $this->add('text', 'installments', ts('Number of Installments'), array('size' => 20), TRUE);

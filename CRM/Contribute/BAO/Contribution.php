@@ -2748,7 +2748,7 @@ WHERE  contribution_id = %1 ";
         if (!empty($params['payment_processor'])) {
           $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
         }
-        CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+        $financialTxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
       }
     }
 
@@ -2939,8 +2939,9 @@ WHERE  contribution_id = %1 ";
       CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
     }
 
-    // create batch entry if batch_id is passed
-    if (!empty($params['batch_id'])) {
+    // create batch entry if batch_id is passed and
+    // ensure no batch entry is been made on 'Pending' or 'Failed' contribution, CRM-16611
+    if (!empty($params['batch_id']) && !empty($financialTxn)) {
       $entityParams = array(
         'batch_id' => $params['batch_id'],
         'entity_table' => 'civicrm_financial_trxn',

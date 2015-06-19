@@ -624,9 +624,16 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $sharedContact->id = $relationship->contact_id_a;
         $sharedContact->find(TRUE);
 
-        if ($relationship->relationship_type_id == 4 && $relationship->contact_id_b == $sharedContact->employer_id) {
+        // CRM-15881 UPDATES
+        // changed FROM "...relationship->relationship_type_id == 4..." TO "...relationship->relationship_type_id == 5..."
+        // As the system should be looking for type "employer of" (id 5) and not "sibling of" (id 4)
+        // As suggested by @davecivicrm, the employee relationship type id is fetched using the CRM_Core_DAO::getFieldValue() class and method, since these ids differ from system to system.
+        $employerRelTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
+
+        if ($relationship->relationship_type_id == $employerRelTypeId && $relationship->contact_id_b == $sharedContact->employer_id) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
         }
+
       }
     }
     return $relationship;
@@ -1456,6 +1463,24 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
     }
 
+    // CRM-15829 UPDATES
+    // If we're looking for active memberships we must consider pending (id: 5) ones too.
+    // Hence we can't just call CRM_Member_BAO_Membership::getValues below with the active flag, is it would completely miss pending relatioships.
+    // As suggested by @davecivicrm, the pending status id is fetched using the CRM_Member_PseudoConstant::membershipStatus() class and method, since these ids differ from system to system.
+    $pendingStatusId = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
+
+    $query = 'SELECT * FROM `civicrm_membership_status`';
+    if ($active) {
+      $query .= 'WHERE `is_current_member` = 1 OR `id` = %1 ';
+    }
+
+    $params[1] = array($pendingStatusId, 'String');
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+    while ($dao->fetch()) {
+      $membershipStatusRecordIds[$dao->id] = $dao->id;
+    }
+
     // Now get the active memberships for all the contacts.
     // If contact have any valid membership(s), then add it to
     // 'values' array.
@@ -1463,7 +1488,23 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       $memParams = array('contact_id' => $cid);
       $memberships = array();
 
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, $active, TRUE);
+      // CRM-15829 UPDATES
+      // Since we want PENDING memberships as well, the $active flag needs to be set to false so that this will return all memberships and we can then filter the memberships based on the status IDs recieved above.
+      CRM_Member_BAO_Membership::getValues($memParams, $memberships, FALSE, TRUE);
+
+      // CRM-15829 UPDATES
+      // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1462
+      foreach ($memberships as $key => $membership) {
+
+        if (!isset($memberships[$key]['status_id'])) {
+          continue;
+        }
+
+        $membershipStatusId = $memberships[$key]['status_id'];
+        if (!isset($membershipStatusRecordIds[$membershipStatusId])) {
+          unset($memberships[$key]);
+        }
+      }
 
       if (empty($memberships)) {
         continue;

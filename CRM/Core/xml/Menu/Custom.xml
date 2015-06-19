@@ -5,4 +5,14 @@
      <path>civicrm/custom/add</path>
      <page_callback>CRM_Custom_Form_CustomData</page_callback>
   </item>
+  <item>
+     <path>civicrm/ajax/optionlist</path>
+     <page_callback>CRM_Custom_Page_AJAX::getOptionList</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/reorder</path>
+     <page_callback>CRM_Custom_Page_AJAX::fixOrdering</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
