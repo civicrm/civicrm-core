@@ -224,7 +224,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
       $msgTitle = ts('Update Success');
       $msgType = 'success';
-
+      $msg = ts('Recurring Contribution Updated');
       $contactID = $this->_subscriptionDetails->contact_id;
 
       if ($this->_subscriptionDetails->amount != $params['amount']) {
@@ -233,6 +233,12 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
               1 => CRM_Utils_Money::format($this->_subscriptionDetails->amount, $this->_subscriptionDetails->currency),
               2 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
             )) . ' ';
+        if ($this->_subscriptionDetails->amount < $params['amount']) {
+          $msg = ts('Recurring Contribution Updated - increased installment amount');
+        }
+        else {
+          $msg = ts('Recurring Contribution Updated - decreased installment amount');
+        }
       }
 
       if ($this->_subscriptionDetails->installments != $params['installments']) {
@@ -248,7 +254,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
           'Update Recurring Contribution',
           'name'
         ),
-        'subject' => ts('Recurring Contribution Updated'),
+        'subject' => $msg,
         'details' => $message,
         'activity_date_time' => date('YmdHis'),
         'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
