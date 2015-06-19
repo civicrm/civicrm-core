@@ -60,7 +60,7 @@ It could perhaps be thinned by 30-60% by making more directives.
           ng-model="mailing.recipients.groups.base[0]"
           ng-required="true"
           >
-          <option ng-repeat="grp in crmMailingConst.groupNames | filter:{visibility:'Public pages'}" value="{{grp.id}}">{{grp.title}}</option>
+          <option ng-repeat="grp in crmMailingConst.groupNames | orderBy:'title'" value="{{grp.id}}">{{grp.title}}</option>
         </select>
       </div>
     </span>

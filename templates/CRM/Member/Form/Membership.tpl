@@ -256,6 +256,7 @@
       function setPaymentBlock(mode, checkboxEvent) {
         var memType = parseInt(cj('#membership_type_id_1').val( ));
         var isPriceSet = 0;
+        var existingAmount = {/literal}{if !empty($onlinePendingContributionId)}1{else}0{/if}{literal};
 
         if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
           isPriceSet = 1;
@@ -266,7 +267,7 @@
         }
 
         var allMemberships = {/literal}{$allMembershipInfo}{literal};
-        if ( !mode ) {
+        if (!mode) {
           //check the record_contribution checkbox if membership is a paid one
           {/literal}{if $action eq 1}{literal}
           if (!checkboxEvent) {
@@ -303,13 +304,16 @@
           cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
         }
         else {
-    if (taxRate) {
+          if (taxRate) {
             var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
-      cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
+            cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
           }
           else {
-      var feeTotal = allMemberships[memType]['total_amount'];
-      cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+            var feeTotal = allMemberships[memType]['total_amount'];
+            if (!existingAmount) {
+              // CRM-16680 don't set amount if there is an existing contribution.
+              cj("#total_amount").val(allMemberships[memType]['total_amount']);
+            }
           }
         }
         var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';

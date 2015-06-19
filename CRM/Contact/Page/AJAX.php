@@ -158,7 +158,7 @@ class CRM_Contact_Page_AJAX {
   public static function getPCPList() {
     $name = CRM_Utils_Array::value('term', $_GET);
     $name = CRM_Utils_Type::escape($name, 'String');
-    $limit = '10';
+    $limit = $max = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
 
     $where = ' AND pcp.page_id = cp.id AND pcp.contact_id = cc.id';
 
@@ -181,8 +181,11 @@ class CRM_Contact_Page_AJAX {
       $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
     }
 
-    if (!empty($_GET['limit'])) {
-      $limit = CRM_Utils_Type::escape($_GET['limit'], 'Positive');
+    $offset = $count = 0;
+    if (!empty($_GET['page'])) {
+      $page = (int) $_GET['page'];
+      $offset = $limit * ($page - 1);
+      $limit++;
     }
 
     $select = 'cc.sort_name, pcp.title, cp.title';
@@ -198,17 +201,22 @@ class CRM_Contact_Page_AJAX {
             FROM civicrm_pcp pcp, civicrm_event cp, civicrm_contact cc
             {$includeEmailFrom}
             {$whereClause} AND pcp.page_type = 'event'
-            LIMIT 0, {$limit}
             ) t
         ORDER BY sort_name
+        LIMIT $offset, $limit
         ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-    $results = array();
+    $output = array('results' => array(), 'more' => FALSE);
     while ($dao->fetch()) {
-      $results[] = array('id' => $dao->id, 'text' => $dao->data);
+      if (++$count > $max) {
+        $output['more'] = TRUE;
+      }
+      else {
+        $output['results'][] = array('id' => $dao->id, 'text' => $dao->data);
+      }
     }
-    CRM_Utils_JSON::output($results);
+    CRM_Utils_JSON::output($output);
   }
 
   public static function relationship() {
