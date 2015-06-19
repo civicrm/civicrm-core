@@ -771,6 +771,23 @@ class CRM_Core_SelectValues {
   }
 
   /**
+    * Day Names.
+    *
+    * @return array
+    */
+  public static function getDayNames() {
+    return array(
+      '1' => ts('Sunday'),
+      '2' => ts('Monday'),
+      '3' => ts('Tuesday'),
+      '4' => ts('Wednesday'),
+      '5' => ts('Thursday'),
+      '6' => ts('Friday'),
+      '7' => ts('Saturday'),
+    );
+  }
+
+  /**
    * Get numeric options.
    *
    * @param int $start

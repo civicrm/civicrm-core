@@ -73,6 +73,14 @@
        </tr>
    </table>
 </fieldset>
+<fieldset><legend>{ts}Week Begins{/ts}</legend>
+   <table class="form-layout-compressed">
+       <tr class="crm-date-form-block-weekBegins">
+          <td class="label">{$form.weekBegins.label}</td>
+          <td>{$form.weekBegins.html}</td>
+       </tr>
+   </table>
+</fieldset>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 <div class="spacer"></div>
 </div>
