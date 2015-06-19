@@ -2059,7 +2059,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
  * @throws Exception
  */
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
-  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName, 'String');
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE || CRM_Utils_System::isNull($fieldValue)) {
     return;
   }
@@ -2259,18 +2259,22 @@ function _civicrm_api3_deprecation_check($entity, $result = array()) {
  * Get the actual field value.
  *
  * In some case $params[$fieldName] holds Array value in this format Array([operator] => [value])
- * So this function returns the actual field value
+ * So this function returns the actual field value.
  *
  * @param array $params
  * @param string $fieldName
+ * @param string $type
  *
  * @return mixed
  */
-function _civicrm_api3_field_value_check(&$params, $fieldName) {
+function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
   $fieldValue = CRM_Utils_Array::value($fieldName, $params);
   $op = NULL;
 
-  if (!empty($fieldValue) && is_array($fieldValue) && array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
+  if (!empty($fieldValue) && is_array($fieldValue) &&
+    (array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators()) ||
+      $type == 'String' && strstr(key($fieldValue), 'EMPTY'))
+  ) {
     $op = key($fieldValue);
     $fieldValue = CRM_Utils_Array::value($op, $fieldValue);
   }
