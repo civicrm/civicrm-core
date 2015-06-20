@@ -261,6 +261,11 @@ AND    time_format <> ''
       unset($params[$setting]);
     }
     CRM_Core_BAO_ConfigSetting::create($params);
+
+    CRM_Core_Config::clearDBCache();
+    CRM_Utils_System::flushCache();
+    CRM_Core_Resources::singleton()->resetCacheCode();
+
     CRM_Core_Session::setStatus(" ", ts('Changes Saved'), "success");
   }
 
