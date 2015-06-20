@@ -3,7 +3,7 @@
 
 /**
  * Email validation rule
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -22,7 +22,7 @@
  */
 
 /**
- * Abstract base class for QuickForm validation rules 
+ * Abstract base class for QuickForm validation rules
  */
 require_once 'HTML/QuickForm/Rule.php';
 
@@ -51,6 +51,17 @@ class HTML_QuickForm_Rule_Email extends HTML_QuickForm_Rule
      */
     function validate($email, $checkDomain = false)
     {
+        if (function_exists('idn_to_ascii')) {
+          if ($parts = explode('@', $email)) {
+            if (sizeof($parts) == 2) {
+              foreach ($parts as &$part) {
+                $part = idn_to_ascii($part);
+              }
+              $email = implode('@', $parts);
+            }
+          }
+        }
+
         // Fix for bug #10799: add 'D' modifier to regex
         if (preg_match($this->regex . 'D', $email)) {
             if ($checkDomain && function_exists('checkdnsrr')) {
