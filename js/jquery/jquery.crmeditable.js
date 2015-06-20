@@ -198,9 +198,12 @@
           }
           var result,
             info = $i.crmEditableEntity(),
-            hash = info.entity + '.' + info.field,
+            // Strip extra id from multivalued custom fields
+            custom = info.field.match(/(custom_\d+)_\d+/),
+            field = custom ? custom[1] : info.field,
+            hash = info.entity + '.' + field,
             params = {
-              field: info.field,
+              field: field,
               context: 'create'
             };
           $i.data('optionsHashKey', hash);
