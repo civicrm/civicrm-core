@@ -1476,13 +1476,16 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         ));
       }
 
+      $params['contribution_status_id'] = CRM_Utils_Array::value('is_recur', $paymentParams) ? 2 : 1;
       if ($result) {
+        if (isset($this->_params['contribution_status_id'])) {
+          unset($this->_params['contribution_status_id']);
+        }
         $this->_params = array_merge($this->_params, $result);
         //assign amount to template if payment was successful
         $this->assign('amount', $params['total_amount']);
       }
 
-      $params['contribution_status_id'] = CRM_Utils_Array::value('is_recur', $paymentParams) ? 2 : 1;
       $params['receive_date'] = $now;
       $params['invoice_id'] = $this->_params['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
@@ -1683,6 +1686,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     // finally set membership id if already not set
     if (!$this->_id) {
       $this->_id = $membership->id;
+    }
+
+    if (is_array($result) && is_array($paymentParams) && CRM_Utils_Array::value('contribution_status_id', $result) == 1 && CRM_Utils_Array::value('is_recur', $paymentParams)) {
+      $r = civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id));
     }
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
