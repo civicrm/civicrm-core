@@ -3805,12 +3805,12 @@ WHERE con.id = {$contributionId}
   /**
    * Compute the stats values
    *
-   * @param stat either 'mode' or 'median'
-   * @param sql
-   * @param alias of civicrm_contribution
+   * @param $stat either 'mode' or 'median'
+   * @param $sql
+   * @param $alias of civicrm_contribution
    */
   public static function computeStats($stat, $sql, $alias = NULL) {
-    switch($stat) {
+    switch ($stat) {
       case 'mode':
         $modeDAO = CRM_Core_DAO::executeQuery($sql);
         while ($modeDAO->fetch()) {
@@ -3852,13 +3852,13 @@ WHERE con.id = {$contributionId}
             }
           }
           if ($even) {
-            $midValue = $midValue/2;
+            $midValue = $midValue / 2;
             $median[] = CRM_Utils_Money::format($midValue, $currency);
           }
         }
         return $median;
 
-      default :
+      default:
         return;
     }
   }
