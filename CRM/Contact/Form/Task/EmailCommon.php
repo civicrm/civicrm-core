@@ -522,13 +522,13 @@ class CRM_Contact_Form_Task_EmailCommon {
     $followupStatus = '';
     if ($sent) {
       $followupActivity = NULL;
-      if (!empty( $formValues['followup_activity_type_id'] )) {
+      if (!empty($formValues['followup_activity_type_id'])) {
         $params['followup_activity_type_id'] = $formValues['followup_activity_type_id'];
         $params['followup_activity_subject'] = $formValues['followup_activity_subject'];
         $params['followup_date'] = $formValues['followup_date'];
         $params['followup_date_time'] = $formValues['followup_date_time'];
         $params['target_contact_id'] = $form->_contactIds;
-        $params['followup_assignee_contact_id'] = explode( ',', $formValues['followup_assignee_contact_id']);
+        $params['followup_assignee_contact_id'] = explode(',', $formValues['followup_assignee_contact_id']);
         $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activityId, $params);
         $followupStatus = ts('A followup activity has been scheduled.');
 
@@ -557,7 +557,7 @@ class CRM_Contact_Form_Task_EmailCommon {
       CRM_Core_Session::setStatus(ts('One message was sent successfully. ', array(
             'plural' => '%count messages were sent successfully. ',
             'count' => $count_success,
-          )). $followupStatus, ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
+          )) . $followupStatus, ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
     }
 
     // Display the name and number of contacts for those email is not sent.
