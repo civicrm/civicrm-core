@@ -577,7 +577,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
 
     $totalAmount = $average = $mode = $median = $softTotalAmount = $softAverage = array();
-    $count = $midValue = $softCount = 0;
+    $count = $softCount = 0;
     while ($contriDAO->fetch()) {
       $totalAmount[]
         = CRM_Utils_Money::format($contriDAO->civicrm_contribution_total_amount_sum, $contriDAO->currency) .
@@ -588,51 +588,14 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     $groupBy = "\n{$group}, {$this->_aliases['civicrm_contribution']}.total_amount";
     $orderBy = "\nORDER BY civicrm_contribution_total_amount_count DESC";
-    $modeSQL = "SELECT civicrm_contribution_total_amount_count, civicrm_contribution_total_amount, currency
-    FROM (SELECT {$this->_aliases['civicrm_contribution']}.total_amount as civicrm_contribution_total_amount,
+    $modeSQL = "SELECT civicrm_contribution_total_amount_count, amount, currency
+    FROM (SELECT {$this->_aliases['civicrm_contribution']}.total_amount as amount,
     {$contriQuery} {$groupBy} {$orderBy}) as mode GROUP BY currency";
 
-    $modeDAO = CRM_Core_DAO::executeQuery($modeSQL);
-    while ($modeDAO->fetch()) {
-      if ($modeDAO->civicrm_contribution_total_amount_count > 1) {
-        $mode[] = CRM_Utils_Money::format($modeDAO->civicrm_contribution_total_amount, $modeDAO->currency);
-      }
-      else {
-        $mode[] = 'N/A';
-      }
-    }
+    $mode = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
 
-    $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
-    foreach ($currencies as $currency => $val) {
-      $where = "AND {$this->_aliases['civicrm_contribution']}.currency = '{$currency}'";
-      $rowCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) as count {$this->_from} {$this->_where} {$where}");
-
-      $even = FALSE;
-      $offset = 1;
-      $medianRow = floor($rowCount / 2);
-      if ($rowCount % 2 == 0 && !empty($medianRow)) {
-        $even = TRUE;
-        $offset++;
-        $medianRow--;
-      }
-
-      $medianValue = "SELECT {$this->_aliases['civicrm_contribution']}.total_amount as median
-         {$this->_from} {$this->_where} {$where}
-         ORDER BY median LIMIT {$medianRow},{$offset}";
-      $medianValDAO = CRM_Core_DAO::executeQuery($medianValue);
-      while ($medianValDAO->fetch()) {
-        if ($even) {
-          $midValue = $midValue + $medianValDAO->median;
-        }
-        else {
-          $median[] = CRM_Utils_Money::format($medianValDAO->median, $currency);
-        }
-      }
-      if ($even) {
-        $midValue = $midValue/2;
-        $median[] = CRM_Utils_Money::format($midValue, $currency);
-      }
-    }
+    $medianSQL = "{$this->_from} {$this->_where}";
+    $median = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, $this->_aliases['civicrm_contribution']);
 
     if ($softCredit) {
       $softDAO = CRM_Core_DAO::executeQuery($softSQL);
