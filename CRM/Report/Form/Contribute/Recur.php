@@ -368,9 +368,10 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_amount', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
+      }
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_installment_amount', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_installment_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_installment_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
       }
-
     }
   }
 
