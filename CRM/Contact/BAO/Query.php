@@ -4747,6 +4747,7 @@ civicrm_relationship.is_permission_a_b = 0
 SELECT COUNT( conts.total_amount ) as total_count,
        SUM(   conts.total_amount ) as total_amount,
        AVG(   conts.total_amount ) as total_avg,
+       conts.total_amount          as amount,
        conts.currency              as currency";
     if ($this->_permissionWhereClause) {
       $where .= " AND " . $this->_permissionWhereClause;
@@ -4761,10 +4762,11 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $summary = array();
     $summary['total'] = array();
     $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
+    $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
+      civicrm_contribution.currency $from $completedWhere";
 
     $query = "$select FROM (
-      SELECT civicrm_contribution.total_amount, civicrm_contribution.currency $from $completedWhere
-      GROUP BY civicrm_contribution.id
+      $innerQuery GROUP BY civicrm_contribution.id
     ) as conts
     GROUP BY currency";
 
@@ -4777,12 +4779,27 @@ SELECT COUNT( conts.total_amount ) as total_count,
       $summary['total']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
       $summary['total']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
     }
+
+    $orderBy = 'ORDER BY civicrm_contribution_total_amount_count DESC';
+    $groupBy = 'GROUP BY civicrm_contribution.total_amount';
+    $modeSQL = "$select, conts.civicrm_contribution_total_amount_count as civicrm_contribution_total_amount_count FROM ($innerQuery
+    $groupBy $orderBy) as conts
+    GROUP BY currency";
+
+    $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
+
+    $medianSQL = "{$from} {$completedWhere}";
+    $summary['total']['median'] = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, 'civicrm_contribution');
+    $summary['total']['currencyCount'] = count($summary['total']['median']);
+
     if (!empty($summary['total']['amount'])) {
       $summary['total']['amount'] = implode(',&nbsp;', $summary['total']['amount']);
       $summary['total']['avg'] = implode(',&nbsp;', $summary['total']['avg']);
+      $summary['total']['mode'] = implode(',&nbsp;', $summary['total']['mode']);
+      $summary['total']['median'] = implode(',&nbsp;', $summary['total']['median']);
     }
     else {
-      $summary['total']['amount'] = $summary['total']['avg'] = 0;
+      $summary['total']['amount'] = $summary['total']['avg'] = $summary['total']['median'] = 0;
     }
 
     // soft credit summary
