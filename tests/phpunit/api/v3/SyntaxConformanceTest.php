@@ -1143,7 +1143,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
             // http://forum.civicrm.org/index.php/topic,33990.0.html
             // See also my question on the CiviCRM Stack Exchange:
             // https://civicrm.stackexchange.com/questions/3437
-            $entity[$fieldName] = serialize(array('sort_name' => "SortName2{$counter}"));
+            $entity[$fieldName] = array('sort_name' => "SortName2");
           }
           else {
             $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
