@@ -2733,7 +2733,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
    * @param object $activity
    * @param array $mailToContacts
    *
-   * @return boolean
+   * @return bool
    */
   public static function sendToAssignee($activity, $mailToContacts) {
     if (!CRM_Utils_array::crmIsEmptyArray($mailToContacts)) {
@@ -2747,4 +2747,5 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     }
     return FALSE;
   }
+
 }
