@@ -99,9 +99,9 @@ function civicrm_api3_saved_search_get($params) {
  * @param array $result API result to be cleaned up.
  */
 function _civicrm_api3_saved_search_result_cleanup(&$result) {
-  // Only clean up the values if there are values. (A getCount operation
-  // for example does not return values.)
   if (isset($result['values'])) {
+    // Only clean up the values if there are values. (A getCount operation
+    // for example does not return values.)
     foreach ($result['values'] as $key => $value) {
       $result['values'][$key]['form_values'] = unserialize($value['form_values']);
     }
