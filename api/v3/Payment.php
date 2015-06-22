@@ -38,7 +38,7 @@
  *  Input parameters.
  *
  * @return array
- *   Array of contributions, if error an array with an error id and error message
+ *   Array of contributions which are payments, if error an array with an error id and error message
  */
 function civicrm_api3_payment_get($params) {
   
@@ -58,4 +58,65 @@ function civicrm_api3_payment_get($params) {
     _civicrm_api3_format_soft_credit($contribution[$dao->contribution_id]);
   }
   return civicrm_api3_create_success($contribution, $params, 'Contribution', 'get', $dao);
+}
+
+/**
+ * Add or update a Contribution which is a payment.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @throws API_Exception
+ * @return array
+ *   Api result array
+ */
+function civicrm_api3_payment_create(&$params) {
+  $values = array();
+  _civicrm_api3_custom_format_params($params, $values, 'Contribution');
+  $params = array_merge($params, $values);
+  if (empty($params['contribution_id']) || 
+      (isset($params['contribution_id']) && !CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'id'))) {
+    return civicrm_api3_create_error(ts('You need to supply a valid contribution ID to create a payment'));
+  }
+  $params['id'] = $params['contribution_id'];
+
+  if (!empty($params['contribution_id']) && !empty($params['contribution_status_id'])) {
+    $error = array();
+    //throw error for invalid status change such as setting completed back to pending
+    //@todo this sort of validation belongs in the BAO not the API - if it is not an OK
+    // action it needs to be blocked there. If it is Ok through a form it needs to be OK through the api
+    CRM_Contribute_BAO_Contribution::checkStatusValidation(NULL, $params, $error);
+    if (array_key_exists('contribution_status_id', $error)) {
+      throw new API_Exception($error['contribution_status_id']);
+    }
+  }
+  if (!empty($params['contribution_id']) && !empty($params['financial_type_id'])) {
+    $error = array();
+    CRM_Contribute_BAO_Contribution::checkFinancialTypeChange($params['financial_type_id'], $params['id'], $error);
+    if (array_key_exists('financial_type_id', $error)) {
+      throw new API_Exception($error['financial_type_id']);
+    }
+  }
+  _civicrm_api3_contribution_create_legacy_support_45($params);
+
+  // Make sure tax calculation is handled via api.
+  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
+
+  return _civicrm_api3_basic_create('CRM_Contribute_BAO_Contribution', $params, 'Contribution');
+}
+
+/**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_payment_create_spec(&$params) {
+  $params['contribution_id']['api.required'] = 1;  
+  $params['total_amount']['api.required'] = 1; 
+  $params['payment_instrument_id']['api.required'] = 0; // if not provided, Financial Account of default Asset account will be used  
+  $params['payment_processor_id']['api.required'] = 0; // offline payments do not involve a payment processor
+  $params['payment_processor_id']['description'] = 'Payment processor ID - required for payment processor payments'; 
 }
