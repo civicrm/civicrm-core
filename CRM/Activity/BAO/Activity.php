@@ -2727,4 +2727,24 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     }
   }
 
+  /**
+   * Send activity as attachment
+   *
+   * @param object $activity
+   * @param array $mailToContacts
+   *
+   * @return boolean
+   */
+  public static function sendToAssignee($activity, $mailToContacts) {
+    if (!CRM_Utils_array::crmIsEmptyArray($mailToContacts)) {
+      $ics = new CRM_Activity_BAO_ICalendar($activity);
+      $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $activity->id);
+      $ics->addAttachment($attachments, $mailToContacts);
+
+      CRM_Case_BAO_Case::sendActivityCopy(NULL, $activity->id, $mailToContacts, $attachments, NULL);
+      $ics->cleanup();
+      return TRUE;
+    }
+    return FALSE;
+  }
 }
