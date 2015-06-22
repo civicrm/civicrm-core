@@ -309,7 +309,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
         $this->_where .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) week)",
             $relative, $from, $to, $start_date_type, NULL, NULL);
-        $this->_where .=" AND $frequency_unit_db_alias = 'week' ) OR \n";
+        $this->_where .= " AND $frequency_unit_db_alias = 'week' ) OR \n";
 
         $this->_where .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) year)",
