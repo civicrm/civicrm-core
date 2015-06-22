@@ -59,7 +59,7 @@
   <field>
     <name>search_custom_id</name>
     <type>int unsigned</type>
-    <title>Option Value ID</name>
+    <title>Option Value ID</title>
     <comment>Foreign key to civicrm_option value table used for saved custom searches.</comment>
     <add>2.0</add>
   </field>
