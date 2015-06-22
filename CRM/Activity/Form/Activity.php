@@ -1106,7 +1106,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
         $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
         if ($sentFollowup) {
-          $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s)."); 
+          $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
         }
       }
     }
