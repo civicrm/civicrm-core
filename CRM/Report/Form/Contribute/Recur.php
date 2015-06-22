@@ -123,8 +123,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'installment_amount' => array(
             'title' => ts('Installment Amount'),
             'required' => TRUE,
-            'default' => TRUE,
-            'dbAlias' => 'ROUND(contribution_recur_civireport.amount/contribution_recur_civireport.installments, 2)'
+            'dbAlias' => 'ROUND(contribution_recur_civireport.amount/contribution_recur_civireport.installments, 2)',
           ),
           'installments' => array(
             'title' => ts('Installments'),
