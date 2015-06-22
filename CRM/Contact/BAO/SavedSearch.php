@@ -309,4 +309,15 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     return $savedSearch;
   }
 
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'form_values') {
+      // A dummy value for form_values.
+      $this->{$fieldName} = serialize(
+          array('sort_name' => "SortName{$counter}"));
+    }
+    else {
+      parent::assignTestValues($fieldName, $fieldDef, $counter);
+    }
+  }
+
 }
