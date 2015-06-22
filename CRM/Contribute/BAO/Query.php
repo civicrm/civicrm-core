@@ -65,8 +65,6 @@ class CRM_Contribute_BAO_Query {
    * If contributions are involved, add the specific contribute fields.
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     // if contribute mode add contribution id
@@ -344,6 +342,7 @@ class CRM_Contribute_BAO_Query {
       case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
         $qillName = $name;
         $pseudoExtraParam = NULL;
+        // @todo including names using a switch statement & then using an 'if' to filter them out is ... odd!
         if ((strpos($name, '_amount') !== FALSE) || (strpos($name, '_date') !== FALSE) || in_array($name,
             array(
               'contribution_id',
