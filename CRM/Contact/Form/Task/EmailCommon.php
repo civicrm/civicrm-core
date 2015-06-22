@@ -541,14 +541,10 @@ class CRM_Contact_Form_Task_EmailCommon {
               $mailToFollowupContacts[$values['email']] = $values;
             }
 
-            if (!CRM_Utils_array::crmIsEmptyArray($mailToFollowupContacts)) {
-              $ics = new CRM_Activity_BAO_ICalendar($followupActivity);
-              $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $followupActivity->id);
-              $ics->addAttachment($attachments, $mailToFollowupContacts);
-              CRM_Case_BAO_Case::sendActivityCopy(NULL, $followupActivity->id, $mailToFollowupContacts, $attachments, NULL);
-              $ics->cleanup();
-              $followupStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
-            }
+	    $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
+	    if ($sentFollowup) {
+	      $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s)."); 
+	    }
           }
         }
       }

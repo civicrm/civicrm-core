@@ -1089,21 +1089,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           }
         }
 
-        if (!CRM_Utils_array::crmIsEmptyArray($mailToContacts)) {
-          //include attachments while sending a copy of activity.
-          $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $activity->id);
-
-          $ics = new CRM_Activity_BAO_ICalendar($activity);
-          $ics->addAttachment($attachments, $mailToContacts);
-
-          // CRM-8400 add param with _currentlyViewedContactId for URL link in mail
-          CRM_Case_BAO_Case::sendActivityCopy(NULL, $activity->id, $mailToContacts, $attachments, NULL);
-
-          $ics->cleanup();
-
-          $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
-        }
-      }
+	$sent = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
+	if ($sent) {
+	  $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
+	}
+     }
 
       // Also send email to follow-up activity assignees if set
       if ($followupActivity) {
@@ -1114,17 +1104,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           }
         }
 
-        if (!CRM_Utils_array::crmIsEmptyArray($mailToFollowupContacts)) {
-          $ics = new CRM_Activity_BAO_ICalendar($followupActivity);
-          $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $followupActivity->id);
-          $ics->addAttachment($attachments, $mailToFollowupContacts);
-
-          CRM_Case_BAO_Case::sendActivityCopy(NULL, $followupActivity->id, $mailToFollowupContacts, $attachments, NULL);
-
-          $ics->cleanup();
-
-          $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
-        }
+        $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
+	if ($sentFollowup) {
+	  $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s)."); 
+	}
       }
     }
 
