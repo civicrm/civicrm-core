@@ -1089,11 +1089,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           }
         }
 
-	$sent = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
-	if ($sent) {
-	  $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
-	}
-     }
+        $sent = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
+        if ($sent) {
+          $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
+        }
+      }
 
       // Also send email to follow-up activity assignees if set
       if ($followupActivity) {
@@ -1105,9 +1105,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         }
 
         $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
-	if ($sentFollowup) {
-	  $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s)."); 
-	}
+        if ($sentFollowup) {
+          $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s)."); 
+        }
       }
     }
 

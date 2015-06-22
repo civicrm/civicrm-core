@@ -541,10 +541,10 @@ class CRM_Contact_Form_Task_EmailCommon {
               $mailToFollowupContacts[$values['email']] = $values;
             }
 
-	    $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
-	    if ($sentFollowup) {
-	      $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s)."); 
-	    }
+            $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
+            if ($sentFollowup) {
+              $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s)."); 
+            }
           }
         }
       }
