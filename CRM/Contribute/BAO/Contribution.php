@@ -3802,4 +3802,65 @@ WHERE con.id = {$contributionId}
     }
   }
 
+  /**
+   * Compute the stats values
+   *
+   * @param stat either 'mode' or 'median'
+   * @param sql
+   * @param alias of civicrm_contribution
+   */
+  public static function computeStats($stat, $sql, $alias = NULL) {
+    switch($stat) {
+      case 'mode':
+        $modeDAO = CRM_Core_DAO::executeQuery($sql);
+        while ($modeDAO->fetch()) {
+          if ($modeDAO->civicrm_contribution_total_amount_count > 1) {
+            $mode[] = CRM_Utils_Money::format($modeDAO->amount, $modeDAO->currency);
+          }
+          else {
+            $mode[] = 'N/A';
+          }
+        }
+        return $mode;
+
+      case 'median':
+        $midValue = 0;
+        $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
+        foreach ($currencies as $currency => $val) {
+          $where = "AND {$alias}.currency = '{$currency}'";
+          $rowCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) as count {$sql} {$where}");
+
+          $even = FALSE;
+          $offset = 1;
+          $medianRow = floor($rowCount / 2);
+          if ($rowCount % 2 == 0 && !empty($medianRow)) {
+            $even = TRUE;
+            $offset++;
+            $medianRow--;
+          }
+
+          $medianValue = "SELECT {$alias}.total_amount as median
+             {$sql} {$where}
+             ORDER BY median LIMIT {$medianRow},{$offset}";
+          $medianValDAO = CRM_Core_DAO::executeQuery($medianValue);
+          while ($medianValDAO->fetch()) {
+            if ($even) {
+              $midValue = $midValue + $medianValDAO->median;
+            }
+            else {
+              $median[] = CRM_Utils_Money::format($medianValDAO->median, $currency);
+            }
+          }
+          if ($even) {
+            $midValue = $midValue/2;
+            $median[] = CRM_Utils_Money::format($midValue, $currency);
+          }
+        }
+        return $median;
+
+      default :
+        return;
+    }
+  }
+
 }
