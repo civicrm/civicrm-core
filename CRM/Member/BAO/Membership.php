@@ -1373,14 +1373,17 @@ AND civicrm_membership.is_test = %2";
         $isPayLater
       );
 
-      if (is_a($result[1], 'CRM_Core_Error')) {
-        $errors[1] = CRM_Core_Error::getMessages($paymentResult[1]);
+      // @todo - is this meaningful / required. Taken from shared function.
+      if ($form->_priceSetId && $form->_lineItem) {
+        $form->_values['lineItem'] = $form->_lineItem;
+        $form->_values['priceSetID'] = $form->_priceSetId;
       }
 
       if (is_a($paymentResult, 'CRM_Core_Error')) {
         $errors[1] = CRM_Core_Error::getMessages($paymentResult);
       }
-      elseif (!empty($paymentResult['contribution'])) {
+
+      if (!empty($paymentResult['contribution'])) {
         //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
         $membershipContribution = $paymentResult['contribution'];
         // Save the contribution ID so that I can be used in email receipts
@@ -1408,12 +1411,7 @@ AND civicrm_membership.is_test = %2";
       $membershipContributionID = $membershipContribution->id;
     }
 
-    //@todo - why is this nested so deep? it seems like it could be just set on the calling function on the form layer
-    if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
-      $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
-    }
-    //@todo it should no longer be possible for it to get to this point & membership to not be an array
-    if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
+    if (!empty($membershipContributionID)) {
       $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
       foreach ($membershipTypeIDs as $memType) {
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);

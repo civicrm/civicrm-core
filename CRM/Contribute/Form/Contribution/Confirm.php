@@ -1778,6 +1778,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     ) {
       $this->_params['campaign_id'] = $this->_params['onbehalf']['member_campaign_id'];
     }
+
     $fields = array('email-Primary' => 1);
 
     // get the add to groups
@@ -2070,6 +2071,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $fieldTypes = array('Contact', 'Organization', 'Contribution');
       }
       $financialTypeID = $this->wrangleFinancialTypeID($contributionTypeId);
+
+      // @todo - is this meaningful / required. Taken from shared function.
+      if ($this->_priceSetId && $this->_lineItem) {
+        $this->_values['lineItem'] = $this->_lineItem;
+        $this->_values['priceSetID'] = $this->_priceSetId;
+      }
 
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
         $premiumParams, $contactID,
