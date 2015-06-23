@@ -1772,6 +1772,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
     $premiumParams = $membershipParams = $params = $this->_params;
+
+    if (!empty($this->_params['onbehalf']) &&
+      is_array($this->_params['onbehalf']) && !empty($this->_params['onbehalf']['member_campaign_id'])
+    ) {
+      $this->_params['campaign_id'] = $this->_params['onbehalf']['member_campaign_id'];
+    }
     $fields = array('email-Primary' => 1);
 
     // get the add to groups
@@ -2003,12 +2009,46 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipParams['is_pay_later'] = 1;
       }
 
+      // added new parameter for cms user contact id, needed to distinguish behaviour for on behalf of sign-ups
+      if (isset($this->_params['related_contact'])) {
+        $membershipParams['cms_contactID'] = $this->_params['related_contact'];
+      }
+      else {
+        $membershipParams['cms_contactID'] = $contactID;
+      }
+      $priceFieldIds = $this->get('memberPriceFieldIDS');
+
+      if (!empty($priceFieldIds)) {
+        $contributionTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
+        unset($priceFieldIds['id']);
+        $membershipTypeIds = array();
+        $membershipTypeTerms = array();
+        foreach ($priceFieldIds as $priceFieldId) {
+          if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
+            $membershipTypeIds[] = $id;
+            //@todo the value for $term is immediately overwritten. It is unclear from the code whether it was intentional to
+            // do this or a double = was intended (this ambiguity is the reason many IDEs complain about 'assignment in condition'
+            $term = 1;
+            if ($term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms')) {
+              $membershipTypeTerms[$id] = ($term > 1) ? $term : 1;
+            }
+            else {
+              $membershipTypeTerms[$id] = 1;
+            }
+          }
+        }
+        $membershipParams['selectMembership'] = $membershipTypeIds;
+        $membershipParams['financial_type_id'] = $contributionTypeID;
+        $membershipParams['types_terms'] = $membershipTypeTerms;
+      }
+
       //inherit campaign from contribution page.
       if (!array_key_exists('campaign_id', $membershipParams)) {
         $membershipParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values);
       }
 
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
+
       $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams, $isPayLater);
     }
     else {
@@ -2097,31 +2137,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $fieldTypes = array('Contact', 'Organization', 'Membership');
     }
 
-    $priceFieldIds = $this->get('memberPriceFieldIDS');
-
-    if (!empty($priceFieldIds)) {
-      $contributionTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
-      unset($priceFieldIds['id']);
-      $membershipTypeIds = array();
-      $membershipTypeTerms = array();
-      foreach ($priceFieldIds as $priceFieldId) {
-        if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
-          $membershipTypeIds[] = $id;
-          //@todo the value for $term is immediately overwritten. It is unclear from the code whether it was intentional to
-          // do this or a double = was intended (this ambiguity is the reason many IDEs complain about 'assignment in condition'
-          $term = 1;
-          if ($term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms')) {
-            $membershipTypeTerms[$id] = ($term > 1) ? $term : 1;
-          }
-          else {
-            $membershipTypeTerms[$id] = 1;
-          }
-        }
-      }
-      $membershipParams['selectMembership'] = $membershipTypeIds;
-      $membershipParams['financial_type_id'] = $contributionTypeID;
-      $membershipParams['types_terms'] = $membershipTypeTerms;
-    }
     if (!empty($membershipParams['selectMembership'])) {
       // CRM-12233
       $membershipLineItems = array();
