@@ -420,8 +420,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Setter method for stateMachine.
    *
    * @param CRM_Core_StateMachine $stateMachine
-   *
-   * @return void
    */
   public function setStateMachine($stateMachine) {
     $this->_stateMachine = $stateMachine;
