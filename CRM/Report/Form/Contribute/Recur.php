@@ -105,10 +105,6 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'required' => TRUE,
             'no_display' => TRUE,
           ),
-          'amount' => array(
-            'title' => ts('Amount'),
-            'default' => TRUE,
-          ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
           ),
@@ -120,10 +116,9 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'title' => ts('Frequency unit'),
             'default' => TRUE,
           ),
-          'installment_amount' => array(
+          'amount' => array(
             'title' => ts('Installment Amount'),
-            'required' => TRUE,
-            'dbAlias' => 'ROUND(contribution_recur_civireport.amount/contribution_recur_civireport.installments, 2)',
+            'default' => TRUE,
           ),
           'installments' => array(
             'title' => ts('Installments'),
@@ -185,15 +180,13 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'title' => ts('Frequency Interval'),
             'type' => CRM_Utils_Type::T_INT,
           ),
+          'amount' => array(
+            'title' => ts('Installment Amount'),
+            'type' => CRM_Utils_Type::T_MONEY,
+          ),
           'installments' => array(
             'title' => ts('Installments'),
             'type' => CRM_Utils_Type::T_INT,
-          ),
-          'installment_amount' => array(
-            'title' => ts('Installment Amount'),
-            'type' => CRM_Utils_Type::T_MONEY,
-            'dbAlias' => 'civicrm_contribution_recur_installment_amount',
-            'having' => TRUE,
           ),
           'start_date' => array(
             'title' => ts('Start Date'),
@@ -368,9 +361,6 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_amount', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
-      }
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_installment_amount', $row)) {
-        $rows[$rowNum]['civicrm_contribution_recur_installment_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_installment_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
       }
     }
   }
