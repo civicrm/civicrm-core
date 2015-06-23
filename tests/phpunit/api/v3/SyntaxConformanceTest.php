@@ -599,6 +599,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'weight', //won't update as there is no 1 in the same price set
         ),
       ),
+      'SavedSearch' => array(
+        // I think the fields below are generated based on form_values.
+        'cant_update' => array(
+          'search_custom_id',
+          'where_clause',
+          'select_tables',
+          'where_tables',
+        )
+      )
     );
     if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])) {
       return array();
