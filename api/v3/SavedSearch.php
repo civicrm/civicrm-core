@@ -49,12 +49,14 @@ function civicrm_api3_saved_search_create($params) {
   // So for the create API, I guess it should work for serialized and
   // unserialized form_values.
 
-  if (is_array($params["form_values"])) {
-    $params["formValues"] = $params["form_values"];
-  }
-  else {
-    // Assume that form_values is serialized.
-    $params["formValues"] = unserialize($params["form_values"]);
+  if (isset($params["form_values"])) {
+    if (is_array($params["form_values"])) {
+      $params["formValues"] = $params["form_values"];
+    }
+    else {
+      // Assume that form_values is serialized.
+      $params["formValues"] = unserialize($params["form_values"]);
+    }
   }
 
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
