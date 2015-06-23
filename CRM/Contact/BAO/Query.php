@@ -5695,6 +5695,9 @@ AND   displayRelType.is_active = 1
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
       $pseduoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
     }
+    elseif ($fieldName == 'contribution_product_id') {
+      $pseduoOptions = CRM_Contribute_PseudoConstant::products();
+    }
     elseif ($daoName) {
       $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
     }
