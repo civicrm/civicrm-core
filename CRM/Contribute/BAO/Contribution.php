@@ -718,8 +718,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         ),
       );
 
+      // CRM-16713 - contribution search by Premiums on 'Find Contribution' form.
+      $premiums = array(
+        'contribution_product_id' => array(
+          'title' => ts('Premium'),
+          'name' => 'contribution_product_id',
+          'where' => 'civicrm_product.id',
+          'data_type' => CRM_Utils_Type::T_INT,
+        ),
+      );
+
       $fields = array_merge($impFields, $typeField, $contributionStatus, $contributionPage, $optionField, $expFieldProduct,
-        $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount,
+        $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount, $premiums,
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution')
       );
 
