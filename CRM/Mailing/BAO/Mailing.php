@@ -2735,18 +2735,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Build the  compose PDF letter form.
-   *
-   * @param CRM_Core_Form $form
-   *
-   * @return void
-   * @deprecated
-   */
-  public static function commonLetterCompose(&$form) {
-    CRM_Mailing_BAO_Mailing::commonCompose($form);
-  }
-
-  /**
    * Get the search based mailing Ids.
    *
    * @return array
