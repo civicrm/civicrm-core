@@ -43,7 +43,7 @@ class CRM_Contribute_BAO_Query {
   static $_contribOrSoftCredit = "only_contribs";
 
   /**
-   * Function get the import/export fields for contribution
+   * Function get the import/export fields for contribution.
    *
    * @return array
    *   self::$_contributionFields  associative array of contribution fields
@@ -64,9 +64,7 @@ class CRM_Contribute_BAO_Query {
   /**
    * If contributions are involved, add the specific contribute fields.
    *
-   * @param $query
-   *
-   * @return void
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function select(&$query) {
     // if contribute mode add contribution id
@@ -226,7 +224,9 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * @param $query
+   * Get where clause.
+   *
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function where(&$query) {
     $grouping = NULL;
@@ -259,8 +259,10 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * @param $values
-   * @param $query
+   * Get where clause for a single value.
+   *
+   * @param array $values
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -349,6 +351,7 @@ class CRM_Contribute_BAO_Query {
       case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
         $qillName = $name;
         $pseudoExtraParam = NULL;
+        // @todo including names using a switch statement & then using an 'if' to filter them out is ... odd!
         if ((strpos($name, '_amount') !== FALSE) || (strpos($name, '_date') !== FALSE) || in_array($name,
             array(
               'contribution_id',
@@ -557,9 +560,11 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
+   * Get from clause.
+   *
    * @param string $name
-   * @param $mode
-   * @param $side
+   * @param string $mode
+   * @param string $side
    *
    * @return NULL|string
    */
@@ -700,7 +705,9 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * @param $query
+   * Initialise the soft credit clause.
+   *
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function initializeAnySoftCreditClause(&$query) {
     if (self::isSoftCreditOptionEnabled($query->_params)) {
@@ -713,6 +720,8 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
+   * Check if soft credits are enables.
+   *
    * @param array $queryParams
    *
    * @return bool
@@ -752,6 +761,8 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
+   * Get return properties for soft credits.
+   *
    * @param bool $isExportMode
    *
    * @return array
@@ -972,14 +983,20 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
-   * @param $row
+   * Function that may not be needed.
+   *
+   * @param array $row
    * @param int $id
    */
   public static function searchAction(&$row, $id) {
   }
 
   /**
-   * @param $tables
+   * Get table names.
+   *
+   * @todo better function comment needed - what IS the point of this?
+   *
+   * @param array $tables
    */
   public static function tableNames(&$tables) {
     // Add contribution table
@@ -1023,6 +1040,8 @@ class CRM_Contribute_BAO_Query {
   }
 
   /**
+   * Get fields for recurring contributions.
+   *
    * @return array
    */
   public static function getRecurringFields() {
