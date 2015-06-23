@@ -3810,6 +3810,7 @@ WHERE con.id = {$contributionId}
    * @param $alias of civicrm_contribution
    */
   public static function computeStats($stat, $sql, $alias = NULL) {
+    $mode = $median = array();
     switch ($stat) {
       case 'mode':
         $modeDAO = CRM_Core_DAO::executeQuery($sql);
