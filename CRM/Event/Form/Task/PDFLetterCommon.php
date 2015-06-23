@@ -64,23 +64,17 @@ class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLette
       // https://issues.civicrm.org/jira/browse/CRM-16599?focusedCommentId=77663&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-77663
       $contactId = $participant['contact_id'];
       $params = array('contact_id' => $contactId);
-      list($contact) = CRM_Utils_Token::getTokenDetails($params, $returnProperties, $skipOnHold, $skipDeceased, NULL, $messageToken, 'CRM_Contact_Form_Task_PDFLetterCommon'
-      );
-
-      if (civicrm_error($contact)) {
-        $notSent[] = $contactId;
-        continue;
-      }
-
-      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact[$contactId], TRUE, $messageToken);
+      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
       $tokenHtml = CRM_Utils_Token::replaceEntityTokens('event', $event, $tokenHtml, $messageToken);
-      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact[$contactId], $categories, TRUE);
+      $tokenHtml = CRM_Utils_Token::replaceEntityTokens('participant', $participant, $tokenHtml, $messageToken);
+      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact, $categories, TRUE);
 
       if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
         $smarty = CRM_Core_Smarty::singleton();
         // also add the contact tokens to the template
         $smarty->assign_by_ref('contact', $contact);
         $smarty->assign_by_ref('event', $event);
+        $smarty->assign_by_ref('participant', $participant);
         $tokenHtml = $smarty->fetch("string:$tokenHtml");
       }
 

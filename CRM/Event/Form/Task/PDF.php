@@ -107,6 +107,10 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
     foreach ($customEventTokens as $customEventTokenKey => $customEventTokenValue) {
       $tokens["{event.custom_$customEventTokenKey}"] = $customEventTokenValue['label'] . '::' . $customEventTokenValue['groupTitle'];
     }
+    $tokens = array_merge(CRM_Core_SelectValues::participantTokens(), $tokens);
+    unset($tokens['{participant.template_title}']);
+    unset($tokens['{participant.fee_label}']);
+    unset($tokens['{participant.default_role_id}']);
     return $tokens;
   }
 
