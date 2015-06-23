@@ -56,13 +56,15 @@
 <tr>
   <td>
     {$form.contribution_or_softcredits.label} <br />
-    {$form.contribution_or_softcredits.html}
-  </td>
-  <td>
+    {$form.contribution_or_softcredits.html}<br />
     <div class="float-left" id="contribution_soft_credit_type_wrapper">
       {$form.contribution_soft_credit_type_id.label} <br />
       {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
     </div>
+  </td>
+  <td>
+    {$form.invoice_id.label} <br />
+    {$form.invoice_id.html}
   </td>
 </tr>
 <tr>

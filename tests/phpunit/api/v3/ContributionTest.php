@@ -505,6 +505,25 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-16227 introduces invoice_id as a parameter.
+   */
+  public function testGetContributionByInvoice() {
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, array('invoice_id' => 'curly')));
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params), array('invoice_id' => 'churlish'));
+    $this->callAPISuccessGetCount('Contribution', array(), 2);
+    $this->callAPISuccessGetSingle('Contribution', array('invoice_id' => 'curly'));
+    // The following don't work. They are the format we are trying to introduce but although the form uses this format
+    // CRM_Contact_BAO_Query::convertFormValues puts them into the other format & the where only supports that.
+    // ideally the where clause would support this format (as it does on contact_BAO_Query) and those lines would
+    // come out of convertFormValues
+    // $this->callAPISuccessGetSingle('Contribution', array('invoice_id' => array('LIKE' => '%ish%')));
+    // $this->callAPISuccessGetSingle('Contribution', array('invoice_id' => array('NOT IN' => array('curly'))));
+    // $this->callAPISuccessGetCount('Contribution', array('invoice_id' => array('LIKE' => '%ly%')), 2);
+    // $this->callAPISuccessGetCount('Contribution', array('invoice_id' => array('IN' => array('curly', 'churlish'))),
+    // 2);
+  }
+
+  /**
    * Create test with unique field name on source.
    */
   public function testCreateContributionSource() {
