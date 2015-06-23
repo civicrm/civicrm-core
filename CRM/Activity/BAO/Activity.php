@@ -2738,7 +2738,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
    */
   public static function sendToAssignee($activity, $mailToContacts, $params = array()) {
     if (!CRM_Utils_Array::crmIsEmptyArray($mailToContacts)) {
-      $clientID = CRM_Utils_Array::value('client_id', $params);  
+      $clientID = CRM_Utils_Array::value('client_id', $params);
       $caseID = CRM_Utils_Array::value('case_id', $params);
 
       $ics = new CRM_Activity_BAO_ICalendar($activity);
