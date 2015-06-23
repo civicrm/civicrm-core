@@ -524,14 +524,14 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     foreach ($rows as $rowNum => $row) {
       // make count columns point to activity detail report
       if (!empty($row['civicrm_activity_id_count'])) {
-        $url =array();
+        $url = array();
         $urlParams = array('activity_type_id', 'gid', 'status_id', 'contact_id');
         foreach ($urlParams as $field) {
-          if (!empty($row['civicrm_activity_'.$field])) {
+          if (!empty($row['civicrm_activity_' . $field])) {
             $url[] = "{$field}_op=in&{$field}_value={$row['civicrm_activity_'.$field]}";
           }
-          elseif (!empty($this->_params[$field.'_value'])) {
-            $val = implode(",",$this->_params[$field.'_value']);
+          elseif (!empty($this->_params[$field . '_value'])) {
+            $val = implode(",", $this->_params[$field . '_value']);
             $url[] = "{$field}_op=in&{$field}_value={$val}";
           }
         }
@@ -543,13 +543,13 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                 CRM_Utils_Array::value("activity_date_time_relative", $this->_params),
                 CRM_Utils_Array::value("activity_date_time_from", $this->_params),
                 CRM_Utils_Array::value("activity_date_time_to", $this->_params)
-             );
+                );
             $url[] = "activity_date_time_from={$from}&activity_date_time_to={$to}";
             break;
           }
         }
-        $url=implode('&', $url);
-        $url = CRM_Report_Utils_Report::getNextUrl('activity',"reset=1&force=1&{$url}",
+        $url = implode('&', $url);
+        $url = CRM_Report_Utils_Report::getNextUrl('activity', "reset=1&force=1&{$url}",
                  $this->_absoluteUrl,
                  $this->_id,
                  $this->_drilldownReport);
