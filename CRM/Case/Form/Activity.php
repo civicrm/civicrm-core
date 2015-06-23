@@ -663,23 +663,9 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         }
       }
 
-      if (!CRM_Utils_array::crmIsEmptyArray($mailToContacts)) {
-        //include attachments while sending a copy of activity.
-        $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity',
-          $vval['actId']
-        );
-
-        $ics = new CRM_Activity_BAO_ICalendar($activity);
-        $ics->addAttachment($attachments, $mailToContacts);
-        $result = CRM_Case_BAO_Case::sendActivityCopy($this->_currentlyViewedContactId,
-          $vval['actId'], $mailToContacts, $attachments, $vval['case_id']
-        );
-        $ics->cleanup();
-        if (empty($result)) {
-          $mailStatus = '';
-        }
-      }
-      else {
+      $params = array('case_id' => $vval['case_id'], 'client_id' => $this->_currentlyViewedContactId);
+      $result = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts, $params);
+      if (empty($result)) {
         $mailStatus = '';
       }
 
