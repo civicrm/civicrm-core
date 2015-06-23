@@ -1333,13 +1333,16 @@ AND civicrm_membership.is_test = %2";
    * @param bool $isPayLater
    * @param bool $isPending
    *
+   * @param $isPending
+   *
    * @throws \CRM_Core_Exception
    */
   public static function postProcessMembership(
     $membershipParams, $contactID, &$form, $premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater, $isPending) {
-    $result = $membershipContribution = NULL;
+    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater,
+    $isPending) {
+    $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = $paymentResult = array();
 
@@ -1369,6 +1372,7 @@ AND civicrm_membership.is_test = %2";
         $isTest,
         $isPayLater
       );
+
       if (is_a($result[1], 'CRM_Core_Error')) {
         $errors[1] = CRM_Core_Error::getMessages($paymentResult[1]);
       }
@@ -1420,7 +1424,7 @@ AND civicrm_membership.is_test = %2";
         else {
           $pending = $isPending;
         }
-        $membership = self::renewMembershipFormWrapper($contactID, $memType,
+        $createdMemberships = self::renewMembershipFormWrapper($contactID, $memType,
           $isTest, $form, date('YmdHis'),
           CRM_Utils_Array::value('cms_contactID', $membershipParams),
           $customFieldsFormatted, $numTerms,
@@ -1430,8 +1434,8 @@ AND civicrm_membership.is_test = %2";
 
         if (!empty($membershipContribution)) {
           // update recurring id for membership record
-          self::updateRecurMembership($membership, $membershipContribution);
-          self::linkMembershipPayment($membership, $membershipContribution);
+          self::updateRecurMembership($createdMemberships[$memType], $membershipContribution);
+          self::linkMembershipPayment($createdMemberships[$memType], $membershipContribution);
         }
       }
       if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {

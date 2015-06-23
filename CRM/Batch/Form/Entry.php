@@ -794,7 +794,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value['membership_type_id'],
             FALSE,
             $this,
-            NULL,
+            // This may or may not apply to this form - was in a shared form uber-spaghetti bowl.
+            $this->get('renewalDate'),
             NULL,
             $value['custom'],
             1,
