@@ -4781,7 +4781,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
     }
 
     $orderBy = 'ORDER BY civicrm_contribution_total_amount_count DESC';
-    $groupBy = 'GROUP BY civicrm_contribution.total_amount';
+    $groupBy = 'GROUP BY currency, civicrm_contribution.total_amount';
     $modeSQL = "$select, conts.civicrm_contribution_total_amount_count as civicrm_contribution_total_amount_count FROM ($innerQuery
     $groupBy $orderBy) as conts
     GROUP BY currency";
