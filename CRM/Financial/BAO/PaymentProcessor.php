@@ -322,15 +322,15 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    */
   public static function getAllPaymentProcessors($mode, $reset = FALSE) {
-    /*
-     * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
-     * if (!$reset) {
-     *   $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
-     *   if (!empty($processors)) {
-     *     return $processors;
-     *   }
-     * }
-     */
+
+    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
+    if (!$reset) {
+      $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
+      if (!empty($processors)) {
+        return $processors;
+      }
+    }
+
     $retrievalParameters = array(
       'is_active' => TRUE,
       'options' => array('sort' => 'is_default DESC, name'),
@@ -342,22 +342,22 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     elseif ($mode == 'live') {
       $retrievalParameters['is_test'] = 0;
     }
+
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
     foreach ($processors['values'] as $processor) {
-      $fieldsToProvide = array('user_name', 'password', 'signature', 'subject');
+      $fieldsToProvide = array('user_name', 'password', 'signature', 'subject', 'is_recur');
       foreach ($fieldsToProvide as $field) {
-        //prevent e-notices in processor classes when not configured
+        // Prevent e-notices in processor classes when not configured.
         if (!isset($processor[$field])) {
           $processor[$field] = NULL;
         }
       }
       $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
-      $mode = empty($processor['is_test']) ? 'live' : 'test';
-      $processors['values'][$processor['id']]['object'] = CRM_Core_Payment::singleton($mode, $processor);
+      $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processor);
     }
-    /*
-    CRM_Utils_Cache::singleton()->set($cacheKey, $processors);
-     */
+
+    CRM_Utils_Cache::singleton()->set($cacheKey, $processors['values']);
+
     return $processors['values'];
   }
 
@@ -387,13 +387,16 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $mode = 'live';
     }
     $processors = self::getAllPaymentProcessors($mode);
+
     if ($capabilities) {
       foreach ($processors as $index => $processor) {
         if (!empty($ids) && !in_array($processor['id'], $ids)) {
           unset ($processors[$index]);
           continue;
         }
-        if (($error = $processor['object']->checkConfig()) != NULL) {
+        // Invalid processors will store a null value in 'object' (e.g. if not all required config fields are present).
+        // This is determined by calling when loading the processor via the $processorObject->checkConfig() function.
+        if (!is_a($processor['object'], 'CRM_Core_Payment')) {
           unset ($processors[$index]);
           continue;
         }
