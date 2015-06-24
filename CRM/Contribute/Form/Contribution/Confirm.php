@@ -2107,7 +2107,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       );
 
       if (CRM_Utils_Array::value('contribution_status_id', $result) == 1) {
-        civicrm_api3('contribution', 'completetransaction', array('id' => $result['contribution']->id));
+        civicrm_api3('contribution', 'completetransaction', array(
+          'id' => $result['contribution']->id,
+          'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+          )
+        );
       }
       return $result;
     }
