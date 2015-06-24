@@ -207,14 +207,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
     }
     elseif ($isPaymentTransaction) {
-      if (!empty($paymentParams['is_recur']) &&
-        $form->_contributeMode == 'direct'
-      ) {
-
-        // For recurring contribution, create Contribution Record first.
-        // Contribution ID, Recurring ID and Contact ID needed
-        // When we get a callback from the payment processor
-
+      if ($form->_contributeMode == 'direct') {
         $paymentParams['contactID'] = $contactID;
 
         // Fix for CRM-14354. If the membership is recurring, don't create a
@@ -222,16 +215,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // (i.e., the amount NOT associated with the membership). Temporarily
         // cache the is_recur values so we can process the additional gift as a
         // one-off payment.
-        $pending = FALSE;
         if (!empty($form->_values['is_recur'])) {
           if ($form->_membershipBlock['is_separate_payment'] && !empty($form->_params['auto_renew'])) {
             $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
             $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
             unset($form->_values['is_recur']);
             unset($paymentParams['is_recur']);
-          }
-          else {
-            $pending = TRUE;
           }
         }
 
@@ -241,7 +230,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
           NULL,
           $contactID,
           $financialType,
-          $pending, TRUE,
+          TRUE,
+          TRUE,
           $isTest,
           $lineItems,
           $form->_bltID
@@ -303,21 +293,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $form->_params['source'] = $paymentParams['contribution_source'];
       }
 
-      // check if pending was set to true by payment processor
-      $pending = FALSE;
-      if (!empty($form->_params['contribution_status_pending'])) {
-        $pending = TRUE;
-      }
-      if (!(!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct')) {
-        $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
-          $form->_params, $result,
-          $contactID, $financialType,
-          $pending, TRUE,
-          $isTest,
-          $lineItems,
-          $form->_bltID
-        );
-      }
       $form->postProcessPremium($premiumParams, $contribution);
       if (is_array($result) && !empty($result['trxn_id'])) {
         $contribution->trxn_id = $result['trxn_id'];
@@ -331,8 +306,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     //Do not send an email if Recurring contribution is done via Direct Mode
     //We will send email once the IPN is received.
-    if (!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct') {
-      return TRUE;
+    if ($form->_contributeMode == 'direct') {
+      return $result;
     }
 
     // get the price set values for receipt.
