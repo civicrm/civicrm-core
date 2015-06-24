@@ -856,6 +856,29 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Checks to see if invoice_id already exists in db.
+   *
+   * It's arguable if this belongs in the payment subsystem at all but since several processors implement it
+   * it is better to standardise to being here.
+   *
+   * @param int $invoiceId The ID to check.
+   *
+   * @param null $contributionID
+   *   If a contribution exists pass in the contribution ID.
+   *
+   * @return bool
+   *   True if invoice ID otherwise exists, else false
+   */
+  protected function checkDupe($invoiceId, $contributionID = NULL) {
+    $contribution = new CRM_Contribute_DAO_Contribution();
+    $contribution->invoice_id = $invoiceId;
+    if ($contributionID) {
+      $contribution->whereAdd("id <> $contributionID");
+    }
+    return $contribution->find();
+  }
+
+  /**
    * Get url for users to manage this recurring contribution for this processor.
    *
    * @param int $entityID
