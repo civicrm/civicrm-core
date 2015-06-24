@@ -105,7 +105,7 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
     $customEventTokens = CRM_CORE_BAO_CustomField::getFields('Event');
 
     foreach ($customEventTokens as $customEventTokenKey => $customEventTokenValue) {
-      $tokens["{event.custom_customEventTokenKey}"] = $customEventTokenValue['label'] . '::' . $customEventTokenValue['groupTitle'];
+      $tokens["{event.custom_$customEventTokenKey}"] = $customEventTokenValue['label'] . '::' . $customEventTokenValue['groupTitle'];
     }
     return $tokens;
   }
