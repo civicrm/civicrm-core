@@ -124,6 +124,10 @@
     {$form.contribution_source.label} <br />
     {$form.contribution_source.html|crmAddClass:twenty}
   </td>
+  <td>
+    {$form.contribution_product_id.label} <br />
+    {$form.contribution_product_id.html|crmAddClass:twenty}
+  </td>
 </tr>
 <tr>
   <td>
