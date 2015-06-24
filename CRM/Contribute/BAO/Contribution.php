@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
@@ -228,7 +226,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-   * @return CRM_Contribute_BAO_Contribution|null the found object or null
+   * @return CRM_Contribute_BAO_Contribution|null
+   *   The found object or null
    */
   public static function &getValues($params, &$values, &$ids) {
     if (empty($params)) {
@@ -495,8 +494,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   (reference) the default values, some of which need to be resolved.
    * @param bool $reverse
    *   True if we want to resolve the values in the reverse direction (value -> name).
-   *
-   * @return void
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
     self::lookupValue($defaults, 'financial_type', CRM_Contribute_PseudoConstant::financialType(), $reverse);
@@ -1047,7 +1044,6 @@ GROUP BY p.id
    *
    * @return array
    *   list of contribution fields
-   *
    */
   public static function getHonorContacts($honorId) {
     $params = array();
@@ -1178,6 +1174,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
 
   /**
    * Check if there is a contribution with the params passed in.
+   *
    * Used for trxn_id,invoice_id and contribution_id
    *
    * @param array $params
@@ -1217,7 +1214,6 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    *
    * @return array
    *   associated array
-   *
    */
   public static function getContributionDetails($exportMode, $componentIds) {
     $paymentDetails = array();
@@ -1314,7 +1310,6 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    *
    * @param int $contributionId
    * @param int $contactId
-   *
    */
   public static function deleteAddress($contributionId = NULL, $contactId = NULL) {
     $clauses = array();
