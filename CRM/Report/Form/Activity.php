@@ -228,7 +228,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         ),
         'filters' => array(
           'activity_date_time' => array(
-            'default' => 'this.month',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'activity_subject' => array('title' => ts('Activity Subject')),
