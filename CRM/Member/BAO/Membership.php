@@ -1136,7 +1136,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   /**
    * Get all exportable fields.
    *
-   * @retun array return array of all exportable fields
+   * @return array return array of all exportable fields
    */
   public static function &exportableFields() {
     $expFieldMembership = CRM_Member_DAO_Membership::export();
@@ -1761,8 +1761,12 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @param CRM_Core_DAO $dao
    *   Membership object.
    *
-   * @return null|array
-   *   array of memberships if created
+   * @param bool $reset
+   *
+   * @return array|null
+   *   Membership details, if created.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
     static $relatedContactIds = array();

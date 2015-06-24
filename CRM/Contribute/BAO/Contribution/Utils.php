@@ -266,11 +266,26 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
         }
       }
-      if (is_object($payment)) {
-        $result = $payment->doDirectPayment($paymentParams);
+      try {
+        $result = $payment->doPayment($paymentParams);
       }
-      else {
-        CRM_Core_Error::fatal($paymentObjError);
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        // Clean up DB as appropriate.
+        if (!empty($paymentParams['contributionID'])) {
+          CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'],
+            $paymentParams['contactID'], $e->getMessage());
+        }
+        if (!empty($paymentParams['contributionRecurID'])) {
+          CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+        }
+
+        if ($component !== 'membership') {
+          // This is only called from contribution form.
+          // Not sure if there is any reason not to just throw an exception up to it.
+          $result['is_payment_failure'] = TRUE;
+          return $result;
+        }
+        $membershipResult[1] = $result;
       }
     }
 
@@ -278,26 +293,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $membershipResult = array();
     }
 
-    if (is_a($result, 'CRM_Core_Error')) {
-      //make sure to cleanup db for recurring case.
-      //@todo this clean up has always been controversial as many orgs prefer to see failed transactions.
-      // most recent discussion has been that they should be retained and this could be altered
-      if (!empty($paymentParams['contributionID'])) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
-      }
-      if (!empty($paymentParams['contributionRecurID'])) {
-        CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
-      }
-
-      if ($component !== 'membership') {
-        CRM_Core_Error::displaySessionError($result);
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-          "_qf_Main_display=true&qfKey={$form->_params['qfKey']}"
-        ));
-      }
-      $membershipResult[1] = $result;
-    }
-    elseif ($result || ($form->_amount == 0.0 && !$form->_params['is_pay_later'])) {
+    if ($result || ($form->_amount == 0.0 && !$form->_params['is_pay_later'])) {
       if ($result) {
         $form->_params = array_merge($form->_params, $result);
       }

@@ -870,13 +870,18 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * Prior to CRM-16417 these were simply removed from the database but it has been agreed that seeing attempted
    * payments is important for forensic and outreach reasons.
    *
-   * This function updates the financial transaction records to failed.
-   *
-   * @todo in principle we also think it makes sense to add an activity - this part would be a second step as
-   * the first change is likely to go into the LTS.
+   * @param int $contributionID
+   * @param string $message
    */
-  public static function failPayment($contributionID, $message) {
-
+  public static function failPayment($contributionID, $contactID, $message) {
+    civicrm_api3('activity', 'create', array(
+      'activity_type_id' => 'Failed Payment',
+      'details' => $message,
+      'subject' => ts('Payment failed at payment processor'),
+      'source_record_id' => $contributionID,
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
+        $contactID,
+    ));
   }
 
   /**
