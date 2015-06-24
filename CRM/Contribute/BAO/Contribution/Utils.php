@@ -93,13 +93,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $payment = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
-    if ($isPaymentTransaction) {
-      $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
+    if ($isPaymentTransaction && !empty($form->_paymentProcessor)) {
+      // @todo - remove this line once we are sure we can just use $form->_paymentProcessor['object'] consistently.
+      $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
     }
 
-    //fix for CRM-2062
     //fix for CRM-16317
-
     $form->_params['receive_date'] = date('YmdHis');
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
