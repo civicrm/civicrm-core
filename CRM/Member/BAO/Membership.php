@@ -2305,7 +2305,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    */
   public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, &$form) {
     if (!empty($membershipContribution)) {
-      $pending = ($membershipContribution->contribution_status_id == 2) ? TRUE : FALSE;
+      $pendingStatus = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+      $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
     }
     $membership = self::renewMembershipFormWrapper($contactID, $memType,
       $isTest, $form, NULL,
