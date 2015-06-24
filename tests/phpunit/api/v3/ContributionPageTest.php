@@ -400,12 +400,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
     $this->setUpMembershipBlockPriceSet();
-    $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate(array(
-      'payment_processor_type_id' => 'Dummy',
-      'class_name' => 'Payment_Dummy',
-      'billing_mode' => 1,
-    ));
-    $this->_paymentProcessor = $this->callAPISuccess('payment_processor', 'getsingle', array('id' => $this->params['payment_processor_id']));
+    $this->setupPaymentProcessor();
     $this->setUpContributionPage();
 
     $this->callAPISuccess('membership_block', 'create', array(
@@ -505,6 +500,18 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
     $unitTest = new CiviUnitTestCase();
     $unitTest->quickCleanup($tablesToTruncate);
+  }
+
+  /**
+   * Create a payment processor instance.
+   */
+  protected function setupPaymentProcessor() {
+    $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate(array(
+      'payment_processor_type_id' => 'Dummy',
+      'class_name' => 'Payment_Dummy',
+      'billing_mode' => 1,
+    ));
+    $this->_paymentProcessor = $this->callAPISuccess('payment_processor', 'getsingle', array('id' => $this->params['payment_processor_id']));
   }
 
 }

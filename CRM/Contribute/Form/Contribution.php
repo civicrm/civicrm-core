@@ -180,7 +180,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public $_priceSetId;
 
-
   /**
    * Price set as an array
    * @var array
