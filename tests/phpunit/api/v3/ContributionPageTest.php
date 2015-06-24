@@ -225,8 +225,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * We are expecting a separate payment for the membership vs the contribution.
    */
-  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessor() {
+  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow() {
     $this->setUpMembershipContributionPage(TRUE);
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -288,7 +290,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'activity_type_id' => 'Failed Payment',
     ));
 
-
   }
 
   /**
@@ -298,7 +299,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
    */
-  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecur() {
+  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurNow() {
     $this->params['is_recur'] = 1;
     $var = array();
     $this->params['recur_frequency_unit'] = 'month';
