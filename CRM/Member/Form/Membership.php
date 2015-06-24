@@ -1690,8 +1690,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->_id = $membership->id;
     }
 
-    if (is_array($result) && is_array($paymentParams) && CRM_Utils_Array::value('contribution_status_id', $result) == 1 && CRM_Utils_Array::value('is_recur', $paymentParams)) {
-      $r = civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id));
+    if (is_array($result) && is_array($paymentParams) &&
+      (CRM_Utils_Array::value('contribution_status_id', $result) == 1 || CRM_Utils_Array::value('payment_status_id', $result))
+      && CRM_Utils_Array::value('is_recur', $paymentParams)) {
+      civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id, 'trxn_id' => CRM_Utils_Array::value('trxn_id', $result)));
     }
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
