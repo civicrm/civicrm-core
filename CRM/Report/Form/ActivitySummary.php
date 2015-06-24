@@ -434,7 +434,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
    *
    * @return array
    */
-  public function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $contactFields = array('sort_name', 'email', 'phone');
     if (!empty($fields['group_bys'])) {
