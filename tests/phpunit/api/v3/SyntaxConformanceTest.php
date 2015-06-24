@@ -606,8 +606,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'where_clause',
           'select_tables',
           'where_tables',
-        )
-      )
+        ),
+      ),
     );
     if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])) {
       return array();
