@@ -144,8 +144,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // add qfKey so we can send to paypal
         $form->_params['qfKey'] = $form->controller->_key;
         if ($component == 'membership') {
-          $membershipResult = array(1 => $contribution);
-          return $membershipResult;
+          return array('contribution' => $contribution);
         }
         else {
           if (!$isPayLater) {
@@ -265,18 +264,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
           CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
         }
 
-        if ($component !== 'membership') {
-          // This is only called from contribution form.
-          // Not sure if there is any reason not to just throw an exception up to it.
-          $result['is_payment_failure'] = TRUE;
-          return $result;
-        }
-        $membershipResult[1] = $result;
+        $result['is_payment_failure'] = TRUE;
       }
-    }
-
-    if ($component == 'membership') {
-      $membershipResult = array();
     }
 
     if ($result || ($form->_amount == 0.0 && !$form->_params['is_pay_later'])) {
@@ -297,13 +286,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
       if (is_array($result) && !empty($result['trxn_id'])) {
         $contribution->trxn_id = $result['trxn_id'];
       }
-      $membershipResult[1] = $contribution;
+      $result['contribution'] = $contribution;
     }
-
-    if ($component == 'membership') {
-      return $membershipResult;
-    }
-
     //Do not send an email if Recurring contribution is done via Direct Mode
     //We will send email once the IPN is received.
     if ($form->_contributeMode == 'direct') {
