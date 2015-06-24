@@ -1144,9 +1144,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_TEXT:
         case CRM_Utils_Type::T_LONGTEXT:
         case CRM_Utils_Type::T_EMAIL:
-          if ($fieldName == 'form_values' && $entity_name == 'SavedSearch') {
-            // This is a hack for the SavedSearch API. It expects form_values
-            // to be a serialized array.
+          if ($fieldName == 'form_values' && $entityName == 'SavedSearch') {
+            // This is a hack for the SavedSearch API.
+            // It expects form_values to be an array.
             // If you want to fix this, you should definitely read this forum
             // post.
             // http://forum.civicrm.org/index.php/topic,33990.0.html
