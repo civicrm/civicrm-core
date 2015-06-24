@@ -2304,12 +2304,15 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @return array
    */
   public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, &$form) {
+    if (!empty($membershipContribution)) {
+      $pending = ($membershipContribution->contribution_status_id == 2) ? TRUE : FALSE;
+    }
     $membership = self::renewMembershipFormWrapper($contactID, $memType,
       $isTest, $form, NULL,
       CRM_Utils_Array::value('cms_contactID', $membershipParams),
       $customFieldsFormatted, $numTerms,
       $membershipID,
-      self::extractPendingFormValue($form, $memType)
+      self::extractPendingFormValue($form, $memType, $pending)
     );
 
     if (!empty($membershipContribution)) {
@@ -2349,9 +2352,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return bool
    */
-  public static function extractPendingFormValue($form, $membershipID) {
+  public static function extractPendingFormValue($form, $membershipID, $pending = FALSE) {
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipID);
-    $pending = FALSE;
     //@todo this is a BAO function & should not inspect the form - the form should do this
     // & pass required params to the BAO
     if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
