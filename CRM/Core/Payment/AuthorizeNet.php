@@ -128,7 +128,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     // Authorize.Net will not refuse duplicates, so we should check if the user already submitted this transaction
-    if ($this->_checkDupe($authorizeNetFields['x_invoice_num'])) {
+    if ($this->checkDupe($authorizeNetFields['x_invoice_num'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::error(9004, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
 
@@ -371,21 +371,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     return $fields;
-  }
-
-  /**
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
   }
 
   /**

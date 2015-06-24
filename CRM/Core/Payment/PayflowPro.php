@@ -260,7 +260,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     /*
      * Check to see if we have a duplicate before we send
      */
-    if ($this->_checkDupe($params['invoiceID'])) {
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
 
@@ -343,22 +343,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     }
 
     return self::errorExit(9014, "Check the code - all transactions should have been headed off before they got here. Something slipped through the net");
-  }
-
-  /**
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    //copied from Eway but not working and not really sure it should!
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
   }
 
   /*
