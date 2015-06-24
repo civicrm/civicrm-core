@@ -265,6 +265,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
 
         $result['is_payment_failure'] = TRUE;
+        $result['error'] = $e;
       }
     }
 
