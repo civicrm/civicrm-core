@@ -102,6 +102,11 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
     // Should be cleaned up after ActionSchedule token replacement cleanup.
     unset($tokens['{event.contact_email}']);
     unset($tokens['{event.contact_phone}']);
+    $customEventTokens = CRM_CORE_BAO_CustomField::getFields('Event');
+
+    foreach ($customEventTokens as $customEventTokenKey => $customEventTokenValue) {
+      $tokens["{event.custom_customEventTokenKey}"] = $customEventTokenValue['label'] . '::' . $customEventTokenValue['groupTitle'];
+    }
     return $tokens;
   }
 
