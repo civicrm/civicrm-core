@@ -160,7 +160,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($payment_processor_id, $this->_mode);
     $this->assign('paymentProcessor', $this->_paymentProcessor);
 
-    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE);
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, FALSE);
 
     if ($can_pay_later || self::is_administrator()) {
       $this->addElement('checkbox', 'is_pay_later',

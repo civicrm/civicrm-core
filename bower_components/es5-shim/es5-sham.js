@@ -13,6 +13,7 @@
 // see https://github.com/umdjs/umd/blob/master/returnExports.js
 (function (root, factory) {
     'use strict';
+
     /*global define, exports, module */
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
@@ -74,14 +75,14 @@ if (!Object.getPrototypeOf) {
 //ES5 15.2.3.3
 //http://es5.github.com/#x15.2.3.3
 
-function doesGetOwnPropertyDescriptorWork(object) {
+var doesGetOwnPropertyDescriptorWork = function doesGetOwnPropertyDescriptorWork(object) {
     try {
         object.sentinel = 0;
         return Object.getOwnPropertyDescriptor(object, 'sentinel').value === 0;
     } catch (exception) {
         return false;
     }
-}
+};
 
 //check whether getOwnPropertyDescriptor works if it's given. Otherwise,
 //shim partially.
@@ -189,6 +190,64 @@ if (!Object.create) {
                         // the following produces false positives
                         // in Opera Mini => not a reliable check
                         // Object.prototype.__proto__ === null
+
+    // Check for document.domain and active x support
+    // No need to use active x approach when document.domain is not set
+    // see https://github.com/es-shims/es5-shim/issues/150
+    // variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
+    /*global ActiveXObject */
+    var shouldUseActiveX = function shouldUseActiveX() {
+        // return early if document.domain not set
+        if (!document.domain) {
+            return false;
+        }
+
+        try {
+            return !!new ActiveXObject('htmlfile');
+        } catch (exception) {
+            return false;
+        }
+    };
+
+    // This supports IE8 when document.domain is used
+    // see https://github.com/es-shims/es5-shim/issues/150
+    // variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
+    var getEmptyViaActiveX = function getEmptyViaActiveX() {
+        var empty;
+        var xDoc;
+
+        xDoc = new ActiveXObject('htmlfile');
+
+        xDoc.write('<script><\/script>');
+        xDoc.close();
+
+        empty = xDoc.parentWindow.Object.prototype;
+        xDoc = null;
+
+        return empty;
+    };
+
+    // The original implementation using an iframe
+    // before the activex approach was added
+    // see https://github.com/es-shims/es5-shim/issues/150
+    var getEmptyViaIFrame = function getEmptyViaIFrame() {
+        var iframe = document.createElement('iframe');
+        var parent = document.body || document.documentElement;
+        var empty;
+
+        iframe.style.display = 'none';
+        parent.appendChild(iframe);
+        /*eslint-disable no-script-url */
+        iframe.src = 'javascript:';
+        /*eslint-enable no-script-url */
+
+        empty = iframe.contentWindow.Object.prototype;
+        parent.removeChild(iframe);
+        iframe = null;
+
+        return empty;
+    };
+
     /*global document */
     if (supportsProto || typeof document === 'undefined') {
         createEmpty = function () {
@@ -201,16 +260,10 @@ if (!Object.create) {
         // object and *steal* its Object.prototype and strip it bare. This is
         // used as the prototype to create nullary objects.
         createEmpty = function () {
-            var iframe = document.createElement('iframe');
-            var parent = document.body || document.documentElement;
-            iframe.style.display = 'none';
-            parent.appendChild(iframe);
-            /*eslint-disable no-script-url */
-            iframe.src = 'javascript:';
-            /*eslint-enable no-script-url */
-            var empty = iframe.contentWindow.Object.prototype;
-            parent.removeChild(iframe);
-            iframe = null;
+            // Determine which approach to use
+            // see https://github.com/es-shims/es5-shim/issues/150
+            var empty = shouldUseActiveX() ? getEmptyViaActiveX() : getEmptyViaIFrame();
+
             delete empty.constructor;
             delete empty.hasOwnProperty;
             delete empty.propertyIsEnumerable;
@@ -222,7 +275,7 @@ if (!Object.create) {
             empty.__proto__ = null;
             /*eslint-enable no-proto */
 
-            function Empty() {}
+            var Empty = function Empty() {};
             Empty.prototype = empty;
             // short-circuit future calls
             createEmpty = function () {
@@ -235,7 +288,7 @@ if (!Object.create) {
     Object.create = function create(prototype, properties) {
 
         var object;
-        function Type() {} // An empty constructor.
+        var Type = function Type() {}; // An empty constructor.
 
         if (prototype === null) {
             object = createEmpty();
@@ -279,14 +332,14 @@ if (!Object.create) {
 // WebKit Bugs:
 //     https://bugs.webkit.org/show_bug.cgi?id=36423
 
-function doesDefinePropertyWork(object) {
+var doesDefinePropertyWork = function doesDefinePropertyWork(object) {
     try {
         Object.defineProperty(object, 'sentinel', {});
         return 'sentinel' in object;
     } catch (exception) {
         return false;
     }
-}
+};
 
 // check whether defineProperty works if it's given. Otherwise,
 // shim partially.
@@ -385,11 +438,11 @@ if (!Object.defineProperties || definePropertiesFallback) {
             }
         }
 
-        for (var property in properties) {
-            if (owns(properties, property) && property !== '__proto__') {
+        Object.keys(properties).forEach(function (property) {
+            if (property !== '__proto__') {
                 Object.defineProperty(object, property, properties[property]);
             }
-        }
+        });
         return object;
     };
 }
@@ -426,7 +479,7 @@ if (!Object.freeze) {
 try {
     Object.freeze(function () {});
 } catch (exception) {
-    Object.freeze = (function freeze(freezeObject) {
+    Object.freeze = (function (freezeObject) {
         return function freeze(object) {
             if (typeof object === 'function') {
                 return object;

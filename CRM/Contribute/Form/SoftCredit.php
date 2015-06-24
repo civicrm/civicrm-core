@@ -74,7 +74,7 @@ class CRM_Contribute_Form_SoftCredit {
    * @return void
    */
   public static function buildQuickForm(&$form) {
-    if ($form->_mode == 'live' && !empty($form->_honor_block_is_active)) {
+    if (!empty($form->_honor_block_is_active)) {
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
       $ufJoinDAO->module = 'soft_credit';
       $ufJoinDAO->entity_id = $form->_id;
@@ -145,8 +145,10 @@ class CRM_Contribute_Form_SoftCredit {
     $siteHasPCPs = CRM_Contribute_PseudoConstant::pcPage();
     if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
       $form->assign('siteHasPCPs', 1);
-      $form->add('hidden', 'pcp_made_through'); // stores the label
-      $form->add('text', 'pcp_made_through_id', ts('Credit to a Personal Campaign Page'), array('class' => 'twenty'));
+      // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
+      $form->add('text', 'pcp_made_through_id', ts('Credit to a Personal Campaign Page'), array('class' => 'twenty', 'placeholder' => ts('- select -')));
+      // stores the label
+      $form->add('hidden', 'pcp_made_through');
       $form->addElement('checkbox', 'pcp_display_in_roll', ts('Display in Honor Roll?'), NULL);
       $form->addElement('text', 'pcp_roll_nickname', ts('Name (for Honor Roll)'));
       $form->addElement('textarea', 'pcp_personal_note', ts('Personal Note (for Honor Roll)'));

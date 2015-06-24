@@ -128,6 +128,11 @@ CRM.$(function($) {
   $('#format_id', $form).on('change', function() {
     selectFormat($(this).val());
   });
+  // After the pdf downloads, the user has to manually close the dialog (which would be nice to fix)
+  // But at least we can trigger the underlying list of activities to refresh
+  $form.closest('.ui-dialog-content.crm-ajax-container').on('dialogbeforeclose', function() {
+    $(this).trigger('crmFormSuccess');
+  });
 });
 
 var currentWidth;
@@ -170,28 +175,35 @@ function updateFormatLabel() {
 
 updateFormatLabel();
 
-function selectFormat( val, bind )
-{
+function fillFormatInfo( data, bind ) {
+  cj("#format_id").val( data.id );
+  cj("#paper_size").val( data.paper_size );
+  cj("#orientation").val( data.orientation );
+  cj("#metric").val( data.metric );
+  cj("#margin_top").val( data.margin_top );
+  cj("#margin_bottom").val( data.margin_bottom );
+  cj("#margin_left").val( data.margin_left );
+  cj("#margin_right").val( data.margin_right );
+  selectPaper( data.paper_size );
+  cj("#update_format").prop({checked: false}).parent().hide();
+  document.getElementById('bind_format').checked = bind;
+  showBindFormatChkBox();
+}
+
+function selectFormat( val, bind ) {
   updateFormatLabel();
-    if (!val) {
-        val = 0;
-        bind = false;
-    }
+  if (!val) {
+    val = 0;
+    bind = false;
     var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
     cj.post( dataUrl, {formatId: val}, function( data ) {
-        cj("#format_id").val( data.id );
-        cj("#paper_size").val( data.paper_size );
-        cj("#orientation").val( data.orientation );
-        cj("#metric").val( data.metric );
-        cj("#margin_top").val( data.margin_top );
-        cj("#margin_bottom").val( data.margin_bottom );
-        cj("#margin_left").val( data.margin_left );
-        cj("#margin_right").val( data.margin_right );
-        selectPaper( data.paper_size );
-        cj("#update_format").prop({checked: false}).parent().hide();
-        document.getElementById('bind_format').checked = bind;
-        showBindFormatChkBox();
-    }, 'json');
+      fillFormatInfo(data, bind);
+      }, 'json');
+  } 
+  else {
+    data=JSON.parse(val);
+    fillFormatInfo(data, bind);
+  }
 }
 
 function selectPaper( val )

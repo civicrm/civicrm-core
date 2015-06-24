@@ -436,19 +436,20 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param bool $withInactive
    *   Whether or not to include inactive entries.
    * @param bool|string $extendComponentName name of the component like 'CiviEvent','CiviContribute'
+   * @param string $column name of the column.
    *
    * @return array
    *   associative array of id => name
    */
-  public static function getAssoc($withInactive = FALSE, $extendComponentName = FALSE) {
-    $query = '
+  public static function getAssoc($withInactive = FALSE, $extendComponentName = FALSE, $column = 'title') {
+    $query = "
     SELECT
-       DISTINCT ( price_set_id ) as id, title
+       DISTINCT ( price_set_id ) as id, {$column}
     FROM
        civicrm_price_field,
        civicrm_price_set
     WHERE
-       civicrm_price_set.id = civicrm_price_field.price_set_id  AND is_quick_config = 0 ';
+       civicrm_price_set.id = civicrm_price_field.price_set_id  AND is_quick_config = 0 ";
 
     if (!$withInactive) {
       $query .= ' AND civicrm_price_set.is_active = 1 ';
@@ -470,7 +471,7 @@ WHERE     ct.id = cp.financial_type_id AND
 
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $priceSets[$dao->id] = $dao->title;
+      $priceSets[$dao->id] = $dao->$column;
     }
     return $priceSets;
   }

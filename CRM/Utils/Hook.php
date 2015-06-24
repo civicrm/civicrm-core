@@ -1839,7 +1839,7 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public static function alterDisplayName($displayName, $contactId, $dao) {
+  public static function alterDisplayName(&$displayName, $contactId, $dao) {
     return self::singleton()->invoke(3,
       $displayName, $contactId, $dao, self::$_nullObject, self::$_nullObject,
       self::$_nullObject, 'civicrm_contact_get_displayname'
@@ -1924,6 +1924,26 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(1, $fileSearches,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_fileSearches'
+    );
+  }
+
+  /**
+   * This hook is called when a query string of the CSV Batch export is generated.
+   */
+  public static function batchQuery(&$query) {
+    return self::singleton()->invoke(1, $query, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_batchQuery'
+    );
+  }
+
+  /**
+   * This hook is called when the entries of the CSV Batch export are mapped.
+   */
+  public static function batchItems(&$results, &$items) {
+    return self::singleton()->invoke(2, $results, $items,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_batchItems'
     );
   }
 

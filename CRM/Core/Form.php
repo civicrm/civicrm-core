@@ -1598,13 +1598,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
-      return $tempID;
+      return (int) $tempID;
     }
 
     $userID = $this->getLoggedInUserContactID();
 
-    if ($tempID == $userID) {
-      return $userID;
+    if (!is_null($tempID) && $tempID === $userID) {
+      return (int) $userID;
     }
 
     //check if this is a checksum authentication
@@ -1621,7 +1621,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       return $tempID;
     }
 
-    return $userID;
+    return is_numeric($userID) ? $userID : NULL;
   }
 
   /**
@@ -1847,7 +1847,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
             if (!$options) {
               $targetField->setAttribute('placeholder', $targetField->getAttribute('data-none-prompt'));
             }
-          } 
+          }
           else {
             $targetField->setAttribute('placeholder', $targetField->getAttribute('data-empty-prompt'));
             $targetField->setAttribute('disabled', 'disabled');

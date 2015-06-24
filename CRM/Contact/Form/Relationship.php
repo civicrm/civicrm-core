@@ -388,9 +388,18 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Store the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
 
+    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
+    $params['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_a_b', $params, 0);
+    $params['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_b_a', $params, 0);
+
     // action is taken depending upon the mode
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contact_BAO_Relationship::del($this->_relationshipId);
+
+      // CRM-15881 UPDATES
+      // Since the line above nullifies the organization_name and employer_id fiels in the contact record, we need to reload all blocks to reflect this chage on the user interface.
+      $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
+
       return;
     }
 
@@ -433,6 +442,14 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         // clear the current employer. CRM-3235.
         $relChanged = $params['relationship_type_id'] != $this->_values['relationship_type_id'];
         if (!$params['is_active'] || !$params['is_current_employer'] || $relChanged) {
+
+          // CRM-15881 UPDATES
+          // If not is_active then is_current_employer needs to be set false as well! Logically a contact cannot be a current employee of a disabled employer relationship.
+          // If this is not done, then the below process will go ahead and disable the organization_name and employer_id fields in the contact record (which is what is wanted) but then further down will be re-enabled becuase is_current_employer is not false, therefore undoing what was done correctly.
+          if (!$params['is_active']) {
+            $params['is_current_employer'] = FALSE;
+          }
+
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
           // Refresh contact summary if in ajax mode
           $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');

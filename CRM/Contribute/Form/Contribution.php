@@ -575,7 +575,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $billingPanes = array();
     if ($this->_mode) {
-      if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE) == TRUE) {
+      if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE) == TRUE) {
         $buildRecurBlock = TRUE;
         foreach ($this->billingPane as $name => $label) {
           if (!empty($this->billingFieldSets[$name]['fields'])) {
@@ -797,11 +797,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $hasPriceSets = FALSE;
       if ($buildPriceSet) {
         $hasPriceSets = TRUE;
+        // CRM-16451: set financial type of 'Price Set' in back office contribution
+        // instead of selecting manually
+        $financialTypeIds = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviContribute', 'financial_type_id');
         $element = $this->add('select', 'price_set_id', ts('Choose price set'),
           array(
             '' => ts('Choose price set'),
           ) + $priceSets,
-          NULL, array('onchange' => "buildAmount( this.value );")
+          NULL, array('onchange' => "buildAmount( this.value, " . json_encode($financialTypeIds) . ");")
         );
         if ($this->_online && !($this->_action & CRM_Core_Action::UPDATE)) {
           $element->freeze();
@@ -950,10 +953,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $sum = CRM_Utils_Money::format($sum - $self->_values['tax_amount'], NULL, '%a');
         }
       }
-      if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
+      if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != CRM_Utils_Rule::cleanMoney($sum)) {
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }
     }
+
+    //CRM-16285 - Function to handle validation errors on form, for recurring contribution field.
+    CRM_Contribute_BAO_ContributionRecur::validateRecurContribution($fields, $files, $self, $errors);
+
     // Form rule for status http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
     if ($self->_id && $self->_values['contribution_status_id'] != $fields['contribution_status_id']) {
       CRM_Contribute_BAO_Contribution::checkStatusValidation($self->_values, $fields, $errors);

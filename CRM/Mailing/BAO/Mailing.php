@@ -425,7 +425,7 @@ WHERE      $mg.entity_table = '$group'
       }
 
       $smartGroupInclude = "
-INSERT IGNORE INTO I_$job_id (email_id, contact_id)
+REPLACE INTO I_$job_id (email_id, contact_id)
 SELECT     civicrm_email.id as email_id, c.id as contact_id
 FROM       civicrm_contact c
 INNER JOIN civicrm_email                ON civicrm_email.contact_id         = c.id
@@ -442,7 +442,7 @@ $order_by
 ";
       if ($mode == 'sms') {
         $smartGroupInclude = "
-INSERT IGNORE INTO I_$job_id (phone_id, contact_id)
+REPLACE INTO I_$job_id (phone_id, contact_id)
 SELECT     p.id as phone_id, c.id as contact_id
 FROM       civicrm_contact c
 INNER JOIN civicrm_phone p                ON p.contact_id         = c.id
@@ -1472,7 +1472,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if ($this->url_tracking) {
         $data = CRM_Mailing_BAO_TrackableURL::getTrackerURL($token, $this->id, $event_queue_id);
         if (!empty($html)) {
-          $data = htmlentities($data);
+          $data = htmlentities($data, ENT_NOQUOTES);
         }
       }
       else {

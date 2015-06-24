@@ -49,8 +49,10 @@ class CRM_Core_Payment_Form {
    *   Array of properties including 'object' as loaded from CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors.
    * @param bool $forceBillingFieldsForPayLater
    *   Display billing fields even for pay later.
+   * @param bool $isBackOffice
+   *   Is this a back office function? If so the option to suppress the cvn needs to be evaluated.
    */
-  static public function setPaymentFieldsByProcessor(&$form, $processor, $forceBillingFieldsForPayLater = FALSE) {
+  static public function setPaymentFieldsByProcessor(&$form, $processor, $forceBillingFieldsForPayLater = FALSE, $isBackOffice = FALSE) {
     $form->billingFieldSets = array();
     if ($processor != NULL) {
       // ie it is pay later
@@ -62,6 +64,12 @@ class CRM_Core_Payment_Form {
       $form->assign('paymentTypeLabel', $paymentTypeLabel);
 
       $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
+      if (in_array('cvv2', $paymentFields) && $isBackOffice) {
+        if (!civicrm_api3('setting', 'getvalue', array('name' => 'cvv_backoffice_required', 'group' => 'Contribute Preferences'))) {
+          $form->billingFieldSets[$paymentTypeName]['fields'][array_search('cvv2', $paymentFields)]['required'] = 0;
+        }
+      }
+
       $form->billingPane = array($paymentTypeName => $paymentTypeLabel);
       $form->assign('paymentFields', $paymentFields);
     }
@@ -254,7 +262,7 @@ class CRM_Core_Payment_Form {
    *
    * @return bool
    */
-  public static function buildPaymentForm(&$form, $processor, $isBillingDataOptional) {
+  public static function buildPaymentForm(&$form, $processor, $isBillingDataOptional, $isBackOffice) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
     $profileAddressFields = $form->get('profileAddressFields');
     if (!empty($profileAddressFields)) {
@@ -268,7 +276,7 @@ class CRM_Core_Payment_Form {
       return NULL;
     }
 
-    self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional));
+    self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional), $isBackOffice);
     self::addCommonFields($form, !$isBillingDataOptional, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
     self::addPaypalExpressCode($form);
@@ -303,8 +311,7 @@ class CRM_Core_Payment_Form {
    */
   protected static function addPaypalExpressCode(&$form) {
     if (empty($form->isBackOffice)) {
-      if (CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor) == 3
-      ) {
+      if (in_array(CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor), array(2, 3))) {
         $form->_expressButtonName = $form->getButtonName('upload', 'express');
         $form->assign('expressButtonName', $form->_expressButtonName);
         $form->add('image',

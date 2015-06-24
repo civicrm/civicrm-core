@@ -280,14 +280,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   public static function formRule($params, $files, $self) {
     $errors = array();
     $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
+    $fields = array(
+      'total_amount' => 'Amount',
+      'financial_type' => 'Financial Type',
+      'payment_instrument' => 'Paid By',
+    );
 
     //CRM-16480 if contact is selected, validate financial type and amount field.
     foreach ($params['field'] as $key => $value) {
-      if (!empty($params['primary_contact_id'][$key]) && empty($value['total_amount'])) {
-        $errors["field[$key][total_amount]"] = ts('Amount is a required field.');
-      }
-      if (!empty($params['primary_contact_id'][$key]) && empty($value['financial_type'])) {
-        $errors["field[$key][financial_type]"] = ts('Financial Type is a required field.');
+      foreach ($fields as $field => $label) {
+        if (!empty($params['primary_contact_id'][$key]) && empty($value[$field])) {
+          $errors["field[$key][$field]"] = ts('%1 is a required field.', array(1 => $label));
+        }
       }
     }
 
@@ -319,8 +323,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     if ($self->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
       foreach (array_unique($params["open_pledges"]) as $value) {
-        $duplicateRows = array_keys($params["open_pledges"], $value);
-        if (count($duplicateRows) > 1) {
+        if (!empty($value)) {
+          $duplicateRows = array_keys($params["open_pledges"], $value);
+        }
+        if (!empty($duplicateRows) && count($duplicateRows) > 1) {
           foreach ($duplicateRows as $key) {
             $errors["open_pledges[$key]"] = ts('You can not record two payments for the same pledge in a single batch.');
           }

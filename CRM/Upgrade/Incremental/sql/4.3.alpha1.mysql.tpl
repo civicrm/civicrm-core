@@ -601,7 +601,7 @@ SELECT 'civicrm_payment_processor', id, @option_value_rel_id_as, @financial_acco
 -- CRM-9923 and CRM-11037
 SELECT @option_group_id_batch_status   := max(id) from civicrm_option_group where name = 'batch_status';
 
-SELECT @weight                 := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_batch_status;
+SELECT @weight                 := MAX(ROUND(value)) FROM civicrm_option_value WHERE option_group_id = @option_group_id_batch_status;
 
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`)

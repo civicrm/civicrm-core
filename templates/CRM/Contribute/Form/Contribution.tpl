@@ -262,7 +262,7 @@
               <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
                 {$form.pcp_made_through_id.html} &nbsp;
-                <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</span>
+                <div class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</div>
 
                 <div class="spacer"></div>
                  <div class="crm-contribution-form-block-pcp_details">
@@ -274,15 +274,15 @@
                     <tr id="nickID" class="crm-contribution-form-block-pcp_roll_nickname">
                       <td class="label">{$form.pcp_roll_nickname.label}</td>
                       <td>{$form.pcp_roll_nickname.html|crmAddClass:big}<br/>
-                        <span class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</span>
+                        <div class="description">{ts}Name or nickname contributor wants to be displayed in the Honor Roll. Enter "Anonymous" for anonymous contributions.{/ts}</div>
                       </td>
                     </tr>
                     <tr id="personalNoteID" class="crm-contribution-form-block-pcp_personal_note">
                       <td class="label" style="vertical-align: top">{$form.pcp_personal_note.label}</td>
                       <td>
                         {$form.pcp_personal_note.html}
-                        <span
-                          class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</span>
+                        <div
+                          class="description">{ts}Personal message submitted by contributor for display in the Honor Roll.{/ts}</div>
                       </td>
                     </tr>
                   </table>
@@ -292,6 +292,7 @@
           </table>
         </div>
       </div>
+      {include file="CRM/Contribute/Form/PCP.js.tpl"}
     {/if}
     <!-- end of PCP -->
 
@@ -543,9 +544,11 @@
 {if $buildPriceSet}{literal}buildAmount( );{/literal}{/if}
 
 {literal}
-function buildAmount( priceSetId ) {
-  if (!priceSetId) priceSetId = cj("#price_set_id").val( );
 
+// CRM-16451: set financial type of 'Price Set' in back office contribution
+// instead of selecting manually
+function buildAmount( priceSetId, financialtypeIds ) {
+  if (!priceSetId) priceSetId = cj("#price_set_id").val( );
   var fname = '#priceset';
   if (!priceSetId) {
     // hide price set fields.
@@ -556,6 +559,10 @@ function buildAmount( priceSetId ) {
     cj("#totalAmount").show( );
     var choose = "{/literal}{ts}Choose price set{/ts}{literal}";
     cj("#price_set_id option[value='']").html( choose );
+
+    cj('label[for="total_amount"]').text('{/literal}{ts}Total Amount{/ts}{literal}');
+    cj(".crm-contribution-form-block-financial_type_id").show();
+    cj("#financial_type_id option[value='']").attr('selected', true);
 
     //we might want to build recur block.
     if (cj("#is_recur")) buildRecurBlock( null );
@@ -586,6 +593,10 @@ function buildAmount( priceSetId ) {
   cj( "#totalAmount").hide( );
   var manual = "{/literal}{ts}Manual contribution amount{/ts}{literal}";
   cj("#price_set_id option[value='']").html( manual );
+
+  cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');
+  cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
+  cj(".crm-contribution-form-block-financial_type_id").css("display", "none");
 }
 
 function adjustPayment( ) {
@@ -615,8 +626,8 @@ cj('#fee_amount').change( function() {
   var totalAmount = cj('#total_amount').val();
   var feeAmount = cj('#fee_amount').val();
   var netAmount = totalAmount.replace(/,/g, '') - feeAmount.replace(/,/g, '');
-  if (!cj('#net_amount').val()) {
-    cj('#net_amount').val(netAmount);
+  if (!cj('#net_amount').val() && totalAmount) {
+    cj('#net_amount').val(CRM.formatMoney(netAmount, true));
   }
 });
 

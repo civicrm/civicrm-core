@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="price-set-1"}
 <div id="priceset" class="crm-section price_set-section">
     {if $priceSet.help_pre}
         <div class="messages help">{$priceSet.help_pre}</div>
@@ -39,27 +40,30 @@
             <div class="crm-section {$element.name}-section">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_"|cat:$field_id}
-          <div class="label">{$form.$element_name.label}</div>
-                <div class="content {$element.name}-content">
-                {assign var="rowCount" value="1"}
-                {assign var="count" value="1"}
+              <div class="label">{$form.$element_name.label}</div>
+              <div class="content {$element.name}-content">
+                {assign var="elementCount" value="0"}
+                {assign var="optionCount" value="0"}
+                {assign var="rowCount" value="0"}
                 {foreach name=outer key=key item=item from=$form.$element_name}
-                    {if is_numeric($key) }
-                        {if $count == 1}<div class="price-set-row {$element.name}-row{$rowCount}">{/if}
-                        <span class="price-set-option-content">{$form.$element_name.$key.html}</span>
-                        {if $count == $element.options_per_line}
-                          </div>
-                          {assign var="rowCount" value=`$rowCount+1`}
-                          {assign var="count" value="1"}
-                        {else}
-                          {assign var="count" value=`$count+1`}
-                        {/if}
+                  {assign var="elementCount" value=`$elementCount+1`}
+                  {if is_numeric($key) }
+                    {assign var="optionCount" value=`$optionCount+1`}
+                    {if $optionCount == 1}
+                      {assign var="rowCount" value=`$rowCount+1`}
+                      <div class="price-set-row {$element.name}-row{$rowCount}">
                     {/if}
+                    <span class="price-set-option-content">{$form.$element_name.$key.html}</span>
+                    {if $optionCount == $element.options_per_line || $elementCount == $form.$element_name|@count}
+                      </div>
+                      {assign var="optionCount" value="0"}
+                    {/if}
+                  {/if}
                 {/foreach}
                 {if $element.help_post}
-                    <div class="description">{$element.help_post}</div>
+                  <div class="description">{$element.help_post}</div>
                 {/if}
-                </div>
+              </div>
 
                 {if !empty($extends) && $extends eq "Membership"}
                   <div id="allow_auto_renew">
@@ -126,3 +130,4 @@
     {include file="CRM/Price/Form/Calculate.tpl"}
 {/if}
 </div>
+{/crmRegion}

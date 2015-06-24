@@ -213,6 +213,10 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_contribution_soft_contact'] = 1;
       $query->_tables['civicrm_contribution_soft_phone'] = 1;
     }
+    if (!empty($query->_returnProperties['contribution_campaign_title'])) {
+      $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
+      $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
+    }
     // LCD 716 END
   }
 
@@ -337,7 +341,7 @@ class CRM_Contribute_BAO_Query {
       case 'contribution_check_number':
       case 'contribution_contact_id':
       case (strpos($name, '_amount') !== FALSE):
-      case (strpos($name, '_date') !== FALSE):
+      case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
         $qillName = $name;
         $pseudoExtraParam = NULL;
         if ((strpos($name, '_amount') !== FALSE) || (strpos($name, '_date') !== FALSE) || in_array($name,
@@ -640,6 +644,10 @@ class CRM_Contribute_BAO_Query {
         $from .= " $side  JOIN civicrm_membership ON civicrm_membership_payment.membership_id = civicrm_membership.id ";
         break;
 
+      case 'civicrm_campaign':
+        $from = " $side  JOIN civicrm_campaign ON civicrm_campaign.id = civicrm_contribution.campaign_id";
+        break;
+
       case 'contribution_participant':
         $from = " $side  JOIN civicrm_participant_payment ON civicrm_participant_payment.contribution_id = civicrm_contribution.id";
         $from .= " $side  JOIN civicrm_participant ON civicrm_participant_payment.participant_id = civicrm_participant.id ";
@@ -801,6 +809,7 @@ class CRM_Contribute_BAO_Query {
         'amount_level' => 1,
         'contribution_note' => 1,
         'contribution_batch' => 1,
+        'contribution_campaign_title' => 1,
         'contribution_campaign_id' => 1,
       );
       if (self::isSoftCreditOptionEnabled()) {
@@ -868,16 +877,10 @@ class CRM_Contribute_BAO_Query {
       array('entity' => 'contribution', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
-    $form->add('select', 'contribution_pcp_made_through_id',
-      ts('Personal Campaign Page'),
-      array(
-        '' => ts('- any -'),
-      ) +
-      CRM_Contribute_PseudoConstant::pcPage(),
-      FALSE, array('class' => 'crm-select2')
-    );
-
-    $status = array();
+    // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
+    $form->add('text', 'contribution_pcp_made_through_id', ts('Personal Campaign Page'), array('class' => 'twenty', 'id' => 'pcp_made_through_id', 'placeholder' => ts('- any -')));
+    // stores the label
+    $form->add('hidden', 'pcp_made_through');
 
     $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status');
     // Remove status values that are only used for recurring contributions or pledges (In Progress, Overdue).

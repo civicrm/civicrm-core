@@ -238,6 +238,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           'product_option' => array(
             'title' => ts('Premium Option'),
           ),
+          'fulfilled_date' => array(
+            'title' => ts('Premium Fulfilled Date'),
+          ),
           'contribution_id' => array(
             'no_display' => TRUE,
           ),
@@ -465,7 +468,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
     //for premiums
     if (!empty($this->_params['fields']['product_name']) ||
-      !empty($this->_params['fields']['product_option'])
+      !empty($this->_params['fields']['product_option']) ||
+      !empty($this->_params['fields']['fulfilled_date'])
     ) {
       $this->_from .= "
                  LEFT JOIN  civicrm_contribution_product {$this->_aliases['civicrm_contribution_product']}
@@ -606,10 +610,12 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $select = "                                                                                                                                                                                                     SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,                                                                                                                                   SUM( {$this->_aliases['civicrm_contribution']}.total_amount ) as amount,                                                                                                                                   ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,                                                                                                                              {$this->_aliases['civicrm_contribution']}.currency as currency                                                                                                                                       ";
+    $select = "SELECT DISTINCT {$this->_aliases['civicrm_contribution']}.id";
 
-    $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
-    $sql = "{$select} {$this->_from} {$this->_where} {$group}";
+    $sql = "SELECT COUNT(cc.id) as count, SUM(cc.total_amount) as amount, ROUND(AVG(cc.total_amount), 2) as avg, cc.currency as currency
+            FROM civicrm_contribution cc
+            WHERE cc.id IN ({$select} {$this->_from} {$this->_where})
+            GROUP BY cc.currency";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $totalAmount = $average = array();
