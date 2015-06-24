@@ -2097,7 +2097,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       $financialTypeID = $this->wrangleFinancialTypeID($contributionTypeId);
 
-      return CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
+      $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
         $premiumParams, $contactID,
         $financialTypeID,
         'contribution',
@@ -2105,6 +2105,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         ($this->_mode == 'test') ? 1 : 0,
         $isPayLater
       );
+
+      if (CRM_Utils_Array::value('contribution_status_id', $result) == 1) {
+        civicrm_api3('contribution', 'completetransaction', array('id' => $result['contribution']->id));
+      }
+      return $result;
     }
   }
 
