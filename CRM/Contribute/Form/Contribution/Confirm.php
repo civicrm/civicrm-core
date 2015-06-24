@@ -728,7 +728,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contactID = $this->getContactID();
     $result = $this->processFormSubmission($contactID);
     if (is_array($result) && !empty($result['is_payment_failure'])) {
-      CRM_Core_Error::displaySessionError($result);
+      // We will probably have the function that gets this error throw an exception on the next round of refactoring.
+      CRM_Core_Session::singleton()->setStatus(ts("Payment Processor Error message :") .
+          $result['error']->getMessage());
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
         "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"
       ));
