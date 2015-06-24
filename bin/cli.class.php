@@ -179,7 +179,7 @@ class civicrm_cli {
       elseif ($arg == '-o' || $arg == '--output') {
         $this->_output = TRUE;
       }
-      elseif ($arg == '--json') {
+      elseif ($arg == '-J' || $arg == '--json') {
         $this->_output = 'json';
       }
       elseif ($arg == '-j' || $arg == '--joblog') {
