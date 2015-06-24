@@ -75,17 +75,18 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $lineItems = $form->_lineItem;
     $isPaymentTransaction = self::isPaymentTransaction($form);
 
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $contributionTypeId;
-    if (!$contributionType->find(TRUE)) {
-      //@todo - surely this check was part of the 4.3 upgrade & can go now?
-      CRM_Core_Error::fatal('Could not find a system table');
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $contributionTypeId;
+    $financialType->find(TRUE);
+    if ($financialType->is_deductible) {
+      $form->assign('is_deductible', TRUE);
+      $form->set('is_deductible', TRUE);
     }
 
     // add some financial type details to the params list
     // if folks need to use it
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
-    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
+    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
     //CRM-11456
     $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
@@ -116,7 +117,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $paymentParams,
         NULL,
         $contactID,
-        $contributionType,
+        $financialType,
         TRUE, TRUE,
         $isTest,
         $lineItems,
@@ -162,10 +163,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
             // follow similar flow as IPN
             // send the receipt mail
             $form->set('params', $form->_params);
-            if ($contributionType->is_deductible) {
-              $form->assign('is_deductible', TRUE);
-              $form->set('is_deductible', TRUE);
-            }
             if (isset($paymentParams['contribution_source'])) {
               $form->_params['source'] = $paymentParams['contribution_source'];
             }
@@ -243,7 +240,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $paymentParams,
           NULL,
           $contactID,
-          $contributionType,
+          $financialType,
           $pending, TRUE,
           $isTest,
           $lineItems,
@@ -301,12 +298,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       // result has all the stuff we need
       // lets archive it to a financial transaction
-      //@todo - this is done in 2 places - can't we just do it once straight after retrieving contribution type -
-      // when would this be a bad thing?
-      if ($contributionType->is_deductible) {
-        $form->assign('is_deductible', TRUE);
-        $form->set('is_deductible', TRUE);
-      }
 
       if (isset($paymentParams['contribution_source'])) {
         $form->_params['source'] = $paymentParams['contribution_source'];
@@ -320,7 +311,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       if (!(!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct')) {
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
           $form->_params, $result,
-          $contactID, $contributionType,
+          $contactID, $financialType,
           $pending, TRUE,
           $isTest,
           $lineItems,
