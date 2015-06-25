@@ -663,8 +663,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         }
       }
 
-      $params = array('case_id' => $vval['case_id'], 'client_id' => $this->_currentlyViewedContactId);
-      $result = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts, $params);
+      $extraParams = array('case_id' => $vval['case_id'], 'client_id' => $this->_currentlyViewedContactId);
+      $result = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts, $extraParams);
       if (empty($result)) {
         $mailStatus = '';
       }
