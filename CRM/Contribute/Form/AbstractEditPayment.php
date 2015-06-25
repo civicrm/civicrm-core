@@ -58,7 +58,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @var array current payment processor including a copy of the object in 'object' key
    */
   public $_paymentProcessor;
-  public $_recurPaymentProcessors;
+
+  /**
+   * Available recurring processors.
+   *
+   * @var array
+   */
+  public $_recurPaymentProcessors = array();
 
   /**
    * Array of processor options in the format id => array($id => $label)
@@ -435,11 +441,10 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         if (!empty($processor['description'])) {
           $this->_processors[$id] .= ' : ' . ts($processor['description']);
         }
+        if ($processor['is_recur']) {
+          $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
+        }
       }
-      //get the valid recurring processors.
-      $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
-      $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
-      $this->_recurPaymentProcessors = array_intersect_key($this->_processors, $recurring);
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
