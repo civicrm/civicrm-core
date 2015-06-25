@@ -184,9 +184,7 @@ $having
 civicrm_contribution AS contrib,
 civicrm_contact AS contact_a {$this->_aclFrom}
 ";
-    if ($this->_aclWhere) {
-      $this->_where .= " {$this->_aclWhere} ";
-    }
+
     return $from;
   }
 
@@ -233,8 +231,12 @@ civicrm_contact AS contact_a {$this->_aclFrom}
       $financial_type_ids = implode(',', array_keys($this->_formValues['financial_type_id']));
       $clauses[] = "contrib.financial_type_id IN ($financial_type_ids)";
     }
-
-    return implode(' AND ', $clauses);
+    if ($this->_aclWhere) {
+      return " {$this->_aclWhere} " . implode(' AND ', $clauses);
+    }
+    else {
+      return implode(' AND ', $clauses);
+    }
   }
 
   /**

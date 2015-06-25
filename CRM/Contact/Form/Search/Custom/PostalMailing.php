@@ -121,9 +121,6 @@ LEFT JOIN civicrm_address address               ON (address.contact_id       = c
                                                     address.is_primary       = 1 )
 LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.state_province_id {$this->_aclFrom}
 ";
-    if ($this->_aclWhere) {
-      $this->_where .= " {$this->_aclWhere} ";
-    }
     return $from;
   }
 
@@ -150,7 +147,11 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
                                        (select cr.contact_id_b from civicrm_relationship cr where (cr.contact_id_a = cgc.contact_id AND (cr.relationship_type_id = 7 OR cr.relationship_type_id = 6))),
                                         cgc.contact_id )";
     $clause[] = "contact_a.contact_type IN ('Individual','Household')";
-
+    
+    if ($this->_aclWhere) {
+      $clause[] = " {$this->_aclWhere} ";
+    }
+    
     if (!empty($clause)) {
       $where = implode(' AND ', $clause);
     }

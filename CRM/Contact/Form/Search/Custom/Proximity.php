@@ -222,10 +222,6 @@ LEFT JOIN civicrm_group_contact cgc ON ( cgc.contact_id = contact_a.id AND cgc.s
 ";
     }
 
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
-    }
-
     return $f;
   }
 
@@ -257,7 +253,11 @@ AND cgc.group_id = {$this->_group}
 
     $where .= " AND contact_a.is_deleted != 1 ";
     $where .= "{$this->_where}";
-
+    
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
+    
     return $this->whereClause($where, $params);
   }
 

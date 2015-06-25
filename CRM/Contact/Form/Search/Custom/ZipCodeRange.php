@@ -140,9 +140,6 @@ LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id A
 LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
                                        email.is_primary = 1 ) {$this->_aclFrom}
 ";
-    if ($this->_aclWhere) {
-      $this->_where .= " {$this->_aclWhere} ";
-    }
     return $from;
   }
 
@@ -174,6 +171,10 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
       1 => array(trim($low), 'Integer'),
       2 => array(trim($high), 'Integer'),
     );
+
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
 
     return $this->whereClause($where, $params);
   }

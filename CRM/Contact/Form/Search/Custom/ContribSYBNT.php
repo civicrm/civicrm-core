@@ -181,9 +181,6 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
 
     }
     $this->buildACLClause('contact_a');
-    if ($this->_aclWhere) {
-      $where .= " AND {$this->_aclWhere} ";
-    }
     $sql = "
 SELECT     $select
 FROM       civicrm_contact AS contact_a {$this->_aclFrom}
@@ -340,6 +337,9 @@ AND      c.receive_date < {$this->start_date_1}
       }
 
       $clauses[] = " xg.contact_id IS NULL ";
+    }
+    if ($this->_aclWhere) {
+      $clauses[] .= " {$this->_aclWhere} ";
     }
     return implode(' AND ', $clauses);
   }

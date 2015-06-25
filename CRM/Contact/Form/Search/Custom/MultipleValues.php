@@ -229,10 +229,6 @@ contact_a.sort_name    as sort_name,
                        AND cgc.status = 'Added')";
     }
 
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
-    }
-
     return $from;
   }
 
@@ -276,6 +272,9 @@ contact_a.sort_name    as sort_name,
 
     if ($this->_group) {
       $clause[] = "cgc.group_id = {$this->_group}";
+    }
+    if ($this->_aclWhere) {
+      $clause[] = " AND {$this->_aclWhere} ";
     }
 
     $where = '( 1 )';
