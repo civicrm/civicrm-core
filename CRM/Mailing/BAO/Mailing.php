@@ -2906,17 +2906,13 @@ WHERE  civicrm_mailing_job.id = %1
     // CRM-8460
     $gotCronLock = FALSE;
 
-    if (property_exists($config, 'mailerJobsMax') && $config->mailerJobsMax && $config->mailerJobsMax > 1) {
+    if (property_exists($config, 'mailerJobsMax') && $config->mailerJobsMax && $config->mailerJobsMax > 0) {
       $lockArray = range(1, $config->mailerJobsMax);
       shuffle($lockArray);
 
       // check if we are using global locks
-      $serverWideLock = CRM_Core_BAO_Setting::getItem(
-        CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-        'civimail_server_wide_lock'
-      );
       foreach ($lockArray as $lockID) {
-        $cronLock = new CRM_Core_Lock("civimail.cronjob.{$lockID}", NULL, $serverWideLock);
+        $cronLock = Civi\Core\Container::singleton()->get('lockManager')->acquire("worker.mailing.send.{$lockID}");
         if ($cronLock->isAcquired()) {
           $gotCronLock = TRUE;
           break;
@@ -2927,6 +2923,11 @@ WHERE  civicrm_mailing_job.id = %1
       if (!$gotCronLock) {
         CRM_Core_Error::debug_log_message('Returning early, since max number of cronjobs running');
         return TRUE;
+      }
+
+      if (getenv('CIVICRM_CRON_HOLD')) {
+        // In testing, we may need to simulate some slow activities.
+        sleep(getenv('CIVICRM_CRON_HOLD'));
       }
     }
 

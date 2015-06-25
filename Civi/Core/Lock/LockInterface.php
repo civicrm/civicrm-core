@@ -24,53 +24,36 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
+namespace Civi\Core\Lock;
 
-/**
- * A PHP cron script to mail the result set of specified report to the
- * recipients mentioned for that report
- */
-class CiviReportMail {
+interface LockInterface {
+
   /**
+   * @param int|NULL $timeout
+   *   The number of seconds to wait to get the lock.
+   *   For a default value, use NULL.
+   * @return bool
    */
-  public function __construct() {
-    $this->initialize();
+  public function acquire($timeout = NULL);
 
-    CRM_Utils_System::authenticateScript(TRUE);
+  /**
+   * @return bool|null|string
+   *   Trueish/falsish.
+   */
+  public function release();
 
-    //log the execution of script
-    CRM_Core_Error::debug_log_message('CiviReportMail.php');
-  }
+  /**
+   * @return bool|null|string
+   *   Trueish/falsish.
+   * @deprecated
+   *   Not supported by some locking strategies. If you need to poll, better
+   *   to use acquire(0).
+   */
+  public function isFree();
 
-  public function initialize() {
-    require_once '../civicrm.config.php';
-    require_once 'CRM/Core/Config.php';
-
-    $config = CRM_Core_Config::singleton();
-  }
-
-  public function run() {
-    $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.report.CiviReportMail');
-
-    if ($lock->isAcquired()) {
-      // try to unset any time limits
-      if (!ini_get('safe_mode')) {
-        set_time_limit(0);
-      }
-
-      // if there are named sets of settings, use them - otherwise use the default (null)
-      require_once 'CRM/Report/Utils/Report.php';
-      $result = CRM_Report_Utils_Report::processReport();
-      echo $result['messages'];
-    }
-    else {
-      throw new Exception('Could not acquire lock, another CiviReportMail process is running');
-    }
-
-    $lock->release();
-  }
+  /**
+   * @return bool
+   */
+  public function isAcquired();
 
 }
-
-session_start();
-$obj = new CiviReportMail();
-$obj->run();
