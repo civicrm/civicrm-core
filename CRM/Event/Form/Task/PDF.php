@@ -92,4 +92,14 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
     return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
   }
 
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
+  }
+
 }
