@@ -75,17 +75,18 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $lineItems = $form->_lineItem;
     $isPaymentTransaction = self::isPaymentTransaction($form);
 
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $contributionTypeId;
-    if (!$contributionType->find(TRUE)) {
-      //@todo - surely this check was part of the 4.3 upgrade & can go now?
-      CRM_Core_Error::fatal('Could not find a system table');
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $contributionTypeId;
+    $financialType->find(TRUE);
+    if ($financialType->is_deductible) {
+      $form->assign('is_deductible', TRUE);
+      $form->set('is_deductible', TRUE);
     }
 
     // add some financial type details to the params list
     // if folks need to use it
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
-    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $contributionType->name;
+    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
     //CRM-11456
     $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($contributionTypeId);
     $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
@@ -93,13 +94,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $payment = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
-    if ($isPaymentTransaction) {
-      $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
+    if ($isPaymentTransaction && !empty($form->_paymentProcessor)) {
+      // @todo - remove this line once we are sure we can just use $form->_paymentProcessor['object'] consistently.
+      $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
     }
 
-    //fix for CRM-2062
     //fix for CRM-16317
-
     $form->_params['receive_date'] = date('YmdHis');
     $form->assign('receive_date',
       CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
@@ -117,7 +117,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $paymentParams,
         NULL,
         $contactID,
-        $contributionType,
+        $financialType,
         TRUE, TRUE,
         $isTest,
         $lineItems,
@@ -144,8 +144,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // add qfKey so we can send to paypal
         $form->_params['qfKey'] = $form->controller->_key;
         if ($component == 'membership') {
-          $membershipResult = array(1 => $contribution);
-          return $membershipResult;
+          return array('contribution' => $contribution);
         }
         else {
           if (!$isPayLater) {
@@ -163,10 +162,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
             // follow similar flow as IPN
             // send the receipt mail
             $form->set('params', $form->_params);
-            if ($contributionType->is_deductible) {
-              $form->assign('is_deductible', TRUE);
-              $form->set('is_deductible', TRUE);
-            }
             if (isset($paymentParams['contribution_source'])) {
               $form->_params['source'] = $paymentParams['contribution_source'];
             }
@@ -211,14 +206,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
     }
     elseif ($isPaymentTransaction) {
-      if (!empty($paymentParams['is_recur']) &&
-        $form->_contributeMode == 'direct'
-      ) {
-
-        // For recurring contribution, create Contribution Record first.
-        // Contribution ID, Recurring ID and Contact ID needed
-        // When we get a callback from the payment processor
-
+      if ($form->_contributeMode == 'direct') {
         $paymentParams['contactID'] = $contactID;
 
         // Fix for CRM-14354. If the membership is recurring, don't create a
@@ -226,16 +214,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
         // (i.e., the amount NOT associated with the membership). Temporarily
         // cache the is_recur values so we can process the additional gift as a
         // one-off payment.
-        $pending = FALSE;
         if (!empty($form->_values['is_recur'])) {
           if ($form->_membershipBlock['is_separate_payment'] && !empty($form->_params['auto_renew'])) {
             $cachedFormValue = CRM_Utils_Array::value('is_recur', $form->_values);
             $cachedParamValue = CRM_Utils_Array::value('is_recur', $paymentParams);
             unset($form->_values['is_recur']);
             unset($paymentParams['is_recur']);
-          }
-          else {
-            $pending = TRUE;
           }
         }
 
@@ -244,8 +228,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $paymentParams,
           NULL,
           $contactID,
-          $contributionType,
-          $pending, TRUE,
+          $financialType,
+          TRUE,
+          TRUE,
           $isTest,
           $lineItems,
           $form->_bltID
@@ -266,38 +251,25 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
         }
       }
-      if (is_object($payment)) {
-        $result = $payment->doDirectPayment($paymentParams);
+      try {
+        $result = $payment->doPayment($paymentParams);
       }
-      else {
-        CRM_Core_Error::fatal($paymentObjError);
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        // Clean up DB as appropriate.
+        if (!empty($paymentParams['contributionID'])) {
+          CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'],
+            $paymentParams['contactID'], $e->getMessage());
+        }
+        if (!empty($paymentParams['contributionRecurID'])) {
+          CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+        }
+
+        $result['is_payment_failure'] = TRUE;
+        $result['error'] = $e;
       }
     }
 
-    if ($component == 'membership') {
-      $membershipResult = array();
-    }
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      //make sure to cleanup db for recurring case.
-      //@todo this clean up has always been controversial as many orgs prefer to see failed transactions.
-      // most recent discussion has been that they should be retained and this could be altered
-      if (!empty($paymentParams['contributionID'])) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
-      }
-      if (!empty($paymentParams['contributionRecurID'])) {
-        CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
-      }
-
-      if ($component !== 'membership') {
-        CRM_Core_Error::displaySessionError($result);
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-          "_qf_Main_display=true&qfKey={$form->_params['qfKey']}"
-        ));
-      }
-      $membershipResult[1] = $result;
-    }
-    elseif ($result || ($form->_amount == 0.0 && !$form->_params['is_pay_later'])) {
+    if ($result || ($form->_amount == 0.0 && !$form->_params['is_pay_later'])) {
       if ($result) {
         $form->_params = array_merge($form->_params, $result);
       }
@@ -306,47 +278,21 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       // result has all the stuff we need
       // lets archive it to a financial transaction
-      //@todo - this is done in 2 places - can't we just do it once straight after retrieving contribution type -
-      // when would this be a bad thing?
-      if ($contributionType->is_deductible) {
-        $form->assign('is_deductible', TRUE);
-        $form->set('is_deductible', TRUE);
-      }
 
       if (isset($paymentParams['contribution_source'])) {
         $form->_params['source'] = $paymentParams['contribution_source'];
       }
 
-      // check if pending was set to true by payment processor
-      $pending = FALSE;
-      if (!empty($form->_params['contribution_status_pending'])) {
-        $pending = TRUE;
-      }
-      if (!(!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct')) {
-        $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
-          $form->_params, $result,
-          $contactID, $contributionType,
-          $pending, TRUE,
-          $isTest,
-          $lineItems,
-          $form->_bltID
-        );
-      }
       $form->postProcessPremium($premiumParams, $contribution);
       if (is_array($result) && !empty($result['trxn_id'])) {
         $contribution->trxn_id = $result['trxn_id'];
       }
-      $membershipResult[1] = $contribution;
+      $result['contribution'] = $contribution;
     }
-
-    if ($component == 'membership') {
-      return $membershipResult;
-    }
-
     //Do not send an email if Recurring contribution is done via Direct Mode
     //We will send email once the IPN is received.
-    if (!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct') {
-      return TRUE;
+    if ($form->_contributeMode == 'direct') {
+      return $result;
     }
 
     // get the price set values for receipt.

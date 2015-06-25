@@ -225,8 +225,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * We are expecting a separate payment for the membership vs the contribution.
    */
-  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessor() {
+  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow() {
     $this->setUpMembershipContributionPage(TRUE);
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -256,13 +258,48 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that when a transaction fails the pending contribution remains.
+   *
+   * An activity should also be created. CRM-16417.
+   */
+  public function testSubmitPaymentProcessorFailure() {
+    $this->setUpContributionPage();
+    $this->setupPaymentProcessor();
+    $this->createLoggedInUser();
+    $priceFieldID = reset($this->_ids['price_field']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
+    $submitParams = array(
+      'price_' . $priceFieldID => $priceFieldValueID,
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'payment_processor_id' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2008),
+      'cvv2' => 123,
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 2,
+    ));
+
+    $this->callAPISuccessGetSingle('activity', array(
+      'source_record_id' => $contribution['id'],
+      'activity_type_id' => 'Failed Payment',
+    ));
+
+  }
+
+  /**
    * Test submit recurring membership with immediate confirmation (IATS style)
    * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
    * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
    */
-  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecur() {
+  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurNow() {
     $this->params['is_recur'] = 1;
     $var = array();
     $this->params['recur_frequency_unit'] = 'month';
