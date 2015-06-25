@@ -709,15 +709,12 @@ LIMIT 1;";
       $this->copyCustomValues($recurContrib->id, $contribution->id);
     }
 
-    // next create the transaction record
-    $paymentProcessor = $paymentProcessorId = '';
+    $paymentProcessorId = '';
     if (isset($objects['paymentProcessor'])) {
       if (is_array($objects['paymentProcessor'])) {
-        $paymentProcessor = $objects['paymentProcessor']['payment_processor_type'];
         $paymentProcessorId = $objects['paymentProcessor']['id'];
       }
       else {
-        $paymentProcessor = $objects['paymentProcessor']->payment_processor_type;
         $paymentProcessorId = $objects['paymentProcessor']->id;
       }
     }

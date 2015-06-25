@@ -253,6 +253,12 @@ class CRM_Core_Payment_Form {
    *   for payment processors that gather payment data on site as rendering the fields as not being required. (not entirely sure why but this
    *   is implemented for back office forms)
    *
+   * @param bool $isBackOffice
+   *   Is this a backoffice form. This could affect the display of the cvn or whether some processors show,
+   *   although the distinction is losing it's meaning as front end forms are used for back office and a permission
+   *   for the 'enter without cvn' is probably more appropriate. Paypal std does not support another user
+   *   entering details but once again the issue is not back office but 'another user'.
+   *
    * @return bool
    */
   public static function buildPaymentForm(&$form, $processor, $isBillingDataOptional, $isBackOffice) {
