@@ -120,6 +120,10 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
+      elseif ($element->getAttribute('type') == 'text' && $element->getAttribute('format')) {
+        $this->renderFrozenDate($el, $element);
+      }
+
       $el['html'] = '<span class="crm-frozen-field">' . $el['html'] . '</span>';
     }
     // Active form elements
@@ -258,6 +262,24 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
 
     $el['html'] = implode('; ', $display) . '<input type="hidden" value="' . $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
+  }
+
+  /**
+   * Render a date field as text.
+   *
+   * @param array $el
+   * @param HTML_QuickForm_element $field
+   */
+  public function renderFrozenDate(&$el, $field) {
+    $format = $field->getAttribute('format');
+    $map = CRM_Core_SelectValues::datePluginToPHPFormats($format);
+
+    if (isset($map[$format])) {
+      $format = $map[$format];
+    }
+
+    $date = DateTime::createFromFormat('d/m/Y', $field->getValue());
+    $el['html'] = $date->format($format) . '<input type="hidden" value="' . $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
   }
 
   /**
