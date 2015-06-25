@@ -315,10 +315,6 @@ contact_a.display_name   as display_name";
 FROM       civicrm_contact contact_a
 INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.id ) {$this->_aclFrom}
 ";
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
-    }
-
     return $from;
   }
 
@@ -328,7 +324,11 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    return ' ( 1 ) ';
+    $where = ' ( 1 ) ';
+    if ($this->_aclWhere) {
+      $where = " AND {$this->_aclWhere} ";
+    }
+    return $where;
   }
 
   /**

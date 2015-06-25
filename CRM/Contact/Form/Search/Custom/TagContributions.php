@@ -154,9 +154,6 @@ WHERE  $where
                                         civicrm_entity_tag.entity_id = contact_a.id )
       LEFT JOIN civicrm_tag ON civicrm_tag.id = civicrm_entity_tag.tag_id {$this->_aclFrom}
      ";
-    if ($this->_aclWhere) {
-      $this->_where .= " {$this->_aclWhere} ";
-    }
     return $from;
   }
 
@@ -208,6 +205,9 @@ WHERE  $where
         $contactIDs = implode(', ', $contactIDs);
         $clauses[] = "contact_a.id IN ( $contactIDs )";
       }
+    }
+    if ($this->_aclWhere) {
+      $clauses[] = " {$this->_aclWhere} ";
     }
     return implode(' AND ', $clauses);
   }

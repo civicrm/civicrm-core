@@ -205,9 +205,6 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
 
         left join civicrm_option_value on
         ( civicrm_option_value.value = civicrm_event.event_type_id AND civicrm_option_value.option_group_id = 14) {$this->_aclFrom}";
-    if ($this->_aclWhere) {
-      $this->_where .= "{$this->_aclWhere} ";
-    }
 
     return $from;
   }
@@ -264,6 +261,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     if (!empty($this->_formValues['event_type_id'])) {
       $event_type_ids = implode(',', array_keys($this->_formValues['event_type_id']));
       $clauses[] = "civicrm_event.event_type_id IN ( $event_type_ids )";
+    }
+    if ($this->_aclWhere) {
+      $clauses[] = "{$this->_aclWhere} ";
     }
     return implode(' AND ', $clauses);
   }

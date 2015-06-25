@@ -331,10 +331,6 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     $from .= " $fromTail";
 
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
-    }
-
     return $from;
 
   }
@@ -345,6 +341,12 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
+    $where = '(1)';
+    
+    if ($this->_aclWhere) {
+      $where = " AND {$this->_aclWhere} ";
+    }
+    
     return '(1)';
   }
 

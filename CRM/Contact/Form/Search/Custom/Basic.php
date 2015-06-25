@@ -183,9 +183,6 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     $this->buildACLClause('contact_a');
     $from = $this->_query->_fromClause;
     $from .= "{$this->_aclFrom}";
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
-    }
     return $from;
   }
 
@@ -196,6 +193,9 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    */
   public function where($includeContactIDs = FALSE) {
     if ($whereClause = $this->_query->whereClause()) {
+      if ($this->_aclWhere) {
+        $whereCluase .= " AND {$this->_aclWhere} ";
+      }
       return $whereClause;
     }
     return ' (1) ';

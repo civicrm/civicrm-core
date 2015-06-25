@@ -149,9 +149,6 @@ LEFT JOIN civicrm_email           ON ( civicrm_email.contact_id = contact_a.id A
                                        civicrm_email.is_primary = 1 )
 LEFT JOIN civicrm_state_province state_province ON state_province.id = address.state_province_id {$this->_aclFrom}
 ";
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
-    }
     return $from;
   }
 
@@ -191,6 +188,10 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
     if ($state) {
       $params[$count] = array($state, 'Integer');
       $clause[] = "state_province.id = %{$count}";
+    }
+    
+    if ($this->_aclWhere) {
+      $clause[] = " AND {$this->_aclWhere} ";
     }
 
     if (!empty($clause)) {

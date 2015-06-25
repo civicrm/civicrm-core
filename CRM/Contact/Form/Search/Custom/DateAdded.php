@@ -388,10 +388,6 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       $from .= " INNER JOIN Ig_{$this->_tableName} temptable1 ON (contact_a.id = temptable1.contact_id)";
     }
 
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
-    }
-
     return $from;
   }
 
@@ -401,7 +397,11 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    return '(1)';
+    $where = '(1)';
+    if ($this->_aclWhere) {
+      $where = " AND {$this->_aclWhere} ";
+    }
+    return $where;
   }
 
   /**

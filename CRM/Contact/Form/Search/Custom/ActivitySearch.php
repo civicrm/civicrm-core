@@ -256,6 +256,7 @@ ORDER BY contact_a.sort_name';
    * @return string
    */
   public function from() {
+    $this->buildACLClause('contact_a');
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -281,10 +282,6 @@ ORDER BY contact_a.sort_name';
                  ON activity.id = assignment.activity_id AND assignment.record_type_id = {$assigneeID}
             LEFT JOIN civicrm_contact contact_c
                  ON assignment.contact_id = contact_c.id {$this->_aclFrom}";
-
-    if ($this->_aclWhere) {
-      $this->_where .= " {$this->_aclWhere} ";
-    }
 
     return $from;
   }
@@ -361,6 +358,10 @@ ORDER BY contact_a.sort_name';
         $contactIDs = implode(', ', $contactIDs);
         $clauses[] = "contact_a.id IN ( $contactIDs )";
       }
+    }
+
+    if ($this->_aclWhere) {
+      $clauses[] = " {$this->_aclWhere} ";
     }
 
     return implode(' AND ', $clauses);
