@@ -986,6 +986,21 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @return array|bool
    */
   public static function getContactMembership($contactID, $memType, $isTest, $membershipId = NULL, $onlySameParentOrg = FALSE) {
+    //check for owner membership id, if it exists update that membership instead: CRM-15992
+    if ($membershipId) {
+      $ownerMemberId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+        $membershipId,
+        'owner_membership_id', 'id'
+      );
+      if ($ownerMemberId) {
+        $membershipId = $ownerMemberId;
+        $contactID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+          $membershipId,
+          'contact_id', 'id'
+        );
+      }
+    }
+
     $dao = new CRM_Member_DAO_Membership();
     if ($membershipId) {
       $dao->id = $membershipId;
@@ -1040,6 +1055,17 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
         $membership['status_id'],
         'is_current_member', 'id'
       );
+      $ownerMemberId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+        $membership['id'],
+        'owner_membership_id', 'id'
+      );
+      if ($ownerMemberId) {
+        $membership['id'] = $membership['membership_id'] = $ownerMemberId;
+        $membership['membership_contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+          $membership['id'],
+          'contact_id', 'id'
+        );
+      }
       return $membership;
     }
 
