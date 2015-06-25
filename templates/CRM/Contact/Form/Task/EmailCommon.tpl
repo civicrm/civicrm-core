@@ -79,3 +79,4 @@
 
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
 
+{include file="CRM/Activity/Form/FollowUp.tpl" type='email-'}
