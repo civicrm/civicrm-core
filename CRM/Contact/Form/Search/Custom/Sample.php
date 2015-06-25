@@ -189,7 +189,7 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
       $params[$count] = array($state, 'Integer');
       $clause[] = "state_province.id = %{$count}";
     }
-    
+
     if ($this->_aclWhere) {
       $clause[] = " AND {$this->_aclWhere} ";
     }

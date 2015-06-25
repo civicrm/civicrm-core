@@ -253,11 +253,11 @@ AND cgc.group_id = {$this->_group}
 
     $where .= " AND contact_a.is_deleted != 1 ";
     $where .= "{$this->_where}";
-    
+
     if ($this->_aclWhere) {
       $where .= " AND {$this->_aclWhere} ";
     }
-    
+
     return $this->whereClause($where, $params);
   }
 
