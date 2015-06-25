@@ -342,11 +342,11 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
    */
   public function where($includeContactIDs = FALSE) {
     $where = '(1)';
-    
+
     if ($this->_aclWhere) {
       $where = " AND {$this->_aclWhere} ";
     }
-    
+
     return '(1)';
   }
 
