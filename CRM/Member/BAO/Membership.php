@@ -1314,7 +1314,7 @@ AND civicrm_membership.is_test = %2";
     $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater) {
     $result = $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
-    $errors = $createdMemberships = array();
+    $errors = $createdMemberships = $paymentResult = array();
 
     //@todo move this into the calling function & pass in the correct financialTypeID
     if (isset($paymentParams['financial_type'])) {
@@ -1343,7 +1343,7 @@ AND civicrm_membership.is_test = %2";
         $isPayLater
       );
       if (is_a($result[1], 'CRM_Core_Error')) {
-        $errors[1] = CRM_Core_Error::getMessages($result[1]);
+        $errors[1] = CRM_Core_Error::getMessages($paymentResult[1]);
       }
 
       if (is_a($paymentResult, 'CRM_Core_Error')) {
@@ -1360,7 +1360,7 @@ AND civicrm_membership.is_test = %2";
 
     if ($isProcessSeparateMembershipTransaction) {
       try {
-        $lineItems = $form->_lineItem = $membershipLineItems;
+        $form->_lineItem = $membershipLineItems;
         if (empty($form->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
           unset($membershipParams['is_recur']);
         }
