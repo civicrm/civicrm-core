@@ -1555,22 +1555,23 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       if ($params['total_amount'] > 0.0) {
         $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
-        $result = $payment->doDirectPayment($paymentParams);
-      }
-
-      if (is_a($result, 'CRM_Core_Error')) {
-        //make sure to cleanup db for recurring case.
-        if (!empty($paymentParams['contributionID'])) {
-          CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
+        try {
+          $result = $payment->doPayment($paymentParams);
         }
-        if (!empty($paymentParams['contributionRecurID'])) {
-          CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
-        }
+        catch (PaymentProcessorException $e) {
+          if (!empty($paymentParams['contributionID'])) {
+            CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'], $e->getMessage());
+          }
+          if (!empty($paymentParams['contributionRecurID'])) {
+            CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+          }
 
-        CRM_Core_Error::displaySessionError($result);
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
-          "reset=1&action=add&cid={$this->_contactID}&context=&mode={$this->_mode}"
-        ));
+          CRM_Core_Error::displaySessionError($result);
+          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
+            "reset=1&action=add&cid={$this->_contactID}&context=&mode={$this->_mode}"
+          ));
+
+        }
       }
 
       if ($result) {

@@ -136,7 +136,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     /**********************************************************
      * Check to see if we have a duplicate before we send
      **********************************************************/
-    if ($this->_checkDupe($this->_getParam('order_id'))) {
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::error(9004, ts('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.'));
     }
 
@@ -425,21 +425,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $this->_setParam('timestamp', $timestamp);
 
     return TRUE;
-  }
-
-  /**
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
   }
 
   /**

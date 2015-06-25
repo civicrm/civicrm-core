@@ -1264,7 +1264,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
       catch (PaymentProcessorException $e) {
-        CRM_Contribute_BAO_Contribution::failPayment($contribution->id, $e->getMessage());
+        CRM_Contribute_BAO_Contribution::failPayment($contribution->id, $paymentParams['contactID'], $e->getMessage());
         throw new PaymentProcessorException($e->getMessage());
       }
     }
