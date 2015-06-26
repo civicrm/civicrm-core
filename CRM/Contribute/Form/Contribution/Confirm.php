@@ -1965,14 +1965,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_useForMember = $this->get('useForMember');
 
     // store the fact that this is a membership and membership type is selected
-    $processMembership = FALSE;
     if ((!empty($membershipParams['selectMembership']) &&
         $membershipParams['selectMembership'] != 'no_thanks'
       ) ||
       $this->_useForMember
     ) {
-      $processMembership = TRUE;
-
       if (!$this->_useForMember) {
         $this->assign('membership_assign', TRUE);
         $this->set('membershipTypeID', $this->_params['selectMembership']);
@@ -1984,98 +1981,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if ($this->_params['is_pay_later']) {
         $membershipParams['is_pay_later'] = 1;
       }
-    }
-
-    if ($processMembership) {
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
-
-      // added new parameter for cms user contact id, needed to distinguish behaviour for on behalf of sign-ups
-      if (isset($this->_params['related_contact'])) {
-        $membershipParams['cms_contactID'] = $this->_params['related_contact'];
-      }
-      else {
-        $membershipParams['cms_contactID'] = $contactID;
-      }
 
       //inherit campaign from contribution page.
       if (!array_key_exists('campaign_id', $membershipParams)) {
         $membershipParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values);
       }
 
-      if (!empty($membershipParams['onbehalf']) &&
-        is_array($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])
-      ) {
-        $this->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
-      }
-
-      $customFieldsFormatted = $fieldTypes = array();
-      if (!empty($membershipParams['onbehalf']) &&
-        is_array($membershipParams['onbehalf'])
-      ) {
-        foreach ($membershipParams['onbehalf'] as $key => $value) {
-          if (strstr($key, 'custom_')) {
-            $customFieldId = explode('_', $key);
-            CRM_Core_BAO_CustomField::formatCustomField(
-              $customFieldId[1],
-              $customFieldsFormatted,
-              $value,
-              'Membership',
-              NULL,
-              $contactID
-            );
-          }
-        }
-        $fieldTypes = array('Contact', 'Organization', 'Membership');
-      }
-
-      $priceFieldIds = $this->get('memberPriceFieldIDS');
-
-      if (!empty($priceFieldIds)) {
-        $contributionTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
-        unset($priceFieldIds['id']);
-        $membershipTypeIds = array();
-        $membershipTypeTerms = array();
-        foreach ($priceFieldIds as $priceFieldId) {
-          if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
-            $membershipTypeIds[] = $id;
-            //@todo the value for $term is immediately overwritten. It is unclear from the code whether it was intentional to
-            // do this or a double = was intended (this ambiguity is the reason many IDEs complain about 'assignment in condition'
-            $term = 1;
-            if ($term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms')) {
-              $membershipTypeTerms[$id] = ($term > 1) ? $term : 1;
-            }
-            else {
-              $membershipTypeTerms[$id] = 1;
-            }
-          }
-        }
-        $membershipParams['selectMembership'] = $membershipTypeIds;
-        $membershipParams['financial_type_id'] = $contributionTypeID;
-        $membershipParams['types_terms'] = $membershipTypeTerms;
-      }
-      if (!empty($membershipParams['selectMembership'])) {
-        // CRM-12233
-        $membershipLineItems = array();
-        if ($this->_separateMembershipPayment && $this->_values['amount_block_is_active']) {
-          foreach ($this->_values['fee'] as $key => $feeValues) {
-            if ($feeValues['name'] == 'membership_amount') {
-              $fieldId = $this->_params['price_' . $key];
-              $membershipLineItems[$this->_priceSetId][$fieldId] = $this->_lineItem[$this->_priceSetId][$fieldId];
-              unset($this->_lineItem[$this->_priceSetId][$fieldId]);
-              break;
-            }
-          }
-        }
-        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater);
-        if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
-          // we need to explicitly create a CMS user in case of free memberships
-          // since it is done under processConfirm for paid memberships
-          CRM_Contribute_BAO_Contribution_Utils::createCMSUser($membershipParams,
-            $membershipParams['cms_contactID'],
-            'email-' . $this->_bltID
-          );
-        }
-      }
+      CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $membershipParams, TRUE);
+      $this->doMembershipProcessing($contactID, $membershipParams, $premiumParams, $isPayLater);
     }
     else {
       // at this point we've created a contact and stored its address etc
@@ -2114,6 +2027,102 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         );
       }
       return $result;
+    }
+  }
+
+  /**
+   * Membership processing section.
+   *
+   * This is in a separate function as part of a move towards refactoring.
+   *
+   * @param int $contactID
+   * @param array $membershipParams
+   * @param array $premiumParams
+   * @param bool $isPayLater
+   */
+  protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $isPayLater) {
+
+    // added new parameter for cms user contact id, needed to distinguish behaviour for on behalf of sign-ups
+    if (isset($this->_params['related_contact'])) {
+      $membershipParams['cms_contactID'] = $this->_params['related_contact'];
+    }
+    else {
+      $membershipParams['cms_contactID'] = $contactID;
+    }
+
+    if (!empty($membershipParams['onbehalf']) &&
+      is_array($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])
+    ) {
+      $this->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
+    }
+
+    $customFieldsFormatted = $fieldTypes = array();
+    if (!empty($membershipParams['onbehalf']) &&
+      is_array($membershipParams['onbehalf'])
+    ) {
+      foreach ($membershipParams['onbehalf'] as $key => $value) {
+        if (strstr($key, 'custom_')) {
+          $customFieldId = explode('_', $key);
+          CRM_Core_BAO_CustomField::formatCustomField(
+            $customFieldId[1],
+            $customFieldsFormatted,
+            $value,
+            'Membership',
+            NULL,
+            $contactID
+          );
+        }
+      }
+      $fieldTypes = array('Contact', 'Organization', 'Membership');
+    }
+
+    $priceFieldIds = $this->get('memberPriceFieldIDS');
+
+    if (!empty($priceFieldIds)) {
+      $contributionTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
+      unset($priceFieldIds['id']);
+      $membershipTypeIds = array();
+      $membershipTypeTerms = array();
+      foreach ($priceFieldIds as $priceFieldId) {
+        if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
+          $membershipTypeIds[] = $id;
+          //@todo the value for $term is immediately overwritten. It is unclear from the code whether it was intentional to
+          // do this or a double = was intended (this ambiguity is the reason many IDEs complain about 'assignment in condition'
+          $term = 1;
+          if ($term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms')) {
+            $membershipTypeTerms[$id] = ($term > 1) ? $term : 1;
+          }
+          else {
+            $membershipTypeTerms[$id] = 1;
+          }
+        }
+      }
+      $membershipParams['selectMembership'] = $membershipTypeIds;
+      $membershipParams['financial_type_id'] = $contributionTypeID;
+      $membershipParams['types_terms'] = $membershipTypeTerms;
+    }
+    if (!empty($membershipParams['selectMembership'])) {
+      // CRM-12233
+      $membershipLineItems = array();
+      if ($this->_separateMembershipPayment && $this->_values['amount_block_is_active']) {
+        foreach ($this->_values['fee'] as $key => $feeValues) {
+          if ($feeValues['name'] == 'membership_amount') {
+            $fieldId = $this->_params['price_' . $key];
+            $membershipLineItems[$this->_priceSetId][$fieldId] = $this->_lineItem[$this->_priceSetId][$fieldId];
+            unset($this->_lineItem[$this->_priceSetId][$fieldId]);
+            break;
+          }
+        }
+      }
+      $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater);
+      if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
+        // we need to explicitly create a CMS user in case of free memberships
+        // since it is done under processConfirm for paid memberships
+        CRM_Contribute_BAO_Contribution_Utils::createCMSUser($membershipParams,
+          $membershipParams['cms_contactID'],
+          'email-' . $this->_bltID
+        );
+      }
     }
   }
 
