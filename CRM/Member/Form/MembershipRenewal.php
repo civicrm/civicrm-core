@@ -572,10 +572,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $renewalDate = NULL;
-
     if ($formValues['renewal_date']) {
-      $this->set('renewalDate', CRM_Utils_Date::processDate($formValues['renewal_date']));
+      $renewalDate = CRM_Utils_Date::processDate($formValues['renewal_date']);
     }
+    // This set is probably obsolete.
+    $this->set('renewalDate', $renewalDate);
+
     $this->_membershipId = $this->_id;
 
     // membership type custom data
@@ -610,7 +612,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
     $renewMembership = CRM_Member_BAO_Membership::renewMembershipFormWrapper($this->_contactID,
       $formValues['membership_type_id'][1],
-      $isTestMembership, $this, NULL, NULL,
+      $isTestMembership, $this,
+      $renewalDate,
+      NULL,
       $customFieldsFormatted, $numRenewTerms,
       $this->_membershipId,
       CRM_Member_BAO_Membership::extractPendingFormValue($this, $formValues['membership_type_id'][1])
