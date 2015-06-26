@@ -1412,7 +1412,13 @@ AND civicrm_membership.is_test = %2";
       $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
       foreach ($membershipTypeIDs as $memType) {
         $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
-        $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form);
+        if (!empty($membershipContribution)) {
+          $pendingStatus = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
+          $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
+        }
+        self::extractPendingFormValue($form, $memType, $pending);
+        $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID,
+          $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form, $pending);
       }
       if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
         foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
@@ -2345,17 +2351,13 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    */
   public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted,
                                                  $membershipID, $memType, $isTest, $numTerms,
-                                                 $membershipContribution, &$form) {
-    if (!empty($membershipContribution)) {
-      $pendingStatus = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-      $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
-    }
+                                                 $membershipContribution, &$form, $isPending) {
     $membership = self::renewMembershipFormWrapper($contactID, $memType,
       $isTest, $form, date('YmdHis'),
       CRM_Utils_Array::value('cms_contactID', $membershipParams),
       $customFieldsFormatted, $numTerms,
       $membershipID,
-      self::extractPendingFormValue($form, $memType, $pending)
+      $isPending
     );
 
     if (!empty($membershipContribution)) {
