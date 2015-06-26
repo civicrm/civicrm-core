@@ -45,6 +45,7 @@ class civicrm_cli {
   var $_entity = NULL;
   var $_action = NULL;
   var $_output = FALSE;
+  var $_json = FALSE;
   var $_joblog = FALSE;
   var $_config;
 
@@ -118,6 +119,9 @@ class civicrm_cli {
     elseif ($this->_output) {
       print_r($result['values']);
     }
+    elseif ($this->_json) {
+      echo json_encode($result);
+    }
     return TRUE;
   }
 
@@ -175,6 +179,9 @@ class civicrm_cli {
       }
       elseif ($arg == '-o' || $arg == '--output') {
         $this->_output = TRUE;
+      }
+      elseif ($args == '-J' || $arg == '--json') {
+        $this->_json = TRUE;
       }
       elseif ($arg == '-j' || $arg == '--joblog') {
         $this->_joblog = TRUE;
