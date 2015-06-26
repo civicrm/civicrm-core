@@ -296,7 +296,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('profile', 'get', $params);
 
     foreach ($expected as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
+      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']) . " error message: " . "missing/mismatching value for {$profileField}"
       );
     }
   }
@@ -552,7 +552,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
 
     foreach ($updateParams as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $profileDetails['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
+      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $profileDetails['values']) . " error message: " . "missing/mismatching value for {$profileField}"
       );
     }
   }
@@ -634,7 +634,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('profile', 'get', $params);
 
     foreach ($updateParams as $profileField => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
+      $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']) . " error message: " . "missing/mismatching value for {$profileField}"
       );
     }
   }
@@ -709,7 +709,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     );
 
     foreach ($expected['contact'] as $field => $value) {
-      $this->assertEquals($value, CRM_Utils_Array::value($field, $result['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$field}"
+      $this->assertEquals($value, CRM_Utils_Array::value($field, $result['values']) . " error message: " . "missing/mismatching value for {$field}"
       );
     }
 
@@ -720,7 +720,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
              ) as $fieldType) {
       $typeValues = array_pop($result['values'][$fieldType]);
       foreach ($expected[$fieldType] as $field => $value) {
-        $this->assertEquals($value, CRM_Utils_Array::value($field, $typeValues), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$field} ({$fieldType})"
+        $this->assertEquals($value, CRM_Utils_Array::value($field, $typeValues) . " error message: " . "missing/mismatching value for {$field} ({$fieldType})"
         );
       }
     }
@@ -811,7 +811,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $keys = array_keys($contact['values']);
     $contactId = array_pop($keys);
 
-    $this->assertEquals(0, $contact['values'][$contactId]['api.address.create']['is_error'], "In line " . __LINE__ . " error message: " . CRM_Utils_Array::value('error_message', $contact['values'][$contactId]['api.address.create'])
+    $this->assertEquals(0, $contact['values'][$contactId]['api.address.create']['is_error'] . " error message: " . CRM_Utils_Array::value('error_message', $contact['values'][$contactId]['api.address.create'])
     );
 
     $activityParams = array(

@@ -263,7 +263,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
     $params = array('mailing_id' => $mail['id'], 'test_email' => 'alice@example.org', 'test_group' => NULL);
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
-    $this->assertEquals(1, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
+    $this->assertEquals(1, $deliveredInfo['count']); // verify mail has been sent to user by count
 
     $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
     $this->assertEquals(array($contactIDs['alice']), $deliveredContacts);
@@ -313,7 +313,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'test_email' => NULL,
       'test_group' => $groupIDs['inc'],
     ));
-    $this->assertEquals(3, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
+    $this->assertEquals(3, $deliveredInfo['count']); // verify mail has been sent to user by count
 
     $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
     $this->assertEquals(array($contactIDs['alice'], $contactIDs['bob'], $contactIDs['carol']), $deliveredContacts);

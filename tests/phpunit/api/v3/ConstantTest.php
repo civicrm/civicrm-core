@@ -73,10 +73,10 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
       'name' => 'activityStatus',
     ));
 
-    $this->assertTrue($result['count'] > 5, "In line " . __LINE__);
-    $this->assertContains('Scheduled', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Completed', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Cancelled', $result['values'], "In line " . __LINE__);
+    $this->assertTrue($result['count'] > 5);
+    $this->assertContains('Scheduled', $result['values']);
+    $this->assertContains('Completed', $result['values']);
+    $this->assertContains('Cancelled', $result['values']);
 
   }
 
@@ -87,8 +87,8 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('constant', 'get', array(
       'name' => 'activityType',
     ), __FUNCTION__, __FILE__, NULL, NULL, 'get');
-    $this->assertTrue($result['count'] > 2, "In line " . __LINE__);
-    $this->assertContains('Meeting', $result['values'], "In line " . __LINE__);
+    $this->assertTrue($result['count'] > 2);
+    $this->assertContains('Meeting', $result['values']);
   }
 
   /**
@@ -102,11 +102,11 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
       'field' => 'location_type_id',
     );
     $result = $this->callAPIAndDocument('address', 'getoptions', $params, __FUNCTION__, __FILE__);
-    $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
-    $this->assertContains('Home', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Work', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Main', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Billing', $result['values'], "In line " . __LINE__);
+    $this->assertTrue($result['count'] > 3);
+    $this->assertContains('Home', $result['values']);
+    $this->assertContains('Work', $result['values']);
+    $this->assertContains('Main', $result['values']);
+    $this->assertContains('Billing', $result['values']);
   }
 
   /**
@@ -118,12 +118,12 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument('phone', 'getoptions', $params, __FUNCTION__, __FILE__);
 
-    $this->assertEquals(5, $result['count'], "In line " . __LINE__);
-    $this->assertContains('Phone', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Mobile', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Fax', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Pager', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Voicemail', $result['values'], "In line " . __LINE__);
+    $this->assertEquals(5, $result['count']);
+    $this->assertContains('Phone', $result['values']);
+    $this->assertContains('Mobile', $result['values']);
+    $this->assertContains('Fax', $result['values']);
+    $this->assertContains('Pager', $result['values']);
+    $this->assertContains('Voicemail', $result['values']);
   }
 
   /**
@@ -135,11 +135,11 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument('mail_settings', 'getoptions', $params, __FUNCTION__, __FILE__);
 
-    $this->assertEquals(4, $result['count'], "In line " . __LINE__);
-    $this->assertContains('IMAP', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Maildir', $result['values'], "In line " . __LINE__);
-    $this->assertContains('POP3', $result['values'], "In line " . __LINE__);
-    $this->assertContains('Localdir', $result['values'], "In line " . __LINE__);
+    $this->assertEquals(4, $result['count']);
+    $this->assertContains('IMAP', $result['values']);
+    $this->assertContains('Maildir', $result['values']);
+    $this->assertContains('POP3', $result['values']);
+    $this->assertContains('Localdir', $result['values']);
   }
 
 }

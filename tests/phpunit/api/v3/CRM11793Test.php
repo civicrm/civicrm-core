@@ -65,7 +65,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
     );
 
     foreach ($result['values'] as $idx => $contact) {
-      $this->assertEquals($contact['contact_type'], $contactType, "In line " . __LINE__);
+      $this->assertEquals($contact['contact_type'], $contactType);
     }
   }
 

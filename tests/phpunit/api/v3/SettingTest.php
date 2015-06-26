@@ -476,7 +476,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'mailing_format' => 'bcs',
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
-    $this->assertAPISuccess($result, "in line " . __LINE__);
+    $this->assertAPISuccess($result);
     $revertParams = array(
       'name' => 'address_format',
     );
@@ -539,12 +539,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'domain_id' => $dom['id'],
     );
     $result = $this->callAPISuccess('setting', 'get', $params);
-    $this->assertAPISuccess($result, "in line " . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertArrayNotHasKey('tag_unconfirmed', $result['values'][$dom['id']], 'setting for domain 3 should not be set. Debug this IF domain test is passing');
     $result = $this->callAPISuccess('setting', 'fill', $params);
-    $this->assertAPISuccess($result, "in line " . __LINE__);
+    $this->assertAPISuccess($result);
     $result = $this->callAPISuccess('setting', 'get', $params);
-    $this->assertAPISuccess($result, "in line " . __LINE__);
+    $this->assertAPISuccess($result);
     $this->assertArrayHasKey('tag_unconfirmed', $result['values'][$dom['id']]);
     $this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);

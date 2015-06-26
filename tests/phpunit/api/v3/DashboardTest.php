@@ -58,8 +58,8 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
       'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&snippet=5&context=dashletFullscreen',
     );
     $dashboard = $this->callAPISuccess('dashboard', 'create', $params);
-    $this->assertTrue(is_numeric($dashboard['id']), "In line " . __LINE__);
-    $this->assertTrue($dashboard['id'] > 0, "In line " . __LINE__);
+    $this->assertTrue(is_numeric($dashboard['id']));
+    $this->assertTrue($dashboard['id'] > 0);
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $this->assertEquals($oldCount + 1, $newCount);
     $this->DashboardDelete($dashboard['id'], $oldCount);

@@ -203,9 +203,9 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   public function testUFGroupDelete() {
     $ufGroup = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = array('id' => $ufGroup['id']);
-    $this->assertEquals(1, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
+    $this->assertEquals(1, $this->callAPISuccess('uf_group', 'getcount', $params));
     $result = $this->callAPIAndDocument('uf_group', 'delete', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
+    $this->assertEquals(0, $this->callAPISuccess('uf_group', 'getcount', $params));
   }
 
 }
