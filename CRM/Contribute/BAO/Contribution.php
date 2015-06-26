@@ -2814,7 +2814,7 @@ WHERE  contribution_id = %1 ";
         'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
-      if ($fromFinancialAccountId != NULL && !$params['contribution']->is_pay_later || !in_array(CRM_Utils_Array::value('contribution_status_id', $params), $pendingStatus)) {
+      if ($fromFinancialAccountId != NULL && (!$params['contribution']->is_pay_later || !in_array(CRM_Utils_Array::value('contribution_status_id', $params), $pendingStatus))) {
         $trxnParams['is_payment'] = 1;
       }
 
