@@ -610,6 +610,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($formValues['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) {
       $this->_params['is_pay_later'] = 1;
     }
+
     $renewMembership = CRM_Member_BAO_Membership::renewMembershipFormWrapper($this->_contactID,
       $formValues['membership_type_id'][1],
       $isTestMembership, $this,
@@ -617,7 +618,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       NULL,
       $customFieldsFormatted, $numRenewTerms,
       $this->_membershipId,
-      CRM_Member_BAO_Membership::extractPendingFormValue($this, $formValues['membership_type_id'][1])
+      self::extractPendingFormValue($this, $formValues['membership_type_id'][1])
     );
 
     $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
@@ -790,6 +791,33 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+  }
+
+  /**
+   * Determine if the form has a pending status.
+   *
+   * @deprecated
+   *
+   * @param CRM_Core_Form $form
+   * @param int $membershipID
+   *
+   * @return bool
+   */
+  public static function extractPendingFormValue($form, $membershipID) {
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipID);
+    $pending = FALSE;
+    // @todo function was shared by 2 not-very-related forms & the below may include irrelevant stuff.
+    if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
+      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later'])
+        ) &&
+        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
+          CRM_Utils_Array::value('record_contribution', $form->_params)
+        )
+      ) {
+        $pending = TRUE;
+      }
+    }
+    return $pending;
   }
 
 }
