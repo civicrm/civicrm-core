@@ -41,23 +41,8 @@
  *   Array of contributions which are payments, if error an array with an error id and error message
  */
 function civicrm_api3_payment_get($params) {
-  
-  require_once 'api/v3/Contribution.php';
-
-  $mode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
   $params['is_payment'] = 1;
-  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Contribution');
-
-  $contribution = array();
-  while ($dao->fetch()) {
-    //CRM-8662
-    $contribution_details = $query->store($dao);
-    $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dao->contribution_id, TRUE);
-    $contribution[$dao->contribution_id] = array_merge($contribution_details, $softContribution);
-    // format soft credit for backward compatibility
-    _civicrm_api3_format_soft_credit($contribution[$dao->contribution_id]);
-  }
-  return civicrm_api3_create_success($contribution, $params, 'Contribution', 'get', $dao);
+  return civicrm_api3('Contribution', 'get', $params);
 }
 
 /**
@@ -83,20 +68,31 @@ function civicrm_api3_payment_create(&$params) {
   $contribution = reset($contribution['values']);
   if ($contribution['contribution_status'] == 'Partially paid') {
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+    $participantPayment = civicrm_api3('ParticipantPayment', 'get', array('contribution_id' => $params['contribution_id']));
+    if (!empty($participantPayment['values'])) {
+      $values = reset($participantPayment['values']);
+      $participantId = $values['participant_id'];
+    }
+    // Get payment balance
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participantId, 'event');
+    if ($paymentInfo['paid'] >= $paymentInfo['total']) {
+      $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    }
   }
-  $participantPayment = civicrm_api3('ParticipantPayment', 'get', array('contribution_id' => $params['contribution_id']));
-  if (!empty($participantPayment['values'])) {
-    $values = reset($participantPayment['values']);
-    $participantId = $values['participant_id'];
-  }
-  // Get payment balance
-  $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participantId, 'event');
-  if ($paymentInfo['paid'] >= $paymentInfo['total']) {
-    $params['contribution_status_id'] = $statusId;
+  if ($contribution['contribution_status'] == 'Pending') {
+    $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+    $balance = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($params['contribution_id']);
+    $total = CRM_Price_BAO_LineItem::getLineTotal($params['contribution_id'], 'civicrm_contribution');
+    $paid = $total - $balance['total_amount'];
+    if ($total >= $paid) {
+      $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    }
+    else if ($total < $paid) {
+      $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
+    }
   }
   unset($params['total_amount']);
   $params['id'] = $params['contribution_id'];
-
   return _civicrm_api3_basic_create('CRM_Contribute_BAO_Contribution', $params, 'Contribution');
 }
 
