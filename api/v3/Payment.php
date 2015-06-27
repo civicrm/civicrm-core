@@ -83,7 +83,7 @@ function civicrm_api3_payment_create(&$params) {
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
     $balance = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($params['contribution_id']);
     $total = CRM_Price_BAO_LineItem::getLineTotal($params['contribution_id'], 'civicrm_contribution');
-    $paid = $total - $balance['total_amount'];
+    $paid = $balance['total_amount'] - $total;
     if ($total >= $paid) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
