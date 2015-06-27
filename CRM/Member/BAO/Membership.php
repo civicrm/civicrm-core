@@ -1417,8 +1417,19 @@ AND civicrm_membership.is_test = %2";
           $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
         }
         self::extractPendingFormValue($form, $memType, $pending);
-        $createdMemberships[$memType] = self::createOrRenewMembership($membershipParams, $contactID,
-          $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, $form, $pending);
+        $membership = self::renewMembershipFormWrapper($contactID, $memType,
+          $isTest, $form, date('YmdHis'),
+          CRM_Utils_Array::value('cms_contactID', $membershipParams),
+          $customFieldsFormatted, $numTerms,
+          $membershipID,
+          $pending
+        );
+
+        if (!empty($membershipContribution)) {
+          // update recurring id for membership record
+          self::updateRecurMembership($membership, $membershipContribution);
+          self::linkMembershipPayment($membership, $membershipContribution);
+        }
       }
       if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
         foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
@@ -2346,26 +2357,15 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $numTerms
    * @param $membershipContribution
    * @param CRM_Core_Form $form
+   * @param bool $isPending
    *
    * @return array
    */
   public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted,
                                                  $membershipID, $memType, $isTest, $numTerms,
                                                  $membershipContribution, &$form, $isPending) {
-    $membership = self::renewMembershipFormWrapper($contactID, $memType,
-      $isTest, $form, date('YmdHis'),
-      CRM_Utils_Array::value('cms_contactID', $membershipParams),
-      $customFieldsFormatted, $numTerms,
-      $membershipID,
-      $isPending
-    );
 
-    if (!empty($membershipContribution)) {
-      // update recurring id for membership record
-      self::updateRecurMembership($membership, $membershipContribution);
 
-      self::linkMembershipPayment($membership, $membershipContribution);
-    }
     return $membership;
   }
 
