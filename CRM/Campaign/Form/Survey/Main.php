@@ -73,13 +73,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       CRM_Utils_System::setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
     }
 
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
-
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this);
@@ -115,9 +108,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    *   array of default values
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     $defaults = $this->_values;
 
@@ -151,9 +141,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    * @return void
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'title'), TRUE);
 

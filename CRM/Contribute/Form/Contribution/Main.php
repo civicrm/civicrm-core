@@ -377,12 +377,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // Build payment processor form
     if (empty($_GET['onbehalf'])) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-      // Return if we are in an ajax - this is probably redundant now as
-      // processor does not call this form for a snippet anymore - but unsure about
-      // cdType
-      if ($this->_snippet) {
-        return;
-      }
     }
 
     $config = CRM_Core_Config::singleton();

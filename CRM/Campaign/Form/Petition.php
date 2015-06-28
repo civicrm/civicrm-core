@@ -67,13 +67,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       }
     }
 
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
-
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this);

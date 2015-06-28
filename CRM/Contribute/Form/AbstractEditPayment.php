@@ -195,11 +195,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $_formType;
 
   /**
-   * @var mystery variable screaming out for documentation
-   */
-  protected $_cdType;
-
-  /**
    * Array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
    * be all in this array in order like
    *  'credit_card' => array('credit_card_number' ...

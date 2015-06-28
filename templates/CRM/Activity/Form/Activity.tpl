@@ -24,9 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing other (custom) activities. *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
   {if $action eq 4}
     <div class="crm-block crm-content-block crm-activity-view-block">
   {else}
@@ -294,5 +291,5 @@
     {/literal}
   {/if}
   </div>{* end of form block*}
-{/if} {* end of snippet if*}
+
 {include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$activityId entityTable="civicrm_activity"}

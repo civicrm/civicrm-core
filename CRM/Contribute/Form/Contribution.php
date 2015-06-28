@@ -154,11 +154,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   protected $_formType;
 
-  /**
-   * @todo what on earth does cdType stand for????
-   * @var
-   */
-  protected $_cdType;
   public $_honoreeProfileType;
 
   /**
@@ -224,15 +219,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
-    }
-    // @todo - if anyone ever figures out what this _cdType subroutine is about
-    // (or even if it still applies) please add comments!!!!!!!!!!
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      CRM_Custom_Form_CustomData::preProcess($this);
-      return;
     }
 
     parent::preProcess();
@@ -329,11 +315,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return array
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      // @todo document when this function would be called in this way
-      // (and whether it is valid or an overloading of this form).
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     $defaults = $this->_values;
 
@@ -486,11 +467,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function buildQuickForm() {
 
-    //@todo document the purpose of cdType (if still in use)
-    if ($this->_cdType) {
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      return;
-    }
     $allPanes = array();
     $recurJs = NULL;
     //tax rate from financialType
