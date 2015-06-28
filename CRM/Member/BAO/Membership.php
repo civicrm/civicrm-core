@@ -1443,7 +1443,8 @@ AND civicrm_membership.is_test = %2";
 
         list($membership, $renewalMode, $dates) = self::renewMembership(
           $contactID, $memType, $isTest,
-          date('YmdHis'), CRM_Utils_Array::value('cms_contactID', $membershipParams), $customFieldsFormatted,
+          date('YmdHis'), CRM_Utils_Array::value('cms_contactID', $membershipParams),
+          $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
           $contributionRecurID, $membershipSource, $isPayLater, $campaignId
         );
@@ -2329,7 +2330,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @throws CRM_Core_Exception
    * @return array
    */
-  public static function renewMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $statusFormat, $isPayLater, $campaignId) {
+  public static function renewMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId) {
     $renewalMode = $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
