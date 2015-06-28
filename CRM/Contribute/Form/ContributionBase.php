@@ -204,7 +204,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws \Exception
    */
   public function preProcess() {
-    $session = CRM_Core_Session::singleton();
 
     // current contribution page id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -215,7 +214,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     // this was used prior to the cleverer this_>getContactID - unsure now
-    $this->_userID = $session->get('userID');
+    $this->_userID = CRM_Core_Session::singleton()->get('userID');
 
     //Check if honor block is enabled for current contribution
     $ufJoinParams = array(
@@ -313,8 +312,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($isMonetary &&
         (!$isPayLater || !empty($this->_values['payment_processor']))
       ) {
-        $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value
-        ('payment_processor', $this->_values)
+        $this->_paymentProcessorIDs = explode(
+          CRM_Core_DAO::VALUE_SEPARATOR,
+          CRM_Utils_Array::value('payment_processor', $this->_values)
         );
 
         $this->assignPaymentProcessor();
