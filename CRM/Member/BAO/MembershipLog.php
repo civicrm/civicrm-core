@@ -45,7 +45,7 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
    *
    * @return object
    */
-  public static function add(&$params, &$ids) {
+  public static function add(&$params) {
     $membershipLog = new CRM_Member_DAO_MembershipLog();
     $membershipLog->copyValues($params);
 

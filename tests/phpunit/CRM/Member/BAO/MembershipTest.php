@@ -522,7 +522,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $membershipRenewal = new CRM_Core_Form();
     $membershipRenewal->controller = new CRM_Core_Controller();
     $isTestMembership = 0;
-    $MembershipRenew = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
+    $MembershipRenew = CRM_Member_BAO_Membership::renewMembership(
       $contactId,
       $this->_membershipTypeID,
       $isTestMembership,
@@ -606,10 +606,10 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $membershipRenewal = new CRM_Core_Form();
     $membershipRenewal->controller = new CRM_Core_Controller();
-    $MembershipRenew = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
+    $MembershipRenew = CRM_Member_BAO_Membership::renewMembership(
       $contactId,
       $this->_membershipTypeID,
-      $isTestMembership = 0,
+      FALSE,
       $membershipRenewal,
       NULL,
       NULL,
