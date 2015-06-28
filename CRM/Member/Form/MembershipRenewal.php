@@ -611,26 +611,25 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['is_pay_later'] = 1;
     }
 
+    // These variable sets prior to renewMembership may not be required for this form. They were in
+    // a function this form shared with other forms.
     $contributionRecurID = isset($this->_params['contributionRecurID']) ? $this->_params['contributionRecurID'] : NULL;
-
     $membershipSource = NULL;
-    if (!empty($form->_params['membership_source'])) {
-      $membershipSource = $form->_params['membership_source'];
-    }
-    elseif (isset($form->_values['title']) && !empty($form->_values['title'])) {
-      $membershipSource = ts('Online Contribution:') . ' ' . $form->_values['title'];
+    if (!empty($this->_params['membership_source'])) {
+      $membershipSource = $this->_params['membership_source'];
     }
     $isPayLater = NULL;
-    if (isset($form->_params)) {
-      $isPayLater = CRM_Utils_Array::value('is_pay_later', $form->_params);
+    if (isset($this->_params)) {
+      $isPayLater = CRM_Utils_Array::value('is_pay_later', $this->_params);
     }
     $campaignId = NULL;
-    if (isset($form->_values) && is_array($form->_values) && !empty($form->_values)) {
-      $campaignId = CRM_Utils_Array::value('campaign_id', $form->_params);
-      if (!array_key_exists('campaign_id', $form->_params)) {
-        $campaignId = CRM_Utils_Array::value('campaign_id', $form->_values);
+    if (isset($this->_values) && is_array($this->_values) && !empty($this->_values)) {
+      $campaignId = CRM_Utils_Array::value('campaign_id', $this->_params);
+      if (!array_key_exists('campaign_id', $this->_params)) {
+        $campaignId = CRM_Utils_Array::value('campaign_id', $this->_values);
       }
     }
+
     $renewMembership = CRM_Member_BAO_Membership::renewMembership(
       $this->_contactID, $formValues['membership_type_id'][1], $isTestMembership,
       $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
