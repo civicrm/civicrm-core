@@ -1398,7 +1398,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $params['invoiceID'] = $invoiceID;
     $params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
 
-    $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+    $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $token = $payment->setExpressCheckout($params);
     if (is_a($token, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($token);

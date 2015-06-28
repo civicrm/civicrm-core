@@ -73,6 +73,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var array
    */
   public $_paymentProcessor;
+
   public $_paymentObject = NULL;
 
   /**
@@ -203,7 +204,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws \Exception
    */
   public function preProcess() {
-    $session = CRM_Core_Session::singleton();
 
     // current contribution page id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -214,7 +214,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     // this was used prior to the cleverer this_>getContactID - unsure now
-    $this->_userID = $session->get('userID');
+    $this->_userID = CRM_Core_Session::singleton()->get('userID');
 
     //Check if honor block is enabled for current contribution
     $ufJoinParams = array(
@@ -309,41 +309,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $isMonetary = CRM_Utils_Array::value('is_monetary', $this->_values);
       $isPayLater = CRM_Utils_Array::value('is_pay_later', $this->_values);
 
-      //FIXME: to support multiple payment processors
       if ($isMonetary &&
         (!$isPayLater || !empty($this->_values['payment_processor']))
       ) {
-        $ppID = CRM_Utils_Array::value('payment_processor', $this->_values);
-        if (!$ppID) {
-          CRM_Core_Error::fatal(ts('A payment processor must be selected for this contribution page (contact the site administrator for assistance).'));
-        }
+        $this->_paymentProcessorIDs = explode(
+          CRM_Core_DAO::VALUE_SEPARATOR,
+          CRM_Utils_Array::value('payment_processor', $this->_values)
+        );
 
-        $paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $ppID);
-
-        $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPayments($paymentProcessorIDs, $this->_mode);
-
-        $this->set('paymentProcessors', $this->_paymentProcessors);
-
-        if (!empty($this->_paymentProcessors)) {
-          foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
-            if (($processor = Civi\Payment\System::singleton()->getByProcessor($paymentProcessorDetail)) != FALSE) {
-              // We don't really know why we do this.
-              $this->_paymentObject = $processor;
-            }
-
-            if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
-            ) {
-              $this->_paymentProcessor = $paymentProcessorDetail;
-              $this->assign('paymentProcessor', $this->_paymentProcessor);
-            }
-          }
-          if (empty($this->_paymentObject)) {
-            throw new CRM_Core_Exception(ts('No valid payment processor'));
-          }
-        }
-        else {
-          throw new CRM_Core_Exception(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
-        }
+        $this->assignPaymentProcessor();
       }
 
       // get price info
