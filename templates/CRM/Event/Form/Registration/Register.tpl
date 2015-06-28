@@ -141,7 +141,7 @@
     <div id="billing-payment-block">
       {* If we have a payment processor, load it - otherwise it happens via ajax *}
       {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
-        {include file="CRM/Event/Form/Registration/Register.tpl" snippet=4}
+        {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
       {/if}
     </div>
     {include file="CRM/common/paymentBlock.tpl"}
@@ -210,7 +210,7 @@
 
     {/literal}
   </script>
-{/if}
+
 {literal}
 <script type="text/javascript">
   {/literal}{if $pcp && $is_honor_roll }pcpAnonymous();
@@ -315,7 +315,8 @@
     {/literal}{/if}{literal}
   }
 
-  {/literal}{if $pcp && $is_honor_roll }{literal}
+  {/literal}
+  {if $pcp && $is_honor_roll }{literal}
   function pcpAnonymous() {
     // clear nickname field if anonymous is true
     if (document.getElementsByName("pcp_is_anonymous")[1].checked) {
@@ -334,7 +335,9 @@
       }
     }
   }
-  {/literal}{literal}
+  {/literal}
+  {/if}
+  {literal}
 
 </script>
 {/literal}
