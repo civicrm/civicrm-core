@@ -68,12 +68,12 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     }
 
     foreach ($activityTypes as $aType) {
-      $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity type:')]/span/div/a", $aType, FALSE, TRUE);
+      $this->select2("xpath=//tr[@class='addRow']/td/span[@placeholder='Add activity type']/div/a", $aType, FALSE, TRUE);
     }
 
     $this->click("xpath=//a[text()='Standard Timeline']");
     foreach ($timelineActivityTypes as $tActivityType) {
-      $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", $tActivityType, FALSE, TRUE);
+      $this->select2("xpath=//tr[@class='addRow']/td/span[@placeholder='Add activity']/div/a", $tActivityType, FALSE, TRUE);
     }
 
     $this->click('css=.crm-submit-buttons button:first-child');
@@ -136,7 +136,7 @@ class WebTest_Case_AddCaseTypeTest extends CiviSeleniumTestCase {
     $this->click("xpath=//*[@id='crm-main-content-wrapper']/div/div/form/div/div[4]/table/tbody/tr[4]/td[2]/input[@type='checkbox']");
 
     $this->click("xpath=//a[text()='Standard Timeline']");
-    $this->select2("xpath=//tr[@class='addRow']/td[contains(text(),'Add activity:')]/span/div/a", 'SMS', FALSE, TRUE);
+    $this->select2("xpath=//tr[@class='addRow']/td/span[@placeholder='Add activity']/div/a", 'SMS', FALSE, TRUE);
 
     $this->click('css=.crm-submit-buttons button:first-child');
     $this->waitForElementPresent("xpath=//*[@id='crm-main-content-wrapper']/div/div/div[2]/a/span[contains(text(),'New Case Type')]");
