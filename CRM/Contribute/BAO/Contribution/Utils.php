@@ -295,6 +295,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
       return $result;
     }
 
+    // @todo - is shit still reachable? We are trying to eliminate it into the second
+    // (complete transaction) phase.
     // get the price set values for receipt.
     if ($form->_priceSetId && $form->_lineItem) {
       $form->_values['lineItem'] = $form->_lineItem;

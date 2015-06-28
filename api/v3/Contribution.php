@@ -434,7 +434,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     $params = _ipn_process_transaction($params, $contribution, $input, $ids);
   }
   catch(Exception $e) {
-    throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
+    throw new API_Exception('failed to process transaction' . $e->getMessage() . "\n" . $e->getTraceAsString());
   }
 }
 
