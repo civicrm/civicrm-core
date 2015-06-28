@@ -175,6 +175,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Get the payment processor details.
    *
+   * @deprecated Use Civi\Payment\System::singleton->getByID();
+   *
    * @param int $paymentProcessorID
    *   Payment processor id.
    * @param string $mode
@@ -231,32 +233,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * User getPaymentProcessors.
-   *
-   * @deprecated
-   *
-   * @param $paymentProcessorIDs
-   * @param $mode
-   *
-   * @return array
-   * @throws Exception
-   */
-  public static function getPayments($paymentProcessorIDs, $mode) {
-    if (!$paymentProcessorIDs) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
-    }
-
-    $payments = array();
-    foreach ($paymentProcessorIDs as $paymentProcessorID) {
-      $payment = self::getPayment($paymentProcessorID, $mode);
-      $payments[$payment['id']] = $payment;
-    }
-
-    uasort($payments, 'self::defaultComparison');
-    return $payments;
-  }
-
-  /**
    * Compare 2 payment processors to see which should go first based on is_default
    * (sort function for sortDefaultFirst)
    * @param array $processor1
@@ -276,6 +252,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Build payment processor details.
    *
+   * @deprecated
+   *
    * @param object $dao
    *   Payment processor object.
    * @param string $mode
@@ -284,7 +262,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    *   associated array with payment processor related fields
    */
-  public static function buildPayment($dao, $mode) {
+  protected static function buildPayment($dao, $mode) {
     $fields = array(
       'id',
       'name',
