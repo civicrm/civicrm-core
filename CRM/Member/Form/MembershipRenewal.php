@@ -597,23 +597,36 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($formValues['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) {
       $this->_params['is_pay_later'] = 1;
     }
-    $renewMembership = CRM_Member_BAO_Membership::renewMembershipFormWrapper($this->_contactID,
-      $formValues['membership_type_id'][1],
-      $isTestMembership, $this,
-      $renewalDate,
-      NULL,
-      $customFieldsFormatted, $numRenewTerms,
-      $this->_membershipId,
-      CRM_Member_BAO_Membership::extractPendingFormValue($this, $formValues['membership_type_id'][1])
+
+    // These variable sets prior to renewMembership may not be required for this form. They were in
+    // a function this form shared with other forms.
+    $contributionRecurID = isset($this->_params['contributionRecurID']) ? $this->_params['contributionRecurID'] : NULL;
+    $membershipSource = NULL;
+    if (!empty($this->_params['membership_source'])) {
+      $membershipSource = $this->_params['membership_source'];
+    }
+    $isPayLater = NULL;
+    if (isset($this->_params)) {
+      $isPayLater = CRM_Utils_Array::value('is_pay_later', $this->_params);
+    }
+    $campaignId = NULL;
+    if (isset($this->_values) && is_array($this->_values) && !empty($this->_values)) {
+      $campaignId = CRM_Utils_Array::value('campaign_id', $this->_params);
+      if (!array_key_exists('campaign_id', $this->_params)) {
+        $campaignId = CRM_Utils_Array::value('campaign_id', $this->_values);
+      }
+    }
+
+    $renewMembership = CRM_Member_BAO_Membership::renewMembership(
+      $this->_contactID, $formValues['membership_type_id'][1], $isTestMembership,
+      $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
+      self::extractPendingFormValue($this, $formValues['membership_type_id'][1]),
+      $contributionRecurID, $membershipSource, $isPayLater, $campaignId
     );
 
     $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
 
-    // Retrieve the name and email of the current user - this will be the FROM for the receipt email
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-
-    list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+    list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
 
     $memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $renewMembership->membership_type_id, 'name');
 
@@ -777,6 +790,33 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+  }
+
+  /**
+   * Determine if the form has a pending status.
+   *
+   * @deprecated
+   *
+   * @param CRM_Core_Form $form
+   * @param int $membershipID
+   *
+   * @return bool
+   */
+  public static function extractPendingFormValue($form, $membershipID) {
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipID);
+    $pending = FALSE;
+    // @todo function was shared by 2 not-very-related forms & the below may include irrelevant stuff.
+    if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
+      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later'])
+        ) &&
+        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
+          CRM_Utils_Array::value('record_contribution', $form->_params)
+        )
+      ) {
+        $pending = TRUE;
+      }
+    }
+    return $pending;
   }
 
 }
