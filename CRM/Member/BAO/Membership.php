@@ -1441,7 +1441,7 @@ AND civicrm_membership.is_test = %2";
           }
         }
 
-        list($membership, $renewalMode, $dates) =  self::renewMembership(
+        list($membership, $renewalMode, $dates) = self::renewMembership(
           $contactID, $memType, $isTest,
           date('YmdHis'), CRM_Utils_Array::value('cms_contactID', $membershipParams), $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
