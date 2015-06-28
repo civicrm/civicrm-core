@@ -69,9 +69,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $this->_processorName = ts('PayPal Express');
     }
 
-    if (!$this->_paymentProcessor['user_name']) {
-      CRM_Core_Error::fatal(ts('Could not find user name for payment processor'));
-    }
   }
 
   /**
@@ -432,14 +429,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   public function checkConfig() {
     $error = array();
     $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
-    if (
-      $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType) ||
-      $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal', $paymentProcessorType)
-    ) {
-      if (empty($this->_paymentProcessor['user_name'])) {
-        $error[] = ts('User Name is not set in the Administer &raquo; System Settings &raquo; Payment Processors.');
-      }
-    }
 
     if ($this->_paymentProcessor['payment_processor_type_id'] != CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType)) {
       if (empty($this->_paymentProcessor['signature'])) {
@@ -449,6 +438,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       if (empty($this->_paymentProcessor['password'])) {
         $error[] = ts('Password is not set in the Administer &raquo; System Settings &raquo; Payment Processors.');
       }
+    }
+    if (!$this->_paymentProcessor['user_name']) {
+      $error[] = ts('User Name is not set in the Administer &raquo; System Settings &raquo; Payment Processors.');
     }
 
     if (!empty($error)) {

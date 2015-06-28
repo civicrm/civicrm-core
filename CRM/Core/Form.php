@@ -74,6 +74,28 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_action;
 
   /**
+   * Available payment processors.
+   *
+   * As part of trying to consolidate various payment pages we store processors here & have functions
+   * at this level to manage them.
+   *
+   * @var array
+   *   An array of payment processor details with objects loaded in the 'object' field.
+   */
+  public $_paymentProcessors;
+
+  /**
+   * Available payment processors (IDS).
+   *
+   * As part of trying to consolidate various payment pages we store processors here & have functions
+   * at this level to manage them.
+   *
+   * @var array
+   *   An array of the IDS available on this form.
+   */
+  public $_paymentProcessorIDs;
+
+  /**
    * The renderer used for this form
    *
    * @var object
@@ -635,6 +657,38 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->set('bltID', $this->_bltID);
     $this->assign('bltID', $this->_bltID);
   }
+
+  /**
+   * This if a front end form function for setting the payment processor.
+   *
+   * It would be good to sync it with the back-end function on abstractEditPayment & use one everywhere.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assignPaymentProcessor() {
+    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(
+      array(ucfirst($this->_mode) . 'Mode'),
+      $this->_paymentProcessorIDs
+    );
+
+    if (!empty($this->_paymentProcessors)) {
+      foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
+        if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
+        ) {
+          $this->_paymentProcessor = $paymentProcessorDetail;
+          $this->assign('paymentProcessor', $this->_paymentProcessor);
+          // Setting this is a bit of a legacy overhang.
+          $this->_paymentObject = $paymentProcessorDetail['object'];
+        }
+      }
+      // It's not clear why we set this on the form.
+      $this->set('paymentProcessors', $this->_paymentProcessors);
+    }
+    else {
+      throw new CRM_Core_Exception(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
+    }
+  }
+
 
   /**
    * Setter function for options.
