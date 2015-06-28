@@ -231,6 +231,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
+   * User getPaymentProcessors.
+   *
+   * @deprecated
+   *
    * @param $paymentProcessorIDs
    * @param $mode
    *
@@ -388,25 +392,25 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
     $processors = self::getAllPaymentProcessors($mode);
 
-    if ($capabilities) {
-      foreach ($processors as $index => $processor) {
-        if (!empty($ids) && !in_array($processor['id'], $ids)) {
+    foreach ($processors as $index => $processor) {
+      if (!empty($ids) && !in_array($processor['id'], $ids)) {
+        unset ($processors[$index]);
+        continue;
+      }
+      // Invalid processors will store a null value in 'object' (e.g. if not all required config fields are present).
+      // This is determined by calling when loading the processor via the $processorObject->checkConfig() function.
+      if (!is_a($processor['object'], 'CRM_Core_Payment')) {
+        unset ($processors[$index]);
+        continue;
+      }
+      foreach ($capabilities as $capability) {
+        if (($processor['object']->supports($capability)) == FALSE) {
           unset ($processors[$index]);
-          continue;
-        }
-        // Invalid processors will store a null value in 'object' (e.g. if not all required config fields are present).
-        // This is determined by calling when loading the processor via the $processorObject->checkConfig() function.
-        if (!is_a($processor['object'], 'CRM_Core_Payment')) {
-          unset ($processors[$index]);
-          continue;
-        }
-        foreach ($capabilities as $capability) {
-          if (($processor['object']->supports($capability)) == FALSE) {
-            unset ($processors[$index]);
-          }
+          continue 1;
         }
       }
     }
+
     return $processors;
   }
 
