@@ -31,9 +31,7 @@
   </div>
 {/if}
 <div class="spacer"></div>
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{elseif $priceSetId}
+{if $priceSetId}
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
   {literal}
   <script type="text/javascript">

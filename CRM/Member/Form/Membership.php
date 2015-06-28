@@ -173,13 +173,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @throws \Exception
    */
   public function preProcess() {
-    //custom data related code
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
     $this->assign('formClass', 'membership');
     parent::preProcess();
@@ -275,9 +268,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     if ($this->_priceSetId) {
       return CRM_Price_BAO_PriceSet::setDefaultPriceSet($this, $defaults);
@@ -426,9 +416,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
 
