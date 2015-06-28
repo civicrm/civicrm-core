@@ -1531,6 +1531,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipTypeIDs = (array) $membershipParams['selectMembership'];
       $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
       $membershipType = empty($membershipTypes) ? array() : reset($membershipTypes);
+      $isPending = $this->getIsPending();
+
       $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipType));
 
       $isPaidMembership = FALSE;
@@ -1552,8 +1554,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       CRM_Member_BAO_Membership::postProcessMembership($membershipParams, $contactID,
         $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $contributionTypeId,
-        $membershipLineItems, $isPayLater
-      );
+        $membershipLineItems, $isPayLater, $isPending);
       $this->assign('membership_assign', TRUE);
       $this->set('membershipTypeID', $membershipParams['selectMembership']);
     }
@@ -1561,6 +1562,26 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       CRM_Core_Session::singleton()->setStatus($e->getMessage());
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
     }
+  }
+
+  /**
+   * Is the payment a pending payment.
+   *
+   * We are moving towards always creating as pending and updating at the end (based on payment), so this should be
+   * an interim refactoring. It was shared with another unrelated form & some parameters may not apply to this form.
+   *
+   *
+   * @return bool
+   */
+  protected function getIsPending() {
+    if (((isset($this->_contributeMode)) || !empty
+        ($this->_params['is_pay_later'])
+      ) &&
+      (($this->_values['is_monetary'] && $this->_amount > 0.0))
+    ) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
