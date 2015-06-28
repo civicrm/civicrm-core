@@ -611,14 +611,30 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['is_pay_later'] = 1;
     }
 
-    $renewMembership = CRM_Member_BAO_Membership::renewMembershipFormWrapper($this->_contactID,
-      $formValues['membership_type_id'][1],
-      $isTestMembership, $this,
-      $renewalDate,
-      NULL,
-      $customFieldsFormatted, $numRenewTerms,
-      $this->_membershipId,
-      self::extractPendingFormValue($this, $formValues['membership_type_id'][1])
+    $contributionRecurID = isset($form->_params['contributionRecurID']) ? $form->_params['contributionRecurID'] : NULL;
+
+    $membershipSource = NULL;
+    if (!empty($form->_params['membership_source'])) {
+      $membershipSource = $form->_params['membership_source'];
+    }
+    elseif (isset($form->_values['title']) && !empty($form->_values['title'])) {
+      $membershipSource = ts('Online Contribution:') . ' ' . $form->_values['title'];
+    }
+    $isPayLater = NULL;
+    if (isset($form->_params)) {
+      $isPayLater = CRM_Utils_Array::value('is_pay_later', $form->_params);
+    }
+    $campaignId = NULL;
+    if (isset($form->_values) && is_array($form->_values) && !empty($form->_values)) {
+      $campaignId = CRM_Utils_Array::value('campaign_id', $form->_params);
+      if (!array_key_exists('campaign_id', $form->_params)) {
+        $campaignId = CRM_Utils_Array::value('campaign_id', $form->_values);
+      }
+    }
+    $renewMembership = CRM_Member_BAO_Membership::renewMembership(
+      $this->_contactID, $formValues['membership_type_id'][1], $isTestMembership,
+      $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId, self::extractPendingFormValue($this, $formValues['membership_type_id'][1],
+      $contributionRecurID, $membershipSource, $isPayLater, $campaignId
     );
 
     $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
