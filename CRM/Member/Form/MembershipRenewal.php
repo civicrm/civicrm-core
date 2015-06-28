@@ -611,7 +611,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['is_pay_later'] = 1;
     }
 
-    $contributionRecurID = isset($form->_params['contributionRecurID']) ? $form->_params['contributionRecurID'] : NULL;
+    $contributionRecurID = isset($this->_params['contributionRecurID']) ? $this->_params['contributionRecurID'] : NULL;
 
     $membershipSource = NULL;
     if (!empty($form->_params['membership_source'])) {
@@ -633,17 +633,14 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
     $renewMembership = CRM_Member_BAO_Membership::renewMembership(
       $this->_contactID, $formValues['membership_type_id'][1], $isTestMembership,
-      $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId, self::extractPendingFormValue($this, $formValues['membership_type_id'][1],
+      $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
+      self::extractPendingFormValue($this, $formValues['membership_type_id'][1]),
       $contributionRecurID, $membershipSource, $isPayLater, $campaignId
     );
 
     $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
 
-    // Retrieve the name and email of the current user - this will be the FROM for the receipt email
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-
-    list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+    list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
 
     $memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $renewMembership->membership_type_id, 'name');
 
