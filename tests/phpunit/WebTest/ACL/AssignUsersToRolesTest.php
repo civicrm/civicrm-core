@@ -121,8 +121,8 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->click('_qf_Basic_refresh');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Basic_next_action");
-    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']"));
-    $this->click("xpath=//table/tbody//tr/td[1]/input[@type='checkbox']");
+    $this->assertTrue($this->isElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr/td[3]/a[text()='{$lastName}, {$firstName}']"));
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody//tr/td[1]/input[@type='checkbox']");
     $this->click('_qf_Basic_next_action');
     $this->waitForElementPresent("_qf_AddToGroup_back-bottom");
     $this->click('_qf_AddToGroup_next-bottom');
