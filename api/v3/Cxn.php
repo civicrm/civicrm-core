@@ -140,6 +140,25 @@ function _civicrm_api3_cxn_unregister_spec(&$spec) {
  * @return array
  */
 function civicrm_api3_cxn_unregister($params) {
+  $cxnId = _civicrm_api3_cxn_parseCxnId($params);
+  $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
+
+  /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
+  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+  list($cxnId, $result) = $client->unregister($appMeta, CRM_Utils_Array::value('force', $params, FALSE));
+
+  return $result;
+}
+
+/**
+ * @param array $params
+ *   An array with cxn_guid and/or app_guid.
+ * @return string
+ *   The CxnId. (If not available, then an exception is thrown.)
+ *
+ * @throws API_Exception
+ */
+function _civicrm_api3_cxn_parseCxnId($params) {
   $cxnId = NULL;
 
   if (!empty($params['cxn_guid'])) {
@@ -156,14 +175,7 @@ function civicrm_api3_cxn_unregister($params) {
   if (!$cxnId) {
     throw new API_Exception('Missing required parameter: cxn_guid');
   }
-
-  $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
-
-  /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
-  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
-  list($cxnId, $result) = $client->unregister($appMeta, CRM_Utils_Array::value('force', $params, FALSE));
-
-  return $result;
+  return $cxnId;
 }
 
 function _civicrm_api3_cxn_get_spec(&$spec) {
@@ -199,4 +211,48 @@ function civicrm_api3_cxn_get($params) {
   }
 
   return $result;
+}
+
+/**
+ * Adjust metadata for "getlink" action.
+ *
+ * @param array $spec
+ *   List of fields.
+ */
+function _civicrm_api3_cxn_getlink_spec(&$spec) {
+  $daoFields = CRM_Cxn_DAO_Cxn::fields();
+  $spec['app_guid'] = $daoFields['app_guid'];
+  $spec['cxn_guid'] = $daoFields['cxn_guid'];
+  $spec['page'] = array(
+    'name' => 'page',
+    'type' => CRM_Utils_Type::T_STRING,
+    'title' => ts('Page Type'),
+    'description' => 'The type of page (eg "settings")',
+    'maxlength' => 63,
+    'size' => CRM_Utils_Type::HUGE,
+  );
+}
+
+/**
+ *
+ * @param array $params
+ *   Array with keys:
+ *   - cxn_guid OR app_guid: string.
+ *   - page: string.
+ * @return array
+ * @throws Exception
+ */
+function civicrm_api3_cxn_getlink($params) {
+  $cxnId = _civicrm_api3_cxn_parseCxnId($params);
+  $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
+
+  if (empty($params['page']) || !is_string($params['page'])) {
+    throw new API_Exception("Invalid page");
+  }
+
+  /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
+  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+  return $client->call($appMeta, 'Cxn', 'getlink', array(
+    'page' => $params['page'],
+  ));
 }
