@@ -840,4 +840,207 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Build Membership  Block in Contribution Pages.
+   *
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param int $pageID
+   *   Unused?.
+   * @param int $cid
+   *   Contact checked for having a current membership for a particular membership.
+   * @param bool $formItems
+   * @param int $selectedMembershipTypeID
+   *   Selected membership id.
+   * @param bool $thankPage
+   *   Thank you page.
+   * @param null $isTest
+   *
+   * @return bool
+   *   Is this a separate membership payment
+   */
+  protected function buildMembershipBlock(
+    $cid,
+    $formItems = FALSE,
+    $selectedMembershipTypeID = NULL,
+    $thankPage = FALSE,
+    $isTest = NULL
+  ) {
+
+    $separateMembershipPayment = FALSE;
+    if ($this->_membershipBlock) {
+      $this->_currentMemberships = array();
+
+      $membershipBlock = $this->_membershipBlock;
+      $membershipTypeIds = $membershipTypes = $radio = array();
+      $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember) ? TRUE : FALSE;
+
+      $allowAutoRenewMembership = $autoRenewOption = FALSE;
+      $autoRenewMembershipTypeOptions = array();
+
+      $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
+
+      $separateMembershipPayment = CRM_Utils_Array::value('is_separate_payment', $membershipBlock);
+
+      if ($membershipPriceset) {
+        foreach ($this->_priceSet['fields'] as $pField) {
+          if (empty($pField['options'])) {
+            continue;
+          }
+          foreach ($pField['options'] as $opId => $opValues) {
+            if (empty($opValues['membership_type_id'])) {
+              continue;
+            }
+            $membershipTypeIds[$opValues['membership_type_id']] = $opValues['membership_type_id'];
+          }
+        }
+      }
+      elseif (!empty($membershipBlock['membership_types'])) {
+        $membershipTypeIds = explode(',', $membershipBlock['membership_types']);
+      }
+
+      if (!empty($membershipTypeIds)) {
+        //set status message if wrong membershipType is included in membershipBlock
+        if (isset($this->_mid) && !$membershipPriceset) {
+          $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+            $this->_mid,
+            'membership_type_id'
+          );
+          if (!in_array($membershipTypeID, $membershipTypeIds)) {
+            CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Invalid Membership'), 'error');
+          }
+        }
+
+        $membershipTypeValues = self::buildMembershipTypeValues($this, $membershipTypeIds);
+        $this->_membershipTypeValues = $membershipTypeValues;
+        $endDate = NULL;
+        foreach ($membershipTypeIds as $value) {
+          $memType = $membershipTypeValues[$value];
+          if ($selectedMembershipTypeID != NULL) {
+            if ($memType['id'] == $selectedMembershipTypeID) {
+              $this->assign('minimum_fee',
+                CRM_Utils_Array::value('minimum_fee', $memType)
+              );
+              $this->assign('membership_name', $memType['name']);
+              if (!$thankPage && $cid) {
+                $membership = new CRM_Member_DAO_Membership();
+                $membership->contact_id = $cid;
+                $membership->membership_type_id = $memType['id'];
+                if ($membership->find(TRUE)) {
+                  $this->assign('renewal_mode', TRUE);
+                  $memType['current_membership'] = $membership->end_date;
+                  $this->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
+                }
+              }
+              $membershipTypes[] = $memType;
+            }
+          }
+          elseif ($memType['is_active']) {
+            $javascriptMethod = NULL;
+            $allowAutoRenewOpt = 1;
+            if (is_array($this->_paymentProcessors)) {
+              foreach ($this->_paymentProcessors as $id => $val) {
+                if (!$val['is_recur']) {
+                  $allowAutoRenewOpt = 0;
+                  continue;
+                }
+              }
+            }
+
+            $javascriptMethod = array('onclick' => "return showHideAutoRenew( this.value );");
+            $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $allowAutoRenewOpt * CRM_Utils_Array::value($value, CRM_Utils_Array::value('auto_renew', $this->_membershipBlock));;
+
+            if ($allowAutoRenewOpt) {
+              $allowAutoRenewMembership = TRUE;
+            }
+
+            //add membership type.
+            $radio[$memType['id']] = $this->createElement('radio', NULL, NULL, NULL,
+              $memType['id'], $javascriptMethod
+            );
+            if ($cid) {
+              $membership = new CRM_Member_DAO_Membership();
+              $membership->contact_id = $cid;
+              $membership->membership_type_id = $memType['id'];
+
+              //show current membership, skip pending and cancelled membership records,
+              //because we take first membership record id for renewal
+              $membership->whereAdd('status_id != 5 AND status_id !=6');
+
+              if (!is_null($isTest)) {
+                $membership->is_test = $isTest;
+              }
+
+              //CRM-4297
+              $membership->orderBy('end_date DESC');
+
+              if ($membership->find(TRUE)) {
+                if (!$membership->end_date) {
+                  unset($radio[$memType['id']]);
+                  $this->assign('islifetime', TRUE);
+                  continue;
+                }
+                $this->assign('renewal_mode', TRUE);
+                $this->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
+                $memType['current_membership'] = $membership->end_date;
+                if (!$endDate) {
+                  $endDate = $memType['current_membership'];
+                  $this->_defaultMemTypeId = $memType['id'];
+                }
+                if ($memType['current_membership'] < $endDate) {
+                  $endDate = $memType['current_membership'];
+                  $this->_defaultMemTypeId = $memType['id'];
+                }
+              }
+            }
+            $membershipTypes[] = $memType;
+          }
+        }
+      }
+
+      $this->assign('showRadio', $formItems);
+      if ($formItems) {
+        if (!$membershipPriceset) {
+          if (!$membershipBlock['is_required']) {
+            $this->assign('showRadioNoThanks', TRUE);
+            $radio[''] = $this->createElement('radio', NULL, NULL, NULL, 'no_thanks', NULL);
+            $this->addGroup($radio, 'selectMembership', NULL);
+          }
+          elseif ($membershipBlock['is_required'] && count($radio) == 1) {
+            $temp = array_keys($radio);
+            $this->add('hidden', 'selectMembership', $temp[0], array('id' => 'selectMembership'));
+            $this->assign('singleMembership', TRUE);
+            $this->assign('showRadio', FALSE);
+          }
+          else {
+            $this->addGroup($radio, 'selectMembership', NULL);
+          }
+
+          $this->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');
+        }
+        else {
+          $autoRenewOption = CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($this->_priceSetId);
+          $this->assign('autoRenewOption', $autoRenewOption);
+        }
+
+        if (!$this->_values['is_pay_later'] && is_array($this->_paymentProcessors) && ($allowAutoRenewMembership || $autoRenewOption)) {
+          $this->addElement('checkbox', 'auto_renew', ts('Please renew my membership automatically.'));
+        }
+
+      }
+
+      $this->assign('membershipBlock', $membershipBlock);
+      $this->assign('membershipTypes', $membershipTypes);
+      $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
+      $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
+
+      //give preference to user submitted auto_renew value.
+      $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted()) ? TRUE : FALSE;
+      $this->assign('takeUserSubmittedAutoRenew', $takeUserSubmittedAutoRenew);
+    }
+
+    return $separateMembershipPayment;
+  }
+
+
 }

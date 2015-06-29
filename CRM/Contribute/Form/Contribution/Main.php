@@ -67,7 +67,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public function preProcess() {
     parent::preProcess();
 
-    self::preProcessPaymentOptions($this);
+    $this->_paymentProcessors = $this->get('paymentProcessors');
+    $this->preProcessPaymentOptions();
 
     // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
@@ -455,8 +456,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $this->set('useForMember', $this->_useForMember);
         }
 
-        $this->_separateMembershipPayment = CRM_Member_BAO_Membership::buildMembershipBlock($this,
-          $this->_id,
+        $this->_separateMembershipPayment = $this->buildMembershipBlock(
           $this->_membershipContactID,
           TRUE, NULL, FALSE,
           $isTest
@@ -1345,45 +1345,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
     }
 
-  }
-
-  /**
-   * Handle Payment Processor switching for contribution and event registration forms.
-   *
-   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
-   * @param bool $noFees
-   */
-  public static function preProcessPaymentOptions(&$form, $noFees = FALSE) {
-    $form->_snippet = CRM_Utils_Array::value('snippet', $_GET);
-
-    $form->_paymentProcessors = $noFees ? array() : $form->get('paymentProcessors');
-    $form->_paymentProcessorID = NULL;
-    if ($form->_paymentProcessors) {
-      if (!empty($form->_submitValues)) {
-        $form->_paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $form->_submitValues);
-        $form->_paymentProcessor = CRM_Utils_Array::value($form->_paymentProcessorID, $form->_paymentProcessors);
-        $form->set('type', $form->_paymentProcessorID);
-        $form->set('mode', $form->_mode);
-        $form->set('paymentProcessor', $form->_paymentProcessor);
-      }
-      // Set default payment processor
-      else {
-        foreach ($form->_paymentProcessors as $values) {
-          if (!empty($values['is_default']) || count($form->_paymentProcessors) == 1) {
-            $form->_paymentProcessorID = $values['id'];
-            break;
-          }
-        }
-      }
-      if ($form->_paymentProcessorID) {
-        CRM_Core_Payment_ProcessorForm::preProcess($form);
-      }
-      else {
-        $form->_paymentProcessor = array();
-      }
-      CRM_Financial_Form_Payment::addCreditCardJs();
-    }
-    $form->assign('paymentProcessorID', $form->_paymentProcessorID);
   }
 
   /**

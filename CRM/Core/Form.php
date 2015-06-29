@@ -82,7 +82,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @var array
    *   An array of payment processor details with objects loaded in the 'object' field.
    */
-  public $_paymentProcessors;
+  protected $_paymentProcessors;
 
   /**
    * Available payment processors (IDS).
@@ -689,6 +689,45 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
+  /**
+   * Handle Payment Processor switching for contribution and event registration forms.
+   *
+   * This function is shared between contribution & event forms & this is their common class.
+   *
+   * However, this should be seen as an in-progress refactor, the end goal being to also align the
+   * backoffice forms that action payments.
+   *
+   * This function overlaps assignPaymentProcessor, in a bad way.
+   */
+  protected function preProcessPaymentOptions() {
+    $this->_paymentProcessorID = NULL;
+    if ($this->_paymentProcessors) {
+      if (!empty($this->_submitValues)) {
+        $this->_paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $this->_submitValues);
+        $this->_paymentProcessor = CRM_Utils_Array::value($this->_paymentProcessorID, $this->_paymentProcessors);
+        $this->set('type', $this->_paymentProcessorID);
+        $this->set('mode', $this->_mode);
+        $this->set('paymentProcessor', $this->_paymentProcessor);
+      }
+      // Set default payment processor
+      else {
+        foreach ($this->_paymentProcessors as $values) {
+          if (!empty($values['is_default']) || count($this->_paymentProcessors) == 1) {
+            $this->_paymentProcessorID = $values['id'];
+            break;
+          }
+        }
+      }
+      if ($this->_paymentProcessorID) {
+        CRM_Core_Payment_ProcessorForm::preProcess($this);
+      }
+      else {
+        $this->_paymentProcessor = array();
+      }
+      CRM_Financial_Form_Payment::addCreditCardJs();
+    }
+    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+  }
 
   /**
    * Setter function for options.

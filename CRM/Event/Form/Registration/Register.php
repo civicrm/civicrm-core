@@ -97,7 +97,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // We hide the payment fields if the event is full or requires approval,
     // and the current user has not yet been approved CRM-12279
     $this->_noFees = (($eventFull || $this->_requireApproval) && !$this->_allowConfirmation);
-    CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this, $this->_noFees);
+    $this->_paymentProcessors = $this->_noFees ? array() : $this->get('paymentProcessors');
+    $this->preProcessPaymentOptions();
     if ($this->_snippet) {
       return;
     }
