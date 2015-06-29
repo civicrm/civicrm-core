@@ -1123,7 +1123,7 @@ AND civicrm_membership.is_test = %2";
    *
    * @param bool $isProcessSeparateMembershipTransaction
    *
-   * @param int $defaultContributionTypeID
+   * @param int $financialTypeID
    * @param array $membershipLineItems
    *   Line items specific to membership payment that is separate to contribution.
    * @param bool $isPayLater
@@ -1134,22 +1134,10 @@ AND civicrm_membership.is_test = %2";
   public static function postProcessMembership(
     $membershipParams, $contactID, &$form, $premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater, $isPending) {
+    $isProcessSeparateMembershipTransaction, $financialTypeID, $membershipLineItems, $isPayLater, $isPending) {
     $result = $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = $paymentResult = array();
-
-    //@todo move this into the calling function & pass in the correct financialTypeID
-    if (isset($paymentParams['financial_type'])) {
-      $financialTypeID = $paymentParams['financial_type'];
-    }
-    else {
-      $financialTypeID = $defaultContributionTypeID;
-    }
-
-    if (CRM_Utils_Array::value('membership_source', $form->_params)) {
-      $membershipParams['contribution_source'] = $form->_params['membership_source'];
-    }
 
     if ($isPaidMembership) {
       if ($isProcessSeparateMembershipTransaction) {
@@ -2013,9 +2001,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee, $financialTypeID) {
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
-    if (!$financialType->find(TRUE)) {
-      CRM_Core_Error::fatal(ts("Could not find a system table"));
-    }
+    $financialType->find(TRUE);
     $tempParams['amount'] = $minimumFee;
     $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
 
