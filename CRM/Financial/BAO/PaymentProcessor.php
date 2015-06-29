@@ -362,16 +362,24 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    */
   public static function getPaymentProcessors($capabilities = array(), $ids = array()) {
     $mode = NULL;
+    $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : array();
+    $processors = $liveProcessors = self::getAllPaymentProcessors('live');
+
     if (in_array('TestMode', $capabilities)) {
-      $mode = 'test';
+      foreach ($testProcessors as $testProcessor) {
+        if (!in_array($testProcessor['id'], $ids)) {
+          foreach ($liveProcessors as $liveProcessor) {
+            if ($liveProcessor['name'] == $testProcessor['name']) {
+              $ids[] = $testProcessor['id'];
+            }
+          }
+        }
+      }
+      $processors = $testProcessors;
     }
-    elseif (in_array('LiveMode', $capabilities)) {
-      $mode = 'live';
-    }
-    $processors = self::getAllPaymentProcessors($mode);
 
     foreach ($processors as $index => $processor) {
-      if (!empty($ids) && !in_array($processor['id'], $ids)) {
+      if (!in_array($processor['id'], $ids)) {
         unset ($processors[$index]);
         continue;
       }
