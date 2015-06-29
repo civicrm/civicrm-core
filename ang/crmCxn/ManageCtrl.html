@@ -30,6 +30,10 @@
         <!--
         <a class="action-item crm-hover-button" ng-click="toggleCxn(cxn)">{{cxn.is_active ? ts('Disable') : ts('Enable') }}</a>
         -->
+        <a class="action-item crm-hover-button" ng-click="openLink(cxn.app_meta, 'settings', {title: ts('%1: Settings (External)', {1: cxn.app_meta.title})})" ng-show="cxn.app_meta.links.settings">{{ts('Settings')}}</a>
+        <a class="action-item crm-hover-button" ng-click="openLink(cxn.app_meta, 'logs', {title: ts('%1: Logs (External)', {1: cxn.app_meta.title})})" ng-show="cxn.app_meta.links.logs">{{ts('Logs')}}</a>
+        <a class="action-item crm-hover-button" ng-click="openLink(cxn.app_meta, 'docs', {title: ts('%1: Documentation (External)', {1: cxn.app_meta.title})})" ng-show="cxn.app_meta.links.docs">{{ts('Docs')}}</a>
+        <a class="action-item crm-hover-button" ng-click="openLink(cxn.app_meta, 'support', {title: ts('%1: Support (External)', {1: cxn.app_meta.title})})" ng-show="cxn.app_meta.links.support">{{ts('Support')}}</a>
         <a class="action-item crm-hover-button"
            crm-confirm='{width: "65%", resizable: true, title: ts("Disconnect"), message: ts("Are you sure you want to disconnect \"%1?\". Doing so may permanently destroy data linkage.", {1: cxn.app_meta.title})}'
            on-yes="unregister(cxn.app_meta)"

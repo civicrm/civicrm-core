@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('crmCxn').controller('CrmCxnManageCtrl', function CrmCxnManageCtrl($scope, apiCalls, crmApi, crmUiAlert, crmBlocker, crmStatus, $timeout) {
+  angular.module('crmCxn').controller('CrmCxnManageCtrl', function CrmCxnManageCtrl($scope, apiCalls, crmApi, crmUiAlert, crmBlocker, crmStatus, $timeout, dialogService) {
     var ts = $scope.ts = CRM.ts(null);
     $scope.appMetas = apiCalls.appMetas.values;
     $scope.cxns = apiCalls.cxns.values;
@@ -60,6 +60,50 @@
         cxn.is_active = !cxn.is_active;
       });
       return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, reg));
+    };
+
+    $scope.openLink = function openLink(appMeta, page, options) {
+      var promise = crmApi('Cxn', 'getlink', {app_guid: appMeta.appId, page: page}).then(function(result) {
+        var mode = result.values.mode ? result.values.mode : 'popup';
+        switch (result.values.mode) {
+          case 'iframe':
+            var passThrus = ['height', 'width']; // Options influenced by remote server.
+            options = angular.extend(_.pick(result.values, passThrus), options);
+            $scope.openIframe(result.values.url, options);
+            break;
+          case 'popup':
+            CRM.alert(ts('The page "%1" will open in a popup. If it does not appear automatically, check your browser for notifications.', {1: options.title}), '', 'info');
+            window.open(result.values.url, 'cxnSettings', 'resizable,scrollbars,status');
+            break;
+          case 'redirect':
+            window.location = result.values.url;
+            break;
+          default:
+            CRM.alert(ts('Cannot open link. Unrecognized mode.'), '', 'error');
+        }
+      });
+      return block(crmStatus({start: ts('Opening...'), success: ''}, promise));
+    };
+
+    // @param Object options -- see dialogService.open
+    $scope.openIframe = function openIframe(url, options) {
+      var model = {
+        url: url
+      };
+      options = CRM.utils.adjustDialogDefaults(angular.extend(
+        {
+          autoOpen: false,
+          height: 'auto',
+          width: '40%',
+          title: ts('External Link')
+        },
+        options
+      ));
+      return dialogService.open('cxnLinkDialog', '~/crmCxn/LinkDialogCtrl.html', model, options)
+        .then(function(item) {
+          mailing.msg_template_id = item.id;
+          return item;
+        });
     };
   });
 
