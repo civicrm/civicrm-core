@@ -43,11 +43,6 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Contact Type in mapping</comment>
-    <pseudoconstant>
-      <table>civicrm_contact_type</table>
-      <keyColumn>name</keyColumn>
-      <labelColumn>label</labelColumn>
-    </pseudoconstant>
     <html>
       <type>Select</type>
     </html>
