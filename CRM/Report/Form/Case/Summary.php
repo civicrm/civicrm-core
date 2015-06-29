@@ -323,7 +323,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
   }
 
   public function groupBy() {
-    $this->_groupBy = "";
+    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_c2']}.id";
   }
 
   public function postProcess() {
