@@ -1869,6 +1869,43 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Add a Mapping.
+   *
+   * @param array $params
+   * @return CRM_Core_DAO_Mapping
+   *   Mapping id of created mapping
+   */
+  public function mappingCreate($params = NULL) {
+    if ($params === NULL) {
+      $params = array(
+        'name' => 'Mapping name',
+        'description' => 'Mapping description',
+        // 'Export Contact' mapping.
+        'mapping_type_id' => 7,
+      );
+    }
+
+    $mapping = new CRM_Core_DAO_Mapping();
+    $mapping->copyValues($params);
+    $mapping->save();
+    // clear getfields cache
+    CRM_Core_PseudoConstant::flush();
+    $this->callAPISuccess('mapping', 'getfields', array('version' => 3, 'cache_clear' => 1));
+    return $mapping;
+  }
+
+  /**
+   * Delete a Mapping
+   *
+   * @param int $mappingId
+   */
+  public function mappingDelete($mappingId) {
+    $mapping = new CRM_Core_DAO_Mapping();
+    $mapping->id = $mappingId;
+    $mapping->delete();
+  }
+
+  /**
    * Add a Group.
    *
    * @param array $params
