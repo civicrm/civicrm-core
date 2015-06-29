@@ -379,7 +379,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
 
     foreach ($processors as $index => $processor) {
-      if (!in_array($processor['id'], $ids)) {
+      if (!empty($ids) && !in_array($processor['id'], $ids)) {
         unset ($processors[$index]);
         continue;
       }
@@ -403,13 +403,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Is there a processor on this site with the specified capability.
    * @param array $capabilities
-   * @param bool $isIncludeTest
    *
    * @return bool
    */
-  public static function hasPaymentProcessorSupporting($capabilities = array(), $isIncludeTest = FALSE) {
-    $mode = $isIncludeTest ? 'Test' : 'Live';
-    $capabilities[] = $mode . 'Mode';
+  public static function hasPaymentProcessorSupporting($capabilities = array()) {
     $result = self::getPaymentProcessors($capabilities);
     return (!empty($result)) ? TRUE : FALSE;
   }
