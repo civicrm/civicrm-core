@@ -906,7 +906,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
 
-        $membershipTypeValues = self::buildMembershipTypeValues($this, $membershipTypeIds);
+        $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
         $this->_membershipTypeValues = $membershipTypeValues;
         $endDate = NULL;
         foreach ($membershipTypeIds as $value) {
