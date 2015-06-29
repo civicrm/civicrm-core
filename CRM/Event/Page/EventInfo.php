@@ -79,7 +79,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     if (!$values['event']['is_active']) {
       // form is inactive, die a fatal death
-      CRM_Core_Error::fatal(ts('The page you requested is currently unavailable.'));
+      CRM_Utils_System::setUFMessage(ts('The event you requested is currently unavailable (contact the site administrator for assistance).'));
+      return CRM_Utils_System::permissionDenied();
     }
 
     if (!empty($values['event']['is_template'])) {
