@@ -331,7 +331,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       foreach ($fieldsToProvide as $field) {
         // Prevent e-notices in processor classes when not configured.
         if (!isset($processor[$field])) {
-          $processor[$field] = NULL;
+          $processors['values'][$processor['id']][$field] = NULL;
         }
       }
       $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
