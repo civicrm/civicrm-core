@@ -194,7 +194,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   public function where($includeContactIDs = FALSE) {
     if ($whereClause = $this->_query->whereClause()) {
       if ($this->_aclWhere) {
-        $whereCluase .= " AND {$this->_aclWhere} ";
+        $whereClause .= " AND {$this->_aclWhere} AND contact_a.is_deleted = 0";
       }
       return $whereClause;
     }

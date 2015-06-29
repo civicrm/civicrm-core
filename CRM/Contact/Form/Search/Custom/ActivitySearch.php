@@ -363,7 +363,6 @@ ORDER BY contact_a.sort_name';
     if ($this->_aclWhere) {
       $clauses[] = " {$this->_aclWhere} ";
     }
-
     return implode(' AND ', $clauses);
   }
 

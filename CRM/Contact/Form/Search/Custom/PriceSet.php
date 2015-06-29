@@ -326,7 +326,7 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
   public function where($includeContactIDs = FALSE) {
     $where = ' ( 1 ) ';
     if ($this->_aclWhere) {
-      $where = " AND {$this->_aclWhere} ";
+      $where .= " AND {$this->_aclWhere} ";
     }
     return $where;
   }

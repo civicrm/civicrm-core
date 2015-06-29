@@ -344,7 +344,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     $where = '(1)';
 
     if ($this->_aclWhere) {
-      $where = " AND {$this->_aclWhere} ";
+      $where .= " AND {$this->_aclWhere} ";
     }
 
     return '(1)';
