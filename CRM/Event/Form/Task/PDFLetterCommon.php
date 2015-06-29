@@ -54,7 +54,7 @@ class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLette
 
       $participant = civicrm_api3('participant', 'get', array('participant_id' => $participantID));
       $participant = $participant['values'][$participantID];
-      $event = civicrm_api3('event', 'get', array('id' => $eventid));
+      $event = civicrm_api3('event', 'get', array('id' => $participant['event_id']));
       $event = $event['values'][$participant['event_id']];
 
       // get contact information
