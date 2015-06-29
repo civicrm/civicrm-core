@@ -545,8 +545,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (isset($params['selectMembership']) &&
         $params['selectMembership'] != 'no_thanks'
       ) {
-        CRM_Member_BAO_Membership::buildMembershipBlock($this,
-          $this->_id,
+        $this->buildMembershipBlock(
           $this->_membershipContactID,
           FALSE,
           $params['selectMembership'],
