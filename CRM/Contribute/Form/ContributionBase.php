@@ -843,13 +843,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Build Membership  Block in Contribution Pages.
    *
-   * @param CRM_Core_Form $form
-   *   Form object.
-   * @param int $pageID
-   *   Unused?.
    * @param int $cid
    *   Contact checked for having a current membership for a particular membership.
-   * @param bool $formItems
+   * @param bool $isContributionMainPage
+   *   Is this the main page? If so add form input fields.
+   *   (or better yet don't have this functionality in a function shared with forms that don't share it).
    * @param int $selectedMembershipTypeID
    *   Selected membership id.
    * @param bool $thankPage
@@ -861,7 +859,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function buildMembershipBlock(
     $cid,
-    $formItems = FALSE,
+    $isContributionMainPage = FALSE,
     $selectedMembershipTypeID = NULL,
     $thankPage = FALSE,
     $isTest = NULL
@@ -871,16 +869,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->_membershipBlock) {
       $this->_currentMemberships = array();
 
-      $membershipBlock = $this->_membershipBlock;
       $membershipTypeIds = $membershipTypes = $radio = array();
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember) ? TRUE : FALSE;
 
       $allowAutoRenewMembership = $autoRenewOption = FALSE;
       $autoRenewMembershipTypeOptions = array();
 
-      $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
-
-      $separateMembershipPayment = CRM_Utils_Array::value('is_separate_payment', $membershipBlock);
+      $separateMembershipPayment = CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock);
 
       if ($membershipPriceset) {
         foreach ($this->_priceSet['fields'] as $pField) {
@@ -895,8 +890,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
       }
-      elseif (!empty($membershipBlock['membership_types'])) {
-        $membershipTypeIds = explode(',', $membershipBlock['membership_types']);
+      elseif (!empty($this->_membershipBlock['membership_types'])) {
+        $membershipTypeIds = explode(',', $this->_membershipBlock['membership_types']);
       }
 
       if (!empty($membershipTypeIds)) {
@@ -998,15 +993,23 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
 
-      $this->assign('showRadio', $formItems);
-      if ($formItems) {
+      $this->assign('membershipBlock', $this->_membershipBlock);
+      $this->assign('showRadio', $isContributionMainPage);
+      $this->assign('membershipTypes', $membershipTypes);
+      $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
+      $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
+      //give preference to user submitted auto_renew value.
+      $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted()) ? TRUE : FALSE;
+      $this->assign('takeUserSubmittedAutoRenew', $takeUserSubmittedAutoRenew);
+
+      if ($isContributionMainPage) {
         if (!$membershipPriceset) {
-          if (!$membershipBlock['is_required']) {
+          if (!$this->_membershipBlock['is_required']) {
             $this->assign('showRadioNoThanks', TRUE);
             $radio[''] = $this->createElement('radio', NULL, NULL, NULL, 'no_thanks', NULL);
             $this->addGroup($radio, 'selectMembership', NULL);
           }
-          elseif ($membershipBlock['is_required'] && count($radio) == 1) {
+          elseif ($this->_membershipBlock['is_required'] && count($radio) == 1) {
             $temp = array_keys($radio);
             $this->add('hidden', 'selectMembership', $temp[0], array('id' => 'selectMembership'));
             $this->assign('singleMembership', TRUE);
@@ -1028,19 +1031,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
       }
-
-      $this->assign('membershipBlock', $membershipBlock);
-      $this->assign('membershipTypes', $membershipTypes);
-      $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
-      $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
-
-      //give preference to user submitted auto_renew value.
-      $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted()) ? TRUE : FALSE;
-      $this->assign('takeUserSubmittedAutoRenew', $takeUserSubmittedAutoRenew);
     }
 
     return $separateMembershipPayment;
   }
-
 
 }
