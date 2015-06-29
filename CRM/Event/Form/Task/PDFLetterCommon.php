@@ -40,14 +40,10 @@
  */
 class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLetterCommon {
   /**
-   * process the form after the input has been submitted and validated
-   * @todo this is horrible copy & paste code because there is so much risk of breakage
-   * in fixing the existing pdfLetter classes to be suitably generic
+   * Process the form after the input has been submitted and validated.
    * @access public
-   *
-   * @return None
    */
-  static function postProcess(&$form) {
+  public static function postProcess(&$form) {
 
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
 
@@ -94,5 +90,4 @@ class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLette
     CRM_Utils_System::civiExit(1);
   }
 
- 
 }
