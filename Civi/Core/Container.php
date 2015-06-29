@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Core\Lock\LockManager;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\FileCacheReader;
@@ -67,6 +68,12 @@ class Container {
     //      }
     //    }
 
+    $container->setDefinition('lockManager', new Definition(
+      '\Civi\Core\Lock\LockManager',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createLockManager');
+
     $container->setDefinition('angular', new Definition(
       '\Civi\Angular\Manager',
       array()
@@ -131,6 +138,25 @@ class Container {
         'handleException',
       ));
     return $dispatcher;
+  }
+
+  /**
+   * @return LockManager
+   */
+  public function createLockManager() {
+    // Ideally, downstream implementers could override any definitions in
+    // the container. For now, we'll make-do with some define()s.
+    $lm = new LockManager();
+    $lm
+      ->register('/^cache\./', defined('CIVICRM_CACHE_LOCK') ? CIVICRM_CACHE_LOCK : array('CRM_Core_Lock', 'createScopedLock'))
+      ->register('/^data\./', defined('CIVICRM_DATA_LOCK') ? CIVICRM_DATA_LOCK : array('CRM_Core_Lock', 'createScopedLock'))
+      ->register('/^worker\.mailing\.send\./', defined('CIVICRM_WORK_LOCK') ? CIVICRM_WORK_LOCK : array('CRM_Core_Lock', 'createCivimailLock'))
+      ->register('/^worker\./', defined('CIVICRM_WORK_LOCK') ? CIVICRM_WORK_LOCK : array('CRM_Core_Lock', 'createScopedLock'));
+
+    // Registrations may use complex resolver expressions, but (as a micro-optimization)
+    // the default factory is specified as an array.
+
+    return $lm;
   }
 
   /**
