@@ -274,15 +274,13 @@ contact_a.sort_name    as sort_name,
       $clause[] = "cgc.group_id = {$this->_group}";
     }
     if ($this->_aclWhere) {
-      $clause[] = " AND {$this->_aclWhere} ";
+      $clause[] = " {$this->_aclWhere} AND contact_a.is_deleted = 0";
     }
 
     $where = '( 1 )';
     if (!empty($clause)) {
       $where .= ' AND ' . implode(' AND ', $clause);
     }
-
-    $where .= "{$this->_where} ";
 
     return $this->whereClause($where, $params);
   }

@@ -399,7 +399,8 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
   public function where($includeContactIDs = FALSE) {
     $where = '(1)';
     if ($this->_aclWhere) {
-      $where = " AND {$this->_aclWhere} ";
+      $where .= " AND {$this->_aclWhere} ";
+      $where .= " AND contact_a.is_deleted = 0";
     }
     return $where;
   }

@@ -232,11 +232,10 @@ civicrm_contact AS contact_a {$this->_aclFrom}
       $clauses[] = "contrib.financial_type_id IN ($financial_type_ids)";
     }
     if ($this->_aclWhere) {
-      return " {$this->_aclWhere} " . implode(' AND ', $clauses);
+      $clauses[] =  " {$this->_aclWhere} ";
     }
-    else {
-      return implode(' AND ', $clauses);
-    }
+
+    return implode(' AND ', $clauses);
   }
 
   /**

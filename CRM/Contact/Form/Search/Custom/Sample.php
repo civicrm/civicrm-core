@@ -160,7 +160,6 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
   public function where($includeContactIDs = FALSE) {
     $params = array();
     $where = "contact_a.contact_type   = 'Household'";
-    $where .= "{$this->_where}";
 
     $count = 1;
     $clause = array();
@@ -191,7 +190,7 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
     }
 
     if ($this->_aclWhere) {
-      $clause[] = " AND {$this->_aclWhere} ";
+      $clause[] = " {$this->_aclWhere} ";
     }
 
     if (!empty($clause)) {

@@ -200,7 +200,6 @@ ORDER BY   donation_amount desc
       $dao = CRM_Core_DAO::executeQuery($query);
       $sql = "SELECT contact_a.id as contact_id FROM CustomSearch_SYBNT_temp as contact_a";
     }
-
     return $sql;
   }
 
