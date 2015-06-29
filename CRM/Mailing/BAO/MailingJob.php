@@ -136,9 +136,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lockName = "civimail.job.{$job->id}";
-
-      $lock = new CRM_Core_Lock($lockName);
+      $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -344,9 +342,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     // X Number of child jobs
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lockName = "civimail.job.{$job->id}";
-
-      $lock = new CRM_Core_Lock($lockName);
+      $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -614,7 +610,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * @param $fields
+   * @param array $fields
+   *   List of intended recipients.
+   *   Each recipient is an array with keys 'hash', 'contact_id', 'email', etc.
    * @param $mailing
    * @param $mailer
    * @param $job_date

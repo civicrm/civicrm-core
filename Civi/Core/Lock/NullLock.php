@@ -24,53 +24,63 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
+namespace Civi\Core\Lock;
 
 /**
- * A PHP cron script to mail the result set of specified report to the
- * recipients mentioned for that report
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
-class CiviReportMail {
+class NullLock implements LockInterface {
+
+  private $hasLock = FALSE;
+
   /**
+   * @param string $name
+   * @return static
    */
-  public function __construct() {
-    $this->initialize();
-
-    CRM_Utils_System::authenticateScript(TRUE);
-
-    //log the execution of script
-    CRM_Core_Error::debug_log_message('CiviReportMail.php');
+  public static function create($name) {
+    return new static();
   }
 
-  public function initialize() {
-    require_once '../civicrm.config.php';
-    require_once 'CRM/Core/Config.php';
-
-    $config = CRM_Core_Config::singleton();
+  /**
+   * @param int|NULL $timeout
+   *   The number of seconds to wait to get the lock.
+   *   For a default value, use NULL.
+   * @return bool
+   */
+  public function acquire($timeout = NULL) {
+    $this->hasLock = TRUE;
+    return TRUE;
   }
 
-  public function run() {
-    $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.report.CiviReportMail');
+  /**
+   * @return bool|null|string
+   *   Trueish/falsish.
+   */
+  public function release() {
+    $this->hasLock = FALSE;
+    return TRUE;
+  }
 
-    if ($lock->isAcquired()) {
-      // try to unset any time limits
-      if (!ini_get('safe_mode')) {
-        set_time_limit(0);
-      }
+  /**
+   * @return bool|null|string
+   *   Trueish/falsish.
+   * @deprecated
+   *   Not supported by some locking strategies. If you need to poll, better
+   *   to use acquire(0).
+   */
+  public function isFree() {
+    return !$this->hasLock;
+  }
 
-      // if there are named sets of settings, use them - otherwise use the default (null)
-      require_once 'CRM/Report/Utils/Report.php';
-      $result = CRM_Report_Utils_Report::processReport();
-      echo $result['messages'];
-    }
-    else {
-      throw new Exception('Could not acquire lock, another CiviReportMail process is running');
-    }
-
-    $lock->release();
+  /**
+   * @return bool
+   */
+  public function isAcquired() {
+    return $this->hasLock;
   }
 
 }
-
-session_start();
-$obj = new CiviReportMail();
-$obj->run();

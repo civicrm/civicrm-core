@@ -1313,6 +1313,9 @@ CRM.strings = CRM.strings || {};
         CRM.confirm({
           title: ts('Preview'),
           resizable: true,
+          // Prevent overlap with the menubar
+          maxHeight: $(window).height() - 30,
+          position: {my: 'center', at: 'center center+15', of: window},
           message: '<div class="crm-custom-image-popup"><img style="max-width: 100%" src="' + $(this).attr('href') + '"></div>',
           options: null
         });
