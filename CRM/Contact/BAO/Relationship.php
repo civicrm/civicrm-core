@@ -1852,17 +1852,9 @@ AND cc.sort_name LIKE '%$name%'";
    *   True on success, false if error is encountered.
    */
   public static function disableExpiredRelationships() {
-    $query = "SELECT id FROM civicrm_relationship WHERE is_active = 1 AND end_date < CURDATE()";
+    $query = "UPDATE civicrm_relationship SET is_active = 0 WHERE is_active = 1 AND end_date < CURDATE()";
 
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $result = CRM_Contact_BAO_Relationship::setIsActive($dao->id, FALSE);
-      // Result will be NULL if error occurred. We abort early if error detected.
-      if ($result == NULL) {
-        return FALSE;
-      }
-    }
-    return TRUE;
+    return (!is_a(CRM_Core_DAO::executeQuery($query), 'DB_Error'));
   }
 
   /**
