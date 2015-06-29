@@ -651,7 +651,10 @@ class CRM_Contribute_BAO_Query {
         break;
 
       case 'civicrm_campaign':
-        $from = " $side  JOIN civicrm_campaign ON civicrm_campaign.id = civicrm_contribution.campaign_id";
+        //CRM-16764 - get survey clause from campaign bao
+        if (!CRM_Campaign_BAO_Query::$_applySurveyClause) {
+          $from = " $side  JOIN civicrm_campaign ON civicrm_campaign.id = civicrm_contribution.campaign_id";
+        }
         break;
 
       case 'contribution_participant':
