@@ -63,10 +63,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $campaignId
    * @param bool $isMonetary
    * @param bool $pending
-   * @param $paymentProcessorOutcome
-   * @param $receiptDate
+   * @param array $paymentProcessorOutcome
+   * @param string $receiptDate
    * @param int $recurringContributionID
-   * @param $isTest
+   * @param bool $isTest
    * @param int $addressID
    * @param int $softCreditToID
    * @param array $lineItems
@@ -695,8 +695,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Overwrite action, since we are only showing elements in frozen mode
-   * no help display needed
+   * Overwrite action.
+   *
+   * Since we are only showing elements in frozen mode no help display needed.
    *
    * @return int
    */
@@ -714,8 +715,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * Note that in edit/view mode
    * the default values are retrieved from the database
-   *
-   * @return void
    */
   public function setDefaultValues() {
   }
@@ -1523,7 +1522,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $premiumParams
    * @param array $membershipLineItems
    *   Line items specifically relating to memberships.
-   * @param $isPayLater
+   * @param bool $isPayLater
    */
   public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater) {
     try {
