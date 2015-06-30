@@ -87,6 +87,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $query = new CRM_Contact_BAO_Query($this->get('queryParams'));
     $qill = $query->qill();
 
+    // Values from the search form
+    $formValues = $this->controller->exportValues();
+
     // need to save qill for the smarty template
     $this->assign('qill', $qill);
 
@@ -135,6 +138,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     }
     else {
       $this->addDefaultButtons(ts('Save Smart Group'));
+      $this->assign('partiallySelected', $formValues['radio_ts'] != 'ts_all');
     }
     $this->addRule('title', ts('Name already exists in Database.'),
       'objectExists', array('CRM_Contact_DAO_Group', $groupID, 'title')
