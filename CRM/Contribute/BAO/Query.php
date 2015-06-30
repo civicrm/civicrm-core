@@ -901,7 +901,7 @@ class CRM_Contribute_BAO_Query {
     );
 
     $form->addSelect('payment_instrument_id',
-      array('entity' => 'contribution', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+      array('entity' => 'contribution', 'multiple' => 'multiple', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
     // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
