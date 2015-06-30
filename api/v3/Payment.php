@@ -92,6 +92,36 @@ function civicrm_api3_payment_create(&$params) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
     }
   }
+  if (CRM_Utils_Array::value('line_item', $params) && isset($trxn)) {
+    foreach ($params['line_item'] as $values) {
+      foreach ($values as $id => $amount) {
+        $p = array('id' => $id);
+        $check = CRM_Price_BAO_LineItem::retrieve($p, $defaults);
+        if (empty($check)) {
+          return civicrm_api3_create_error(ts('Please specify a valid Line Item.'));
+        }
+        // get financial item
+        $sql = "SELECT fi.id
+          FROM civicrm_financial_item fi
+          INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
+          WHERE li.contribution_id = %1 AND li.id = %2";
+        $sqlParams = array(
+          1 => array($params['contribution_id'], 'Integer'),
+          2 => array($id, 'Integer'),
+        );
+        $fid = CRM_Core_DAO::singleValueQuery($sql, $sqlParams);
+        // Record Entity Financial Trxn
+        $eftParams = array(
+          'entity_table' => 'civicrm_financial_item',
+          'financial_trxn_id' => $trxn->id,
+          'amount' => $amount,
+          'entity_id' => $fid,
+        );
+        civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+      }
+    }
+    unset($params['line_item']);
+  }
   unset($params['total_amount']);
   $params['id'] = $params['contribution_id'];
   return _civicrm_api3_basic_create('CRM_Contribute_BAO_Contribution', $params, 'Contribution');
