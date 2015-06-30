@@ -63,6 +63,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_acl_contact_cache',
       'civicrm_contribution',
       'civicrm_participant',
+      'civicrm_uf_match',
     );
     $this->quickCleanup($tablesToTruncate);
     $config = CRM_Core_Config::singleton();

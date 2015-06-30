@@ -66,7 +66,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   public function testGetContributionRecur() {
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $this->callAPISuccess($this->_entity, 'create', $this->params);
     $getParams = array(
       'amount' => '500',
     );
@@ -93,7 +93,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   public function testDeleteContributionRecur() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => $result['id']);
-    $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count']);
   }
