@@ -37,6 +37,8 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
   protected $_latitude = NULL;
   protected $_longitude = NULL;
   protected $_distance = NULL;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
   /**
    * @param $formValues
@@ -199,12 +201,13 @@ country.name           as country
    * @return string
    */
   public function from() {
+    $this->buildACLClause('contact_a');
     $f = "
 FROM      civicrm_contact contact_a
 LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
                                        address.is_primary       = 1 )
 LEFT JOIN civicrm_state_province state_province ON state_province.id = address.state_province_id
-LEFT JOIN civicrm_country country               ON country.id        = address.country_id
+LEFT JOIN civicrm_country country               ON country.id        = address.country_id {$this->_aclFrom}
 ";
 
     // This prevents duplicate rows when contacts have more than one tag any you select "any tag"
@@ -249,6 +252,10 @@ AND cgc.group_id = {$this->_group}
     }
 
     $where .= " AND contact_a.is_deleted != 1 ";
+
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
 
     return $this->whereClause($where, $params);
   }
@@ -301,6 +308,13 @@ AND cgc.group_id = {$this->_group}
     else {
       CRM_Utils_System::setTitle(ts('Search'));
     }
+  }
+
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }
