@@ -106,7 +106,21 @@ function civicrm_api3_payment_create(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_payment_create_spec(&$params) {
-  $params['contribution_id']['api.required'] = 1;   
-  $params['total_amount']['api.required'] = 1;  
-  $params['payment_processor_id']['description'] = 'Payment processor ID - required for payment processor payments'; 
+  $params = array( 
+    'contribution_id' => array(
+      'api.required' => 1 ,
+      'title' => 'Contribution ID',
+      'type' => CRM_Utils_Type::T_INT,
+      ),
+    'total_amount' => array(
+      'api.required' => 1 ,
+      'title' => 'Total Payment Amount',
+      'type' => CRM_Utils_Type::T_FLOAT,
+      ),
+    'payment_processor_id' => array(
+      'title' => 'Payment Processor ID',
+      'type' => CRM_Utils_Type::T_INT,
+      'description' => ts('Payment processor ID - required for payment processor payments'),
+      ),
+    );
 }
