@@ -35,7 +35,8 @@
 class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_eventID = NULL;
-
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   protected $_tableName = NULL;
   public $_permissionedComponent;
 
@@ -309,10 +310,12 @@ contact_a.display_name   as display_name";
    * @return string
    */
   public function from() {
-    return "
+    $this->buildACLClause('contact_a');
+    $from = "
 FROM       civicrm_contact contact_a
-INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.id )
+INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.id ) {$this->_aclFrom}
 ";
+    return $from;
   }
 
   /**
@@ -321,7 +324,11 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    return ' ( 1 ) ';
+    $where = ' ( 1 ) ';
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
+    return $where;
   }
 
   /**
@@ -354,6 +361,13 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
     else {
       CRM_Utils_System::setTitle(ts('Export Price Set Info for an Event'));
     }
+  }
+
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }
