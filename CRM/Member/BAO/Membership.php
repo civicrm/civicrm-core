@@ -728,210 +728,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
-   * Build Membership  Block in Contribution Pages.
-   *
-   * @param CRM_Core_Form $form
-   *   Form object.
-   * @param int $pageID
-   *   Unused?.
-   * @param int $cid
-   *   Contact checked for having a current membership for a particular membership.
-   * @param bool $formItems
-   * @param int $selectedMembershipTypeID
-   *   Selected membership id.
-   * @param bool $thankPage
-   *   Thank you page.
-   * @param null $isTest
-   *
-   * @return bool
-   *   Is this a separate membership payment
-   */
-  public static function buildMembershipBlock(
-    &$form,
-    $pageID,
-    $cid,
-    $formItems = FALSE,
-    $selectedMembershipTypeID = NULL,
-    $thankPage = FALSE,
-    $isTest = NULL
-  ) {
-
-    $separateMembershipPayment = FALSE;
-    if ($form->_membershipBlock) {
-      $form->_currentMemberships = array();
-
-      $membershipBlock = $form->_membershipBlock;
-      $membershipTypeIds = $membershipTypes = $radio = array();
-      $membershipPriceset = (!empty($form->_priceSetId) && $form->_useForMember) ? TRUE : FALSE;
-
-      $allowAutoRenewMembership = $autoRenewOption = FALSE;
-      $autoRenewMembershipTypeOptions = array();
-
-      $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
-
-      $separateMembershipPayment = CRM_Utils_Array::value('is_separate_payment', $membershipBlock);
-
-      if ($membershipPriceset) {
-        foreach ($form->_priceSet['fields'] as $pField) {
-          if (empty($pField['options'])) {
-            continue;
-          }
-          foreach ($pField['options'] as $opId => $opValues) {
-            if (empty($opValues['membership_type_id'])) {
-              continue;
-            }
-            $membershipTypeIds[$opValues['membership_type_id']] = $opValues['membership_type_id'];
-          }
-        }
-      }
-      elseif (!empty($membershipBlock['membership_types'])) {
-        $membershipTypeIds = explode(',', $membershipBlock['membership_types']);
-      }
-
-      if (!empty($membershipTypeIds)) {
-        //set status message if wrong membershipType is included in membershipBlock
-        if (isset($form->_mid) && !$membershipPriceset) {
-          $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-            $form->_mid,
-            'membership_type_id'
-          );
-          if (!in_array($membershipTypeID, $membershipTypeIds)) {
-            CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Invalid Membership'), 'error');
-          }
-        }
-
-        $membershipTypeValues = self::buildMembershipTypeValues($form, $membershipTypeIds);
-        $form->_membershipTypeValues = $membershipTypeValues;
-        $endDate = NULL;
-        foreach ($membershipTypeIds as $value) {
-          $memType = $membershipTypeValues[$value];
-          if ($selectedMembershipTypeID != NULL) {
-            if ($memType['id'] == $selectedMembershipTypeID) {
-              $form->assign('minimum_fee',
-                CRM_Utils_Array::value('minimum_fee', $memType)
-              );
-              $form->assign('membership_name', $memType['name']);
-              if (!$thankPage && $cid) {
-                $membership = new CRM_Member_DAO_Membership();
-                $membership->contact_id = $cid;
-                $membership->membership_type_id = $memType['id'];
-                if ($membership->find(TRUE)) {
-                  $form->assign('renewal_mode', TRUE);
-                  $memType['current_membership'] = $membership->end_date;
-                  $form->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
-                }
-              }
-              $membershipTypes[] = $memType;
-            }
-          }
-          elseif ($memType['is_active']) {
-            $javascriptMethod = NULL;
-            $allowAutoRenewOpt = 1;
-            if (is_array($form->_paymentProcessors)) {
-              foreach ($form->_paymentProcessors as $id => $val) {
-                if (!$val['is_recur']) {
-                  $allowAutoRenewOpt = 0;
-                  continue;
-                }
-              }
-            }
-
-            $javascriptMethod = array('onclick' => "return showHideAutoRenew( this.value );");
-            $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $allowAutoRenewOpt * CRM_Utils_Array::value($value, CRM_Utils_Array::value('auto_renew', $form->_membershipBlock));;
-
-            if ($allowAutoRenewOpt) {
-              $allowAutoRenewMembership = TRUE;
-            }
-
-            //add membership type.
-            $radio[$memType['id']] = $form->createElement('radio', NULL, NULL, NULL,
-              $memType['id'], $javascriptMethod
-            );
-            if ($cid) {
-              $membership = new CRM_Member_DAO_Membership();
-              $membership->contact_id = $cid;
-              $membership->membership_type_id = $memType['id'];
-
-              //show current membership, skip pending and cancelled membership records,
-              //because we take first membership record id for renewal
-              $membership->whereAdd('status_id != 5 AND status_id !=6');
-
-              if (!is_null($isTest)) {
-                $membership->is_test = $isTest;
-              }
-
-              //CRM-4297
-              $membership->orderBy('end_date DESC');
-
-              if ($membership->find(TRUE)) {
-                if (!$membership->end_date) {
-                  unset($radio[$memType['id']]);
-                  $form->assign('islifetime', TRUE);
-                  continue;
-                }
-                $form->assign('renewal_mode', TRUE);
-                $form->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
-                $memType['current_membership'] = $membership->end_date;
-                if (!$endDate) {
-                  $endDate = $memType['current_membership'];
-                  $form->_defaultMemTypeId = $memType['id'];
-                }
-                if ($memType['current_membership'] < $endDate) {
-                  $endDate = $memType['current_membership'];
-                  $form->_defaultMemTypeId = $memType['id'];
-                }
-              }
-            }
-            $membershipTypes[] = $memType;
-          }
-        }
-      }
-
-      $form->assign('showRadio', $formItems);
-      if ($formItems) {
-        if (!$membershipPriceset) {
-          if (!$membershipBlock['is_required']) {
-            $form->assign('showRadioNoThanks', TRUE);
-            $radio[''] = $form->createElement('radio', NULL, NULL, NULL, 'no_thanks', NULL);
-            $form->addGroup($radio, 'selectMembership', NULL);
-          }
-          elseif ($membershipBlock['is_required'] && count($radio) == 1) {
-            $temp = array_keys($radio);
-            $form->add('hidden', 'selectMembership', $temp[0], array('id' => 'selectMembership'));
-            $form->assign('singleMembership', TRUE);
-            $form->assign('showRadio', FALSE);
-          }
-          else {
-            $form->addGroup($radio, 'selectMembership', NULL);
-          }
-
-          $form->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');
-        }
-        else {
-          $autoRenewOption = CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($form->_priceSetId);
-          $form->assign('autoRenewOption', $autoRenewOption);
-        }
-
-        if (!$form->_values['is_pay_later'] && is_array($form->_paymentProcessors) && ($allowAutoRenewMembership || $autoRenewOption)) {
-          $form->addElement('checkbox', 'auto_renew', ts('Please renew my membership automatically.'));
-        }
-
-      }
-
-      $form->assign('membershipBlock', $membershipBlock);
-      $form->assign('membershipTypes', $membershipTypes);
-      $form->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
-      $form->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
-
-      //give preference to user submitted auto_renew value.
-      $takeUserSubmittedAutoRenew = (!empty($_POST) || $form->isSubmitted()) ? TRUE : FALSE;
-      $form->assign('takeUserSubmittedAutoRenew', $takeUserSubmittedAutoRenew);
-    }
-
-    return $separateMembershipPayment;
-  }
-
-  /**
    * Return Membership Block info in Contribution Pages.
    *
    * @param int $pageID
@@ -1327,7 +1123,7 @@ AND civicrm_membership.is_test = %2";
    *
    * @param bool $isProcessSeparateMembershipTransaction
    *
-   * @param int $defaultContributionTypeID
+   * @param int $financialTypeID
    * @param array $membershipLineItems
    *   Line items specific to membership payment that is separate to contribution.
    * @param bool $isPayLater
@@ -1338,22 +1134,10 @@ AND civicrm_membership.is_test = %2";
   public static function postProcessMembership(
     $membershipParams, $contactID, &$form, $premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-    $isProcessSeparateMembershipTransaction, $defaultContributionTypeID, $membershipLineItems, $isPayLater, $isPending) {
+    $isProcessSeparateMembershipTransaction, $financialTypeID, $membershipLineItems, $isPayLater, $isPending) {
     $result = $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = $paymentResult = array();
-
-    //@todo move this into the calling function & pass in the correct financialTypeID
-    if (isset($paymentParams['financial_type'])) {
-      $financialTypeID = $paymentParams['financial_type'];
-    }
-    else {
-      $financialTypeID = $defaultContributionTypeID;
-    }
-
-    if (CRM_Utils_Array::value('membership_source', $form->_params)) {
-      $membershipParams['contribution_source'] = $form->_params['membership_source'];
-    }
 
     if ($isPaidMembership) {
       if ($isProcessSeparateMembershipTransaction) {
@@ -1961,7 +1745,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *
    * @return array
    */
-  public static function &buildMembershipTypeValues(&$form, $membershipTypeID = NULL) {
+  public static function buildMembershipTypeValues(&$form, $membershipTypeID = NULL) {
     $whereClause = " WHERE domain_id = " . CRM_Core_Config::domainID();
 
     if (is_array($membershipTypeID)) {
@@ -2217,9 +2001,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee, $financialTypeID) {
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
-    if (!$financialType->find(TRUE)) {
-      CRM_Core_Error::fatal(ts("Could not find a system table"));
-    }
+    $financialType->find(TRUE);
     $tempParams['amount'] = $minimumFee;
     $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
 

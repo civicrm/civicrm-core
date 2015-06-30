@@ -66,7 +66,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_skipDupeRegistrationCheck = FALSE;
 
   public $_paymentProcessorID;
-  public $_snippet;
 
   /**
    * @var boolean determines if fee block should be shown or hidden
@@ -97,10 +96,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // We hide the payment fields if the event is full or requires approval,
     // and the current user has not yet been approved CRM-12279
     $this->_noFees = (($eventFull || $this->_requireApproval) && !$this->_allowConfirmation);
-    CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this, $this->_noFees);
-    if ($this->_snippet) {
-      return;
-    }
+    $this->_paymentProcessors = $this->_noFees ? array() : $this->get('paymentProcessors');
+    $this->preProcessPaymentOptions();
 
     $this->_allowWaitlist = FALSE;
     if ($eventFull && !$this->_allowConfirmation && !empty($this->_values['event']['has_waitlist'])) {
@@ -139,11 +136,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    */
   public function setDefaultValues() {
-    if ($this->_paymentProcessorID && $this->_snippet && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
-      // see function comment block for explanation of this. Note that CRM-15555 will require this to look at the billing form fields not the
-      // billing_mode which
-      return;
-    }
     $this->_defaults = array();
     $contactID = $this->getContactID();
     $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
@@ -162,10 +154,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // set default state/province from config if no state/province set
     if (empty($this->_defaults["billing_state_province_id-{$this->_bltID}"])) {
       $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
-    }
-
-    if ($this->_snippet) {
-      return $this->_defaults;
     }
 
     if ($contactID) {
@@ -334,10 +322,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-    // Return if we are in an ajax callback
-    if ($this->_snippet) {
-      return;
-    }
 
     $contactID = $this->getContactID();
     if ($contactID) {

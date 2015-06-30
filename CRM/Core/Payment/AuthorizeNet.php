@@ -52,11 +52,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Authorize.net');
 
-    $config = CRM_Core_Config::singleton();
     $this->_setParam('apiLogin', $paymentProcessor['user_name']);
     $this->_setParam('paymentKey', $paymentProcessor['password']);
     $this->_setParam('paymentType', 'AIM');
-    $this->_setParam('md5Hash', $paymentProcessor['signature']);
+    $this->_setParam('md5Hash', CRM_Utils_Array::value('signature', $paymentProcessor));
 
     $this->_setParam('emailCustomer', 'TRUE');
     $this->_setParam('timestamp', time());

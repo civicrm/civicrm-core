@@ -172,8 +172,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('membership_amount', $membershipAmount);
       $this->assign('renewal_mode', $renewalMode);
 
-      CRM_Member_BAO_Membership::buildMembershipBlock($this,
-        $this->_id,
+      $this->buildMembershipBlock(
         $this->_membershipContactID,
         FALSE,
         $membershipTypeID,
