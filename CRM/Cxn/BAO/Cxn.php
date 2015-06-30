@@ -166,4 +166,17 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
     return $client;
   }
 
+  /**
+   * Construct a server for handling API requests.
+   *
+   * @return \Civi\Cxn\Rpc\ApiServer
+   */
+  public static function createApiServer() {
+    $cxnStore = new CRM_Cxn_CiviCxnStore();
+    $apiServer = new \Civi\Cxn\Rpc\ApiServer($cxnStore);
+    $apiServer->setLog(new CRM_Utils_SystemLogger());
+    $apiServer->setRouter(array('CRM_Cxn_ApiRouter', 'route'));
+    return $apiServer;
+  }
+
 }
