@@ -75,7 +75,8 @@ function civicrm_api3_payment_create(&$params) {
     }
     // Get payment balance
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participantId, 'event');
-    if ($paymentInfo['paid'] >= $paymentInfo['total']) {
+    $cmp = bccomp($paymentInfo['paid'], $paymentInfo['total'], 5); // Compare the two floating point amounts till the 5th decimal place.
+    if ($cmp == 1 || $cmp == 0) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
   }
