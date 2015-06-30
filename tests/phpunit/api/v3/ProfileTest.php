@@ -59,6 +59,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'civicrm_address',
       'civicrm_membership',
       'civicrm_contribution',
+      'civicrm_uf_match',
     ), TRUE);
     $this->callAPISuccess('membership_type', 'delete', array('id' => $this->_membershipTypeID));
     // ok can't be bothered wring an api to do this & truncating is crazy
