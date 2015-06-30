@@ -984,7 +984,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  INNER JOIN  civicrm_relationship_type ON civicrm_relationship.relationship_type_id = civicrm_relationship_type.id
  INNER JOIN  civicrm_contact ON civicrm_relationship.contact_id_b = civicrm_contact.id
  LEFT JOIN  civicrm_phone ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary = 1)
- LEFT JOIN  civicrm_email ON (civicrm_email.contact_id = civicrm_contact.id )
+ LEFT JOIN  civicrm_email ON (civicrm_email.contact_id = civicrm_contact.id AND civicrm_email.is_primary = 1)
      WHERE  civicrm_relationship.contact_id_a = %1 AND civicrm_relationship.case_id = %2';
 
     $params = array(
