@@ -173,7 +173,7 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
     );
 
     if ($this->_aclWhere) {
-      $where .= " AND {$this->_aclWhere} AND contact_a.is_deleted = 0";
+      $where .= " AND {$this->_aclWhere} ";
     }
     return $this->whereClause($where, $params);
   }
