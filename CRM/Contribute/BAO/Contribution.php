@@ -2959,7 +2959,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $balanceTrxnParams['status_id'] = $statusId;
         $balanceTrxnParams['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
-        if ($fromFinancialAccountId != NULL && 
+        if (isset($balanceTrxnParams['from_financial_account_id']) && 
             ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially Paid', $contributionStatuses))) {
           $balanceTrxnParams['is_payment'] = 1;
         }
@@ -4542,6 +4542,39 @@ LIMIT 1;";
       $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
     }
     return $trxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+  }
+
+  public static function addPayments($lineItems, $contributions) {
+    if ($contributions[0]->contribution_status_id != CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name')) 
+      return;
+    // get financial trxn which is a payment
+    $sql = "SELECT ft.id 
+      FROM civicrm_financial_trxn ft 
+      INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
+      WHERE eft.entity_id = %1 AND ft.is_payment = 1";
+    $ftId = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($contributions[0]->id, 'Integer')));
+    // get financial item
+    $sql = "SELECT fi.id, li.price_field_value_id
+      FROM civicrm_financial_item fi
+      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
+      WHERE li.contribution_id = %1";
+    $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contributions[0]->id, 'Integer')));
+    while ($dao->fetch()) {
+      $ftIds[$dao->price_field_value_id] = $dao->id;
+    }
+    foreach ($lineItems as $key => $value) {
+      $paid = $value['line_total'] * ($contributions[0]->net_amount/$contributions[0]->total_amount);
+      // Record Entity Financial Trxn
+      $params = array(
+        'entity_table' => 'civicrm_financial_item',
+        'financial_trxn_id' => $ftId,
+        'amount' => $paid,
+        'entity_id' => $ftIds[$value['price_field_value_id']],
+      );
+      $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+      $entityTrxn->copyValues($params);
+      $entityTrxn->save();
+    }
   }
 
 }
