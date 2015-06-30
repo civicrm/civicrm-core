@@ -161,8 +161,9 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
    */
   public static function createRegistrationClient() {
     $cxnStore = new \CRM_Cxn_CiviCxnStore();
-    $client = new \Civi\Cxn\Rpc\RegistrationClient(self::getCACert(), $cxnStore, \CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
+    $client = new \Civi\Cxn\Rpc\RegistrationClient($cxnStore, \CRM_Cxn_BAO_Cxn::getSiteCallbackUrl());
     $client->setLog(new \CRM_Utils_SystemLogger());
+    $client->setCertValidator(self::createCertificateValidator());
     return $client;
   }
 
@@ -175,8 +176,22 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
     $cxnStore = new CRM_Cxn_CiviCxnStore();
     $apiServer = new \Civi\Cxn\Rpc\ApiServer($cxnStore);
     $apiServer->setLog(new CRM_Utils_SystemLogger());
+    $apiServer->setCertValidator(self::createCertificateValidator());
     $apiServer->setRouter(array('CRM_Cxn_ApiRouter', 'route'));
     return $apiServer;
   }
 
+  /**
+   * @return \Civi\Cxn\Rpc\CertificateValidatorInterface
+   * @throws CRM_Core_Exception
+   */
+  public static function createCertificateValidator() {
+    $caCert = self::getCACert();
+    if ($caCert === NULL) {
+      return new \Civi\Cxn\Rpc\DefaultCertificateValidator(NULL, NULL, NULL);
+    }
+    else {
+      return new \Civi\Cxn\Rpc\DefaultCertificateValidator($caCert);
+    }
+  }
 }
