@@ -398,7 +398,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       // get organization address
       $domain = CRM_Core_BAO_Domain::getDomain();
-      $locParams = array('contact_id' => $domain->id);
+      $locParams = array('contact_id' => $domain->contact_id);
       $locationDefaults = CRM_Core_BAO_Location::getValues($locParams);
       if (isset($locationDefaults['address'][1]['state_province_id'])) {
         $stateProvinceAbbreviationDomain = CRM_Core_PseudoConstant::stateProvinceAbbreviation($locationDefaults['address'][1]['state_province_id']);
