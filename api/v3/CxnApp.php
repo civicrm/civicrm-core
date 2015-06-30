@@ -104,7 +104,8 @@ function civicrm_api3_cxn_app_get($params) {
     throw new API_Exception("Failed to download application list.");
   }
 
-  $agent = new \Civi\Cxn\Rpc\Agent(CRM_Cxn_BAO_Cxn::getCACert(), NULL, NULL);
+  $agent = new \Civi\Cxn\Rpc\Agent(NULL, NULL);
+  $agent->setCertValidator(CRM_Cxn_BAO_Cxn::createCertificateValidator());
   $message = $agent->decode(array(AppMetasMessage::NAME, GarbledMessage::NAME), $blob);
 
   if ($message instanceof AppMetasMessage) {
