@@ -83,10 +83,11 @@ function civicrm_api3_payment_create(&$params) {
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
     $balance = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($params['contribution_id']);
     $total = CRM_Price_BAO_LineItem::getLineTotal($params['contribution_id'], 'civicrm_contribution');
-    if ((float)$total <= (float)$paid) {
+    $cmp = bccomp($total, $paid, 5); // Compare the two floating point amounts till the 5th decimal place.
+    if ($cmp == 0 || $cmp == -1) { // If paid amount is greater or equal to total amount
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
-    else if ((float)$total > (float)$paid) {
+    else if ($cmp == 1) { // If paid amount is lesser than total amount
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
     }
   }
