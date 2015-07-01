@@ -203,34 +203,28 @@ class CRM_Member_BAO_Query {
 
       case 'membership_status':
       case 'member_status_id':
-        if (!is_array($value)) {
-          $status = $value;
-          if (!empty($value)) {
-            $value = array_flip(explode(",", str_replace(array('(', ')'), '', $value)));
-          }
-          else {
-            $value = array();
-          }
+      case 'membership_type':
+      case 'membership_type_id':
+      case 'member_id':
+        if (strpos($name, 'status') !== FALSE) {
+          $name = 'status_id';
+          $qillName = 'Membership Status(s)';
+        }
+        elseif ($name == 'member_id') {
+          $name = 'id';
+          $qillName = 'Membership ID';
         }
         else {
-          $status = implode(',', array_keys($value));
-          if (count($value) > 0) {
-            $op = 'IN';
-            $status = "({$status})";
-          }
+          $name = 'membership_type_id';
+          $qillName = 'Memebership Type(s)';
         }
-
-        $names = array();
-        $statusTypes = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label');
-        foreach ($value as $id => $dontCare) {
-          $names[] = $statusTypes[$id];
-        }
-        $query->_qill[$grouping][] = ts('Membership Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.status_id",
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.$name",
           $op,
-          $status,
+          $value,
           "Integer"
         );
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Member_DAO_Membership', $name, $value, $op);
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $qillName, 2 => $op, 3 => $value));
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
@@ -279,46 +273,6 @@ class CRM_Member_BAO_Query {
         else {
           $query->_qill[$grouping][] = ts("Membership is NOT Pay Later");
         }
-        $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
-        return;
-
-      case 'membership_type':
-      case 'member_membership_type_id':
-        if (!is_array($value)) {
-          $mType = $value;
-          if (!empty($value)) {
-            $value = array_flip(explode(",", str_replace(array('(', ')'), '', $value)));
-          }
-          else {
-            $value = array();
-          }
-        }
-        else {
-          $mType = implode(',', array_keys($value));
-          if (count($value) > 0) {
-            $op = 'IN';
-            $mType = "({$mType})";
-          }
-        }
-
-        $names = array();
-        $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-        foreach ($value as $id => $dontCare) {
-          if (!empty($membershipTypes[$id])) {
-            $names[] = $membershipTypes[$id];
-          }
-        }
-        $query->_qill[$grouping][] = ts('Membership Type %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.membership_type_id",
-          $op,
-          $mType,
-          "Integer"
-        );
-        $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
-        return;
-
-      case 'member_id':
-        $query->_where[$grouping][] = " civicrm_membership.id $op $value";
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
@@ -436,13 +390,13 @@ class CRM_Member_BAO_Query {
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
-    foreach (CRM_Member_PseudoConstant::membershipType() as $id => $Name) {
-      $form->_membershipType = &$form->addElement('checkbox', "member_membership_type_id[$id]", NULL, $Name);
-    }
+    $form->addSelect('status_id',
+      array('entity' => 'membership', 'multiple' => 'multiple', 'label' => ts('Memebership Status(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+    );
 
-    foreach (CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label') as $sId => $sName) {
-      $form->_membershipStatus = &$form->addElement('checkbox', "member_status_id[$sId]", NULL, $sName);
-    }
+    $form->addSelect('membership_type_id',
+      array('entity' => 'membership', 'multiple' => 'multiple', 'label' => ts('Memebership Type(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+    );
 
     $form->addElement('text', 'member_source', ts('Source'));
 
