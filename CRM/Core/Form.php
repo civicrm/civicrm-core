@@ -1259,6 +1259,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $required
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
+   * @return HTML_QuickForm_Element
    */
   public function addField($name, $props = array(), $required = FALSE) {
     // TODO: Handle custom field
@@ -1361,26 +1362,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Link':
         //TODO: Autodetect ranges
         $props['size'] = isset($props['size']) ? $props['size'] : 60;
-        $this->add('text', $name, $label, $props, $required);
-        break;
+        return $this->add('text', $name, $label, $props, $required);
 
       case 'hidden':
-        $this->add('hidden', $name, NULL, $props, $required);
-        break;
+        return $this->add('hidden', $name, NULL, $props, $required);
 
       case 'TextArea':
         //Set default columns and rows for textarea.
         $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
         $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
-        $this->addElement('textarea', $name, $label, $props, $required);
-        break;
+        return $this->addElement('textarea', $name, $label, $props, $required);
 
       case 'Select Date':
         //TODO: add range support
         //TODO: Add date formats
         //TODO: Add javascript template for dates.
-        $this->addDate($name, $label, $required, $props);
-        break;
+        return $this->addDate($name, $label, $required, $props);
 
       case 'Radio':
         $separator = isset($props['separator']) ? $props['separator'] : NULL;
@@ -1388,47 +1385,41 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (!isset($props['allowClear'])) {
           $props['allowClear'] = !$required;
         }
-        $this->addRadio($name, $label, $options, $props, $separator, $required);
-        break;
+        return $this->addRadio($name, $label, $options, $props, $separator, $required);
 
       case 'Select':
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
         }
-        $this->add('select', $name, $label, $options, $required, $props);
         // TODO: Add and/or option for fields that store multiple values
-        break;
+        return $this->add('select', $name, $label, $options, $required, $props);
 
       case 'CheckBoxGroup':
-        $this->addCheckBox($name, $label, array_flip($options), $required, $props);
-        break;
+        return $this->addCheckBox($name, $label, array_flip($options), $required, $props);
 
       case 'RadioGroup':
-        $this->addRadio($name, $label, $options, $props, NULL, $required);
-        break;
+        return $this->addRadio($name, $label, $options, $props, NULL, $required);
 
       //case 'AdvMulti-Select':
       case 'CheckBox':
         $text = isset($props['text']) ? $props['text'] : NULL;
         unset($props['text']);
-        $this->addElement('checkbox', $name, $label, $text, $props);
-        break;
+        return $this->addElement('checkbox', $name, $label, $text, $props);
 
       case 'File':
         // We should not build upload file in search mode.
         if (isset($props['context']) && $props['context'] == 'search') {
           return;
         }
-        $this->add('file', $name, $label, $props, $required);
+        $file = $this->add('file', $name, $label, $props, $required);
         $this->addUploadElement($name);
-        break;
+        return $file;
 
       //case 'RichTextEditor':
       //TODO: Add javascript template for wysiwyg.
       case 'Autocomplete-Select':
       case 'EntityRef':
-        $this->addEntityRef($name, $label, $props, $required);
-        break;
+        return $this->addEntityRef($name, $label, $props, $required);
 
       // Check datatypes of fields
       // case 'Int':
