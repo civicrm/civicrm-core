@@ -724,6 +724,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
     $this->callAPISuccess($entityName, 'delete', array('id' => $result['id']));
+    $this->quickCleanup(array('civicrm_uf_match'));
   }
 
   /**
