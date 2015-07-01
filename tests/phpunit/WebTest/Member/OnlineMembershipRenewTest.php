@@ -867,7 +867,9 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->assertEquals($membership['count'], 1);
     $membershipId = $membership['id'];
     $this->assertEquals($membership['values'][$membershipId]['membership_name'], $membershipTypeTitle);
-    $this->assertEquals($membership['values'][$membershipId]['status_id'], 1);
+    //CRM-16165: if membership contribution status is pending then membership status should be pending
+    $pendingStatus = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', 'Pending', 'id', 'name');
+    $this->assertEquals($membership['values'][$membershipId]['status_id'], $pendingStatus);
 
     //check if the membership created is set to reccuring
     $recurringContributionId = $membership['values'][$membershipId]['contribution_recur_id'];
