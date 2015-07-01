@@ -66,6 +66,9 @@ function civicrm_api3_payment_create(&$params) {
   // Get contribution
   $contribution = civicrm_api3('Contribution', 'get', array('id' => $params['contribution_id']));
   $contribution = reset($contribution['values']);
+  if ($contribution['contribution_status'] == 'Completed') {
+    return civicrm_api3_create_error(ts('Please select a contribution which has a pending payment'));
+  }
   if ($contribution['contribution_status'] == 'Partially paid') {
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
     $participantPayment = civicrm_api3('ParticipantPayment', 'get', array('contribution_id' => $params['contribution_id']));

@@ -3922,9 +3922,9 @@ WHERE con.id = {$contributionId}
     $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
     $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
     $balanceTrxnParams['currency'] = $contribution['currency'];
-    $balanceTrxnParams['trxn_id'] = $params['contribution_trxn_id'];
+    $balanceTrxnParams['trxn_id'] = CRM_Utils_Array::value('contribution_trxn_id', $params, NULL);
     $balanceTrxnParams['status_id'] = $statusId;
-    $balanceTrxnParams['payment_instrument_id'] = $params['payment_instrument_id'];
+    $balanceTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
     $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
     if ($fromFinancialAccountId != NULL && 
         ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially Paid', $contributionStatuses))) {
@@ -3933,7 +3933,7 @@ WHERE con.id = {$contributionId}
     if (!empty($params['payment_processor'])) {
       $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
     }
-    return $trxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+    $trxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
   }
 
   public static function addPayments($lineItems, $contributions) {
