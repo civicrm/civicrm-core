@@ -160,7 +160,7 @@ class CRM_Utils_Type {
       case 'Integer':
       case 'Int':
         if (CRM_Utils_Rule::integer($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
@@ -284,7 +284,7 @@ class CRM_Utils_Type {
       case 'Integer':
       case 'Int':
         if (CRM_Utils_Rule::integer($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 

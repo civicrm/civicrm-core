@@ -113,6 +113,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(array('civicrm_uf_match'));
   }
 
   /**
