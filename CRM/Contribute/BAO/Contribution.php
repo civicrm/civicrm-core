@@ -3933,7 +3933,7 @@ WHERE con.id = {$contributionId}
     if (!empty($params['payment_processor'])) {
       $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
     }
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+    return $trxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
   }
 
   public static function addPayments($lineItems, $contributions) {
