@@ -4553,7 +4553,7 @@ LIMIT 1;";
   public static function addPayments($lineItems, $contributions) {
     foreach ($contributions as $k => $contribution) {
       if ($contribution->contribution_status_id != CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name')) 
-        return;
+        continue;
       // get financial trxn which is a payment
       $sql = "SELECT ft.id 
       FROM civicrm_financial_trxn ft 
