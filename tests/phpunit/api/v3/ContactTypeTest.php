@@ -87,10 +87,10 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_id' => $contact['id'],
     );
     $result = $this->callAPISuccess('contact', 'get', $params);
-    $this->assertEquals($result['values'][$contact['id']]['first_name'], $contactParams['first_name'], "In line " . __LINE__);
-    $this->assertEquals($result['values'][$contact['id']]['last_name'], $contactParams['last_name'], "In line " . __LINE__);
-    $this->assertEquals($result['values'][$contact['id']]['contact_type'], $contactParams['contact_type'], "In line " . __LINE__);
-    $this->assertEquals(end($result['values'][$contact['id']]['contact_sub_type']), $contactParams['contact_sub_type'], "In line " . __LINE__);
+    $this->assertEquals($result['values'][$contact['id']]['first_name'], $contactParams['first_name']);
+    $this->assertEquals($result['values'][$contact['id']]['last_name'], $contactParams['last_name']);
+    $this->assertEquals($result['values'][$contact['id']]['contact_type'], $contactParams['contact_type']);
+    $this->assertEquals(end($result['values'][$contact['id']]['contact_sub_type']), $contactParams['contact_sub_type']);
     $this->callAPISuccess('contact', 'delete', $params);
 
     // check for Type:Organization Subtype:sub_organization
@@ -106,9 +106,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     );
     $getContacts = $this->callAPISuccess('contact', 'get', $params);
     $result = $getContacts['values'][$contact['id']];
-    $this->assertEquals($result['organization_name'], $contactParams['organization_name'], "In line " . __LINE__);
-    $this->assertEquals($result['contact_type'], $contactParams['contact_type'], "In line " . __LINE__);
-    $this->assertEquals(end($result['contact_sub_type']), $contactParams['contact_sub_type'], "In line " . __LINE__);
+    $this->assertEquals($result['organization_name'], $contactParams['organization_name']);
+    $this->assertEquals($result['contact_type'], $contactParams['contact_type']);
+    $this->assertEquals(end($result['contact_sub_type']), $contactParams['contact_sub_type']);
     $this->callAPISuccess('contact', 'delete', $params);
   }
 
@@ -159,7 +159,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_sub_type' => $this->subTypeIndividual,
     );
     $updateContact = $this->callAPISuccess('contact', 'create', $updateParams);
-    $this->assertEquals($updateContact['id'], $contact['id'], "In line " . __LINE__);
+    $this->assertEquals($updateContact['id'], $contact['id']);
 
     $params = array(
       'contact_id' => $contact['id'],
@@ -167,10 +167,10 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $getContacts = $this->callAPISuccess('contact', 'get', $params);
     $result = $getContacts['values'][$contact['id']];
 
-    $this->assertEquals($result['first_name'], $updateParams['first_name'], "In line " . __LINE__);
-    $this->assertEquals($result['last_name'], $updateParams['last_name'], "In line " . __LINE__);
-    $this->assertEquals($result['contact_type'], $updateParams['contact_type'], "In line " . __LINE__);
-    $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type'], "In line " . __LINE__);
+    $this->assertEquals($result['first_name'], $updateParams['first_name']);
+    $this->assertEquals($result['last_name'], $updateParams['last_name']);
+    $this->assertEquals($result['contact_type'], $updateParams['contact_type']);
+    $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type']);
     $this->callAPISuccess('contact', 'delete', $params);
 
     // check for Type:Organization
@@ -188,7 +188,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_sub_type' => $this->subTypeOrganization,
     );
     $updateContact = $this->callAPISuccess('contact', 'create', $updateParams);
-    $this->assertEquals($updateContact['id'], $contact['id'], "In line " . __LINE__);
+    $this->assertEquals($updateContact['id'], $contact['id']);
 
     $params = array(
       'contact_id' => $contact['id'],
@@ -196,9 +196,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $getContacts = $this->callAPISuccess('contact', 'get', $params);
     $result = $getContacts['values'][$contact['id']];
 
-    $this->assertEquals($result['organization_name'], $updateParams['organization_name'], "In line " . __LINE__);
-    $this->assertEquals($result['contact_type'], $updateParams['contact_type'], "In line " . __LINE__);
-    $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type'], "In line " . __LINE__);
+    $this->assertEquals($result['organization_name'], $updateParams['organization_name']);
+    $this->assertEquals($result['contact_type'], $updateParams['contact_type']);
+    $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type']);
     $this->callAPISuccess('contact', 'delete', $params);
   }
 
@@ -285,7 +285,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     );
     $updateContact = $this->callAPISuccess('contact', 'create', $updateParams);
 
-    $this->assertEquals($updateContact['id'], $contact['id'], "In line " . __LINE__);
+    $this->assertEquals($updateContact['id'], $contact['id']);
 
     $params = array(
       'contact_id' => $contact['id'],
@@ -293,10 +293,10 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $getContacts = $this->callAPISuccess('contact', 'get', $params);
     $result = $getContacts['values'][$contact['id']];
 
-    $this->assertEquals($result['first_name'], $updateParams['first_name'], "In line " . __LINE__);
-    $this->assertEquals($result['last_name'], $updateParams['last_name'], "In line " . __LINE__);
-    $this->assertEquals($result['contact_type'], $updateParams['contact_type'], "In line " . __LINE__);
-    $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type'], "In line " . __LINE__);
+    $this->assertEquals($result['first_name'], $updateParams['first_name']);
+    $this->assertEquals($result['last_name'], $updateParams['last_name']);
+    $this->assertEquals($result['contact_type'], $updateParams['contact_type']);
+    $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type']);
     $this->callAPISuccess('contact', 'delete', $params);
 
     $params = array(
@@ -325,7 +325,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'contact_sub_type' => $subtype,
     );
     $updateContact = $this->callAPISuccess('contact', 'create', $updateParams);
-    $this->assertEquals($updateContact['id'], $contact['id'], "In line " . __LINE__);
+    $this->assertEquals($updateContact['id'], $contact['id']);
 
     $params = array(
       'contact_id' => $contact['id'],
@@ -333,9 +333,9 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $getContacts = $this->callAPISuccess('contact', 'get', $params);
     $result = $getContacts['values'][$contact['id']];
 
-    $this->assertEquals($result['organization_name'], $updateParams['organization_name'], "In line " . __LINE__);
-    $this->assertEquals($result['contact_type'], $updateParams['contact_type'], "In line " . __LINE__);
-    $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type'], "In line " . __LINE__);
+    $this->assertEquals($result['organization_name'], $updateParams['organization_name']);
+    $this->assertEquals($result['contact_type'], $updateParams['contact_type']);
+    $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type']);
     $this->callAPISuccess('contact', 'delete', $params);
   }
 

@@ -159,9 +159,9 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('group_contact', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['not_added'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['added'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['total_count'], 2, "in line " . __LINE__);
+    $this->assertEquals($result['not_added'], 1);
+    $this->assertEquals($result['added'], 1);
+    $this->assertEquals($result['total_count'], 2);
   }
 
   ///////////////// civicrm_group_contact_remove methods
@@ -176,8 +176,8 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['removed'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['total_count'], 1, "in line " . __LINE__);
+    $this->assertEquals($result['removed'], 1);
+    $this->assertEquals($result['total_count'], 1);
   }
 
   public function testDeletePermanent() {
@@ -188,8 +188,8 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
     $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
     $result = $this->callAPISuccess('group_contact', 'get', $params);
-    $this->assertEquals(0, $result['count'], "in line " . __LINE__);
-    $this->assertArrayNotHasKey('id', $result, "in line " . __LINE__);
+    $this->assertEquals(0, $result['count']);
+    $this->assertArrayNotHasKey('id', $result);
   }
 
 }

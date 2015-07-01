@@ -154,9 +154,9 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertAPISuccess($result, " in line " . __LINE__);
-    $this->assertEquals($result['values'][$this->_participantID]['event_id'], $this->_eventID, "in line " . __LINE__);
-    $this->assertEquals($result['values'][$this->_participantID]['participant_register_date'], '2007-02-19 00:00:00', "in line " . __LINE__);
-    $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon', "in line " . __LINE__);
+    $this->assertEquals($result['values'][$this->_participantID]['event_id'], $this->_eventID);
+    $this->assertEquals($result['values'][$this->_participantID]['participant_register_date'], '2007-02-19 00:00:00');
+    $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon');
     $params = array(
       'id' => $this->_participantID,
       'return' => 'id,participant_register_date,event_id',

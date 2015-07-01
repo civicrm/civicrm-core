@@ -152,14 +152,14 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $this->_membershipID,
     ));
-    $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
-    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
-    $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($result['join_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
-    $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
+    $this->assertEquals($result['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($result['join_date'], '2009-01-21');
+    $this->assertEquals($result['start_date'], '2009-01-21');
+    $this->assertEquals($result['end_date'], '2009-12-21');
+    $this->assertEquals($result['source'], 'Payment');
+    $this->assertEquals($result['is_override'], 1);
   }
 
   /**
@@ -223,14 +223,14 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $membership['id'],
     ));
     $result = $membership['values'][$membership['id']];
-    $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
-    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
-    $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($result['join_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
-    $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
+    $this->assertEquals($result['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($result['join_date'], '2009-01-21');
+    $this->assertEquals($result['start_date'], '2009-01-21');
+    $this->assertEquals($result['end_date'], '2009-12-21');
+    $this->assertEquals($result['source'], 'Payment');
+    $this->assertEquals($result['is_override'], 1);
     $this->assertEquals($result['id'], $membership['id']);
   }
 
@@ -299,15 +299,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $membership['id'],
     ));
-    $this->assertEquals($result['join_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
-    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
-    $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
+    $this->assertEquals($result['join_date'], '2009-01-21');
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
+    $this->assertEquals($result['status_id'], $this->_membershipStatusID);
 
-    $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
-    $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['start_date'], '2009-01-21');
+    $this->assertEquals($result['end_date'], '2009-12-21');
+    $this->assertEquals($result['source'], 'Payment');
+    $this->assertEquals($result['is_override'], 1);
   }
 
 
@@ -372,7 +372,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
 
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals($membership['count'], 0, "In line " . __LINE__);
+    $this->assertEquals($membership['count'], 0);
   }
 
   /**
@@ -732,7 +732,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $result['id'],
     ));
-    $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
+    $this->assertEquals($result['id'], $membershipID);
   }
 
   /**
@@ -759,7 +759,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $result['id'],
     ));
 
-    $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
+    $this->assertEquals($result['id'], $membershipID);
   }
 
   /**
@@ -782,7 +782,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $result['id'],
     ));
-    $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
+    $this->assertEquals($result['id'], $membershipID);
   }
 
   /**
@@ -804,7 +804,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $result['id'],
     ));
-    $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
+    $this->assertEquals($result['id'], $membershipID);
   }
 
   /**
@@ -823,7 +823,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'skipStatusCal' => 1,
     );
     $result = $this->callAPISuccess('membership', 'create', $params);
-    $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
+    $this->assertEquals($result['id'], $membershipID);
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $result['id'],
     ));
