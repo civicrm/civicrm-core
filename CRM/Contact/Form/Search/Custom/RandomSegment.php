@@ -35,6 +35,8 @@
 class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_debug = 0;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
   function __construct(&$formValues) {
     parent::__construct($formValues);
@@ -271,6 +273,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
         CRM_Core_DAO::executeQuery($insertGroupNameQuery);
       }
     }
+    $this->buildACLClause('contact_a');
 
     $from = "FROM civicrm_contact contact_a";
 
@@ -304,15 +307,22 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     $from = "FROM random_{$this->_tableName} random";
 
-    $from .= " INNER JOIN civicrm_contact contact_a ON random.id = contact_a.id";
+    $from .= " INNER JOIN civicrm_contact contact_a ON random.id = contact_a.id {$this->_aclFrom}";
 
     $from .= " $fromTail";
 
     return $from;
+
   }
 
   function where($includeContactIDs = FALSE) {
-    return '(1)';
+    $where = '(1)';
+
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->aclWhere} ";
+    }
+
+    return $where;
   }
 
   function templateFile() {
@@ -341,5 +351,12 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     // but let mysql clean up
     return;
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildAclClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+  
+}
