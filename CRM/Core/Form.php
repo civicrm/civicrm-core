@@ -1363,25 +1363,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         //TODO: Autodetect ranges
         $props['size'] = isset($props['size']) ? $props['size'] : 60;
         return $this->add('text', $name, $label, $props, $required);
-        break;
 
       case 'hidden':
         return $this->add('hidden', $name, NULL, $props, $required);
-        break;
 
       case 'TextArea':
         //Set default columns and rows for textarea.
         $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
         $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
         return $this->addElement('textarea', $name, $label, $props, $required);
-        break;
 
       case 'Select Date':
         //TODO: add range support
         //TODO: Add date formats
         //TODO: Add javascript template for dates.
         return $this->addDate($name, $label, $required, $props);
-        break;
 
       case 'Radio':
         $separator = isset($props['separator']) ? $props['separator'] : NULL;
@@ -1390,30 +1386,25 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $props['allowClear'] = !$required;
         }
         return $this->addRadio($name, $label, $options, $props, $separator, $required);
-        break;
 
       case 'Select':
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
         }
-        return $this->add('select', $name, $label, $options, $required, $props);
         // TODO: Add and/or option for fields that store multiple values
-        break;
+        return $this->add('select', $name, $label, $options, $required, $props);
 
       case 'CheckBoxGroup':
         return $this->addCheckBox($name, $label, array_flip($options), $required, $props);
-        break;
 
       case 'RadioGroup':
         return $this->addRadio($name, $label, $options, $props, NULL, $required);
-        break;
 
       //case 'AdvMulti-Select':
       case 'CheckBox':
         $text = isset($props['text']) ? $props['text'] : NULL;
         unset($props['text']);
         return $this->addElement('checkbox', $name, $label, $text, $props);
-        break;
 
       case 'File':
         // We should not build upload file in search mode.
@@ -1423,14 +1414,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $file = $this->add('file', $name, $label, $props, $required);
         $this->addUploadElement($name);
         return $file;
-        break;
 
       //case 'RichTextEditor':
       //TODO: Add javascript template for wysiwyg.
       case 'Autocomplete-Select':
       case 'EntityRef':
         return $this->addEntityRef($name, $label, $props, $required);
-        break;
 
       // Check datatypes of fields
       // case 'Int':
