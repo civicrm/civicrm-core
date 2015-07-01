@@ -3006,6 +3006,12 @@ WHERE  contribution_id = %1 ";
       && $context == 'changePaymentInstrument'
     ) {
       return;
+    } 
+    if (($params['prevContribution']->contribution_status_id == array_search('Partially paid', $contributionStatus))
+      && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
+      && $context == 'changedStatus'
+    ) {
+      return;
     }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
       $itemAmount = $params['trxnParams']['total_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
