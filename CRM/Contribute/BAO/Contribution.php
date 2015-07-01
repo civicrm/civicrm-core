@@ -4551,35 +4551,37 @@ LIMIT 1;";
   }
 
   public static function addPayments($lineItems, $contributions) {
-    if ($contributions[0]->contribution_status_id != CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name')) 
-      return;
-    // get financial trxn which is a payment
-    $sql = "SELECT ft.id 
+    foreach ($contributions as $k => $contribution) {
+      if ($contribution->contribution_status_id != CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name')) 
+        return;
+      // get financial trxn which is a payment
+      $sql = "SELECT ft.id 
       FROM civicrm_financial_trxn ft 
       INNER JOIN civicrm_entity_financial_trxn eft ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
       WHERE eft.entity_id = %1 AND ft.is_payment = 1";
-    $ftId = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($contributions[0]->id, 'Integer')));
-    // get financial item
-    $sql = "SELECT fi.id, li.price_field_value_id
+      $ftId = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($contribution->id, 'Integer')));
+      // get financial item
+      $sql = "SELECT fi.id, li.price_field_value_id
       FROM civicrm_financial_item fi
       INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
       WHERE li.contribution_id = %1";
-    $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contributions[0]->id, 'Integer')));
-    while ($dao->fetch()) {
-      $ftIds[$dao->price_field_value_id] = $dao->id;
-    }
-    foreach ($lineItems as $key => $value) {
-      $paid = $value['line_total'] * ($contributions[0]->net_amount/$contributions[0]->total_amount);
-      // Record Entity Financial Trxn
-      $params = array(
-        'entity_table' => 'civicrm_financial_item',
-        'financial_trxn_id' => $ftId,
-        'amount' => $paid,
-        'entity_id' => $ftIds[$value['price_field_value_id']],
-      );
-      $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
-      $entityTrxn->copyValues($params);
-      $entityTrxn->save();
+      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contribution->id, 'Integer')));
+      while ($dao->fetch()) {
+        $ftIds[$dao->price_field_value_id] = $dao->id;
+      }
+      foreach ($lineItems as $key => $value) {
+        $paid = $value['line_total'] * ($contribution->net_amount/$contribution->total_amount);
+        // Record Entity Financial Trxn
+        $params = array(
+          'entity_table' => 'civicrm_financial_item',
+          'financial_trxn_id' => $ftId,
+          'amount' => $paid,
+          'entity_id' => $ftIds[$value['price_field_value_id']],
+        );
+        $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+        $entityTrxn->copyValues($params);
+        $entityTrxn->save();
+      }
     }
   }
 
