@@ -109,9 +109,9 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
 
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Event registration for $displayName has been added");
-    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table//tbody/tr[1]/td[8]/span//a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//form[@class='CRM_Event_Form_Search crm-search-form']/table/tbody/tr[1]/td[8]/span//a[text()='View']");
     $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
 
     $this->webtestVerifyTabularData(
@@ -143,7 +143,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     );
 
     $this->clickAjaxLink("xpath=//button//span[contains(text(),'Done')]");
-    $this->waitForElementPresent("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//form[@id='ParticipantView']//div/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span//a[text()='View']");
     // make additional payment
     // 1 - check for links presence on participant view and edit page
     $this->waitForElementPresent("xpath=//form[@id='ParticipantView']//div//table//tbody//td[@id='payment-info']//a[contains(text(), 'Record Payment')]");
