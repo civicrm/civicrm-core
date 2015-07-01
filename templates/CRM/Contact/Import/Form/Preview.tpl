@@ -47,7 +47,7 @@ function pollLoop( ){
 }
 
 function verify( ) {
-    if (! confirm('{/literal}{ts escape='js'}Are you sure you want to Import now{/ts}{literal}?') ) {
+    if (! confirm('Backing up your database before importing is recommended, as there is no Undo for this. {/literal}{ts escape='js'}Are you sure you want to Import now{/ts}{literal}?') ) {
         return false;
     }
 
