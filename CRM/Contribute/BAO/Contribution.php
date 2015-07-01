@@ -3210,6 +3210,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       && $context == 'changePaymentInstrument'
     ) {
       return;
+    } 
+    if (($params['prevContribution']->contribution_status_id == array_search('Partially paid', $contributionStatus))
+      && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
+      && $context == 'changedStatus'
+    ) {
+      return;
     }
     if (($params['prevContribution']->contribution_status_id == array_search('Partially paid', $contributionStatus))
       && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
