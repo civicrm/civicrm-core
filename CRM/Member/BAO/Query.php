@@ -88,7 +88,7 @@ class CRM_Member_BAO_Query {
         $query->_whereTables['civicrm_membership_status'] = 1;
       }
 
-      if (!empty($query->_returnProperties['status_id'])) {
+      if (!empty($query->_returnProperties['membership_status_id'])) {
         $query->_select['status_id'] = "civicrm_membership_status.id as status_id";
         $query->_element['status_id'] = 1;
         $query->_tables['civicrm_membership_status'] = 1;
@@ -203,6 +203,7 @@ class CRM_Member_BAO_Query {
 
       case 'membership_status':
       case 'member_status_id':
+      case 'membership_status_id':
       case 'membership_type':
       case 'membership_type_id':
       case 'member_id':
@@ -390,8 +391,9 @@ class CRM_Member_BAO_Query {
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
-    $form->addSelect('status_id',
-      array('entity' => 'membership', 'multiple' => 'multiple', 'label' => ts('Memebership Status(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+    $membershipStatus = CRM_Member_PseudoConstant::membershipStatus();
+    $form->add('select', 'membership_status_id', ts('Memebership Status(s)'), $membershipStatus, FALSE,
+      array('id' => 'membership_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     $form->addSelect('membership_type_id',
