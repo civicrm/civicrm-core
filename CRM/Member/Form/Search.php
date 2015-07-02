@@ -210,7 +210,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     }
 
     $specialParams = array(
-      'status_id',
+      'membership_status_id',
       'membership_type_id',
     );
     foreach ($specialParams as $element) {
