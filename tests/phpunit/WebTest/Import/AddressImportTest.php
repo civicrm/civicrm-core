@@ -286,7 +286,8 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
         $customField1 => '1',
         $customField2 => '12345',
         $customField9 => '123,456.00',
-        $customField10 => 'December 31st, 2009',
+        //CRM-16068 -- changing assertion to match the date format selected during custom field creation.
+        $customField10 => '2009-12-31',
       ),
     );
   }

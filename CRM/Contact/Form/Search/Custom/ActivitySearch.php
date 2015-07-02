@@ -35,6 +35,8 @@
 class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
   /**
    * @param $formValues
@@ -254,12 +256,13 @@ ORDER BY contact_a.sort_name';
    * @return string
    */
   public function from() {
+    $this->buildACLClause('contact_a');
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
-    return "
+    $from = "
         civicrm_activity activity
             LEFT JOIN civicrm_activity_contact target
                  ON activity.id = target.activity_id AND target.record_type_id = {$targetID}
@@ -278,7 +281,9 @@ ORDER BY contact_a.sort_name';
             LEFT JOIN civicrm_activity_contact assignment
                  ON activity.id = assignment.activity_id AND assignment.record_type_id = {$assigneeID}
             LEFT JOIN civicrm_contact contact_c
-                 ON assignment.contact_id = contact_c.id ";
+                 ON assignment.contact_id = contact_c.id {$this->_aclFrom}";
+
+    return $from;
   }
 
   /**
@@ -355,6 +360,9 @@ ORDER BY contact_a.sort_name';
       }
     }
 
+    if ($this->_aclWhere) {
+      $clauses[] = " {$this->_aclWhere} ";
+    }
     return implode(' AND ', $clauses);
   }
 
@@ -378,7 +386,7 @@ ORDER BY contact_a.sort_name';
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
@@ -410,6 +418,13 @@ ORDER BY contact_a.sort_name';
    */
   public function summary() {
     return NULL;
+  }
+
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }

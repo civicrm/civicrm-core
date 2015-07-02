@@ -93,7 +93,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'case_type_id' => 1,
     );
 
-    $result = $this->callAPIFailure('case', 'create', $params);
+    $this->callAPIFailure('case', 'create', $params);
   }
 
   /**

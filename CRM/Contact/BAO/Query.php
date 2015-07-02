@@ -2217,7 +2217,7 @@ class CRM_Contact_BAO_Query {
           if (!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
             //Via Contact get api value is not in array(operator => array(values)) format ONLY for IN/NOT IN operators
             //so this condition will satisfy the search for now
-            if (strstr('IN', $op)) {
+            if (strpos($op, 'IN') !== FALSE) {
               $value = array($op => $value);
             }
             // we don't know when this might happen
@@ -5081,7 +5081,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $date = "('" . implode("','", $value) . "')";
         $format = implode(', ', $format);
       }
-      elseif ($value) {
+      elseif ($value && (!strstr($op, 'NULL') && !strstr($op, 'EMPTY'))) {
         $date = CRM_Utils_Date::processDate($value);
         if (!$appendTimeStamp) {
           $date = substr($date, 0, 8);
@@ -5219,26 +5219,6 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       case 'IS NOT EMPTY':
         $clause = " (NULLIF($field, '') IS NOT NULL) ";
         return $clause;
-
-      case 'IN':
-      case 'NOT IN':
-        if (isset($dataType)) {
-          if (is_array($value)) {
-            $values = $value;
-          }
-          else {
-            $value = CRM_Utils_Type::escape($value, "String");
-            $values = explode(',', CRM_Utils_Array::value(0, explode(')', CRM_Utils_Array::value(1, explode('(', $value)))));
-          }
-          // supporting multiple values in IN clause
-          $val = array();
-          foreach ($values as $v) {
-            $v = trim($v);
-            $val[] = "'" . CRM_Utils_Type::escape($v, $dataType) . "'";
-          }
-          $value = "(" . implode($val, ",") . ")";
-        }
-        return "$clause $value";
 
       default:
         if (empty($dataType)) {

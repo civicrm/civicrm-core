@@ -109,6 +109,9 @@
             {$form.onbehalf.$fieldName.html}
             {if !empty($onBehalfOfFields.$fieldName.html_type)  && $onBehalfOfFields.$fieldName.html_type eq 'Autocomplete-Select'}
               {assign var=elementName value=onbehalf[$fieldName]}
+              {if $onBehalfOfFields.$fieldName.data_type eq 'ContactReference'}
+                {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $elementName}
+              {/if}
             {/if}
             {if $onBehalfOfFields.$fieldName.name|substr:0:5 eq 'phone'}
               {assign var="phone_ext_field" value=$onBehalfOfFields.$fieldName.name|replace:'phone':'phone_ext'}
@@ -116,9 +119,9 @@
                 &nbsp;{$form.onbehalf.$phone_ext_field.html}
               {/if}
             {/if}
-      {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
-            {assign var=elementName value=onbehalf[$fieldName]}
-         {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
+            {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
+              {assign var=elementName value=onbehalf[$fieldName]}
+              {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
             {/if}
             {if $onBehalfOfFields.$fieldName.help_post}
               <br /><span class='description'>{$onBehalfOfFields.$fieldName.help_post}</span>
