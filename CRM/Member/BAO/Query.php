@@ -202,7 +202,6 @@ class CRM_Member_BAO_Query {
         return;
 
       case 'membership_status':
-      case 'member_status_id':
       case 'membership_status_id':
       case 'membership_type':
       case 'membership_type_id':
