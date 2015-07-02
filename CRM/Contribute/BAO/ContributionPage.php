@@ -454,14 +454,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'cc_receipt',
         'bcc_receipt',
       ));
+      $isEmailReceipt = CRM_Utils_Array::value('is_email_receipt', $value[$pageID]);
+    }
+    elseif ($recur->id) {
+      // This means we are coming from back-office - ie. no page ID, but recurring.
+      // Ideally this information would be passed into the function clearly rather than guessing by convention.
+      $isEmailReceipt = TRUE;
     }
 
-    $isEmailReceipt = CRM_Utils_Array::value('is_email_receipt', $value[$pageID]);
-    $isOfflineRecur = FALSE;
-    if (!$pageID && $recur->id) {
-      $isOfflineRecur = TRUE;
-    }
-    if ($isEmailReceipt || $isOfflineRecur) {
+    if ($isEmailReceipt) {
       if ($pageID) {
         $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$pageID]) . '" <' . $value[$pageID]['receipt_from_email'] . '>';
 
