@@ -486,4 +486,35 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return $this->url($_GET['q']);
   }
 
+  /**
+   * Get an array of user details for a contact, containing at minimum the user ID & name.
+   *
+   * @param int $contactID
+   *
+   * @return array
+   *   CMS user details including
+   *   - id
+   *   - name (ie the system user name.
+   */
+  public function getUser($contactID) {
+    $userDetails = parent::getUser($contactID);
+    $user = $this->getUserObject($userDetails['id']);
+    $userDetails['name'] = $user->name;
+    $userDetails['email'] = $user->mail;
+    return $userDetails;
+  }
+
+  /**
+   * Load the user object.
+   *
+   * Note this function still works in drupal 6, 7 & 8 but is deprecated in Drupal 8.
+   *
+   * @param $userID
+   *
+   * @return object
+   */
+  public function getUserObject($userID) {
+    return user_load($userID);
+  }
+
 }

@@ -104,6 +104,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'civicrm_contact',
       'civicrm_activity',
       'civicrm_activity_contact',
+      'civicrm_uf_match',
     );
     $this->quickCleanup($tablesToTruncate, TRUE);
     $this->callAPISuccess('option_value', 'delete', array('id' => $this->test_activity_type_id));

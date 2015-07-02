@@ -99,6 +99,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       'civicrm_managed',
       'civicrm_relationship',
       'civicrm_relationship_type',
+      'civicrm_uf_match',
     );
 
     $this->quickCleanup($this->tablesToTruncate);

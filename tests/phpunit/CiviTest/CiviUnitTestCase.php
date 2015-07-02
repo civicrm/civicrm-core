@@ -473,6 +473,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
    * CRM-8180
+   *
+   * @return int
+   *   Contact ID of the created user.
    */
   public function createLoggedInUser() {
     $params = array(
@@ -481,9 +484,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'contact_type' => 'Individual',
     );
     $contactID = $this->individualCreate($params);
+    $this->callAPISuccess('UFMatch', 'create', array(
+      'contact_id' => $contactID,
+      'uf_name' => 'superman',
+      'uf_id' => 6,
+    ));
 
     $session = CRM_Core_Session::singleton();
     $session->set('userID', $contactID);
+    return $contactID;
   }
 
   public function cleanDB() {
@@ -525,7 +534,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       CRM_Core_Transaction::forceRollbackIfEnabled();
       \Civi\Core\Transaction\Manager::singleton(TRUE);
 
-      $tablesToTruncate = array('civicrm_contact');
+      $tablesToTruncate = array('civicrm_contact', 'civicrm_uf_match');
       $this->quickCleanup($tablesToTruncate);
       $this->createDomainContacts();
     }

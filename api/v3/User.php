@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
@@ -22,62 +23,61 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-<tr>
-  <td><label>{$form.membership_type_id.label}</label><br />
-      {$form.membership_type_id.html|crmAddClass:twenty}
-  </td>
-  <td><label>{$form.status_id.label}</label><br />
-      {$form.status_id.html|crmAddClass:twenty}
-  </td>
-</tr>
+ */
 
-<tr>
-  <td>
-  {$form.member_source.label}
-    <br />{$form.member_source.html}
-    <p>
-    {$form.member_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} &nbsp;{$form.member_test.html}
-    </p>
-  </td>
-  <td>
-    <p>
-    {$form.member_is_primary.label}
-    {help id="id-member_is_primary" file="CRM/Member/Form/Search.hlp"}
-    {$form.member_is_primary.html}
-    </p>
-    <p>
-    {$form.member_pay_later.label}&nbsp;{$form.member_pay_later.html}
-    </p>
-    <p>
-    {$form.member_auto_renew.label}&nbsp;{$form.member_auto_renew.html}
-    </p>
-  </td>
-</tr>
+/**
+ * This api exposes CiviCRM the user framework user account.
+ *
+ * @package CiviCRM_APIv3
+ */
 
-<tr><td><label>{ts}Member Since{/ts}</label></td></tr>
-<tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="member_join_date" from='_low' to='_high'}
-</tr>
+/**
+ * Get details about the CMS User entity.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_user_get($params) {
+  if (empty($params['contact_id'])) {
+    $params['contact_id'] = civicrm_api3('UFMatch', 'getvalue', array(
+      'uf_id' => $params['id'],
+      'domain_id' => CRM_Core_Config::domainID(),
+      'return' => 'contact_id',
+    ));
+  }
+  $result = CRM_Core_Config::singleton()->userSystem->getUser($params['contact_id']);
+  $result['contact_id'] = $params['contact_id'];
+  return civicrm_api3_create_success(
+    array($result['id'] => $result),
+    $params,
+    'user',
+    'get'
+  );
 
-<tr><td><label>{ts}Start Date{/ts}</label></td></tr>
-<tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="member_start_date" from='_low' to='_high'}
-</tr>
+}
 
-<tr><td><label>{ts}End Date{/ts}</label></td></tr>
-<tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="member_end_date" from='_low' to='_high'}
-</tr>
-
-{* campaign in membership search *}
-{include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
-campaignTrClass='' campaignTdClass=''}
-
-{if $membershipGroupTree}
-<tr>
-  <td colspan="4">
-  {include file="CRM/Custom/Form/Search.tpl" groupTree=$membershipGroupTree showHideLinks=false}
-  </td>
-</tr>
-{/if}
+/**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_user_get_spec(&$params) {
+  // At this stage contact-id is required - we may be able to loosen this.
+  $params['contact_id'] = array(
+    'title' => 'Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => 1,
+  );
+  $params['id'] = array(
+    'title' => 'CMS User ID',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['name'] = array(
+    'title' => 'Username',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+}

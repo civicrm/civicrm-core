@@ -102,6 +102,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Extension',
       'ReportTemplate',
       'System',
+      'User',
     );
     $this->toBeImplemented['delete'] = array(
       'MembershipPayment',
@@ -118,6 +119,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Entity',
       'Domain',
       'Setting',
+      'User',
     );
     $this->deprecatedAPI = array('Location', 'ActivityType', 'SurveyRespondant');
     $this->deletableTestObjects = array();
@@ -278,8 +280,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * Mailing Contact Just doesn't support id. We have always insisted on finding a way to
    * support id in API but in this case the underlying tables are crying out for a restructure
-   * & it just doesn't make sense, on the otherhand Event need id to be existent as pseudo property
-   * is been associated with it, so we need to bypass for get api otherwise it will through pseudo_match validation
+   * & it just doesn't make sense.
+   *
+   * User doesn't support get By ID because the user id is actually the CMS user ID & is not part of
+   *   CiviCRM - so can only be tested through UserTest - not SyntaxConformanceTest.
    *
    * @param bool $sequential
    *
@@ -287,7 +291,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *   Entities that cannot be retrieved by ID
    */
   public static function toBeSkipped_getByID($sequential = FALSE) {
-    return array('MailingContact', 'Event');
+    return array('MailingContact', 'User');
   }
 
   /**
@@ -327,6 +331,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Profile',
       'CustomValue',
       'Setting',
+      'User',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -719,6 +724,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
     $this->callAPISuccess($entityName, 'delete', array('id' => $result['id']));
+    $this->quickCleanup(array('civicrm_uf_match'));
   }
 
   /**
