@@ -95,7 +95,7 @@ function civicrm_api3_payment_create(&$params) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
     }
   }
-  if (CRM_Utils_Array::value('line_item', $params) && isset($trxn)) {
+  if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
     foreach ($params['line_item'] as $values) {
       foreach ($values as $id => $amount) {
         $p = array('id' => $id);
@@ -124,6 +124,32 @@ function civicrm_api3_payment_create(&$params) {
       }
     }
     unset($params['line_item']);
+  }
+  elseif (!empty($trxn)) {
+    // Assign the lineitems proportionally
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
+    // get financial item
+    $sql = "SELECT fi.id, li.price_field_value_id
+      FROM civicrm_financial_item fi
+      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
+      WHERE li.contribution_id = %1";
+    $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['contribution_id'], 'Integer')));
+    while ($dao->fetch()) {
+      $ftIds[$dao->price_field_value_id] = $dao->id;
+    }
+    foreach ($lineItems as $key => $value) {
+      $paid = $value['line_total'] * ($params['total_amount']/$contribution['total_amount']);
+      // Record Entity Financial Trxn
+      $eftParams = array(
+        'entity_table' => 'civicrm_financial_item',
+        'financial_trxn_id' => $trxn->id,
+        'amount' => $paid,
+        'entity_id' => $ftIds[$value['price_field_value_id']],
+      );
+      $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+      $entityTrxn->copyValues($eftParams);
+      $entityTrxn->save();
+    }
   }
   unset($params['total_amount']);
   $params['id'] = $params['contribution_id'];
