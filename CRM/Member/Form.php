@@ -58,6 +58,20 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected $_fromEmails = array();
 
+  /**
+   * Details of all enabled membership types.
+   *
+   * @var array
+   */
+  protected $allMembershipTypeDetails = array();
+
+  /**
+   * Array of membership type IDs and whether they permit autorenewal.
+   *
+   * @var array
+   */
+  protected $membershipTypeRenewalStatus = array();
+
   public function preProcess() {
     // Check for edit permission.
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
@@ -73,6 +87,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
+    $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, NULL, TRUE);
+    foreach ($this->allMembershipTypeDetails as $index => $membershipType) {
+      if ($membershipType['auto_renew']) {
+        $this->_recurMembershipTypes[$index] = $membershipType;
+        $this->membershipTypeRenewalStatus[$index] = $membershipType['auto_renew'];
+      }
+    }
   }
 
   /**
@@ -126,52 +147,19 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
-    $autoRenew = array();
-    $recurProcessor = array();
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
-      if (!empty($recurProcessor)) {
-        $autoRenew = array();
-        if (!empty($membershipType)) {
-          $sql = '
-SELECT  id,
-        auto_renew,
-        duration_unit,
-        duration_interval
- FROM   civicrm_membership_type
-WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
-          $recurMembershipTypes = CRM_Core_DAO::executeQuery($sql);
-          while ($recurMembershipTypes->fetch()) {
-            $autoRenew[$recurMembershipTypes->id] = $recurMembershipTypes->auto_renew;
-            foreach (array(
-                       'id',
-                       'auto_renew',
-                       'duration_unit',
-                       'duration_interval',
-                     ) as $fld) {
-              $this->_recurMembershipTypes[$recurMembershipTypes->id][$fld] = $recurMembershipTypes->$fld;
-            }
-          }
-        }
-
-        if ($this->_mode) {
-          if (!empty($this->_recurPaymentProcessors)) {
-            $this->assign('allowAutoRenew', TRUE);
-          }
-        }
-
-        $this->assign('autoRenew', json_encode($autoRenew));
-        $autoRenewElement = $this->addElement('checkbox', 'auto_renew', ts('Membership renewed automatically'),
-          NULL, array('onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );")
-        );
-        if ($this->_action & CRM_Core_Action::UPDATE) {
-          $autoRenewElement->freeze();
-        }
+      if (!empty($this->_recurPaymentProcessors)) {
+        $this->assign('allowAutoRenew', TRUE);
       }
 
-    }
-    $this->assign('recurProcessor', json_encode($recurProcessor));
+      $autoRenewElement = $this->addElement('checkbox', 'auto_renew', ts('Membership renewed automatically'),
+        NULL, array('onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );")
+      );
+      if ($this->_action & CRM_Core_Action::UPDATE) {
+        $autoRenewElement->freeze();
+      }
 
-    if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
+      $this->assign('recurProcessor', json_encode($this->_recurPaymentProcessors));
       $this->addElement('checkbox',
         'auto_renew',
         ts('Membership renewed automatically'),
@@ -181,7 +169,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $this->assignPaymentRelatedVariables();
     }
-    $this->assign('autoRenewOptions', json_encode($autoRenew));
+    $this->assign('autoRenewOptions', json_encode($this->membershipTypeRenewalStatus));
 
     if ($this->_action & CRM_Core_Action::RENEW) {
       $this->addButtons(array(

@@ -1740,14 +1740,23 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   }
 
   /**
+   * Build an array of available membership types.
+   *
    * @param CRM_Core_Form $form
    * @param int $membershipTypeID
+   * @param bool $activeOnly
+   *   Do we only want active ones?
+   *   (probably this should default to TRUE but as a newly added parameter we are leaving default b
+   *   behaviour unchanged).
    *
    * @return array
    */
-  public static function buildMembershipTypeValues(&$form, $membershipTypeID = NULL) {
+  public static function buildMembershipTypeValues(&$form, $membershipTypeID = NULL, $activeOnly = FALSE) {
     $whereClause = " WHERE domain_id = " . CRM_Core_Config::domainID();
 
+    if ($activeOnly) {
+      $whereClause .= " AND is_active = 1 ";
+    }
     if (is_array($membershipTypeID)) {
       $allIDs = implode(',', $membershipTypeID);
       $whereClause .= " AND id IN ( $allIDs )";
@@ -1778,6 +1787,8 @@ FROM   civicrm_membership_type
       'relationship_type_id',
       'relationship_direction',
       'max_related',
+      'duration_unit',
+      'duration_interval',
     );
 
     while ($dao->fetch()) {
