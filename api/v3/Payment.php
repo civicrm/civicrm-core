@@ -41,8 +41,26 @@
  *   Array of contributions which are payments, if error an array with an error id and error message
  */
 function civicrm_api3_payment_get($params) {
-  $params['is_payment'] = 1;
-  return civicrm_api3('Contribution', 'get', $params);
+  if (CRM_Utils_Array::value('contribution_id', $params)) {
+    $params['entity_id'] = $params['contribution_id'];
+  }
+  $params['entity_table'] = 'civicrm_contribution';
+  $eft = civicrm_api3('EntityFinancialTrxn', 'get', $params);
+  if (!empty($eft['values'])) {
+    foreach ($eft['values'] as $efts) {
+      $eftids[] = $efts['financial_trxn_id'];
+      $map[$efts['financial_trxn_id']] = $efts['entity_id'];
+    }
+    $ftParams = array(
+      'id' => array( 'IN' => $eftids ),
+      'is_payment' => 1,
+    );
+    $ft = civicrm_api3('FinancialTrxn', 'get', $ftParams);
+    foreach ($ft['values'] as &$values) {
+      $values['contribution_id'] = $map[$values['id']];
+    }
+  }
+  return $ft;
 }
 
 /**
@@ -170,16 +188,33 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'api.required' => 1 ,
       'title' => 'Contribution ID',
       'type' => CRM_Utils_Type::T_INT,
-      ),
+    ),
     'total_amount' => array(
       'api.required' => 1 ,
       'title' => 'Total Payment Amount',
       'type' => CRM_Utils_Type::T_FLOAT,
-      ),
+    ),
     'payment_processor_id' => array(
       'title' => 'Payment Processor ID',
       'type' => CRM_Utils_Type::T_INT,
       'description' => ts('Payment processor ID - required for payment processor payments'),
-      ),
-    );
+    ),
+  );
+}
+
+/**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_payment_get_spec(&$params) {
+  $params = array( 
+    'contribution_id' => array(
+      'title' => 'Contribution ID',
+      'type' => CRM_Utils_Type::T_INT,
+    )
+  );
 }
