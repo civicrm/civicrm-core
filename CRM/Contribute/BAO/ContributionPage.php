@@ -405,7 +405,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $taxAmt = $template->get_template_vars('dataArray');
         $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
-        if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+        if (isset($invoicing) && isset($prefixValue['is_email_pdf'])) {
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $values['contribution_id'];
         }
