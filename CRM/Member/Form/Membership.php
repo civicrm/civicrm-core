@@ -565,11 +565,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $memTypeJs = array(
       'onChange' => "buildMaxRelated(this.value,true); CRM.buildCustomData('Membership', this.value);",
     );
+
     if (!empty($this->_recurPaymentProcessors)) {
       $memTypeJs['onChange'] = "" . $memTypeJs['onChange'] . 'buildAutoRenew(this.value, null);';
     }
 
-    ;
     $this->add('text', 'max_related', ts('Max related'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_Membership', 'max_related')
     );
