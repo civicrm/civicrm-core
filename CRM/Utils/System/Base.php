@@ -4,8 +4,11 @@
  * Base class for UF system integrations
  */
 abstract class CRM_Utils_System_Base {
+
   /**
-   * Deprecated property to check if this is a drupal install. The correct method is to have functions on the UF classes for all UF specific
+   * Deprecated property to check if this is a drupal install.
+   *
+   * The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    *
    * @deprecated
@@ -161,7 +164,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Load user into session.
    *
-   * @param $user
+   * @param obj $user
    *
    * @return bool
    */
@@ -170,14 +173,14 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Immediately stop script execution and display a 401 "Access Denied" page
+   * Immediately stop script execution and display a 401 "Access Denied" page.
    */
   public function permissionDenied() {
     CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
   }
 
   /**
-   * Immediately stop script execution, log out the user and redirect to the home page
+   * Immediately stop script execution, log out the user and redirect to the home page.
    *
    * @deprecated
    *   This function should be removed in favor of linking to the CMS's logout page
@@ -204,8 +207,7 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * If we are using a theming system, invoke theme, else just print the
-   * content
+   * If we are using a theming system, invoke theme, else just print the content.
    *
    * @param string $content
    *   The content that will be themed.
@@ -242,7 +244,8 @@ abstract class CRM_Utils_System_Base {
         print theme('maintenance_page', array('content' => $content));
         exit();
       }
-      $ret = TRUE; // TODO: Figure out why D7 returns but everyone else prints
+      // TODO: Figure out why D7 returns but everyone else prints
+      $ret = TRUE;
     }
     $out = $content;
 
@@ -364,11 +367,13 @@ abstract class CRM_Utils_System_Base {
   public abstract function getLoginURL($destination = '');
 
   /**
-   * Get the login destination string. When this is passed in the
-   * URL the user will be directed to it after filling in the CMS form
+   * Get the login destination string.
+   *
+   * When this is passed in the URL the user will be directed to it after filling in the CMS form.
    *
    * @param CRM_Core_Form $form
    *   Form object representing the 'current' form - to which the user will be returned.
+   *
    * @return string|NULL
    *   destination value for URL
    */
@@ -402,15 +407,14 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Reset any system caches that may be required for proper CiviCRM
-   * integration.
+   * Reset any system caches that may be required for proper CiviCRM integration.
    */
   public function flush() {
     // nullop by default
   }
 
   /**
-   * Flush css/js caches
+   * Flush css/js caches.
    */
   public function clearResourceCache() {
     // nullop by default
@@ -422,7 +426,7 @@ abstract class CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @param $url : string, absolute path to file
+   * @param string $url absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -439,7 +443,7 @@ abstract class CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @param $code : string, javascript code
+   * @param string $code javascript code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -456,7 +460,7 @@ abstract class CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @param $url : string, absolute path to file
+   * @param string $url absolute path to file
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -473,7 +477,7 @@ abstract class CRM_Utils_System_Base {
    * Note: This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
-   * @param $code : string, css code
+   * @param string $code css code
    * @param string $region
    *   location within the document: 'html-header', 'page-header', 'page-footer'.
    *
@@ -512,7 +516,8 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Perform any post login activities required by the CMS -
+   * Perform any post login activities required by the CMS.
+   *
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
    * calls hook_user op 'login' and generates a new session.
    *
@@ -571,24 +576,49 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Get Unique Identifier from UserFramework system (CMS)
+   * Get Unique Identifier from UserFramework system (CMS).
+   *
    * @param object $user
    *   Object as described by the User Framework.
+   *
    * @return mixed
-   *   $uniqueIdentifer Unique identifier from the user Framework system
+   *   Unique identifier from the user Framework system
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return NULL;
   }
 
   /**
-   * Get User ID from UserFramework system (CMS)
+   * Get User ID from UserFramework system (CMS).
+   *
    * @param object $user
+   *
    *   Object as described by the User Framework.
    * @return null|int
    */
   public function getUserIDFromUserObject($user) {
     return NULL;
+  }
+
+  /**
+   * Get an array of user details for a contact, containing at minimum the user ID & name.
+   *
+   * @param int $contactID
+   *
+   * @return array
+   *   CMS user details including
+   *   - id
+   *   - name (ie the system user name.
+   */
+  public function getUser($contactID) {
+    $ufMatch = civicrm_api3('UFMatch', 'getsingle', array(
+      'contact_id' => $contactID,
+      'domain_id' => CRM_Core_Config::domainID(),
+    ));
+    return array(
+      'id' => $ufMatch['uf_id'],
+      'name' => $ufMatch['uf_name'],
+    );
   }
 
   /**
@@ -612,16 +642,20 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Return a UFID (user account ID from the UserFramework / CMS system being based on the user object
-   * passed, defaulting to the logged in user if not passed. Note that ambiguous situation occurs
-   * in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would seem to be resolving the user id before calling
-   * the function
+   * Return a UFID (user account ID from the UserFramework / CMS system.
+   *
+   * ID is based on the user object passed, defaulting to the logged in user if not passed.
+   *
+   * Note that ambiguous situation occurs in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would
+   * seem to be resolving the user id before calling the function.
    *
    * Note there is already a function getUFId which takes $username as a param - we could add $user
-   * as a second param to it but it seems messy - just overloading it because the name is taken
+   * as a second param to it but it seems messy - just overloading it because the name is taken.
+   *
    * @param object $user
+   *
    * @return int
-   *   $ufid - user ID of UF System
+   *   User ID of UF System
    */
   public function getBestUFID($user = NULL) {
     if ($user) {
@@ -631,12 +665,15 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Return a unique identifier (usually an email address or username) from the UserFramework / CMS system being based on the user object
-   * passed, defaulting to the logged in user if not passed. Note that ambiguous situation occurs
-   * in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would seem to be resolving the unique identifier before calling
-   * the function
+   * Return a unique identifier (usually an email address or username) from the UserFramework / CMS system.
+   *
+   * This is based on the user object passed, defaulting to the logged in user if not passed.
+   *
+   * Note that ambiguous situation occurs in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would seem to be
+   * resolving the unique identifier before calling the function.
    *
    * @param object $user
+   *
    * @return string
    *   unique identifier from the UF System
    */
@@ -659,6 +696,7 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Get Url to view user record.
+   *
    * @param int $contactID
    *   Contact ID.
    *
@@ -670,6 +708,7 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Is the current user permitted to add a user.
+   *
    * @return bool
    */
   public function checkPermissionAddUser() {
@@ -678,6 +717,7 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Output code from error function.
+   *
    * @param string $content
    */
   public function outputError($content) {

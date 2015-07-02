@@ -69,7 +69,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    */
   public function tearDown() {
     parent::tearDown();
-    $this->quickCleanup(array('civicrm_case_type'));
+    $this->quickCleanup(array('civicrm_case_type', 'civicrm_uf_match'));
   }
 
   /**

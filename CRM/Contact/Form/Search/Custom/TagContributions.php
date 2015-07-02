@@ -35,6 +35,8 @@
 class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   public $_permissionedComponent;
 
   /**
@@ -144,13 +146,15 @@ WHERE  $where
    * @return string
    */
   public function from() {
-    return "
+    $this->buildACLClause('contact_a');
+    $from = "
       civicrm_contribution,
       civicrm_contact contact_a
       LEFT JOIN civicrm_entity_tag ON ( civicrm_entity_tag.entity_table = 'civicrm_contact' AND
                                         civicrm_entity_tag.entity_id = contact_a.id )
-      LEFT JOIN civicrm_tag ON civicrm_tag.id = civicrm_entity_tag.tag_id
-";
+      LEFT JOIN civicrm_tag ON civicrm_tag.id = civicrm_entity_tag.tag_id {$this->_aclFrom}
+     ";
+    return $from;
   }
 
   /*
@@ -202,6 +206,9 @@ WHERE  $where
         $clauses[] = "contact_a.id IN ( $contactIDs )";
       }
     }
+    if ($this->_aclWhere) {
+      $clauses[] = " {$this->_aclWhere} ";
+    }
     return implode(' AND ', $clauses);
   }
 
@@ -226,7 +233,7 @@ WHERE  $where
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */
@@ -258,6 +265,13 @@ WHERE  $where
    */
   public function summary() {
     return NULL;
+  }
+
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }

@@ -81,7 +81,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   }
 
   public function __destruct() {
-    // mysql drops the tables when connectiomn is terminated
+    // mysql drops the tables when connection is terminated
     // cannot drop tables here, since the search might be used
     // in other parts after the object is destroyed
   }
