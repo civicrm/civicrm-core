@@ -216,10 +216,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     foreach ($specialParams as $element) {
       $value = CRM_Utils_Array::value($element, $this->_formValues);
       if (!empty($value) && is_array($value)) {
-        if ($element == 'status_id') {
-          unset($this->_formValues[$element]);
-          $element = 'member_' . $element;
-        }
         $this->_formValues[$element] = array('IN' => $value);
       }
     }
