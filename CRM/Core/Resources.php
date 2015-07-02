@@ -195,12 +195,9 @@ class CRM_Core_Resources {
       $domain = ($translate === TRUE) ? $ext : $translate;
       $this->addString($this->strings->get($domain, $this->getPath($ext, $file), 'text/javascript'), $domain);
     }
-    // Look for non-minified version if we are in debug mode
-    if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.js') !== FALSE) {
-      $nonMiniFile = str_replace('.min.js', '.js', $file);
-      if ($this->getPath($ext, $nonMiniFile)) {
-        $file = $nonMiniFile;
-      }
+    // Use non-minified version if we are in debug mode
+    if (CRM_Core_Config::singleton()->debug) {
+      $file = str_replace('.min.js', '.js', $file);
     }
     return $this->addScriptUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
@@ -416,6 +413,10 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
+    // Use non-minified version if we are in debug mode
+    if (CRM_Core_Config::singleton()->debug) {
+      $file = str_replace('.min.css', '.css', $file);
+    }
     return $this->addStyleUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
 
@@ -685,32 +686,31 @@ class CRM_Core_Resources {
   /**
    * List of core resources we add to every CiviCRM page.
    *
+   * Note: non-compressed versions of .min files will be used in debug mode
+   *
    * @return array
    */
   public function coreResourceList() {
     $config = CRM_Core_Config::singleton();
-    // Use minified files for production, uncompressed in debug mode
-    // Note, $this->addScriptFile would automatically search for the non-minified file in debug mode but this is probably faster
-    $min = $config->debug ? '' : '.min';
 
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
     $items = array(
       "bower_components/jquery/dist/jquery.min.js",
       "bower_components/jquery-ui/jquery-ui.min.js",
-      "bower_components/jquery-ui/themes/smoothness/jquery-ui$min.css",
+      "bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css",
       "bower_components/lodash-compat/lodash.min.js",
-      "packages/jquery/plugins/jquery.mousewheel$min.js",
-      "bower_components/select2/select2$min.js",
-      "bower_components/select2/select2$min.css",
+      "packages/jquery/plugins/jquery.mousewheel.min.js",
+      "bower_components/select2/select2.min.js",
+      "bower_components/select2/select2.min.css",
       "packages/jquery/plugins/jquery.tableHeader.js",
-      "packages/jquery/plugins/jquery.form$min.js",
-      "packages/jquery/plugins/jquery.timeentry$min.js",
-      "packages/jquery/plugins/jquery.blockUI$min.js",
-      "bower_components/datatables/media/js/jquery.dataTables$min.js",
-      "bower_components/datatables/media/css/jquery.dataTables$min.css",
-      "bower_components/jquery-validation/dist/jquery.validate$min.js",
-      "packages/jquery/plugins/jquery.ui.datepicker.validation$min.js",
+      "packages/jquery/plugins/jquery.form.min.js",
+      "packages/jquery/plugins/jquery.timeentry.min.js",
+      "packages/jquery/plugins/jquery.blockUI.min.js",
+      "bower_components/datatables/media/js/jquery.dataTables.min.js",
+      "bower_components/datatables/media/css/jquery.dataTables.min.css",
+      "bower_components/jquery-validation/dist/jquery.validate.min.js",
+      "packages/jquery/plugins/jquery.ui.datepicker.validation.min.js",
       "js/Common.js",
       "js/crm.ajax.js",
     );
@@ -727,10 +727,10 @@ class CRM_Core_Resources {
 
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
-      $items[] = "packages/jquery/plugins/jquery.menu$min.js";
+      $items[] = "packages/jquery/plugins/jquery.menu.min.js";
       $items[] = "css/navigation.css";
-      $items[] = "packages/jquery/plugins/jquery.jeditable$min.js";
-      $items[] = "packages/jquery/plugins/jquery.notify$min.js";
+      $items[] = "packages/jquery/plugins/jquery.jeditable.min.js";
+      $items[] = "packages/jquery/plugins/jquery.notify.min.js";
       $items[] = "js/jquery/jquery.crmeditable.js";
     }
 
