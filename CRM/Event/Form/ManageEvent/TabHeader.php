@@ -85,7 +85,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs['location'] = array('title' => ts('Event Location')) + $default;
     $tabs['fee'] = array('title' => ts('Fees')) + $default;
     $tabs['registration'] = array('title' => ts('Online Registration')) + $default;
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
+    if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
       $tabs['reminder'] = array('title' => ts('Schedule Reminders'), 'class' => 'livePage') + $default;
     }
     $tabs['conference'] = array('title' => ts('Conference Slots')) + $default;
