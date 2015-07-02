@@ -513,48 +513,39 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
-    $dao = new CRM_Member_DAO_MembershipType();
-    $dao->domain_id = CRM_Core_Config::domainID();
-    $dao->find();
-
     // retrieve all memberships
-    $allMemberships = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
-
-    $allMembershipInfo = $membershipType = array();
-    foreach ($allMemberships as $key => $values) {
-      if (!empty($values['is_active'])) {
-        $membershipType[$key] = CRM_Utils_Array::value('name', $values);
-        if ($this->_mode && empty($values['minimum_fee'])) {
-          continue;
-        }
-        else {
-          $memberOfContactId = CRM_Utils_Array::value('member_of_contact_id', $values);
-          if (empty($selMemTypeOrg[$memberOfContactId])) {
-            $selMemTypeOrg[$memberOfContactId] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-              $memberOfContactId,
-              'display_name',
-              'id'
-            );
-
-            $selOrgMemType[$memberOfContactId][0] = ts('- select -');
-          }
-          if (empty($selOrgMemType[$memberOfContactId][$key])) {
-            $selOrgMemType[$memberOfContactId][$key] = CRM_Utils_Array::value('name', $values);
-          }
-        }
-
-        // build membership info array, which is used when membership type is selected to:
-        // - set the payment information block
-        // - set the max related block
-        $allMembershipInfo[$key] = array(
-          'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
-          'total_amount' => CRM_Utils_Money::format($values['minimum_fee'], NULL, '%a'),
-          'total_amount_numeric' => CRM_Utils_Array::value('minimum_fee', $values),
-          'auto_renew' => CRM_Utils_Array::value('auto_renew', $values),
-          'has_related' => isset($values['relationship_type_id']),
-          'max_related' => CRM_Utils_Array::value('max_related', $values),
-        );
+    $allMembershipInfo = array();
+    foreach ($this->allMembershipTypeDetails as $key => $values) {
+      if ($this->_mode && empty($values['minimum_fee'])) {
+        continue;
       }
+      else {
+        $memberOfContactId = CRM_Utils_Array::value('member_of_contact_id', $values);
+        if (empty($selMemTypeOrg[$memberOfContactId])) {
+          $selMemTypeOrg[$memberOfContactId] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+            $memberOfContactId,
+            'display_name',
+            'id'
+          );
+
+          $selOrgMemType[$memberOfContactId][0] = ts('- select -');
+        }
+        if (empty($selOrgMemType[$memberOfContactId][$key])) {
+          $selOrgMemType[$memberOfContactId][$key] = CRM_Utils_Array::value('name', $values);
+        }
+      }
+
+      // build membership info array, which is used when membership type is selected to:
+      // - set the payment information block
+      // - set the max related block
+      $allMembershipInfo[$key] = array(
+        'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
+        'total_amount' => CRM_Utils_Money::format($values['minimum_fee'], NULL, '%a'),
+        'total_amount_numeric' => CRM_Utils_Array::value('minimum_fee', $values),
+        'auto_renew' => CRM_Utils_Array::value('auto_renew', $values),
+        'has_related' => isset($values['relationship_type_id']),
+        'max_related' => CRM_Utils_Array::value('max_related', $values),
+      );
     }
 
     $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
@@ -571,10 +562,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $selOrgMemType[$index] = $orgMembershipType;
     }
 
-    $memTypeJs = array('onChange' => "CRM.buildCustomData( 'Membership', this.value );");
+    $memTypeJs = array(
+      'onChange' => "buildMaxRelated(this.value,true); CRM.buildCustomData('Membership', this.value);",
+    );
+    if (!empty($this->_recurPaymentProcessors)) {
+      $memTypeJs['onChange'] = "" . $memTypeJs['onChange'] . 'buildAutoRenew(this.value, null);';
+    }
 
-    // for max_related: a little JS to show/hide & set default value
-    $memTypeJs['onChange'] = "buildMaxRelated(this.value,true); " . $memTypeJs['onChange'];
+    ;
     $this->add('text', 'max_related', ts('Max related'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_Membership', 'max_related')
     );
@@ -1316,8 +1311,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $ids['membership'] = $params['id'] = $this->_id;
     }
 
-    $session = CRM_Core_Session::singleton();
-    $ids['userId'] = $session->get('userID');
+    $ids['userId'] = CRM_Core_Session::singleton()->get('userID');
 
     // membership type custom data
     foreach ($this->_memTypeSelected as $memType) {
@@ -1336,7 +1330,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $membershipType = implode(', ', $membershipTypes);
 
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
-    list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
+    list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
 
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
@@ -1507,9 +1501,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if (!empty($paymentParams['is_recur'])) {
         $contributionType = new CRM_Financial_DAO_FinancialType();
         $contributionType->id = $params['financial_type_id'];
-        if (!$contributionType->find(TRUE)) {
-          CRM_Core_Error::fatal('Could not find a system table');
-        }
+        $contributionType->find(TRUE);
 
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
           $paymentParams,
@@ -1541,13 +1533,17 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
 
       if ($params['total_amount'] > 0.0) {
-        $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+        $payment = $this->_paymentProcessor['object'];
         try {
           $result = $payment->doPayment($paymentParams);
+          $this->_params = array_merge($this->_params, $result);
+          // Assign amount to template if payment was successful.
+          $this->assign('amount', $params['total_amount']);
         }
         catch (PaymentProcessorException $e) {
           if (!empty($paymentParams['contributionID'])) {
-            CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'], $e->getMessage());
+            CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'], $this->_contactID,
+              $e->getMessage());
           }
           if (!empty($paymentParams['contributionRecurID'])) {
             CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
