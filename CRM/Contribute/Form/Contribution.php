@@ -1212,8 +1212,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if ($paymentParams['amount'] > 0.0) {
       // force a re-get of the payment processor in case the form changed it, CRM-7179
-      // NOTE - I expect this is not obsolete.
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
+      // NOTE - I expect this is obsolete.
+      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       try {
         $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
         $result = $payment->doPayment($paymentParams, 'contribute');

@@ -54,7 +54,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $controller->run();
 
     //add honor block
-    $params = array();
     $params = CRM_Contribute_BAO_Contribution::getHonorContacts($this->_contactId);
 
     if (!empty($params)) {

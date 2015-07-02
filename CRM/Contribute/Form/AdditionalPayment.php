@@ -565,7 +565,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     if ($paymentParams['amount'] > 0.0) {
       // force a reget of the payment processor in case the form changed it, CRM-7179
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
+      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       $result = $payment->doDirectPayment($paymentParams);
     }
 

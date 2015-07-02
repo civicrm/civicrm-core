@@ -505,9 +505,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $formValues['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
       }
 
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($formValues['payment_processor_id'],
-        $this->_mode
-      );
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($formValues['payment_processor_id']);
 
       $fields = array();
 
@@ -574,7 +572,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
 
       if (!empty($paymentParams['auto_renew'])) {
         $contributionRecurParams = $this->processRecurringContribution($paymentParams);
