@@ -195,10 +195,7 @@ class CRM_Core_Resources {
       $domain = ($translate === TRUE) ? $ext : $translate;
       $this->addString($this->strings->get($domain, $this->getPath($ext, $file), 'text/javascript'), $domain);
     }
-    // Use non-minified version if we are in debug mode
-    if (CRM_Core_Config::singleton()->debug) {
-      $file = str_replace('.min.js', '.js', $file);
-    }
+    $this->resolveFileName($file, $ext);
     return $this->addScriptUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
 
@@ -413,10 +410,7 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    // Use non-minified version if we are in debug mode
-    if (CRM_Core_Config::singleton()->debug) {
-      $file = str_replace('.min.css', '.css', $file);
-    }
+    $this->resolveFileName($file, $ext);
     return $this->addStyleUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
 
@@ -815,6 +809,21 @@ class CRM_Core_Resources {
     );
 
     return $filters;
+  }
+
+  /**
+   * In debug mode, look for a non-minified version of this file
+   *
+   * @param string $fileName
+   * @param string $extName
+   */
+  private function resolveFileName(&$fileName, $extName) {
+    if (CRM_Core_Config::singleton()->debug && strpos($fileName, '.min.') !== FALSE) {
+      $nonMiniFile = str_replace('.min.', '.', $fileName);
+      if ($this->getPath($extName, $nonMiniFile)) {
+        $fileName = $nonMiniFile;
+      }
+    }
   }
 
 }
