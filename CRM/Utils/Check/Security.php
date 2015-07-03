@@ -252,9 +252,6 @@ class CRM_Utils_Check_Security {
     if (defined('CIVICRM_CXN_CA') && CIVICRM_CXN_CA !== 'CiviRootCA') {
       $list[] = 'CIVICRM_CXN_CA';
     }
-    if (defined('CIVICRM_CXN_APPS_VERIFY') && !CIVICRM_CXN_APPS_VERIFY) {
-      $list[] = 'CIVICRM_CXN_APPS_VERIFY';
-    }
     if (defined('CIVICRM_CXN_APPS_URL') && CIVICRM_CXN_APPS_URL !== \Civi\Cxn\Rpc\Constants::OFFICIAL_APPMETAS_URL) {
       $list[] = 'CIVICRM_CXN_APPS_URL';
     }

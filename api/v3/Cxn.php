@@ -43,17 +43,14 @@
 function _civicrm_api3_cxn_register_spec(&$spec) {
   $daoFields = CRM_Cxn_DAO_Cxn::fields();
   $spec['app_guid'] = $daoFields['app_guid'];
-
-  if (!CRM_Cxn_BAO_Cxn::isAppMetaVerified()) {
-    $spec['app_meta_url'] = array(
-      'name' => 'app_meta_url',
-      'type' => CRM_Utils_Type::T_STRING,
-      'title' => ts('Application Metadata URL'),
-      'description' => 'Application Metadata URL',
-      'maxlength' => 255,
-      'size' => CRM_Utils_Type::HUGE,
-    );
-  }
+  $spec['app_meta_url'] = array(
+    'name' => 'app_meta_url',
+    'type' => CRM_Utils_Type::T_STRING,
+    'title' => ts('Application Metadata URL'),
+    'description' => 'Application Metadata URL',
+    'maxlength' => 255,
+    'size' => CRM_Utils_Type::HUGE,
+  );
 }
 
 /**
@@ -72,21 +69,13 @@ function _civicrm_api3_cxn_register_spec(&$spec) {
  */
 function civicrm_api3_cxn_register($params) {
   if (!empty($params['app_meta_url'])) {
-    if (!CRM_Cxn_BAO_Cxn::isAppMetaVerified()) {
-      list ($status, $json) = CRM_Utils_HttpClient::singleton()->get($params['app_meta_url']);
-      if (CRM_Utils_HttpClient::STATUS_OK != $status) {
-        throw new API_Exception("Failed to download appMeta. (Bad HTTP response)");
-      }
-      $appMeta = json_decode($json, TRUE);
-      if (empty($appMeta)) {
-        throw new API_Exception("Failed to download appMeta. (Malformed)");
-      }
+    list ($status, $json) = CRM_Utils_HttpClient::singleton()->get($params['app_meta_url']);
+    if (CRM_Utils_HttpClient::STATUS_OK != $status) {
+      throw new API_Exception("Failed to download appMeta. (Bad HTTP response)");
     }
-    else {
-      // Note: The metadata includes a cert, but the details aren't signed.
-      // This is very useful in testing/development. In ordinary usage, we
-      // rely on civicrm.org to sign the metadata for all apps en masse.
-      throw new API_Exception('This site is configured to only connect to applications with verified metadata.');
+    $appMeta = json_decode($json, TRUE);
+    if (empty($appMeta)) {
+      throw new API_Exception("Failed to download appMeta. (Malformed)");
     }
   }
   elseif (!empty($params['app_guid'])) {
