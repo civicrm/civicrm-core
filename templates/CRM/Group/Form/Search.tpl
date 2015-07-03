@@ -175,7 +175,7 @@ CRM.$(function($) {
           var id = $('td:last', nRow).text().split(',')[0];
           var cl = $('td:last', nRow).text().split(',')[1];
           $(nRow).addClass(cl).attr({id: 'row_' + id, 'data-id': id, 'data-entity': 'group'});
-          $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-title" />');
+          //$('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-title" />');
           $('td:eq(1)', nRow).addClass('right');
           $('td:eq(3)', nRow).wrapInner('<div class="crm-editable crmf-description" data-type="textarea" />');
           $('td:eq(5)', nRow).wrapInner('<div class="crm-editable crmf-visibility" data-type="select" />');
@@ -289,10 +289,10 @@ CRM.$(function($) {
             $.each( response, function( i, val ) {
               appendHTML += '<tr id="row_'+ val.group_id +'_'+parent_id+'" data-entity="group" data-id="'+ val.group_id +'" class="parent_is_' + parent_id + ' crm-row-child ' + val.class.split(',')[1] + '">';
               if ( val.is_parent ) {
-                appendHTML += '<td class="crm-group-name ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}<span class="crm-editable crmf-title">' + val.group_name + '</span></td>';
+                appendHTML += '<td class="crm-group-name ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.group_name + '</td>';
               }
               else {
-                appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span><span class="crm-editable crmf-title">' + val.group_name + '</span></td>';
+                appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span>' + val.group_name + '</td>';
               }
               appendHTML += '<td class="right">' + val.count + "</td>";
               appendHTML += "<td>" + val.created_by + "</td>";
