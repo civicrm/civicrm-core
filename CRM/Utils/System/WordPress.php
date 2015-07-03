@@ -627,4 +627,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
   }
 
+  /**
+   * Append WP js to coreResourcesList.
+   */
+  public function appendCoreResources(&$list) {
+    $list[] = 'js/crm.wordpress.js';
+  }
+
 }
