@@ -19,3 +19,6 @@ UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Detail
 
 UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Summary Report'{/localize}
   WHERE value = 'activitySummary' AND option_group_id = @option_group_id_report;
+
+-- Added is_payment flag 
+ALTER TABLE civicrm_financial_trxn ADD COLUMN is_payment tinyint(4) DEFAULT '0' COMMENT 'Is this entry either a payment or a reversal of a payment?';
