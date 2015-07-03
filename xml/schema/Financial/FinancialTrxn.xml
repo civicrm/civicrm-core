@@ -148,6 +148,15 @@
     </html>
   </field>
   <field>
+    <name>is_payment</name>
+    <title>Is Payment?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <comment>Is this entry either a payment or a reversal of a payment?</comment>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>payment_processor</name>
     <type>varchar</type>
     <length>64</length>
