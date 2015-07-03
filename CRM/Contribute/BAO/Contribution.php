@@ -376,7 +376,25 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $deleteParams = array('id' => $pcpId);
       CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
     }
-
+    if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
+      $softParams = array();
+      $softParams['contribution_id'] = $contribution->id;
+      $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
+      $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
+        $pcp['pcp_made_through_id'], 'contact_id'
+      );
+      $softParams['currency'] = $contribution->currency;
+      $softParams['amount'] = $contribution->total_amount;
+      $softParams['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcp);
+      $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
+      $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
+      $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
+      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
+      //Send notification to owner for PCP
+      if ($contributionSoft->pcp_id) {
+        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+      }
+    }
     if (isset($params['soft_credit'])) {
       $softParams = $params['soft_credit'];
 
@@ -388,7 +406,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           }
         }
       }
-      $createSoft = FALSE;
+
       foreach ($softParams as $softParam) {
         $softParam['contribution_id'] = $contribution->id;
         $softParam['currency'] = $contribution->currency;
@@ -396,28 +414,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         if (empty($softParam['amount'])) {
           $softParam['amount'] = $contribution->total_amount;
         }
-        if (empty($softParam['id'])) {
-          $createSoft = TRUE;
-        }
         CRM_Contribute_BAO_ContributionSoft::add($softParam);
-      }
-    }
-
-    if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
-      $softParams = array();
-      $softParams['contribution_id'] = $contribution->id;
-      $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
-      $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcp['pcp_made_through_id'], 'contact_id');
-      $softParams['currency'] = $contribution->currency;
-      $softParams['amount'] = $contribution->total_amount;
-      $softParams['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcp);
-      $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
-      $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
-      $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
-      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
-      //Send notification to owner for PCP
-      if ($contributionSoft->pcp_id && (empty($params['id']) || !empty($createSoft))) {
-        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
       }
     }
 
