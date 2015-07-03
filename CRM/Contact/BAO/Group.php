@@ -861,6 +861,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           'count' => '0',
         );
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
+        // Wrap with crm-editable. Not an ideal solution.
+        $values[$object->id]['title'] = '<span class="crm-editable crmf-title">' . $values[$object->id]['title'] . '</span>';
+
         if ($object->saved_search_id) {
           $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';
           // check if custom search, if so fix view link
