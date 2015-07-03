@@ -135,25 +135,6 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
   }
 
   /**
-   * Determine if this site's security policy allows connecting
-   * to apps based on untrusted metadata.
-   *
-   * @return bool
-   *   TRUE if application metadata must be verified.
-   */
-  public static function isAppMetaVerified() {
-    if (defined('CIVICRM_CXN_APPS_VERIFY')) {
-      return CIVICRM_CXN_APPS_VERIFY;
-    }
-    elseif (!defined('CIVICRM_CXN_CA')) {
-      return TRUE;
-    }
-    else {
-      return !in_array(CIVICRM_CXN_CA, array('CiviTestRootCA', 'none'));
-    }
-  }
-
-  /**
    * Construct a client for performing registration actions.
    *
    * @return \Civi\Cxn\Rpc\RegistrationClient
