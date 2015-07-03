@@ -32,13 +32,13 @@
  */
 
 /**
- * Retrieve a set of contributions which are payments.
+ * Retrieve a set of financial transactions which are payments.
  *
  * @param array $params
  *  Input parameters.
  *
  * @return array
- *   Array of contributions which are payments, if error an array with an error id and error message
+ *   Array of financiial transactions which are payments, if error an array with an error id and error message
  */
 function civicrm_api3_payment_get($params) {
   if (CRM_Utils_Array::value('contribution_id', $params)) {
