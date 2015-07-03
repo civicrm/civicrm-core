@@ -327,12 +327,14 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
           'title' => 'Memberships',
           'fields' => array(
             'Membership Type' => array(
-              'type' => 'checkbox',
-              'values' => array('member_membership_type_id[1]', 'member_membership_type_id[2]'),
+              'type' => 'multiselect2',
+              'locator' => 'membership_type_id',
+              'values' => array(array('General', 'Student')),
             ),
             'Membership Status' => array(
-              'type' => 'checkbox',
-              'values' => array('member_status_id[1]', 'member_status_id[2]'),
+              'type' => 'multiselect2',
+              'locator' => 'membership_status_id',
+              'values' => array(array('New', 'Current')),
             ),
           ),
         ),
