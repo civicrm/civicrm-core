@@ -115,7 +115,7 @@
     <div>
         <span class="crm-profile-selector-select"></span>
         <button type="button" class="crm-profile-selector-preview" title="{ts}Preview{/ts}"><div class="icon ui-icon-zoomin">{ts}Preview{/ts}</div></button>
-        {if call_user_func(array('CRM_Core_Permission', 'check'), 'administer CiviCRM') OR call_user_func(array('CRM_Core_Permission', 'check'), 'manage event profiles')}
+        {if $perm EQ 1}
           <button class="crm-profile-selector-edit">{ts}Edit{/ts}</button>
           <button class="crm-profile-selector-copy">{ts}Copy{/ts}</button>
           <button class="crm-profile-selector-create">{ts}Create{/ts}</button>
