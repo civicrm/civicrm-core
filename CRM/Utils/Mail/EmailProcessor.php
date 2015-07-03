@@ -225,11 +225,11 @@ class CRM_Utils_Mail_EmailProcessor {
           // is base64 encoded
           // Check all parts
           if (!$matches) {
-            $all_parts=$mail->fetchParts();
+            $all_parts = $mail->fetchParts();
             foreach ($all_parts as $k_part => $v_part) {
               if ($v_part instanceof ezcMailFile) {
                 $p_file = $v_part->__get('fileName');
-                $c_file=file_get_contents($p_file);
+                $c_file = file_get_contents($p_file);
                 if (preg_match($rpXheaderRegex, $c_file, $matches)) {
                   self::_log("file match rpXheaderRegex", $matches);
                   list($match, $action, $job, $queue, $hash) = $matches;
@@ -237,7 +237,6 @@ class CRM_Utils_Mail_EmailProcessor {
               }
             }
           }
-
 
           // if all else fails, check Delivered-To for possible pattern
           if (!$matches and preg_match($regex, $mail->getHeader('Delivered-To'), $matches)) {
