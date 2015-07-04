@@ -515,7 +515,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     );
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customActivityFields,
       NULL,
       'Activity'
     );

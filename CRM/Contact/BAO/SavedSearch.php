@@ -296,7 +296,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       $savedSearch->form_values = serialize($params['formValues']);
     }
     else {
-      $savedSearch->form_values = 'null';
+      $savedSearch->form_values = NULL;
     }
 
     $savedSearch->is_active = CRM_Utils_Array::value('is_active', $params, 1);

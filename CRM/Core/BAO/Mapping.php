@@ -319,7 +319,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     $contactType = array('Individual', 'Household', 'Organization');
     foreach ($contactType as $value) {
-      $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required);
+      if ($mappingType == 'Search Builder') {
+        // get multiple custom group fields in this context
+        $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required, FALSE, TRUE);
+      }
+      else {
+        $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required);
+      }
       $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
 
       // exclude the address options disabled in the Address Settings
@@ -557,7 +563,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
-        // sort everything BUT the contactType which is sorted seperately by
+        // sort everything BUT the contactType which is sorted separately by
         // an initial commit of CRM-13278 (check ksort above)
         if (!in_array($key, $contactType)) {
           asort($mapperFields[$key]);
@@ -1036,34 +1042,9 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             }
           }
 
-          // CRM-14563: we store checkbox, multi-select and adv-multi select custom field using separator, hence it
-          // needs special handling.
-          if ($cfID = CRM_Core_BAO_CustomField::getKeyID(CRM_Utils_Array::value(1, $v))) {
-            $isCustomField = TRUE;
-            $customFieldType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
-            $specialHTMLType = array(
-              'CheckBox',
-              'Multi-Select',
-              'AdvMulti-Select',
-              'Multi-Select State/Province',
-              'Multi-Select Country',
-            );
-
-            // override the operator to handle separator ( note: this might have some performance issues )
-            if (in_array($customFieldType, $specialHTMLType)) {
-              // FIX ME: != and few other operators are not handled
-              $specialOperators = array('=', 'IN', 'LIKE');
-
-              if (in_array($params['operator'][$key][$k], $specialOperators)) {
-                $params['operator'][$key][$k] = 'RLIKE';
-              }
-            }
-          }
-
           // CRM-14983: verify if values are comma separated convert to array
-          if (strstr($params['operator'][$key][$k], 'IN') && !is_array($value) && (strpos($value, ',') !== FALSE || strstr($value, '(') || !empty($value)) && empty($isCustomField)) {
-            $value = explode(',', trim($value, "(..)"));
-            $value = array($params['operator'][$key][$k] => $value);
+          if (strstr($params['operator'][$key][$k], 'IN') && !is_array($value) && (strpos($value, ',') !== FALSE || strstr($value, '(') || !empty($value)) && substr($fldName, 0, 7) != 'custom_') {
+            $value = explode(',', str_replace(array('(', ')'), '', $value));
           }
 
           if ($row) {

@@ -23,51 +23,16 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* this template is used for displaying survey information *}
-{if $campaigns}
-  <div class="action-link">
-      <a href="{$addCampaignUrl}" class="button">
-        <span><div class="icon ui-icon-circle-plus"></div> {ts}Add Campaign{/ts}</span>
-      </a>
-  </div>
-  {include file="CRM/common/enableDisableApi.tpl"}
-  <div id="campaignType">
-    <table id="options" class="display">
-      <thead>
-        <tr>
-          <th>{ts}Campaign Title{/ts}</th>
-          <th>{ts}Description{/ts}</th>
-          <th>{ts}Start Date{/ts}</th>
-          <th>{ts}End Date{/ts}</th>
-          <th>{ts}Campaign Type{/ts}</th>
-          <th>{ts}Status{/ts}</th>
-          <th>{ts}Active?{/ts}</th>
-          <th id="nosort"></th>
-  </tr>
-      </thead>
-      {foreach from=$campaigns item=campaign}
-        <tr id="campaign-{$campaign.campaign_id}" class="crm-entity {if $campaign.is_active neq 1} disabled{/if}">
-          <td class="crm-editable" data-field="title">{$campaign.title}</td>
-          <td>{$campaign.description}</td>
-          <td>{$campaign.start_date}</td>
-          <td>{$campaign.end_date}</td>
-          <td>{$campaign.campaign_type_id}</td>
-          <td>{$campaign.status_id}</td>
-          <td id="row_{$campaign.id}_status">{if $campaign.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$campaign.action}</td>
-  </tr>
-      {/foreach}
-    </table>
-  </div>
-
-{else}
-    <div class="messages status no-popup">
-        <div class="icon inform-icon"></div> &nbsp;
-        {ts}None found.{/ts}
+{if $form.$expressButtonName}
+  <div class="crm-section no-label paypal_button_info-section">
+    <div class="content description">
+      {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click <strong>Continue</strong> at the bottom of the page.{/ts}
     </div>
+  </div>
+  <div class="crm-section no-label {$form.$expressButtonName.name}-section">
+    <div class="content description">
+      {$form.$expressButtonName.html}
+      <div class="description">Save time. Checkout securely. Pay without sharing your financial information.</div>
+    </div>
+  </div>
 {/if}
-<div class="action-link">
-  <a href="{$addCampaignUrl}" class="button">
-    <span><div class="icon ui-icon-circle-plus"></div> {ts}Add Campaign{/ts}</span>
-  </a>
-</div>

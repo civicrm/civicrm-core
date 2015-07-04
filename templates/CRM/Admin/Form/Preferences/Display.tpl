@@ -157,27 +157,6 @@
       <td class="label">{$form.editor_id.label}</td>
       <td>{$form.editor_id.html}</td>
     </tr>
-    {if $form.wysiwyg_input_format.html}
-      <tr id="crm-preferences-display-form-block-wysiwyg_input_format" style="display:none;">
-        <td class="label">{$form.wysiwyg_input_format.label}</td>
-        <td>
-          {$form.wysiwyg_input_format.html}{literal}
-            <script type="text/javascript">
-              CRM.$(function($) {
-                if ($('#editor_id').val() == 4) {
-                  $('#crm-preferences-display-form-block-wysiwyg_input_format').show();
-                }
-              });
-            </script>
-          {/literal}
-          <br/>
-          <span class="description">
-            {ts}You will need to enable and configure several modules if you want to allow users to upload images while using a Drupal Default Editor.{/ts}
-            {docURL page="Configuring CiviCRM to Use the Default Drupal Editor" resource="wiki"}
-          </span>
-        </td>
-      </tr>
-    {/if}
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">

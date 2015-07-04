@@ -215,6 +215,11 @@ class CRM_Contribute_BAO_Query {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
     }
+    //CRM-16116: get financial_type_id
+    if (!empty($query->_returnProperties['financial_type_id'])) {
+      $query->_select['financial_type_id'] = "civicrm_contribution.financial_type_id as financial_type_id";
+      $query->_element['financial_type_id'] = $query->_tables['civicrm_contribution'] = 1;
+    }
     // LCD 716 END
   }
 
@@ -518,6 +523,15 @@ class CRM_Contribute_BAO_Query {
         $query->_qill[$grouping][] = ts('Batch Name %1 %2', array(1 => $op, 2 => $batches[$value]));
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         $query->_tables['contribution_batch'] = $query->_whereTables['contribution_batch'] = 1;
+        return;
+
+      case 'contribution_product_id':
+        // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
+        $qillName = $name;
+        list($operator, $productValue) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Product', $name, $value, $op);
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $operator, 3 => $productValue));
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_product.id", $op, $value);
+        $query->_tables['civicrm_product'] = $query->_whereTables['civicrm_product'] = 1;
         return;
 
       default:
@@ -826,6 +840,7 @@ class CRM_Contribute_BAO_Query {
         'contribution_batch' => 1,
         'contribution_campaign_title' => 1,
         'contribution_campaign_id' => 1,
+        'contribution_product_id' => 1,
       );
       if (self::isSoftCreditOptionEnabled()) {
         $properties = array_merge($properties, self::softCreditReturnProperties());
@@ -881,15 +896,12 @@ class CRM_Contribute_BAO_Query {
 
     $form->add('select', 'contribution_page_id',
       ts('Contribution Page'),
-      array(
-        '' => ts('- any -'),
-      ) +
       CRM_Contribute_PseudoConstant::contributionPage(),
-      FALSE, array('class' => 'crm-select2')
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
     );
 
     $form->addSelect('payment_instrument_id',
-      array('entity' => 'contribution', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+      array('entity' => 'contribution', 'multiple' => 'multiple', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
     // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
@@ -947,6 +959,13 @@ class CRM_Contribute_BAO_Query {
         'multiple' => TRUE,
         'context' => 'search',
       )
+    );
+
+    // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
+    $form->add('select', 'contribution_product_id',
+      ts('Premium'),
+      CRM_Contribute_PseudoConstant::products(),
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
     );
 
     // Add all the custom searchable fields

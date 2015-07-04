@@ -17,7 +17,7 @@
  */
 /* This class is used to create Tax rules to be added to the tax tables
  * in the shopping cart
- * Ther are two types of tax rules
+ * There are two types of tax rules
  * 1. default (should be added to a default tax table)
  * 2. alternate (should be added to an alternate tax table)
  *

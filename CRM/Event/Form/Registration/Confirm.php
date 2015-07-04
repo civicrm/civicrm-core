@@ -126,7 +126,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
         $params['amount_level'] = $this->_params[0]['amount_level'];
         $params['currencyID'] = $this->_params[0]['currencyID'];
-        $params['payment_action'] = 'Sale';
 
         // also merge all the other values from the profile fields
         $values = $this->controller->exportValues('Register');
@@ -172,7 +171,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($this->_values['event']['is_monetary']) {
         $registerParams['ip_address'] = CRM_Utils_System::ipAddress();
         $registerParams['currencyID'] = $this->_params[0]['currencyID'];
-        $registerParams['payment_action'] = 'Sale';
       }
       //assign back primary participant params.
       $this->_params[0] = $registerParams;
@@ -774,7 +772,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    //update status and send mail to cancelled additonal participants, CRM-4320
+    //update status and send mail to cancelled additional participants, CRM-4320
     if ($this->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
       $cancelledId = array_search('Cancelled',
         CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")

@@ -3619,7 +3619,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (5166, 1075, "TR", "Tampere Region"),
 (5167, 1075, "OB", "Ostrobothnia"),
 (5168, 1075, "NK", "North Karelia"),
-(5169, 1075, "NO", "Nothern Ostrobothnia"),
+(5169, 1075, "NO", "Northern Ostrobothnia"),
 (5170, 1075, "NS", "Northern Savo"),
 (5171, 1075, "PH", "Päijät-Häme"),
 (5172, 1075, "SK", "Satakunta"),

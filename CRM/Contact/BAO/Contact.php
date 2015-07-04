@@ -276,9 +276,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param bool $invokeHooks
    *   If we need to invoke hooks.
    *
-   * @param bool $skipDelete
-   *   Unclear parameter, passed to website create
-   *
    * @todo explain this parameter
    *
    * @throws Exception
@@ -286,7 +283,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *   Created or updated contribution object. We are deprecating returning an error in
    *   favour of exceptions
    */
-  public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE, $skipDelete = FALSE) {
+  public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE) {
     $contact = NULL;
     if (empty($params['contact_type']) && empty($params['contact_id'])) {
       return $contact;
@@ -327,7 +324,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     $contact = self::add($params);
     if (!$contact) {
-      // Not dying here is stupid, since we get into wierd situation and into a bug that
+      // Not dying here is stupid, since we get into weird situation and into a bug that
       // is impossible to figure out for the user or for us
       // CRM-7925
       CRM_Core_Error::fatal();
@@ -366,8 +363,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       $contact->$name = $value;
     }
 
-    //add website
-    CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
+    // Process website(s) if present in params
+    if (!empty($params['website'])) {
+      CRM_Core_BAO_Website::create($params, $contact->id);
+    }
 
     //get userID from session
     $session = CRM_Core_Session::singleton();
@@ -1865,6 +1864,15 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     if ($contactID) {
+      // CRM-10551
+      // If a user has logged in, or accessed via a checksum
+      // Then deliberately 'blanking' a value in the profile should remove it from their record
+      $session = CRM_Core_Session::singleton();
+      $params['updateBlankLocInfo'] = TRUE;
+      if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
+        $params['updateBlankLocInfo'] = FALSE;
+      }
+
       $editHook = TRUE;
       CRM_Utils_Hook::pre('edit', 'Profile', $contactID, $params);
     }
@@ -2003,7 +2011,11 @@ ORDER BY civicrm_email.is_primary DESC";
       !empty($params['contact_sub_type_hidden'])
     ) {
       // if profile was used, and had any subtype, we obtain it from there
-      $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $params['contact_sub_type_hidden']) . CRM_Core_DAO::VALUE_SEPARATOR;
+      //CRM-13596 - add to existing contact types, rather than overwriting
+      $data_contact_sub_type_arr = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR));
+      if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
+        $data['contact_sub_type'] = $data['contact_sub_type'] . implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $params['contact_sub_type_hidden']) . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
     }
 
     if ($ctype == 'Organization') {
@@ -2225,14 +2237,20 @@ ORDER BY civicrm_email.is_primary DESC";
             }
           }
 
-          $type = $data['contact_type'];
-          if (!empty($data['contact_sub_type'])) {
-            $type = $data['contact_sub_type'];
-            $type = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($type, CRM_Core_DAO::VALUE_SEPARATOR));
-            // generally a contact even if, has multiple subtypes the parent-type is going to be one only
-            // and since formatCustomField() would be interested in parent type, lets consider only one subtype
-            // as the results going to be same.
-            $type = $type[0];
+          //CRM-13596 - check for contact_sub_type_hidden first
+          if (array_key_exists('contact_sub_type_hidden', $params)) {
+            $type = $params['contact_sub_type_hidden'];
+          }
+          else {
+            $type = $data['contact_type'];
+            if (!empty($data['contact_sub_type'])) {
+              $type = $data['contact_sub_type'];
+              $type = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($type, CRM_Core_DAO::VALUE_SEPARATOR));
+              // generally a contact even if, has multiple subtypes the parent-type is going to be one only
+              // and since formatCustomField() would be interested in parent type, lets consider only one subtype
+              // as the results going to be same.
+              $type = $type[0];
+            }
           }
 
           CRM_Core_BAO_CustomField::formatCustomField($customFieldId,

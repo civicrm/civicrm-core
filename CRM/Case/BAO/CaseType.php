@@ -109,7 +109,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @param string $name
    * @param array $definition
-   *   The case-type defintion expressed as an array-tree.
+   *   The case-type definition expressed as an array-tree.
    * @return string
    *   XML
    */

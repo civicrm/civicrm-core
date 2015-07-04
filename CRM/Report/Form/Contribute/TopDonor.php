@@ -105,6 +105,13 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
           ),
         ),
+        'filters' => array(
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+        ),
       ),
     );
     $this->_columns += $this->getAddressColumns();
@@ -138,6 +145,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           'birth_date' => array(
             'title' => ts('Birth Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
           ),
           'receive_date' => array(
             'default' => 'this.year',

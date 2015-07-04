@@ -128,6 +128,20 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_preEditValues;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Contact';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @return void
@@ -771,13 +785,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // subtype is a common field. lets keep it here
     $subtypes = CRM_Contact_BAO_Contact::buildOptions('contact_sub_type', 'create', array('contact_type' => $this->_contactType));
     if (!empty($subtypes)) {
-      $sel = $this->add('select', 'contact_sub_type', ts('Contact Type'),
-        $subtypes, FALSE,
-        array(
-          'id' => 'contact_sub_type',
-          'multiple' => 'multiple',
-          'class' => $buildCustomData . ' crm-select2',
-        )
+      $this->addField('contact_sub_type', array(
+        'label' => ts('Contact Type'),
+        'options' => $subtypes,
+        'class' => $buildCustomData,
+        'multiple' => 'multiple',
+        'options-url' => FALSE,
+          )
       );
     }
 
@@ -803,8 +817,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     CRM_Contact_Form_Location::buildQuickForm($this);
 
     // add attachment
-    $this->addElement('file', 'image_URL', ts('Browse/Upload Image'), 'size=30 maxlength=60');
-    $this->addUploadElement('image_URL');
+    $this->addField('image_URL', array('maxlength' => '60', 'label' => ts('Browse/Upload Image')));
 
     // add the dedupe button
     $this->addElement('submit',
@@ -932,7 +945,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $customFieldExtends = (CRM_Utils_Array::value('contact_sub_type', $params)) ? $params['contact_sub_type'] : $params['contact_type'];
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_contactId,
       $customFieldExtends,
       TRUE
@@ -1221,7 +1233,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *   of key value consist of address blocks.
    *
    * @return array
-   *   as array of sucess/fails for each address block
+   *   as array of success/fails for each address block
    */
   public function parseAddress(&$params) {
     $parseSuccess = $parsedFields = array();

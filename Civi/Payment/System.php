@@ -29,7 +29,14 @@ class System {
   }
 
   /**
+   * Starting from the processor as an array retrieve the processor as an object.
+   *
+   * If there is no valid configuration it will not be retrieved.
+   *
    * @param array $processor
+   *
+   * @return CRM_Core_Payment|NULL
+   *
    * @throws \CRM_Core_Exception
    */
   public function getByProcessor($processor) {
@@ -52,14 +59,23 @@ class System {
           require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
         }
 
-        $this->cache[$id] = new $paymentClass($processor['is_test'] ? 'test' : 'live', $processor);
+        $processorObject = new $paymentClass(!empty($processor['is_test']) ? 'test' : 'live', $processor);
+        if ($processorObject->checkConfig()) {
+          $processorObject = NULL;
+        }
+        else {
+          $processorObject->setPaymentProcessor($processor);
+        }
       }
+      $this->cache[$id] = $processorObject;
     }
     return $this->cache[$id];
   }
 
   /**
    * @param int $id
+   *
+   * @return \Civi\Payment\CRM_Core_Payment|NULL
    * @throws \CiviCRM_API3_Exception
    */
   public function getById($id) {
@@ -70,6 +86,8 @@ class System {
   /**
    * @param string $name
    * @param bool $is_test
+   *
+   * @return \Civi\Payment\CRM_Core_Payment|NULL
    * @throws \CiviCRM_API3_Exception
    */
   public function getByName($name, $is_test) {

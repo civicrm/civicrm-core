@@ -64,7 +64,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   public $_params;
 
-  public $_membershipId = NULL;
   /**
    * When not to reset sort_name.
    */
@@ -482,7 +481,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          CRM_Core_DAO::$_nullObject,
           NULL,
           'Contribution'
         );
@@ -693,7 +691,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
-          $customFields,
           $key,
           'Membership',
           $membershipTypeId
@@ -789,13 +786,23 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         $value['is_renew'] = FALSE;
         if (!empty($params['member_option']) && CRM_Utils_Array::value($key, $params['member_option']) == 2) {
+
+          // The following parameter setting may be obsolete.
           $this->_params = $params;
           $value['is_renew'] = TRUE;
-          $membership = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
-            $value['contact_id'],
-            $value['membership_type_id'],
-            FALSE, $this, NULL, NULL,
-            $value['custom']
+          $isPayLater = CRM_Utils_Array::value('is_pay_later', $params);
+          $campaignId = NULL;
+          if (isset($this->_values) && is_array($this->_values) && !empty($this->_values)) {
+            $campaignId = CRM_Utils_Array::value('campaign_id', $this->_params);
+            if (!array_key_exists('campaign_id', $this->_params)) {
+              $campaignId = CRM_Utils_Array::value('campaign_id', $this->_values);
+            }
+          }
+
+          list($membership) = CRM_Member_BAO_Membership::renewMembership(
+            $value['contact_id'], $value['membership_type_id'], FALSE,
+            NULL, NULL, $value['custom'], NULL, NULL, FALSE,
+            NULL, NULL, $isPayLater, $campaignId
           );
 
           // make contribution entry

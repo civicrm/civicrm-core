@@ -373,7 +373,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
           'data_type' => CRM_Utils_Type::T_FLOAT,
         ),
         'grant_application_received_date' => array(
-          'title' => 'Grant Application Recieved Date',
+          'title' => 'Grant Application Received Date',
           'name' => 'grant_application_received_date',
           'data_type' => CRM_Utils_Type::T_DATE,
         ),

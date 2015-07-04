@@ -140,7 +140,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $params = $values = $ids = array();
     $participantId = Participant::create($this->_contactId, $this->_eventId);
     $fetchParticipant = CRM_Event_BAO_Participant::getValues($params, $values, $ids);
-    $this->assertNull($fetchParticipant, 'In line ' . __LINE__);
+    $this->assertNull($fetchParticipant);
 
     Contact::delete($this->_contactId);
     Event::delete($this->_eventId);

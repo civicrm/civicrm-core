@@ -123,7 +123,7 @@
    */
   CRM.UF.UFFieldModel = CRM.Backbone.Model.extend({
     /**
-     * Backbone.Form descripton of the field to which this refers
+     * Backbone.Form description of the field to which this refers
      */
     defaults: {
       help_pre: '',

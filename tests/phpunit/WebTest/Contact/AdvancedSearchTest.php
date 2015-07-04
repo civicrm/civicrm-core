@@ -277,7 +277,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select("group", "label=$groupName");
     // select tag
     $this->select("contact_tags", "label=$tagName");
-    // select prefered language
+    // select preferred language
     $this->select("preferred_language", "value=en_US");
     // select privacy
     $this->select("privacy_options", "value=do_not_email");

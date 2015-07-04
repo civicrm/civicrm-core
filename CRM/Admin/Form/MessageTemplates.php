@@ -173,7 +173,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       );
     }
     else {
-      $this->addWysiwyg('msg_html', ts('HTML Message'),
+      $this->add('wysiwyg', 'msg_html', ts('HTML Message'),
         array(
           'cols' => '80',
           'rows' => '8',

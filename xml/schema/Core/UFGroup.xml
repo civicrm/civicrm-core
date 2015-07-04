@@ -111,7 +111,7 @@
     <name>limit_listings_group_id</name>
     <title>Profile Search Limit Group</title>
     <type>int unsigned</type>
-    <comment>Group id, foriegn key from civicrm_group</comment>
+    <comment>Group id, foreign key from civicrm_group</comment>
     <add>1.4</add>
   </field>
   <foreignKey>

@@ -67,7 +67,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     ) + $this->params;
 
     $result = $this->callAPIAndDocument('custom_value', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $result = $this->callAPISuccess('custom_value', 'get', $params);
   }
 

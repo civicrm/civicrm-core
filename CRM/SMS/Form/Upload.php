@@ -435,4 +435,14 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     return ts('SMS Content');
   }
 
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
+  }
+
 }

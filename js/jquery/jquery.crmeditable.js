@@ -238,7 +238,7 @@
   };
 
   $(document).on('crmLoad', function(e) {
-    $('.crm-editable', e.target).crmEditable();
+    $('.crm-editable', e.target).not('thead *').crmEditable();
   });
 
 })(jQuery, CRM._);

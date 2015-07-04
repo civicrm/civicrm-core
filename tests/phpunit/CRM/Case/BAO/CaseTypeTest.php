@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
 
   /**
-   * Provide a series of test-scenarios. Each scenario includes a case-type defintion expressed as
+   * Provide a series of test-scenarios. Each scenario includes a case-type definition expressed as
    * JSON and equivalent XML.
    *
    * @return array

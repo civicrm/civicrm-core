@@ -175,6 +175,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Get the payment processor details.
    *
+   * @deprecated Use Civi\Payment\System::singleton->getByID();
+   *
    * @param int $paymentProcessorID
    *   Payment processor id.
    * @param string $mode
@@ -183,7 +185,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    *   associated array with payment processor related fields
    */
-  public static function getPayment($paymentProcessorID, $mode) {
+  public static function getPayment($paymentProcessorID, $mode = 'based_on_id') {
     if (!$paymentProcessorID) {
       CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
     }
@@ -211,25 +213,23 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * @param $paymentProcessorIDs
-   * @param $mode
+   * Given a live processor ID get the test id.
    *
-   * @return array
-   * @throws Exception
+   * @param int $id
+   *
+   * @return int
+   *   Test payment processor ID.
    */
-  public static function getPayments($paymentProcessorIDs, $mode) {
-    if (!$paymentProcessorIDs) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
-    }
-
-    $payments = array();
-    foreach ($paymentProcessorIDs as $paymentProcessorID) {
-      $payment = self::getPayment($paymentProcessorID, $mode);
-      $payments[$payment['id']] = $payment;
-    }
-
-    uasort($payments, 'self::defaultComparison');
-    return $payments;
+  public static function getTestProcessorId($id) {
+    $liveProcessorName = civicrm_api3('payment_processor', 'getvalue', array(
+      'id' => $id,
+      'return' => 'name',
+    ));
+    return civicrm_api3('payment_processor', 'getvalue', array(
+      'return' => 'id',
+      'name' => $liveProcessorName,
+      'domain_id' => CRM_Core_Config::domainID(),
+    ));
   }
 
   /**
@@ -252,6 +252,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * Build payment processor details.
    *
+   * @deprecated
+   *
    * @param object $dao
    *   Payment processor object.
    * @param string $mode
@@ -260,7 +262,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    *   associated array with payment processor related fields
    */
-  public static function buildPayment($dao, $mode) {
+  protected static function buildPayment($dao, $mode) {
     $fields = array(
       'id',
       'name',
@@ -286,7 +288,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
     $result['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $dao->payment_processor_type_id, 'name');
 
-    $result['instance'] = $result['object'] =& CRM_Core_Payment::singleton($mode, $result);
+    $result['instance'] = $result['object'] = CRM_Core_Payment::singleton($mode, $result);
 
     return $result;
   }
@@ -302,15 +304,15 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return array
    */
   public static function getAllPaymentProcessors($mode, $reset = FALSE) {
-    /*
-     * $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
-     * if (!$reset) {
-     *   $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
-     *   if (!empty($processors)) {
-     *     return $processors;
-     *   }
-     * }
-     */
+
+    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
+    if (!$reset) {
+      $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
+      if (!empty($processors)) {
+        return $processors;
+      }
+    }
+
     $retrievalParameters = array(
       'is_active' => TRUE,
       'options' => array('sort' => 'is_default DESC, name'),
@@ -322,22 +324,22 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     elseif ($mode == 'live') {
       $retrievalParameters['is_test'] = 0;
     }
+
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
     foreach ($processors['values'] as $processor) {
-      $fieldsToProvide = array('user_name', 'password', 'signature', 'subject');
+      $fieldsToProvide = array('user_name', 'password', 'signature', 'subject', 'is_recur');
       foreach ($fieldsToProvide as $field) {
-        //prevent e-notices in processor classes when not configured
+        // Prevent e-notices in processor classes when not configured.
         if (!isset($processor[$field])) {
-          $processor[$field] = NULL;
+          $processors['values'][$processor['id']][$field] = NULL;
         }
       }
       $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
-      $mode = empty($processor['is_test']) ? 'live' : 'test';
-      $processors['values'][$processor['id']]['object'] = CRM_Core_Payment::singleton($mode, $processor);
+      $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processor);
     }
-    /*
-    CRM_Utils_Cache::singleton()->set($cacheKey, $processors);
-     */
+
+    CRM_Utils_Cache::singleton()->set($cacheKey, $processors['values']);
+
     return $processors['values'];
   }
 
@@ -353,50 +355,60 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   - LiveMode
    *   - FutureStartDate
    *
-   * @param array $ids
+   * @param array|bool $ids
    *
    * @return array
    *   available processors
    */
-  public static function getPaymentProcessors($capabilities = array(), $ids = array()) {
+  public static function getPaymentProcessors($capabilities = array(), $ids = FALSE) {
     $mode = NULL;
+    $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : array();
+    $processors = $liveProcessors = self::getAllPaymentProcessors('live');
+
     if (in_array('TestMode', $capabilities)) {
-      $mode = 'test';
-    }
-    elseif (in_array('LiveMode', $capabilities)) {
-      $mode = 'live';
-    }
-    $processors = self::getAllPaymentProcessors($mode);
-    if ($capabilities) {
-      foreach ($processors as $index => $processor) {
-        if (!empty($ids) && !in_array($processor['id'], $ids)) {
-          unset ($processors[$index]);
-          continue;
-        }
-        if (($error = $processor['object']->checkConfig()) != NULL) {
-          unset ($processors[$index]);
-          continue;
-        }
-        foreach ($capabilities as $capability) {
-          if (($processor['object']->supports($capability)) == FALSE) {
-            unset ($processors[$index]);
+      if ($ids) {
+        foreach ($testProcessors as $testProcessor) {
+          if (!in_array($testProcessor['id'], $ids)) {
+            foreach ($liveProcessors as $liveProcessor) {
+              if ($liveProcessor['name'] == $testProcessor['name']) {
+                $ids[] = $testProcessor['id'];
+              }
+            }
           }
         }
       }
+      $processors = $testProcessors;
     }
+
+    foreach ($processors as $index => $processor) {
+      if ($ids && !in_array($processor['id'], $ids)) {
+        unset ($processors[$index]);
+        continue;
+      }
+      // Invalid processors will store a null value in 'object' (e.g. if not all required config fields are present).
+      // This is determined by calling when loading the processor via the $processorObject->checkConfig() function.
+      if (!is_a($processor['object'], 'CRM_Core_Payment')) {
+        unset ($processors[$index]);
+        continue;
+      }
+      foreach ($capabilities as $capability) {
+        if (($processor['object']->supports($capability)) == FALSE) {
+          unset ($processors[$index]);
+          continue 1;
+        }
+      }
+    }
+
     return $processors;
   }
 
   /**
    * Is there a processor on this site with the specified capability.
    * @param array $capabilities
-   * @param bool $isIncludeTest
    *
    * @return bool
    */
-  public static function hasPaymentProcessorSupporting($capabilities = array(), $isIncludeTest = FALSE) {
-    $mode = $isIncludeTest ? 'Test' : 'Live';
-    $capabilities[] = $mode . 'Mode';
+  public static function hasPaymentProcessorSupporting($capabilities = array()) {
     $result = self::getPaymentProcessors($capabilities);
     return (!empty($result)) ? TRUE : FALSE;
   }

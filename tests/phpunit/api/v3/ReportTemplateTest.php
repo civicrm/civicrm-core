@@ -51,10 +51,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'component' => 'CiviCase',
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $entityId = $result['id'];
-    $this->assertTrue(is_numeric($entityId), 'In line ' . __LINE__);
-    $this->assertEquals(7, $result['values'][$entityId]['component_id'], 'In line ' . __LINE__);
+    $this->assertTrue(is_numeric($entityId));
+    $this->assertEquals(7, $result['values'][$entityId]['component_id']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -67,7 +67,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'component' => '',
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -81,7 +81,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'is_active' => 0,
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -94,7 +94,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'is_active' => 1,
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -105,7 +105,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'id' => $entityId,
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       ');

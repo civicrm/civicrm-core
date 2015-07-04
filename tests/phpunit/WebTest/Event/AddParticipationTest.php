@@ -313,7 +313,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
         'Check Number' => '1044',
       )
     );
-    $this->verifyText("xpath=//table/tbody/tr/td[text()='Total Amount']/following-sibling::td/strong", preg_quote('$ 800.00'), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//table/tbody/tr/td[text()='Total Amount']/following-sibling::td/strong", preg_quote('$ 800.00'));
   }
 
   public function testEventAddMultipleParticipants() {

@@ -2322,7 +2322,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param string $description
    *   Descriptive text for the example file.
    * @param string $exampleName
-   *   Name for this example file (CamelCase) - if ommitted the action name will be substituted.
+   *   Name for this example file (CamelCase) - if omitted the action name will be substituted.
    */
   private function documentMe($entity, $action, $params, $result, $testFunction, $testFile, $description = "", $exampleName = NULL) {
     if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
@@ -2571,8 +2571,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   public function quickCleanUpFinancialEntities() {
     $tablesToTruncate = array(
+      'civicrm_activity',
+      'civicrm_activity_contact',
       'civicrm_contribution',
       'civicrm_contribution_soft',
+      'civicrm_contribution_product',
       'civicrm_financial_trxn',
       'civicrm_financial_item',
       'civicrm_contribution_recur',
@@ -2602,6 +2605,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   public function restoreDefaultPriceSetConfig() {
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_price_set WHERE id > 2');
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
   }
@@ -2609,7 +2613,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Function does a 'Get' on the entity & compares the fields in the Params with those returned
    * Default behaviour is to also delete the entity
    * @param array $params
-   *   Params array to check agains.
+   *   Params array to check against.
    * @param int $id
    *   Id of the entity concerned.
    * @param string $entity
@@ -3117,7 +3121,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @todo this isn't a great place to put it - but really it belongs on a class that extends
    * this parent class & we don't have a structure for that yet
    * There is another function to this effect on the PaypalPro test but it appears to be silently failing
-   * & the best protection agains that is the functions this class affords
+   * & the best protection against that is the functions this class affords
    * @param array $params
    * @return int $result['id'] payment processor id
    */

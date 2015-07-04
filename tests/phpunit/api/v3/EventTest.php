@@ -345,7 +345,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   public function testCreateEventSuccess() {
     $result = $this->callAPIAndDocument('Event', 'Create', $this->_params[0], __FUNCTION__, __FILE__);
-    $this->assertArrayHasKey('id', $result['values'][$result['id']], 'In line ' . __LINE__);
+    $this->assertArrayHasKey('id', $result['values'][$result['id']]);
     $result = $this->callAPISuccess($this->_entity, 'Get', array('id' => $result['id']));
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
     $this->assertEquals('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set in line ' . __LINE__);
@@ -363,8 +363,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->_params[0]['event_title'] = $this->_params[0]['title'];
     unset($this->_params[0]['title']);
     $result = $this->callAPISuccess('Event', 'Create', $this->_params[0]);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertArrayHasKey('id', $result['values'][$result['id']], 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
+    $this->assertArrayHasKey('id', $result['values'][$result['id']]);
     $result = $this->callAPISuccess($this->_entity, 'Get', array('id' => $result['id']));
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
 
@@ -409,7 +409,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'event_id' => $this->_eventIds[0],
     );
     $result = $this->callAPISuccess('Event', 'Delete', $params);
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
+    $this->assertAPISuccess($result);
   }
 
   /**
@@ -472,8 +472,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('event', 'get', $params);
 
-    $this->assertEquals($result['values'][$this->_eventIds[0]]['id'], $this->_eventIds[0], 'In line ' . __LINE__);
-    $this->assertEquals($result['values'][$this->_eventIds[0]]['title'], 'Annual CiviCRM meet', 'In line ' . __LINE__);
+    $this->assertEquals($result['values'][$this->_eventIds[0]]['id'], $this->_eventIds[0]);
+    $this->assertEquals($result['values'][$this->_eventIds[0]]['title'], 'Annual CiviCRM meet');
   }
 
   /**
@@ -532,7 +532,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
+    $this->assertEquals(1, $result['values']['title']['api.required']);
   }
 
   /**
@@ -542,14 +542,14 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('api_action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['title']['api.required'], 'in line ' . __LINE__);
+    $this->assertEquals(1, $result['values']['title']['api.required']);
   }
 
   public function testgetfieldsGet() {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'get');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals('title', $result['values']['event_title']['name'], 'in line ' . __LINE__);
+    $this->assertEquals('title', $result['values']['event_title']['name']);
   }
 
   public function testgetfieldsDelete() {

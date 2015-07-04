@@ -256,7 +256,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->assertDBCompareValue('CRM_Contribute_DAO_ContributionSoft', $id, 'contact_id',
       'contribution_id', $honoreeContactId, 'Check DB for honor contact of the contribution'
     );
-    //get honory information
+    //get honorary information
     $getHonorContact = CRM_Contribute_BAO_Contribution::getHonorContacts($honoreeContactId);
 
     $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,

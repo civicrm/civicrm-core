@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to delete a group of
- * contributions. This class provides functionality for the actual
- * deletion.
+ * This class provides the functionality to delete a group of contributions.
+ *
+ * This class provides functionality for the actual deletion.
  */
 class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
 

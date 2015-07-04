@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_ContributionPage {
   protected $_colors;
@@ -186,7 +184,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       array('onclick' => "widgetBlock(this)")
     );
 
-    $this->addWysiwyg('about', ts('About'), $attributes['about']);
+    $this->add('wysiwyg', 'about', ts('About'), $attributes['about']);
 
     foreach ($this->_fields as $name => $val) {
       $this->add($val[1],

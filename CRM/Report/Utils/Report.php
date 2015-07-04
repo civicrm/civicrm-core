@@ -54,7 +54,7 @@ class CRM_Report_Utils_Report {
       array_shift($args);
       array_shift($args);
 
-      // put rest of arguement back in the form of url, which is how value
+      // put rest of argument back in the form of url, which is how value
       // is stored in option value table
       $optionVal = implode('/', $args);
     }

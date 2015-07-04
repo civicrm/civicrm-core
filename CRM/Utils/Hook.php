@@ -81,7 +81,6 @@ abstract class CRM_Utils_Hook {
     if (self::$_singleton == NULL || $fresh) {
       $config = CRM_Core_Config::singleton();
       $class = $config->userHookClass;
-      require_once str_replace('_', DIRECTORY_SEPARATOR, $config->userHookClass) . '.php';
       self::$_singleton = new $class();
     }
     return self::$_singleton;
@@ -1340,7 +1339,7 @@ abstract class CRM_Utils_Hook {
    *   float $x x position in user units
    *   float $y y position in user units
    *   boolean $reseth if true reset the last cell height (default true).
-   *   int $stretch stretch carachter mode: <ul><li>0 = disabled</li><li>1 = horizontal scaling only if
+   *   int $stretch stretch character mode: <ul><li>0 = disabled</li><li>1 = horizontal scaling only if
    *                necessary</li><li>2 = forced horizontal scaling</li><li>3 = character spacing only if
    *                necessary</li><li>4 = forced character spacing</li></ul>
    *   boolean $ishtml set to true if $txt is HTML content (default = false).
@@ -1925,6 +1924,18 @@ abstract class CRM_Utils_Hook {
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_fileSearches'
     );
+  }
+
+  /**
+   * Check system status.
+   *
+   * @param array $messages
+   *   Array<CRM_Utils_Check_Message>. A list of messages regarding system status.
+   * @return mixed
+   */
+  public static function check(&$messages) {
+    return self::singleton()
+      ->invoke(1, $messages, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_check');
   }
 
   /**

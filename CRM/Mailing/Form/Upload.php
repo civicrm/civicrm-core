@@ -690,4 +690,15 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     return ts('Mailing Content');
   }
 
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
+    return $tokens;
+  }
+
 }

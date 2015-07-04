@@ -405,7 +405,7 @@ AND         cp.page_type = 'contribute'
       $this, FALSE, 0
     );
 
-    if ($this->_sortByCharacter == 1 ||
+    if ($this->_sortByCharacter == 'all' ||
       !empty($_POST)
     ) {
       $this->_sortByCharacter = '';
@@ -432,6 +432,7 @@ AND         cp.page_type = 'contribute'
   SELECT  id
     FROM  civicrm_contribution_page
    WHERE  $whereClause
+   ORDER BY is_active desc, title asc
    LIMIT  $offset, $rowCount";
     $contribPage = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Contribute_DAO_ContributionPage');
     $contribPageIds = array();
@@ -445,7 +446,7 @@ AND         cp.page_type = 'contribute'
 SELECT *
 FROM civicrm_contribution_page
 WHERE $whereClause
-ORDER BY title asc
+ORDER BY is_active desc, title asc
    LIMIT $offset, $rowCount";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Contribute_DAO_ContributionPage');

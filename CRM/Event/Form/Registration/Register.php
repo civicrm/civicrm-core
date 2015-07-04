@@ -66,7 +66,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_skipDupeRegistrationCheck = FALSE;
 
   public $_paymentProcessorID;
-  public $_snippet;
 
   /**
    * @var boolean determines if fee block should be shown or hidden
@@ -97,10 +96,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // We hide the payment fields if the event is full or requires approval,
     // and the current user has not yet been approved CRM-12279
     $this->_noFees = (($eventFull || $this->_requireApproval) && !$this->_allowConfirmation);
-    CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this, $this->_noFees);
-    if ($this->_snippet) {
-      return;
-    }
+    $this->_paymentProcessors = $this->_noFees ? array() : $this->get('paymentProcessors');
+    $this->preProcessPaymentOptions();
 
     $this->_allowWaitlist = FALSE;
     if ($eventFull && !$this->_allowConfirmation && !empty($this->_values['event']['has_waitlist'])) {
@@ -139,11 +136,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    */
   public function setDefaultValues() {
-    if ($this->_paymentProcessorID && $this->_snippet && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
-      // see function comment block for explanation of this. Note that CRM-15555 will require this to look at the billing form fields not the
-      // billing_mode which
-      return;
-    }
     $this->_defaults = array();
     $contactID = $this->getContactID();
     $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
@@ -162,10 +154,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // set default state/province from config if no state/province set
     if (empty($this->_defaults["billing_state_province_id-{$this->_bltID}"])) {
       $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
-    }
-
-    if ($this->_snippet) {
-      return $this->_defaults;
     }
 
     if ($contactID) {
@@ -199,7 +187,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $pid => $value) {
         if (!empty($value['is_default'])) {
-          $this->_defaults['payment_processor'] = $pid;
+          $this->_defaults['payment_processor_id'] = $pid;
         }
       }
     }
@@ -334,10 +322,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-    // Return if we are in an ajax callback
-    if ($this->_snippet) {
-      return;
-    }
 
     $contactID = $this->getContactID();
     if ($contactID) {
@@ -442,14 +426,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if ($this->_values['event']['is_monetary']) {
       if (count($pps) > 1) {
-        $this->addRadio('payment_processor', ts('Payment Method'), $pps,
+        $this->addRadio('payment_processor_id', ts('Payment Method'), $pps,
           NULL, "&nbsp;"
         );
       }
       elseif (!empty($pps)) {
         $ppKeys = array_keys($pps);
         $currentPP = array_pop($ppKeys);
-        $this->addElement('hidden', 'payment_processor', $currentPP);
+        $this->addElement('hidden', 'payment_processor_id', $currentPP);
       }
     }
 
@@ -548,6 +532,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     $this->addFormRule(array('CRM_Event_Form_Registration_Register', 'formRule'), $this);
+    $this->unsavedChangesWarn = TRUE;
 
     // add pcp fields
     if ($this->_pcpId) {
@@ -893,8 +878,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     if ($self->_values['event']['is_monetary']) {
-      if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 && !isset($fields['payment_processor'])) {
-        $errors['payment_processor'] = ts('Please select a Payment Method');
+      if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 && !isset
+        ($fields['payment_processor_id'])) {
+        $errors['payment_processor_id'] = ts('Please select a Payment Method');
       }
       // return if this is express mode
       if ($self->_paymentProcessor &&
@@ -991,7 +977,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $params['is_primary'] = 1;
 
     if ($this->_values['event']['is_pay_later']
-      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor'] == 0)
+      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor_id'] == 0)
     ) {
       $params['is_pay_later'] = 1;
     }
@@ -1135,7 +1121,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if ($this->_values['event']['is_monetary']) {
         $params['ip_address'] = CRM_Utils_System::ipAddress();
         $params['currencyID'] = $config->defaultCurrency;
-        $params['payment_action'] = 'Sale';
         $params['invoiceID'] = $invoiceID;
       }
       $this->_params = $this->get('params');
@@ -1184,9 +1169,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             TRUE, NULL, FALSE
           );
           $params['invoiceID'] = $invoiceID;
-
-          //default action is Sale
-          $params['payment_action'] = 'Sale';
 
           $token = $payment->setExpressCheckout($params);
           if (is_a($token, 'CRM_Core_Error')) {
@@ -1330,7 +1312,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
-    // update status and send mail to cancelled additonal participants, CRM-4320
+    // update status and send mail to cancelled additional participants, CRM-4320
     if ($this->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
       $cancelledId = array_search('Cancelled',
         CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")

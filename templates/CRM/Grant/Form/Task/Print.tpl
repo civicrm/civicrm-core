@@ -38,7 +38,7 @@
     <td>{ts}Amount Requested{/ts}</td>
     <td>{ts}Amount Requested(orig. currency){/ts}</td>
     <td>{ts}Amount Granted{/ts}</td>
-    <td>{ts}Application Recieved{/ts}</td>
+    <td>{ts}Application Received{/ts}</td>
     <td>{ts}Money Transferred{/ts}</td>
   </tr>
 {foreach from=$rows item=row}

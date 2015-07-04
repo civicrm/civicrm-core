@@ -25,9 +25,6 @@
 *}
 
 {* this template is used for adding/editing activities for a case. *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 <div class="crm-block crm-form-block crm-case-activity-form-block">
 
   {if $action neq 8 and $action  neq 32768 }
@@ -64,8 +61,7 @@
       <tr class="crm-case-activity-form-block-details">
         <td class="label">{ts}Notes{/ts}</td>
         <td class="view-value">
-          {* If using plain textarea, assign class=huge to make input large enough. *}
-          {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+          {$form.details.html}
         </td>
       </tr>
       {* Added Activity Details accordion tab *}
@@ -166,8 +162,7 @@
                 <tr class="crm-case-activity-form-block-details">
                   <td class="label">{$form.details.label}</td>
                   <td class="view-value">
-                  {* If using plain textarea, assign class=huge to make input large enough. *}
-                    {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+                    {$form.details.html}
                   </td>
                 </tr>
               {/if}
@@ -230,37 +225,7 @@
     {/if}
   <tr class="crm-case-activity-form-block-schedule_followup">
     <td colspan="2">
-
-      <div id="follow-up" class="crm-accordion-wrapper collapsed">
-        <div class="crm-accordion-header">
-          {ts}Schedule Follow-up{/ts}
-        </div><!-- /.crm-accordion-header -->
-        <div class="crm-accordion-body">
-
-          <table class="form-layout-compressed">
-            <tr class="crm-case-activity-form-block-followup_activity_type_id">
-              <td class="label">{ts}Schedule Follow-up Activity{/ts}</td>
-              <td>{$form.followup_activity_type_id.html}&nbsp;&nbsp;{ts}on{/ts}
-              {include file="CRM/common/jcalendar.tpl" elementName=followup_date}
-              </td>
-            </tr>
-            <tr class="crm-case-activity-form-block-followup_activity_subject">
-              <td class="label">{$form.followup_activity_subject.label}</td>
-              <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
-            </tr>
-            <tr>
-              <td class="label">
-                {$form.followup_assignee_contact_id.label}
-                {edit}
-                {/edit}
-              </td>
-              <td>
-                {$form.followup_assignee_contact_id.html}
-              </td>
-            </tr>
-          </table>
-        </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+    {include file="CRM/Activity/Form/FollowUp.tpl" type="case-"}
     </td>
   </tr>
   {* Suppress activity status and priority for changes to status, case type and start date. PostProc will force status to completed. *}
@@ -339,4 +304,3 @@
     {/literal}
   {/if}
 </div>
-{/if} {* end of main if block*}

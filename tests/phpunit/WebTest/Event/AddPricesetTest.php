@@ -636,7 +636,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
       )
     );
     $this->waitForElementPresent("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td");
-    $this->verifyText("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td/table/tbody/tr[2]/td", preg_quote('$ 2,705.00'), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//table/tbody/tr/td[text()='Fees']/following-sibling::td/table/tbody/tr[2]/td", preg_quote('$ 2,705.00'));
     $expectedLineItems = array(
       2 => array(
         1 => 'Full Conference',

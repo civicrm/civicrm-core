@@ -312,7 +312,7 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $g2contact.status = 'Added'
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $location_filter
                         AND             $email.email IS NOT NULL
                         AND             $email.email != ''
@@ -343,7 +343,7 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $g2contact.status = 'Added'
                         AND             $contact.do_not_sms = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $phone.phone_type_id = {$phoneTypes['Mobile']}
                         AND             $phone.phone IS NOT NULL
                         AND             $phone.phone != ''
@@ -372,7 +372,7 @@ WHERE  c.group_id = {$groupDAO->id}
                                        ($mg.group_type = 'Include')
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $location_filter
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
@@ -398,7 +398,7 @@ WHERE  c.group_id = {$groupDAO->id}
                                        ($mg.group_type = 'Include')
                         AND             $contact.do_not_sms = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $phone.phone_type_id = {$phoneTypes['Mobile']}
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null";
@@ -434,7 +434,7 @@ LEFT  JOIN X_$job_id                      ON X_$job_id.contact_id = c.id
 WHERE      gc.group_id = {$groupDAO->id}
   AND      c.do_not_email = 0
   AND      c.is_opt_out = 0
-  AND      c.is_deceased = 0
+  AND      c.is_deceased <> 1
   AND      $location_filter
   AND      civicrm_email.on_hold = 0
   AND      X_$job_id.contact_id IS null
@@ -451,7 +451,7 @@ LEFT  JOIN X_$job_id                      ON X_$job_id.contact_id = c.id
 WHERE      gc.group_id = {$groupDAO->id}
   AND      c.do_not_sms = 0
   AND      c.is_opt_out = 0
-  AND      c.is_deceased = 0
+  AND      c.is_deceased <> 1
   AND      p.phone_type_id = {$phoneTypes['Mobile']}
   AND      X_$job_id.contact_id IS null";
       }
@@ -498,7 +498,7 @@ AND    $mg.mailing_id = {$mailing_id}
                         AND             $g2contact.status = 'Added'
                         AND             $contact.do_not_email = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $location_filter
                         AND             $email.on_hold = 0
                         AND             $mg.mailing_id = {$mailing_id}
@@ -523,7 +523,7 @@ AND    $mg.mailing_id = {$mailing_id}
                         AND             $g2contact.status = 'Added'
                         AND             $contact.do_not_sms = 0
                         AND             $contact.is_opt_out = 0
-                        AND             $contact.is_deceased = 0
+                        AND             $contact.is_deceased <> 1
                         AND             $phone.phone_type_id = {$phoneTypes['Mobile']}
                         AND             $mg.mailing_id = {$mailing_id}
                         AND             X_$job_id.contact_id IS null";
@@ -939,7 +939,7 @@ INNER JOIN civicrm_contact ON civicrm_email.contact_id = civicrm_contact.id
 WHERE      (civicrm_email.is_bulkmail = 1 OR civicrm_email.is_primary = 1)
 AND        civicrm_contact.id = {$groupContact}
 AND        civicrm_contact.do_not_email = 0
-AND        civicrm_contact.is_deceased = 0
+AND        civicrm_contact.is_deceased <> 1
 AND        civicrm_email.on_hold = 0
 AND        civicrm_contact.is_opt_out = 0
 GROUP BY   civicrm_email.id
@@ -2637,19 +2637,10 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function commonCompose(&$form) {
     //get the tokens.
-    $tokens = CRM_Core_SelectValues::contactTokens();
+    $tokens = array();
 
-    $className = CRM_Utils_System::getClassName($form);
-    if ($className == 'CRM_Mailing_Form_Upload') {
-      $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
-    }
-    elseif ($className == 'CRM_Admin_Form_ScheduleReminders') {
-      $tokens = array_merge(CRM_Core_SelectValues::activityTokens(), $tokens);
-      $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
-      $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
-    }
-    elseif ($className == 'CRM_Event_Form_ManageEvent_ScheduleReminders') {
-      $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
+    if (method_exists($form, 'listTokens')) {
+      $tokens = array_merge($form->listTokens(), $tokens);
     }
 
     //sorted in ascending order tokens by ignoring word case
@@ -2660,10 +2651,12 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     $textFields = array('text_message' => ts('HTML Format'), 'sms_text_message' => ts('SMS Message'));
     $modePrefixes = array('Mail' => NULL, 'SMS' => 'SMS');
 
+    $className = CRM_Utils_System::getClassName($form);
+
     if ($className != 'CRM_SMS_Form_Upload' && $className != 'CRM_Contact_Form_Task_SMS' &&
       $className != 'CRM_Contact_Form_Task_SMS'
     ) {
-      $form->addWysiwyg('html_message',
+      $form->add('wysiwyg', 'html_message',
         ts('HTML Format'),
         array(
           'cols' => '80',
@@ -2704,7 +2697,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       else {
         $templates[$prefix] = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
       }
-
       if (!empty($templates[$prefix])) {
         $form->assign('templates', TRUE);
 
@@ -2720,60 +2712,11 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       );
       $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
     }
-  }
 
-  /**
-   * Build the  compose PDF letter form.
-   *
-   * @param CRM_Core_Form $form
-   *
-   * @return void
-   */
-  public static function commonLetterCompose(&$form) {
-    //get the tokens.
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    if (CRM_Utils_System::getClassName($form) == 'CRM_Mailing_Form_Upload') {
-      $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
-    }
-    //@todo move this fn onto the form
-    if (CRM_Utils_System::getClassName($form) == 'CRM_Contribute_Form_Task_PDFLetter') {
-      $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
-    }
-
-    if (method_exists($form, 'listTokens')) {
-      $tokens = array_merge($form->listTokens(), $tokens);
-    }
-
-    $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
-
-    $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
-    if (!empty($form->_templates)) {
-      $form->assign('templates', TRUE);
-      $form->add('select', 'template', ts('Select Template'),
-        array(
-          '' => ts('- select -'),
-        ) + $form->_templates, FALSE,
-        array('onChange' => "selectValue( this.value,'' );")
-      );
-      $form->add('checkbox', 'updateTemplate', ts('Update Template'), NULL);
-    }
-
-    $form->add('checkbox', 'saveTemplate', ts('Save As New Template'), NULL, FALSE,
-      array('onclick' => "showSaveDetails(this);")
-    );
-    $form->add('text', 'saveTemplateName', ts('Template Title'));
-
-    $form->addWysiwyg('html_message',
-      ts('Your Letter'),
-      array(
-        'cols' => '80',
-        'rows' => '8',
-        'onkeyup' => "return verify(this)",
-      )
-    );
+    // I'm not sure this is ever called.
     $action = CRM_Utils_Request::retrieve('action', 'String', $form, FALSE);
     if ((CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Task_PDF') &&
-      $action == CRM_Core_Action::VIEW
+        $action == CRM_Core_Action::VIEW
     ) {
       $form->freeze('html_message');
     }
@@ -3047,18 +2990,17 @@ AND        m.id = %1
     // format params and add links
     $contactMailings = array();
     foreach ($mailings as $mailingId => $values) {
-      $contactMailings[$mailingId]['subject'] = $values['subject'];
-      $contactMailings[$mailingId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-      $contactMailings[$mailingId]['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report/event',
-        "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
-
-      $contactMailings[$mailingId]['mailing_creator'] = CRM_Utils_System::href(
+      $mailing = array();
+      $mailing['subject'] = $values['subject'];
+      $mailing['creator_name'] = CRM_Utils_System::href(
         $values['creator_name'],
         'civicrm/contact/view',
         "reset=1&cid={$values['creator_id']}");
-
+      $mailing['recipients'] = CRM_Utils_System::href(ts('(recipients)'), 'civicrm/mailing/report/event',
+        "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
+      $mailing['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
       //CRM-12814
-      $contactMailings[$mailingId]['openstats'] = "Opens: " .
+      $mailing['openstats'] = "Opens: " .
         CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
         "<br />Clicks: " .
         CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
@@ -3084,7 +3026,7 @@ AND        m.id = %1
         $mailingKey = $hash;
       }
 
-      $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink(
+      $mailing['links'] = CRM_Core_Action::formLink(
         $actionLinks,
         NULL,
         array(
@@ -3098,9 +3040,16 @@ AND        m.id = %1
         'Mailing',
         $values['mailing_id']
       );
+
+      array_push($contactMailings, $mailing);
     }
 
-    return $contactMailings;
+    $contactMailingsDT = array();
+    $contactMailingsDT['data'] = $contactMailings;
+    $contactMailingsDT['recordsTotal'] = $params['total'];
+    $contactMailingsDT['recordsFiltered'] = $params['total'];
+
+    return $contactMailingsDT;
   }
 
   /**

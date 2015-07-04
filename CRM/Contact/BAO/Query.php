@@ -2789,114 +2789,90 @@ class CRM_Contact_BAO_Query {
   public function group(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    if (count($value) > 1) {
-      $this->_useDistinct = TRUE;
-    }
-
     // Replace pseudo operators from search builder
     $op = str_replace('EMPTY', 'NULL', $op);
 
-    $groupNames = CRM_Core_PseudoConstant::group();
-    $groupIds = '';
+    if (count($value) > 1) {
+      if (strpos($op, 'IN') === FALSE && strpos($op, 'NULL') === FALSE) {
+        CRM_Core_Error::fatal(ts("%1 is not a valid operator", array(1 => $op)));
+      }
+      $this->_useDistinct = TRUE;
+    }
+
+    $groupIds = NULL;
     $names = array();
+    $isSmart = FALSE;
+    $isNotOp = ($op == 'NOT IN' || $op == '!=');
 
     if ($value) {
-      $groupIds = implode(',', array_keys($value));
-      foreach ($value as $id => $dontCare) {
-        if (array_key_exists($id, $groupNames) && $dontCare) {
-          $names[] = $groupNames[$id];
-        }
+      if (strpos($op, 'IN') === FALSE) {
+        $value = key($value);
+      }
+      else {
+        $value = array_keys($value);
       }
     }
 
     $statii = array();
-    $in = FALSE;
     $gcsValues = &$this->getWhereValues('group_contact_status', $grouping);
     if ($gcsValues &&
       is_array($gcsValues[2])
     ) {
       foreach ($gcsValues[2] as $k => $v) {
         if ($v) {
-          if ($k == 'Added') {
-            $in = TRUE;
-          }
           $statii[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
         }
       }
     }
     else {
       $statii[] = '"Added"';
-      $in = TRUE;
     }
 
     $skipGroup = FALSE;
-    if (count($value) == 1 &&
+    if (!is_array($value) &&
       count($statii) == 1 &&
-      $statii[0] == '"Added"'
+      $statii[0] == '"Added"' &&
+      !$isNotOp
     ) {
-      // check if smart group, if so we can get rid of that one additional
-      // left join
-      $groupIDs = array_keys($value);
-
-      if (!empty($groupIDs[0]) &&
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
-          $groupIDs[0],
-          'saved_search_id'
-        )
-      ) {
-        $skipGroup = TRUE;
+      if (!empty($value) && CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $value, 'saved_search_id')) {
+        $isSmart = TRUE;
       }
     }
 
-    if (!$skipGroup) {
+    $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
+    $isSmart = (!$ssClause) ? FALSE : $isSmart;
+    $groupClause = NULL;
+
+    if (!$isSmart) {
+      $groupIds = implode(',', (array) $value);
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
-      if ($groupIds && ($op == 'IN' || $op == 'NOT IN')) {
-        $joinClause[] = "{$gcTable}.group_id IN ( $groupIds )";
-      }
-      // For NOT IN we join on groups the contact IS in, then exclude them in the where clause
-      if ($statii && $op == 'NOT IN') {
+      if ($statii) {
         $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
       }
       $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
-    }
-
-    if ($op == 'IN') {
-      $qill = ts('In group');
-    }
-    else {
-      $qill = ts('Groups %1', array(1 => $op));
-    }
-    $qill .= ' ' . implode(' ' . ts('or') . ' ', $names);
-
-    $groupClause = NULL;
-
-    if (!$skipGroup) {
-      $groupClause = "{$gcTable}.group_id $op" . ($groupIds ? " ( $groupIds ) " : '');
-      if (!empty($statii) && $groupIds) {
-        $groupClause .= " AND {$gcTable}.status IN (" . implode(', ', $statii) . ")";
-        $qill .= " " . ($op == 'NOT IN' ? ts('WHERE') : ts('AND')) . " " . ts('Group Status') . ' - ' . implode(' ' . ts('or') . ' ', $statii);
-      }
-      // For NOT IN op, params were set in the join
-      if ($op == 'NOT IN') {
-        $groupClause = "{$gcTable}.group_id IS NULL";
+      $groupClause = "{$gcTable}.group_id $op $groupIds";
+      if (strpos($op, 'IN') !== FALSE) {
+        $groupClause = "{$gcTable}.group_id $op ( $groupIds )";
       }
     }
 
-    if ($in) {
-      $ssClause = $this->savedSearch($values);
-      if ($ssClause) {
-        if ($groupClause) {
-          $groupClause = "( ( $groupClause ) OR ( $ssClause ) )";
-        }
-        else {
-          $groupClause = $ssClause;
-        }
+    if ($ssClause) {
+      $and = ($op == 'IS NULL') ? 'AND' : 'OR';
+      if ($groupClause) {
+        $groupClause = "( ( $groupClause ) $and ( $ssClause ) )";
+      }
+      else {
+        $groupClause = $ssClause;
       }
     }
 
-    $this->_where[$grouping][] = $groupClause;
-    $this->_qill[$grouping][] = $qill;
+    list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
+    $this->_qill[$grouping][] = ts("Group(s) %1 %2", array(1 => $qillop, 2 => $qillVal));
+    $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
+    if ($groupClause) {
+      $this->_where[$grouping][] = $groupClause;
+    }
   }
 
   /**
@@ -2915,68 +2891,50 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Where / qill clause for smart groups
-   *
-   * @param $values
-   *
-   * @return string|NULL
-   */
-  public function savedSearch(&$values) {
-    list($name, $op, $value, $grouping, $wildcard) = $values;
-    return $this->addGroupContactCache(array_keys((array) $value));
-  }
-
-  /**
    * @param array $groups
    * @param string $tableAlias
    * @param string $joinTable
+   * @param string $op
    *
    * @return null|string
    */
-  public function addGroupContactCache($groups, $tableAlias = NULL, $joinTable = "contact_a") {
-    $config = CRM_Core_Config::singleton();
-
-    // Find all the groups that are part of a saved search.
-    $groupIDs = implode(',', $groups);
-    if (empty($groupIDs)) {
+  public function addGroupContactCache($groups, $tableAlias = NULL, $joinTable = "contact_a", $op) {
+    $isNullOp = (strpos($op, 'NULL') !== FALSE);
+    $groupsIds = $groups;
+    if (!$isNullOp && !$groups) {
       return NULL;
     }
+    elseif (strpos($op, 'IN') !== FALSE) {
+      $groups = array($op => $groups);
+    }
 
+    // Find all the groups that are part of a saved search.
+    $smartGroupClause = self::buildClause("id", $op, $groups, 'Int');
     $sql = "
 SELECT id, cache_date, saved_search_id, children
 FROM   civicrm_group
-WHERE  id IN ( $groupIDs )
+WHERE  $smartGroupClause
   AND  ( saved_search_id != 0
    OR    saved_search_id IS NOT NULL
    OR    children IS NOT NULL )
 ";
 
     $group = CRM_Core_DAO::executeQuery($sql);
-    $groupsFiltered = array();
 
     while ($group->fetch()) {
-      $groupsFiltered[] = $group->id;
-
       $this->_useDistinct = TRUE;
-
       if (!$this->_smartGroupCache || $group->cache_date == NULL) {
         CRM_Contact_BAO_GroupContactCache::load($group);
       }
     }
 
-    if (count($groupsFiltered)) {
-      $groupIDsFiltered = implode(',', $groupsFiltered);
-
-      if ($tableAlias == NULL) {
-        $tableAlias = "`civicrm_group_contact_cache_{$groupIDsFiltered}`";
-      }
-
-      $this->_tables[$tableAlias] = $this->_whereTables[$tableAlias] = " LEFT JOIN civicrm_group_contact_cache {$tableAlias} ON {$joinTable}.id = {$tableAlias}.contact_id ";
-
-      return "{$tableAlias}.group_id IN (" . $groupIDsFiltered . ")";
+    if (!$tableAlias) {
+      $tableAlias = "`civicrm_group_contact_cache_";
+      $tableAlias .= ($isNullOp) ? "a`" : implode(',', (array) $groupsIds) . "`";
     }
 
-    return NULL;
+    $this->_tables[$tableAlias] = $this->_whereTables[$tableAlias] = " LEFT JOIN civicrm_group_contact_cache {$tableAlias} ON {$joinTable}.id = {$tableAlias}.contact_id ";
+    return self::buildClause("{$tableAlias}.group_id", $op, $groups, 'Int');
   }
 
   /**
@@ -4100,7 +4058,7 @@ WHERE  id IN ( $groupIDs )
         implode(",", $targetGroup[2]) . ") ) ";
 
       //add contacts from saved searches
-      $ssWhere = $this->addGroupContactCache($targetGroup[2], "civicrm_relationship_group_contact_cache", "contact_b");
+      $ssWhere = $this->addGroupContactCache($targetGroup[2], "civicrm_relationship_group_contact_cache", "contact_b", $op);
 
       //set the group where clause
       if ($ssWhere) {
@@ -4747,6 +4705,7 @@ civicrm_relationship.is_permission_a_b = 0
 SELECT COUNT( conts.total_amount ) as total_count,
        SUM(   conts.total_amount ) as total_amount,
        AVG(   conts.total_amount ) as total_avg,
+       conts.total_amount          as amount,
        conts.currency              as currency";
     if ($this->_permissionWhereClause) {
       $where .= " AND " . $this->_permissionWhereClause;
@@ -4761,10 +4720,11 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $summary = array();
     $summary['total'] = array();
     $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
+    $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
+      civicrm_contribution.currency $from $completedWhere";
 
     $query = "$select FROM (
-      SELECT civicrm_contribution.total_amount, civicrm_contribution.currency $from $completedWhere
-      GROUP BY civicrm_contribution.id
+      $innerQuery GROUP BY civicrm_contribution.id
     ) as conts
     GROUP BY currency";
 
@@ -4777,12 +4737,27 @@ SELECT COUNT( conts.total_amount ) as total_count,
       $summary['total']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
       $summary['total']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
     }
+
+    $orderBy = 'ORDER BY civicrm_contribution_total_amount_count DESC';
+    $groupBy = 'GROUP BY currency, civicrm_contribution.total_amount';
+    $modeSQL = "$select, conts.civicrm_contribution_total_amount_count as civicrm_contribution_total_amount_count FROM ($innerQuery
+    $groupBy $orderBy) as conts
+    GROUP BY currency";
+
+    $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
+
+    $medianSQL = "{$from} {$completedWhere}";
+    $summary['total']['median'] = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, 'civicrm_contribution');
+    $summary['total']['currencyCount'] = count($summary['total']['median']);
+
     if (!empty($summary['total']['amount'])) {
       $summary['total']['amount'] = implode(',&nbsp;', $summary['total']['amount']);
       $summary['total']['avg'] = implode(',&nbsp;', $summary['total']['avg']);
+      $summary['total']['mode'] = implode(',&nbsp;', $summary['total']['mode']);
+      $summary['total']['median'] = implode(',&nbsp;', $summary['total']['median']);
     }
     else {
-      $summary['total']['amount'] = $summary['total']['avg'] = 0;
+      $summary['total']['amount'] = $summary['total']['avg'] = $summary['total']['median'] = 0;
     }
 
     // soft credit summary
@@ -5568,7 +5543,7 @@ AND   displayRelType.is_active = 1
         // handles pseudoconstant fixes for all component
         elseif (in_array($value['pseudoField'], array('participant_status', 'participant_role'))) {
           $pseudoOptions = $viewValues = array();
-          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['pseudoField'], array('flip' => 1));
+          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['idCol']);
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $val) as $k => $v) {
             $viewValues[] = $pseudoOptions[$v];
           }
@@ -5675,6 +5650,11 @@ AND   displayRelType.is_active = 1
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
       $pseduoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
     }
+    elseif ($fieldName == 'contribution_product_id') {
+      $pseduoOptions = CRM_Contribute_PseudoConstant::products();
+    elseif ($daoName == 'CRM_Contact_DAO_Group' && $fieldName == 'id') {
+      $pseduoOptions = CRM_Core_PseudoConstant::group();
+    }
     elseif ($daoName) {
       $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
     }
@@ -5690,7 +5670,7 @@ AND   displayRelType.is_active = 1
       $qillString = array();
       if (!empty($pseduoOptions)) {
         foreach ((array) $fieldValue as $val) {
-          $qillString[] = $pseduoOptions[$val];
+          $qillString[] = CRM_Utils_Array::value($val, $pseduoOptions, $val);
         }
         $fieldValue = implode(', ', $qillString);
       }

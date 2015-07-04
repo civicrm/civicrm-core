@@ -64,13 +64,6 @@ class CRM_Core_Payment_Form {
       $form->assign('paymentTypeLabel', $paymentTypeLabel);
 
       $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
-      if (in_array('cvv2', $paymentFields) && $isBackOffice) {
-        if (!civicrm_api3('setting', 'getvalue', array('name' => 'cvv_backoffice_required', 'group' => 'Contribute Preferences'))) {
-          $form->billingFieldSets[$paymentTypeName]['fields'][array_search('cvv2', $paymentFields)]['required'] = 0;
-        }
-      }
-
-      $form->billingPane = array($paymentTypeName => $paymentTypeLabel);
       $form->assign('paymentFields', $paymentFields);
     }
 
@@ -260,6 +253,12 @@ class CRM_Core_Payment_Form {
    *   for payment processors that gather payment data on site as rendering the fields as not being required. (not entirely sure why but this
    *   is implemented for back office forms)
    *
+   * @param bool $isBackOffice
+   *   Is this a backoffice form. This could affect the display of the cvn or whether some processors show,
+   *   although the distinction is losing it's meaning as front end forms are used for back office and a permission
+   *   for the 'enter without cvn' is probably more appropriate. Paypal std does not support another user
+   *   entering details but once again the issue is not back office but 'another user'.
+   *
    * @return bool
    */
   public static function buildPaymentForm(&$form, $processor, $isBillingDataOptional, $isBackOffice) {
@@ -269,17 +268,13 @@ class CRM_Core_Payment_Form {
       $form->assign('profileAddressFields', $profileAddressFields);
     }
 
-    // $processor->buildForm appears to be an undocumented (possibly unused) option for payment processors
-    // which was previously available only in some form flows
-    if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->isSupported('buildForm')) {
-      $form->_paymentProcessor['object']->buildForm($form);
+    if (!empty($processor['object']) && $processor['object']->buildForm($form)) {
       return NULL;
     }
 
     self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional), $isBackOffice);
     self::addCommonFields($form, !$isBillingDataOptional, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
-    self::addPaypalExpressCode($form);
     return (!empty($form->_paymentFields));
   }
 
@@ -304,6 +299,8 @@ class CRM_Core_Payment_Form {
   }
 
   /**
+<<<<<<< HEAD
+=======
    * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
    * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
    *
@@ -324,6 +321,7 @@ class CRM_Core_Payment_Form {
   }
 
   /**
+>>>>>>> 65e3e1ce2d1e407fa768966606173c79b12ba81f
    * Validate the payment instrument values before passing it to the payment processor
    * We want this to be overrideable by the payment processor, and default to using
    * this object's validCreditCard for credit cards (implemented as the default in the Payment class).

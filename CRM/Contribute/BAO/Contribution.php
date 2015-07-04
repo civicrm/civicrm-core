@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
@@ -228,7 +226,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-   * @return CRM_Contribute_BAO_Contribution|null the found object or null
+   * @return CRM_Contribute_BAO_Contribution|null
+   *   The found object or null
    */
   public static function &getValues($params, &$values, &$ids) {
     if (empty($params)) {
@@ -495,8 +494,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   (reference) the default values, some of which need to be resolved.
    * @param bool $reverse
    *   True if we want to resolve the values in the reverse direction (value -> name).
-   *
-   * @return void
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
     self::lookupValue($defaults, 'financial_type', CRM_Contribute_PseudoConstant::financialType(), $reverse);
@@ -718,8 +715,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         ),
       );
 
+      // CRM-16713 - contribution search by Premiums on 'Find Contribution' form.
+      $premiums = array(
+        'contribution_product_id' => array(
+          'title' => ts('Premium'),
+          'name' => 'contribution_product_id',
+          'where' => 'civicrm_product.id',
+          'data_type' => CRM_Utils_Type::T_INT,
+        ),
+      );
+
       $fields = array_merge($impFields, $typeField, $contributionStatus, $contributionPage, $optionField, $expFieldProduct,
-        $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount,
+        $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount, $premiums,
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution')
       );
 
@@ -855,6 +862,26 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
     CRM_Utils_Recent::del($contributionRecent);
 
     return $results;
+  }
+
+  /**
+   * React to a financial transaction (payment) failure.
+   *
+   * Prior to CRM-16417 these were simply removed from the database but it has been agreed that seeing attempted
+   * payments is important for forensic and outreach reasons.
+   *
+   * @param int $contributionID
+   * @param string $message
+   */
+  public static function failPayment($contributionID, $contactID, $message) {
+    civicrm_api3('activity', 'create', array(
+      'activity_type_id' => 'Failed Payment',
+      'details' => $message,
+      'subject' => ts('Payment failed at payment processor'),
+      'source_record_id' => $contributionID,
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
+        $contactID,
+    ));
   }
 
   /**
@@ -1032,7 +1059,6 @@ GROUP BY p.id
    *
    * @return array
    *   list of contribution fields
-   *
    */
   public static function getHonorContacts($honorId) {
     $params = array();
@@ -1163,6 +1189,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
 
   /**
    * Check if there is a contribution with the params passed in.
+   *
    * Used for trxn_id,invoice_id and contribution_id
    *
    * @param array $params
@@ -1202,7 +1229,6 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    *
    * @return array
    *   associated array
-   *
    */
   public static function getContributionDetails($exportMode, $componentIds) {
     $paymentDetails = array();
@@ -1299,7 +1325,6 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    *
    * @param int $contributionId
    * @param int $contactId
-   *
    */
   public static function deleteAddress($contributionId = NULL, $contactId = NULL) {
     $clauses = array();
@@ -2181,10 +2206,7 @@ WHERE  contribution_id = %1 ";
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if ($recur && !empty($this->_relatedObjects['paymentProcessor'])) {
-      $paymentObject = &CRM_Core_Payment::singleton(
-        $this->is_test ? 'test' : 'live',
-        $this->_relatedObjects['paymentProcessor']
-      );
+      $paymentObject = Civi\Payment\System::singleton()->getByProcessor($this->_relatedObjects['paymentProcessor']);
 
       $entityID = $entity = NULL;
       if (isset($ids['contribution'])) {
@@ -2922,7 +2944,7 @@ WHERE  contribution_id = %1 ";
         $params['entity_id'] = $financialTxn->id;
       }
     }
-    // record line items and finacial items
+    // record line items and financial items
     if (empty($params['skipLineItem'])) {
       CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $update);
     }
@@ -3718,6 +3740,137 @@ WHERE con.id = {$contributionId}
     $result = CRM_Core_DAO::executeQuery($sql, $params);
     if ($result->N > 1) {
       $errors['financial_type_id'] = ts('One or more line items have a different financial type than the contribution. Editing the financial type is not yet supported in this situation.');
+    }
+  }
+
+  /**
+   * Update related pledge payment payments.
+   *
+   * This function has been refactored out of the back office contribution form and may
+   * still overlap with other functions.
+   *
+   * @param string $action
+   * @param int $pledgePaymentID
+   * @param int $contributionID
+   * @param bool $adjustTotalAmount
+   * @param float $total_amount
+   * @param float $original_total_amount
+   * @param int $contribution_status_id
+   * @param int $original_contribution_status_id
+   */
+  public static function updateRelatedPledge(
+    $action,
+    $pledgePaymentID,
+    $contributionID,
+    $adjustTotalAmount,
+    $total_amount,
+    $original_total_amount,
+    $contribution_status_id,
+    $original_contribution_status_id
+  ) {
+    if (!$pledgePaymentID || $action & CRM_Core_Action::ADD && !$contributionID) {
+      return;
+    }
+
+    if ($pledgePaymentID) {
+      //store contribution id in payment record.
+      CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $pledgePaymentID, 'contribution_id', $contributionID);
+    }
+    else {
+      $pledgePaymentID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
+        $contributionID,
+        'id',
+        'contribution_id'
+      );
+    }
+    $pledgeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
+      $contributionID,
+      'pledge_id',
+      'contribution_id'
+    );
+
+    $updatePledgePaymentStatus = FALSE;
+
+    // If either the status or the amount has changed we update the pledge status.
+    if ($action & CRM_Core_Action::ADD) {
+      $updatePledgePaymentStatus = TRUE;
+    }
+    elseif ($action & CRM_Core_Action::UPDATE && (($original_contribution_status_id != $contribution_status_id) ||
+        ($original_total_amount != $total_amount))
+    ) {
+      $updatePledgePaymentStatus = TRUE;
+    }
+
+    if ($updatePledgePaymentStatus) {
+      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID,
+        array($pledgePaymentID),
+        $contribution_status_id,
+        NULL,
+        $total_amount,
+        $adjustTotalAmount
+      );
+    }
+  }
+
+  /**
+   * Compute the stats values
+   *
+   * @param $stat either 'mode' or 'median'
+   * @param $sql
+   * @param $alias of civicrm_contribution
+   */
+  public static function computeStats($stat, $sql, $alias = NULL) {
+    $mode = $median = array();
+    switch ($stat) {
+      case 'mode':
+        $modeDAO = CRM_Core_DAO::executeQuery($sql);
+        while ($modeDAO->fetch()) {
+          if ($modeDAO->civicrm_contribution_total_amount_count > 1) {
+            $mode[] = CRM_Utils_Money::format($modeDAO->amount, $modeDAO->currency);
+          }
+          else {
+            $mode[] = 'N/A';
+          }
+        }
+        return $mode;
+
+      case 'median':
+        $midValue = 0;
+        $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
+        foreach ($currencies as $currency => $val) {
+          $where = "AND {$alias}.currency = '{$currency}'";
+          $rowCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) as count {$sql} {$where}");
+
+          $even = FALSE;
+          $offset = 1;
+          $medianRow = floor($rowCount / 2);
+          if ($rowCount % 2 == 0 && !empty($medianRow)) {
+            $even = TRUE;
+            $offset++;
+            $medianRow--;
+          }
+
+          $medianValue = "SELECT {$alias}.total_amount as median
+             {$sql} {$where}
+             ORDER BY median LIMIT {$medianRow},{$offset}";
+          $medianValDAO = CRM_Core_DAO::executeQuery($medianValue);
+          while ($medianValDAO->fetch()) {
+            if ($even) {
+              $midValue = $midValue + $medianValDAO->median;
+            }
+            else {
+              $median[] = CRM_Utils_Money::format($medianValDAO->median, $currency);
+            }
+          }
+          if ($even) {
+            $midValue = $midValue / 2;
+            $median[] = CRM_Utils_Money::format($midValue, $currency);
+          }
+        }
+        return $median;
+
+      default:
+        return;
     }
   }
 

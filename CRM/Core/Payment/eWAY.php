@@ -44,7 +44,7 @@
  | Plus a bit of our own code of course - Peter Barwell               |
  | contact PB@DolphinSoftware.com.au if required.                     |
  |                                                                    |
- | NOTE: This initial eWAY module does not yet allow for recuring     |
+ | NOTE: This initial eWAY module does not yet allow for recurring     |
  |       payments - contact Peter Barwell or add yourself (or both)   |
  |                                                                    |
  | NOTE: The eWAY gateway only allows a single currency per account   |
@@ -256,7 +256,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     // Check to see if we have a duplicate before we send
     //----------------------------------------------------------------------------------------------------
-    if ($this->_checkDupe($params['invoiceID'])) {
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from eWAY.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
 
@@ -359,7 +359,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     //              received an OK status from eWAY, but their Gateway has not returned the correct unique
     //              token - ie something is broken, BUT money has been taken from the client's account,
     //              so we can't very well error-out as CiviCRM will then not process the registration.
-    //              There is an error message commented out here but my prefered response to this unlikley
+    //              There is an error message commented out here but my preferred response to this unlikley
     //              possibility is to email 'support@eWAY.com.au'
     //-----------------------------------------------------------------------------------------------------
     $eWayTrxnReference_OUT = $eWAYRequest->GetTransactionNumber();
@@ -378,7 +378,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     // Test mode always returns trxn_id = 0 - so we fix that here
     //
     // NOTE: This code was taken from the AuthorizeNet payment processor, however it now appears
-    //       unecessary for the eWAY gateway - Left here in case it proves useful
+    //       unnecessary for the eWAY gateway - Left here in case it proves useful
     //----------------------------------------------------------------------------------------------------
     if ( $this->_mode == 'test' ) {
     $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
@@ -407,21 +407,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     return $params;
   }
   // end function doDirectPayment
-
-  /**
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
-  }
 
   /**
    * **********************************************************************************************

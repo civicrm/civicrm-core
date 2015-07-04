@@ -120,6 +120,12 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
+      elseif ($element->getAttribute('type') == 'text' && $element->getAttribute('formatType')) {
+        list($date, $time) = CRM_Utils_Date::setDateDefaults($element->getValue(), $element->getAttribute('formatType'), $element->getAttribute('format'), $element->getAttribute('timeformat'));
+        $date .= ($element->getAttribute('timeformat')) ? " $time" : '';
+        $el['html'] = $date . '<input type="hidden" value="' . $element->getValue() . '" name="' . $element->getAttribute('name') . '">';
+      }
+
       $el['html'] = '<span class="crm-frozen-field">' . $el['html'] . '</span>';
     }
     // Active form elements

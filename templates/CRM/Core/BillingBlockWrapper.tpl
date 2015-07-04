@@ -24,16 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 
-{* include wysiysg editor files *}
-{if $includeWysiwygEditor}
-    {if $defaultWysiwygEditor eq 1}
-        <script>
-          {* this version of tinymce requires jquery *}
-          if (typeof window.jQuery !== 'function') window.jQuery = CRM.$;
-        </script>
-        <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>
-        <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
-    {elseif $defaultWysiwygEditor eq 2}
-        <script type="text/javascript" src="{$config->resourceBase}packages/ckeditor/ckeditor.js"></script>
-    {/if}
-{/if}
+{* wrapper for the billing block including the div to make the block swappable & the js to make that happen
+This allows the billing block to change when the card type changes *}
+<div id="billing-payment-block">
+  {include file="CRM/Core/BillingBlock.tpl"}
+</div>
+{include file="CRM/common/paymentBlock.tpl"}

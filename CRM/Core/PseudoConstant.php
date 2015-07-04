@@ -1433,7 +1433,7 @@ WHERE  id = %1";
       $condition .= " AND ( $additionalCond ) ";
     }
 
-    // CRM-7178. Make sure we only include payment processors valid in ths
+    // CRM-7178. Make sure we only include payment processors valid in this
     // domain
     $condition .= " AND domain_id = " . CRM_Core_Config::domainID();
 

@@ -514,7 +514,7 @@ class CRM_Utils_REST {
 
     }
     else {
-      $content = "<!-- .tpl file embeded: $tpl -->\n";
+      $content = "<!-- .tpl file embedded: $tpl -->\n";
       CRM_Utils_System::appendTPLFile($tpl, $content);
       echo $content . $smarty->fetch($tpl);
       CRM_Utils_System::civiExit();

@@ -620,7 +620,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testNotImplemented_get($Entity) {
     $result = civicrm_api($Entity, 'Get', array('version' => 3));
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['is_error']);
     // $this->assertContains("API ($Entity, Get) does not exist", $result['error_message']);
     $this->assertRegExp('/API (.*) does not exist/', $result['error_message']);
   }
@@ -662,7 +662,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
     $result = civicrm_api($Entity, 'Get', array());
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['is_error']);
     $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
   }
 
@@ -1004,7 +1004,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testNotImplemented_create($Entity) {
     $result = civicrm_api($Entity, 'Create', array('version' => 3));
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['is_error']);
     $this->assertContains(strtolower("API ($Entity, Create) does not exist"), strtolower($result['error_message']));
   }
 
@@ -1024,7 +1024,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEmptyParam_create($Entity) {
-    $this->markTestIncomplete("fixing this test to test the api functions fails on numberous tests
+    $this->markTestIncomplete("fixing this test to test the api functions fails on numerous tests
       which will either create a completely blank entity (batch, participant status) or
       have a damn good crack at it (e.g mailing job). Marking this as incomplete beats false success");
     return;
@@ -1059,7 +1059,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testCreateWrongTypeParamTag_create() {
     $result = civicrm_api("Tag", 'Create', 'this is not a string');
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['is_error']);
     $this->assertEquals("Input variable `params` is not an array", $result['error_message']);
   }
 
@@ -1131,11 +1131,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           break;
 
         case CRM_Utils_Type::T_TIMESTAMP:
-          // 4.6 doesn't support timestamp updates from 4.7 we should uncomment this. See CRM-16431.
-          continue;
-
-        //case CRM_Utils_Type::T_DATETIME:
-
         case 12:
           $entity[$fieldName] = '2012-05-20 03:05:20';
           break;
@@ -1264,7 +1259,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testNotImplemented_delete($Entity) {
     $nonExistantID = 151416349;
     $result = civicrm_api($Entity, 'Delete', array('version' => 3, 'id' => $nonExistantID));
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['is_error']);
     $this->assertContains(strtolower("API ($Entity, Delete) does not exist"), strtolower($result['error_message']));
   }
 
@@ -1288,7 +1283,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
     $result = civicrm_api($Entity, 'Delete', array());
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['is_error']);
     $this->assertContains("Mandatory key(s) missing from params array", $result['error_message']);
   }
 
@@ -1313,7 +1308,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testDeleteWrongTypeParamTag_delete() {
     $result = civicrm_api("Tag", 'Delete', 'this is not a string');
-    $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['is_error']);
     $this->assertEquals("Input variable `params` is not an array", $result['error_message']);
   }
 
