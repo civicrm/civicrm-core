@@ -27,8 +27,8 @@
   <td><label>{$form.membership_type_id.label}</label><br />
       {$form.membership_type_id.html|crmAddClass:twenty}
   </td>
-  <td><label>{$form.status_id.label}</label><br />
-      {$form.status_id.html|crmAddClass:twenty}
+  <td><label>{$form.membership_status_id.label}</label><br />
+      {$form.membership_status_id.html}
   </td>
 </tr>
 

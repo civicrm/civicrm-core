@@ -67,6 +67,7 @@ function contact_getactions_expectedresult() {
     ),
     'deprecated' => array(
       'getquick' => 'The "getquick" action is deprecated in favor of "getlist".',
+      'setvalue' => 'The "setvalue" action is deprecated. Use "create" with an id instead.',
       'update' => 'The "update" action is deprecated. Use "create" with an id instead.',
     ),
   );
