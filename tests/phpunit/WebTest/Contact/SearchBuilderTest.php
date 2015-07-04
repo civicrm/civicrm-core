@@ -528,14 +528,14 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->waitForText('search-status', "2 Results");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
-    $this->multiselect2("status_id", array("New", "Grace"));
+    $this->multiselect2("membership_status_id", array("New", "Grace"));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForText('search-status', "2 Results");
 
     $this->openCiviPage("member/search", "reset=1", "_qf_Search_refresh");
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->multiselect2("membership_type_id", array($membershipTypes['membership_type']));
-    $this->multiselect2("status_id", array("New"));
+    $this->multiselect2("membership_status_id", array("New"));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForText('search-status', "1 Result");
   }

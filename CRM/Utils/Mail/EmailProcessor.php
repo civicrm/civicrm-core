@@ -171,7 +171,8 @@ class CRM_Utils_Mail_EmailProcessor {
     $rpRegex = '/Return-Path: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
 
     // a regex for finding bound info X-Header
-    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
+    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/i';
+    // CiviMail in regex and Civimail in header !!!
 
     // retrieve the emails
     try {
@@ -219,6 +220,22 @@ class CRM_Utils_Mail_EmailProcessor {
           // CRM-9855
           if (!$matches and preg_match($rpXheaderRegex, $mail->generateBody(), $matches)) {
             list($match, $action, $job, $queue, $hash) = $matches;
+          }
+          // With Mandrilla, the X-CiviMail-Bounce header is produced by generateBody
+          // is base64 encoded
+          // Check all parts
+          if (!$matches) {
+            $all_parts = $mail->fetchParts();
+            foreach ($all_parts as $k_part => $v_part) {
+              if ($v_part instanceof ezcMailFile) {
+                $p_file = $v_part->__get('fileName');
+                $c_file = file_get_contents($p_file);
+                if (preg_match($rpXheaderRegex, $c_file, $matches)) {
+                  self::_log("file match rpXheaderRegex", $matches);
+                  list($match, $action, $job, $queue, $hash) = $matches;
+                }
+              }
+            }
           }
 
           // if all else fails, check Delivered-To for possible pattern
