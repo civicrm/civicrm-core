@@ -887,4 +887,21 @@ class CRM_Utils_Array {
     return $newRows;
   }
 
+  /**
+   * Rewrite the keys in an array by filtering through a function.
+   *
+   * @param array $array
+   * @param callable $func
+   *   Function($key, $value). Returns the new key.
+   * @return array
+   */
+  public static function rekey($array, $func) {
+    $result = array();
+    foreach ($array as $key => $value) {
+      $newKey = $func($key, $value);
+      $result[$newKey] = $value;
+    }
+    return $result;
+  }
+
 }
