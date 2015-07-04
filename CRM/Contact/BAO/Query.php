@@ -5670,7 +5670,7 @@ AND   displayRelType.is_active = 1
       $qillString = array();
       if (!empty($pseduoOptions)) {
         foreach ((array) $fieldValue as $val) {
-          $qillString[] = $pseduoOptions[$val];
+          $qillString[] = CRM_Utils_Array::value($val, $pseduoOptions, $val);
         }
         $fieldValue = implode(', ', $qillString);
       }
