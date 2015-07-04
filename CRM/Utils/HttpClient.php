@@ -171,6 +171,7 @@ class CRM_Utils_HttpClient {
       curl_close($ch);
     }
 
+    // For proper caching, use/improve CRM_Utils_Http::parseExpiration() instead of forceTtl.
     if ($this->cache && !empty($cachePolicy['forceTtl'])) {
       $cachePath = 'get/' . md5($remoteFile);
       $cacheLine = array(
