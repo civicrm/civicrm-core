@@ -94,13 +94,11 @@ function _civicrm_api3_cxn_app_get_spec(&$spec) {
  * @throws \Civi\Cxn\Rpc\Exception\InvalidMessageException
  */
 function civicrm_api3_cxn_app_get($params) {
-  // FIXME: We should cache, but CRM_Utils_Cache and CRM_Core_BAO_Cache don't seem to support TTL...
-
   // You should not change CIVICRM_CXN_APPS_URL in production; this is for local development.
   $url = defined('CIVICRM_CXN_APPS_URL') ? CIVICRM_CXN_APPS_URL : \Civi\Cxn\Rpc\Constants::OFFICIAL_APPMETAS_URL;
 
-  list ($status, $blob) = CRM_Utils_HttpClient::singleton()->get($url);
-  if (CRM_Utils_HttpClient::STATUS_OK != $status) {
+  list ($headers, $blob, $code) = CRM_Cxn_CiviCxnHttp::singleton()->send('GET', $url, '');
+  if ($code != 200) {
     throw new API_Exception("Failed to download application list.");
   }
 
