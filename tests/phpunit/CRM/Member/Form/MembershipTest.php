@@ -519,13 +519,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
-    /* Not currently passing.
+    // Not currently passing.
     //  $this->callAPISuccessGetCount('LineItem', array(
     //  'entity_id' => $membership['id'],
     //  'entity_table' => 'civicrm_membership',
     //  'contribution_id' => $contribution['id'],
     //), 1);
-    */
+    //
   }
 
   /**
