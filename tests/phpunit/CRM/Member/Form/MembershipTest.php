@@ -520,11 +520,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'is_test' => TRUE,
     ));
     /* Not currently passing.
-      $this->callAPISuccessGetCount('LineItem', array(
-      'entity_id' => $membership['id'],
-      'entity_table' => 'civicrm_membership',
-      'contribution_id' => $contribution['id'],
-    ), 1);
+    //  $this->callAPISuccessGetCount('LineItem', array(
+    //  'entity_id' => $membership['id'],
+    //  'entity_table' => 'civicrm_membership',
+    //  'contribution_id' => $contribution['id'],
+    //), 1);
     */
   }
 
