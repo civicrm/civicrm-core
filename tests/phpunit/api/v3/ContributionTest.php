@@ -198,6 +198,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that test contributions can be retrieved.
+   */
+  public function testGetTestContribution() {
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, array('is_test' => 1)));
+    $this->callAPISuccessGetSingle('Contribution', array('is_test' => 1));
+  }
+
+  /**
    * We need to ensure previous tested behaviour still works as part of the api contract.
    */
   public function testGetContributionLegacyBehaviour() {
@@ -214,7 +222,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
     );
-    $this->_contribution = $this->callAPISuccess('contribution', 'create', $p);
+    $this->_contribution = $this->callAPISuccess('Contribution', 'create', $p);
 
     $params = array(
       'contribution_id' => $this->_contribution['id'],
