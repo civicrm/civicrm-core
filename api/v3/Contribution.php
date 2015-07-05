@@ -256,6 +256,7 @@ function _civicrm_api3_contribution_get_spec(&$params) {
     'api.default' => 0,
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'title' => 'Get Test Contributions?',
+    'api.aliases' => array('is_test'),
   );
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
   $params['payment_instrument_id']['api.aliases'] = array('contribution_payment_instrument', 'payment_instrument');
