@@ -1208,16 +1208,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     // process price set and get total amount and line items.
     $lineItem = array();
-    if ($priceSetID) {
-      CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetID);
-    }
     $isQuickConfig = 0;
-    if ($priceSetID && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetID, 'is_quick_config')) {
-      $isQuickConfig = 1;
-    }
-
     $termsByType = array();
     if ($priceSetID) {
+      CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetID);
+
+      if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetID, 'is_quick_config')) {
+        $isQuickConfig = 1;
+      }
+
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetID]);
       if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
