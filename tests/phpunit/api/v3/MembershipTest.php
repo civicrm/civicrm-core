@@ -580,6 +580,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals(1, $result['count']);
 
+    // Delete relationship and assert membership is not inherited
+    $this->callAPISuccess('relationship', 'delete', array('id' => $relationship1['id']));
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(0, $result['count']);
+
     // Tear down - reverse of creation to be safe
     $this->contactDelete($memberContactId[2]);
     $this->contactDelete($memberContactId[1]);
