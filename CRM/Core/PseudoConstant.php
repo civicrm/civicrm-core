@@ -756,7 +756,7 @@ class CRM_Core_PseudoConstant {
    * @return array
    *   array reference of all State/Province abbreviations.
    */
-  public static function &stateProvinceAbbreviation($id = FALSE, $limit = TRUE) {
+  public static function stateProvinceAbbreviation($id = FALSE, $limit = TRUE) {
     if ($id > 1) {
       $query = "
 SELECT abbreviation

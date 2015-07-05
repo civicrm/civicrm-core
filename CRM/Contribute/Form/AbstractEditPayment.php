@@ -52,7 +52,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   public $_bltID;
 
-  public $_fields;
+  public $_fields = array();
 
   /**
    * @var array current payment processor including a copy of the object in 'object' key
@@ -624,7 +624,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
         $this->assignBillingType();
 
-        $this->_fields = array();
         CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE);
       }
     }
