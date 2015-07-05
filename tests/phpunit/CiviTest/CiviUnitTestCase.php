@@ -1482,6 +1482,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'name' => 'Dummy',
       'payment_processor_type_id' => 10,
       'financial_account_id' => 12,
+      'is_test' => TRUE,
       'is_active' => 1,
       'user_name' => '',
       'url_site' => 'http://dummy.com',
