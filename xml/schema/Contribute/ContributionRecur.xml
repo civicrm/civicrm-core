@@ -118,7 +118,7 @@
   </field>
   <field>
     <name>processor_id</name>
-    <title>Payment Processor</title>
+    <title>Processor ID</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Possibly needed to store a unique identifier for this recurring payment order - if this is available from the processor??</comment>
