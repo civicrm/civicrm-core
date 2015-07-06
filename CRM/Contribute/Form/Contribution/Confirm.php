@@ -935,10 +935,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
 
-    //create an contribution address
-    if ($contributeMode != 'notify' && empty($params['is_pay_later']) && $isMonetary) {
-      $addressID = CRM_Contribute_BAO_Contribution::createAddress($params, $billingLocationID);
-    }
+    $addressID = CRM_Contribute_BAO_Contribution::createAddress($params, $billingLocationID);
 
     //@todo - this is being set from the form to resolve CRM-10188 - an
     // eNotice caused by it not being set @ the front end
