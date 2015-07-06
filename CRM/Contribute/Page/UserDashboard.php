@@ -134,6 +134,21 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     }
   }
 
+  public function listPayments() {
+    $payments = array();
+    $trxn = civicrm_api3('Payment', 'get', array());
+    if ($trxn['count'] > 0) {
+      foreach ($trxn['values'] as $id => $values) {
+        $payments[$id]['id'] = $id;
+        $payments[$id]['date'] = date('m/d/Y', strtotime($values['trxn_date']));
+        $payments[$id]['amount'] = CRM_Utils_Money::format($values['total_amount']);
+        $payments[$id]['source'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $values['contribution_id'], 'source');
+        $payments[$id]['total_amount'] = CRM_Utils_Money::format(CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $values['contribution_id'], 'total_amount'));
+      }
+      $this->assign('payments', $payments);
+    }
+  }
+
   /**
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
@@ -143,7 +158,11 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $this->assign('invoicing', $invoicing);
     parent::preProcess();
-    $this->listContribution();
+    $this->listContribution(); 
+    $userOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'user_dashboard_options');
+    if (array_key_exists('Payments', $userOptions)) {
+      $this->listPayments();
+    }
   }
 
 }
