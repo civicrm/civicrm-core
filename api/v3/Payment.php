@@ -38,7 +38,7 @@
  *  Input parameters.
  *
  * @return array
- *   Array of financiial transactions which are payments, if error an array with an error id and error message
+ *   Array of financial transactions which are payments, if error an array with an error id and error message
  */
 function civicrm_api3_payment_get($params) {
   $ft = array();
@@ -61,7 +61,7 @@ function civicrm_api3_payment_get($params) {
       $values['contribution_id'] = $map[$values['id']];
     }
   }
-  return $ft;
+  return civicrm_api3_create_success($ft['values'], $params, 'Payment', 'cancel');
 }
 
 /**
@@ -75,7 +75,7 @@ function civicrm_api3_payment_get($params) {
  *   Api result array
  */
 function civicrm_api3_payment_delete(&$params) {
-  if (!isset($params['civicrm_financial_trxn_id']) || !isset($params['payment_id'])) {
+  if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
     return civicrm_api3_create_error(ts('You need to supply a Payment ID to delete a payment'));
   }
   else {
@@ -85,6 +85,56 @@ function civicrm_api3_payment_delete(&$params) {
     }
     return civicrm_api3('FinancialTrxn', 'delete', $params);
   }
+}
+
+/**
+ * Cancel/Refund a payment for a Contribution.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @throws API_Exception
+ * @return array
+ *   Api result array
+ */
+function civicrm_api3_payment_cancel(&$params) {
+  if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
+    return civicrm_api3_create_error(ts('You need to supply a Payment ID to refund a payment'));
+  }
+  else {
+    $params['id'] = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
+    if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $params['id'], 'id')) {
+      return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to refund a payment'));
+    }
+    $eftParams = array(
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $params['id'],
+    );
+    $entity = civicrm_api3('EntityFinancialTrxn', 'get', $eftParams);
+    $entity = reset($entity['values']);
+    $contributionId = $entity['entity_id'];
+    $params['total_amount'] = $entity['amount'];
+
+    // Check if it is a contribution related to a participant payment
+    $participantId = NULL;
+    $part = civicrm_api3('ParticipantPayment', 'get', array('contribution_id' => $contributionId));
+    if ($part['count'] > 0) {
+      $part = reset($part['values']);
+      $participantId = $part['participant_id'];
+    }
+    
+    $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', $participantId); 
+    $cmp = bccomp($entity['amount'], CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'total_amount'), 5);
+    if ($cmp == 1 || $cmp == 0) {
+      $con = array(
+        'id' => $contributionId,
+        'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name'),
+      );
+      civicrm_api3('Contribution', 'create', $con);
+    }
+    return civicrm_api3_create_success($trxn, $params, 'Payment', 'cancel');
+  }
+  
 }
 
 /**
@@ -244,7 +294,7 @@ function _civicrm_api3_payment_get_spec(&$params) {
 }
 
 /**
- * Adjust Metadata for Get action.
+ * Adjust Metadata for Delete action.
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
@@ -252,6 +302,25 @@ function _civicrm_api3_payment_get_spec(&$params) {
  *   Array of parameters.
  */
 function _civicrm_api3_payment_delete_spec(&$params) {
+  $params = array( 
+    'civicrm_financial_trxn_id' => array(
+      'api.required' => 1 ,
+      'title' => 'Payment ID',
+      'type' => CRM_Utils_Type::T_INT,
+      'api.aliases' => array('payment_id'),
+    )
+  ); 
+}
+
+/**
+ * Adjust Metadata for Cancel action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters.
+ */
+function _civicrm_api3_payment_cancel_spec(&$params) {
   $params = array( 
     'civicrm_financial_trxn_id' => array(
       'api.required' => 1 ,
