@@ -80,11 +80,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $ufCreate = CRM_ACL_API::group(CRM_Core_Permission::CREATE, NULL, 'civicrm_uf_group', $ufGroups);
     $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
     $checkPermission = array(
-        array(
-          'administer CiviCRM',
-          'manage event profiles',
-        ),
-      );
+      array(
+        'administer CiviCRM',
+        'manage event profiles',
+      ),
+    );
     if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
       $this->assign('perm', 1);
     }
