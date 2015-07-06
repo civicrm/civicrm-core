@@ -41,6 +41,7 @@
  *   Array of financiial transactions which are payments, if error an array with an error id and error message
  */
 function civicrm_api3_payment_get($params) {
+  $ft = array();
   if (CRM_Utils_Array::value('contribution_id', $params)) {
     $params['entity_id'] = $params['contribution_id'];
   }
@@ -64,7 +65,30 @@ function civicrm_api3_payment_get($params) {
 }
 
 /**
- * Add or update a Contribution which is a payment.
+ * Delete a payment.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @throws API_Exception
+ * @return array
+ *   Api result array
+ */
+function civicrm_api3_payment_delete(&$params) {
+  if (!isset($params['civicrm_financial_trxn_id']) || !isset($params['payment_id'])) {
+    return civicrm_api3_create_error(ts('You need to supply a Payment ID to delete a payment'));
+  }
+  else {
+    $params['id'] = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
+    if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $params['id'], 'id')) {
+      return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to delete a payment'));
+    }
+    return civicrm_api3('FinancialTrxn', 'delete', $params);
+  }
+}
+
+/**
+ * Add a payment for a Contribution.
  *
  * @param array $params
  *   Input parameters.
@@ -180,7 +204,7 @@ function civicrm_api3_payment_create(&$params) {
  * The metadata is used for setting defaults, documentation & validation.
  *
  * @param array $params
- *   Array of parameters determined by getfields.
+ *   Array of parameters.
  */
 function _civicrm_api3_payment_create_spec(&$params) {
   $params = array( 
@@ -217,4 +241,23 @@ function _civicrm_api3_payment_get_spec(&$params) {
       'type' => CRM_Utils_Type::T_INT,
     )
   );
+}
+
+/**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters.
+ */
+function _civicrm_api3_payment_delete_spec(&$params) {
+  $params = array( 
+    'civicrm_financial_trxn_id' => array(
+      'api.required' => 1 ,
+      'title' => 'Payment ID',
+      'type' => CRM_Utils_Type::T_INT,
+      'api.aliases' => array('payment_id'),
+    )
+  ); 
 }
