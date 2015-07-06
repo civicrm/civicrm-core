@@ -88,6 +88,25 @@ function civicrm_api3_payment_delete(&$params) {
 }
 
 /**
+ * Update a payment.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @throws API_Exception
+ * @return array
+ *   Api result array
+ */
+function civicrm_api3_payment_update(&$params) {
+  if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
+    return civicrm_api3_create_error(ts('You need to supply a Payment ID to delete a payment'));
+  }
+  civicrm_api3('Payment', 'cancel', $params);
+  civicrm_api3('Payment', 'create', $params);
+  // FIXME: Adding two refunded trxns instead of one, need to reassign $params maybe? 
+}
+
+/**
  * Cancel/Refund a payment for a Contribution.
  *
  * @param array $params
@@ -101,40 +120,37 @@ function civicrm_api3_payment_cancel(&$params) {
   if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
     return civicrm_api3_create_error(ts('You need to supply a Payment ID to refund a payment'));
   }
-  else {
-    $params['id'] = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
-    if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $params['id'], 'id')) {
-      return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to refund a payment'));
-    }
-    $eftParams = array(
-      'entity_table' => 'civicrm_contribution',
-      'financial_trxn_id' => $params['id'],
-    );
-    $entity = civicrm_api3('EntityFinancialTrxn', 'get', $eftParams);
-    $entity = reset($entity['values']);
-    $contributionId = $entity['entity_id'];
-    $params['total_amount'] = $entity['amount'];
-
-    // Check if it is a contribution related to a participant payment
-    $participantId = NULL;
-    $part = civicrm_api3('ParticipantPayment', 'get', array('contribution_id' => $contributionId));
-    if ($part['count'] > 0) {
-      $part = reset($part['values']);
-      $participantId = $part['participant_id'];
-    }
-    
-    $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', $participantId); 
-    $cmp = bccomp($entity['amount'], CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'total_amount'), 5);
-    if ($cmp == 1 || $cmp == 0) {
-      $con = array(
-        'id' => $contributionId,
-        'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name'),
-      );
-      civicrm_api3('Contribution', 'create', $con);
-    }
-    return civicrm_api3_create_success($trxn, $params, 'Payment', 'cancel');
+  $params['id'] = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
+  if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $params['id'], 'id')) {
+    return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to refund a payment'));
+  }
+  $eftParams = array(
+    'entity_table' => 'civicrm_contribution',
+    'financial_trxn_id' => $params['id'],
+  );
+  $entity = civicrm_api3('EntityFinancialTrxn', 'get', $eftParams);
+  $entity = reset($entity['values']);
+  $contributionId = $entity['entity_id'];
+  $params['total_amount'] = $entity['amount'];
+  
+  // Check if it is a contribution related to a participant payment
+  $participantId = NULL;
+  $part = civicrm_api3('ParticipantPayment', 'get', array('contribution_id' => $contributionId));
+  if ($part['count'] > 0) {
+    $part = reset($part['values']);
+    $participantId = $part['participant_id'];
   }
   
+  $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', $participantId); 
+  $cmp = bccomp($entity['amount'], CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'total_amount'), 5);
+  if ($cmp == 1 || $cmp == 0) {
+    $con = array(
+      'id' => $contributionId,
+      'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name'),
+    );
+    civicrm_api3('Contribution', 'create', $con);
+  }
+  return civicrm_api3_create_success($trxn, $params, 'Payment', 'cancel');
 }
 
 /**
@@ -257,6 +273,34 @@ function civicrm_api3_payment_create(&$params) {
  *   Array of parameters.
  */
 function _civicrm_api3_payment_create_spec(&$params) {
+  $params = array( 
+    'contribution_id' => array(
+      'api.required' => 1 ,
+      'title' => 'Contribution ID',
+      'type' => CRM_Utils_Type::T_INT,
+    ),
+    'total_amount' => array(
+      'api.required' => 1 ,
+      'title' => 'Total Payment Amount',
+      'type' => CRM_Utils_Type::T_FLOAT,
+    ),
+    'payment_processor_id' => array(
+      'title' => 'Payment Processor ID',
+      'type' => CRM_Utils_Type::T_INT,
+      'description' => ts('Payment processor ID - required for payment processor payments'),
+    ),
+  );
+}
+
+/**
+ * Adjust Metadata for Update action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters.
+ */
+function _civicrm_api3_payment_update_spec(&$params) {
   $params = array( 
     'contribution_id' => array(
       'api.required' => 1 ,
