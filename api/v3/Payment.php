@@ -60,7 +60,7 @@ function civicrm_api3_payment_get($params) {
       $values['contribution_id'] = $map[$values['id']];
     }
   }
-  return civicrm_api3_create_success($ft, $params, 'Payment', 'get');
+  return $ft;
 }
 
 /**
