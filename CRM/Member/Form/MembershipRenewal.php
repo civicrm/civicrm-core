@@ -498,9 +498,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     if ($this->_mode) {
-      $formValues['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, CRM_Core_DAO::getFieldValue
-      ('CRM_Member_DAO_MembershipType',
-        $this->_memType, 'minimum_fee'
+      $formValues['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues,
+        CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee'
       ));
       if (empty($formValues['financial_type_id'])) {
         $formValues['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
@@ -839,4 +838,5 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->_memType = $formValues['membership_type_id'][1];
     $this->submit($formValues);
   }
+
 }
