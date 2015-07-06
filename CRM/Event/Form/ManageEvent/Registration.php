@@ -83,7 +83,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         array(
           'administer CiviCRM',
           'manage event profiles',
-        )
+        ),
       );
     if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
       $this->assign('perm', 1);
