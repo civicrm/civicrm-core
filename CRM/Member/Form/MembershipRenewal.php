@@ -604,18 +604,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->_membershipId = $this->_id;
 
-    // membership type custom data
-    $customFields = CRM_Core_BAO_CustomField::getFields('Membership', FALSE, FALSE,
-      $formValues['membership_type_id'][1]
-    );
-
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-      CRM_Core_BAO_CustomField::getFields('Membership',
-        FALSE, FALSE,
-        NULL, NULL, TRUE
-      )
-    );
-
     $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($formValues,
       $this->_id,
       'Membership'
