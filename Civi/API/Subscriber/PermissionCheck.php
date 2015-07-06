@@ -90,10 +90,10 @@ class PermissionCheck implements EventSubscriberInterface {
   /**
    * check API for ACL permission.
    * @param $apiRequest
-   * @return boolean
+   * @return bool
    */
   public function checkACLPermission($apiRequest) {
-    switch($apiRequest['entity']) {
+    switch ($apiRequest['entity']) {
       case 'UFGroup':
       case 'UFField':
         $ufGroups = \CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
