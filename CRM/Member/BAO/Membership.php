@@ -311,7 +311,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $params['membership_id'] = $membership->id;
     if (isset($ids['membership'])) {
       $ids['contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
-        $ids['membership'],
+        $membership->id,
         'contribution_id',
         'membership_id'
       );
@@ -2710,14 +2710,14 @@ WHERE      civicrm_membership.is_test = 0";
    * @param CRM_Core_Form $qf
    * @param array $membershipType
    *   Array with membership type and organization.
-   * @param int $priceSetId
    *
+   * @return int $priceSetId
    */
-  public static function createLineItems(&$qf, $membershipType, &$priceSetId) {
+  public static function createLineItems(&$qf, $membershipType) {
     $qf->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
-    if ($priceSetId) {
-      $qf->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    }
+    $qf->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
+
+    // The name of the price field corresponds to the membership_type organization contact.
     $editedFieldParams = array(
       'price_set_id' => $priceSetId,
       'name' => $membershipType[0],
@@ -2744,6 +2744,7 @@ WHERE      civicrm_membership.is_test = 0";
 
     $fieldID = key($qf->_priceSet['fields']);
     $qf->_params['price_' . $fieldID] = CRM_Utils_Array::value('id', $editedResults);
+    return $priceSetId;
   }
 
   /**
