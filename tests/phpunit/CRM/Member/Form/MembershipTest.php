@@ -60,6 +60,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   protected $_paymentProcessorID;
 
   /**
+   * Membership type ID for annual fixed membership.
+   *
+   * @var int
+   */
+  protected $membershipTypeAnnualFixedID;
+
+  /**
    * Parameters to create payment processor.
    *
    * @var array
@@ -100,6 +107,19 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         dirname(__FILE__) . '/dataset/data.xml'
       )
     );
+    $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', array(
+      'domain_id' => 1,
+      'name' => "AnnualFixed",
+      'member_of_contact_id' => 23,
+      'duration_unit' => "year",
+      'duration_interval' => 1,
+      'period_type' => "fixed",
+      'fixed_period_start_day' => "101",
+      'fixed_period_rollover_day' => "1231",
+      'relationship_type_id' => 20,
+      'financial_type_id' => 2,
+    ));
+    $this->membershipTypeAnnualFixedID = $membershipTypeAnnualFixed['id'];
 
     $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
     $this->paymentInstruments = $instruments['values'];
@@ -198,12 +218,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = array();
     $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
-    $this->assertType('array', $rc,
-      'In line ' . __LINE__
-    );
-    $this->assertTrue(array_key_exists('end_date', $rc),
-      'In line ' . __LINE__
-    );
+    $this->assertType('array', $rc);
+    $this->assertTrue(array_key_exists('end_date', $rc));
   }
 
   /**
@@ -223,12 +239,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = array();
     $obj = new CRM_Member_Form_Membership();
     $rc = $obj->formRule($params, $files, $obj);
-    $this->assertType('array', $rc,
-      'In line ' . __LINE__
-    );
-    $this->assertTrue(array_key_exists('start_date', $rc),
-      'In line ' . __LINE__
-    );
+    $this->assertType('array', $rc);
+    $this->assertTrue(array_key_exists('start_date', $rc));
   }
 
   /**
@@ -420,15 +432,16 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    */
   public function testSubmit() {
-    $form = new CRM_Member_Form_Membership();
+    $form = $this->getForm();
+    $form->_mode = 'test';
     $this->createLoggedInUser();
     $params = array(
       'cid' => $this->_individualId,
       'join_date' => date('m/d/Y', time()),
       'start_date' => '',
       'end_date' => '',
-      // This format reflects the 1 being the organisation & the 25 being the type.
-      'membership_type_id' => array(1, 25),
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
       'auto_renew' => '0',
       'max_related' => '',
       'num_terms' => '1',
@@ -444,7 +457,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2019', // TODO: Future proof
+        'Y' => '2024', // TODO: Future proof
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -456,7 +469,18 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'billing_country_id-5' => '1228',
     );
     $form->submit($params);
-    $this->callAPISuccessGetCount('Membership', array('contact_id' => $this->_individualId), 1);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 0);
+    $contribution = $this->callAPISuccess('Contribution', 'get', array(
+      'contact_id' => $this->_individualId,
+      'is_test' => TRUE,
+    ));
+
+    $this->callAPISuccessGetCount('LineItem', array(
+      'entity_id' => $membership['id'],
+      'entity_table' => 'civicrm_membership',
+      'contribution_id' => $contribution['id'],
+    ), 1);
   }
 
   /**
@@ -466,7 +490,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form = $this->getForm();
 
     $this->callAPISuccess('MembershipType', 'create', array(
-      'id' => 25,
+      'id' => $this->membershipTypeAnnualFixedID,
       'duration_unit' => 'month',
       'duration_interval' => 1,
       'auto_renew' => TRUE,
@@ -480,8 +504,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'start_date' => '',
       'end_date' => '',
       'campaign_id' => '',
-      // This format reflects the 1 being the organisation & the 25 being the type.
-      'membership_type_id' => array(1, 25),
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
       'auto_renew' => '1',
       'is_recur' => 1,
       'max_related' => 0,

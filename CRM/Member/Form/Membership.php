@@ -1164,6 +1164,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $lineItems = $this->_lineItem;
     }
 
+    if ($this->_id) {
+      $ids['membership'] = $params['id'] = $this->_id;
+    }
+    $ids['userId'] = CRM_Core_Session::singleton()->get('userID');
+
     // Set variables that we normally get from context.
     // In form mode these are set in preProcess.
     //TODO: set memberships, fixme
@@ -1207,37 +1212,40 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     // process price set and get total amount and line items.
-    $lineItem = array();
-    $isQuickConfig = 0;
+    if (!$priceSetID) {
+      $priceSetID = CRM_Member_BAO_Membership::createLineItems(
+        $this,
+        $formValues['membership_type_id'],
+        NULL
+      );
+    }
+    $isQuickConfig = FALSE;
+    if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetID, 'is_quick_config')) {
+      $isQuickConfig = 1;
+    }
     $termsByType = array();
-    if ($priceSetID) {
-      CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetID);
 
-      if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetID, 'is_quick_config')) {
-        $isQuickConfig = 1;
-      }
-
-      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $this->_params, $lineItem[$priceSetID]);
-      if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
-        $params['tax_amount'] = $this->_params['tax_amount'];
-      }
-      $params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
-      $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
-      if (!empty($lineItem[$priceSetID])) {
-        foreach ($lineItem[$priceSetID] as &$li) {
-          if (!empty($li['membership_type_id'])) {
-            if (!empty($li['membership_num_terms'])) {
-              $termsByType[$li['membership_type_id']] = $li['membership_num_terms'];
-            }
+    $lineItem = array();
+    CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
+      $this->_params, $lineItem[$priceSetID]);
+    if (CRM_Utils_Array::value('tax_amount', $this->_params)) {
+      $params['tax_amount'] = $this->_params['tax_amount'];
+    }
+    $params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
+    $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
+    if (!empty($lineItem[$priceSetID])) {
+      foreach ($lineItem[$priceSetID] as &$li) {
+        if (!empty($li['membership_type_id'])) {
+          if (!empty($li['membership_num_terms'])) {
+            $termsByType[$li['membership_type_id']] = $li['membership_num_terms'];
           }
+        }
 
-          ///CRM-11529 for quick config backoffice transactions
-          //when financial_type_id is passed in form, update the
-          //lineitems with the financial type selected in form
-          if ($isQuickConfig && $submittedFinancialType) {
-            $li['financial_type_id'] = $submittedFinancialType;
-          }
+        ///CRM-11529 for quick config backoffice transactions
+        //when financial_type_id is passed in form, update the
+        //lineitems with the financial type selected in form
+        if ($isQuickConfig && $submittedFinancialType) {
+          $li['financial_type_id'] = $submittedFinancialType;
         }
       }
     }
@@ -1303,23 +1311,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if (array_key_exists('max_related', $formValues)) {
         $membershipTypeValues[$memType]['max_related'] = CRM_Utils_Array::value('max_related', $formValues);
       }
-    }
-
-    if ($this->_id) {
-      $ids['membership'] = $params['id'] = $this->_id;
-    }
-
-    $ids['userId'] = CRM_Core_Session::singleton()->get('userID');
-
-    // membership type custom data
-    foreach ($this->_memTypeSelected as $memType) {
       $membershipTypeValues[$memType]['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
         $this->_id,
         'Membership'
       );
-    }
-
-    foreach ($this->_memTypeSelected as $memType) {
       $membershipTypes[$memType] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
         $memType
       );
