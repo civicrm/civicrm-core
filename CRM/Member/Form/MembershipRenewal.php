@@ -633,8 +633,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       //create line items
       $lineItem = array();
-      $priceSetId = NULL;
-      CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetId);
+
+      $priceSetId = CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id']);
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]
       );
