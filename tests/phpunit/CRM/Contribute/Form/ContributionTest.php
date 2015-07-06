@@ -133,7 +133,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(array('civicrm_note'));
+    $this->quickCleanup(array('civicrm_note', 'civicrm_uf_match'));
   }
 
   /**
