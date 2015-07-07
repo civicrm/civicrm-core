@@ -188,12 +188,23 @@ function civicrm_api3_payment_create(&$params) {
     if (!empty($participantPayment['values'])) {
       $values = reset($participantPayment['values']);
       $participantId = $values['participant_id'];
+      // Get payment balance
+      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participantId, 'event');
+      $cmp = bccomp($paymentInfo['paid'], $paymentInfo['total'], 5); // Compare the two floating point amounts till the 5th decimal place.
+      if ($cmp == 1 || $cmp == 0) {
+        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+      }
     }
-    // Get payment balance
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participantId, 'event');
-    $cmp = bccomp($paymentInfo['paid'], $paymentInfo['total'], 5); // Compare the two floating point amounts till the 5th decimal place.
-    if ($cmp == 1 || $cmp == 0) {
-      $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    else {
+      $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
+      $total = CRM_Price_BAO_LineItem::getLineTotal($params['contribution_id'], 'civicrm_contribution');
+      $cmp = bccomp($total, $paid, 5);
+      if ($cmp == 0 || $cmp == -1) { // If paid amount is greater or equal to total amount
+        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+      }
+      else if ($cmp == 1) { // If paid amount is lesser than total amount
+        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
+      }
     }
   }
   if ($contribution['contribution_status'] == 'Pending' || !empty($params['force'])) {

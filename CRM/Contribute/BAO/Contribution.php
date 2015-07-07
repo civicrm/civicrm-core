@@ -2959,8 +2959,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $balanceTrxnParams['status_id'] = $statusId;
         $balanceTrxnParams['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
-        if (isset($balanceTrxnParams['from_financial_account_id']) && 
-            ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially Paid', $contributionStatuses))) {
+        if (!empty($balanceTrxnParams['from_financial_account_id']) && 
+            ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially paid', $contributionStatuses))) {
           $balanceTrxnParams['is_payment'] = 1;
         }
         if (!empty($params['payment_processor'])) {
@@ -4541,7 +4541,7 @@ LIMIT 1;";
     $balanceTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
     $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
     if ($fromFinancialAccountId != NULL && 
-        ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially Paid', $contributionStatuses))) {
+        ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially paid', $contributionStatuses))) {
       $balanceTrxnParams['is_payment'] = 1;
     }
     if (!empty($params['payment_processor'])) {
