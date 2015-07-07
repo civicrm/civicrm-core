@@ -41,6 +41,7 @@ function uf_field_replace_example() {
         'phone_type_id' => 1,
       ),
     ),
+    'check_permissions' => TRUE,
   );
 
   try{
