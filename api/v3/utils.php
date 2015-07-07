@@ -263,6 +263,10 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   }
   // Report deprecations.
   $deprecated = _civicrm_api3_deprecation_check($entity, $result);
+  // Always report "setvalue" action as deprecated.
+  if (!is_string($deprecated) && ($action == 'getactions' || $action == 'setvalue')) {
+    $deprecated = ((array) $deprecated) + array('setvalue' => 'The "setvalue" action is deprecated. Use "create" with an id instead.');
+  }
   // Always report "update" action as deprecated.
   if (!is_string($deprecated) && ($action == 'getactions' || $action == 'update')) {
     $deprecated = ((array) $deprecated) + array('update' => 'The "update" action is deprecated. Use "create" with an id instead.');

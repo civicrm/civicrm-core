@@ -304,7 +304,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $var = array();
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
-    $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_first_success'));
 
     $submitParams = array(
@@ -366,7 +366,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['is_recur'] = 1;
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
-    $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2));
 
     $submitParams = array(

@@ -18,7 +18,7 @@
       $row = this.first().closest('.crm-entity');
       ret.entity = $row.data('entity') || $row[0].id.split('-')[0];
       ret.id = $row.data('id') || $row[0].id.split('-')[1];
-      ret.action = $row.data('action') || 'setvalue';
+      ret.action = $row.data('action') || 'create';
 
     if (!ret.entity || !ret.id) {
       return false;

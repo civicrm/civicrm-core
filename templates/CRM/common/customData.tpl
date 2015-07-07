@@ -29,7 +29,7 @@
     CRM.buildCustomData = function (type, subType, subName, cgCount, groupID, isMultiple) {
       var dataUrl = CRM.url('civicrm/custom', {type: type}),
         prevCount = 1,
-        fname,
+        fname = '#customData',
         storage = {};
 
       if (subType) {
@@ -79,8 +79,8 @@
           $("#add-more-link-" + prevCount).hide();
         }
       }
-      else {
-        fname = '#customData' + (subName && subName != 'null') ? subName : '';
+      else if (subName && subName != 'null') {
+        fname += subName;
       }
       
       CRM.loadPage(dataUrl, {target: fname});

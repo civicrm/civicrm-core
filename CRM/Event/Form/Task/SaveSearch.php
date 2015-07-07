@@ -71,6 +71,9 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
     $query = new CRM_Event_BAO_Query($this->get('formValues'));
     $qill = $query->qill();
 
+    // Values from the search form
+    $formValues = $this->controller->exportValues();
+
     // need to save qill for the smarty template
     $this->assign('qill', $qill);
 
@@ -94,6 +97,7 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
     }
     else {
       $this->addDefaultButtons(ts('Save Smart Group'));
+      $this->assign('partiallySelected', $formValues['radio_ts'] != 'ts_all');
     }
 
     $this->addRule('title', ts('Name already exists in Database.'),

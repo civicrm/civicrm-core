@@ -311,7 +311,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $params['membership_id'] = $membership->id;
     if (isset($ids['membership'])) {
       $ids['contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
-        $ids['membership'],
+        $membership->id,
         'contribution_id',
         'membership_id'
       );
@@ -1740,14 +1740,23 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   }
 
   /**
+   * Build an array of available membership types.
+   *
    * @param CRM_Core_Form $form
    * @param int $membershipTypeID
+   * @param bool $activeOnly
+   *   Do we only want active ones?
+   *   (probably this should default to TRUE but as a newly added parameter we are leaving default b
+   *   behaviour unchanged).
    *
    * @return array
    */
-  public static function buildMembershipTypeValues(&$form, $membershipTypeID = NULL) {
+  public static function buildMembershipTypeValues(&$form, $membershipTypeID = NULL, $activeOnly = FALSE) {
     $whereClause = " WHERE domain_id = " . CRM_Core_Config::domainID();
 
+    if ($activeOnly) {
+      $whereClause .= " AND is_active = 1 ";
+    }
     if (is_array($membershipTypeID)) {
       $allIDs = implode(',', $membershipTypeID);
       $whereClause .= " AND id IN ( $allIDs )";
@@ -1778,6 +1787,8 @@ FROM   civicrm_membership_type
       'relationship_type_id',
       'relationship_direction',
       'max_related',
+      'duration_unit',
+      'duration_interval',
     );
 
     while ($dao->fetch()) {
@@ -2699,14 +2710,14 @@ WHERE      civicrm_membership.is_test = 0";
    * @param CRM_Core_Form $qf
    * @param array $membershipType
    *   Array with membership type and organization.
-   * @param int $priceSetId
    *
+   * @return int $priceSetId
    */
-  public static function createLineItems(&$qf, $membershipType, &$priceSetId) {
+  public static function createLineItems(&$qf, $membershipType) {
     $qf->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
-    if ($priceSetId) {
-      $qf->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    }
+    $qf->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
+
+    // The name of the price field corresponds to the membership_type organization contact.
     $editedFieldParams = array(
       'price_set_id' => $priceSetId,
       'name' => $membershipType[0],
@@ -2733,6 +2744,7 @@ WHERE      civicrm_membership.is_test = 0";
 
     $fieldID = key($qf->_priceSet['fields']);
     $qf->_params['price_' . $fieldID] = CRM_Utils_Array::value('id', $editedResults);
+    return $priceSetId;
   }
 
   /**

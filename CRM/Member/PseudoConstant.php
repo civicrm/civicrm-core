@@ -61,7 +61,7 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array
    *   array reference of all membership types if any
    */
-  public static function &membershipType($id = NULL, $force = FALSE) {
+  public static function membershipType($id = NULL, $force = TRUE) {
     if (!self::$membershipType || $force) {
       CRM_Core_PseudoConstant::populate(self::$membershipType,
         'CRM_Member_DAO_MembershipType',

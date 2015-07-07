@@ -242,16 +242,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('entityID', $this->_id);
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
-    $allMemberships = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
-
-    $allMembershipInfo = $membershipType = array();
+    $allMembershipInfo = array();
 
     // auto renew options if enabled for the membership
     $options = CRM_Core_SelectValues::memberAutoRenew();
 
-    foreach ($allMemberships as $key => $values) {
+    foreach ($this->allMembershipTypeDetails as $key => $values) {
       if (!empty($values['is_active'])) {
-        $membershipType[$key] = CRM_Utils_Array::value('name', $values);
         if ($this->_mode && empty($values['minimum_fee'])) {
           continue;
         }
@@ -288,8 +285,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
 
     if ($this->_memType) {
-      $this->assign('orgName', $selMemTypeOrg[$allMemberships[$this->_memType]['member_of_contact_id']]);
-      $this->assign('memType', $allMemberships[$this->_memType]['name']);
+      $this->assign('orgName', $selMemTypeOrg[$this->allMembershipTypeDetails[$this->_memType]['member_of_contact_id']]);
+      $this->assign('memType', $this->allMembershipTypeDetails[$this->_memType]['name']);
     }
 
     // force select of organization by default, if only one organization in
@@ -304,7 +301,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $selOrgMemType[$index] = $orgMembershipType;
     }
 
-    $js = array('onChange' => "setPaymentBlock( ); CRM.buildCustomData( 'Membership', this.value );");
+    $js = array('onChange' => "setPaymentBlock(); CRM.buildCustomData('Membership', this.value);");
     $sel = &$this->addElement('hierselect',
       'membership_type_id',
       ts('Renewal Membership Organization and Type'), $js
@@ -636,8 +633,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       //create line items
       $lineItem = array();
-      $priceSetId = NULL;
-      CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetId);
+
+      $priceSetId = CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id']);
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]
       );

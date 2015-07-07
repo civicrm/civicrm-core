@@ -68,7 +68,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $sortName = "adv$firstName, $firstName";
     $displayName = "$firstName adv$firstName";
 
-    $this->_searchBuilder("Postal Code", "100[0-9]", $sortName, "RLIKE");
+    $this->_searchBuilder("ZIP / Postal Code", "100[0-9]", $sortName, "RLIKE");
   }
 
   /**
@@ -198,7 +198,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_createContact('Household', $firstName7, "$firstName7@advsearch.co.in", NULL, $postalCode);
 
     // check if the resultset of search builder and advanced search match for the postal code
-    $this->_searchBuilder('Postal Code', $postalCode, NULL, 'LIKE', '4');
+    $this->_searchBuilder('ZIP / Postal Code', $postalCode, NULL, 'LIKE', '4');
     $this->_advancedSearch($postalCode, NULL, NULL, '4', 'postal_code');
 
     $firstName8 = "abcc" . substr(sha1(rand()), 0, 7);
@@ -528,14 +528,14 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->waitForText('search-status', "2 Results");
 
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
-    $this->multiselect2("status_id", array("New", "Grace"));
+    $this->multiselect2("membership_status_id", array("New", "Grace"));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForText('search-status', "2 Results");
 
     $this->openCiviPage("member/search", "reset=1", "_qf_Search_refresh");
     $this->click("xpath=//div[@class='crm-accordion-header crm-master-accordion-header']");
     $this->multiselect2("membership_type_id", array($membershipTypes['membership_type']));
-    $this->multiselect2("status_id", array("New"));
+    $this->multiselect2("membership_status_id", array("New"));
     $this->clickLink('_qf_Search_refresh');
     $this->waitForText('search-status', "1 Result");
   }
