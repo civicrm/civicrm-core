@@ -678,7 +678,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
    */
   public function _testAddReminder($eventTitle) {
     // Go to Schedule Reminders tab
-    $this->click('css=li#tab_reminder a');
+    $this->click("link=Schedule Reminders");
     $this->waitForElementPresent("newScheduleReminder");
     $this->click("newScheduleReminder");
     $this->waitForElementPresent("_qf_ScheduleReminders_next-bottom");
@@ -717,7 +717,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//form[@id='ScheduleReminders']//div[@id='option11_wrapper']");
     //verify the fields for Event Reminder selector
     foreach ($verifyText as $key => $value) {
-      $this->verifyText("xpath=//form[@id='ScheduleReminders']//div['option11_wrapper']/table/tbody/tr/td[$key]", $value);
+      $this->verifyText("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody//tr/td[$key]", $value);
     }
   }
 
@@ -973,6 +973,119 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
       $this->click("xpath=//tr[@id='participant_status_type-{$statusId}']/td[9]/span/a[2][text()='Enable']");
       $this->waitForElementPresent("xpath=//tr[@id='participant_status_type-{$statusId}']/td[9]/span/a[2][text()='Disable']");
     }
+  }
+
+  /**
+   * CRM-16777: Allow to add schedule reminder for event with 'edit all event' permission
+   */
+  public function testConfigureScheduleReminder() {
+    // Log in using webtestLogin() method
+    $this->webtestLogin('admin');
+
+    //Details for TestUser1
+    $role1 = 'role1' . substr(sha1(rand()), 0, 7);
+    $TestUser1 = "TestUser1" . substr(sha1(rand()), 0, 4);
+    $emailId1 = substr(sha1(rand()), 0, 7) . '@web.com';
+
+    //create Role1 with permission 'Access CiviCRM', 'edit all events' and 'Access CiviEvent' permissions.
+    $this->open($this->sboxPath . "admin/people/permissions/roles");
+    $this->type("edit-name", $role1);
+    $this->waitForElementPresent("edit-add");
+    $this->click("edit-add");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->open($this->sboxPath . "admin/people/permissions/roles");
+    $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role1}']");
+    $roleId = explode('/', $this->getAttribute("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role1}']/../td[4]/a[text()='edit permissions']/@href"));
+    $permissions = array(
+      "edit-{$roleId[5]}-access-civicrm",
+      "edit-{$roleId[5]}-edit-all-events",
+      "edit-{$roleId[5]}-access-civievent",
+    );
+    $this->changePermissions($permissions);
+
+    //Create TestUser1
+    $this->open($this->sboxPath . "admin/people/create");
+    $this->waitForElementPresent("edit-submit");
+    $this->type("edit-name", $TestUser1);
+    $this->type("edit-mail", $emailId1);
+    $this->type("edit-pass-pass1", "Test12345");
+    $this->type("edit-pass-pass2", "Test12345");
+    $this->click("xpath=//div[@class='form-item form-type-checkboxes form-item-roles']/div//div/label[contains(text(), '{$role1}')]");
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $this->type("first_name", $firstName);
+    $this->type("last_name", $lastName);
+    $this->type("street_address-1", "902C El Camino Way SW");
+    $this->type("city-1", "Dumfries");
+    $this->type("postal_code-1", "1234");
+    $this->select("state_province-1", "value=1019");
+    $this->click("edit-submit");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    //Add event
+    $this->openCiviPage("event/add", "reset=1&action=add");
+    $eventName = 'My Event - ' . substr(sha1(rand()), 0, 7);
+    $eventDescription = "Here is a description for this conference.";
+    $this->_testAddEventInfo($eventName, $eventDescription);
+
+    //Logging out
+    $this->webtestLogout();
+
+    //Login with TestUser1
+    $this->webtestLogin($TestUser1, 'Test12345');
+    $this->openCiviPage("event/manage", "reset=1");
+    $this->_testAddReminder($eventName);
+    $this->webtestLogout();
+
+    //Details for TestUser2
+    $role2 = 'role2' . substr(sha1(rand()), 0, 5);
+    $TestUser2 = "TestUser2" . substr(sha1(rand()), 0, 5);
+    $emailId2 = substr(sha1(rand()), 0, 7) . '@web.com';
+
+    //create Role2 with only 'Access CiviCRM' and 'Access CiviEvent' permissions
+    $this->webtestLogin('admin');
+    $this->open($this->sboxPath . "admin/people/permissions/roles");
+    $this->type("edit-name", $role2);
+    $this->waitForElementPresent("edit-add");
+    $this->click("edit-add");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->open($this->sboxPath . "admin/people/permissions/roles");
+    $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role2}']");
+    $roleId = explode('/', $this->getAttribute("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role2}']/../td[4]/a[text()='edit permissions']/@href"));
+    $permissions = array(
+      "edit-{$roleId[5]}-access-civicrm",
+      "edit-{$roleId[5]}-access-civievent",
+    );
+    $this->changePermissions($permissions);
+
+    //Create TestUser2
+    $this->open($this->sboxPath . "admin/people/create");
+    $this->waitForElementPresent("edit-submit");
+    $this->type("edit-name", $TestUser2);
+    $this->type("edit-mail", $emailId2);
+    $this->type("edit-pass-pass1", "Test123");
+    $this->type("edit-pass-pass2", "Test123");
+    $this->click("xpath=//div[@class='form-item form-type-checkboxes form-item-roles']/div//div/label[contains(text(), '{$role2}')]");
+    $firstName = 'Smith' . substr(sha1(rand()), 0, 4);
+    $lastName = 'John' . substr(sha1(rand()), 0, 5);
+    $this->type("first_name", $firstName);
+    $this->type("last_name", $lastName);
+    $this->type("street_address-1", "902C El Camino Way SW");
+    $this->type("city-1", "Dumfries");
+    $this->type("postal_code-1", "1234");
+    $this->select("state_province-1", "value=1019");
+    $this->click("edit-submit");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    //Logout
+    $this->webtestLogout();
+
+    //Login with TestUser2
+    $this->webtestLogin($TestUser2, 'Test123');
+    $this->openCiviPage("event/manage", "reset=1");
+    $this->waitForElementPresent("xpath=//div[@id='event_status_id']/div[@class='dataTables_wrapper no-footer']");
+    $this->verifyText("xpath=//div[@id='event_status_id']/div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td", "None found.");
+    $this->webtestLogout();
   }
 
 }
