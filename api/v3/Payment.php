@@ -88,30 +88,6 @@ function civicrm_api3_payment_delete(&$params) {
 }
 
 /**
- * Update a payment.
- *
- * @param array $params
- *   Input parameters.
- *
- * @throws API_Exception
- * @return array
- *   Api result array
- */
-function civicrm_api3_payment_update(&$params) {
-  if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
-    return civicrm_api3_create_error(ts('You need to supply a Payment ID to update a payment'));
-  }
-  $ftId = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
-  if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $ftId, 'id') || !CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $ftId, 'is_payment')) {
-    return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to update a payment'));
-  }
-  civicrm_api3('Payment', 'cancel', $params);
-  $params['force'] = TRUE;
-  $ft = civicrm_api3('Payment', 'create', $params);
-  return civicrm_api3_create_success($ft['values'], $params, 'Payment', 'update');
-}
-
-/**
  * Cancel/Refund a payment for a Contribution.
  *
  * @param array $params
@@ -125,36 +101,20 @@ function civicrm_api3_payment_cancel(&$params) {
   if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
     return civicrm_api3_create_error(ts('You need to supply a Payment ID to refund a payment'));
   }
-  $params['id'] = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
-  if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $params['id'], 'id')) {
+  $ftId = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
+  if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $ftId, 'id')) {
     return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to refund a payment'));
   }
   $eftParams = array(
     'entity_table' => 'civicrm_contribution',
-    'financial_trxn_id' => $params['id'],
+    'financial_trxn_id' => $ftId,
   );
   $entity = civicrm_api3('EntityFinancialTrxn', 'get', $eftParams);
   $entity = reset($entity['values']);
   $contributionId = $entity['entity_id'];
   $params['total_amount'] = $entity['amount'];
   
-  // Check if it is a contribution related to a participant payment
-  $participantId = NULL;
-  $part = civicrm_api3('ParticipantPayment', 'get', array('contribution_id' => $contributionId));
-  if ($part['count'] > 0) {
-    $part = reset($part['values']);
-    $participantId = $part['participant_id'];
-  }
-  
-  $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', $participantId); 
-  $cmp = bccomp($entity['amount'], CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'total_amount'), 5);
-  if ($cmp == 1 || $cmp == 0) {
-    $con = array(
-      'id' => $contributionId,
-      'contribution_status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name'),
-    );
-    civicrm_api3('Contribution', 'create', $con);
-  }
+  $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', NULL, FALSE); 
   return civicrm_api3_create_success($trxn, $params, 'Payment', 'cancel');
 }
 
@@ -176,41 +136,36 @@ function civicrm_api3_payment_create(&$params) {
       (isset($params['contribution_id']) && !CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'id'))) {
     return civicrm_api3_create_error(ts('You need to supply a valid contribution ID to create a payment'));
   }
+  // Check if it is an update
+  $ftId = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
+  if ($ftId && (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $ftId, 'id') || !CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $ftId, 'is_payment'))) {
+    return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to update a payment'));
+  }
+  elseif ($ftId) {
+    $amount = $params['total_amount'];
+    civicrm_api3('Payment', 'cancel', $params);
+    $params['total_amount'] = $amount;
+  }
   // Get contribution
   $contribution = civicrm_api3('Contribution', 'get', array('id' => $params['contribution_id']));
   $contribution = reset($contribution['values']);
-  if ($contribution['contribution_status'] == 'Completed' && empty($params['force'])) {
+  if ($contribution['contribution_status'] == 'Completed') {
     return civicrm_api3_create_error(ts('Please select a contribution which has a pending payment'));
   }
   if ($contribution['contribution_status'] == 'Partially paid') {
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
-    $participantPayment = civicrm_api3('ParticipantPayment', 'get', array('contribution_id' => $params['contribution_id']));
-    if (!empty($participantPayment['values'])) {
-      $values = reset($participantPayment['values']);
-      $participantId = $values['participant_id'];
-      // Get payment balance
-      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participantId, 'event');
-      $cmp = bccomp($paymentInfo['paid'], $paymentInfo['total'], 5); // Compare the two floating point amounts till the 5th decimal place.
-      if ($cmp == 1 || $cmp == 0) {
-        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-      }
-    }
-    else {
-      $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
-      $total = CRM_Price_BAO_LineItem::getLineTotal($params['contribution_id'], 'civicrm_contribution');
-      $cmp = bccomp($total, $paid, 5);
-      if ($cmp == 0 || $cmp == -1) { // If paid amount is greater or equal to total amount
-        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-      }
-      else if ($cmp == 1) { // If paid amount is lesser than total amount
-        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
-      }
+    $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
+    $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
+    $cmp = bccomp($total, $paid, 5);
+    if ($cmp == 0 || $cmp == -1) { // If paid amount is greater or equal to total amount
+      $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+      CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $params['contribution_id'], 'contribution_status_id', $statusId);
     }
   }
-  if ($contribution['contribution_status'] == 'Pending' || !empty($params['force'])) {
+  if ($contribution['contribution_status'] == 'Pending') { // FIXME: may need to be removed since we are only supporting partially paid contributions
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
     $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
-    $total = CRM_Price_BAO_LineItem::getLineTotal($params['contribution_id'], 'civicrm_contribution');
+    $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
     $cmp = bccomp($total, $paid, 5);
     if ($cmp == 0 || $cmp == -1) { // If paid amount is greater or equal to total amount
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
@@ -275,9 +230,7 @@ function civicrm_api3_payment_create(&$params) {
       $entityTrxn->save();
     }
   }
-  unset($params['total_amount']);
-  $params['id'] = $params['contribution_id'];
-  return _civicrm_api3_basic_create('CRM_Contribute_BAO_Contribution', $params, 'Contribution');
+  return civicrm_api3_create_success($trxn, $params, 'Payment', 'create');
 }
 
 /**
@@ -294,40 +247,6 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'api.required' => 1 ,
       'title' => 'Contribution ID',
       'type' => CRM_Utils_Type::T_INT,
-    ),
-    'total_amount' => array(
-      'api.required' => 1 ,
-      'title' => 'Total Payment Amount',
-      'type' => CRM_Utils_Type::T_FLOAT,
-    ),
-    'payment_processor_id' => array(
-      'title' => 'Payment Processor ID',
-      'type' => CRM_Utils_Type::T_INT,
-      'description' => ts('Payment processor ID - required for payment processor payments'),
-    ),
-  );
-}
-
-/**
- * Adjust Metadata for Update action.
- *
- * The metadata is used for setting defaults, documentation & validation.
- *
- * @param array $params
- *   Array of parameters.
- */
-function _civicrm_api3_payment_update_spec(&$params) {
-  $params = array( 
-    'contribution_id' => array(
-      'api.required' => 1 ,
-      'title' => 'Contribution ID',
-      'type' => CRM_Utils_Type::T_INT,
-    ),
-    'civicrm_financial_trxn_id' => array(
-      'api.required' => 1 ,
-      'title' => 'Payment ID',
-      'type' => CRM_Utils_Type::T_INT,
-      'api.aliases' => array('payment_id'),
     ),
     'total_amount' => array(
       'api.required' => 1 ,
