@@ -258,6 +258,11 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'type' => CRM_Utils_Type::T_INT,
       'description' => ts('Payment processor ID - required for payment processor payments'),
     ),
+    'civicrm_financial_trxn_id' => array(
+      'title' => 'Payment ID',
+      'type' => CRM_Utils_Type::T_INT,
+      'api.aliases' => array('payment_id'),
+    ),
   );
 }
 
