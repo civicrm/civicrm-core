@@ -99,11 +99,16 @@ function civicrm_api3_payment_delete(&$params) {
  */
 function civicrm_api3_payment_update(&$params) {
   if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
-    return civicrm_api3_create_error(ts('You need to supply a Payment ID to delete a payment'));
+    return civicrm_api3_create_error(ts('You need to supply a Payment ID to update a payment'));
+  }
+  $ftId = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
+  if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $ftId, 'id') || !CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $ftId, 'is_payment')) {
+    return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to update a payment'));
   }
   civicrm_api3('Payment', 'cancel', $params);
-  civicrm_api3('Payment', 'create', $params);
-  // FIXME: Adding two refunded trxns instead of one, need to reassign $params maybe? 
+  $params['force'] = TRUE;
+  $ft = civicrm_api3('Payment', 'create', $params);
+  return civicrm_api3_create_success($ft['values'], $params, 'Payment', 'update');
 }
 
 /**
@@ -174,7 +179,7 @@ function civicrm_api3_payment_create(&$params) {
   // Get contribution
   $contribution = civicrm_api3('Contribution', 'get', array('id' => $params['contribution_id']));
   $contribution = reset($contribution['values']);
-  if ($contribution['contribution_status'] == 'Completed') {
+  if ($contribution['contribution_status'] == 'Completed' && empty($params['force'])) {
     return civicrm_api3_create_error(ts('Please select a contribution which has a pending payment'));
   }
   if ($contribution['contribution_status'] == 'Partially paid') {
@@ -191,11 +196,11 @@ function civicrm_api3_payment_create(&$params) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
   }
-  if ($contribution['contribution_status'] == 'Pending') {
+  if ($contribution['contribution_status'] == 'Pending' || !empty($params['force'])) {
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
-    $balance = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($params['contribution_id']);
+    $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
     $total = CRM_Price_BAO_LineItem::getLineTotal($params['contribution_id'], 'civicrm_contribution');
-    $cmp = bccomp($total, $paid, 5); // Compare the two floating point amounts till the 5th decimal place.
+    $cmp = bccomp($total, $paid, 5);
     if ($cmp == 0 || $cmp == -1) { // If paid amount is greater or equal to total amount
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
@@ -306,6 +311,12 @@ function _civicrm_api3_payment_update_spec(&$params) {
       'api.required' => 1 ,
       'title' => 'Contribution ID',
       'type' => CRM_Utils_Type::T_INT,
+    ),
+    'civicrm_financial_trxn_id' => array(
+      'api.required' => 1 ,
+      'title' => 'Payment ID',
+      'type' => CRM_Utils_Type::T_INT,
+      'api.aliases' => array('payment_id'),
     ),
     'total_amount' => array(
       'api.required' => 1 ,
