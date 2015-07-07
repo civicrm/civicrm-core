@@ -123,10 +123,11 @@
           $(this).crmError(data.error_message, ts('Error'));
           $(this).removeClass('crm-editable-saving');
         },
-        success: function(entity,field,value,data) {
+        success: function(entity,field,value,data,settings) {
           var $i = $(this);
           CRM.alert('', ts('Saved'), 'success');
           $i.removeClass ('crm-editable-saving crm-error');
+          value = value === '' ? settings.placeholder : value;
           $i.html(value);
         }
       }
@@ -260,7 +261,7 @@
                 if ($i.data('options')){
                   value = $i.data('options')[value];
                 }
-                editableSettings.success.call(this,entity,fieldName,value,data);
+                editableSettings.success.call(this,entity,fieldName,value,data,settings);
               }
             });
            },settings);

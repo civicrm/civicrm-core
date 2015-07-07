@@ -352,7 +352,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_contributionType) {
       $defaults['financial_type_id'] = $this->_contributionType;
     }
-    
+
     if (!CRM_Utils_Array::value('payment_instrument_id', $defaults)) {
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
@@ -701,7 +701,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         unset($status[CRM_Utils_Array::key('Overdue', $statusName)]);
       }
     }
-    
+
     if ($this->_id) {
       $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_id, 'contribution_status_id');
       $name = CRM_Utils_Array::value($contributionStatus, $statusName);
@@ -953,11 +953,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     //FIXME FOR NEW DATA FLOW http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
-     if (CRM_Utils_Array::value('fee_amount', $fields) 
+     if (CRM_Utils_Array::value('fee_amount', $fields)
       && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
-      $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;  
+      $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
-    
+
     // $trxn_id must be unique CRM-13919
     if (!empty($fields['trxn_id'])) {
       $queryParams = array(1 => array($fields['trxn_id'], 'String'));
@@ -969,7 +969,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $tCnt = CRM_Core_DAO::singleValueQuery($query, $queryParams);
       if ($tCnt) {
         $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', array(1 => $fields['trxn_id']));
-      }      
+      }
     }
 
     $errors = array_merge($errors, $softErrors);
@@ -1550,18 +1550,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($paymentParams['amount'] > 0.0) {
       // force a reget of the payment processor in case the form changed it, CRM-7179
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
+      unset($paymentParams['contribution_status_id']);
       $result = $payment->doDirectPayment($paymentParams);
     }
 
     if (is_a($result, 'CRM_Core_Error')) {
+      CRM_Core_Error::debug_log_message('rolling back error !!! ' . ' ' . print_r($result, TRUE));
       //make sure to cleanup db for recurring case.
       if (CRM_Utils_Array::value('contributionID', $paymentParams)) {
         CRM_Core_Error::debug_log_message(CRM_Core_Error::getMessages($result) . "contact id={$this->_contactID} (deleting contribution {$paymentParams['contributionID']}");
-        CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
-      }
-      if (CRM_Utils_Array::value('contributionRecurID', $paymentParams)) {
-        CRM_Core_Error::debug_log_message(CRM_Core_Error::getMessages($result) . "contact id={$this->_contactID} (deleting recurring contribution {$paymentParams['contributionRecurID']}");
-        CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+        CRM_Contribute_BAO_Contribution::failContribution($paymentParams['contributionID'], CRM_Core_Error::getMessages($result));
       }
 
       //set the contribution mode.
@@ -1577,6 +1575,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($result) {
+      if (CRM_Utils_Array::value('contribution_status_id', $result) == 1) {
+        civicrm_api3('contribution', 'completetransaction', array(
+          'id' => $paymentParams['contributionID'],
+          'trxn_id' => $result['trxn_id'],
+        ));
+      }
       $this->_params = array_merge($this->_params, $result);
     }
 

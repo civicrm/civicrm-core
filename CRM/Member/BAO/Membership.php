@@ -60,11 +60,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @param array  $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
-   * @return object CRM_Member_BAO_Membership object
+   * @return CRM_Member_BAO_Membership object
    * @access public
    * @static
    */
-  static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = array()) {
     $oldStatus = $oldType = NULL;
     $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
     if ($params['id']) {
@@ -1229,6 +1229,7 @@ AND civicrm_membership.is_test = %2";
   ) {
     $tempParams  = $membershipParams;
     $paymentDone = FALSE;
+    $paymentCompletedByProcessor = FALSE;
     $result      = NULL;
     $isTest      = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $form->assign('membership_assign', TRUE);
@@ -1267,6 +1268,9 @@ AND civicrm_membership.is_test = %2";
         $contributionTypeId,
         'membership'
       );
+      if ($result[1]->contribution_status_id ==1) {
+        $paymentCompletedByProcessor = TRUE;
+      }
     }
     else {
       // we need to explicitly create a CMS user in case of free memberships
@@ -1375,7 +1379,8 @@ AND civicrm_membership.is_test = %2";
           $membership = self::renewMembership($contactID, $memType,
             $isTest, $form, NULL,
             CRM_Utils_Array::value('cms_contactID', $membershipParams),
-            $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1)
+            $customFieldsFormatted, CRM_Utils_Array::value($memType, $typesTerms, 1),
+            $paymentCompletedByProcessor
           );
 
           $createdMemberships[$memType] = $membership;
@@ -1414,7 +1419,8 @@ AND civicrm_membership.is_test = %2";
         $membership = self::renewMembership($contactID, $membershipTypeID,
           $isTest, $form, NULL,
           CRM_Utils_Array::value('cms_contactID', $membershipParams),
-          $customFieldsFormatted, CRM_Utils_Array::value('types_terms', $membershipParams, 1)
+          $customFieldsFormatted, CRM_Utils_Array::value('types_terms', $membershipParams, 1),
+          (CRM_Utils_Array::value('contribution_status_id', $result) == 2 ? TRUE : FALSE)
         );
         if (isset($contribution[$index])) {
           //insert payment record
@@ -1511,7 +1517,8 @@ AND civicrm_membership.is_test = %2";
     $changeToday = NULL,
     $modifiedID = NULL,
     $customFieldsFormatted = NULL,
-    $numRenewTerms = 1
+    $numRenewTerms = 1,
+    $paymentConfirmed = FALSE
   ) {
     $statusFormat = '%Y-%m-%d';
     $format       = '%Y%m%d';
@@ -1533,13 +1540,16 @@ AND civicrm_membership.is_test = %2";
             && $form->_contributeMode == 'direct'
           )
         ) &&
-        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
+        (isset($form->_values) && ($form->_values['is_monetary'] && $form->_amount > 0.0) ||
          CRM_Utils_Array::value('separate_membership_payment', $form->_params) ||
          CRM_Utils_Array::value('record_contribution', $form->_params)
         )
       ) {
         $pending = TRUE;
       }
+    }
+    if ($paymentConfirmed) {
+      $pending = FALSE;
     }
 
     //decide status here, if needed.
@@ -1679,6 +1689,11 @@ AND civicrm_membership.is_test = %2";
         $memParams['start_date'] = CRM_Utils_Date::isoToMysql($membership->start_date);
         $memParams['end_date'] = CRM_Utils_Array::value('end_date', $dates);
         $memParams['membership_type_id'] = $membershipTypeID;
+        // Only set this if not empty as we don't want to overwrite the DB if not set.
+        // (Or we think we don't).
+        if (!empty($form->_params['contributionRecurID'])) {
+          $memParams['contribution_recur_id'] = $form->_params['contributionRecurID'];
+        }
 
         //set the log start date.
         $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
@@ -2670,6 +2685,7 @@ WHERE      civicrm_membership.is_test = 0";
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
       'honor_contact_id', 'honor_type_id',
       'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later',
+      'contribution_recur_id'
     );
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = CRM_Utils_Array::value($f, $params);

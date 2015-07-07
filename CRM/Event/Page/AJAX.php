@@ -151,8 +151,7 @@ GROUP BY cv.label";
       );
     }
 
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($elements);
   }
 
   /**

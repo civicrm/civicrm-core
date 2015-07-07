@@ -272,8 +272,7 @@ class CRM_Core_IDS {
           'reason' => 'XSS suspected',
         )
       );
-      echo json_encode($error);
-      CRM_Utils_System::civiExit();
+      CRM_Utils_JSON::output($error);
     }
     CRM_Core_Error::fatal($msg);
   }

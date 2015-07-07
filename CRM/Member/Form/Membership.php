@@ -51,6 +51,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   protected $_memTypeSelected;
 
+  public $_values;
+
   /*
    * Display name of the member
    */
@@ -150,7 +152,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_mode) {
       $this->_paymentProcessor = array('billing_mode' => 1);
       $validProcessors = array();
-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN ( 1, 3 )');
+      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN (1, 3) AND payment_type = 1');
 
       foreach ($processors as $ppID => $label) {
         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
@@ -624,7 +626,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if ($this->_mode) {
         //get the valid recurring processors.
         $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
-        $recurProcessor = array_intersect_assoc($this->_processors, $recurring);
+        $recurProcessor = array_intersect_key($this->_processors, $recurring);
         $autoRenew = array();
         if (!empty($recurProcessor)) {
           if (!empty($membershipType)) {
@@ -1476,13 +1478,16 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         ));
       }
 
+      $params['contribution_status_id'] = CRM_Utils_Array::value('is_recur', $paymentParams) ? 2 : 1;
       if ($result) {
+        if (isset($this->_params['contribution_status_id'])) {
+          unset($this->_params['contribution_status_id']);
+        }
         $this->_params = array_merge($this->_params, $result);
         //assign amount to template if payment was successful
         $this->assign('amount', $params['total_amount']);
       }
 
-      $params['contribution_status_id'] = CRM_Utils_Array::value('is_recur', $paymentParams) ? 2 : 1;
       $params['receive_date'] = $now;
       $params['invoice_id'] = $this->_params['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
@@ -1683,6 +1688,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     // finally set membership id if already not set
     if (!$this->_id) {
       $this->_id = $membership->id;
+    }
+
+    if (is_array($result) && is_array($paymentParams) &&
+      (CRM_Utils_Array::value('contribution_status_id', $result) == 1 || CRM_Utils_Array::value('payment_status_id', $result))
+      && CRM_Utils_Array::value('is_recur', $paymentParams)) {
+      civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id, 'trxn_id' => CRM_Utils_Array::value('trxn_id', $result)));
     }
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');

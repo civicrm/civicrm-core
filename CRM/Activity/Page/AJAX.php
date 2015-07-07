@@ -67,6 +67,7 @@ class CRM_Activity_Page_AJAX {
     $iFilteredTotal = $iTotal = $params['total'];
     $selectorElements = array('display_date', 'subject', 'type', 'with_contacts', 'reporter', 'status', 'links', 'class');
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -98,6 +99,7 @@ class CRM_Activity_Page_AJAX {
     $iFilteredTotal = $iTotal = $relGlobalTotalCount;
     $selectorElements = array('sort_name', 'phone', 'email');
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($relGlobal, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -158,6 +160,7 @@ class CRM_Activity_Page_AJAX {
     $iFilteredTotal = $iTotal = $params['total'] = count($allClientRelationships);
     $selectorElements = array('relation', 'name', 'phone', 'email');
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($clientRelationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -280,20 +283,19 @@ class CRM_Activity_Page_AJAX {
     $iFilteredTotal = $iTotal = $params['total'] = count($allCaseRelationships);
     $selectorElements = array('relation', 'name', 'phone', 'email', 'actions');
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($caseRelationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
 
   static function convertToCaseActivity() {
     $params = array('caseID', 'activityID', 'contactID', 'newSubject', 'targetContactIds', 'mode');
+    $vals = array();
     foreach ($params as $param) {
       $vals[$param] = CRM_Utils_Array::value($param, $_POST);
     }
 
-    $retval = self::_convertToCaseActivity($vals);
-
-    echo json_encode($retval);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(self::_convertToCaseActivity($vals));
   }
 
   static function _convertToCaseActivity($params) {
@@ -486,6 +488,7 @@ class CRM_Activity_Page_AJAX {
       'activity_date', 'status','links', 'class',
     );
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($activities, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

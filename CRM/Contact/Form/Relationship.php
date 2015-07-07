@@ -466,14 +466,23 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @return None
    */
   public function postProcess() {
-    // store the submitted values in an array
-    $params = $this->controller->exportValues($this->_name);
     $quickSave = FALSE;
     if (CRM_Utils_Array::value('_qf_Relationship_refresh_save', $_POST) ||
       CRM_Utils_Array::value('_qf_Relationship_refresh_savedetails', $_POST)
     ) {
+      
+      //CRM-15873
+      //Parse custom file uploads
+      $pageName = $this->getAttribute('name');
+      $data = &$this->controller->container();
+      foreach ($this->controller->get('uploadNames') as $name) {
+        $this->controller->_actions['upload']->upload($this, $data, $pageName, $name);
+      }
       $quickSave = TRUE;
     }
+    
+    // store the submitted values in an array
+    $params = $this->controller->exportValues($this->_name);
 
     $this->set('searchDone', 0);
     $this->set('callAjax', FALSE);

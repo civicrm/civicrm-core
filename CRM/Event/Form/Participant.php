@@ -202,6 +202,12 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
   public $_onlinePendingContributionId = NULL;
 
   /**
+   * @todo add explanatory note about this
+   * @var null
+   */
+  public $_onlinePendingContributionId = NULL;
+
+  /**
    * Function to set variables up before form is built
    *
    * @return void
@@ -270,7 +276,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       $this->_paymentProcessor = array('billing_mode' => 1);
 
       $validProcessors = array();
-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 )");
+      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN (1, 3) AND payment_type = 1");
 
       foreach ($processors as $ppID => $label) {
         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);

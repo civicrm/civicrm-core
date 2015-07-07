@@ -227,7 +227,17 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
       }
       if (is_object($payment)) {
+        unset($paymentParams['contribution_status_id']);
         $result = $payment->doDirectPayment($paymentParams);
+        if ($paymentParams['contribution_status_id'] == 1) {
+          civicrm_api3('contribution', 'completetransaction', array(
+            'id' => $paymentParams['contributionID'],
+            'trxn_id' => $result['trxn_id'],
+          ));
+          $contribution->contribution_status_id = 1;
+          $contribution->trxn_id = !empty($result['trxn_id']) ? $result['trxn_id'] :$contribution->trxn_id;
+        }
+
       }
       else {
         CRM_Core_Error::fatal($paymentObjError);

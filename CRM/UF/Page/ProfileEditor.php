@@ -80,8 +80,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    */
   static function getSchemaJSON() {
     $entityTypes = explode(',', $_REQUEST['entityTypes']);
-    echo json_encode(self::getSchema($entityTypes));
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(self::getSchema($entityTypes));
   }
 
   /**

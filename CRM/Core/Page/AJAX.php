@@ -126,9 +126,7 @@ class CRM_Core_Page_AJAX {
     if (!$result) {
       $priceSetId = null;
     }
-    echo json_encode($priceSetId);
-
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output($priceSetId);
   }
 
   /**

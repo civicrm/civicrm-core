@@ -94,8 +94,11 @@ function authenticate_drupal($config) {
 
   // correct base_url so it points to Drupal root
   $pos = strpos($base_url, '/sites/');
+  if ($pos === FALSE) {
+    $pos = strpos($base_url, '/profiles/');
+  }
   $base_url = substr($base_url, 0, $pos); // drupal root absolute url
-  
+
   CRM_Utils_System::loadBootStrap(CRM_Core_DAO::$_nullArray,true,false);
 
   // check if user has access permission...
@@ -106,7 +109,7 @@ function authenticate_drupal($config) {
 }
 
 function authenticate_wordpress($config) {
-  // make sure user has access to civicrm 
+  // make sure user has access to civicrm
   CRM_Utils_System::loadBootStrap();
   require_once "CRM/Core/Permission.php";
   if (CRM_Core_Permission::check('access CiviCRM')) {
@@ -116,16 +119,16 @@ function authenticate_wordpress($config) {
 }
 
 function authenticate_joomla($config) {
-  // make sure only logged in user can see upload / view images 
+  // make sure only logged in user can see upload / view images
   $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
-  
+
   define( '_JEXEC', 1 );
   define('JPATH_BASE', $joomlaBase);
   define( 'DS', DIRECTORY_SEPARATOR );
   require_once ( JPATH_BASE .DS.'includes'.DS.'defines.php' );
   require_once ( JPATH_BASE .DS.'includes'.DS.'framework.php' );
-  
-  $mainframe =& JFactory::getApplication('administrator');
+
+  $mainframe = JFactory::getApplication('administrator');
   $mainframe->initialise();
 
   if (JFactory::getUser()->id == 0) {
@@ -136,6 +139,6 @@ function authenticate_joomla($config) {
 
 checkAuthentication( );
 
-spl_autoload_register('__autoload');
+//spl_autoload_register('__autoload');
 
 ?>

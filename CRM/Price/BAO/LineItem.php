@@ -93,6 +93,32 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
+   * @param int $entityId
+   * @param $entityTable
+   *
+   * @return null|string
+   */
+  public static function getLineTotal($entityId, $entityTable) {
+    $sqlLineItemTotal = "SELECT SUM(li.line_total + COALESCE(li.tax_amount,0))
+FROM civicrm_line_item li
+WHERE li.entity_table = '{$entityTable}'
+AND li.entity_id = {$entityId}
+";
+    $lineItemTotal = CRM_Core_DAO::singleValueQuery($sqlLineItemTotal);
+    return $lineItemTotal;
+  }
+
+  /**
+   * Wrapper for line item retrieval when contribution ID is known.
+   * @param int $contributionID
+   *
+   * @return array
+   */
+  public static function getLineItemsByContributionID($contributionID) {
+    return self::getLineItems($contributionID, 'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
+  }
+
+  /**
    * Given a participant id/contribution id,
    * return contribution/fee line items
    *

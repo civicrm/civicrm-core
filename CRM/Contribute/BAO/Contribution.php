@@ -336,22 +336,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    // check if activity record exist for this contribution, if
-    // not add activity
-    $activity = new CRM_Activity_DAO_Activity();
-    $activity->source_record_id = $contribution->id;
-    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
-      'Contribution',
-      'name'
-    );
-    if (!$activity->find(TRUE)) {
-      CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
-    }
-    else {
-      // CRM-13237 : if activity record found, update it with campaign id of contribution
-      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
-    }
-
     // Handle soft credit and / or link to personal campaign page
     list($type, $softIDs) = CRM_Contribute_BAO_ContributionSoft::getSoftCreditType($contribution->id);
     if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
@@ -396,6 +380,22 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     $transaction->commit();
+
+    // check if activity record exist for this contribution, if
+    // not add activity
+    $activity = new CRM_Activity_DAO_Activity();
+    $activity->source_record_id = $contribution->id;
+    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
+      'Contribution',
+      'name'
+    );
+    if (!$activity->find(TRUE)) {
+      CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
+    }
+    else {
+      // CRM-13237 : if activity record found, update it with campaign id of contribution
+      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity->id, 'campaign_id', $contribution->campaign_id);
+    }
 
     // do not add to recent items for import, CRM-4399
     if (!CRM_Utils_Array::value('skipRecentView', $params)) {
@@ -699,6 +699,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    * @static
    */
   static function deleteContribution($id) {
+    CRM_Core_Error::debug_log_message('deleting contribution!!! ' . $id. ' ' . print_r(debug_backtrace(), TRUE));
     CRM_Utils_Hook::pre('delete', 'Contribution', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
@@ -760,6 +761,21 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
     CRM_Utils_Recent::del($contributionRecent);
 
     return $results;
+  }
+
+  /**
+   * Update contribution to failed. In 4.7 CRM-16417 goes for a more complete approach
+   *
+   * @param $id
+   * @param $message
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function failContribution($id, $message) {
+    civicrm_api3('contribution', 'create', array('id' => $id, 'contribution_status_id' => 'Failed', 'source' => $message));
+    CRM_Core_Error::debug_log_message("Setting contribution status to failed for contribution id " . $id);
+    return TRUE;
   }
 
   /**
@@ -1695,6 +1711,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $query = "
       SELECT    c.id                 as contribution_id,
                 c.contact_id         as contact_id,
+                c.contribution_recur_id,
                 mp.membership_id     as membership_id,
                 m.membership_type_id as membership_type_id,
                 pp.participant_id    as participant_id,
@@ -1729,6 +1746,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
       if ($dao->pledge_payment_id) {
         $pledgePayment[] = $dao->pledge_payment_id;
+      }
+      if ($dao->contribution_recur_id) {
+        $componentDetails['contributionRecur'] = $dao->contribution_recur_id;
       }
     }
 

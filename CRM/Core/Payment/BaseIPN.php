@@ -69,12 +69,18 @@ class CRM_Core_Payment_BaseIPN {
    * Paypal allows you to resend Instant Payment Notifications if you, for example, moved site
    * and didn't update your IPN URL.
    *
-   * @param array $input interpreted values from the values returned through the IPN
-   * @param array $ids more interpreted values (ids) from the values returned through the IPN
-   * @param array $objects an empty array that will be populated with loaded object
-   * @param boolean $required boolean Return FALSE if the relevant objects don't exist
-   * @param integer $paymentProcessorID Id of the payment processor ID in use
-   * @return boolean
+   * @param array $input
+   *   Interpreted values from the values returned through the IPN.
+   * @param array $ids
+   *   More interpreted values (ids) from the values returned through the IPN.
+   * @param array $objects
+   *   An empty array that will be populated with loaded object.
+   * @param bool $required
+   *   Boolean Return FALSE if the relevant objects don't exist.
+   * @param int $paymentProcessorID
+   *   Id of the payment processor ID in use.
+   *
+   * @return bool
    */
   function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
@@ -116,7 +122,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Load objects related to contribution
+   * Load objects related to contribution.
    *
    * @input array information from Payment processor
    * @param array $ids
@@ -329,6 +335,9 @@ class CRM_Core_Payment_BaseIPN {
     $recurContrib = &$objects['contributionRecur'];
 
     $values = array();
+    if (isset($input['is_email_receipt'])) {
+      $values['is_email_receipt'] = $input['is_email_receipt'];
+    }
     $source = NULL;
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
@@ -344,8 +353,9 @@ class CRM_Core_Payment_BaseIPN {
         $values['receipt_from_name'] = $domainValues[0];
         $values['receipt_from_email'] = $domainValues[1];
       }
-      if($recurContrib && $recurContrib->id){
+      if($recurContrib && $recurContrib->id && !isset($input['is_email_receipt'])){
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
+        // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
 
@@ -509,12 +519,35 @@ LIMIT 1;";
     ) {
       $input['net_amount'] = $input['amount'] - $input['fee_amount'];
     }
-    $addLineItems = FALSE;
+    // This complete transaction function is being overloaded to create new contributions too.
+    // here we record if it is a new contribution.
+    // @todo separate the 2 more appropriately.
+    $isNewContribution = FALSE;
     if (empty($contribution->id)) {
-      $addLineItems = TRUE;
+      $isNewContribution = TRUE;
+      if (!empty($input['amount']) &&  $input['amount'] != $contribution->total_amount) {
+        $contribution->total_amount = $input['amount'];
+        // The BAO does this stuff but we are actually kinda bypassing it here (bad code! go sit in the corner)
+        // so we have to handle net_amount in this (naughty) code.
+        if (isset($input['fee_amount']) && is_numeric($input['fee_amount'])) {
+          $contribution->fee_amount = $input['fee_amount'];
+        }
+        $contribution->net_amount = $contribution->total_amount - $contribution->fee_amount;
+      }
+      if (!empty($input['campaign_id'])) {
+        $contribution->campaign_id = $input['campaign_id'];
+      }
     }
 
-    $contribution->contribution_status_id = 1;
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+        'labelColumn' => 'name',
+        'flip' => 1,
+      ));
+
+    // @todo this section should call the api  in order to have hooks called &
+    // because all this 'messiness' setting variables could be avoided
+    // by letting the api resolve pseudoconstants & copy set values and format dates.
+    $contribution->contribution_status_id = $contributionStatuses['Completed'];
     $contribution->is_test = $input['is_test'];
 
     // CRM-15960 If we don't have a value we 'want' for the amounts, leave it to the BAO to sort out.
@@ -539,16 +572,17 @@ LIMIT 1;";
       $contribution->payment_instrument_id = $input['payment_instrument_id'];
     }
 
-    if ($contribution->id) {
+    if (!empty($contribution->id)) {
       $contributionId['id'] = $contribution->id;
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
+
     $contribution->save();
 
-    //add lineitems for recurring payments
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      if ($addLineItems) {
-        $input ['line_item'] = $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+    //add line items for recurring payments
+    if (!empty($contribution->contribution_recur_id)) {
+      if ($isNewContribution) {
+        $input['line_item'] = $this->addRecurLineItems($contribution->contribution_recur_id, $contribution);
       }
       else {
         // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
@@ -598,7 +632,7 @@ LIMIT 1;";
     if ($contribution->id) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       if ((empty($input['prevContribution']) && $paymentProcessorId) || (!$input['prevContribution']->is_pay_later &&
--      $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses))) {
+       $input['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses))) {
        $input['payment_processor'] = $paymentProcessorId;
       }
       $input['contribution_status_id'] = array_search('Completed', $contributionStatuses);
@@ -690,8 +724,8 @@ LIMIT 1;";
       $userID = $session->get('userID');
       if (!empty($userID)) {
         list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
-        $values['receipt_from_email'] = $userEmail;
-        $values['receipt_from_name'] = $userName;
+        $values['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $input, $userEmail);
+        $values['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $input, $userName);
       }
     }
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
@@ -892,7 +926,18 @@ LIMIT 1;";
     $lineSets = array();
 
     $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
-    $lineItems = CRM_Price_BAO_LineItem::getLineItems($originalContributionID, 'contribution');    if (!empty($lineItems)) {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
+    if (count($lineItems) == 1) {
+      foreach ($lineItems as $index => $lineItem) {
+        if ($lineItem['line_total'] != $contribution->total_amount) {
+          // We are dealing with a changed amount! Per CRM-16397 we can work out what to do with these
+          // if there is only one line item, and the UI should prevent this situation for those with more than one.
+          $lineItems[$index]['line_total'] = $contribution->total_amount;
+          $lineItems[$index]['unit_price'] = round($contribution->total_amount / $lineItems[$index]['qty'], 2);
+        }
+      }
+    }
+    if (!empty($lineItems)) {
       foreach ($lineItems as $key => $value) {
         $priceField = new CRM_Price_DAO_PriceField();
         $priceField->id = $value['price_field_id'];

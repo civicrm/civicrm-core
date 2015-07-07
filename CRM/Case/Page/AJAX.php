@@ -41,6 +41,7 @@ class CRM_Case_Page_AJAX {
    * Retrieve unclosed cases.
    */
   static function unclosedCases() {
+    header('Content-Type: text/plain');
     $criteria = explode('-', CRM_Utils_Type::escape(CRM_Utils_Array::value('s', $_GET), 'String'));
 
     $limit = NULL;
@@ -194,8 +195,7 @@ class CRM_Case_Page_AJAX {
     );
 
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
-    echo json_encode(TRUE);
-    CRM_Utils_System::civiExit();
+    CRM_Utils_JSON::output(TRUE);
   }
 
   /**

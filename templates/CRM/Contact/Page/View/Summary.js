@@ -6,6 +6,20 @@
     beforeSubmit: function(arr, $form, options) {
       addCiviOverlay($form);
     },
+    // CRM-15939: Custom Rich Text Editor fields aren't save from in-line editing.
+    beforeSerialize: function(form, options) {
+      // Copied from 4.5 patch
+      if (window.CKEDITOR && window.CKEDITOR.instances) {
+        $.each(CKEDITOR.instances, function() {
+          this.updateElement && this.updateElement();
+        });
+      }
+      if (window.tinyMCE && tinyMCE.editors) {
+        $.each(tinyMCE.editors, function() {
+          this.save();
+        });
+      }
+    },
     success: requestHandler,
     error: errorHandler
   };
