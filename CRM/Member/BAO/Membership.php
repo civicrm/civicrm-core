@@ -1449,8 +1449,13 @@ AND civicrm_membership.is_test = %2";
       $form->_values['contribution_id'] = $membershipContributionID;
     }
 
-    // Do not send an email if Recurring transaction is done via Direct Mode
-    // Email will we sent when the IPN is received.
+    // Refer to CRM-16737. Payment processors 'should' return payment_status_id
+    // to denote the outcome of the transaction.
+    //
+    // In 4.7 trxn_id will no longer denote the outcome & all processor transactions must return an array
+    // containing payment_status_id.
+    // In 4.6 support (such as there was) for other ways of denoting payment outcome is retained but the use
+    // of payment_status_id is strongly encouraged.
     if (!empty($form->_params['is_recur']) && $form->_contributeMode == 'direct') {
       if (!empty($membershipContribution->trxn_id) && !isset($membershipContribution->payment_status_id)
         || (!empty($membershipContribution->payment_status_id) && $membershipContribution->payment_status_id == 1)) {
@@ -1466,6 +1471,8 @@ AND civicrm_membership.is_test = %2";
           CRM_Core_Error::debug_log_message('contribution ' . $membershipContribution->id . ' not completed with trxn_id ' . $membershipContribution->trxn_id . ' and message ' . $e->getMessage());
         }
       }
+      // Do not send an email if Recurring transaction is done via Direct Mode
+      // Email will we sent when the IPN is received.
       return;
     }
 
