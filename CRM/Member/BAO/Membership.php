@@ -1308,7 +1308,7 @@ AND civicrm_membership.is_test = %2";
     }
 
     if ($form->_contributeMode == 'direct') {
-      if (CRM_Utils_Array::value('contribution_status_id', $paymentResult) == 1) {
+      if (CRM_Utils_Array::value('payment_status_id', $paymentResult) == 1) {
         try {
           civicrm_api3('contribution', 'completetransaction', array(
             'id' => $paymentResult['contribution']->id,
