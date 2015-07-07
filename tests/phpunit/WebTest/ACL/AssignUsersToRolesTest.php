@@ -73,8 +73,10 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_ACL_next-bottom");
   }
 
-  public function testACLforSmartGroups() {
-    $this->markTestSkipped('Skipping for now as it works fine locally.');
+  /**
+   * Check ACL for Smart Groups and Profiles.
+   */
+  public function testACLforSmartGroupsAndProfiles() {
     $this->webtestLogin();
 
     //Create role
@@ -146,27 +148,64 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Your smart group has been saved as \'$smartGroupTitle\'");
 
     //Create ACL role
-    $this->openCiviPage("admin/options/acl_role", "action=add&reset=1", "_qf_Options_cancel-bottom");
+    $this->openCiviPage("admin/options/acl_role", "reset=1", "xpath=//a[@class='button new-option']");
+    $this->click("xpath=//a[@class='button new-option']");
     $label = "TestAclRole" . substr(sha1(rand()), 0, 4);
+    $this->waitForElementPresent("label");
     $this->type("label", $label);
     $this->type("value", "Acl value" . $label);
     $this->click("_qf_Options_next-bottom");
     $this->waitForText('crm-notification-container', "The ACL Role '{$label}' has been saved.");
 
     // Assign group to ACL role created
-    $this->openCiviPage("acl/entityrole", "action=add&reset=1");
+    $this->openCiviPage("acl/entityrole", "reset=1", 'newACL');
+    $this->click('newACL');
+    $this->waitForElementPresent("acl_role_id");
     $this->select("acl_role_id", "label=" . $label);
     $this->select("entity_id", "label={$groupTitle}");
-    $this->clickLink("_qf_EntityRole_next-botttom");
+    $this->clickLink("_qf_EntityRole_next-botttom", 'newACL', FALSE);
 
     //Create ACL granting 'Edit' access on smart group to the role
-    $this->openCiviPage("acl", "action=add&reset=1");
-    $this->click("group_id");
+    $this->openCiviPage("acl", "reset=1");
+    $this->click('newACL');
+    $this->waitForElementPresent("group_id");
     $this->select("group_id", "label={$smartGroupTitle}");
     $this->select("operation", "label=Edit");
     $this->select("entity_id", "label={$label}");
     $this->type("name", "describe {$label}");
-    $this->clickLink("_qf_ACL_next-bottom");
+    $this->clickLink("_qf_ACL_next-bottom", 'newACL', FALSE);
+
+    //ACL granting edit permission on events.
+    $this->click('newACL');
+    $this->waitForElementPresent('name');
+    $this->type("name", "Edit All Events $label");
+    $this->select("entity_id", "label={$label}");
+    $this->select("operation", "label=Edit");
+    $this->click("xpath=//label[contains(text(), 'Events')]");
+    $this->select("event_id", "value=0");
+    $this->clickLink("_qf_ACL_next-bottom", 'newACL', FALSE);
+
+    $this->webtestLogin($user, 'Test12345');
+    $this->openCiviPage('event/manage/registration', 'reset=1&action=update&id=3');
+    //ensure all the three buttons are not displayed
+    $this->waitForElementPresent('registration_screen');
+    $this->verifyElementNotPresent("xpath=//div[@id='registration_screen']/table[2]/tbody/tr/td[2]/div/div/button[contains(text(), 'Edit')]");
+    $this->verifyElementNotPresent("xpath=//div[@id='registration_screen']/table[2]/tbody/tr/td[2]/div/div//button[contains(text(), 'Copy')]");
+    $this->verifyElementNotPresent("xpath=//div[@id='registration_screen']/table[2]/tbody/tr/td[2]/div/div//button[contains(text(), 'Create')]");
+    $this->webtestLogout();
+
+    $this->webtestLogin();
+
+    //Create ACL granting Edit permission on Profiles
+    $this->openCiviPage("acl", "reset=1", 'newACL');
+    $this->click('newACL');
+    $this->waitForElementPresent('name');
+    $this->type("name", "Edit All Profiles $label");
+    $this->select("entity_id", "label={$label}");
+    $this->select("operation", "label=Edit");
+    $this->click("xpath=//label[contains(text(), 'A profile')]");
+    $this->select("uf_group_id", "value=0");
+    $this->clickLink("_qf_ACL_next-bottom", 'newACL', FALSE);
 
     //Login as your role user and do Find Contacts
     $this->webtestLogin($user, 'Test12345');
@@ -178,6 +217,85 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']");
     $this->assertElementNotContainsText("xpath=//form[@id='Advanced']/div[3]/div/div", "No matches found for");
     $this->verifyText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[8]", 'United States');
+
+    $this->checkEditOnEventProfile();
+  }
+
+  /**
+   * CRM-16776 - Check Profile Edit on Events with 'manage event profile' permission.
+   */
+  public function testEventProfilePermission() {
+    $this->webtestLogin();
+
+    //create new role
+    $role = 'role' . substr(sha1(rand()), 0, 7);
+    $this->open($this->sboxPath . "admin/people/permissions/roles");
+
+    $this->waitForElementPresent("edit-add");
+    $this->type("edit-name", $role);
+    $this->click("edit-add");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->open($this->sboxPath . "admin/people/permissions/roles");
+    $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role}']");
+    $roleId = explode('/', $this->getAttribute("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role}']/../td[4]/a[text()='edit permissions']/@href"));
+    $roleId = end($roleId);
+
+    $this->open($this->sboxPath . "admin/people/create");
+    $this->waitForElementPresent("edit-submit");
+    $name = "TestUser" . substr(sha1(rand()), 0, 4);
+    $this->type("edit-name", $name);
+    $emailId = substr(sha1(rand()), 0, 7) . '@web.com';
+    $this->type("edit-mail", $emailId);
+    $this->type("edit-pass-pass1", "Test12345");
+    $this->type("edit-pass-pass2", "Test12345");
+    $role = "edit-roles-" . $roleId;
+    $this->check("name=roles[$roleId] value={$roleId}");
+
+    //Add profile Details
+    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+    $lastName = 'An' . substr(sha1(rand()), 0, 7);
+    $this->type("first_name", $firstName);
+    $this->type("last_name", $lastName);
+
+    $this->click("edit-submit");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $permissions = array("edit-{$roleId}-access-civicrm", "edit-{$roleId}-edit-all-events", "edit-{$roleId}-manage-event-profiles");
+    $this->changePermissions($permissions);
+    $this->webtestLogout();
+    $this->webtestLogin($name, 'Test12345');
+    $this->checkEditOnEventProfile();
+  }
+
+  /**
+   * Check Profile Edit on OnlineRegistration Tab
+   */
+  public function checkEditOnEventProfile() {
+    $this->openCiviPage('event/manage/registration', 'reset=1&action=update&id=3');
+    //ensure all the three buttons are displayed
+    $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]/tbody/tr/td[2]/div/div/button[contains(text(), 'Edit')]");
+    $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]/tbody/tr/td[2]/div/div//button[contains(text(), 'Copy')]");
+    $this->waitForElementPresent("xpath=//div[@id='registration_screen']/table[2]/tbody/tr/td[2]/div/div//button[contains(text(), 'Create')]");
+
+    $this->click("xpath=//div[@id='registration_screen']/table[2]/tbody/tr/td[2]/div/div/button[contains(text(), 'Edit')]");
+    $this->waitForAjaxContent();
+    $this->waitForElementPresent("//div[@class='crm-designer-fields-region']");
+    if ($this->isElementPresent("xpath=//span[@class='crm-designer-label'][contains(text(), 'City')]")) {
+      $this->click("xpath=//span[@class='crm-designer-label'][contains(text(), 'City')]/../../span//a[@title='Remove']");
+      $this->waitForElementNotPresent("xpath=//span[@class='crm-designer-label'][contains(text(), 'City')]");
+    }
+    else {
+      $this->click("xpath=//li[@class='crm-designer-palette-section jstree-closed']/a[contains(text(), 'Individual')]");
+      $this->waitForAjaxContent();
+      $this->doubleClick("xpath=//a[contains(text(), 'Individual')]/../ul//li/a[contains(text(), 'City')]");
+      $this->waitForAjaxContent();
+    }
+    $this->click("xpath=//button/span[contains(text(), 'Save')]");
+    $this->waitForElementPresent("crm-notification-container");
+    $this->assertElementNotContainsText("crm-notification-container", 'API permission check failed for UFGroup/create call; insufficient permission: require administer CiviCRM');
+    $this->click("_qf_Registration_upload-top");
+    $this->waitForTextPresent("'Online Registration' information has been saved.");
   }
 
 }
