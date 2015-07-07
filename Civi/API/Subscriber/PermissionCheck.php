@@ -88,12 +88,12 @@ class PermissionCheck implements EventSubscriberInterface {
   }
 
   /**
-  *  Check API for ACL permission.
-  *
-  * @param array $apiRequest
-  *
-  * @return bool
-  */
+   * Check API for ACL permission.
+   *
+   * @param array $apiRequest
+   *
+   * @return bool
+   */
   public function checkACLPermission($apiRequest) {
     switch ($apiRequest['entity']) {
       case 'UFGroup':
