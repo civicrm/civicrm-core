@@ -495,4 +495,29 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
     return $value;
   }
 
+  /**
+   * @param int $contributionId
+   * @param int $contributionFinancialTypeId
+   *
+   * @return array
+   */
+  public static function getTotalPayments($contributionId, $contributionFinancialTypeId = NULL) {
+    if (!$contributionFinancialTypeId) {
+      $contributionFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'financial_type_id');
+    }
+    $q = "SELECT ft.total_amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id = 1";
+
+    $p[1] = array($contributionId, 'Integer');
+
+    $totalAmtDAO = CRM_Core_DAO::executeQuery($q, $p);
+    if ($totalAmtDAO->N) {
+      $paid = 0;
+    }
+    while ($totalAmtDAO->fetch()) {
+      $paid += $totalAmtDAO->total_amount;
+    }
+
+    return $paid;
+  }
+
 }
