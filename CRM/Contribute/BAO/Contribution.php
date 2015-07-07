@@ -370,12 +370,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // Handle soft credit and / or link to personal campaign page
     $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
 
-    //Delete PCP against this contribution and create new on submitted PCP information
     $pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id, TRUE);
-    if ($pcpId) {
-      $deleteParams = array('id' => $pcpId);
-      CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
-    }
+
     if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
       $softParams = array();
       $softParams['contribution_id'] = $contribution->id;
@@ -394,6 +390,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       if ($contributionSoft->pcp_id) {
         CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
       }
+    }
+    //Delete PCP against this contribution and create new on submitted PCP information
+    elseif (array_key_exists('pcp', $params) && $pcpId) {
+      $deleteParams = array('id' => $pcpId);
+      CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
     }
     if (isset($params['soft_credit'])) {
       $softParams = $params['soft_credit'];

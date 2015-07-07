@@ -1202,9 +1202,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
       }
 
-      if (!empty($pcp)) {
-        $params['pcp'] = $pcp;
-      }
+      $params['pcp'] = !empty($pcp) ? $pcp : NULL;
       if (!empty($softParams)) {
         $params['soft_credit'] = $softParams;
         $params['soft_credit_ids'] = $softIDs;
