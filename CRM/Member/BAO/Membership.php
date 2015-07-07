@@ -1452,7 +1452,8 @@ AND civicrm_membership.is_test = %2";
     // Do not send an email if Recurring transaction is done via Direct Mode
     // Email will we sent when the IPN is received.
     if (!empty($form->_params['is_recur']) && $form->_contributeMode == 'direct') {
-      if (!empty($membershipContribution->trxn_id)) {
+      if (!empty($membershipContribution->trxn_id) && !isset($membershipContribution->payment_status_id)
+        || (!empty($membershipContribution->payment_status_id) && $membershipContribution->payment_status_id == 1)) {
         try {
           civicrm_api3('contribution', 'completetransaction', array(
             'id' => $membershipContribution->id,
