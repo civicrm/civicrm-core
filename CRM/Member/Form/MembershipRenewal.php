@@ -429,12 +429,52 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @return void
    */
   public function postProcess() {
-
-    $config = CRM_Core_Config::singleton();
-
     // get the submitted form values.
     $this->_params = $formValues = $this->controller->exportValues($this->_name);
 
+    $statusMsg = $this->submit($formValues);
+
+    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+  }
+
+  /**
+   * Determine if the form has a pending status.
+   *
+   * @deprecated
+   *
+   * @param CRM_Core_Form $form
+   * @param int $membershipID
+   *
+   * @return bool
+   */
+  public static function extractPendingFormValue($form, $membershipID) {
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipID);
+    $pending = FALSE;
+    // @todo function was shared by 2 not-very-related forms & the below may include irrelevant stuff.
+    if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
+      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later'])
+        ) &&
+        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
+          CRM_Utils_Array::value('record_contribution', $form->_params)
+        )
+      ) {
+        $pending = TRUE;
+      }
+    }
+    return $pending;
+  }
+
+  /**
+   * Process form submission.
+   *
+   * This function is also accessed by a unit test.
+   *
+   * @param array $formValues
+   *   Submitted values.
+   *
+   * @return array
+   */
+  protected function submit($formValues) {
     $this->storeContactFields($formValues);
     // use values from screen
 
@@ -458,9 +498,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     if ($this->_mode) {
-      $formValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params, CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $this->_memType, 'minimum_fee'
-      ));
+      $formValues['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues,
+        CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
+      );
       if (empty($formValues['financial_type_id'])) {
         $formValues['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
       }
@@ -509,15 +549,17 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       );
 
       // add all the additional payment params we need
-      $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-      $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
+      $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"]
+        = CRM_Core_PseudoConstant::stateProvinceAbbreviation($formValues["billing_state_province_id-{$this->_bltID}"]);
+      $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"]
+        = CRM_Core_PseudoConstant::countryIsoCode($formValues["billing_country_id-{$this->_bltID}"]);
 
-      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($formValues);
+      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($formValues);
       $this->_params['description'] = ts('Office Credit Card Membership Renewal Contribution');
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $formValues['total_amount'];
-      $this->_params['currencyID'] = $config->defaultCurrency;
+      $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
       $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
 
       // at this point we've created a contact and stored its address etc
@@ -534,7 +576,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
 
-      $result = &$payment->doDirectPayment($paymentParams);
+      $result = $payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {
         CRM_Core_Error::displaySessionError($result);
@@ -555,26 +597,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->assign('trxn_id', $result['trxn_id']);
     }
 
-    $renewalDate = NULL;
-    if ($formValues['renewal_date']) {
-      $renewalDate = CRM_Utils_Date::processDate($formValues['renewal_date']);
-    }
+    $renewalDate = !empty($formValues['renewal_date']) ? $renewalDate = CRM_Utils_Date::processDate($formValues['renewal_date']) : NULL;
+
     // This set is probably obsolete.
     $this->set('renewalDate', $renewalDate);
 
     $this->_membershipId = $this->_id;
-
-    // membership type custom data
-    $customFields = CRM_Core_BAO_CustomField::getFields('Membership', FALSE, FALSE,
-      $formValues['membership_type_id'][1]
-    );
-
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-      CRM_Core_BAO_CustomField::getFields('Membership',
-        FALSE, FALSE,
-        NULL, NULL, TRUE
-      )
-    );
 
     $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($formValues,
       $this->_id,
@@ -614,7 +642,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
     }
 
-    $renewMembership = CRM_Member_BAO_Membership::renewMembership(
+    list($renewMembership) = CRM_Member_BAO_Membership::renewMembership(
       $this->_contactID, $formValues['membership_type_id'][1], $isTestMembership,
       $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
       self::extractPendingFormValue($this, $formValues['membership_type_id'][1]),
@@ -784,36 +812,19 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     if ($receiptSend && $mailSend) {
       $statusMsg .= ' ' . ts('A renewal confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
+      return $statusMsg;
     }
-
-    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+    return $statusMsg;
   }
 
   /**
-   * Determine if the form has a pending status.
+   * Wrapper function for unit tests.
    *
-   * @deprecated
-   *
-   * @param CRM_Core_Form $form
-   * @param int $membershipID
-   *
-   * @return bool
+   * @param array $formValues
    */
-  public static function extractPendingFormValue($form, $membershipID) {
-    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipID);
-    $pending = FALSE;
-    // @todo function was shared by 2 not-very-related forms & the below may include irrelevant stuff.
-    if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
-      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later'])
-        ) &&
-        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
-          CRM_Utils_Array::value('record_contribution', $form->_params)
-        )
-      ) {
-        $pending = TRUE;
-      }
-    }
-    return $pending;
+  public function testSubmit($formValues) {
+    $this->_memType = $formValues['membership_type_id'][1];
+    $this->submit($formValues);
   }
 
 }
