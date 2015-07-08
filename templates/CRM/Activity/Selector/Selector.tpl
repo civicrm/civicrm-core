@@ -23,7 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-
 <div class="crm-activity-selector-{$context}">
   <div class="crm-accordion-wrapper crm-search_filters-accordion">
     <div class="crm-accordion-header">
@@ -58,7 +57,8 @@
   {literal}
     <script type="text/javascript">
       (function($) {
-        CRM.$('table.contact-activity-selector-activity').data({
+        var context = {/literal}"{$context}"{literal};
+        CRM.$('table.contact-activity-selector-' + context).data({
           "ajax": {
             "url": {/literal}'{crmURL p="civicrm/ajax/contactactivity" h=0 q="snippet=4&context=$context&cid=$contactId"}'{literal},
             "data": function (d) {
