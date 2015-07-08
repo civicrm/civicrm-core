@@ -70,7 +70,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'name' => 'mailing name',
       'created_id' => 1,
       'groups' => array('include' => array($this->_groupID)),
-      'scheduled_date' => 'now',
+      //'scheduled_date' => 'now', // In v4.4, 'api.mailing_job.create' is called automatically.
     );
     $this->defaultSettings = array(
       'recipients' => 20, // int, #contacts to receive mailing

@@ -191,5 +191,17 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     throw new Exception("Method not implemented: getLoginURL");
   }
 
+
+  /**
+   * Load user into session.
+   *
+   * @param $user
+   *
+   * @return bool
+   */
+  public function loadUser($user) {
+    return TRUE;
+  }
+
 }
 
