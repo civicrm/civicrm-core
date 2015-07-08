@@ -73,7 +73,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
    *
    * @return bool
    */
-  public function loadBootStrap($name = NULL, $pass = NULL) {
+  function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     return TRUE;
   }
 
