@@ -947,7 +947,7 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $this->webtestAddContact($firstName, 'Anderson', TRUE);
     $contactName = "Anderson, $firstName";
     $displayName = "$firstName Anderson";
-    $this->openCiviPage("event/register", "reset=1&id=$id", '_qf_Register_upload-bottom');
+    $this->openCiviPage("event/register", "reset=1&id=$id&action=preview", '_qf_Register_upload-bottom');
     $this->type('first_name', $firstName);
 
     //fill in last name
