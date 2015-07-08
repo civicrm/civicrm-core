@@ -192,7 +192,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName $firstName");
-    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");    
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());

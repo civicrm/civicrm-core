@@ -377,8 +377,8 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestVerifyTabularData($expected);
   }
 
-  //CRM-16713: Contribution search by premiums on find contribution form.
   public function testOnlineContributionWithPremium() {
+    //CRM-16713: Contribution search by premiums on find contribution form.
     $this->webtestLogin();
 
     // Use default payment processor
