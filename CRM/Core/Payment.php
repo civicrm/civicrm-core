@@ -199,6 +199,7 @@ abstract class CRM_Core_Payment {
         'processor_name' => @$_GET['processor_name'],
         'processor_id' => @$_GET['processor_id'],
         'mode' => @$_GET['mode'],
+        'q' => @$_GET['q'],
       )
     );
   }
@@ -213,7 +214,14 @@ abstract class CRM_Core_Payment {
    */
   static function handlePaymentMethod($method, $params = array( )) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
-      CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
+      $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
+      $lastParam = array_pop($q);
+      if (is_numeric($lastParam)) {
+        $params['processor_id'] = $_GET['processor_id'] = $lastParam;
+      }
+      else {
+        throw new CRM_Core_Exception("Either 'processor_id' or 'processor_name' param is required for payment callback");
+      }
     }
 
     $mode = CRM_Utils_Array::value('mode', $params);

@@ -1883,6 +1883,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
         }
+      }
 
       if ($key == 'birth_date' && $val) {
         CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key);
@@ -1898,7 +1899,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         $params[$key] = $this->checkGender($val);
       }
     }
-   }
 
     //now format custom data.
     foreach ($params as $key => $field) {
