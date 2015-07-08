@@ -2,7 +2,13 @@
 
   angular.module('crmCxn').controller('CrmCxnManageCtrl', function CrmCxnManageCtrl($scope, apiCalls, crmApi, crmUiAlert, crmBlocker, crmStatus, $timeout, dialogService) {
     var ts = $scope.ts = CRM.ts(null);
-    $scope.appMetas = apiCalls.appMetas.values;
+    if (apiCalls.appMetas.is_error) {
+      $scope.appMetas = [];
+      CRM.alert(apiCalls.appMetas.error_message, ts('Application List Unavailable'), 'error');
+    }
+    else {
+      $scope.appMetas = apiCalls.appMetas.values;
+    }
     $scope.cxns = apiCalls.cxns.values;
     $scope.alerts = _.where(apiCalls.sysCheck.values, {name: 'checkCxnOverrides'});
 
