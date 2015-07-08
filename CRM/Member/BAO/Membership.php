@@ -2317,7 +2317,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    */
   public static function createOrRenewMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipID, $memType, $isTest, $numTerms, $membershipContribution, &$form) {
     if (!empty($membershipContribution)) {
+      // CRM-16737 contribution_status_id is the deprecated return parameter from the payment processor. Use
+      // payment_status_id.
       $pending = ($membershipContribution->contribution_status_id == 2) ? TRUE : FALSE;
+      if (isset($membershipContribution->payment_status_id)) {
+        $pending = ($membershipContribution->payment_status_id == 2) ? TRUE : $pending;
+      }
     }
     $membership = self::renewMembershipFormWrapper($contactID, $memType,
       $isTest, $form, NULL,
