@@ -83,7 +83,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -107,9 +107,8 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->type("postal_code-1", "94117");
     $this->select("country-1", "value=1228");
     $this->select("state_province-1", "value=1001");
-
     // Honoree Info
-    $this->click("xpath=id('Main')/div[2]/fieldset/div[2]/div/label[text()='In Honor of']");
+    $this->click("xpath=id('Main')/div[3]/fieldset/div[2]/div/label[text()='In Honor of']");
 
     $this->select("honor[prefix_id]", "label=Ms.");
     $this->type("honor[first_name]", $honorFirstName);
@@ -143,8 +142,8 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-
     $this->type("sort_name", "$lastName $firstName");
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
@@ -156,7 +155,6 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
       'Contribution Status' => 'Completed',
     );
     $this->webtestVerifyTabularData($expected);
-
     //View Soft Credit record of type 'Honor of'
     $this->waitForTextPresent($honorDisplayName);
     $this->waitForTextPresent('100.00 (In Honor of)');
@@ -266,7 +264,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $amountLabel = 'Total Amount';
     $amountValue = '0.00';
     //Open Live Contribution Page
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -325,7 +323,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
     $this->type("email-5", $firstName . "@example.com");
@@ -365,6 +363,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$lastName $firstName");
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
@@ -427,7 +426,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -477,7 +476,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->type("sort_name", "$lastName $firstName");
     $this->multiselect2('contribution_product_id', array('Coffee Mug'));
     $this->click("_qf_Search_refresh");
