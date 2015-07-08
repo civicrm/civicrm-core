@@ -1325,9 +1325,10 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
     }
     if ($hasBillingField) {
       $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
+      return $address->id;
     }
+    return NULL;
 
-    return $address->id;
   }
 
   /**
