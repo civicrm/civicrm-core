@@ -1333,6 +1333,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'cancel_date_time' => '',
       'hidden_Premium' => 1,
     );
+    $this->_bltID = 5;
     if (!empty($params['id'])) {
       $existingContribution = civicrm_api3('contribution', 'getsingle', array(
         'id' => $params['id'],
