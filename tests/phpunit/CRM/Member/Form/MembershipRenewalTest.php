@@ -45,7 +45,7 @@ require_once 'HTML/QuickForm/Page.php';
  *
  * @package   CiviCRM
  */
-class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
+class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Assume empty database with just civicrm_data.
