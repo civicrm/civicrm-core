@@ -114,8 +114,16 @@ function civicrm_api3_payment_cancel(&$params) {
   $contributionId = $entity['entity_id'];
   $params['total_amount'] = $entity['amount'];
   
-  $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', NULL, FALSE); 
-  return civicrm_api3_create_success($trxn, $params, 'Payment', 'cancel');
+  $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', NULL, FALSE);
+  
+  $values = array(); 
+  if (is_a($trxn, 'CRM_Core_Error')) {
+    throw new API_Exception($trxn->_errors[0]['message']);
+  }
+  else {
+    _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
+  }
+  return civicrm_api3_create_success($values, $params, 'Payment', 'cancel', $trxn);
 }
 
 /**
@@ -162,18 +170,6 @@ function civicrm_api3_payment_create(&$params) {
       CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $params['contribution_id'], 'contribution_status_id', $statusId);
     }
   }
-  if ($contribution['contribution_status'] == 'Pending') { // FIXME: may need to be removed since we are only supporting partially paid contributions
-    $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
-    $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
-    $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
-    $cmp = bccomp($total, $paid, 5);
-    if ($cmp == 0 || $cmp == -1) { // If paid amount is greater or equal to total amount
-      $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
-    }
-    else if ($cmp == 1) { // If paid amount is lesser than total amount
-      $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
-    }
-  }
   if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
     foreach ($params['line_item'] as $values) {
       foreach ($values as $id => $amount) {
@@ -207,30 +203,39 @@ function civicrm_api3_payment_create(&$params) {
   elseif (!empty($trxn)) {
     // Assign the lineitems proportionally
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
-    // get financial item
-    $sql = "SELECT fi.id, li.price_field_value_id
+    if (!empty($lineItems)) {
+      // get financial item
+      $sql = "SELECT fi.id, li.price_field_value_id
       FROM civicrm_financial_item fi
       INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
       WHERE li.contribution_id = %1";
-    $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['contribution_id'], 'Integer')));
-    while ($dao->fetch()) {
-      $ftIds[$dao->price_field_value_id] = $dao->id;
-    }
-    foreach ($lineItems as $key => $value) {
-      $paid = $value['line_total'] * ($params['total_amount']/$contribution['total_amount']);
-      // Record Entity Financial Trxn
-      $eftParams = array(
-        'entity_table' => 'civicrm_financial_item',
-        'financial_trxn_id' => $trxn->id,
-        'amount' => $paid,
-        'entity_id' => $ftIds[$value['price_field_value_id']],
-      );
-      $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
-      $entityTrxn->copyValues($eftParams);
-      $entityTrxn->save();
+      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['contribution_id'], 'Integer')));
+      while ($dao->fetch()) {
+        $ftIds[$dao->price_field_value_id] = $dao->id;
+      }
+      foreach ($lineItems as $key => $value) {
+        $paid = $value['line_total'] * ($params['total_amount']/$contribution['total_amount']);
+        // Record Entity Financial Trxn
+        $eftParams = array(
+          'entity_table' => 'civicrm_financial_item',
+          'financial_trxn_id' => $trxn->id,
+          'amount' => $paid,
+          'entity_id' => $ftIds[$value['price_field_value_id']],
+        );
+        $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+        $entityTrxn->copyValues($eftParams);
+        $entityTrxn->save();
+      }
     }
   }
-  return civicrm_api3_create_success($trxn, $params, 'Payment', 'create');
+  $values = array(); 
+  if (is_a($trxn, 'CRM_Core_Error')) {
+    throw new API_Exception($trxn->_errors[0]['message']);
+  }
+  else {
+    _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
+  }
+  return civicrm_api3_create_success($values, $params, 'Payment', 'create', $trxn);
 }
 
 /**
