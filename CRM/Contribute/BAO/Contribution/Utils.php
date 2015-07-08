@@ -335,7 +335,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $contribution->trxn_id = $result['trxn_id'];
         }
         if (!empty($result['payment_status_id'])) {
-          $contribution->contribution_status_id = $result['payment_status_id'];
+          $contribution->payment_status_id = $result['payment_status_id'];
         }
       }
       $membershipResult[1] = $contribution;

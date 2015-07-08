@@ -262,7 +262,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
    */
-  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecur() {
+  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment() {
     $this->params['is_recur'] = 1;
     $var = array();
     $this->params['recur_frequency_unit'] = 'month';
