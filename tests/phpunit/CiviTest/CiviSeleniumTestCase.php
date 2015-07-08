@@ -1357,7 +1357,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
       $this->openCiviPage("admin/contribute", "reset=1");
       $this->waitForAjaxContent();
-      $this->click("xpath=//table['dataTables_wrapper no-footer']/tbody//tr/td[1]/strong[text()='$pageTitle']/../../td[4]/div[1]/span/ul/li[8]/a[text()='Premiums']");
+      $this->click("xpath=//table['dataTables_wrapper no-footer']/tbody//tr/td[1]/strong[text()='$pageTitle']/../../td[5]/div[1]/span/ul/li[8]/a[text()='Premiums']");
       $this->waitForElementPresent('_qf_Premium_cancel-bottom');
       $this->click("xpath=//div[@class='messages status no-popup']/a[text()='add one']");
       $this->waitForElementPresent('_qf_AddProduct_cancel-bottom');
@@ -1369,6 +1369,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     if ($widget) {
       // fill in step 8 (Widget Settings)
+      $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->click('link=Widgets');
       $this->waitForElementPresent('_qf_Widget_next-bottom');
 
@@ -1388,6 +1389,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     if ($pcp) {
       // fill in step 9 (Enable Personal Campaign Pages)
+      $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->click('link=Personal Campaigns');
       $this->waitForElementPresent('_qf_Contribute_next-bottom');
       $this->click('pcp_active');
