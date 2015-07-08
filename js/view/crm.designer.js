@@ -535,6 +535,7 @@
       this.$(".crm-designer-fields").sortable({
         placeholder: 'crm-designer-row-placeholder',
         forcePlaceholderSize: true,
+        cancel: 'input,textarea,button,select,option,a,.crm-designer-open',
         receive: function(event, ui) {
           var paletteFieldModel = ufFieldCanvasView.model.getRel('paletteFieldCollection').get(ui.item.attr('data-plm-cid'));
           var ufFieldModel = paletteFieldModel.addToUFCollection(
