@@ -106,6 +106,7 @@
     <name>street_number</name>
     <title>Street Number</title>
     <type>int</type>
+    <import>true</import>
     <export>true</export>
     <comment>Numeric portion of address number on the street, e.g. For 112A Main St, the street_number = 112.</comment>
     <add>1.1</add>
@@ -142,6 +143,7 @@
     <type>varchar</type>
     <title>Street Name</title>
     <length>64</length>
+    <import>true</import>
     <export>true</export>
     <comment>Actual street name, excluding St, Dr, Rd, Ave, e.g. For 112 Main St, the street_name = Main.</comment>
     <add>1.1</add>
@@ -181,6 +183,7 @@
     <title>Street Unit</title>
     <type>varchar</type>
     <length>16</length>
+    <import>true</import>
     <export>true</export>
     <comment>Secondary unit designator, e.g. Apt 3 or Unit # 14, or Bldg 1200</comment>
     <add>1.1</add>
