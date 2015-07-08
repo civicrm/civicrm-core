@@ -105,7 +105,9 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
    * Ajax callback to display code docs
    */
   public static function getDoc() {
-    if (!empty($_GET['entity']) && strpos($_GET['entity'], '.') === FALSE) {
+    // Verify the API handler we're talking to is valid.
+    $entities = civicrm_api3('Entity', 'get');
+    if (!empty($_GET['entity']) && in_array($_GET['entity'], $entities['values']) && strpos($_GET['entity'], '.') === FALSE) {
       $entity = _civicrm_api_get_camel_name($_GET['entity']);
       $action = CRM_Utils_Array::value('action', $_GET);
       $doc = self::getDocblock($entity, $action);
