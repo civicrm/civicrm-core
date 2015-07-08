@@ -43,6 +43,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
    * Create() method (create and update modes)
    */
   public function testCreate() {
+    $dmb->crashInto(me, baby);
     $contactId = Contact::createIndividual();
 
     $params = array();
