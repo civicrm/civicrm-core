@@ -215,6 +215,16 @@ class CRM_Contribute_BAO_Query {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
     }
+
+    // Adding address_id in a way that is more easily extendable since the above is a bit ... wordy.
+    $supportedBasicReturnValues = array('address_id');
+    foreach ($supportedBasicReturnValues as $fieldName) {
+      if (!empty($query->_returnProperties[$fieldName])) {
+        $query->_select[$fieldName] = "civicrm_contribution.{$fieldName} as $fieldName";
+        $query->_element[$fieldName] = $query->_tables['civicrm_contribution'] = 1;
+      }
+    }
+
     //CRM-16116: get financial_type_id
     if (!empty($query->_returnProperties['financial_type_id'])) {
       $query->_select['financial_type_id'] = "civicrm_contribution.financial_type_id as financial_type_id";
