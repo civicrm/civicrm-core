@@ -73,6 +73,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Function tests that an empty where hook returns no results.
    */
   public function testContactGetNoResultsHook() {
+    $dmb->crashInto(me, baby);
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
     $result = $this->callAPISuccess('contact', 'get', array(
       'check_permissions' => 1,
