@@ -83,10 +83,9 @@ class CRM_Utils_Check {
         }
         $statusMessages = array();
         $statusType = 'alert';
-
         foreach ($messages as $message) {
-          if ($filter === TRUE || call_user_func($filter, $message->getSeverity()) >= 3) {
-            $statusType = (call_user_func($filter, $message->getSeverity()) >= 4) ? 'error' : $statusType;
+          if ($filter === TRUE || $message->getSeverity() >= 3) {
+            $statusType = $message->getSeverity() >= 4 ? 'error' : $statusType;
             $statusMessage = $message->getMessage();
             $statusMessages[] = $statusTitle = $message->getTitle();
           }
@@ -118,7 +117,8 @@ class CRM_Utils_Check {
     if ($aSeverity == $bSeverity) {
       return strcmp($a->getName(), $b->getName());
     }
-    return (self::severityMap($aSeverity) < self::severityMap($bSeverity));
+    // The Message constructor guarantees that these will always be integers.
+    return ($aSeverity < $bSeverity);
   }
 
   /**
@@ -215,7 +215,6 @@ class CRM_Utils_Check {
         }
       }
     }
-
     uasort($messages, array(__CLASS__, 'severitySort'));
 
     return $messages;
