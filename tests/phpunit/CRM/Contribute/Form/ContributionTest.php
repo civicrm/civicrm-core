@@ -133,7 +133,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(array('civicrm_note', 'civicrm_uf_match'));
+    $this->quickCleanup(array('civicrm_note', 'civicrm_uf_match', 'civicrm_address'));
   }
 
   /**
@@ -202,7 +202,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
         'credit_card_number' => '411111111111111',
       ), CRM_Core_Action::ADD,
-        'live');
+        'live'
+      );
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       $this->callAPISuccessGetCount('Contribution', array(
@@ -223,6 +224,62 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       return;
     }
     $this->fail('An expected exception has not been raised.');
+  }
+
+  /**
+   * Test the submit function creates a billing address if provided.
+   */
+  public function testSubmitCreditCardWithBillingAddress() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'payment_processor_id' => $this->paymentProcessor->id,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
+      'credit_card_number' => '411111111111111',
+      'billing_city-5' => 'Vancouver',
+    ), CRM_Core_Action::ADD,
+      'live'
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'address_id'));
+    $this->assertNotEmpty($contribution['address_id']);
+    $this->callAPISuccessGetSingle('Address', array(
+      'city' => 'Vancouver',
+      'location_type_id' => 5,
+      'id' => $contribution['address_id'],
+    ));
+
+  }
+
+  /**
+   * Test the submit function does not create a billing address if no details provided.
+   */
+  public function testSubmitCreditCardWithNoBillingAddress() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'payment_processor_id' => $this->paymentProcessor->id,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
+      'credit_card_number' => '411111111111111',
+    ), CRM_Core_Action::ADD,
+      'live'
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'address_id'));
+    $this->assertEmpty($contribution['address_id']);
+    $this->callAPISuccessGetCount('Address', array(
+      'city' => 'Vancouver',
+      'location_type_id' => 5,
+    ), 0);
+
   }
 
   /**
