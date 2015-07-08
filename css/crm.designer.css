@@ -57,10 +57,6 @@
   cursor: move;
 }
 
-.crm-designer-palette .crm-designer-palette-field.disabled a {
-  cursor: default;
-}
-
 .crm-designer-palette .crm-designer-palette-field:hover,
 .crm-designer-fields-region .crm-designer-row:hover,
 .crm-designer-open .crm-designer-row,
@@ -68,6 +64,11 @@
   border: 1px dashed gray;
   cursor: move;
   background-color: #E9E9F5;
+}
+
+.crm-designer-palette .crm-designer-palette-field.disabled a,
+.crm-designer-open .crm-designer-row:hover {
+  cursor: default;
 }
 
 .crm-container .crm-designer-palette .crm-designer-palette-tree a {
