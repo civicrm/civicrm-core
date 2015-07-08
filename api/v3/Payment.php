@@ -137,9 +137,6 @@ function civicrm_api3_payment_cancel(&$params) {
  *   Api result array
  */
 function civicrm_api3_payment_create(&$params) {
-  $values = array();
-  _civicrm_api3_custom_format_params($params, $values, 'Contribution');
-  $params = array_merge($params, $values);
   if (empty($params['contribution_id']) || 
       (isset($params['contribution_id']) && !CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'id'))) {
     return civicrm_api3_create_error(ts('You need to supply a valid contribution ID to create a payment'));
@@ -157,10 +154,10 @@ function civicrm_api3_payment_create(&$params) {
   // Get contribution
   $contribution = civicrm_api3('Contribution', 'get', array('id' => $params['contribution_id']));
   $contribution = reset($contribution['values']);
-  if ($contribution['contribution_status'] == 'Completed') {
-    return civicrm_api3_create_error(ts('Please select a contribution which has a pending payment'));
+  if ($contribution['contribution_status'] != 'Partially paid') {
+    return civicrm_api3_create_error(ts('Please select a contribution which has a partial payment'));
   }
-  if ($contribution['contribution_status'] == 'Partially paid') {
+  else {
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
     $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
     $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
@@ -198,7 +195,6 @@ function civicrm_api3_payment_create(&$params) {
         civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
       }
     }
-    unset($params['line_item']);
   }
   elseif (!empty($trxn)) {
     // Assign the lineitems proportionally
