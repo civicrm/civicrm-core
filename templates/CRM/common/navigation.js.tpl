@@ -99,7 +99,8 @@ $('#civicrm-menu').ready(function() {
           params = {
             name: request.term,
             field_name: option.val(),
-            table_name: option.attr("data-tablename")
+            table_name: option.attr("data-tablename"),
+            limit: CRM.config.searchAutocompleteCount
           };
         CRM.api3('contact', 'getquick', params).done(function(result) {
           var ret = [];

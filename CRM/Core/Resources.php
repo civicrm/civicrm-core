@@ -605,6 +605,7 @@ class CRM_Core_Resources {
       $settings = array(
         'config' => array(
           'isFrontend' => $config->userFrameworkFrontend,
+          'searchAutocompleteCount' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10),
         ),
       );
       // Disable profile creation if user lacks permission
