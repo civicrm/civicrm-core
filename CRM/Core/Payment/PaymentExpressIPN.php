@@ -278,10 +278,11 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     if ($dps_method == "pxpay") {
+      $result = CRM_Utils_Request::retrieve('result', 'String', NULL, FALSE, NULL, 'GET');
       $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml(array(
         'PxPayUserId' => $dps_user,
         'PxPayKey' => $dps_key,
-        'Response' => $_GET['result'],
+        'Response' => $result,
       ));
       $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml('ProcessResponse', $processResponse);
 
