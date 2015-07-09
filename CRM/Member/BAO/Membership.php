@@ -1308,7 +1308,9 @@ AND civicrm_membership.is_test = %2";
     }
 
     if ($form->_contributeMode == 'direct') {
-      if (CRM_Utils_Array::value('contribution_status_id', $paymentResult) == 1) {
+      if (CRM_Utils_Array::value('payment_status_id', $paymentResult) == 1) {
+      // Refer to CRM-16737. Payment processors 'should' return payment_status_id
+      // to denote the outcome of the transaction.
         try {
           civicrm_api3('contribution', 'completetransaction', array(
             'id' => $paymentResult['contribution']->id,
@@ -1322,6 +1324,8 @@ AND civicrm_membership.is_test = %2";
           CRM_Core_Error::debug_log_message('contribution ' . $membershipContribution->id . ' not completed with trxn_id ' . $membershipContribution->trxn_id . ' and message ' . $e->getMessage());
         }
       }
+      // Do not send an email if Recurring transaction is done via Direct Mode
+      // Email will we sent when the IPN is received.
       return;
     }
 

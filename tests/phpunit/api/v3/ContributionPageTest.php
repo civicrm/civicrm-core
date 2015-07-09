@@ -305,7 +305,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_first_success'));
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -316,7 +316,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
       'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor_id' => 1,
+      'payment_processor' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
@@ -341,7 +341,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
     //renew it with processor setting completed - should extend membership
     $submitParams['contact_id'] = $contribution['contact_id'];
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_second_success'));
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_second_success'));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $this->callAPISuccess('contribution', 'getsingle', array(
       'id' => array('NOT IN' => array($contribution['id'])),
@@ -367,7 +367,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2));
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -378,7 +378,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
       'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor_id' => 1,
+      'payment_processor' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
@@ -413,7 +413,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'frequency_unit' => 'month',
       )
     );
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2));
+    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $newContribution = $this->callAPISuccess('contribution', 'getsingle', array(
         'id' => array(
