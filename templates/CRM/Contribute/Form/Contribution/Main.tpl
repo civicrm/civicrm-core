@@ -99,6 +99,13 @@
 
   {capture assign='reqMark'}<span class="marker" title="{ts}This field is required.{/ts}">*</span>{/capture}
   <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
+
+  {if $contact_id}
+    <div class="messages status no-popup crm-not-you-message">
+      {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
+    </div>
+  {/if}
+
   <div id="intro_text" class="crm-section intro_text-section">
     {$intro_text}
   </div>
