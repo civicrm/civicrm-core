@@ -35,6 +35,8 @@
 class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   public $_permissionedComponent;
 
   function __construct(&$formValues) {
@@ -150,9 +152,10 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT implements CRM_Contact_Form_Se
 
     }
 
+    $this->buildAclClause('contact');
     $sql = "
 SELECT     $select
-FROM       civicrm_contact AS contact
+FROM       civicrm_contact AS contact {$this->_aclFrom}
 LEFT JOIN  civicrm_contribution contrib_1 ON contrib_1.contact_id = contact.id
            $from
 WHERE      contrib_1.contact_id = contact.id
@@ -292,7 +295,9 @@ AND      c.receive_date < {$this->start_date_1}
 
       $clauses[] = " xg.contact_id IS NULL ";
     }
-
+    if ($this->_aclWhere) {
+      $clauses[] = "{$this->_aclWhere}";
+    }
     return implode(' AND ', $clauses);
   }
 
@@ -331,5 +336,12 @@ AND      c.receive_date < {$this->start_date_1}
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildAclClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

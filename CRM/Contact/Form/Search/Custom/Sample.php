@@ -33,6 +33,8 @@
  *
  */
 class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -106,14 +108,16 @@ state_province.name    as state_province
   }
 
   function from() {
-    return "
+    $this->buildACLClause('contact_a');
+    $from = "
 FROM      civicrm_contact contact_a
 LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
                                        address.is_primary       = 1 )
 LEFT JOIN civicrm_email           ON ( civicrm_email.contact_id = contact_a.id AND
                                        civicrm_email.is_primary = 1 )
-LEFT JOIN civicrm_state_province state_province ON state_province.id = address.state_province_id
+LEFT JOIN civicrm_state_province state_province ON state_province.id = address.state_province_id {$this->_aclFrom}
 ";
+    return $from;
   }
 
   function where($includeContactIDs = FALSE) {
@@ -148,6 +152,10 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
       $clause[] = "state_province.id = %{$count}";
     }
 
+    if ($this->_aclWhere) {
+      $clause[] = " {$this->_aclWhere} ";
+    }
+
     if (!empty($clause)) {
       $where .= ' AND ' . implode(' AND ', $clause);
     }
@@ -177,5 +185,12 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildAclClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}
