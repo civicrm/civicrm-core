@@ -163,7 +163,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $recur->cancel_date = $now;
       $recur->save();
 
-      CRM_Core_Error::debug_log_message("Subscription payment failed - '{$input['response_reason_text']}'");
+      $message = ts("Subscription payment failed - %1", array(1 => htmlspecialchars($input['response_reason_text'])));
+      CRM_Core_Error::debug_log_message($message);
 
       // the recurring contribution has declined a payment or has failed
       // so we just fix the recurring contribution and not change any of
@@ -175,7 +176,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     // check if contribution is already completed, if so we ignore this ipn
     if ($objects['contribution']->contribution_status_id == 1) {
       $transaction->commit();
-      CRM_Core_Error::debug_log_message("returning since contribution has already been handled");
+      CRM_Core_Error::debug_log_message("Returning since contribution has already been handled.");
       echo "Success: Contribution has already been handled<p>";
       return TRUE;
     }
@@ -252,15 +253,15 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
     $contRecur = CRM_Core_DAO::executeQuery($sql);
     $contRecur->fetch();
     $ids['contributionRecur'] = $contRecur->id;
-    if($ids['contact'] != $contRecur->contact_id){
-      CRM_Core_Error::debug_log_message("Recurring contribution appears to have been re-assigned from id {$ids['contact']} to {$contRecur->contact_id}
-        Continuing with {$contRecur->contact_id}
-      ");
+    if ($ids['contact'] != $contRecur->contact_id) {
+      $message = ts("Recurring contribution appears to have been re-assigned from id %1 to %2, continuing with %2.", array(1 => $ids['contact'], 2 => $contRecur->contact_id));
+      CRM_Core_Error::debug_log_message($message);
       $ids['contact'] = $contRecur->contact_id;
     }
     if (!$ids['contributionRecur']) {
-      CRM_Core_Error::debug_log_message("Could not find contributionRecur id: ".print_r($input, TRUE));
-      echo "Failure: Could not find contributionRecur<p>";
+      $message = ts("Could not find contributionRecur id: %1", array(1 => htmlspecialchars(print_r($input, TRUE))));
+      CRM_Core_Error::debug_log_message($message);
+      echo "Failure: $message<p>";
       exit();
     }
 
@@ -320,4 +321,3 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     return TRUE;
   }
 }
-
