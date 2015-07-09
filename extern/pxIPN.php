@@ -31,7 +31,8 @@ LEFT JOIN civicrm_payment_processor_type ON civicrm_payment_processor_type.id = 
 WHERE     civicrm_payment_processor_type.name = 'Payment_Express'
 AND       user_name = %1
 ";
-$params = array(1 => array($_GET['userid'], 'String'));
+$userid = CRM_Utils_Request::retrieve('userid', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
+$params = array(1 => array($userid, 'String'));
 
 $dpsSettings = CRM_Core_DAO::executeQuery($query, $params);
 while ($dpsSettings->fetch()) {
