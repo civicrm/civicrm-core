@@ -1025,7 +1025,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function processCreditCard($submittedValues, $lineItem, $contactID) {
-    $contribution = FALSE;
 
     $isTest = ($this->_mode == 'test') ? 1 : 0;
     // CRM-12680 set $_lineItem if its not set
@@ -1226,12 +1225,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
          *     with a delayed start)
          *  3) the payment succeeded with an immediate payment.
          *
-         * The doPayment function ensures that contribution_status_id is always set
+         * The doPayment function ensures that payment_status_id is always set
          * as historically we have had to guess from the context - ie doDirectPayment
          * = error or success, unless it is a recurring contribution in which case it is pending.
          */
-        if (!isset($result['contribution_status_id']) || $result['contribution_status_id'] ==
-          array_search('Completed', $statuses)) {
+        if ($result['payment_status_id'] == array_search('Completed', $statuses)) {
           civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id, 'trxn_id' => $result['trxn_id']));
         }
         else {

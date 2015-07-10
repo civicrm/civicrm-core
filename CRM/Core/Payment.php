@@ -651,19 +651,19 @@ abstract class CRM_Core_Payment {
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
-      if (is_array($result) && !isset($result['contribution_status_id'])) {
-        $result['contribution_status_id'] = array_search('Pending', $statuses);
+      if (is_array($result) && !isset($result['payment_status_id'])) {
+        $result['payment_status_id'] = array_search('Pending', $statuses);
       }
     }
     else {
       $result = $this->doDirectPayment($params, $component);
-      if (is_array($result) && !isset($result['contribution_status_id'])) {
+      if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
           // See comment block.
-          $paymentParams['contribution_status_id'] = array_search('Pending', $statuses);
+          $paymentParams['payment_status_id'] = array_search('Pending', $statuses);
         }
         else {
-          $result['contribution_status_id'] = array_search('Completed', $statuses);
+          $result['payment_status_id'] = array_search('Completed', $statuses);
         }
       }
     }
