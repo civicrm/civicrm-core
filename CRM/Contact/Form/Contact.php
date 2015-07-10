@@ -861,6 +861,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
     $this->assign('oldSubtypes', json_encode($this->_oldSubtypes));
 
+    // Add an element to distinguish the full contact edit form
+    $this->addElement('hidden', 'isFullContactEdit', TRUE);
+
     $this->addButtons($buttons);
   }
 
