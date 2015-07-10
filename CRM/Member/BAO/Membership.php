@@ -1999,88 +1999,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * Where a second separate financial transaction is supported we will process it here.
-   *
-   * @param int $contactID
-   * @param CRM_Contribute_Form_Contribution_Confirm $form
-   * @param array $tempParams
-   * @param bool $isTest
-   * @param array $lineItems
-   * @param $minimumFee
-   * @param int $financialTypeID
-   *
-   * @throws CRM_Core_Exception
-   * @throws Exception
-   * @return CRM_Contribute_BAO_Contribution
-   */
-  public static function processSecondaryFinancialTransaction($contactID, &$form, $tempParams, $isTest, $lineItems, $minimumFee, $financialTypeID) {
-    $financialType = new CRM_Financial_DAO_FinancialType();
-    $financialType->id = $financialTypeID;
-    $financialType->find(TRUE);
-    $tempParams['amount'] = $minimumFee;
-    $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
-
-    $result = NULL;
-    if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
-      $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
-
-      if ($form->_contributeMode == 'express') {
-        $result = $payment->doExpressCheckout($tempParams);
-        if (is_a($result, 'CRM_Core_Error')) {
-          throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
-        }
-      }
-      else {
-        $result = $payment->doPayment($tempParams, 'contribute');
-      }
-    }
-
-    //assign receive date when separate membership payment
-    //and contribution amount not selected.
-    if ($form->_amount == 0) {
-      $now = date('YmdHis');
-      $form->_params['receive_date'] = $now;
-      $receiveDate = CRM_Utils_Date::mysqlToIso($now);
-      $form->set('params', $form->_params);
-      $form->assign('receive_date', $receiveDate);
-    }
-
-    $form->set('membership_trx_id', $result['trxn_id']);
-    $form->set('membership_amount', $minimumFee);
-
-    $form->assign('membership_trx_id', $result['trxn_id']);
-    $form->assign('membership_amount', $minimumFee);
-
-    // we don't need to create the user twice, so lets disable cms_create_account
-    // irrespective of the value, CRM-2888
-    $tempParams['cms_create_account'] = 0;
-
-    //CRM-16165, scenarios are
-    // 1) If contribution is_pay_later and if contribution amount is > 0.0 we set pending = TRUE, vice-versa FALSE
-    // 2) If not pay later but auto-renewal membership is chosen then pending = TRUE as it later triggers
-    //   pending recurring contribution, vice-versa FALSE
-    $pending = $form->_params['is_pay_later'] ? (($minimumFee > 0.0) ? TRUE : FALSE) : (!empty($form->_params['auto_renew']) ? TRUE : FALSE);
-
-    //set this variable as we are not creating pledge for
-    //separate membership payment contribution.
-    //so for differentiating membership contribution from
-    //main contribution.
-    $form->_params['separate_membership_payment'] = 1;
-    $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
-      $tempParams,
-      $result,
-      $contactID,
-      $financialType,
-      $pending,
-      TRUE,
-      $isTest,
-      $lineItems,
-      $form->_bltID
-    );
-    return $membershipContribution;
-  }
-
-  /**
    * Create linkages between membership & contribution - note this is the wrong place for this code but this is a
    * refactoring step. This should be BAO functionality
    * @param $membership
@@ -2091,22 +2009,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       'membership_id' => $membership->id,
       'contribution_id' => $membershipContribution->id,
     ));
-  }
-
-  /**
-   * Turn array of errors into message string.
-   *
-   * @param array $errors
-   *
-   * @return string
-   */
-  public static function compileErrorMessage($errors) {
-    foreach ($errors as $error) {
-      if (is_string($error)) {
-        $message[] = $error;
-      }
-    }
-    return ts('Payment Processor Error message') . ': ' . implode('<br/>', $message);
   }
 
   /**
