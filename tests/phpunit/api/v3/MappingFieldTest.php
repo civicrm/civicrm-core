@@ -48,9 +48,9 @@ class api_v3_MappingFieldTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
 
     $this->_entity = 'mapping_field';
-    $this->_mappingID = $this->mappingCreate();
+    $mappingID = $this->mappingCreate();
     $this->params = array(
-      'mapping_id' => $this->_mappingID,
+      'mapping_id' => $mappingID->id,
       'name' => 'last_name',
       'contact_type' => 'Individual',
       'column_number' => 2,
