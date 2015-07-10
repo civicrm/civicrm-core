@@ -24,10 +24,11 @@ and WordPress content management systems.
 *************************
 2. Installation
 *************************
-The download URLs and installation instructions are available on our
-website:
-
+Links to download the full CiviCRM package are on our website:
 http://civicrm.org/go/download
+
+Installation instruction can be found on the wiki:
+http://wiki.civicrm.org/
 
 
 *************************
@@ -36,14 +37,17 @@ http://civicrm.org/go/download
 Documentation, as well as the project bug tracker and mailing lists,
 can be found at http://civicrm.org/ Just click on the appropriate link.
 
-Our main documentation site is the wiki at http://wiki.civicrm.org/
-- particularly http://docs.civicrm.org/
+Our main documentation site is the CiviCRM wiki:
+http://wiki.civicrm.org/
 
 
 *************************
 4. Support
 *************************
-All support is on the CiviCRM forums:
+The best place to get support is from the CiviCRM Stack Exchange site:
+http://civicrm.stackexchange.com/
+
+There is also a forum, for more in-depth discussions:
 http://forum.civicrm.org/
 
 
