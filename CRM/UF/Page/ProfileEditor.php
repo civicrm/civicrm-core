@@ -102,10 +102,10 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
     $entityTypes = array_unique($entityTypes);
     $availableFields = NULL;
+    $civiSchema = array();
     foreach ($entityTypes as $entityType) {
       if (!$availableFields) {
         $availableFields = CRM_Core_BAO_UFField::getAvailableFieldsFlat();
-        //dpm($availableFields);
       }
       switch ($entityType) {
         case 'IndividualModel':
@@ -174,6 +174,26 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
         default:
           throw new CRM_Core_Exception("Unrecognized entity type: $entityType");
+      }
+    }
+
+    // Adding the oddball "formatting" field here because there's no other place to put it
+    foreach (array('Individual', 'Organization', 'Household') as $type) {
+      if (isset($civiSchema[$type . 'Model'])) {
+        $civiSchema[$type . 'Model']['schema'] += array(
+          'formatting' => array(
+            'type' => 'Markup',
+            'title' => ts('Free HTML'),
+            'civiFieldType' => 'Formatting',
+            'section' => 'formatting',
+          ),
+        );
+        $civiSchema[$type . 'Model']['sections'] += array(
+          'formatting' => array(
+            'title' => ts('Formatting'),
+            'is_addable' => FALSE,
+          ),
+        );
       }
     }
 

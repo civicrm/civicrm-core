@@ -274,7 +274,7 @@ contact_a.sort_name    as sort_name,
       $clause[] = "cgc.group_id = {$this->_group}";
     }
     if ($this->_aclWhere) {
-      $clause[] = " {$this->_aclWhere} AND contact_a.is_deleted = 0";
+      $clause[] = " {$this->_aclWhere}";
     }
 
     $where = '( 1 )';
