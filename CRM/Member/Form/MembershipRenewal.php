@@ -560,7 +560,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $formValues['total_amount'];
       $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
-      $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+      $paymentParams['invoiceID'] = $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
 
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the passed params
@@ -576,6 +576,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
 
+      if (!empty($paymentParams['auto_renew'])) {
+        $contributionRecurParams = $this->processRecurringContribution($paymentParams);
+        $paymentParams = array_merge($paymentParams, $contributionRecurParams);
+      }
       $result = $payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {

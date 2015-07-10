@@ -535,6 +535,7 @@
       this.$(".crm-designer-fields").sortable({
         placeholder: 'crm-designer-row-placeholder',
         forcePlaceholderSize: true,
+        cancel: 'input,textarea,button,select,option,a,.crm-designer-open',
         receive: function(event, ui) {
           var paletteFieldModel = ufFieldCanvasView.model.getRel('paletteFieldCollection').get(ui.item.attr('data-plm-cid'));
           var ufFieldModel = paletteFieldModel.addToUFCollection(
@@ -760,6 +761,9 @@
       if (!this.options.fieldSchema.civiIsMultiple) {
         fields = _.without(fields, 'is_multi_summary');
       }
+      if (this.options.fieldSchema.type == 'Markup') {
+        fields = _.without(fields, 'is_required', 'is_view', 'visibility', 'in_selector', 'is_searchable', 'help_post');
+      }
 
       this.form = new Backbone.Form({
         model: this.model,
@@ -784,7 +788,9 @@
 
       if (!this.model.isInSelectorAllowed() && this.model.get('in_selector') != "0") {
         this.model.set('in_selector', "0");
-        this.form.setValue('in_selector', "0");
+        if (this.form.fields.in_selector) {
+          this.form.setValue('in_selector', "0");
+        }
         // TODO: It might be nicer if we didn't completely discard in_selector -- e.g.
         // if the value could be restored when the user isInSelectorAllowed becomes true
         // again. However, I haven't found a simple way to do this.
