@@ -654,7 +654,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     if ($args) {
       // append destination so user is returned to form they came from after login
       $args = 'reset=1' . $args;
-      $destination = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $args, TRUE, NULL, TRUE, TRUE);
+      $destination = CRM_Utils_System::url(CRM_Utils_System::currentPath(), $args, TRUE, NULL, FALSE, TRUE);
     }
 
     return $destination;
