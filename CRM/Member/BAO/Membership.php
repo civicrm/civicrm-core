@@ -1307,15 +1307,10 @@ AND civicrm_membership.is_test = %2";
       $form->_values['contribution_id'] = $membershipContributionID;
     }
 
-    // Refer to CRM-16737. Payment processors 'should' return payment_status_id
-    // to denote the outcome of the transaction.
-    //
-    // In 4.7 trxn_id will no longer denote the outcome & all processor transactions must return an array
-    // containing payment_status_id.
-    // In 4.6 support (such as there was) for other ways of denoting payment outcome is retained but the use
-    // of payment_status_id is strongly encouraged.
-    if (!empty($form->_params['is_recur']) && $form->_contributeMode == 'direct') {
-      if (!isset($membershipContribution->payment_status_id) && $membershipContribution->payment_status_id == 1) {
+    if ($form->_contributeMode == 'direct') {
+      if (CRM_Utils_Array::value('payment_status_id', $paymentResult) == 1) {
+        // Refer to CRM-16737. Payment processors 'should' return payment_status_id
+        // to denote the outcome of the transaction.
         try {
           civicrm_api3('contribution', 'completetransaction', array(
             'id' => $paymentResult['contribution']->id,
