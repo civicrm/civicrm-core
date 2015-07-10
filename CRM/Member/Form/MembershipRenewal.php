@@ -582,7 +582,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->_params['amount'] = $formValues['total_amount'];
       $this->_params['currencyID'] = $config->defaultCurrency;
       $this->_params['payment_action'] = 'Sale';
-      $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+      $paymentParams['invoiceID'] = $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
 
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the passed params
@@ -598,6 +598,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
 
+      if (!empty($paymentParams['auto_renew'])) {
+        $contributionRecurParams = $this->processRecurringContribution($paymentParams);
+        $paymentParams = array_merge($paymentParams, $contributionRecurParams);
+      }
       $result = &$payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {
