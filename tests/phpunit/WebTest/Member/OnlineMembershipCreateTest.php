@@ -148,7 +148,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     // Click View action link on associated contribution record
     $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[1][text()='View']");
     $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[1][text()='View']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     //View Contribution Record
     $verifyData = array(
       'From' => $firstName . ' ' . $lastName,
