@@ -722,8 +722,11 @@ function civicrm_api3_contact_getquick($params) {
     $selectAliases = ", $selectAliases";
   }
   $from = implode(' ', $from);
+
+  // Number of results to return
+  $default_limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
   $limit = (int) CRM_Utils_Array::value('limit', $params);
-  $limit = $limit > 0 ? $limit : 10;
+  $limit = $limit > 0 ? $limit : $default_limit;
 
   // add acl clause here
   list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
