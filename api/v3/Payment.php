@@ -75,16 +75,11 @@ function civicrm_api3_payment_get($params) {
  *   Api result array
  */
 function civicrm_api3_payment_delete(&$params) {
-  if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
-    return civicrm_api3_create_error(ts('You need to supply a Payment ID to delete a payment'));
+  $params['id'] = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
+  if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $params['id'], 'id')) {
+    return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to delete a payment'));
   }
-  else {
-    $params['id'] = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
-    if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $params['id'], 'id')) {
-      return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to delete a payment'));
-    }
-    return civicrm_api3('FinancialTrxn', 'delete', $params);
-  }
+  return civicrm_api3('FinancialTrxn', 'delete', $params);
 }
 
 /**
@@ -98,9 +93,6 @@ function civicrm_api3_payment_delete(&$params) {
  *   Api result array
  */
 function civicrm_api3_payment_cancel(&$params) {
-  if (!isset($params['civicrm_financial_trxn_id']) && !isset($params['payment_id'])) {
-    return civicrm_api3_create_error(ts('You need to supply a Payment ID to refund a payment'));
-  }
   $ftId = isset($params['civicrm_financial_trxn_id']) ? $params['civicrm_financial_trxn_id'] : $params['payment_id'];
   if (!CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $ftId, 'id')) {
     return civicrm_api3_create_error(ts('You need to supply a valid Payment ID to refund a payment'));
@@ -198,31 +190,7 @@ function civicrm_api3_payment_create(&$params) {
   }
   elseif (!empty($trxn)) {
     // Assign the lineitems proportionally
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
-    if (!empty($lineItems)) {
-      // get financial item
-      $sql = "SELECT fi.id, li.price_field_value_id
-      FROM civicrm_financial_item fi
-      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
-      WHERE li.contribution_id = %1";
-      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['contribution_id'], 'Integer')));
-      while ($dao->fetch()) {
-        $ftIds[$dao->price_field_value_id] = $dao->id;
-      }
-      foreach ($lineItems as $key => $value) {
-        $paid = $value['line_total'] * ($params['total_amount']/$contribution['total_amount']);
-        // Record Entity Financial Trxn
-        $eftParams = array(
-          'entity_table' => 'civicrm_financial_item',
-          'financial_trxn_id' => $trxn->id,
-          'amount' => $paid,
-          'entity_id' => $ftIds[$value['price_field_value_id']],
-        );
-        $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
-        $entityTrxn->copyValues($eftParams);
-        $entityTrxn->save();
-      }
-    }
+    CRM_Contribution_BAO_Contribution::assignProportionalLineItems($params, $trxn);
   }
   $values = array(); 
   if (is_a($trxn, 'CRM_Core_Error')) {

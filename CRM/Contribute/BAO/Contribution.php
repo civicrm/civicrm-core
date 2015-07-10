@@ -3969,4 +3969,32 @@ WHERE con.id = {$contributionId}
       }
     }
   }
+
+  public static function assignProportionalLineItems($params, $trxn) {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
+    if (!empty($lineItems)) {
+      // get financial item
+      $sql = "SELECT fi.id, li.price_field_value_id
+      FROM civicrm_financial_item fi
+      INNER JOIN civicrm_line_item li ON li.id = fi.entity_id
+      WHERE li.contribution_id = %1";
+      $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($params['contribution_id'], 'Integer')));
+      while ($dao->fetch()) {
+        $ftIds[$dao->price_field_value_id] = $dao->id;
+      }
+      foreach ($lineItems as $key => $value) {
+        $paid = $value['line_total'] * ($params['total_amount']/$contribution['total_amount']);
+        // Record Entity Financial Trxn
+        $eftParams = array(
+          'entity_table' => 'civicrm_financial_item',
+          'financial_trxn_id' => $trxn->id,
+          'amount' => $paid,
+          'entity_id' => $ftIds[$value['price_field_value_id']],
+        );
+        $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
+        $entityTrxn->copyValues($eftParams);
+        $entityTrxn->save();
+      }
+    }
+  }
 }
