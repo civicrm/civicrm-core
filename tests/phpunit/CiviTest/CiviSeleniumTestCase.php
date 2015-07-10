@@ -1357,7 +1357,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
       $this->openCiviPage("admin/contribute", "reset=1");
       $this->waitForAjaxContent();
-      $this->click("xpath=//table['dataTables_wrapper no-footer']/tbody//tr/td[1]/strong[text()='$pageTitle']/../../td[5]/div[1]/span/ul/li[8]/a[text()='Premiums']");
+      $this->click("xpath=//table['dataTables_wrapper no-footer']/tbody//tr/td[1]/strong[text()='$pageTitle']/../../td[4]/div[1]/span/ul/li[8]/a[text()='Premiums']");
       $this->waitForElementPresent('_qf_Premium_cancel-bottom');
       $this->click("xpath=//div[@class='messages status no-popup']/a[text()='add one']");
       $this->waitForElementPresent('_qf_AddProduct_cancel-bottom');
