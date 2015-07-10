@@ -180,7 +180,7 @@ class WebTest_Case_ActivityToCaseTest extends CiviSeleniumTestCase {
     $this->clickAjaxLink('_qf_Activity_upload-bottom');
     $id = $this->urlArg('id');
     $this->waitForText("case_id_$id", $activitySubject);
-    $this->click("xpath=//a[contains(text(),'$activitySubject')]");
+    $this->click("xpath=//table[@id='case_id_{$id}']/tbody//tr/td[2]/div[text()='{$activitySubject}']/../../td[8]/a[text()='View']");
 
     $LinkCaseActivityData = array(
       "Client" => $contact2['first_name'],
