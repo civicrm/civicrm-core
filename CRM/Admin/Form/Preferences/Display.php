@@ -143,6 +143,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $extra = array();
 
     $this->addElement('select', 'editor_id', ts('WYSIWYG Editor'), $wysiwyg_options, $extra);
+    $this->addElement('submit', 'ckeditor_config', ts('Configure CKEditor'));
 
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');
     $this->assign('editOptions', $editOptions);
@@ -188,6 +189,15 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $this->_config->editor_id = $this->_params['editor_id'];
 
     $this->postProcessCommon();
+
+    // If "Configure CKEditor" button was clicked
+    if (!empty($this->_params['ckeditor_config'])) {
+      // Suppress the "Saved" status message and redirect to the CKEditor Config page
+      $session = CRM_Core_Session::singleton();
+      $session->getStatus(TRUE);
+      $url = CRM_Utils_System::url('civicrm/admin/ckeditor', 'reset=1');
+      $session->pushUserContext($url);
+    }
   }
 
 }

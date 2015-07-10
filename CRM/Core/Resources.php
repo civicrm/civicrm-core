@@ -582,14 +582,17 @@ class CRM_Core_Resources {
 
       // Add resources from coreResourceList
       $jsWeight = -9999;
-      foreach ($this->coreResourceList() as $file) {
-        if (substr($file, -2) == 'js') {
+      foreach ($this->coreResourceList() as $item) {
+        if (is_array($item)) {
+          $this->addSetting($item);
+        }
+        elseif (substr($item, -2) == 'js') {
           // Don't bother  looking for ts() calls in packages, there aren't any
-          $translate = (substr($file, 0, 3) == 'js/');
-          $this->addScriptFile('civicrm', $file, $jsWeight++, $region, $translate);
+          $translate = (substr($item, 0, 3) == 'js/');
+          $this->addScriptFile('civicrm', $item, $jsWeight++, $region, $translate);
         }
         else {
-          $this->addStyleFile('civicrm', $file, -100, $region);
+          $this->addStyleFile('civicrm', $item, -100, $region);
         }
       }
 
@@ -717,6 +720,10 @@ class CRM_Core_Resources {
     if ($editor == "CKEditor") {
       $items[] = "bower_components/ckeditor/ckeditor.js";
       $items[] = "js/wysiwyg/crm.ckeditor.js";
+      $ckConfig = CRM_Admin_Page_CKEditorConfig::getConfigUrl();
+      if ($ckConfig) {
+        $items[] = array('config' => array('CKEditorCustomConfig' => $ckConfig));
+      }
     }
 
     // These scripts are only needed by back-office users
