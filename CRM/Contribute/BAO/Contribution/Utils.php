@@ -284,8 +284,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
 
       $form->postProcessPremium($premiumParams, $contribution);
-      if (is_array($result) && !empty($result['trxn_id'])) {
-        $contribution->trxn_id = $result['trxn_id'];
+      if (is_array($result)) {
+        if (!empty($result['trxn_id'])) {
+          $contribution->trxn_id = $result['trxn_id'];
+        }
+        if (!empty($result['payment_status_id'])) {
+          $contribution->payment_status_id = $result['payment_status_id'];
+        }
       }
       $result['contribution'] = $contribution;
     }

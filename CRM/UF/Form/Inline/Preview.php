@@ -56,7 +56,13 @@ class CRM_UF_Form_Inline_Preview extends CRM_UF_Form_AbstractPreview {
       CRM_Core_Error::fatal(ts('Preview only supports HTTP POST'));
     }
     // Inline forms don't get menu-level permission checks
-    if (!CRM_Core_Permission::check('administer CiviCRM')) {
+    $checkPermission = array(
+      array(
+        'administer CiviCRM',
+        'manage event profiles',
+      ),
+    );
+    if (!CRM_Core_Permission::check($checkPermission)) {
       CRM_Core_Error::fatal(ts('Permission Denied'));
     }
     $content = json_decode($_REQUEST['ufData'], TRUE);

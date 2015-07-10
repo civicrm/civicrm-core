@@ -1561,6 +1561,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if (isset($result['contribution_status_id'])) {
         $params['contribution_status_id'] = $result['contribution_status_id'];
       }
+      elseif (isset($result['payment_status_id'])) {
+        // CRM-16737 $result['contribution_status_id'] is deprecated in favour
+        // of payment_status_id as the payment processor only knows whether the payment is complete
+        // not whether payment completes the contribution
+        $params['contribution_status_id'] = $params['payment_status_id'];
+      }
       // do what used to happen previously
       else {
         $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
