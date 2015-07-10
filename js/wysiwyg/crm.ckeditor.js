@@ -16,15 +16,17 @@
       browseUrl = CRM.config.userFrameworkResourceURL + "packages/kcfinder/browse.php?cms=civicrm",
       uploadUrl = CRM.config.userFrameworkResourceURL + "packages/kcfinder/upload.php?cms=civicrm";
     if ($(item).length) {
-      editor = CKEDITOR.replace($(item)[0]);
+      editor = CKEDITOR.replace($(item)[0], {
+        filebrowserBrowseUrl: browseUrl + '&type=files',
+        filebrowserImageBrowseUrl: browseUrl + '&type=images',
+        filebrowserFlashBrowseUrl: browseUrl + '&type=flash',
+        filebrowserUploadUrl: uploadUrl + '&type=files',
+        filebrowserImageUploadUrl: uploadUrl + '&type=images',
+        filebrowserFlashUploadUrl: uploadUrl + '&type=flash',
+        customConfig: CRM.config.CKEditorCustomConfig
+      });
     }
     if (editor) {
-      editor.config.filebrowserBrowseUrl = browseUrl + '&type=files';
-      editor.config.filebrowserImageBrowseUrl = browseUrl + '&type=images';
-      editor.config.filebrowserFlashBrowseUrl = browseUrl + '&type=flash';
-      editor.config.filebrowserUploadUrl = uploadUrl + '&type=files';
-      editor.config.filebrowserImageUploadUrl = uploadUrl + '&type=images';
-      editor.config.filebrowserFlashUploadUrl = uploadUrl + '&type=flash';
       editor.on('focus', function() {
         $(item).trigger('focus');
       });
