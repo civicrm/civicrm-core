@@ -200,6 +200,6 @@ SELECT @option_group_id_dash_wt := MAX(weight) FROM civicrm_option_value WHERE o
 SELECT @option_group_id_dash_val := MAX(CAST( `value` AS UNSIGNED )) FROM civicrm_option_value WHERE option_group_id = @option_group_id_dash;
 
 INSERT INTO
-`civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+`civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
-(@option_group_id_dash, {localize}'{ts escape="sql"}Payments{/ts}'{/localize}, @option_group_id_dash_val+1, 'Payments', NULL, NULL, NULL, @option_group_id_dash_wt+1, NULL, 0, 0, 1, NULL, NULL);
+(@option_group_id_dash, {localize}'{ts escape="sql"}Payments{/ts}'{/localize}, @option_group_id_dash_val+1, 'Payments', NULL, NULL, NULL, @option_group_id_dash_wt+1, 0, 0, 1, NULL, NULL);
