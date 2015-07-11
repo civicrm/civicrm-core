@@ -1792,39 +1792,39 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($params['non_deductible_amount'])) {
       return $params['non_deductible_amount'];
     }
-    if (empty($params['non_deductible_amount'])) {
-      $contributionType = new CRM_Financial_DAO_FinancialType();
-      $contributionType->id = $params['financial_type_id'];
 
-      if ($contributionType->is_deductible) {
+    $financialType = new CRM_Financial_DAO_FinancialType();
+    $financialType->id = $params['financial_type_id'];
 
-        if (isset($formValues['product_name'][0])) {
-          $selectProduct = $formValues['product_name'][0];
+    if ($financialType->is_deductible) {
+
+      if (isset($formValues['product_name'][0])) {
+        $selectProduct = $formValues['product_name'][0];
+      }
+      // if there is a product - compare the value to the contribution amount
+      if (isset($selectProduct)) {
+        $productDAO = new CRM_Contribute_DAO_Product();
+        $productDAO->id = $selectProduct;
+        $productDAO->find(TRUE);
+        // product value exceeds contribution amount
+        if ($params['total_amount'] < $productDAO->price) {
+          return $params['total_amount'];
         }
-        // if there is a product - compare the value to the contribution amount
-        if (isset($selectProduct)) {
-          $productDAO = new CRM_Contribute_DAO_Product();
-          $productDAO->id = $selectProduct;
-          $productDAO->find(TRUE);
-          // product value exceeds contribution amount
-          if ($params['total_amount'] < $productDAO->price) {
-            return $params['total_amount'];
-          }
-          // product value does NOT exceed contribution amount
-          else {
-            return $productDAO->price;
-          }
-        }
-        // contribution is deductible - but there is no product
+        // product value does NOT exceed contribution amount
         else {
-          return '0.00';
+          return $productDAO->price;
         }
       }
-      // contribution is NOT deductible
+      // contribution is deductible - but there is no product
       else {
-        return $params['total_amount'];
+        return '0.00';
       }
     }
+    // contribution is NOT deductible
+    else {
+      return $params['total_amount'];
+    }
+
     return 0;
   }
 
