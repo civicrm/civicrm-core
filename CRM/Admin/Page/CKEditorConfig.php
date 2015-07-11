@@ -194,7 +194,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       // FIXME: Basing file path off imageUploadURL sucks, but it's all we got
       $url = CRM_Utils_file::addTrailingSlash(CRM_Core_Config::singleton()->imageUploadURL, '/');
       $url = str_replace('/persist/contribute/', '/persist/', $url);
-      return $url . SELF::CONFIG_FILENAME;
+      return $url . self::CONFIG_FILENAME;
     }
     return NULL;
   }
@@ -210,7 +210,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     $dir = CRM_Core_Config::singleton()->imageUploadDir;
     $dir = CRM_Utils_file::addTrailingSlash(str_replace('\\', '/', $dir), '/');
     $dir = str_replace('/persist/contribute/', '/persist/', $dir);
-    $fileName = $dir . SELF::CONFIG_FILENAME;
+    $fileName = $dir . self::CONFIG_FILENAME;
     return !$checkIfFileExists || is_file($fileName) ? $fileName : NULL;
   }
 
@@ -223,7 +223,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
-   * Delete SELF::CONFIG_FILENAME
+   * Delete self::CONFIG_FILENAME
    */
   public static function deleteConfigFile() {
     $file = self::getConfigFile();
