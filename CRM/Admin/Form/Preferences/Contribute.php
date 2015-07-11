@@ -140,6 +140,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
       $this->assign("{$setting}_description", ts($props['description']));
     }
     $this->add('checkbox', 'invoicing', ts('Enable Tax and Invoicing'));
+    $this->add('checkbox', 'acl_financial_type', ts('Enable Access Control by Financial Type'));
     parent::buildQuickForm();
   }
 
