@@ -32,6 +32,11 @@
             {$form.invoicing.html} {$form.invoicing.label}
           </td>
         </tr>
+        <tr class="crm-preferences-form-block-acl_financial_type">
+          <td>
+            {$form.acl_financial_type.html} {$form.acl_financial_type.label}&nbsp;{help id="acl_financial_type"}
+          </td>
+        </tr>
       </table>
     {/if}
     <table class="form-layout" id="invoicing_blocks">
