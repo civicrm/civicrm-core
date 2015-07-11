@@ -260,6 +260,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     }
 
     $params = &$this->getActiveFieldParams();
+    $params['contact_type'] = 'Contribution';
     $formatted = array('version' => 3);
 
     // don't add to recent items, CRM-4399
