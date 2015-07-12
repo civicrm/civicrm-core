@@ -149,14 +149,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test CRM_Member_Form_Membership::buildQuickForm()
-   */
-  //function testCRMMemberFormMembershipBuildQuickForm()
-  //{
-  //    throw new PHPUnit_Framework_IncompleteTestError( "not implemented" );
-  //}
-
-  /**
    * Test the submit function of the membership form.
    */
   public function testSubmit() {
@@ -174,7 +166,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '1',
       'source' => '',
       'total_amount' => '50.00',
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'soft_credit_type_id' => '',
       'soft_credit_contact_id' => '',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -267,7 +260,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
-    //$this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 1);
+    $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 1);
     $contribution = $this->callAPISuccess('Contribution', 'get', array(
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,

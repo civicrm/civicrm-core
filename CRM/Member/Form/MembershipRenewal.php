@@ -431,8 +431,17 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public function postProcess() {
     // get the submitted form values.
     $this->_params = $formValues = $this->controller->exportValues($this->_name);
+    $this->assignBillingName();
 
-    $statusMsg = $this->submit($formValues);
+    try {
+      $statusMsg = $this->submit($formValues);
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      CRM_Core_Error::displaySessionError($e->getMessage());
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
+        "reset=1&action=renew&cid={$this->_contactID}&id={$this->_id}&context=membership&mode={$this->_mode}"
+      ));
+    }
 
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
   }
@@ -528,8 +537,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $fields["email-{$this->_bltID}"] = 1;
 
-      $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type');
-
       $nameFields = array('first_name', 'middle_name', 'last_name');
 
       foreach ($nameFields as $name) {
@@ -539,11 +546,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           $formValues['preserveDBName'] = TRUE;
         }
       }
-
+dpm($fields);
       //here we are setting up the billing contact - if different from the member they are already created
       // but they will get billing details assigned
       CRM_Contact_BAO_Contact::createProfileContact($formValues, $fields,
-        $this->_contributorContactID, NULL, NULL, $ctype
+        $this->_contributorContactID, NULL, NULL,
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
       );
 
       // add all the additional payment params we need
@@ -574,18 +582,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
 
-      if (!empty($paymentParams['auto_renew'])) {
+      if (!empty($formValues['auto_renew'])) {
         $contributionRecurParams = $this->processRecurringContribution($paymentParams);
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
       }
-      $result = $payment->doDirectPayment($paymentParams);
-
-      if (is_a($result, 'CRM_Core_Error')) {
-        CRM_Core_Error::displaySessionError($result);
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
-          "reset=1&action=renew&cid={$this->_contactID}&id={$this->_id}&context=membership&mode={$this->_mode}"
-        ));
-      }
+      $result = $payment->doPayment($paymentParams);
 
       if ($result) {
         $this->_params = array_merge($this->_params, $result);
@@ -747,19 +748,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       ));
       $this->assign('customValues', $customValues);
       if ($this->_mode) {
-        if (!empty($this->_params['billing_first_name'])) {
-          $name = $this->_params['billing_first_name'];
-        }
-
-        if (!empty($this->_params['billing_middle_name'])) {
-          $name .= " {$this->_params['billing_middle_name']}";
-        }
-
-        if (!empty($this->_params['billing_last_name'])) {
-          $name .= " {$this->_params['billing_last_name']}";
-        }
-        $this->assign('billingName', $name);
-
         // assign the address formatted up for display
         $addressParts = array(
           "street_address-{$this->_bltID}",
@@ -827,6 +815,21 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public function testSubmit($formValues) {
     $this->_memType = $formValues['membership_type_id'][1];
     $this->submit($formValues);
+  }
+
+  protected function assignBillingName() {
+    if (!empty($this->_params['billing_first_name'])) {
+      $name = $this->_params['billing_first_name'];
+    }
+
+    if (!empty($this->_params['billing_middle_name'])) {
+      $name .= " {$this->_params['billing_middle_name']}";
+    }
+
+    if (!empty($this->_params['billing_last_name'])) {
+      $name .= " {$this->_params['billing_last_name']}";
+    }
+    $this->assign('billingName', $name);
   }
 
 }
