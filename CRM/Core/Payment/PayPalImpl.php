@@ -191,6 +191,20 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Get any details that may be available to the payment processor due to an approval process having happened.
+   *
+   * In some cases the browser is redirected to enter details on a processor site. Some details may be available as a
+   * result.
+   *
+   * @param array $storedDetails
+   *
+   * @return array
+   */
+  public function getPreApprovalDetails($storedDetails) {
+    return $this->getExpressCheckoutDetails($storedDetails['token']);
+  }
+
+  /**
    * Get details from paypal. Check PayPal documentation for more information
    *
    * @param string $token

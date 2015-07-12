@@ -252,6 +252,20 @@ abstract class CRM_Core_Payment {
   public function doPreApproval($params) {}
 
   /**
+   * Get any details that may be available to the payment processor due to an approval process having happened.
+   *
+   * In some cases the browser is redirected to enter details on a processor site. Some details may be available as a
+   * result.
+   *
+   * @param array $storedDetails
+   *
+   * @return array
+   */
+  public function getPreApprovalDetails($storedDetails) {
+    return array();
+  }
+
+  /**
    * Default payment instrument validation.
    *
    * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
