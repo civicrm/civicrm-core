@@ -1747,7 +1747,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * Build an array of available membership types.
    *
    * @param CRM_Core_Form $form
-   * @param int $membershipTypeID
+   * @param array $membershipTypeID
    * @param bool $activeOnly
    *   Do we only want active ones?
    *   (probably this should default to TRUE but as a newly added parameter we are leaving default b
@@ -1755,20 +1755,16 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *
    * @return array
    */
-  public static function buildMembershipTypeValues(&$form, $membershipTypeID = NULL, $activeOnly = FALSE) {
+  public static function buildMembershipTypeValues(&$form, $membershipTypeID = array(), $activeOnly = FALSE) {
     $whereClause = " WHERE domain_id = " . CRM_Core_Config::domainID();
+    $membershipTypeIDS = (array) $membershipTypeID;
 
     if ($activeOnly) {
       $whereClause .= " AND is_active = 1 ";
     }
-    if (is_array($membershipTypeID)) {
-      $allIDs = implode(',', $membershipTypeID);
+    if (!empty($membershipTypeIDS)) {
+      $allIDs = implode(',', $membershipTypeIDS);
       $whereClause .= " AND id IN ( $allIDs )";
-    }
-    elseif (is_numeric($membershipTypeID) &&
-      $membershipTypeID > 0
-    ) {
-      $whereClause .= " AND id = $membershipTypeID";
     }
 
     $query = "
