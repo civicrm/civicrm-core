@@ -1425,7 +1425,7 @@ WHERE  id = %1";
    * @return array
    *   array of all payment processors
    */
-  public static function &paymentProcessor($all = FALSE, $test = FALSE, $additionalCond = NULL) {
+  public static function paymentProcessor($all = FALSE, $test = FALSE, $additionalCond = NULL) {
     $condition = "is_test = ";
     $condition .= ($test) ? '1' : '0';
 

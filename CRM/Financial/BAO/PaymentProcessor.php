@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -81,6 +79,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       );
       CRM_Financial_BAO_FinancialTypeAccount::add($values);
     }
+    Civi\Payment\System::singleton()->flushProcessors();
     return $processor;
   }
 
@@ -170,6 +169,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $testDAO->delete();
 
     $dao->delete();
+    Civi\Payment\System::singleton()->flushProcessors();
   }
 
   /**
