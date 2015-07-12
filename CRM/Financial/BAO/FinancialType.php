@@ -197,6 +197,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *   an array of permissions
    */
   public static function permissionedFinancialTypes(&$permissions) {
+    if (!self::isACLFinancialTypeStatus()) {
+      return $membershipTypes;
+    }
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     $prefix = ts('CiviCRM') . ': ';
     foreach ($financialTypes as $id => $type) {
@@ -212,6 +215,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (empty($financialTypes)) {
       $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     }
+    if (!self::isACLFinancialTypeStatus()) {
+      return $financialTypes;
+    }
     foreach ($financialTypes as $finTypeId => $type) {
       if (!CRM_Core_Permission::check($action . ' contributions of type ' . $type)) {
         unset($financialTypes[$finTypeId]);
@@ -224,6 +230,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (empty($membershipTypes)) {
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
     }
+    if (!self::isACLFinancialTypeStatus()) {
+      return $membershipTypes;
+    }
     foreach ($membershipTypes as $memTypeId => $type) {
       $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeId, 'financial_type_id');
       $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
@@ -235,6 +244,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   public static function buildPermissionedClause(&$whereClauses, $component = NULL, $alias = NULL) {
+    if (!self::isACLFinancialTypeStatus()) {
+      return FALSE;
+    }
     if (is_array($whereClauses)) {
       self::getAvailableFinancialTypes($types);
       if (empty($types)) {
@@ -278,5 +290,20 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       }
     }
     return $flag;
+  }
+  
+  /**
+   * Check if FT-ACL is turned on or off
+   *
+   * @return boolean 
+   */
+  public static function isACLFinancialTypeStatus() {
+    $contributeSettings = CRM_Core_BAO_Setting::getItem(
+      CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings'
+    );
+    if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
+      return TRUE;
+    }
+    return FALSE;
   }
 }
