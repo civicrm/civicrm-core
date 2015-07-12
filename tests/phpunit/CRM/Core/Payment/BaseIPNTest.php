@@ -53,40 +53,19 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
+    $this->_processorId = $this->paymentProcessorAuthorizeNetCreate();
     $this->input = $this->ids = $this->objects = array();
     $this->IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->input);
 
     $this->_contactId = $this->individualCreate();
     $this->ids['contact'] = $this->_contactId;
-    $this->paymentProcessor = new CRM_Financial_BAO_PaymentProcessor();
-
-    $paymentProcessorParams = array(
-      'user_name' => 'user_name',
-      'password' => 'password',
-      'url_recur' => 'url_recur',
-      //@todo - if we used the api then we could pass in 'AuthNet & the api will resolve
-      // (as least it will once the pseudoconstant s in the schema)
-      'payment_processor_type_id' => $this->callAPISuccess('payment_processor_type', 'getvalue', array(
-        'return' => 'id',
-        'name' => 'AuthNet',
-      )),
-    );
-
-    $paymentProcessorParams['domain_id'] = 1;
-    $paymentProcessorParams['is_active'] = 1;
-    $paymentProcessorParams['is_test'] = 1;
-    $paymentProcessorParams['billing_mode'] = 1;
-    $paymentProcessorParams['class_name'] = "Payment_AuthorizeNet";
-    $processorEntity = $this->paymentProcessor->create($paymentProcessorParams);
-
-    $this->_processorId = $processorEntity->id;
     $this->_contributionTypeId = 1;
 
     $this->_contributionParams = array(
       'contact_id' => $this->_contactId,
       'version' => 3,
       'financial_type_id' => $this->_contributionTypeId,
-      'recieve_date' => date('Ymd'),
+      'receive_date' => date('Ymd'),
       'total_amount' => 150.00,
       'invoice_id' => 'c8acb91e080ad7bd8a2adc119c192885',
       'currency' => 'USD',
@@ -95,7 +74,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     );
     $contribution = civicrm_api('contribution', 'create', $this->_contributionParams);
-    $this->assertAPISuccess($contribution, 'line ' . __LINE__ . ' set-up of contribution ');
+    $this->assertAPISuccess($contribution, ' set-up of contribution ');
     $this->_contributionId = $contribution['id'];
 
     $contribution = new CRM_Contribute_BAO_Contribution();
@@ -121,8 +100,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertArrayHasKey($this->_membershipTypeID, $this->objects['membership']);
     $this->assertTrue(is_a($this->objects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($this->objects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
-    $this->assertFalse(empty($this->objects['contributionRecur']), __LINE__);
-    $this->assertFalse(empty($this->objects['paymentProcessor']), __LINE__);
+    $this->assertFalse(empty($this->objects['contributionRecur']));
+    $this->assertFalse(empty($this->objects['paymentProcessor']));
   }
 
   /**
@@ -140,8 +119,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertArrayHasKey($this->_membershipTypeID, $contribution->_relatedObjects['membership']);
     $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($contribution->_relatedObjects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
-    $this->assertFalse(empty($contribution->_relatedObjects['contributionRecur']), __LINE__);
-    $this->assertFalse(empty($contribution->_relatedObjects['paymentProcessor']), __LINE__);
+    $this->assertFalse(empty($contribution->_relatedObjects['contributionRecur']));
+    $this->assertFalse(empty($contribution->_relatedObjects['paymentProcessor']));
   }
 
   /**
@@ -152,7 +131,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $values = array();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
-    $this->assertTrue(is_array($msg), "Message returned as an array in line" . __LINE__);
+    $this->assertTrue(is_array($msg), "Message returned as an array in line");
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertContains('<p>Please print this confirmation for your records.</p>', $msg['html']);
     $this->assertContains('Membership Type: General', $msg['body']);
@@ -331,7 +310,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function testRequiredWithContributionPage() {
     $this->_setUpContributionObjects(TRUE);
-
     $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, array('return_error' => 1));
     $this->assertFalse(is_array($result), $result['error_message']);
   }
@@ -341,7 +319,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function testRequiredWithContributionPageError() {
     $this->_setUpContributionObjects();
-    $values = array();
     $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, array('return_error' => 1));
     $this->assertArrayHasKey('error_message', $result);
     $this->assertEquals('Could not find contribution page for contribution record: 1', $result['error_message']);
@@ -441,6 +418,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $contribution->find(TRUE);
     $contributionPageID = NULL;
+
     if (!empty($contributionPage)) {
       $dao = new CRM_Core_DAO();
       $contribution_page = $dao->createTestObject('CRM_Contribute_DAO_ContributionPage');
@@ -501,10 +479,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'membership_id' => $this->_membershipId,
     ));
 
-    $contribution = new CRM_Contribute_BAO_Contribution();
-    $contribution->id = $this->_contributionId;
-    $contribution->find();
-    $this->objects['contribution'] = $contribution;
     $this->input = array(
       'component' => 'contribute',
       'total_amount' => 150.00,

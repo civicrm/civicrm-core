@@ -82,7 +82,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
         continue;
       }
 
-
       require_once 'api/v3/utils.php';
       //@todo calling api functions directly is not supported
       _civicrm_api3_object_to_array($recur, $values);
