@@ -488,8 +488,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Process form submission.
    *
    * This function is also accessed by a unit test.
-   *
-   * @return array
    */
   protected function submit() {
     $this->storeContactFields($this->_params);
@@ -596,7 +594,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $membershipSource = $this->_params['membership_source'];
     }
 
-    $isPending = ($this->_params['contribution_status_id'] == 2) ? TRUE :FALSE;
+    $isPending = ($this->_params['contribution_status_id'] == 2) ? TRUE : FALSE;
 
     list($renewMembership) = CRM_Member_BAO_Membership::renewMembership(
       $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
