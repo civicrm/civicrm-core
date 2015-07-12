@@ -2203,7 +2203,7 @@ WHERE  contribution_id = %1 ";
         $this->is_test ? 'test' : 'live'
       );
       $ids['paymentProcessor'] = $paymentProcessorID;
-      $this->_relatedObjects['paymentProcessor'] = &$paymentProcessor;
+      $this->_relatedObjects['paymentProcessor'] = $paymentProcessor;
     }
     elseif ($required) {
       throw new Exception("Could not find payment processor for contribution record: " . $this->id);

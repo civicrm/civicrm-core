@@ -1440,6 +1440,35 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create test Authorize.net instance.
+   *
+   * @param array $params
+   *
+   * @return mixed
+   */
+  public function paymentProcessorAuthorizeNetCreate($params = array()) {
+    $params = array_merge(array(
+      'name' => 'Authorize',
+      'domain_id' => CRM_Core_Config::domainID(),
+      'payment_processor_type_id' => 'AuthNet',
+      'title' => 'AuthNet',
+      'is_active' => 1,
+      'is_default' => 0,
+      'is_test' => 1,
+      'is_recur' => 1,
+      'user_name' => '4y5BfuW7jm',
+      'password' => '4cAmW927n8uLf5J8',
+      'url_site' => 'https://test.authorize.net/gateway/transact.dll',
+      'url_recur' => 'https://apitest.authorize.net/xml/v1/request.api',
+      'class_name' => 'Payment_AuthorizeNet',
+      'billing_mode' => 1,
+    ), $params);
+
+    $result = $this->callAPISuccess('payment_processor', 'create', $params);
+    return $result['id'];
+  }
+
+  /**
    * Create Participant.
    *
    * @param array $params
@@ -1607,8 +1636,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create contribution.
    *
-   * @param int $cID
-   *   Contact_id.
+   * @param int|array $params
+   *   Array of parameters or Contact_id (legacy) .
    * @param int $cTypeID
    *   Id of financial type.
    * @param int $invoiceID
@@ -1619,21 +1648,23 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int
    *   id of created contribution
    */
-  public function contributionCreate($cID, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID = 1, $isFee = TRUE) {
-    $params = array(
+  public function contributionCreate($params, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID
+  = 1, $isFee = TRUE) {
+    if (!is_array($params)) {
+      $params = array('contact_id' => $params);
+    }
+    $params = array_merge(array(
       'domain_id' => 1,
-      'contact_id' => $cID,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
-      'financial_type_id' => empty($cTypeID) ? 1 : $cTypeID,
+      'financial_type_id' => $cTypeID,
       'payment_instrument_id' => empty($paymentInstrumentID) ? 1 : $paymentInstrumentID,
       'non_deductible_amount' => 10.00,
       'trxn_id' => $trxnID,
       'invoice_id' => $invoiceID,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      // 'note'                   => 'Donating for Nobel Cause', *Fixme
-    );
+    ), $params);
 
     if ($isFee) {
       $params['fee_amount'] = 5.00;
@@ -3179,6 +3210,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'contact_id' => $this->_contactID,
         'contribution_page_id' => $this->_contributionPageID,
         'payment_processor_id' => $this->_paymentProcessorID,
+        'is_test' => 1,
       ),
     ));
     $this->_contributionRecurID = $contributionRecur['id'];
@@ -3191,7 +3223,10 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function setupMembershipRecurringPaymentProcessorTransaction() {
     $this->ids['membership_type'] = $this->membershipTypeCreate();
     //create a contribution so our membership & contribution don't both have id = 1
-    $this->contributionCreate($this->_contactID, 1, 'abcd', '345j');
+    $this->contributionCreate(array(
+      'contact_id' => $this->_contactID,
+      'is_test' => 1),
+      1, 'abcd', '345j');
     $this->setupRecurringPaymentProcessorTransaction();
 
     $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(
