@@ -229,7 +229,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return CRM_Contribute_BAO_Contribution|null
    *   The found object or null
    */
-  public static function &getValues($params, &$values, &$ids) {
+  public static function getValues($params, &$values, &$ids) {
     if (empty($params)) {
       return NULL;
     }
@@ -269,6 +269,62 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (!isset($params['net_amount'])) {
       $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
     }
+  }
+
+  /**
+   * @param $params
+   * @param $billingLocationTypeID
+   *
+   * @return array
+   */
+  protected static function getBillingAddressParams($params, $billingLocationTypeID) {
+    $hasBillingField = FALSE;
+    $billingFields = array(
+      'street_address',
+      'city',
+      'state_province_id',
+      'postal_code',
+      'country_id',
+    );
+
+    //build address array
+    $addressParams = array();
+    $addressParams['location_type_id'] = $billingLocationTypeID;
+    $addressParams['is_billing'] = 1;
+
+    $billingFirstName = CRM_Utils_Array::value('billing_first_name', $params);
+    $billingMiddleName = CRM_Utils_Array::value('billing_middle_name', $params);
+    $billingLastName = CRM_Utils_Array::value('billing_last_name', $params);
+    $addressParams['address_name'] = "{$billingFirstName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingMiddleName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingLastName}";
+
+    foreach ($billingFields as $value) {
+      $addressParams[$value] = CRM_Utils_Array::value("billing_{$value}-{$billingLocationTypeID}", $params);
+      if (!empty($addressParams[$value])) {
+        $hasBillingField = TRUE;
+      }
+    }
+    return array($hasBillingField, $addressParams);
+  }
+
+  /**
+   * Get address params ready to be passed to the payment processor.
+   *
+   * We need address params in a couple of formats. For the payment processor we wan state_province_id-5.
+   * To create an address we need state_province_id.
+   *
+   * @param array $params
+   * @param int $billingLocationTypeID
+   *
+   * @return array
+   */
+  public static function getPaymentProcessorReadyAddressParams($params, $billingLocationTypeID) {
+    list($hasBillingField, $addressParams) = self::getBillingAddressParams($params, $billingLocationTypeID);
+    foreach ($addressParams as $name => $field) {
+      if (substr($name, 0, 8) == 'billing_') {
+        $addressParams[substr($name, 9)] = $addressParams[$field];
+      }
+    }
+    return array($hasBillingField, $addressParams);
   }
 
   /**
@@ -1299,31 +1355,7 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    *   address id
    */
   public static function createAddress($params, $billingLocationTypeID) {
-    $hasBillingField = FALSE;
-    $billingFields = array(
-      'street_address',
-      'city',
-      'state_province_id',
-      'postal_code',
-      'country_id',
-    );
-
-    //build address array
-    $addressParams = array();
-    $addressParams['location_type_id'] = $billingLocationTypeID;
-    $addressParams['is_billing'] = 1;
-
-    $billingFirstName = CRM_Utils_Array::value('billing_first_name', $params);
-    $billingMiddleName = CRM_Utils_Array::value('billing_middle_name', $params);
-    $billingLastName = CRM_Utils_Array::value('billing_last_name', $params);
-    $addressParams['address_name'] = "{$billingFirstName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingMiddleName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingLastName}";
-
-    foreach ($billingFields as $value) {
-      $addressParams[$value] = CRM_Utils_Array::value("billing_{$value}-{$billingLocationTypeID}", $params);
-      if (!empty($addressParams[$value])) {
-        $hasBillingField = TRUE;
-      }
-    }
+    list($hasBillingField, $addressParams) = self::getBillingAddressParams($params, $billingLocationTypeID);
     if ($hasBillingField) {
       $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
       return $address->id;
