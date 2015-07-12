@@ -1438,8 +1438,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $fields["email-{$this->_bltID}"] = 1;
       }
 
-      $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type');
-
       $nameFields = array('first_name', 'middle_name', 'last_name');
 
       foreach ($nameFields as $name) {
@@ -1452,7 +1450,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if ($this->_contributorContactID == $this->_contactID) {
         //see CRM-12869 for discussion of why we don't do this for separate payee payments
         CRM_Contact_BAO_Contact::createProfileContact($formValues, $fields,
-          $this->_contributorContactID, NULL, NULL, $ctype
+          $this->_contributorContactID, NULL, NULL,
+          CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
         );
       }
 
