@@ -184,29 +184,17 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
       }
     }
-    elseif ($form->_contributeMode == 'express') {
-      if ($form->_values['is_monetary'] && $form->_amount > 0.0) {
-        // determine if express + recurring and direct accordingly
-        if (!empty($paymentParams['is_recur']) && $paymentParams['is_recur'] == 1) {
-          if (is_object($payment)) {
-            $result = $payment->createRecurringPayments($paymentParams);
-          }
-          else {
-            CRM_Core_Error::fatal($paymentObjError);
-          }
+
+    elseif ($isPaymentTransaction && $form->_contributeMode) {
+      if ($form->_contributeMode == 'express' && !empty($paymentParams['is_recur']) && $paymentParams['is_recur'] == 1) {
+        if (is_object($payment)) {
+          $result = $payment->createRecurringPayments($paymentParams);
         }
         else {
-          if (is_object($payment)) {
-            $result = $payment->doExpressCheckout($paymentParams);
-          }
-          else {
-            CRM_Core_Error::fatal($paymentObjError);
-          }
+          CRM_Core_Error::fatal($paymentObjError);
         }
       }
-    }
-    elseif ($isPaymentTransaction) {
-      if ($form->_contributeMode == 'direct') {
+      else {
         $paymentParams['contactID'] = $contactID;
 
         // Fix for CRM-14354. If the membership is recurring, don't create a
@@ -296,7 +284,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     }
     //Do not send an email if Recurring contribution is done via Direct Mode
     //We will send email once the IPN is received.
-    if ($form->_contributeMode == 'direct') {
+    if (!$isPayLater) {
       return $result;
     }
 

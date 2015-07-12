@@ -219,7 +219,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       );
       if ($rfp) {
         $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
-        $expressParams = $payment->getExpressCheckoutDetails($this->get('token'));
+        $expressParams = $payment->getPreApprovalDetails($this->get('pre_approval_parameters'));
 
         $this->_params['payer'] = CRM_Utils_Array::value('payer', $expressParams);
         $this->_params['payer_id'] = $expressParams['payer_id'];
@@ -916,7 +916,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   ) {
     $transaction = new CRM_Core_Transaction();
     $contribSoftContactId = $addressID = NULL;
-    $contributeMode = $form->_contributeMode;
     $isMonetary = !empty($form->_values['is_monetary']);
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
     // How do these vary from params? These are currently passed to
