@@ -529,6 +529,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+      $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
+      $this->assign('credit_card_number',
+        CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
+      );
+      $this->assign('credit_card_type', $this->_params['credit_card_type']);
       $this->_params['description'] = ts('Office Credit Card Membership Renewal Contribution');
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $this->_params['total_amount'];
@@ -704,13 +709,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           }
         }
         $this->assign('address', CRM_Utils_Address::format($addressFields));
-        $date = CRM_Utils_Date::format($this->_params['credit_card_exp_date']);
-        $date = CRM_Utils_Date::mysqlToIso($date);
-        $this->assign('credit_card_exp_date', $date);
-        $this->assign('credit_card_number',
-          CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
-        );
-        $this->assign('credit_card_type', $this->_params['credit_card_type']);
         $this->assign('contributeMode', 'direct');
         $this->assign('isAmountzero', 0);
         $this->assign('is_pay_later', 0);
@@ -747,6 +745,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   }
 
   protected function assignBillingName() {
+    $name = '';
     if (!empty($this->_params['billing_first_name'])) {
       $name = $this->_params['billing_first_name'];
     }
