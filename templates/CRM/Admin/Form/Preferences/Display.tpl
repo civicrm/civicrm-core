@@ -237,7 +237,6 @@
         });
 
         function showCKEditorConfig() {
-          console.log($(this).val());
           $('.crm-preferences-display-form-block-editor_id .crm-button').toggle($(this).val() == '2');
         }
         $('select[name=editor_id]').each(showCKEditorConfig).change(showCKEditorConfig);
