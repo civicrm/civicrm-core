@@ -160,10 +160,13 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
       $params = array('id' => $id);
 
       CRM_Member_BAO_Membership::retrieve($params, $values);
-      $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'financial_type_id');
-      $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
-      if (!CRM_Core_Permission::check('view contributions of type ' . $finType)) {
-        CRM_Core_Error::fatal(ts('You do not have permissionn to access this page.'));
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+        $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'financial_type_id');
+        $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
+        
+        if (!CRM_Core_Permission::check('view contributions of type ' . $finType)) {
+          CRM_Core_Error::fatal(ts('You do not have permissionn to access this page.'));
+        }
       }
       $this->assign('financialTypeId', $finType);
       $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']);
