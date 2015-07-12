@@ -72,37 +72,6 @@ abstract class CRM_Core_Payment {
   protected $_paymentProcessor;
 
   /**
-   * Singleton function used to manage this object.
-   *
-   * We will migrate to calling Civi\Payment\System::singleton()->getByProcessor($paymentProcessor)
-   * & Civi\Payment\System::singleton()->getById($paymentProcessor) directly as the main access methods & work
-   * to remove this function all together
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   * @param array $paymentProcessor
-   *   The details of the payment processor being invoked.
-   * @param object $paymentForm
-   *   Deprecated - avoid referring to this if possible. If you have to use it document why as this is scary interaction.
-   * @param bool $force
-   *   Should we force a reload of this payment object.
-   *
-   * @return CRM_Core_Payment
-   * @throws \CRM_Core_Exception
-   */
-  public static function singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    // make sure paymentProcessor is not empty
-    // CRM-7424
-    if (empty($paymentProcessor)) {
-      return CRM_Core_DAO::$_nullObject;
-    }
-    //we use two lines because we can't remove the '&singleton' without risking breakage
-    //of extension classes that extend this one
-    $object = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
-    return $object;
-  }
-
-  /**
    * Opportunity for the payment processor to override the entire form build.
    *
    * @param CRM_Core_Form $form

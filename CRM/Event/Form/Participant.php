@@ -1187,7 +1187,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $mapParams = array_merge(array('contact_id' => $contactID), $this->_params);
       CRM_Core_Payment_Form::mapParams($this->_bltID, $mapParams, $paymentParams, TRUE);
 
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+      $payment = $this->_paymentProcessor['object'];
 
       // CRM-15622: fix for incorrect contribution.fee_amount
       $paymentParams['fee_amount'] = NULL;
