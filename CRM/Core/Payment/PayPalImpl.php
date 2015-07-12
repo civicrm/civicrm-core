@@ -83,6 +83,24 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Does this processor support pre-approval.
+   *
+   * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
+   *
+   * Currently Paypal express supports this, with a redirect to paypal after the 'Main' form is submitted in the
+   * contribution page. This token can then be processed at the confirm phase. Although this flow 'looks' like the
+   * 'notify' flow a key difference is that in the notify flow they don't have to return but in this flow they do.
+   *
+   * @return bool
+   */
+  protected function supportsPreApproval() {
+    if ($this->_processorName == ts('PayPal_Express')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * Opportunity for the payment processor to override the entire form build.
    *
    * @param CRM_Core_Form $form
@@ -596,6 +614,24 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       return TRUE;
     }
     return FALSE;
+  }
+
+ /**
+ * Function to action pre-approval if supported
+ *
+ * @param array $params
+ *   Parameters from the form
+ *
+ * @return array
+ *   - pre_approval_parameters (this will be stored on the calling form & available later)
+ *   - redirect_url (if set the browser will be redirected to this.
+ */
+  public function doPreApproval(&$params) {
+    $token = $this->setExpressCheckOut($params);
+    return array(
+      'pre_approval_parameters' => array('token' => $token),
+      'redirect_url' => $this->_paymentProcessor['url_site'] . "/cgi-bin/webscr?cmd=_express-checkout&token=$token",
+    );
   }
 
   /**

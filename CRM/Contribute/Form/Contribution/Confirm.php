@@ -916,7 +916,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   ) {
     $transaction = new CRM_Core_Transaction();
     $contribSoftContactId = $addressID = NULL;
-    $contributeMode = $form->_contributeMode;
     $isMonetary = !empty($form->_values['is_monetary']);
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
     // How do these vary from params? These are currently passed to

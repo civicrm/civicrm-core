@@ -223,6 +223,35 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does this processor support pre-approval.
+   *
+   * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
+   *
+   * Currently Paypal express supports this, with a redirect to paypal after the 'Main' form is submitted in the
+   * contribution page. This token can then be processed at the confirm phase. Although this flow 'looks' like the
+   * 'notify' flow a key difference is that in the notify flow they don't have to return but in this flow they do.
+   *
+   * @return bool
+   */
+  protected function supportsPreApproval() {
+    return FALSE;
+  }
+
+  /**
+   * Function to action pre-approval if supported
+   *
+   * @param array $params
+   *   Parameters from the form
+   * @param string component
+   *  contribution or event.
+   *
+   * This function returns an array which should contain
+   *   - pre_approval_parameters (this will be stored on the calling form & available later)
+   *   - redirect_url (if set the browser will be redirected to this.
+   */
+  protected function doPreApproval($params) {}
+
+  /**
    * Default payment instrument validation.
    *
    * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
@@ -631,12 +660,15 @@ abstract class CRM_Core_Payment {
    * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
    * more agnostic.
    *
-   * Payment processors should set contribution_status_id. This function adds some historical defaults ie. the
+   * Payment processors should set payment_status_id. This function adds some historical defaults ie. the
    * assumption that if a 'doDirectPayment' processors comes back it completed the transaction & in fact
    * doTransferCheckout would not traditionally come back.
    *
    * doDirectPayment does not do an immediate payment for Authorize.net or Paypal so the default is assumed
    * to be Pending.
+   *
+   * Once this function is fully rolled out then it will be preferred for processors to throw exceptions than to
+   * return Error objects
    *
    * @param array $params
    *
@@ -656,7 +688,12 @@ abstract class CRM_Core_Payment {
       }
     }
     else {
-      $result = $this->doDirectPayment($params, $component);
+      if ($this->_paymentProcessor['billing_mode'] ==1) {
+        $result = $this->doDirectPayment($params, $component);
+      }
+      else {
+        $result = $this->doExpressCheckout($params);
+      }
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
           // See comment block.
