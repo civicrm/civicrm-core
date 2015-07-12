@@ -630,16 +630,16 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return FALSE;
   }
 
- /**
- * Function to action pre-approval if supported
- *
- * @param array $params
- *   Parameters from the form
- *
- * @return array
- *   - pre_approval_parameters (this will be stored on the calling form & available later)
- *   - redirect_url (if set the browser will be redirected to this.
- */
+  /**
+   * Function to action pre-approval if supported
+   *
+   * @param array $params
+   *   Parameters from the form
+   *
+   * @return array
+   *   - pre_approval_parameters (this will be stored on the calling form & available later)
+   *   - redirect_url (if set the browser will be redirected to this.
+   */
   public function doPreApproval(&$params) {
     $token = $this->setExpressCheckOut($params);
     return array(

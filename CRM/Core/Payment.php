@@ -242,8 +242,6 @@ abstract class CRM_Core_Payment {
    *
    * @param array $params
    *   Parameters from the form
-   * @param string component
-   *  contribution or event.
    *
    * This function returns an array which should contain
    *   - pre_approval_parameters (this will be stored on the calling form & available later)
@@ -702,7 +700,7 @@ abstract class CRM_Core_Payment {
       }
     }
     else {
-      if ($this->_paymentProcessor['billing_mode'] ==1) {
+      if ($this->_paymentProcessor['billing_mode'] == 1) {
         $result = $this->doDirectPayment($params, $component);
       }
       else {
