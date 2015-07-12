@@ -62,19 +62,21 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    */
   public function buildQuickForm() {
     $count = 0;
-    foreach ($this->_contributionIds as $key => $id) {
-      $finTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'financial_type_id');
-      if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($finTypeID))) {
-        unset($this->_contributionIds[$key]);
-        $count++;
-      }
-      // Now check for lineItems
-      if ($lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id)) {
-        foreach ($lineItems as $items) { 
-          if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
-            unset($this->_contributionIds[$key]);
-            $count++;
-            break;
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      foreach ($this->_contributionIds as $key => $id) {
+        $finTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'financial_type_id');
+        if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($finTypeID))) {
+          unset($this->_contributionIds[$key]);
+          $count++;
+        }
+        // Now check for lineItems
+        if ($lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id)) {
+          foreach ($lineItems as $items) { 
+            if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+              unset($this->_contributionIds[$key]);
+              $count++;
+              break;
+            }
           }
         }
       }

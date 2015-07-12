@@ -114,7 +114,9 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     $dao->find();
 
     while ($dao->fetch()) {
-      if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() 
+        && !CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))
+      ) {
         continue;
       }
       $links = self::links();
@@ -141,10 +143,10 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
         }
         $membershipType[$dao->id]['maxRelated'] = CRM_Utils_Array::value('max_related', $membershipType[$dao->id]);
       }
-      if (!CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
         unset($links[CRM_Core_Action::UPDATE], $links[CRM_Core_Action::ENABLE], $links[CRM_Core_Action::DISABLE]);
       }
-      if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
         unset($links[CRM_Core_Action::DELETE]);
       }
       // form all action links

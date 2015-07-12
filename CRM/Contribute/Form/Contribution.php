@@ -459,7 +459,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function buildQuickForm() {
     // FIXME: This probably needs to be done in preprocess
-    if ($this->_action & CRM_Core_Action::UPDATE && CRM_Utils_Array::value('financial_type_id', $this->_values)) {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() 
+      && $this->_action & CRM_Core_Action::UPDATE 
+      && CRM_Utils_Array::value('financial_type_id', $this->_values)
+    ) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($this->_id, 'edit');
       if (!CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)) {
