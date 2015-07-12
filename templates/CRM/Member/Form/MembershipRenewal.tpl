@@ -70,7 +70,7 @@
                     onclick='adjustMembershipOrgType(); return false;'>{ts}change membership type{/ts}</a>
         </td>
       </tr>
-      <tr id="membershipOrgType" class="crm-member-membershiprenew-form-block-renew_org_name">
+      <tr id="membershipOrgType" class="crm-member-membershiprenew-form-block-renew_org_name hiddenElement">
         <td class="label">{$form.membership_type_id.label}</td>
         <td>{$form.membership_type_id.html}
           {if $member_is_test} {ts}(test){/ts}{/if}<br/>

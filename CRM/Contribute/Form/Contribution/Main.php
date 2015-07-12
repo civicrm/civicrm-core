@@ -1198,7 +1198,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
       else {
         $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this,
-          $params['selectMembership']
+          (array) $params['selectMembership']
         );
       }
       $memFee = $membershipTypeValues['minimum_fee'];
@@ -1293,82 +1293,100 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // generate and set an invoiceID for this transaction
     $invoiceID = md5(uniqid(rand(), TRUE));
     $this->set('invoiceID', $invoiceID);
+    $params['invoiceID'] = $invoiceID;
+    $params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
 
     // required only if is_monetary and valid positive amount
     if ($this->_values['is_monetary'] &&
       is_array($this->_paymentProcessor) &&
       ((float ) $params['amount'] > 0.0 || $memFee > 0.0)
     ) {
-
-      // default mode is direct
-      $this->set('contributeMode', 'direct');
+      $this->setContributeMode();
 
       if ($this->_paymentProcessor &&
-        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
+        $this->_paymentProcessor['object']->supportsPreApproval()
       ) {
-        //get the button name
-        $buttonName = $this->controller->getButtonName();
-        if (in_array($buttonName,
-            array($this->_expressButtonName, $this->_expressButtonName . '_x', $this->_expressButtonName . '_y')
-          ) && empty($params['is_pay_later'])
-        ) {
-          $this->handlePaypalExpress($invoiceID, $params);
-        }
-      }
-      elseif ($this->_paymentProcessor &&
-        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
-      ) {
-        $this->set('contributeMode', 'notify');
+        $this->handlePreApproval($params);
       }
     }
 
-    // should we skip the confirm page?
     if (empty($this->_values['is_confirm_enabled'])) {
-      // call the post process hook for the main page before we switch to confirm
-      $this->postProcessHook();
-
-      // build the confirm page
-      $confirmForm = &$this->controller->_pages['Confirm'];
-      $confirmForm->preProcess();
-      $confirmForm->buildQuickForm();
-
-      // the confirmation page is valid
-      $data = &$this->controller->container();
-      $data['valid']['Confirm'] = 1;
-
-      // confirm the contribution
-      // mainProcess calls the hook also
-      $confirmForm->mainProcess();
-      $qfKey = $this->controller->_key;
-
-      // redirect to thank you page
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
+      $this->skipToThankYouPage();
     }
 
   }
 
   /**
-   * @param $invoiceID
-   * @param $params
+   * Assign the billing mode to the template.
    *
-   * @return mixed
+   * This is required for legacy support for contributeMode in templates.
+   *
+   * The goal is to remove this parameter & use more relevant parameters.
    */
-  protected function handlePaypalExpress($invoiceID, $params) {
-    $this->set('contributeMode', 'express');
+  protected function setContributeMode() {
+    switch ($this->_paymentProcessor['billing_mode']) {
+      case CRM_Core_Payment::BILLING_MODE_FORM:
+        $this->set('contributeMode', 'direct');
+        break;
 
-    $params['invoiceID'] = $invoiceID;
-    $params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
+      case CRM_Core_Payment::BILLING_MODE_BUTTON:
+        $this->set('contributeMode', 'express');
+        break;
 
-    $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-    $token = $payment->setExpressCheckout($params);
-    if (is_a($token, 'CRM_Core_Error')) {
-      CRM_Core_Error::displaySessionError($token);
+      case CRM_Core_Payment::BILLING_MODE_NOTIFY:
+        $this->set('contributeMode', 'notify');
+        break;
+    }
+
+  }
+
+  /**
+   * Handle pre approval for processors.
+   *
+   * This fits with the flow where a pre-approval is done and then confirmed in the next stage when confirm is hit.
+   *
+   * This applies to processors that
+   * @param array $params
+   */
+  protected function handlePreApproval(&$params) {
+    try {
+      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+      $result = $payment->doPreApproval($params);
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      CRM_Core_Error::displaySessionError($e->getMessage());
       CRM_Utils_System::redirect($params['cancelURL']);
     }
 
-    $this->set('token', $token);
-    $paymentURL = $this->_paymentProcessor['url_site'] . "/cgi-bin/webscr?cmd=_express-checkout&token=$token";
-    CRM_Utils_System::redirect($paymentURL);
+    $this->set('pre_approval_parameters', $result['pre_approval_parameters']);
+    if (!empty($result['redirect_url'])) {
+      CRM_Utils_System::redirect($result['redirect_url']);
+    }
+  }
+
+  /**
+   * Process confirm function and pass browser to the thank you page.
+   */
+  protected function skipToThankYouPage() {
+    // call the post process hook for the main page before we switch to confirm
+    $this->postProcessHook();
+
+    // build the confirm page
+    $confirmForm = &$this->controller->_pages['Confirm'];
+    $confirmForm->preProcess();
+    $confirmForm->buildQuickForm();
+
+    // the confirmation page is valid
+    $data = &$this->controller->container();
+    $data['valid']['Confirm'] = 1;
+
+    // confirm the contribution
+    // mainProcess calls the hook also
+    $confirmForm->mainProcess();
+    $qfKey = $this->controller->_key;
+
+    // redirect to thank you page
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
   }
 
 }

@@ -1747,7 +1747,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * Build an array of available membership types.
    *
    * @param CRM_Core_Form $form
-   * @param int $membershipTypeID
+   * @param array $membershipTypeID
    * @param bool $activeOnly
    *   Do we only want active ones?
    *   (probably this should default to TRUE but as a newly added parameter we are leaving default b
@@ -1755,20 +1755,16 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *
    * @return array
    */
-  public static function buildMembershipTypeValues(&$form, $membershipTypeID = NULL, $activeOnly = FALSE) {
+  public static function buildMembershipTypeValues(&$form, $membershipTypeID = array(), $activeOnly = FALSE) {
     $whereClause = " WHERE domain_id = " . CRM_Core_Config::domainID();
+    $membershipTypeIDS = (array) $membershipTypeID;
 
     if ($activeOnly) {
       $whereClause .= " AND is_active = 1 ";
     }
-    if (is_array($membershipTypeID)) {
-      $allIDs = implode(',', $membershipTypeID);
+    if (!empty($membershipTypeIDS)) {
+      $allIDs = implode(',', $membershipTypeIDS);
       $whereClause .= " AND id IN ( $allIDs )";
-    }
-    elseif (is_numeric($membershipTypeID) &&
-      $membershipTypeID > 0
-    ) {
-      $whereClause .= " AND id = $membershipTypeID";
     }
 
     $query = "
@@ -2263,6 +2259,54 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
+   * Get line items representing the default price set.
+   *
+   * @param int $membershipOrg
+   * @param int $membershipTypeID
+   * @param float $total_amount
+   *
+   * @return array
+   */
+  public static function getQuickConfigMembershipLineItems($membershipOrg, $membershipTypeID, $total_amount) {
+    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
+    $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
+
+    // The name of the price field corresponds to the membership_type organization contact.
+    $params = array(
+      'price_set_id' => $priceSetId,
+      'name' => $membershipOrg,
+    );
+    $results = array();
+    CRM_Price_BAO_PriceField::retrieve($params, $results);
+
+    if (!empty($results)) {
+      $fields[$results['id']] = $priceSets['fields'][$results['id']];
+      $fid = $results['id'];
+      $editedFieldParams = array(
+        'price_field_id' => $results['id'],
+        'membership_type_id' => $membershipTypeID,
+      );
+      $results = array();
+      CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $results);
+      $fields[$fid]['options'][$results['id']] = $priceSets['fields'][$fid]['options'][$results['id']];
+      if (!empty($total_amount)) {
+        $fields[$fid]['options'][$results['id']]['amount'] = $total_amount;
+      }
+    }
+
+    $fieldID = key($fields);
+    $returnParams = array(
+      'price_set_id' => $priceSetId,
+      'price_sets' => $priceSets,
+      'fields' => $fields,
+      'price_fields' => array(
+        'price_' . $fieldID => CRM_Utils_Array::value('id', $results),
+      ),
+    );
+    return $returnParams;
+  }
+
+  /**
    * Process price set and line items.
    *
    * @param int $membershipId
@@ -2612,6 +2656,9 @@ WHERE      civicrm_membership.is_test = 0";
 
   /**
    * Record line items for default membership.
+   * @deprecated
+   *
+   * Use getQuickConfigMembershipLineItems
    *
    * @param CRM_Core_Form $qf
    * @param array $membershipType
