@@ -541,7 +541,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           $formValues['preserveDBName'] = TRUE;
         }
       }
-dpm($fields);
+
       //here we are setting up the billing contact - if different from the member they are already created
       // but they will get billing details assigned
       CRM_Contact_BAO_Contact::createProfileContact($formValues, $fields,
