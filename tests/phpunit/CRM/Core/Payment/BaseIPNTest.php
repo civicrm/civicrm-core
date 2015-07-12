@@ -422,6 +422,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     if (!empty($contributionPage)) {
       $dao = new CRM_Core_DAO();
       $contribution_page = $dao->createTestObject('CRM_Contribute_DAO_ContributionPage');
+      $contribution_page->payment_processor = 1;
+      $contribution_page->save();
       $contribution->contribution_page_id = $contributionPageID = $contribution_page->id;
       //for unknown reasons trying to do a find & save on a contribution with a receive_date set
       // doesn't work. This seems of minimal relevance to this test so ignoring

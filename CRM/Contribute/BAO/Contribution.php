@@ -2075,9 +2075,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $paymentProcessorID = CRM_Utils_Array::value('paymentProcessor', $ids);
     $contributionType = new CRM_Financial_BAO_FinancialType();
     $contributionType->id = $this->financial_type_id;
-    if (!$contributionType->find(TRUE)) {
-      throw new Exception("Could not find financial type record: " . $this->financial_type_id);
-    }
+    $contributionType->find(TRUE);
+
     if (!empty($ids['contact'])) {
       $this->_relatedObjects['contact'] = new CRM_Contact_BAO_Contact();
       $this->_relatedObjects['contact']->id = $ids['contact'];
