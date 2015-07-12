@@ -621,6 +621,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   static function getPermissionedLinks($memTypeID, &$links) {
+    if (!self::isACLFinancialTypeStatus()) {
+      return FALSE;
+    }
     $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeID, 'financial_type_id');
     $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
     if (!CRM_Core_Permission::check('edit contributions of type ' . $finType)) {

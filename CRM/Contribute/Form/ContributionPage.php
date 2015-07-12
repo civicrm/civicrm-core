@@ -142,7 +142,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
 
     // Check permission to edit contribution page
-    if ($this->_action & CRM_Core_Action::UPDATE) {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::UPDATE) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
       if (!CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)) {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));

@@ -963,14 +963,16 @@ WHERE  id = %1";
     else {
       $feeBlock = &$form->_priceSet['fields'];
     }
-    foreach ($feeBlock as $key => $value) {
-      foreach ($value['options'] as $k => $options) {
-        if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
-          unset($feeBlock[$key]['options'][$k]);
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      foreach ($feeBlock as $key => $value) {
+        foreach ($value['options'] as $k => $options) {
+          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+            unset($feeBlock[$key]['options'][$k]);
+          }
         }
-      }
-      if (empty($feeBlock[$key]['options'])) {
-        unset($feeBlock[$key]);
+        if (empty($feeBlock[$key]['options'])) {
+          unset($feeBlock[$key]);
+        }
       }
     }
     // call the hook.

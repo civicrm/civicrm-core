@@ -47,7 +47,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $this->assign('context', $context);
 
     CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
-    if ($this->_action & CRM_Core_Action::VIEW) {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::VIEW) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'view');
       if (CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'edit', FALSE)) {
