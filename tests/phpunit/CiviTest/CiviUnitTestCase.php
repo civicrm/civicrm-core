@@ -1648,8 +1648,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int
    *   id of created contribution
    */
-  public function contributionCreate($params, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID
-  = 1, $isFee = TRUE) {
+  public function contributionCreate($params, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345,
+    $paymentInstrumentID = 1, $isFee = TRUE) {
     if (!is_array($params)) {
       $params = array('contact_id' => $params);
     }
