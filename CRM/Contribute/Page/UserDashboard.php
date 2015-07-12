@@ -82,8 +82,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
         continue;
       }
 
-      // note that we are passing a CRM_Core_Page object ($this) as if it were a form here:
-      $paymentObject = CRM_Core_Payment::singleton($mode, $paymentProcessor, $this);
 
       require_once 'api/v3/utils.php';
       //@todo calling api functions directly is not supported

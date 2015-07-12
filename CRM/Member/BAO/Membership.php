@@ -1298,7 +1298,7 @@ AND civicrm_membership.is_test = %2";
         // call postProcess hook before leaving
         $form->postProcessHook();
         // this does not return
-        $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
+        $payment = $form->_paymentProcessor['object'];
         $payment->doTransferCheckout($form->_params, 'contribute');
       }
     }
