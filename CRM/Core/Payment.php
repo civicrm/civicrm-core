@@ -249,7 +249,7 @@ abstract class CRM_Core_Payment {
    *   - pre_approval_parameters (this will be stored on the calling form & available later)
    *   - redirect_url (if set the browser will be redirected to this.
    */
-  protected function doPreApproval($params) {}
+  public function doPreApproval($params) {}
 
   /**
    * Default payment instrument validation.
