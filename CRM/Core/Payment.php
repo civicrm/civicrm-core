@@ -247,7 +247,7 @@ abstract class CRM_Core_Payment {
    *   - pre_approval_parameters (this will be stored on the calling form & available later)
    *   - redirect_url (if set the browser will be redirected to this.
    */
-  public function doPreApproval($params) {}
+  public function doPreApproval(&$params) {}
 
   /**
    * Get any details that may be available to the payment processor due to an approval process having happened.

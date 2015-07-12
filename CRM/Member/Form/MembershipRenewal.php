@@ -523,11 +523,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $formValues['email-5'] = $formValues['email-Primary'] = $this->_contributorEmail;
       $formValues['register_date'] = $now;
 
-      // now set the values for the billing location.
-      foreach ($this->_fields as $name => $dontCare) {
-        $fields[$name] = 1;
-      }
-
       // also add location name to the array
       $formValues["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $formValues) . ' ' . CRM_Utils_Array::value('billing_middle_name', $formValues) . ' ' . CRM_Utils_Array::value('billing_last_name', $formValues);
 
