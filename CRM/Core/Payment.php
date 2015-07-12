@@ -678,7 +678,7 @@ abstract class CRM_Core_Payment {
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
           // See comment block.
-          $paymentParams['payment_status_id'] = array_search('Pending', $statuses);
+          $result['payment_status_id'] = array_search('Pending', $statuses);
         }
         else {
           $result['payment_status_id'] = array_search('Completed', $statuses);
