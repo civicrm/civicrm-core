@@ -321,7 +321,6 @@ class CRM_Core_Payment_Form {
   }
 
   /**
->>>>>>> 65e3e1ce2d1e407fa768966606173c79b12ba81f
    * Validate the payment instrument values before passing it to the payment processor
    * We want this to be overrideable by the payment processor, and default to using
    * this object's validCreditCard for credit cards (implemented as the default in the Payment class).
@@ -329,7 +328,7 @@ class CRM_Core_Payment_Form {
   public static function validatePaymentInstrument($payment_processor_id, $values, &$errors, $form) {
     // ignore if we don't have a payment instrument to validate (e.g. backend payments)
     if ($payment_processor_id > 0) {
-      $payment =  Civi\Payment\System::singleton()->getById($payment_processor_id);
+      $payment = Civi\Payment\System::singleton()->getById($payment_processor_id);
       $payment->validatePaymentInstrument($values, $errors);
     }
   }
