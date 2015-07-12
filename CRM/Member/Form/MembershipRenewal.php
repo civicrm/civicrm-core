@@ -482,14 +482,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   protected function submit() {
     $this->storeContactFields($this->_params);
-    // use values from screen
-
-    if ($this->_params['membership_type_id'][1] <> 0) {
-      $defaults['receipt_text_renewal'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $this->_params['membership_type_id'][1],
-        'receipt_text_renewal'
-      );
-    }
 
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->convertDateFieldsToMySQL($this->_params);

@@ -2301,7 +2301,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       'fields' => $fields,
       'price_fields' => array(
         'price_' . $fieldID => CRM_Utils_Array::value('id', $results),
-      )
+      ),
     );
     return $returnParams;
   }
