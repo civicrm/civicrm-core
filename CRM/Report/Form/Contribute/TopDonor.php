@@ -382,7 +382,10 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->select();
 
     $this->from();
-    $this->getPermissionedFTQuery($this);
+
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      $this->getPermissionedFTQuery($this);
+    }
 
     $this->where();
 

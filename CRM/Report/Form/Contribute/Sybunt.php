@@ -433,8 +433,10 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->from();
     $this->where();
     $this->groupBy();
-
-    $this->getPermissionedFTQuery($this);
+    
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      $this->getPermissionedFTQuery($this);
+    }
 
     $rows = $contactIds = array();
     if (empty($this->_params['charts'])) {

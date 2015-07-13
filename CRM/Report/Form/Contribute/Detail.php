@@ -418,7 +418,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
-    $this->getPermissionedFTQuery($this);
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      $this->getPermissionedFTQuery($this);
+    }
     
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'both'
