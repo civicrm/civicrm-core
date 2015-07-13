@@ -419,7 +419,7 @@ SELECT  id, html_type
         );
         
         // Check permissions for financial type first
-        CRM_Financial_BAO_FinancialType::addFinancialTypes($financialTypes);
+        CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
 
         $form->add('select', 'financial_type_id',
           ts('Financial Type'),
