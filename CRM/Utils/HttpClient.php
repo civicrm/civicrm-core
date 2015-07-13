@@ -55,6 +55,11 @@ class CRM_Utils_HttpClient {
   protected $connectionTimeout;
 
   /**
+   * @var CRM_Utils_Cache_Interface|null
+   */
+  protected $cache;
+
+  /**
    * @return CRM_Utils_HttpClient
    */
   public static function singleton() {
@@ -67,8 +72,12 @@ class CRM_Utils_HttpClient {
   /**
    * @param null $connectionTimeout
    */
-  public function __construct($connectionTimeout = NULL) {
+  public function __construct($connectionTimeout = NULL, $cache = NULL) {
     $this->connectionTimeout = $connectionTimeout;
+    $this->cache = $cache ? $cache : new CRM_Utils_Cache_SqlGroup(array(
+      'group' => 'HttpClient',
+      'prefetch' => FALSE,
+    ));
   }
 
   /**
@@ -118,10 +127,16 @@ class CRM_Utils_HttpClient {
    *
    * @param string $remoteFile
    *   URL of remote file.
+   * @param array|FALSE $cachePolicy
+   *   A caching policy. Note that this is not compliant with HTTP standards; it's
+   *   stop-gap until we can replace HttpClient with something better.
+   *   FALSE to disable caching.
+   *   If an array, pass in any of these keys:
+   *     - forceTtl: int, the #seconds for which $remoteFile may be cached.
    * @return array
    *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
-  public function get($remoteFile) {
+  public function get($remoteFile, $cachePolicy = FALSE) {
     // Download extension zip file ...
     if (!function_exists('curl_init')) {
       // CRM-13805
@@ -130,6 +145,14 @@ class CRM_Utils_HttpClient {
         ts('Curl is not installed')
       );
       return array(self::STATUS_DL_ERROR, NULL);
+    }
+
+    if ($this->cache && !empty($cachePolicy['forceTtl'])) {
+      $cachePath = 'get/' . md5($remoteFile);
+      $cacheLine = $this->cache->get($cachePath);
+      if ($cacheLine && $cacheLine['ts'] + $cachePolicy['forceTtl'] > CRM_Utils_Time::getTimeRaw()) {
+        return array(self::STATUS_OK, $cacheLine['data']);
+      }
     }
 
     list($ch, $caConfig) = $this->createCurl($remoteFile);
@@ -146,6 +169,17 @@ class CRM_Utils_HttpClient {
     }
     else {
       curl_close($ch);
+    }
+
+    // For proper caching, use/improve CRM_Utils_Http::parseExpiration() instead of forceTtl.
+    if ($this->cache && !empty($cachePolicy['forceTtl'])) {
+      $cachePath = 'get/' . md5($remoteFile);
+      $cacheLine = array(
+        'url' => $remoteFile,
+        'ts' => CRM_Utils_Time::getTimeRaw(),
+        'data' => $data,
+      );
+      $this->cache->set($cachePath, $cacheLine);
     }
 
     return array(self::STATUS_OK, $data);
@@ -188,6 +222,15 @@ class CRM_Utils_HttpClient {
     }
 
     return array(self::STATUS_OK, $data);
+  }
+
+  /**
+   * Flush any cached data.
+   */
+  public function flush() {
+    if ($this->cache) {
+      $this->cache->flush();
+    }
   }
 
   /**

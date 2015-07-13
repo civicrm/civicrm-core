@@ -175,11 +175,36 @@ function _civicrm_api3_system_log_spec(&$params) {
  * @return array
  */
 function civicrm_api3_system_get($params) {
+  $config = CRM_Core_Config::singleton();
   $returnValues = array(
     array(
-      'version' => CRM_Utils_System::version(),
-      'uf' => CIVICRM_UF,
+      'version' => CRM_Utils_System::version(), // deprecated in favor of civi.version
+      'uf' => CIVICRM_UF, // deprecated in favor of cms.type
+      'php' => array(
+        'version' => phpversion(),
+        'tz' => date_default_timezone_get(),
+        'extensions' => get_loaded_extensions(),
+      ),
+      'mysql' => array(
+        'version' => CRM_Core_DAO::singleValueQuery('SELECT @@version'),
+      ),
+      'cms' => array(
+        'type' => CIVICRM_UF,
+        'modules' => CRM_Core_Module::collectStatuses($config->userSystem->getModules()),
+      ),
+      'civi' => array(
+        'version' => CRM_Utils_System::version(),
+        'dev' => (bool) CRM_Utils_System::isDevelopment(),
+        'components' => array_keys(CRM_Core_Component::getEnabledComponents()),
+        'extensions' => preg_grep(
+          '/^uninstalled$/',
+          CRM_Extension_System::singleton()->getManager()->getStatuses(),
+          PREG_GREP_INVERT
+        ),
+        'exampleUrl' => CRM_Utils_System::url('civicrm/example', NULL, TRUE, NULL, FALSE),
+      ),
     ),
   );
+
   return civicrm_api3_create_success($returnValues, $params, 'System', 'get');
 }

@@ -44,10 +44,12 @@ class RespondEvent extends Event {
    *   The full description of the API request.
    * @param mixed $response
    *   The response to return to the client.
+   * @param \Civi\API\Kernel $apiKernel
+   *   The kernel which fired the event.
    */
-  public function __construct($apiProvider, $apiRequest, $response) {
+  public function __construct($apiProvider, $apiRequest, $response, $apiKernel) {
     $this->response = $response;
-    parent::__construct($apiProvider, $apiRequest);
+    parent::__construct($apiProvider, $apiRequest, $apiKernel);
   }
 
   /**
