@@ -368,12 +368,14 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 DELETE a
 FROM   civicrm_activity a
 INNER JOIN civicrm_activity_contact t ON t.activity_id = a.id
+INNER JOIN civicrm_case_activity ca on ca.activity_id = a.id
 WHERE  t.contact_id = %1
 AND    t.record_type_id = $targetID
 AND    a.is_auto = 1
 AND    a.is_current_revision = 1
+AND    ca.case_id = %2
 ";
-    $sqlParams = array(1 => array($params['clientID'], 'Integer'));
+    $sqlParams = array(1 => array($params['clientID'], 'Integer'), 2 => array($params['caseID'], 'Integer'));
     CRM_Core_DAO::executeQuery($query, $sqlParams);
   }
 
