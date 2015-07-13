@@ -2569,13 +2569,11 @@ AND       civicrm_openid.is_primary = 1";
 
       case 'rel':
         $result = CRM_Contact_BAO_Relationship::getRelationship($contactId,
-          CRM_Contact_BAO_Relationship::CURRENT,
-          0, 1
+          CRM_Contact_BAO_Relationship::CURRENT
         );
-        return $result;
+        return count($result);
 
       case 'group':
-
         return CRM_Contact_BAO_GroupContact::getContactGroup($contactId, "Added", NULL, TRUE);
 
       case 'log':
