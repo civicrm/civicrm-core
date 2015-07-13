@@ -137,7 +137,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'field' => 'is_online_registration',
         );
 
-      if (CRM_Core_Permission::check('administer CiviCRM')) {
+      if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
         self::$_tabLinks[$cacheKey]['reminder']
           = array(
             'title' => ts('Schedule Reminders'),
