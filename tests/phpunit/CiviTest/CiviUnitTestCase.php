@@ -3217,7 +3217,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'contact_id' => $this->_contactID,
         'contribution_page_id' => $this->_contributionPageID,
         'payment_processor_id' => $this->_paymentProcessorID,
-        'is_test' => 1,
+        'is_test' => 0,
       ),
     ));
     $this->_contributionRecurID = $contributionRecur['id'];

@@ -41,7 +41,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->_paymentProcessorID = $this->paymentProcessorCreate();
+    $this->_paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $this->_contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', array(
         'title' => "Test Contribution Page",
@@ -58,7 +58,10 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test IPN response updates contribution_recur & contribution for first & second contribution
+   * Test IPN response updates contribution_recur & contribution for first & second contribution.
+   *
+   * The scenario is that a pending contribution exists and the first call will update it to completed.
+   * The second will create a new contribution.
    */
   public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
