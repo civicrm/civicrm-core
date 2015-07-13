@@ -3061,7 +3061,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
    */
-  public function setupACL() {
+  public function setupACL($isProfile = FALSE) {
     global $_REQUEST;
     $_REQUEST = $this->_params;
 
@@ -3083,36 +3083,49 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
     CRM_Core_DAO::executeQuery("
     INSERT INTO civicrm_acl_entity_role (
-    `acl_role_id`, `entity_table`, `entity_id`
-    ) VALUES (55, 'civicrm_group', {$this->_permissionedGroup});
+    `acl_role_id`, `entity_table`, `entity_id`, `is_active`
+    ) VALUES (55, 'civicrm_group', {$this->_permissionedGroup}, 1);
     ");
 
-    CRM_Core_DAO::executeQuery("
-    INSERT INTO civicrm_acl (
-    `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
-    )
-    VALUES (
-    'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_saved_search', {$this->_permissionedGroup}, 1
-    );
-    ");
+    if ($isProfile) {
+      CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_acl (
+      `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+      )
+      VALUES (
+      'view picked', 'civicrm_acl_role', 55, 'Edit', 'civicrm_uf_group', 0, 1
+      );
+      ");
+    }
+    else {
+      CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_acl (
+      `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+      )
+      VALUES (
+      'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_saved_search', {$this->_permissionedGroup}, 1
+      );
+      ");
 
-    CRM_Core_DAO::executeQuery("
-    INSERT INTO civicrm_acl (
-    `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
-    )
-    VALUES (
-    'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_saved_search', {$this->_permissionedDisabledGroup}, 1
-    );
-    ");
+      CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_acl (
+      `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+      )
+      VALUES (
+      'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_saved_search', {$this->_permissionedDisabledGroup}, 1
+      );
+      ");
+      //flush cache
+      CRM_ACL_BAO_Cache::resetCache();
+      CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+    }
+
     $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
     $this->callAPISuccess('group_contact', 'create', array(
       'group_id' => $this->_permissionedGroup,
       'contact_id' => $this->_loggedInUser,
     ));
-    //flush cache
-    CRM_ACL_BAO_Cache::resetCache();
-    CRM_Contact_BAO_Group::getPermissionClause(TRUE);
-    CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
   }
 
   /**
