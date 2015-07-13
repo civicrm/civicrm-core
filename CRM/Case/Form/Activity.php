@@ -203,7 +203,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
             CRM_Core_Error::statusBounce(ts("You can not add another '%1' activity to this case. %2",
                 array(
                   1 => $this->_activityTypeName,
-                  2 => ts("Do you want to <a href='%1'>edit the existing activity</a>?", array(1 => $editUrl)),
+                  2 => ts("Do you want to <a %1>edit the existing activity</a>?", array(1 => "href='$editUrl'")),
                 )
               ),
               $url
