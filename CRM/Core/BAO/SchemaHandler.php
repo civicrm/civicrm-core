@@ -346,10 +346,12 @@ ALTER TABLE {$tableName}
 
     $config = CRM_Core_Config::singleton();
     if ($config->logging) {
-      // logging support: if we’re adding a column (but only then!) make sure the potential relevant log table gets a column as well
-      if ($params['operation'] == 'add') {
+      // CRM-16717 not sure why this was originally limited to add.
+      // For example custom tables can have field length changes - which need to flow through to logging.
+      // Are there any modifies we DON'T was to call this function for (& shouldn't it be clever enough to cope?)
+      if ($params['operation'] == 'add' || $params['operation'] == 'modify') {
         $logging = new CRM_Logging_Schema();
-        $logging->fixSchemaDifferencesFor($params['table_name'], array('ADD' => array($params['name'])), FALSE);
+        $logging->fixSchemaDifferencesFor($params['table_name'], array(trim($prefix) => array($params['name'])), FALSE);
       }
     }
 
