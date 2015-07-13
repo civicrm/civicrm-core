@@ -90,7 +90,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       //we lost rfp in case of additional participant. So set it explicitly.
       if ($rfp || CRM_Utils_Array::value('additional_participants', $this->_params[0], FALSE)) {
-        $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+        $payment = $this->_paymentProcessor['object'];
         $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
         if (is_object($payment)) {
           $expressParams = $payment->getExpressCheckoutDetails($this->get('token'));
@@ -580,7 +580,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // required only if paid event
       if ($this->_values['event']['is_monetary'] && !($this->_allowWaitlist || $this->_requireApproval)) {
         if (is_array($this->_paymentProcessor)) {
-          $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+          $payment = $this->_paymentProcessor['object'];
         }
         $result = NULL;
 

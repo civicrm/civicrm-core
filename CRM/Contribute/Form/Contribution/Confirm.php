@@ -218,7 +218,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET'
       );
       if ($rfp) {
-        $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
         $expressParams = $payment->getPreApprovalDetails($this->get('pre_approval_parameters'));
 
         $this->_params['payer'] = CRM_Utils_Array::value('payer', $expressParams);
@@ -1762,7 +1762,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // call postProcess hook before leaving
         $form->postProcessHook();
         // this does not return
-        $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
+        $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
         $payment->doTransferCheckout($form->_params, 'contribute');
       }
     }
@@ -1842,7 +1842,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $result = NULL;
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
-      $payment = CRM_Core_Payment::singleton($form->_mode, $form->_paymentProcessor, $form);
+      $payment = $form->_paymentProcessor['object'];
 
       if ($form->_contributeMode == 'express') {
         $result = $payment->doExpressCheckout($tempParams);
