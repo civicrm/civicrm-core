@@ -465,7 +465,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                             {$this->_aliases['civicrm_address']}.contact_id AND
                             {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
-    $this->getPermissionedFTQuery($this);
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      $this->getPermissionedFTQuery($this);
+    }
   }
 
   /**
