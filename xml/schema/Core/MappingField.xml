@@ -9,6 +9,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
+    <title>Mapping Field ID</title>
     <required>true</required>
     <comment>Mapping Field ID</comment>
     <add>1.2</add>
@@ -21,6 +22,7 @@
   <field>
     <name>mapping_id</name>
     <type>int unsigned</type>
+    <title>Mapping ID</title>
     <required>true</required>
     <comment>Mapping to which this field belongs</comment>
     <add>1.2</add>
@@ -58,6 +60,7 @@
   <field>
     <name>location_type_id</name>
     <type>int unsigned</type>
+    <title>Location type ID</title>
     <comment>Location type of this mapping, if required</comment>
     <add>1.2</add>
   </field>
@@ -78,12 +81,14 @@
   <field>
     <name>phone_type_id</name>
     <type>int unsigned</type>
+    <title>Phone type ID</title>
     <comment>Which type of phone does this number belongs.</comment>
     <add>2.2</add>
   </field>
   <field>
     <name>im_provider_id</name>
     <type>int unsigned</type>
+    <title>IM provider ID</title>
     <comment>Which type of IM Provider does this name belong.</comment>
     <add>3.0</add>
     <pseudoconstant>
