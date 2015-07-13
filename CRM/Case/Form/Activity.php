@@ -203,7 +203,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
             CRM_Core_Error::statusBounce(ts("You can not add another '%1' activity to this case. %2",
                 array(
                   1 => $this->_activityTypeName,
-                  2 => "Do you want to <a href='$editUrl'>edit the existing activity</a> ?",
+                  2 => ts("Do you want to <a href='%1'>edit the existing activity</a>?", array(1 => $editUrl)),
                 )
               ),
               $url
@@ -431,7 +431,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     }
 
     // required for status msg
-    $recordStatus = 'created';
+    $recordStatus = ts("The '%1' activity has been created.", array(1 => $this->_activityTypeName));
 
     // store the dates with proper format
     $params['activity_date_time'] = CRM_Utils_Date::processDate($params['activity_date_time'], $params['activity_date_time_time']);
@@ -502,7 +502,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
 
       // record status for status msg
-      $recordStatus = 'updated';
+      $recordStatus = ts("The '%1' activity has been updated.", array(1 => $this->_activityTypeName));
     }
 
     if (!isset($newActParams)) {
@@ -699,14 +699,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         }
       }
 
-      CRM_Core_Session::setStatus('', ts("'%1' activity has been %2. %3 %4",
-        array(
-          1 => $this->_activityTypeName,
-          2 => $recordStatus,
-          3 => $followupStatus,
-          4 => $mailStatus,
-        )
-      ), 'info');
+      CRM_Core_Session::setStatus('', $recordStatus . ' ' . $followupStatus . ' ' . $mailStatus, 'info');
     }
   }
 
