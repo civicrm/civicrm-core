@@ -9,6 +9,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
+    <title>Mapping ID</title>
     <required>true</required>
     <comment>Mapping ID</comment>
     <add>1.2</add>
@@ -45,6 +46,7 @@
   <field>
     <name>mapping_type_id</name>
     <type>int unsigned</type>
+    <title>Mapping Type</title>
     <comment>Mapping Type</comment>
     <add>2.1</add>
     <pseudoconstant>
