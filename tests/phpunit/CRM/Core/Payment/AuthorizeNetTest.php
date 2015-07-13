@@ -27,7 +27,6 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/AuthorizeNet.php';
 
 /**
  * Class CRM_Core_Payment_AuthorizeNetTest
