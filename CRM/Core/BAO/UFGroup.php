@@ -2022,8 +2022,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $subtypeList = $subtypes;
       }
 
-      $sel = $form->add('select', $name, $title, $subtypeList, $required);
-      $sel->setMultiple(TRUE);
+      $form->add('select', $name, $title, $subtypeList, $required, array('class' => 'crm-select2', 'multiple' => TRUE));
     }
     elseif (in_array($fieldName, CRM_Contact_BAO_Contact::$_greetingTypes)) {
       //add email greeting, postal greeting, addressee, CRM-4575
