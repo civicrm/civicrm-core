@@ -1842,7 +1842,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $result = NULL;
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
-      $payment = $form->_paymentProcessor['object'];
+      // At the moment our tests are calling this form in a way that leaves 'object' empty. For
+      // now we compensate here.
+      if (empty($form->_paymentProcessor['object'])) {
+        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+      }
+      else {
+        $payment = $form->_paymentProcessor['object'];
+      }
 
       if ($form->_contributeMode == 'express') {
         $result = $payment->doExpressCheckout($tempParams);
