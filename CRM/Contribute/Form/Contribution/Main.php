@@ -358,6 +358,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $config = CRM_Core_Config::singleton();
 
+    $contactID = $this->getContactID();
+    if ($contactID) {
+      $this->assign('contact_id', $contactID);
+      $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
+    }
+
     if ($this->_onbehalf) {
       CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
       // Return if we are in an ajax callback
