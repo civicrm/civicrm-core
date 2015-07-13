@@ -103,6 +103,8 @@ class System {
    */
   public function flushProcessors() {
     $this->cache = array();
+    \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors(NULL, TRUE);
+    \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('test', TRUE);
   }
 
 }

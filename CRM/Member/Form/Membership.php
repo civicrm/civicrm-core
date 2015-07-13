@@ -723,10 +723,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $this->addFormRule(array('CRM_Member_Form_Membership', 'formRule'), $this);
 
-    $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-      'mailing_backend'
-    );
-    $this->assign('outBound_option', $mailingInfo['outBound_option']);
+    $this->assign('outBound_option', CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      'mailing_backend'));
 
     parent::buildQuickForm();
   }
@@ -1010,6 +1008,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     CRM_Core_BAO_UFGroup::getValues($formValues['contact_id'], $customFields, $customValues, FALSE, $members);
+    $form->assign('customValues', $customValues);
 
     if ($form->_mode) {
       $name = '';
@@ -1091,7 +1090,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
     }
 
-    $form->assign('customValues', $customValues);
     $isBatchProcess = is_a($form, 'CRM_Batch_Form_Entry');
     if ((empty($form->_contributorDisplayName) || empty($form->_contributorEmail)) || $isBatchProcess) {
       // in this case the form is being called statically from the batch editing screen
