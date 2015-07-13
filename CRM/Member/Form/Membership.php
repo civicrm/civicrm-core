@@ -1490,15 +1490,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // we do need contribution and recurring records.
       $result = NULL;
       if (!empty($paymentParams['is_recur'])) {
-        $contributionType = new CRM_Financial_DAO_FinancialType();
-        $contributionType->id = $params['financial_type_id'];
-        $contributionType->find(TRUE);
-
+        $financialType = new CRM_Financial_DAO_FinancialType();
+        $financialType->id = $params['financial_type_id'];
+        $financialType->find(TRUE);
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
           $paymentParams,
           $result,
           $this->_contributorContactID,
-          $contributionType,
+          $financialType,
           TRUE,
           FALSE,
           $isTest,
@@ -1548,26 +1547,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
 
-      if ($result) {
-        $this->_params = array_merge($this->_params, $result);
-        //assign amount to template if payment was successful
-        $this->assign('amount', $params['total_amount']);
-      }
-
-      // if the payment processor returns a payment_status_id -we assume this
-      // applies to the whole contribution.
-      // At this stage this form is not processing separate payments.
-      if (isset($result['payment_status_id'])) {
-        // CRM-16737 $result['contribution_status_id'] is deprecated in favour
-        // of payment_status_id as the payment processor only knows whether the payment is complete
-        // not whether payment completes the contribution
-        $params['contribution_status_id'] = $params['payment_status_id'];
-      }
-      // do what used to happen previously
-      else {
-        $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
-      }
-      if ($params['contribution_status_id'] != array_search('Completed', $allContributionStatus)) {
+      if ($this->_params['payment_status_id'] != array_search('Completed', $allContributionStatus)) {
         $params['status_id'] = array_search('Pending', $allMemberStatus);
         $params['skipStatusCal'] = TRUE;
         // unset send-receipt option, since receipt will be sent when ipn is received.
@@ -1624,6 +1604,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         if (!empty($softParams) && empty($paymentParams['is_recur'])) {
           $membershipParams['soft_credit'] = $softParams;
         }
+        // This is required to trigger the recording of the membership contribution in the
+        // CRM_Member_BAO_Membership::Create function.
+        // @todo stop setting this & 'teach' the create function to respond to something
+        // appropriate as part of our 2-step always create the pending contribution & then finally add the payment
+        // process -
+        // @see http://wiki.civicrm.org/confluence/pages/viewpage.action?pageId=261062657#Payments&AccountsRoadmap-Movetowardsalwaysusinga2-steppaymentprocess
+        $membershipParams['contribution_status_id'] = CRM_Utils_Array::value('payment_status_id', $result);
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
