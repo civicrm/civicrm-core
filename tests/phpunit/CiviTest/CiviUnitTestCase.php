@@ -1649,14 +1649,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   id of created contribution
    */
   public function contributionCreate($params, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345,
-    $paymentInstrumentID = 1, $isFee = TRUE) {
+    $paymentInstrumentID = 1) {
     if (!is_array($params)) {
       $params = array('contact_id' => $params);
     }
+
     $params = array_merge(array(
       'domain_id' => 1,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
+      'fee_amount' => 5.00,
+      'net_ammount' => 95.00,
       'financial_type_id' => $cTypeID,
       'payment_instrument_id' => empty($paymentInstrumentID) ? 1 : $paymentInstrumentID,
       'non_deductible_amount' => 10.00,
@@ -1665,11 +1668,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ), $params);
-
-    if ($isFee) {
-      $params['fee_amount'] = 5.00;
-      $params['net_amount'] = 95.00;
-    }
 
     $result = $this->callAPISuccess('contribution', 'create', $params);
     return $result['id'];
