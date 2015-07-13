@@ -174,7 +174,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
 
           if (!empty($defaultArray)) {
-            // also add the seperator before and after the value per new conventio (CRM-1604)
+            // also add the separator before and after the value per new convention (CRM-1604)
             $params['default_value'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $defaultArray) . CRM_Core_DAO::VALUE_SEPARATOR;
           }
         }
@@ -251,8 +251,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         self::fixOptionGroups($params['id'], $params['option_group_id']);
       }
 
-      // if we dont have a default value
-      // retrive it from one of the other custom fields which use this option group
+      // if we do not have a default value
+      // retrieve it from one of the other custom fields which use this option group
       if (empty($params['default_value'])) {
         //don't insert only value separator as default value, CRM-4579
         $defaultValue = self::getOptionGroupDefault($params['option_group_id'],
