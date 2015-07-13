@@ -1304,7 +1304,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->setContributeMode();
 
       if ($this->_paymentProcessor &&
-        $this->_paymentProcessor['object']->supportsPreApproval()
+        $this->_paymentProcessor['object']->supports('preApproval')
       ) {
         $this->handlePreApproval($params);
       }
