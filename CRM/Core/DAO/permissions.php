@@ -431,6 +431,17 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'edit pledges',
     ),
   );
+
+  //CRM-16777: Disable schedule reminder for user that have 'edit all events' and 'administer CiviCRM' permission.
+  $permissions['action_schedule'] = array(
+    'update' => array(
+      array(
+        'access CiviCRM',
+        'edit all events',
+      ),
+    ),
+  );
+
   $permissions['pledge_payment'] = array(
     'create' => array(
       'access CiviCRM',

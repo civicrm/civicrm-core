@@ -58,6 +58,19 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
+    //CRM-16777: Don't provide access to administer schedule reminder page, with user that does not have 'administer CiviCRM' permission
+    if (empty($this->_context) && !CRM_Core_Permission::check('administer CiviCRM')) {
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    }
+    //CRM-16777: When user have ACLs 'edit' permission for specific event, do not give access to add, delete & updtae
+    //schedule reminder for other events.
+    else {
+      $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
+      if (!CRM_Event_BAO_Event::checkPermission($this->_compId, CRM_Core_Permission::EDIT)) {
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      }
+    }
+
     if ($this->_action & (CRM_Core_Action::DELETE)) {
       $reminderName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'title');
       if ($this->_context == 'event') {
