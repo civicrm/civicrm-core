@@ -320,7 +320,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */

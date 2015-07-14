@@ -419,7 +419,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
     $this->getPermissionedFTQuery($this);
-    
+
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'both'
     ) {
@@ -492,8 +492,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                  LEFT JOIN civicrm_batch {$this->_aliases['civicrm_batch']}
                         ON {$this->_aliases['civicrm_batch']}.id = {$this->_aliases['civicrm_entity_batch']}.batch_id";
     }
-
-    
   }
 
   public function groupBy() {
@@ -630,7 +628,6 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     // simple reset of ->_from
     $this->from();
-
 
     // also include custom group from if included
     // since this might be included in select

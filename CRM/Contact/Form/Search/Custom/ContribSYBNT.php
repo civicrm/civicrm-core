@@ -128,7 +128,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
    * @param int $offset
    * @param int $rowcount
    * @param null $sort
-   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
    *
    * @return string
    */

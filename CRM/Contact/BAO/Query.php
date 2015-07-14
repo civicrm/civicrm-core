@@ -4775,7 +4775,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     if (!empty($financialTypes)) {
-      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ") AND li.id IS NULL";
+      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND li.id IS NULL";
     }
     else {
       $where .= " AND civicrm_contribution.financial_type_id IN (0) AND li.financial_type_id IN (0)";
@@ -4789,7 +4789,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
     $from .= "LEFT JOIN civicrm_line_item li
                       ON civicrm_contribution.id = li.contribution_id AND
-                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',' , array_keys($financialTypes)) . ")";
+                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
     $query = "$select FROM (
       SELECT civicrm_contribution.total_amount, civicrm_contribution.currency $from $completedWhere
       GROUP BY civicrm_contribution.id

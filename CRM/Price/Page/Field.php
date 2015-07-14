@@ -144,7 +144,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         $params = array('price_field_id' => $priceFieldBAO->id);
 
         CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
-        $financialTypeId = $optionValues['financial_type_id']; 
+        $financialTypeId = $optionValues['financial_type_id'];
         if (!array_key_exists($financialTypeId, $financialTypes)) {
           unset($priceField[$priceFieldBAO->id]);
           continue;

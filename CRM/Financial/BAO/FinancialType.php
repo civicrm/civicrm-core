@@ -181,13 +181,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     );
 
     foreach ($financialType as $key => $financialTypeName) {
-      if (!in_array($key, $revenueFinancialType) 
+      if (!in_array($key, $revenueFinancialType)
         || (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
           && !CRM_Core_Permission::check('add contributions of type ' . $financialTypeName))
       ) {
         unset($financialType[$key]);
       }
-      
     }
     return $financialType;
   }
@@ -196,7 +195,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * adding permissions for financial types
    *
    *
-   * @param array $permissions        
+   * @param array $permissions
    *   an array of permissions
    */
   public static function permissionedFinancialTypes(&$permissions) {
@@ -228,7 +227,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     return $financialTypes;
   }
- 
+
   public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = 'view') {
     if (empty($membershipTypes)) {
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
@@ -253,10 +252,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (is_array($whereClauses)) {
       self::getAvailableFinancialTypes($types);
       if (empty($types)) {
-        $whereClauses[] = ' '.$alias.'.financial_type_id IN (0)';
+        $whereClauses[] = ' ' . $alias . '.financial_type_id IN (0)';
       }
       else {
-        $whereClauses[] = ' '.$alias.'.financial_type_id IN (' . implode(',' , array_keys($types)) .')';
+        $whereClauses[] = ' ' . $alias . '.financial_type_id IN (' . implode(',', array_keys($types)) . ')';
       }
     }
     else {
@@ -272,14 +271,14 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
         $whereClauses .= " AND civicrm_{$component}.{$column} IN (0)";
         return;
       }
-      $whereClauses .= " AND civicrm_{$component}.{$column} IN (". implode(',' , array_keys($types)) .")";
+      $whereClauses .= " AND civicrm_{$component}.{$column} IN (" . implode(',', array_keys($types)) . ")";
     }
   }
 
   public static function checkPermissionedLineItems($id, $op, $force = TRUE) {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
     $flag = FALSE;
-    foreach ($lineItems as $items) { 
+    foreach ($lineItems as $items) {
       if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
         if ($force) {
           CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
@@ -294,11 +293,11 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     return $flag;
   }
-  
+
   /**
    * Check if FT-ACL is turned on or off
    *
-   * @return boolean 
+   * @return bool
    */
   public static function isACLFinancialTypeStatus() {
     $contributeSettings = CRM_Core_BAO_Setting::getItem(
@@ -309,4 +308,5 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     return FALSE;
   }
+
 }

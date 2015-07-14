@@ -417,7 +417,6 @@ SELECT  id, html_type
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
           array('onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);")
         );
-        
         // Check permissions for financial type first
         if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
           CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');

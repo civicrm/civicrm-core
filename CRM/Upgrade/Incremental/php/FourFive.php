@@ -331,7 +331,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *
    * @return bool TRUE for success
    */
-  static function updateSavedSearch(CRM_Queue_TaskContext $ctx) {
+  public static function updateSavedSearch(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT id, form_values FROM civicrm_saved_search";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
@@ -341,22 +341,22 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
         if (preg_match('/^custom_/', $field) && is_array($data_value) && !array_key_exists("${field}_operator", $formValues)) {
           // Now check for CiviCRM_OP_OR as either key or value in the data_value array.
           // This is the conclusive evidence of an old-style data format.
-          if(array_key_exists('CiviCRM_OP_OR', $data_value) || FALSE !== array_search('CiviCRM_OP_OR', $data_value)) {
+          if (array_key_exists('CiviCRM_OP_OR', $data_value) || FALSE !== array_search('CiviCRM_OP_OR', $data_value)) {
             // We have old style data. Mark this record to be updated.
             $update = TRUE;
             $op = 'and';
-            if(!preg_match('/^custom_([0-9]+)/', $field, $matches)) {
+            if (!preg_match('/^custom_([0-9]+)/', $field, $matches)) {
               // fatal error?
               continue;
             }
-            $fieldID= $matches[1];
+            $fieldID = $matches[1];
             if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
               // This indicates data structure identified by jamie in the form:
               // value1 => 1, value2 => , value3 => 1.
               $data_value = array_keys($data_value, 1);
 
               // If CiviCRM_OP_OR - change OP from default to OR
-              if($data_value['CiviCRM_OP_OR'] == 1) {
+              if ($data_value['CiviCRM_OP_OR'] == 1) {
                 $op = 'or';
               }
               unset($data_value['CiviCRM_OP_OR']);
