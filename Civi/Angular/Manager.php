@@ -81,6 +81,12 @@ class Manager {
         'ext' => 'civicrm',
         'js' => array('ang/crmAutosave.js'),
       );
+      $angularModules['crmCxn'] = array(
+        'ext' => 'civicrm',
+        'js' => array('ang/crmCxn.js', 'ang/crmCxn/*.js'),
+        'css' => array('ang/crmCxn.css'),
+        'partials' => array('ang/crmCxn'),
+      );
       //$angularModules['crmExample'] = array(
       //  'ext' => 'civicrm',
       //  'js' => array('ang/crmExample.js'),
@@ -112,6 +118,10 @@ class Manager {
       $angularModules['ngRoute'] = array(
         'ext' => 'civicrm',
         'js' => array('bower_components/angular-route/angular-route.min.js'),
+      );
+      $angularModules['ngSanitize'] = array(
+        'ext' => 'civicrm',
+        'js' => array('bower_components/angular-sanitize/angular-sanitize.min.js'),
       );
       $angularModules['ui.utils'] = array(
         'ext' => 'civicrm',

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,37 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\API\Event;
+require_once '../civicrm.config.php';
+$config = CRM_Core_Config::singleton();
 
-/**
- * Class ResolveEvent
- * @package Civi\API\Event
- */
-class ResolveEvent extends Event {
-  /**
-   * @param array $apiRequest
-   *   The full description of the API request.
-   * @param \Civi\API\Kernel $apiKernel
-   *   The kernel which fired the event.
-   */
-  public function __construct($apiRequest, $apiKernel) {
-    parent::__construct(NULL, $apiRequest, $apiKernel);
-  }
+CRM_Utils_System::loadBootStrap(array(), FALSE);
 
-  /**
-   * @param \Civi\API\Provider\ProviderInterface $apiProvider
-   *   The API provider responsible for executing the request.
-   */
-  public function setApiProvider($apiProvider) {
-    $this->apiProvider = $apiProvider;
-  }
-
-  /**
-   * @param array $apiRequest
-   *   The full description of the API request.
-   */
-  public function setApiRequest($apiRequest) {
-    $this->apiRequest = $apiRequest;
-  }
-
-}
+CRM_Cxn_BAO_Cxn::createApiServer()
+  ->handle(file_get_contents('php://input'))
+  ->send();

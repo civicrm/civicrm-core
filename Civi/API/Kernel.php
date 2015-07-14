@@ -99,7 +99,7 @@ class Kernel {
       return $this->formatResult($apiRequest, $apiResponse);
     }
     catch (\Exception $e) {
-      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, $apiProvider, $apiRequest));
+      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, $apiProvider, $apiRequest, $this));
 
       if ($e instanceof \PEAR_Exception) {
         $err = $this->formatPearException($e, $apiRequest);
@@ -165,7 +165,7 @@ class Kernel {
    */
   public function resolve($apiRequest) {
     /** @var ResolveEvent $resolveEvent */
-    $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest));
+    $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest, $this));
     $apiRequest = $resolveEvent->getApiRequest();
     if (!$resolveEvent->getApiProvider()) {
       throw new \Civi\API\Exception\NotImplementedException("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
@@ -184,7 +184,7 @@ class Kernel {
    */
   public function authorize($apiProvider, $apiRequest) {
     /** @var AuthorizeEvent $event */
-    $event = $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest));
+    $event = $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest, $this));
     if (!$event->isAuthorized()) {
       throw new \Civi\API\Exception\UnauthorizedException("Authorization failed");
     }
@@ -201,7 +201,7 @@ class Kernel {
    */
   public function prepare($apiProvider, $apiRequest) {
     /** @var PrepareEvent $event */
-    $event = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent($apiProvider, $apiRequest));
+    $event = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent($apiProvider, $apiRequest, $this));
     return $event->getApiRequest();
   }
 
@@ -218,7 +218,7 @@ class Kernel {
    */
   public function respond($apiProvider, $apiRequest, $result) {
     /** @var RespondEvent $event */
-    $event = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent($apiProvider, $apiRequest, $result));
+    $event = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent($apiProvider, $apiRequest, $result, $this));
     return $event->getResponse();
   }
 
