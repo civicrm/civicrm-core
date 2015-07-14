@@ -26,12 +26,19 @@
 <div class="crm-block crm-form-block crm-{$formName}-block">
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $formName == "Contribute_Preferences" }
+<<<<<<< HEAD
       <table class = "form-layout">
         <tr class="crm-miscellaneous-form-block-cvv-backoffice-required">
           <td class="label">{$form.cvv_backoffice_required.label}</td>
           <td>
             {$form.cvv_backoffice_required.html}<br />
             <p class="description">{ts}{$cvv_backoffice_required_description}{/ts}</p>
+          </td>
+        </tr>
+        <tr class="crm-preferences-form-block-acl_financial_type">
+          <td class="label">{$form.acl_financial_type.label}&nbsp;{help id="acl_financial_type"}</td>
+          <td>
+            {$form.acl_financial_type.html}
           </td>
         </tr>
         {if $formName == "Contribute_Preferences" }
@@ -42,11 +49,6 @@
             </td>
           </tr>
         {/if}
-        <tr class="crm-preferences-form-block-acl_financial_type">
-          <td>
-            {$form.acl_financial_type.html} {$form.acl_financial_type.label}&nbsp;{help id="acl_financial_type"}
-          </td>
-        </tr>
       </table>
     {/if}
     <table class="form-layout" id="invoicing_blocks">
