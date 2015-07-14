@@ -427,13 +427,11 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   public function postProcess() {
     // get ready with post process params
     $this->beginPostProcess();
-
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     $this->select();
     $this->from();
     $this->where();
     $this->groupBy();
-
     $this->getPermissionedFTQuery($this);
 
     $rows = $contactIds = array();

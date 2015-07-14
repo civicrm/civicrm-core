@@ -115,7 +115,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
     $addWhere = "financial_type_id IN (0)";
     if (!empty($financialTypes)) {
-      $addWhere = "financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
+      $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
     }
 
     if ($dao->find(TRUE)) {

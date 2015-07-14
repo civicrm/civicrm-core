@@ -267,7 +267,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     }
     $this->getPermissionedFTQuery($this);
   }
-  
+
   public function where() {
     $clauses = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -278,7 +278,6 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
             $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
             $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
           }
           else {

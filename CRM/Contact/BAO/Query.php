@@ -4749,7 +4749,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     if (!empty($financialTypes)) {
-      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ") AND li.id IS NULL";
+      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND li.id IS NULL";
     }
     else {
       $where .= " AND civicrm_contribution.financial_type_id IN (0) AND li.financial_type_id IN (0)";

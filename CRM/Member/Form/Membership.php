@@ -660,7 +660,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if (CRM_Core_Action::ADD & $this->_action) {
       $op = 'add';
     }
-    else if (CRM_Core_Action::UPDATE & $this->_action) {
+    elseif (CRM_Core_Action::UPDATE & $this->_action) {
       $op = 'edit';
     }
     $this->add('select', 'financial_type_id',

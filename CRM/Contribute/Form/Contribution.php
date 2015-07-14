@@ -459,8 +459,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function buildQuickForm() {
     // FIXME: This probably needs to be done in preprocess
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() 
-      && $this->_action & CRM_Core_Action::UPDATE 
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && $this->_action & CRM_Core_Action::UPDATE
       && CRM_Utils_Array::value('financial_type_id', $this->_values)
     ) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
@@ -618,7 +618,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
-    
+
     // Check permissions for financial type first
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
 
