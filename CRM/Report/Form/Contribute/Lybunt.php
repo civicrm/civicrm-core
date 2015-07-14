@@ -430,9 +430,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->where();
     $this->groupBy();
 
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-      $this->getPermissionedFTQuery($this);
-    }
+    $this->getPermissionedFTQuery($this);
 
     $rows = $this->_contactIds = array();
     $this->limit();
