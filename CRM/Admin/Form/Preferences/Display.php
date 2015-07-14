@@ -114,9 +114,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $defaults = parent::setDefaultValues();
     parent::cbsDefaultValues($defaults);
 
-    if ($this->_config->editor_id) {
-      $defaults['editor_id'] = $this->_config->editor_id;
-    }
     if ($this->_config->display_name_format) {
       $defaults['display_name_format'] = $this->_config->display_name_format;
     }
@@ -133,13 +130,12 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
    * @return void
    */
   public function buildQuickForm() {
-    $wysiwyg_options = CRM_Core_OptionGroup::values('wysiwyg_editor');
+    $wysiwyg_options = CRM_Core_OptionGroup::values('wysiwyg_editor', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
 
     //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
     $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $this->assign('invoicing', $invoicing);
-    $config = CRM_Core_Config::singleton();
     $extra = array();
 
     $this->addElement('select', 'editor_id', ts('WYSIWYG Editor'), $wysiwyg_options, $extra);
