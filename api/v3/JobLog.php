@@ -25,37 +25,14 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\API\Event;
-
 /**
- * Class ResolveEvent
- * @package Civi\API\Event
+ * Retrieve one or more job log record.
+ *
+ * @param array $params
+ *   input parameters
+ *
+ * @return array
  */
-class ResolveEvent extends Event {
-  /**
-   * @param array $apiRequest
-   *   The full description of the API request.
-   * @param \Civi\API\Kernel $apiKernel
-   *   The kernel which fired the event.
-   */
-  public function __construct($apiRequest, $apiKernel) {
-    parent::__construct(NULL, $apiRequest, $apiKernel);
-  }
-
-  /**
-   * @param \Civi\API\Provider\ProviderInterface $apiProvider
-   *   The API provider responsible for executing the request.
-   */
-  public function setApiProvider($apiProvider) {
-    $this->apiProvider = $apiProvider;
-  }
-
-  /**
-   * @param array $apiRequest
-   *   The full description of the API request.
-   */
-  public function setApiRequest($apiRequest) {
-    $this->apiRequest = $apiRequest;
-  }
-
+function civicrm_api3_job_log_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
