@@ -693,7 +693,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         }
       }
       $title = ts("%1 Saved", array(1 => $this->_activityTypeName));
-      CRM_Core_Session::setStatus($followupStatus . $mailStatus, $title, 'info');
+      CRM_Core_Session::setStatus($followupStatus . $mailStatus, $title, 'success');
     }
   }
 
