@@ -308,8 +308,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
-    CRM_Core_Error::debug( '$params', $params );
-    exit;
 
     // we do this in case the user has hit the forward/back button
     if ($this->_id) {
@@ -339,11 +337,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $params['honor_block_title'] = NULL;
       $params['honor_block_text'] = NULL;
     }
-    else {
-      $sctJSON = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($params);
-    }
-
-
 
     $dao = CRM_Contribute_BAO_ContributionPage::create($params);
 
@@ -368,14 +361,12 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $ufJoinParam['weight'] = 1;
         $ufJoinParam['is_active'] = 1;
         if ($index == 'honor_block_is_active') {
-          $ufJoinParam['module'] = 'soft_credit';
           $ufJoinParam['uf_group_id'] = $params['honoree_profile'];
           $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($params);
         }
         else {
-          $ufJoinParam['module'] = 'on_behalf';
           $ufJoinParam['uf_group_id'] = $params['onbehalf_profile_id'];
-          $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($params);
+          $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatMultilingualOnBehalfParams($params);
         }
         CRM_Core_BAO_UFJoin::create($ufJoinParam);
       }

@@ -210,17 +210,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = CRM_Core_Session::singleton()->get('userID');
 
-    //Check if honor block is enabled for current contribution
-    $ufJoinParams = array(
-      'module' => 'soft_credit',
-      'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $this->_id,
-    );
-    $ufJoin = new CRM_Core_DAO_UFJoin();
-    $ufJoin->copyValues($ufJoinParams);
-    $ufJoin->find(TRUE);
-    $this->_honor_block_is_active = $ufJoin->is_active;
-
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
     if ($this->_contactID) {
