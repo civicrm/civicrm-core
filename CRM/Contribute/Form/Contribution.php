@@ -621,7 +621,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Check permissions for financial type first
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
-
+    if (empty($financialTypes)) {
+      CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.')); 
+    }
     $financialType = $this->add('select', 'financial_type_id',
       ts('Financial Type'),
       array('' => ts('- select -')) + $financialTypes,
