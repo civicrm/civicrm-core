@@ -472,7 +472,7 @@ WHERE     ct.id = cp.financial_type_id AND
     // Check permissioned financial types
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialType, 'add');
     if ($financialType) {
-      $types = implode(',' , array_keys($financialType));
+      $types = implode(',', array_keys($financialType));
       $query .= ' AND s.financial_type_id IN (' . $types . ') AND v.financial_type_id IN (' . $types . ') ';
     }
     else {

@@ -273,10 +273,11 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     ));
 
     // financial type
-    if (CRM_Core_Permission::check('administer CiviCRM Financial Types')) {
+    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() ||
+        (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Core_Permission::check('administer CiviCRM Financial Types'))) {
       $this->addSelect('financial_type_id');
     }
-    else { 
+    else {
       CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
       $this->addSelect('financial_type_id', array('context' => 'search', 'options' => $financialTypes));
     }

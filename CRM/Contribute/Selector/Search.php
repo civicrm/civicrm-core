@@ -368,7 +368,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       // Now check for lineItems
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
         $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($result->id);
-        foreach ($lineItems as $items) { 
+        foreach ($lineItems as $items) {
           if (!CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
             $checkLineItem = TRUE;
             break;

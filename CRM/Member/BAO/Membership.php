@@ -1533,11 +1533,11 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       $allIDs = implode(',', $membershipTypeIDS);
       $whereClause .= " AND id IN ( $allIDs )";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add'); 
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
 
     if ($financialTypes) {
-      $whereClause .= " AND financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
-    } 
+      $whereClause .= " AND financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+    }
     else {
       $whereClause .= " AND financial_type_id IN (0)";
     }
@@ -1598,7 +1598,7 @@ FROM   civicrm_membership_type
     CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($membershipTypes);
     $addWhere = " AND membership_type_id IN (0)";
     if (!empty($membershipTypes)) {
-      $addWhere = " AND membership_type_id IN (" . implode(',' , array_keys($membershipTypes)) . ")";
+      $addWhere = " AND membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
     }
     $select = "SELECT count(*) FROM civicrm_membership ";
     $where = "WHERE civicrm_membership.contact_id = {$contactID} AND civicrm_membership.is_test = 0 ";

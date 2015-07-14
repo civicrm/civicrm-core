@@ -114,14 +114,14 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     $dao->find();
 
     while ($dao->fetch()) {
-      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() 
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
         && !CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))
       ) {
         continue;
       }
       $links = self::links();
       $membershipType[$dao->id] = array();
-      CRM_Core_DAO::storeValues($dao, $membershipType[$dao->id]); 
+      CRM_Core_DAO::storeValues($dao, $membershipType[$dao->id]);
 
       $membershipType[$dao->id]['period_type'] = CRM_Utils_Array::value($dao->period_type, CRM_Core_SelectValues::periodType(), '');
       $membershipType[$dao->id]['visibility'] = CRM_Utils_Array::value($dao->visibility, CRM_Core_SelectValues::memberVisibility(), '');

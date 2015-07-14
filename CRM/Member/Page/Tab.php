@@ -53,7 +53,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($membershipTypes);
     $addWhere = "membership_type_id IN (0)";
     if (!empty($membershipTypes)) {
-      $addWhere = "membership_type_id IN (" . implode(',' , array_keys($membershipTypes)) . ")";
+      $addWhere = "membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
     }
 
     $membership = array();
@@ -620,7 +620,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     return 'CRM_Member_BAO_Membership';
   }
 
-  static function getPermissionedLinks($memTypeID, &$links) {
+  public static function getPermissionedLinks($memTypeID, &$links) {
     if (!self::isACLFinancialTypeStatus()) {
       return FALSE;
     }

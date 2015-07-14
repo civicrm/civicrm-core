@@ -71,7 +71,7 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
         }
         // Now check for lineItems
         if ($lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id)) {
-          foreach ($lineItems as $items) { 
+          foreach ($lineItems as $items) {
             if (!CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
               unset($this->_contributionIds[$key]);
               $count++;

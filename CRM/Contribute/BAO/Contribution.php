@@ -792,11 +792,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if ($endDate) {
       $where[] = "receive_date <= '" . CRM_Utils_Type::escape($endDate, 'Timestamp') . "'";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes); 
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     if ($financialTypes) {
-      $where[] = "c.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
-      $where[] = "i.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
-    } 
+      $where[] = "c.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+      $where[] = "i.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+    }
     else {
       $where[] = "c.financial_type_id IN (0)";
     }
@@ -1194,11 +1194,11 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
     $startDate = "$year$monthDay";
     $endDate = "$nextYear$monthDay";
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    $additionalWhere = " AND b.financial_type_id IN (0)"; 
+    $additionalWhere = " AND b.financial_type_id IN (0)";
     $liWhere = " AND i.financial_type_id IN (0)";
     if (!empty($financialTypes)) {
-      $additionalWhere = " AND b.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ") AND i.id IS NULL";
-      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',' , array_keys($financialTypes)) . ")";
+      $additionalWhere = " AND b.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND i.id IS NULL";
+      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
     }
     $query = "
       SELECT count(*) as count,
@@ -1907,8 +1907,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $additionalWhere = " AND contribution.financial_type_id IN (0)";
     $liWhere = " AND i.financial_type_id IN (0)";
     if (!empty($financialTypes)) {
-      $additionalWhere = " AND contribution.financial_type_id IN (" . implode(',' , array_keys($financialTypes)) . ")";
-      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',' , array_keys($financialTypes)) . ")";
+      $additionalWhere = " AND contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
     }
     $contactContributionsSQL = "
       SELECT contribution.id AS id
