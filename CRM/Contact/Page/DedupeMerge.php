@@ -32,8 +32,7 @@
  * $Id$
  *
  */
-class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
-
+class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
   const BATCHLIMIT = 5;
 
   /**
@@ -47,7 +46,8 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
     if ($runner) {
       // Run Everything in the Queue via the Web.
       $runner->runAllViaWeb();
-    } else {
+    }
+    else {
       CRM_Core_Session::setStatus(ts('Nothing to merge.'));
     }
 
@@ -57,9 +57,9 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
 
   static function getRunner() {
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
-    $gid  = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
+    $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
     $action = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
-    $mode   = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'safe');
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'safe');
 
     $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
     $cacheKeyString = "merge {$contactType}";
@@ -68,16 +68,17 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
 
     // Setup the Queue
     $queue = CRM_Queue_Service::singleton()->create(array(
-      'name'  => $cacheKeyString,
-      'type'  => 'Sql',
-      'reset' => TRUE,
+      'name' => $cacheKeyString,
+      'type' => 'Sql',
+      'reset' => TRUE
     ));
 
     $where = NULL;
     if ($action == CRM_Core_Action::MAP) {
       $where = "pn.is_selected = 1";
       $isSelected = 1;
-    } else {
+    }
+    else {
       // else merge all (2)
       $isSelected = 2;
     }
@@ -91,12 +92,18 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
     // reset merge stats, so we compute new stats
     CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
 
-    for ($i = 1; $i <= ceil($total/self::BATCHLIMIT); $i++) {
-      $task  = new CRM_Queue_Task(
-        array ('CRM_Contact_Page_DedupeMerge', 'callBatchMerge'),
-        array($rgid, $gid, $mode, TRUE, self::BATCHLIMIT, $isSelected),
-        "Processed " . $i*self::BATCHLIMIT . " pair of duplicates"
-      );
+    for($i = 1; $i <= ceil($total / self::BATCHLIMIT); $i++) {
+      $task = new CRM_Queue_Task(array(
+        'CRM_Contact_Page_DedupeMerge',
+        'callBatchMerge'
+      ), array(
+        $rgid,
+        $gid,
+        $mode,
+        TRUE,
+        self::BATCHLIMIT,
+        $isSelected
+      ), "Processed " . $i * self::BATCHLIMIT . " pair of duplicates");
 
       // Add the Task to the Queue
       $queue->createItem($task);
@@ -110,8 +117,8 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
     $runner = new CRM_Queue_Runner(array(
       'title' => ts('Merging Duplicates..'),
       'queue' => $queue,
-      'errorMode'=> CRM_Queue_Runner::ERROR_ABORT,
-      'onEndUrl' => CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry, TRUE, NULL, FALSE),
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      'onEndUrl' => CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry, TRUE, NULL, FALSE)
     ));
 
     return $runner;

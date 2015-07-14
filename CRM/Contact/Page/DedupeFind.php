@@ -104,13 +104,15 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       if (empty($result['merged']) && empty($result['skipped'])) {
         $message = '';
         if ($mergedCount >= 1) {
-          $message = ts("%1 pairs of duplicates were merged", array(1 => $mergedCount));
+          $message = ts("%1 pairs of duplicates were merged", array(
+            1 => $mergedCount
+          ));
         }
         if ($skippedCount >= 1) {
           $message = $message ? "{$message} and " : '';
-          $message .= ts("%1 pairs of duplicates were skipped due to conflict",
-            array(1 => $skippedCount)
-          );
+          $message .= ts("%1 pairs of duplicates were skipped due to conflict", array(
+            1 => $skippedCount
+          ));
         }
         $message .= ts(" during the batch merge process with safe mode.");
         CRM_Core_Session::setStatus($message, ts('Merge Complete'), 'success');
@@ -127,27 +129,18 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           $urlQry .= "&gid={$gid}";
         }
         $urlQry .= "&skipped={$skippedCount}&merged={$mergedCount}";
-        CRM_Utils_System::jsRedirect(
-          CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry),
-          ts('Batch Merge Task in progress'),
-          ts('The batch merge task is still in progress. This page will be refreshed automatically.')
-        );
+        CRM_Utils_System::jsRedirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry), ts('Batch Merge Task in progress'), ts('The batch merge task is still in progress. This page will be refreshed automatically.'));
       }
     }
 
-    if ($action & CRM_Core_Action::UPDATE ||
-      $action & CRM_Core_Action::BROWSE
-    ) {
+    if ($action & CRM_Core_Action::UPDATE || $action & CRM_Core_Action::BROWSE) {
       $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
       $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
       $this->action = CRM_Core_Action::UPDATE;
 
-      //calculate the $contactType
+      // calculate the $contactType
       if ($rgid) {
-        $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup',
-          $rgid,
-          'contact_type'
-        );
+        $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
       }
 
       $sourceParams = 'snippet=4';
@@ -162,7 +155,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       }
       $this->assign('sourceUrl', CRM_Utils_System::url('civicrm/ajax/dedupefind', $sourceParams, FALSE, NULL, FALSE));
 
-      //reload from cache table
+      // reload from cache table
       $cacheKeyString = "merge $contactType";
       $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
       $cacheKeyString .= $gid ? "_{$gid}" : '_0';
@@ -220,7 +213,9 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           $ruleGroup->find(TRUE);
 
           $session = CRM_Core_Session::singleton();
-          $session->setStatus(ts('No possible duplicates were found using %1 rule.', array(1 => $ruleGroup->name)), ts('None Found'), 'info');
+          $session->setStatus(ts('No possible duplicates were found using %1 rule.', array(
+            1 => $ruleGroup->name
+          )), ts('None Found'), 'info');
           $url = CRM_Utils_System::url('civicrm/contact/deduperules', 'reset=1');
           if ($context == 'search') {
             $url = $session->readUserContext();
@@ -283,7 +278,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
               'dstID' => $dstID,
               'dstName' => $displayNames[$dstID],
               'weight' => $dupes[2],
-              'canMerge' => $canMerge,
+              'canMerge' => $canMerge
             );
 
             $data = CRM_Core_DAO::escapeString(serialize($row));
@@ -301,14 +296,10 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           CRM_Core_BAO_PrevNextCache::setItem($values);
           $session = CRM_Core_Session::singleton();
           if ($this->_cid) {
-            $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/deduperules',
-              "action=update&rgid={$this->_rgid}&gid={$this->_gid}&cid={$this->_cid}"
-            ));
+            $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/deduperules', "action=update&rgid={$this->_rgid}&gid={$this->_gid}&cid={$this->_cid}"));
           }
           else {
-            $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind',
-              "reset=1&action=update&rgid={$this->_rgid}"
-            ));
+            $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind', "reset=1&action=update&rgid={$this->_rgid}"));
           }
         }
       }
@@ -384,5 +375,4 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   public function userContext($mode = NULL) {
     return 'civicrm/contact/dedupefind';
   }
-
 }
