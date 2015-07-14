@@ -78,32 +78,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->assign('mainDisplay', CRM_Utils_Request::retrieve('_qf_Main_display', 'Boolean',
       CRM_Core_DAO::$_nullObject));
 
-    // Possible values for 'is_for_organization':
-    // * 0 - org profile disabled
-    // * 1 - org profile optional
-    // * 2 - org profile required
-    $this->_onbehalf = FALSE;
-    if (!empty($this->_values['is_for_organization'])) {
-      if ($this->_values['is_for_organization'] == 2) {
-        $this->_onBehalfRequired = TRUE;
-      }
-      // Add organization profile if 1 of the following are true:
-      // If the org profile is required
-      if ($this->_onBehalfRequired ||
-        // Or we are building the form for the first time
-        empty($_POST) ||
-        // Or the user has submitted the form and checked the "On Behalf" checkbox
-        !empty($_POST['is_for_organization'])
-      ) {
-        $this->_onbehalf = TRUE;
-        CRM_Contribute_Form_Contribution_OnBehalfOf::preProcess($this);
-      }
-    }
-    $this->assign('onBehalfRequired', $this->_onBehalfRequired);
-
-    if ($this->_honor_block_is_active) {
-      CRM_Contact_Form_ProfileContact::preprocess($this);
-    }
+    CRM_Contact_Form_ProfileContact::preprocess($this);
 
     if ($this->_snippet) {
       $this->assign('isOnBehalfCallback', CRM_Utils_Array::value('onbehalf', $_GET, FALSE));

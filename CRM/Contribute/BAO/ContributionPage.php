@@ -859,7 +859,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
 
     if ($setDefault) {
       $onBehalfJsonDecode = json_decode($params);
-      $onBehalfJsonDecode = (array) $onBehalfJsonDecode->is_for_organization;
+      $onBehalfJsonDecode = (array) $onBehalfJsonDecode->on_behalf;
       if (!$domain->locales && !empty($onBehalfJsonDecode['default'])) {
         //monolingual state
         $onBehalfJsonDecode += (array) $onBehalfJsonDecode['default'];
@@ -904,7 +904,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       $ufJoinDAO->find(TRUE);
       $jsonData = json_decode($ufJoinDAO->module_data);
       if ($jsonData) {
-        $onBehalfJson['on_behalf'] = array_merge((array) $jsonData->soft_credit, $onBehalfJson['on_behalf']);
+        $onBehalfJson['on_behalf'] = array_merge((array) $jsonData->on_behalf, $onBehalfJson['on_behalf']);
       }
       $onBehalfJson = json_encode($onBehalfJson);
     }
