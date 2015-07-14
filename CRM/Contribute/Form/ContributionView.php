@@ -60,6 +60,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
     }
+    elseif ($this->_action & CRM_Core_Action::VIEW) {
+      $this->assign('noACL', TRUE);
+    }
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
     $cancelledStatus = TRUE;
     $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');

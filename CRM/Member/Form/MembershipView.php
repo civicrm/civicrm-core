@@ -166,6 +166,9 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           CRM_Core_Error::fatal(ts('You do not have permissionn to access this page.'));
         }
       }
+      else {
+        $this->assign('noACL', TRUE);
+      }
       $this->assign('financialTypeId', $finType);
       $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']);
 
