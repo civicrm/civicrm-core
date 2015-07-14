@@ -290,6 +290,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   public static function checkPermissionedLineItems($id, $op, $force = TRUE) {
+    if (!self::isACLFinancialTypeStatus()) {
+      return TRUE;
+    }
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
     $flag = FALSE;
     foreach ($lineItems as $items) {
