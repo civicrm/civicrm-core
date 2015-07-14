@@ -38,6 +38,11 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * Static holder for the default LT.
    */
   static $_defaultContributionType = NULL;
+  
+  /**
+   * Statid cache holder of available financial types for this session
+   */
+   static $_availableFinancialTypes = NULL;
 
   /**
    * Class constructor.
@@ -228,20 +233,27 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     );
   }
 
-  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view') {
+  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view', $resetCache = FALSE) {
     if (empty($financialTypes)) {
       $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;
+    } else {
+      // check cached value
+      if (!empty($_availableFinancialTypes) && !$reset) {
+        return $_availableFinancialTypes;
+      }
     }
     foreach ($financialTypes as $finTypeId => $type) {
       if (!CRM_Core_Permission::check($action . ' contributions of type ' . $type)) {
         unset($financialTypes[$finTypeId]);
       }
     }
+    $_availableFinancialTypes = $financialTypes;
     return $financialTypes;
   }
+  
   public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = 'view') {
     if (empty($membershipTypes)) {
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
