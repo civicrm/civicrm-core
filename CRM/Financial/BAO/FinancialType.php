@@ -181,7 +181,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     );
 
     foreach ($financialType as $key => $financialTypeName) {
-      if (!in_array($key, $revenueFinancialType) || !CRM_Core_Permission::check('add contributions of type ' . $financialTypeName)) {
+      if (!in_array($key, $revenueFinancialType) 
+        || (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+          && !CRM_Core_Permission::check('add contributions of type ' . $financialTypeName))
+      ) {
         unset($financialType[$key]);
       }
       
