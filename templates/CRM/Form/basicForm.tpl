@@ -27,14 +27,14 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $formName == "Contribute_Preferences" }
       <table class="form-layout">
-        <tr class="crm-preferences-form-block-invoicing">
-          <td>
-            {$form.invoicing.html} {$form.invoicing.label}
-          </td>
-        </tr>
         <tr class="crm-preferences-form-block-acl_financial_type">
           <td>
             {$form.acl_financial_type.html} {$form.acl_financial_type.label}&nbsp;{help id="acl_financial_type"}
+          </td>
+        </tr>
+        <tr class="crm-preferences-form-block-invoicing">
+          <td>
+            {$form.invoicing.html} {$form.invoicing.label}
           </td>
         </tr>
       </table>
