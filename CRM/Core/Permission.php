@@ -126,7 +126,6 @@ class CRM_Core_Permission {
           if (self::check($orPerm)) {
             // one of our 'or' permissions has succeeded - stop checking this permission
             return TRUE;
-            ;
           }
         }
         // none of our our conditions was met
@@ -219,7 +218,10 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    if (self::check('administer Multiple Organizations') && self::isMultisiteEnabled()) {
+    if (
+      self::check('administer Multiple Organizations') &&
+      self::isMultisiteEnabled()
+    ) {
       return TRUE;
     }
 
@@ -237,9 +239,8 @@ class CRM_Core_Permission {
    * @return array
    */
   public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE) {
-    $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id', array(
-      'fresh' => $reset
-    ));
+    $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id',
+      array('fresh' => $reset));
     $defaultGroups = array();
 
     // check if user has all powerful permission
@@ -303,25 +304,25 @@ class CRM_Core_Permission {
     }
 
     switch ($type) {
-      case CRM_Core_Permission::VIEW :
+      case CRM_Core_Permission::VIEW:
         if (self::check('profile view')) {
           return $allGroups;
         }
         break;
 
-      case CRM_Core_Permission::CREATE :
+      case CRM_Core_Permission::CREATE:
         if (self::check('profile create')) {
           return $allGroups;
         }
         break;
 
-      case CRM_Core_Permission::EDIT :
+      case CRM_Core_Permission::EDIT:
         if (self::check('profile edit')) {
           return $allGroups;
         }
         break;
 
-      case CRM_Core_Permission::SEARCH :
+      case CRM_Core_Permission::SEARCH:
         if (self::check('profile listings')) {
           return $allGroups;
         }
@@ -372,7 +373,9 @@ class CRM_Core_Permission {
       $includeEvents = array_keys($events);
     }
 
-    if ($type == CRM_Core_Permission::VIEW && self::check('view event info')) {
+    if ($type == CRM_Core_Permission::VIEW &&
+      self::check('view event info')
+    ) {
       $includeEvents = array_keys($events);
     }
 
@@ -451,7 +454,7 @@ class CRM_Core_Permission {
         'CiviContribute' => 'edit contributions',
         'CiviGrant' => 'edit grants',
         'CiviMail' => 'access CiviMail',
-        'CiviAuction' => 'add auction items'
+        'CiviAuction' => 'add auction items',
       );
       $permissionName = CRM_Utils_Array::value($module, $editPermissions);
     }
@@ -500,9 +503,13 @@ class CRM_Core_Permission {
     }
 
     // if component_id is present, ensure it is enabled
-    if (isset($item['component_id']) && $item['component_id']) {
+    if (isset($item['component_id']) &&
+      $item['component_id']
+    ) {
       $config = CRM_Core_Config::singleton();
-      if (is_array($config->enableComponentIDs) && in_array($item['component_id'], $config->enableComponentIDs)) {
+      if (is_array($config->enableComponentIDs) &&
+        in_array($item['component_id'], $config->enableComponentIDs)
+      ) {
         // continue with process
       }
       else {
@@ -511,8 +518,10 @@ class CRM_Core_Permission {
     }
 
     // the following is imitating drupal 6 code in includes/menu.inc
-    if (empty($item['access_callback']) || is_numeric($item['access_callback'])) {
-      return (boolean) $item['access_callback'];
+    if (empty($item['access_callback']) ||
+      is_numeric($item['access_callback'])
+    ) {
+      return (boolean ) $item['access_callback'];
     }
 
     // check whether the following Ajax requests submitted the right key
@@ -524,7 +533,10 @@ class CRM_Core_Permission {
     }
 
     // check if callback is for checkMenu, if so optimize it
-    if (is_array($item['access_callback']) && $item['access_callback'][0] == 'CRM_Core_Permission' && $item['access_callback'][1] == 'checkMenu') {
+    if (is_array($item['access_callback']) &&
+      $item['access_callback'][0] == 'CRM_Core_Permission' &&
+      $item['access_callback'][1] == 'checkMenu'
+    ) {
       $op = CRM_Utils_Array::value(1, $item['access_arguments'], 'and');
       return self::checkMenu($item['access_arguments'][0], $op);
     }
@@ -616,7 +628,7 @@ class CRM_Core_Permission {
     static $permissions = array();
     if (empty($permissions)) {
       $permissions = array(
-        'administer CiviCRM'
+        'administer CiviCRM',
       );
       $components = CRM_Core_Component::getComponents();
       foreach ($components as $comp) {
@@ -649,175 +661,175 @@ class CRM_Core_Permission {
     $permissions = array(
       'add contacts' => array(
         $prefix . ts('add contacts'),
-        ts('Create a new contact record in CiviCRM')
+        ts('Create a new contact record in CiviCRM'),
       ),
       'view all contacts' => array(
         $prefix . ts('view all contacts'),
-        ts('View ANY CONTACT in the CiviCRM database, export contact info and perform activities such as Send Email, Phone Call, etc.')
+        ts('View ANY CONTACT in the CiviCRM database, export contact info and perform activities such as Send Email, Phone Call, etc.'),
       ),
       'edit all contacts' => array(
         $prefix . ts('edit all contacts'),
-        ts('View, Edit and Delete ANY CONTACT in the CiviCRM database; Create and edit relationships, tags and other info about the contacts')
+        ts('View, Edit and Delete ANY CONTACT in the CiviCRM database; Create and edit relationships, tags and other info about the contacts'),
       ),
       'view my contact' => array(
-        $prefix . ts('view my contact')
+        $prefix . ts('view my contact'),
       ),
       'edit my contact' => array(
-        $prefix . ts('edit my contact')
+        $prefix . ts('edit my contact'),
       ),
       'delete contacts' => array(
-        $prefix . ts('delete contacts')
+        $prefix . ts('delete contacts'),
       ),
       'access deleted contacts' => array(
         $prefix . ts('access deleted contacts'),
-        ts('Access contacts in the trash')
+        ts('Access contacts in the trash'),
       ),
       'import contacts' => array(
         $prefix . ts('import contacts'),
-        ts('Import contacts and activities')
+        ts('Import contacts and activities'),
       ),
       'edit groups' => array(
         $prefix . ts('edit groups'),
-        ts('Create new groups, edit group settings (e.g. group name, visibility...), delete groups')
+        ts('Create new groups, edit group settings (e.g. group name, visibility...), delete groups'),
       ),
       'administer CiviCRM' => array(
         $prefix . ts('administer CiviCRM'),
-        ts('Perform all tasks in the Administer CiviCRM control panel and Import Contacts')
+        ts('Perform all tasks in the Administer CiviCRM control panel and Import Contacts'),
       ),
       'skip IDS check' => array(
         $prefix . ts('skip IDS check'),
-        ts('IDS system is bypassed for users with this permission. Prevents false errors for admin users.')
+        ts('IDS system is bypassed for users with this permission. Prevents false errors for admin users.'),
       ),
       'access uploaded files' => array(
         $prefix . ts('access uploaded files'),
-        ts('View / download files including images and photos')
+        ts('View / download files including images and photos'),
       ),
       'profile listings and forms' => array(
         $prefix . ts('profile listings and forms'),
-        ts('Access the profile Search form and listings')
+        ts('Access the profile Search form and listings'),
       ),
       'profile listings' => array(
-        $prefix . ts('profile listings')
+        $prefix . ts('profile listings'),
       ),
       'profile create' => array(
         $prefix . ts('profile create'),
-        ts('Use profiles in Create mode')
+        ts('Use profiles in Create mode'),
       ),
       'profile edit' => array(
         $prefix . ts('profile edit'),
-        ts('Use profiles in Edit mode')
+        ts('Use profiles in Edit mode'),
       ),
       'profile view' => array(
-        $prefix . ts('profile view')
+        $prefix . ts('profile view'),
       ),
       'access all custom data' => array(
         $prefix . ts('access all custom data'),
-        ts('View all custom fields regardless of ACL rules')
+        ts('View all custom fields regardless of ACL rules'),
       ),
       'view all activities' => array(
         $prefix . ts('view all activities'),
-        ts('View all activities (for visible contacts)')
+        ts('View all activities (for visible contacts)'),
       ),
       'delete activities' => array(
-        $prefix . ts('Delete activities')
+        $prefix . ts('Delete activities'),
       ),
       'access CiviCRM' => array(
         $prefix . ts('access CiviCRM'),
-        ts('Master control for access to the main CiviCRM backend and API')
+        ts('Master control for access to the main CiviCRM backend and API'),
       ),
       'access Contact Dashboard' => array(
         $prefix . ts('access Contact Dashboard'),
-        ts('View Contact Dashboard (for themselves and visible contacts)')
+        ts('View Contact Dashboard (for themselves and visible contacts)'),
       ),
       'translate CiviCRM' => array(
         $prefix . ts('translate CiviCRM'),
-        ts('Allow User to enable multilingual')
+        ts('Allow User to enable multilingual'),
       ),
       'administer reserved groups' => array(
         $prefix . ts('administer reserved groups'),
-        ts('Edit and disable Reserved Groups (Needs Edit Groups)')
+        ts('Edit and disable Reserved Groups (Needs Edit Groups)'),
       ),
       'administer Tagsets' => array(
-        $prefix . ts('administer Tagsets')
+        $prefix . ts('administer Tagsets'),
       ),
       'administer reserved tags' => array(
-        $prefix . ts('administer reserved tags')
+        $prefix . ts('administer reserved tags'),
       ),
       'administer dedupe rules' => array(
         $prefix . ts('administer dedupe rules'),
-        ts('Create and edit rules, change the supervised and unsupervised rules')
+        ts('Create and edit rules, change the supervised and unsupervised rules'),
       ),
       'merge duplicate contacts' => array(
         $prefix . ts('merge duplicate contacts'),
-        ts('Delete Contacts must also be granted in order for this to work.')
+        ts('Delete Contacts must also be granted in order for this to work.'),
       ),
       'force merge duplicate contacts' => array(
         $prefix . ts('force merge duplicate contacts'),
-        ts('Delete Contacts must also be granted in order for this to work.')
+        ts('Delete Contacts must also be granted in order for this to work.'),
       ),
       'view debug output' => array(
         $prefix . ts('view debug output'),
-        ts('View results of debug and backtrace')
+        ts('View results of debug and backtrace'),
       ),
       'view all notes' => array(
         $prefix . ts('view all notes'),
-        ts("View notes (for visible contacts) even if they're marked admin only")
+        ts("View notes (for visible contacts) even if they're marked admin only"),
       ),
       'access AJAX API' => array(
         $prefix . ts('access AJAX API'),
-        ts('Allow API access even if Access CiviCRM is not granted')
+        ts('Allow API access even if Access CiviCRM is not granted'),
       ),
       'access contact reference fields' => array(
         $prefix . ts('access contact reference fields'),
-        ts('Allow entering data into contact reference fields')
+        ts('Allow entering data into contact reference fields'),
       ),
       'create manual batch' => array(
         $prefix . ts('create manual batch'),
-        ts('Create an accounting batch (with Access to CiviContribute and View Own/All Manual Batches)')
+        ts('Create an accounting batch (with Access to CiviContribute and View Own/All Manual Batches)'),
       ),
       'edit own manual batches' => array(
         $prefix . ts('edit own manual batches'),
-        ts('Edit accounting batches created by user')
+        ts('Edit accounting batches created by user'),
       ),
       'edit all manual batches' => array(
         $prefix . ts('edit all manual batches'),
-        ts('Edit all accounting batches')
+        ts('Edit all accounting batches'),
       ),
       'view own manual batches' => array(
         $prefix . ts('view own manual batches'),
-        ts('View accounting batches created by user (with Access to CiviContribute)')
+        ts('View accounting batches created by user (with Access to CiviContribute)'),
       ),
       'view all manual batches' => array(
         $prefix . ts('view all manual batches'),
-        ts('View all accounting batches (with Access to CiviContribute)')
+        ts('View all accounting batches (with Access to CiviContribute)'),
       ),
       'delete own manual batches' => array(
         $prefix . ts('delete own manual batches'),
-        ts('Delete accounting batches created by user')
+        ts('Delete accounting batches created by user'),
       ),
       'delete all manual batches' => array(
         $prefix . ts('delete all manual batches'),
-        ts('Delete all accounting batches')
+        ts('Delete all accounting batches'),
       ),
       'export own manual batches' => array(
         $prefix . ts('export own manual batches'),
-        ts('Export accounting batches created by user')
+        ts('Export accounting batches created by user'),
       ),
       'export all manual batches' => array(
         $prefix . ts('export all manual batches'),
-        ts('Export all accounting batches')
+        ts('Export all accounting batches'),
       ),
       'administer payment processors' => array(
         $prefix . ts('administer payment processors'),
-        ts('Add, Update, or Disable Payment Processors')
+        ts('Add, Update, or Disable Payment Processors'),
       ),
       'edit message templates' => array(
-        $prefix . ts('edit message templates')
+        $prefix . ts('edit message templates'),
       ),
       'view my invoices' => array(
         $prefix . ts('view my invoices'),
-        ts('Allow users to view/ download their own invoices')
-      )
+        ts('Allow users to view/ download their own invoices'),
+      ),
     );
 
     if (!$descriptions) {
@@ -836,7 +848,9 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function giveMeAllACLs() {
-    if (CRM_Core_Permission::check('view all contacts') || CRM_Core_Permission::check('edit all contacts')) {
+    if (CRM_Core_Permission::check('view all contacts') ||
+      CRM_Core_Permission::check('edit all contacts')
+    ) {
       return TRUE;
     }
 
@@ -847,8 +861,9 @@ class CRM_Core_Permission {
     $aclPermission = self::getPermission();
     if (in_array($aclPermission, array(
       CRM_Core_Permission::EDIT,
-      CRM_Core_Permission::VIEW
-    ))) {
+      CRM_Core_Permission::VIEW,
+    ))
+    ) {
       return TRUE;
     }
 
@@ -857,7 +872,10 @@ class CRM_Core_Permission {
     $tables = $whereTables = array();
     $where = NULL;
 
-    CRM_Utils_Hook::aclWhereClause(CRM_Core_Permission::VIEW, $tables, $whereTables, $contactID, $where);
+    CRM_Utils_Hook::aclWhereClause(CRM_Core_Permission::VIEW,
+      $tables, $whereTables,
+      $contactID, $where
+    );
     return empty($whereTables) ? FALSE : TRUE;
   }
 
@@ -929,7 +947,9 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function isMultisiteEnabled() {
-    return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME, 'is_enabled') ? TRUE : FALSE;
+    return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
+      'is_enabled'
+    ) ? TRUE : FALSE;
   }
 
   /**
@@ -942,9 +962,12 @@ class CRM_Core_Permission {
   public static function checkDownloadInvoice() {
     global $user;
     $cid = CRM_Core_BAO_UFMatch::getContactId($user->uid);
-    if (CRM_Core_Permission::check('access CiviContribute') || (CRM_Core_Permission::check('view my invoices') && $_GET['cid'] == $cid)) {
+    if (CRM_Core_Permission::check('access CiviContribute') ||
+      (CRM_Core_Permission::check('view my invoices') && $_GET['cid'] == $cid)
+    ) {
       return TRUE;
     }
     return FALSE;
   }
+
 }
