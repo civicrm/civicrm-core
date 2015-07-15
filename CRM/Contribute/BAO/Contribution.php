@@ -388,7 +388,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
       $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
       //Send notification to owner for PCP
-      if ($contributionSoft->pcp_id) {
+      if ($contributionSoft->pcp_id && empty($pcpId)) {
         CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
       }
     }
