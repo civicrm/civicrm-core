@@ -40,9 +40,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   static $_defaultContributionType = NULL;
   
   /**
-   * Statid cache holder of available financial types for this session
+   * Static cache holder of available financial types for this session
    */
-   static $_availableFinancialTypes = NULL;
+  static $_availableFinancialTypes = array();
 
   /**
    * Class constructor.
@@ -239,18 +239,18 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;
-    } else {
-      // check cached value
-      if (!empty($_availableFinancialTypes) && !$reset) {
-        return $_availableFinancialTypes;
-      }
+    } 
+    // check cached value
+    if (CRM_Utils_Array::value($action, self::$_availableFinancialTypes) && !$resetCache) {
+      $financialTypes = self::$_availableFinancialTypes[$action];
+      return self::$_availableFinancialTypes[$action];
     }
     foreach ($financialTypes as $finTypeId => $type) {
       if (!CRM_Core_Permission::check($action . ' contributions of type ' . $type)) {
         unset($financialTypes[$finTypeId]);
       }
     }
-    $_availableFinancialTypes = $financialTypes;
+    self::$_availableFinancialTypes[$action] = $financialTypes;
     return $financialTypes;
   }
   
