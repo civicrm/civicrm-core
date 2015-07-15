@@ -129,7 +129,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * @return bool
    */
   protected function supportsLiveMode() {
-    return FALSE;
+    return TRUE;
   }
 
   /**
