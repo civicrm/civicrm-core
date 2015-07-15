@@ -160,7 +160,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     parent::preProcess();
     $this->listContribution(); 
     $userOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'user_dashboard_options');
-    if (array_key_exists('Payments', $userOptions)) {
+    if (CRM_Utils_Array::value('Payments', $userOptions)) {
       $this->listPayments();
     }
   }
