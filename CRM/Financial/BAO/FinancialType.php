@@ -43,6 +43,11 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * Static cache holder of available financial types for this session
    */
   static $_availableFinancialTypes = array();
+  
+  /**
+   * Static cache holder of status of ACL-FT enabled/disabled for this session
+   */
+  static $_statusACLFt = array();
 
   /**
    * Class constructor.
@@ -328,12 +333,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return bool
    */
   public static function isACLFinancialTypeStatus() {
+    if (array_key_exists('acl_financial_type', self::$_statusACLFt)) {
+      return self::$_statusACLFt['acl_financial_type'];
+    }
     $contributeSettings = CRM_Core_BAO_Setting::getItem(
       CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings'
     );
+    self::$_statusACLFt['acl_financial_type'] = FALSE;
     if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
-      return TRUE;
+      self::$_statusACLFt['acl_financial_type'] = TRUE;
     }
-    return FALSE;
+    return self::$_statusACLFt['acl_financial_type'];
   }
 }
