@@ -790,7 +790,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     }
 
     // get the total count of relationships
-    $v['totalCount'] = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'], NULL, NULL, TRUE);
+    $v['totalCount'] = count($v['data']);
 
     $values['relationship']['data'] = &$v['data'];
     $values['relationship']['totalCount'] = &$v['totalCount'];
@@ -1017,11 +1017,14 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           $mask = $mask & $permissionMask;
         }
       }
+
       while ($relationship->fetch()) {
         $rid = $relationship->civicrm_relationship_id;
         $cid = $relationship->civicrm_contact_id;
-        if (($permissionedContact) &&
-          (!CRM_Contact_BAO_Contact_Permission::relationship($cid, $contactId))
+        if (($permissionedContact &&
+            (!CRM_Contact_BAO_Contact_Permission::relationship($cid, $contactId))
+          ) ||
+          (!CRM_Contact_BAO_Contact_Permission::allow($cid))
         ) {
           continue;
         }
