@@ -38,6 +38,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * Static holder for the default LT.
    */
   static $_defaultContributionType = NULL;
+  
+  /**
+   * Static cache holder of available financial types for this session
+   */
+  static $_availableFinancialTypes = array();
+  
+  /**
+   * Static cache holder of status of ACL-FT enabled/disabled for this session
+   */
+  static $_statusACLFt = array();
 
   /**
    * Class constructor.
@@ -228,20 +238,27 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     );
   }
 
-  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view') {
+  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view', $resetCache = FALSE) {
     if (empty($financialTypes)) {
       $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;
+    } 
+    // check cached value
+    if (CRM_Utils_Array::value($action, self::$_availableFinancialTypes) && !$resetCache) {
+      $financialTypes = self::$_availableFinancialTypes[$action];
+      return self::$_availableFinancialTypes[$action];
     }
     foreach ($financialTypes as $finTypeId => $type) {
       if (!CRM_Core_Permission::check($action . ' contributions of type ' . $type)) {
         unset($financialTypes[$finTypeId]);
       }
     }
+    self::$_availableFinancialTypes[$action] = $financialTypes;
     return $financialTypes;
   }
+  
   public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = 'view') {
     if (empty($membershipTypes)) {
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
@@ -316,12 +333,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return bool
    */
   public static function isACLFinancialTypeStatus() {
+    if (array_key_exists('acl_financial_type', self::$_statusACLFt)) {
+      return self::$_statusACLFt['acl_financial_type'];
+    }
     $contributeSettings = CRM_Core_BAO_Setting::getItem(
       CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings'
     );
+    self::$_statusACLFt['acl_financial_type'] = FALSE;
     if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
-      return TRUE;
+      self::$_statusACLFt['acl_financial_type'] = TRUE;
     }
-    return FALSE;
+    return self::$_statusACLFt['acl_financial_type'];
   }
 }
