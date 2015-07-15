@@ -3878,9 +3878,9 @@ WHERE con.id = {$contributionId}
         return $mode;
 
       case 'median':
-        $midValue = 0;
         $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
         foreach ($currencies as $currency => $val) {
+          $midValue = 0;
           $where = "AND {$alias}.currency = '{$currency}'";
           $rowCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) as count {$sql} {$where}");
 
