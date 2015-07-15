@@ -210,6 +210,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
             'url' => 'civicrm/contact/search/custom',
             'qs' => 'reset=1&csid=%%value%%',
             'title' => ts('Run %1', array(1 => self::$_gName)),
+            'class' => 'no-popup',
           ),
         );
         self::$_links = $runLink + self::$_links;
