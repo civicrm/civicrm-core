@@ -108,6 +108,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'pcp_intro_text',
         'new', // The 'new' text in word replacements
         'replyto_email', // e.g. '"Full Name" <user@example.org>'
+        'operator',
       );
     }
     return $this->skipFields;

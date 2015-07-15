@@ -101,6 +101,7 @@
   <field>
     <name>website_type_id</name>
     <type>int unsigned</type>
+    <title>Website type ID</title>
     <comment>Which type of website does this site belong</comment>
     <add>3.2</add>
     <pseudoconstant>
@@ -113,6 +114,7 @@
   <field>
     <name>relationship_type_id</name>
     <type>int unsigned</type>
+    <title>Relationship type ID</title>
     <comment>Relationship type, if required</comment>
     <add>1.2</add>
   </field>
