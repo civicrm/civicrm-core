@@ -159,7 +159,7 @@ WHERE  cacheKey     = %3 AND
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
-  static function markConflict($id1, $id2, $cacheKey, $conflicts) {
+  public static function markConflict($id1, $id2, $cacheKey, $conflicts) {
     if (empty($cacheKey) || empty($conflicts)) {
       return FALSE;
     }
@@ -172,20 +172,20 @@ WHERE  cacheKey     = %3 AND
     $params = array(
       1 => array(
         $id1,
-        'Integer'
+        'Integer',
       ),
       2 => array(
         $id2,
-        'Integer'
+        'Integer',
       ),
       3 => array(
         "{$cacheKey}",
-        'String'
+        'String',
       ),
       4 => array(
         "{$cacheKey}_conflicts",
-        'String'
-      )
+        'String',
+      ),
     );
     $pncFind = CRM_Core_DAO::executeQuery($sql, $params);
 
@@ -216,7 +216,7 @@ WHERE  cacheKey     = %3 AND
    *
    * @return array
    */
-  static function retrieve($cacheKey, $join = NULL, $where = NULL, $offset = 0, $rowCount = 0, $select = array()) {
+  public static function retrieve($cacheKey, $join = NULL, $where = NULL, $offset = 0, $rowCount = 0, $select = array()) {
     $selectString = 'pn.*';
     if (!empty($select)) {
       $aliasArray = array();
@@ -232,8 +232,8 @@ FROM   civicrm_prevnext_cache pn
 WHERE  (pn.cacheKey = %1 OR pn.cacheKey = %2)
 ";
     $params = array(
-      1 => array($cacheKey,'String'),
-      2 => array("{$cacheKey}_conflicts",'String'),
+      1 => array($cacheKey, 'String'),
+      2 => array("{$cacheKey}_conflicts", 'String'),
     );
     if ($where) {
       $query .= " AND {$where}";
@@ -268,7 +268,7 @@ WHERE  (pn.cacheKey = %1 OR pn.cacheKey = %2)
           'is_selected' => $dao->is_selected,
           'entity_id1' => $dao->entity_id1,
           'entity_id2' => $dao->entity_id2,
-          'data' => $main[$count]
+          'data' => $main[$count],
         );
         $main[$count] = array_merge($main[$count], $extraData);
       }
@@ -317,8 +317,8 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
       $query .= " AND {$where}";
     }
     $params = array(
-      1 => array($cacheKey,'String'),
-      2 => array("{$cacheKey}_conflicts",'String'),
+      1 => array($cacheKey, 'String'),
+      2 => array("{$cacheKey}_conflicts", 'String'),
     );
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
   }

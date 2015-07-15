@@ -99,7 +99,7 @@ class CRM_Utils_JSON {
    * @return string
    *
    */
-  static function encodeDataTable($params, $selectorElements) {
+  public static function encodeDataTable($params, $selectorElements) {
     $sOutput = '{';
     $sOutput .= '"data": [ ';
     foreach ($params as $key => $value) {
@@ -129,4 +129,5 @@ class CRM_Utils_JSON {
 
     return $sOutput;
   }
+
 }

@@ -898,7 +898,7 @@ LIMIT {$offset}, {$rowCount}
       3 => array(
         "$cacheKeyString%",
         'String',
-      )
+      ),
     ); // using % to address rows with conflicts as well
 
     CRM_Core_DAO::executeQuery($sql, $params);

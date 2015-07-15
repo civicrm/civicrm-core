@@ -565,11 +565,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *                              Does a force merge otherwise.
    * @param bool $autoFlip to let api decide which contact to retain and which to delete.
    *   Wether to let api decide which contact to retain and which to delete.
-   * @param bool $redirectForPerformance
+   * @param int $batchLimit
+   * @param int $isSelected
    *
    * @return array|bool
    */
-  static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
     $contactType = CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_RuleGroup', $rgid, 'contact_type');
     $cacheKeyString = "merge {$contactType}";
     $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
@@ -601,7 +602,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $autoFlip, $redirectForPerformance);
   }
 
-  static function updateMergeStats($cacheKeyString, $result = array()) {
+  public static function updateMergeStats($cacheKeyString, $result = array()) {
     // gather latest stats
     $merged = count($result['merged']);
     $skipped = count($result['skipped']);
@@ -636,11 +637,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     CRM_Core_BAO_PrevNextCache::setItem($values);
   }
 
-  static function resetMergeStats($cacheKeyString) {
+  public static function resetMergeStats($cacheKeyString) {
     return CRM_Core_BAO_PrevNextCache::deleteItem(NULL, "{$cacheKeyString}_stats");
   }
 
-  static function getMergeStats($cacheKeyString) {
+  public static function getMergeStats($cacheKeyString) {
     $stats = CRM_Core_BAO_PrevNextCache::retrieve("{$cacheKeyString}_stats");
     if (!empty($stats)) {
       $stats = $stats[0];
@@ -648,7 +649,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     return $stats;
   }
 
-  static function getMergeStatsMsg($cacheKeyString) {
+  public static function getMergeStatsMsg($cacheKeyString) {
     $msg = '';
     $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
     if (!empty($stats['merged'])) {
@@ -777,7 +778,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return bool
    */
-  static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = array()) {
+  public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = array()) {
     // $conflicts = array();
     $migrationData = array(
       'old_migration_info' => $migrationInfo,
