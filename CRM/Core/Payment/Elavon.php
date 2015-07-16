@@ -277,13 +277,6 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
-   * NOTE: 'doTransferCheckout' not implemented
-   */
-  public function doTransferCheckout(&$params, $component) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
    * This public function checks to see if we have the right processor config values set.
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying

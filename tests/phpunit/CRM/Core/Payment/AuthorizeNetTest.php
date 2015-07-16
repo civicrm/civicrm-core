@@ -308,7 +308,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
-    $result = $this->processor->doDirectPayment($params);
+    $result = $this->processor->doPayment($params);
     // turn verifySSL on
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
 
