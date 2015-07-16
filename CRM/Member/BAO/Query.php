@@ -245,9 +245,11 @@ class CRM_Member_BAO_Query {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(
             "ccr.contribution_status_id",
             $op,
-            array_search(
-              'Cancelled', 
-              CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
+            CRM_Core_DAO::getFieldValue(
+              'CRM_Core_DAO_OptionValue',
+              'Cancelled',
+              'value',
+              'name'
             ),
             "Integer"
           );
