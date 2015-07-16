@@ -635,7 +635,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->fireEvent($fieldName, 'focus');
     if ($editor == 'CKEditor') {
       if ($compressed) {
-        $this->click("{$fieldName}-plain");
+        $this->click("xpath=//textarea[@id='{$fieldName}']/../div[1]");
       }
       $this->waitForElementPresent("xpath=//div[@id='cke_{$fieldName}']//iframe");
       $this->runScript("CKEDITOR.instances['{$fieldName}'].setData('<p>{$text}</p>');");
@@ -1369,7 +1369,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     if ($widget) {
       // fill in step 8 (Widget Settings)
-      $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->click('link=Widgets');
       $this->waitForElementPresent('_qf_Widget_next-bottom');
 
@@ -1389,7 +1388,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     if ($pcp) {
       // fill in step 9 (Enable Personal Campaign Pages)
-      $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->click('link=Personal Campaigns');
       $this->waitForElementPresent('_qf_Contribute_next-bottom');
       $this->click('pcp_active');
