@@ -479,18 +479,30 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['uf_group'] = array(
     'create' => array(
       'access CiviCRM',
-      'manage event profiles',
+      array(
+        'administer CiviCRM',
+        'manage event profiles',
+      ),
     ),
     'get' => array(
       'access CiviCRM',
     ),
     'update' => array(
       'access CiviCRM',
-      'manage event profiles',
+      array(
+        'administer CiviCRM',
+        'manage event profiles',
+      ),
     ),
   );
   $permissions['uf_field'] = $permissions['uf_group'];
-  $permissions['uf_field']['delete'] = array('access CiviCRM', 'manage event profiles');
+  $permissions['uf_field']['delete'] = array(
+    'access CiviCRM',
+    array(
+      'administer CiviCRM',
+      'manage event profiles',
+    ),
+  );
   $permissions['option_value'] = $permissions['uf_group'];
   $permissions['option_group'] = $permissions['option_value'];
 
