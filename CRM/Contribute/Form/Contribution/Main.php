@@ -789,43 +789,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
-      $currentMemberships = NULL;
-      if ($membershipIsActive) {
-        $is_test = $self->_mode != 'live' ? 1 : 0;
-        $memContactID = $self->_membershipContactID;
-       
-        // For anonymous user check using dedupe rule 
-        // if user has Cancelled Membership
-        if (!$memContactID) {
-          $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-          $dedupeParams['check_permission'] = FALSE;
-          $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
-          // if we find more than one contact, use the first one
-          $memContactID = CRM_Utils_Array::value(0, $ids);
-        }
-        $currentMemberships = CRM_Member_BAO_Membership::getContactsCancelledMembership($memContactID,
-          $is_test
-        );
-        
-        $errorText = 'Your %1 membership was previously cancelled and can not be renewed online. Please contact the site administrator for assistance.';
-        foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
-          if ($fieldValue['html_type'] != 'Text' && CRM_Utils_Array::value('price_' . $fieldKey, $fields)) {
-            if (!is_array($fields['price_' . $fieldKey])) {
-              if (in_array($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'], $currentMemberships)) {
-                $errors['price_' . $fieldKey] = ts($errorText, array( 1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'])));
-              }
-            }
-            else {
-              foreach ($fields['price_' . $fieldKey] as $key => $ignore) {
-                if (in_array($fieldValue['options'][$key]['membership_type_id'], $currentMemberships)) {
-                  $errors['price_' . $fieldKey] = ts($errorText, array(1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$key]['membership_type_id'])));
-                }
-              }
-            }
-          }
-        }
-      }
- 
       // CRM-12233
       if ($membershipIsActive && !$self->_membershipBlock['is_required']
         && $self->_values['amount_block_is_active']) {
