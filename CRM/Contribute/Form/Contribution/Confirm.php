@@ -1766,7 +1766,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $form->postProcessHook();
         // this does not return
         $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
-        $payment->doTransferCheckout($form->_params, 'contribute');
+        $payment->doPayment($form->_params, 'contribute');
       }
     }
 
@@ -1853,16 +1853,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       else {
         $payment = $form->_paymentProcessor['object'];
       }
-
-      if ($form->_contributeMode == 'express') {
-        $result = $payment->doExpressCheckout($tempParams);
-        if (is_a($result, 'CRM_Core_Error')) {
-          throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
-        }
-      }
-      else {
-        $result = $payment->doPayment($tempParams, 'contribute');
-      }
+      $result = $payment->doPayment($tempParams, 'contribute');
     }
 
     //assign receive date when separate membership payment

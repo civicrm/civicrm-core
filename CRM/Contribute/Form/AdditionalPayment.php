@@ -564,19 +564,20 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $result = NULL;
 
     if ($paymentParams['amount'] > 0.0) {
-      // force a reget of the payment processor in case the form changed it, CRM-7179
-      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-      $result = $payment->doDirectPayment($paymentParams);
-    }
-
-    if (is_a($result, 'CRM_Core_Error')) {
-      //set the contribution mode.
-      $urlParams = "action=add&cid={$this->_contactId}&id={$this->_id}&component={$this->_component}";
-      if ($this->_mode) {
-        $urlParams .= "&mode={$this->_mode}";
+      try {
+        // force a reget of the payment processor in case the form changed it, CRM-7179
+        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+        $result = $payment->doPayment($paymentParams);
       }
-      CRM_Core_Error::displaySessionError($result);
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        //set the contribution mode.
+        $urlParams = "action=add&cid={$this->_contactId}&id={$this->_id}&component={$this->_component}";
+        if ($this->_mode) {
+          $urlParams .= "&mode={$this->_mode}";
+        }
+        CRM_Core_Error::displaySessionError($result);
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
+      }
     }
 
     if ($result) {

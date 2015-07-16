@@ -633,7 +633,7 @@ abstract class CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    * @abstract
    */
-  abstract protected function doDirectPayment(&$params);
+  protected function doDirectPayment(&$params) {}
 
   /**
    * Process payment - this function wraps around both doTransferPayment and doDirectPayment.
