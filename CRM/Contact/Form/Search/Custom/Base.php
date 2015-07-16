@@ -174,4 +174,19 @@ class CRM_Contact_Form_Search_Custom_Base {
   function getQueryObj() {
     return NULL;
   }
+
+  /**
+   * Set the title.
+   *
+   * @param string $title
+   */
+  function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
+  }
+
 }
