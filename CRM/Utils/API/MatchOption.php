@@ -79,9 +79,10 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
    * @inheritDoc
    */
   public function fromApiInput($apiRequest) {
+
     // Parse options.match or options.match-mandatory
     $keys = NULL; // array of fields to match against
-    if (isset($apiRequest['params'], $apiRequest['params']['options'])) {
+    if (isset($apiRequest['params'], $apiRequest['params']['options']) && is_array($apiRequest['params']['options'])) {
       if (isset($apiRequest['params']['options']['match-mandatory'])) {
         $isMandatory = TRUE;
         $keys = $apiRequest['params']['options']['match-mandatory'];
