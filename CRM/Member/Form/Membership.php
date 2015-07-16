@@ -1568,10 +1568,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           //display end date w/ status message.
           $endDate = $membership->end_date;
 
+          $membershipStatues = CRM_Member_PseudoConstant::membershipStatus();
           if (!in_array($membership->status_id, array(
-            // CRM-15475
-            array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
-            array_search('Expired', CRM_Member_PseudoConstant::membershipStatus()),
+            array_search('Cancelled', $membershipStatues),
+            array_search('Expired', $membershipStatues),
           ))
           ) {
             $cancelled = FALSE;
