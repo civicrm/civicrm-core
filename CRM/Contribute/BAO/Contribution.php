@@ -4587,7 +4587,7 @@ LIMIT 1;";
     }
   }
 
-  public static function assignProportionalLineItems($params, $trxn) {
+  public static function assignProportionalLineItems($params, $trxn, $contribution) {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
     if (!empty($lineItems)) {
       // get financial item
