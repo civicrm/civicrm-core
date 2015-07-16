@@ -351,9 +351,15 @@
    <access_arguments>merge duplicate contacts</access_arguments>
 </item>
 <item>
-   <path>civicrm/ajax/dedupefind</path>
-   <page_callback>CRM_Contact_Page_AJAX::getDedupes</page_callback>
-   <access_arguments>merge duplicate contacts</access_arguments>
+  <path>civicrm/contact/dedupemerge</path>
+  <title>Batch Merge Duplicate Contacts</title>
+  <page_callback>CRM_Contact_Page_DedupeMerge</page_callback>
+  <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
+  <path>civicrm/ajax/dedupefind</path>
+  <page_callback>CRM_Contact_Page_AJAX::getDedupes</page_callback>
+  <access_arguments>merge duplicate contacts</access_arguments>
 </item>
 <item>
    <path>civicrm/dedupe/exception</path>
@@ -363,9 +369,15 @@
    <weight>110</weight>
 </item>
 <item>
-     <path>civicrm/ajax/dedupeRules</path>
-     <page_callback>CRM_Contact_Page_AJAX::buildDedupeRules</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+    <path>civicrm/ajax/dedupeRules</path>
+    <page_callback>CRM_Contact_Page_AJAX::buildDedupeRules</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+</item>
+<item>
+    <path>civicrm/ajax/toggleDedupeSelect</path>
+    <page_callback>CRM_Contact_Page_AJAX::toggleDedupeSelect
+    </page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
     <path>civicrm/contact/view/useradd</path>

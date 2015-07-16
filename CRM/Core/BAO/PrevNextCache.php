@@ -119,7 +119,7 @@ WHERE  cacheKey     = %3 AND
    */
   public static function deleteItem($id = NULL, $cacheKey = NULL, $entityTable = 'civicrm_contact') {
 
-    //clear cache
+    // clear cache
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = %1";
     $params = array(1 => array($entityTable, 'String'));
 
@@ -159,6 +159,54 @@ WHERE  cacheKey     = %3 AND
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  public static function markConflict($id1, $id2, $cacheKey, $conflicts) {
+    if (empty($cacheKey) || empty($conflicts)) {
+      return FALSE;
+    }
+
+    $sql = "SELECT pn.*
+      FROM  civicrm_prevnext_cache pn
+      WHERE
+      ((pn.entity_id1 = %1 AND pn.entity_id2 = %2) OR (pn.entity_id1 = %2 AND pn.entity_id2 = %1)) AND
+      (cacheKey = %3 OR cacheKey = %4)";
+    $params = array(
+      1 => array(
+        $id1,
+        'Integer',
+      ),
+      2 => array(
+        $id2,
+        'Integer',
+      ),
+      3 => array(
+        "{$cacheKey}",
+        'String',
+      ),
+      4 => array(
+        "{$cacheKey}_conflicts",
+        'String',
+      ),
+    );
+    $pncFind = CRM_Core_DAO::executeQuery($sql, $params);
+
+    while ($pncFind->fetch()) {
+      $data = $pncFind->data;
+      if (!empty($data)) {
+        $data = unserialize($data);
+        $data['conflicts'] = implode(",", array_keys($conflicts));
+
+        $pncUp = new CRM_Core_DAO_PrevNextCache();
+        $pncUp->id = $pncFind->id;
+        if ($pncUp->find(TRUE)) {
+          $pncUp->data = serialize($data);
+          $pncUp->cacheKey = "{$cacheKey}_conflicts";
+          $pncUp->save();
+        }
+      }
+    }
+    return TRUE;
+  }
+
   /**
    * @param $cacheKey
    * @param NULL $join
@@ -168,15 +216,25 @@ WHERE  cacheKey     = %3 AND
    *
    * @return array
    */
-  public static function retrieve($cacheKey, $join = NULL, $where = NULL, $offset = 0, $rowCount = 0) {
+  public static function retrieve($cacheKey, $join = NULL, $where = NULL, $offset = 0, $rowCount = 0, $select = array()) {
+    $selectString = 'pn.*';
+    if (!empty($select)) {
+      $aliasArray = array();
+      foreach ($select as $column => $alias) {
+        $aliasArray[] = $column . ' as ' . $alias;
+      }
+      $selectString .= " , " . implode(' , ', $aliasArray);
+    }
     $query = "
-SELECT data
+SELECT {$selectString}
 FROM   civicrm_prevnext_cache pn
        {$join}
-WHERE  cacheKey = %1
+WHERE  (pn.cacheKey = %1 OR pn.cacheKey = %2)
 ";
-    $params = array(1 => array($cacheKey, 'String'));
-
+    $params = array(
+      1 => array($cacheKey, 'String'),
+      2 => array("{$cacheKey}_conflicts", 'String'),
+    );
     if ($where) {
       $query .= " AND {$where}";
     }
@@ -191,13 +249,31 @@ WHERE  cacheKey = %1
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     $main = array();
+    $count = 0;
     while ($dao->fetch()) {
       if (self::is_serialized($dao->data)) {
-        $main[] = unserialize($dao->data);
+        $main[$count] = unserialize($dao->data);
       }
       else {
-        $main[] = $dao->data;
+        $main[$count] = $dao->data;
       }
+
+      if (!empty($select)) {
+        $extraData = array();
+        foreach ($select as $dfield => $sfield) {
+          $extraData[$sfield] = $dao->$sfield;
+        }
+        $main[$count] = array(
+          'prevnext_id' => $dao->id,
+          'is_selected' => $dao->is_selected,
+          'entity_id1' => $dao->entity_id1,
+          'entity_id2' => $dao->entity_id2,
+          'data' => $main[$count],
+        );
+        $main[$count] = array_merge($main[$count], $extraData);
+      }
+      $count++;
+      ;
     }
 
     return $main;
@@ -219,7 +295,7 @@ WHERE  cacheKey = %1
     $insert = "INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data ) VALUES \n";
     $query = $insert . implode(",\n ", $values);
 
-    //dump the dedupe matches in the prevnext_cache table
+    // dump the dedupe matches in the prevnext_cache table
     CRM_Core_DAO::executeQuery($query);
   }
 
@@ -235,13 +311,15 @@ WHERE  cacheKey = %1
     $query = "
 SELECT COUNT(*) FROM civicrm_prevnext_cache pn
        {$join}
-WHERE cacheKey $op %1
+WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
 ";
     if ($where) {
       $query .= " AND {$where}";
     }
-
-    $params = array(1 => array($cacheKey, 'String'));
+    $params = array(
+      1 => array($cacheKey, 'String'),
+      2 => array("{$cacheKey}_conflicts", 'String'),
+    );
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
   }
 

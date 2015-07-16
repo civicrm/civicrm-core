@@ -124,16 +124,16 @@ class CRM_Core_Permission {
       if (is_array($permission)) {
         foreach ($permission as $orPerm) {
           if (self::check($orPerm)) {
-            //one of our 'or' permissions has succeeded - stop checking this permission
-            return TRUE;;
+            // one of our 'or' permissions has succeeded - stop checking this permission
+            return TRUE;
           }
         }
-        //none of our our conditions was met
+        // none of our our conditions was met
         return FALSE;
       }
       else {
         if (!CRM_Core_Config::singleton()->userPermissionClass->check($permission)) {
-          //one of our 'and' conditions has not been met
+          // one of our 'and' conditions has not been met
           return FALSE;
         }
       }
@@ -442,7 +442,7 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function checkActionPermission($module, $action) {
-    //check delete related permissions.
+    // check delete related permissions.
     if ($action & CRM_Core_Action::DELETE) {
       $permissionName = "delete in $module";
     }
@@ -463,7 +463,7 @@ class CRM_Core_Permission {
       return CRM_Case_BAO_Case::accessCiviCase();
     }
     else {
-      //check for permission.
+      // check for permission.
       return CRM_Core_Permission::check($permissionName);
     }
   }
@@ -763,6 +763,10 @@ class CRM_Core_Permission {
         $prefix . ts('merge duplicate contacts'),
         ts('Delete Contacts must also be granted in order for this to work.'),
       ),
+      'force merge duplicate contacts' => array(
+        $prefix . ts('force merge duplicate contacts'),
+        ts('Delete Contacts must also be granted in order for this to work.'),
+      ),
       'view debug output' => array(
         $prefix . ts('view debug output'),
         ts('View results of debug and backtrace'),
@@ -853,7 +857,7 @@ class CRM_Core_Permission {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
-    //check for acl.
+    // check for acl.
     $aclPermission = self::getPermission();
     if (in_array($aclPermission, array(
       CRM_Core_Permission::EDIT,
@@ -894,7 +898,7 @@ class CRM_Core_Permission {
     if (empty($allCompPermissions)) {
       $components = CRM_Core_Component::getComponents();
       foreach ($components as $name => $comp) {
-        //get all permissions of each components unconditionally
+        // get all permissions of each components unconditionally
         $allCompPermissions[$name] = $comp->getPermissions(TRUE);
       }
     }
