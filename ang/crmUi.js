@@ -314,10 +314,12 @@
 
     // Display an HTML blurb inside an IFRAME.
     // example: <iframe crm-ui-iframe="getHtmlContent()"></iframe>
+    // example:  <iframe crm-ui-iframe crm-ui-iframe-src="getUrl()"></iframe>
     .directive('crmUiIframe', function ($parse) {
       return {
         scope: {
-          crmUiIframe: '@' // expression which evalutes to HTML content
+          crmUiIframeSrc: '@', // expression which evaluates to a URL
+          crmUiIframe: '@' // expression which evaluates to HTML content
         },
         link: function (scope, elm, attrs) {
           var iframe = $(elm)[0];
@@ -325,20 +327,24 @@
           iframe.setAttribute('frameborder', '0');
 
           var refresh = function () {
-            // var iframeHtml = '<html><head><base target="_blank"></head><body onload="parent.document.getElementById(\'' + iframe.id + '\').style.height=document.body.scrollHeight + \'px\'"><scr' + 'ipt type="text/javascript" src="https://gist.github.com/' + iframeId + '.js"></sc' + 'ript></body></html>';
-            var iframeHtml = scope.$parent.$eval(attrs.crmUiIframe);
-
-            var doc = iframe.document;
-            if (iframe.contentDocument) {
-              doc = iframe.contentDocument;
+            if (attrs.crmUiIframeSrc) {
+              iframe.setAttribute('src', scope.$parent.$eval(attrs.crmUiIframeSrc));
             }
-            else if (iframe.contentWindow) {
-              doc = iframe.contentWindow.document;
-            }
+            else {
+              var iframeHtml = scope.$parent.$eval(attrs.crmUiIframe);
 
-            doc.open();
-            doc.writeln(iframeHtml);
-            doc.close();
+              var doc = iframe.document;
+              if (iframe.contentDocument) {
+                doc = iframe.contentDocument;
+              }
+              else if (iframe.contentWindow) {
+                doc = iframe.contentWindow.document;
+              }
+
+              doc.open();
+              doc.writeln(iframeHtml);
+              doc.close();
+            }
           };
 
           // If the iframe is in a dialog, respond to resize events

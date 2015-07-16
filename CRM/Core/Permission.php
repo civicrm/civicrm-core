@@ -120,6 +120,8 @@ class CRM_Core_Permission {
   public static function check($permissions) {
     $permissions = (array) $permissions;
 
+    $tempPerm = CRM_Core_Config::singleton()->userPermissionTemp;
+
     foreach ($permissions as $permission) {
       if (is_array($permission)) {
         foreach ($permission as $orPerm) {
@@ -132,7 +134,10 @@ class CRM_Core_Permission {
         return FALSE;
       }
       else {
-        if (!CRM_Core_Config::singleton()->userPermissionClass->check($permission)) {
+        if (
+          !CRM_Core_Config::singleton()->userPermissionClass->check($permission)
+          && !($tempPerm && $tempPerm->check($permission))
+        ) {
           //one of our 'and' conditions has not been met
           return FALSE;
         }

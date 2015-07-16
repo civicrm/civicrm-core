@@ -35,9 +35,11 @@ class ResolveEvent extends Event {
   /**
    * @param array $apiRequest
    *   The full description of the API request.
+   * @param \Civi\API\Kernel $apiKernel
+   *   The kernel which fired the event.
    */
-  public function __construct($apiRequest) {
-    parent::__construct(NULL, $apiRequest);
+  public function __construct($apiRequest, $apiKernel) {
+    parent::__construct(NULL, $apiRequest, $apiKernel);
   }
 
   /**
