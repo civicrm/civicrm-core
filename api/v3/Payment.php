@@ -97,12 +97,7 @@ function civicrm_api3_payment_cancel(&$params) {
   $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', NULL, FALSE);
   
   $values = array(); 
-  if (is_a($trxn, 'CRM_Core_Error')) {
-    throw new API_Exception($trxn->_errors[0]['message']);
-  }
-  else {
-    _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
-  }
+  _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
   return civicrm_api3_create_success($values, $params, 'Payment', 'cancel', $trxn);
 }
 
@@ -122,7 +117,6 @@ function civicrm_api3_payment_create(&$params) {
     $amount = $params['total_amount'];
     civicrm_api3('Payment', 'cancel', $params);
     $params['total_amount'] = $amount;
-    unset($params['id']);
   }
   // Get contribution
   $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $params['contribution_id']));
@@ -172,12 +166,7 @@ function civicrm_api3_payment_create(&$params) {
     CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contribution);
   }
   $values = array(); 
-  if (is_a($trxn, 'CRM_Core_Error')) {
-    throw new API_Exception($trxn->_errors[0]['message']);
-  }
-  else {
-    _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
-  }
+  _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
   return civicrm_api3_create_success($values, $params, 'Payment', 'create', $trxn);
 }
 
