@@ -40,8 +40,7 @@ class CRM_Contact_Form_ProfileContact {
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    $contactID = $form->_contactID;
 
     foreach (array('soft_credit', 'on_behalf') as $module) {
       $ufJoinParams = array(
@@ -79,7 +78,7 @@ class CRM_Contact_Form_ProfileContact {
       }
       else {
         $form->_onbehalf = FALSE;
-        $params = CRM_Contribute_BAO_ContributionPage::formatMultilingualOnBehalfParams($ufJoin->module_data);
+        $params = CRM_Contribute_BAO_ContributionPage::formatMultilingualOnBehalfParams($ufJoin->module_data, TRUE);
         if (CRM_Utils_Array::value('is_for_organization', $params)) {
           if ($params['is_for_organization'] == 2) {
             $form->_onBehalfRequired = TRUE;
@@ -105,6 +104,43 @@ class CRM_Contact_Form_ProfileContact {
             $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($form->_profileId, $requiredProfileFields);
             if (!$validProfile) {
               CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of an organization and the required fields of the selected onbehalf profile are disabled.'));
+            }
+
+            //CRM-5001,CRM-15787
+            $member = CRM_Member_BAO_Membership::getMembershipBlock($form->_id);
+            if (empty($member['is_active'])) {
+              $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
+              $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($form->_profileId);
+              foreach (array(
+                  'Individual',
+                  'Organization',
+                  'Household',
+                ) as $contactType) {
+                if (in_array($contactType, $onBehalfProfile) &&
+                  (in_array('Membership', $onBehalfProfile) ||
+                    in_array('Contribution', $onBehalfProfile)
+                  )
+                ) {
+                  CRM_Core_Error::fatal($msg);
+                }
+              }
+
+              if ($postID = CRM_Utils_Array::value('custom_post_id', $form->_values)) {
+                $postProfile = CRM_Core_BAO_UFGroup::profileGroups($postID);
+                foreach (array(
+                    'Individual',
+                    'Organization',
+                    'Household',
+                  ) as $contactType) {
+                  if (in_array($contactType, $postProfile) &&
+                    (in_array('Membership', $postProfile) ||
+                      in_array('Contribution', $postProfile)
+                    )
+                  ) {
+                    CRM_Core_Error::fatal($msg);
+                  }
+                }
+              }
             }
 
             $form->assign('profileId', $form->_profileId);
@@ -164,7 +200,7 @@ class CRM_Contact_Form_ProfileContact {
             }
           }
         }
-        $this->assign('onBehalfRequired', $form->_onBehalfRequired);
+        $form->assign('onBehalfRequired', $form->_onBehalfRequired);
       }
     }
   }
@@ -176,6 +212,27 @@ class CRM_Contact_Form_ProfileContact {
    *
    */
   public static function buildQuickForm(&$form) {
+    if (!empty($form->_honor_block_is_active)) {
+      self::buildHonorBlock($form);
+    }
+
+    if (!empty($form->_onbehalf)) {
+      self::buildOnBehalfBlock($form);
+    }
+  }
+
+  /**
+   * @param $form
+   */
+  public static function postProcess($form) {
+  }
+
+  public static function buildHonorBlock(&$form) {
+    $form->assign('honor_block_is_active', TRUE);
+
+    //build soft-credit section
+    CRM_Contribute_Form_SoftCredit::buildQuickForm($form);
+
     $ufGroup = new CRM_Core_DAO_UFGroup();
     $ufGroup->id = $form->_honoreeProfileId;
     if (!$ufGroup->find(TRUE)) {
@@ -202,10 +259,70 @@ class CRM_Contact_Form_ProfileContact {
     }
   }
 
-  /**
-   * @param $form
-   */
-  public static function postProcess($form) {
-  }
+  public static function buildOnBehalfBlock(&$form) {
+    $form->assign('fieldSetTitle', ts('Organization Details'));
+    $form->assign('buildOnBehalfForm', TRUE);
 
+    $contactID = $form->_contactID;
+
+    if ($form->_membershipContactID) {
+      $entityBlock = array('contact_id' => $form->_membershipContactID);
+      //CRM_Core_BAO_Location::getValues($entityBlock, $form->_defaults);
+    }
+
+    if (!$form->_onBehalfRequired) {
+      $form->addElement('checkbox', 'is_for_organization',
+        $form->_values['for_organization'],
+        NULL, array('onclick' => "showOnBehalf( );")
+      );
+    }
+
+    $form->assign('is_for_organization', TRUE);
+    $form->assign('urlPath', 'civicrm/contribute/transact');
+
+    if ($contactID && count($form->_employers) >= 1) {
+      $form->add('text', 'organization_id', ts('Select an existing related Organization OR enter a new one'));
+
+      $form->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $form->_employers));
+
+      $orgOptions = array(
+        0 => ts('Select an existing organization'),
+        1 => ts('Enter a new organization'),
+      );
+
+      $form->addRadio('org_option', ts('options'), $orgOptions);
+      $form->setDefaults(array('org_option' => 0));
+      $form->add('checkbox', 'mode', '');
+    }
+
+    $prefix = 'onbehalf';
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($form->_profileId, FALSE, CRM_Core_Action::VIEW, NULL,
+      NULL, FALSE, NULL, FALSE, NULL,
+      CRM_Core_Permission::CREATE, NULL
+    );
+    $fieldTypes = array('Contact', 'Organization');
+    $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
+    $fieldTypes = array_merge($fieldTypes, $contactSubType);
+
+    if (is_array($form->_membershipBlock) && !empty($form->_membershipBlock)) {
+      $fieldTypes = array_merge($fieldTypes, array('Membership'));
+    }
+    else {
+      $fieldTypes = array_merge($fieldTypes, array('Contribution'));
+    }
+
+    foreach ($profileFields as $name => $field) {
+      if (in_array($field['field_type'], $fieldTypes)) {
+        list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
+        if (in_array($prefixName, array('organization_name', 'email')) && empty($field['is_required'])) {
+          $field['is_required'] = 1;
+        }
+
+        CRM_Core_BAO_UFGroup::buildProfile($form, $field, NULL, NULL, FALSE, $prefix, NULL, $prefix);
+      }
+    }
+
+    $form->assign('onBehalfOfFields', $profileFields);
+    $form->addElement('hidden', 'hidden_onbehalf_profile', 1);
+  }
 }

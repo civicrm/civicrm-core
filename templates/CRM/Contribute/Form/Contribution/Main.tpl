@@ -25,7 +25,7 @@
 *}
 {* Callback snippet: On-behalf profile *}
 {if $snippet and !empty($isOnBehalfCallback)}
-  {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl" context="front-end"}
+  {* include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl" context="front-end" *}
 
 {else}
   {literal}
@@ -172,7 +172,7 @@
 
   {if $is_for_organization}
   <div id='onBehalfOfOrg' class="crm-section">
-    {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
+    {include file="CRM/UF/Form/Block.tpl" fields=$onBehalfOfFields mode=8 prefix='onbehalf'}
   </div>
   {/if}
 

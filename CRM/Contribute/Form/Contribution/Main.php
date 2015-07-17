@@ -101,54 +101,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (!empty($this->_values['footer_text'])) {
       $this->assign('footer_text', $this->_values['footer_text']);
     }
-
-    //CRM-5001
-    //CRM-15787
-    $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
-    if (!empty($this->_values['is_for_organization']) && empty($member['is_active'])) {
-      $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
-      $ufJoinParams = array(
-        'module' => 'onBehalf',
-        'entity_table' => 'civicrm_contribution_page',
-        'entity_id' => $this->_id,
-      );
-      $onBehalfProfileIDs = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-      // getUFGroupIDs returns an array with the first item being the ID we need
-      $onBehalfProfileID = $onBehalfProfileIDs[0];
-      if ($onBehalfProfileID) {
-        $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($onBehalfProfileID);
-        foreach (array(
-                   'Individual',
-                   'Organization',
-                   'Household',
-                 ) as $contactType) {
-          if (in_array($contactType, $onBehalfProfile) &&
-            (in_array('Membership', $onBehalfProfile) ||
-              in_array('Contribution', $onBehalfProfile)
-            )
-          ) {
-            CRM_Core_Error::fatal($msg);
-          }
-        }
-      }
-
-      if ($postID = CRM_Utils_Array::value('custom_post_id', $this->_values)) {
-        $postProfile = CRM_Core_BAO_UFGroup::profileGroups($postID);
-        foreach (array(
-                   'Individual',
-                   'Organization',
-                   'Household',
-                 ) as $contactType) {
-          if (in_array($contactType, $postProfile) &&
-            (in_array('Membership', $postProfile) ||
-              in_array('Contribution', $postProfile)
-            )
-          ) {
-            CRM_Core_Error::fatal($msg);
-          }
-        }
-      }
-    }
   }
 
   /**
@@ -362,12 +314,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
     }
 
-    if ($this->_onbehalf) {
-      CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
-      // Return if we are in an ajax callback
-      if ($this->_snippet) {
-        return;
-      }
+    CRM_Contact_Form_ProfileContact::buildQuickForm($this);
+
+    // Return if we are in an ajax callback
+    if ($this->_onbehalf && $this->_snippet) {
+      return;
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -462,23 +413,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    if ($this->_values['is_for_organization']) {
-      $this->buildOnBehalfOrganization();
-    }
-
     //we allow premium for pledge during pledge creation only.
     if (empty($this->_values['pledge_id'])) {
       CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, TRUE);
-    }
-
-    //add honor block
-    if ($this->_honor_block_is_active) {
-      $this->assign('honor_block_is_active', TRUE);
-
-      //build soft-credit section
-      CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
-      //build honoree profile section
-      CRM_Contact_Form_ProfileContact::buildQuickForm($this);
     }
 
     //don't build pledge block when mid is passed
@@ -582,26 +519,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution_Main', 'formRule'), $this);
-  }
-
-  /**
-   * Build elements to enable pay on behalf of an organization.
-   */
-  public function buildOnBehalfOrganization() {
-    if ($this->_membershipContactID) {
-      $entityBlock = array('contact_id' => $this->_membershipContactID);
-      CRM_Core_BAO_Location::getValues($entityBlock, $this->_defaults);
-    }
-
-    if (!$this->_onBehalfRequired) {
-      $this->addElement('checkbox', 'is_for_organization',
-        $this->_values['for_organization'],
-        NULL, array('onclick' => "showOnBehalf( );")
-      );
-    }
-
-    $this->assign('is_for_organization', TRUE);
-    $this->assign('urlPath', 'civicrm/contribute/transact');
   }
 
   /**
