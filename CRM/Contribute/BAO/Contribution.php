@@ -170,9 +170,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     $contribution->id = $contributionID;
 
-    if (!CRM_Utils_Rule::currencyCode($contribution->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $contribution->currency = $config->defaultCurrency;
+    if (empty($contribution->id)) {
+      // (only) on 'create', make sure that a valid currency is set (CRM-16845)
+      if (!CRM_Utils_Rule::currencyCode($contribution->currency)) {
+        $config = CRM_Core_Config::singleton();
+        $contribution->currency = $config->defaultCurrency;
+      }
     }
 
     if ($contributionID && $setPrevContribution) {
