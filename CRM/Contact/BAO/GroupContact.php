@@ -799,10 +799,15 @@ AND    contact_id IN ( $contactStr )
 
     $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
 
-    // Sort group list by hierarchy
-    // TODO: This will only work when api.entity is "group_contact". What about others?
-    if (($fieldName == 'group' || $fieldName == 'group_id') && ($context == 'search' || $context == 'create')) {
-      $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
+    if (($fieldName == 'group' || $fieldName == 'group_id')) {
+      // Enforce group visibility permissions
+      if (!empty($props['check_permissions'])) {
+        $options = CRM_Core_PseudoConstant::group();
+      }
+      if ($context == 'search' || $context == 'create') {
+        // Sort group list by hierarchy
+        $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
+      }
     }
 
     return $options;
