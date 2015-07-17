@@ -29,21 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ */
+
+/**
+ * Class CRM_Core_Payment_PayPalImpl for paypal pro, paypal standard & paypal express.
  */
 class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   const CHARSET = 'iso-8859-1';
 
   protected $_mode = NULL;
-
-  /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
 
   /**
    * Constructor.
@@ -257,6 +251,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    */
   public function doExpressCheckout(&$params) {
+
+    if (!empty($params['is_recur'])) {
+      return $this->createRecurringPayments($params);
+    }
     $args = array();
 
     $this->initialize($args, 'DoExpressCheckoutPayment');

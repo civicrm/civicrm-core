@@ -4,29 +4,6 @@
  * Class test_extension_manager_paymenttest
  */
 class test_extension_manager_paymenttest extends CRM_Core_Payment {
-  static private $_singleton = NULL;
-
-  /**
-   * Singleton function used to manage this object.
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   * @param array $paymentProcessor
-   *   The details of the payment processor being invoked.
-   * @param CRM_Core_Form $paymentForm
-   *   Reference to the form object if available.
-   * @param bool $force
-   *   Should we force a reload of this payment object.
-   *
-   * @return object
-   */
-  public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new test_extension_manager_paymenttest();
-    }
-    return self::$_singleton[$processorName];
-  }
 
   static $counts = array();
 
@@ -44,17 +21,6 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
 
   public function enable() {
     self::$counts['enable'] = 1 + (int) self::$counts['enable'];
-  }
-
-  /**
-   * This function collects all the information from a web/api form and invokes
-   * the relevant payment processor specific functions to perform the transaction
-   *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
-   *
-   */
-  public function doDirectPayment(&$params) {
   }
 
   public function checkConfig() {
