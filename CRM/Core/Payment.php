@@ -624,16 +624,15 @@ abstract class CRM_Core_Payment {
    *
    * Does a server to server payment transaction.
    *
-   * Note that doPayment will throw an exception so the code may need to be modified
-   *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
    * @return array
-   *   the result in an nice formatted array (or an error object)
-   * @abstract
+   *   the result in an nice formatted array (or an error object - but throwing exceptions is preferred)
    */
-  protected function doDirectPayment(&$params) {}
+  protected function doDirectPayment(&$params) {
+    return $params;
+  }
 
   /**
    * Process payment - this function wraps around both doTransferPayment and doDirectPayment.

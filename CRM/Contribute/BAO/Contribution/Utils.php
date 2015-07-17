@@ -208,7 +208,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_values,
       $contribution->is_test
     );
-    return;
   }
 
   /**
