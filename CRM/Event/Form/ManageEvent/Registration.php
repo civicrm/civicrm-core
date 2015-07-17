@@ -75,20 +75,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       }
     }
 
-    $this->assign('perm', 0);
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
-    $ufCreate = CRM_ACL_API::group(CRM_Core_Permission::CREATE, NULL, 'civicrm_uf_group', $ufGroups);
-    $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
-    $checkPermission = array(
-      array(
-        'administer CiviCRM',
-        'manage event profiles',
-      ),
-    );
-    if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
-      $this->assign('perm', 1);
-    }
-
     $this->assign('addProfileBottomAdd', $this->_addProfileBottomAdd);
     $this->assign('profileBottomNumAdd', $this->_profileBottomNumAdd);
 
