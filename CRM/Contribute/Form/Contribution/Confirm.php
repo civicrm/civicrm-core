@@ -1457,6 +1457,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'donors_email' => $email,
         'pcpInfoURL' => $pcpInfoURL,
         'is_honor_roll_enabled' => $contributionSoft->pcp_display_in_roll,
+        'currency' => $contributionSoft->currency,
       );
       $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
       $sendTemplateParams = array(
