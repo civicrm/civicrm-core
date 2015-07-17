@@ -19,3 +19,8 @@ UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Detail
 
 UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Summary Report'{/localize}
   WHERE value = 'activitySummary' AND option_group_id = @option_group_id_report;
+
+--CRM-16853 PCP Owner Notification
+
+{include file='../CRM/Upgrade/4.7.alpha1.msg_template/civicrm_msg_template.tpl'}
+
