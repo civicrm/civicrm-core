@@ -1046,28 +1046,36 @@ WHERE  id = %1";
         $priceFieldName = 'price_' . $values['price_field_id'];
         $priceFieldValue = self::getPriceFieldValueFromURL($form, $priceFieldName);
         if (!empty($priceFieldValue)) {
-          if ($val['html_type'] == 'CheckBox') {
-            $defaults[$priceFieldName][$priceFieldValue] = 1;
-          }
-          else {
-            $defaults[$priceFieldName] = $priceFieldValue;
-          }
-
+          self::setDefaultPriceSetField($priceFieldName, $priceFieldValue, $val['html_type'], $defaults);
           // break here to prevent overwriting of default due to 'is_default'
           // option configuration. The value sent via URL get's higher priority.
           break;
         }
         elseif ($values['is_default']) {
-          if ($val['html_type'] == 'CheckBox') {
-            $defaults[$priceFieldName][$keys] = 1;
-          }
-          else {
-            $defaults[$priceFieldName] = $keys;
-          }
+          self::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $defaults);
         }
       }
     }
     return $defaults;
+  }
+
+  /**
+   * Get the value of price field if passed via url
+   *
+   * @param string $priceFieldName
+   * @param string $priceFieldValue
+   * @param string $priceFieldType
+   * @param array $defaults
+   *
+   * @return void
+   */
+  public static function setDefaultPriceSetField($priceFieldName, $priceFieldValue, $priceFieldType, &$defaults) {
+    if ($priceFieldType == 'CheckBox') {
+      $defaults[$priceFieldName][$priceFieldValue] = 1;
+    }
+    else {
+      $defaults[$priceFieldName] = $priceFieldValue;
+    }
   }
 
   /**
