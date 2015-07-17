@@ -489,8 +489,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', array('sequential' => TRUE));
     $this->assertEquals(2, $financialTransactions['count']);
     $this->assertEquals(50, $financialTransactions['values'][0]['total_amount']);
-    $this->assertEquals(45, $financialTransactions['values'][1]['net_amount']);
-    $this->assertEquals(45, $financialTransactions['values'][1]['total_amount']);
+    $this->assertEquals(-5, $financialTransactions['values'][1]['total_amount']);
+    $this->assertEquals(-5, $financialTransactions['values'][1]['net_amount']);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', array());
     $this->assertEquals(45, $lineItem['line_total']);
   }
