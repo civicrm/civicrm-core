@@ -283,7 +283,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       case 'disable':
 
         // Instantiate PP
-        $processorInstance = $paymentClass::singleton(NULL, $paymentProcessor);
+        $processorInstance = $paymentProcessor['object'];
 
         // Does PP implement this method, and can we call it?
         if (method_exists($processorInstance, $method) && is_callable(array(
