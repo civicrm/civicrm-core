@@ -46,7 +46,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   public function tearDown() {
-    $this->paymentProcessor->delete($this->processorParams->id);
     $this->quickCleanUpFinancialEntities();
   }
 
@@ -210,7 +209,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
     );
     $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams, $ids);
 
@@ -255,7 +254,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => $start_date,
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
