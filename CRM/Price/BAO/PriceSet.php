@@ -1041,17 +1041,48 @@ WHERE  id = %1";
 
     foreach ($form->_priceSet['fields'] as $key => $val) {
       foreach ($val['options'] as $keys => $values) {
-        if ($values['is_default']) {
+        // build price field index which is passed via URL
+        // url format will be appended by "&price_5=11"
+        $priceFieldName = 'price_' . $values['price_field_id'];
+        $priceFieldValue = self::getPriceFieldValueFromURL($form, $priceFieldName);
+        if (!empty($priceFieldValue)) {
           if ($val['html_type'] == 'CheckBox') {
-            $defaults["price_{$key}"][$keys] = 1;
+            $defaults[$priceFieldName][$priceFieldValue] = 1;
           }
           else {
-            $defaults["price_{$key}"] = $keys;
+            $defaults[$priceFieldName] = $priceFieldValue;
+          }
+
+          // break here to prevent overwriting of default due to 'is_default'
+          // option configuration. The value sent via URL get's higher priority.
+          break;
+        }
+        elseif ($values['is_default']) {
+          if ($val['html_type'] == 'CheckBox') {
+            $defaults[$priceFieldName][$keys] = 1;
+          }
+          else {
+            $defaults[$priceFieldName] = $keys;
           }
         }
       }
     }
     return $defaults;
+  }
+
+  /**
+   * Get the value of price field if passed via url
+   *
+   * @param CRM_Core_Form $form
+   * @param string $priceFieldName
+   *
+   * @return mixed $priceFieldValue
+   */
+  public static function getPriceFieldValueFromURL(&$form, $priceFieldName) {
+    $priceFieldValue = CRM_Utils_Request::retrieve($priceFieldName, 'String', $form, FALSE, NULL, 'GET');
+    if (!empty($priceFieldValue)) {
+      return $priceFieldValue;
+    }
   }
 
   /**
