@@ -355,8 +355,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               (!isset($this->_defaults[$priceFieldName]) ||
                 ($val['html_type'] == 'CheckBox' &&
                 !isset($this->_defaults[$priceFieldName][$keys]))
-              ) ) {
-              CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
+              )) {
+                CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
             }
           }
         }
