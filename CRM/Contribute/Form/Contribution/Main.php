@@ -333,30 +333,30 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             $opMemTypeId = CRM_Utils_Array::value('membership_type_id', $values);
-            if ($opMemTypeId &&
+            $priceFieldName = 'price_' . $values['price_field_id'];
+            $priceFieldValue = CRM_Price_BAO_PriceSet::getPriceFieldValueFromURL($this, $priceFieldName);
+            if (!empty($priceFieldValue)) {
+              CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $priceFieldValue, $val['html_type'], $this->_defaults);
+              // break here to prevent overwriting of default due to 'is_default'
+              // option configuration or setting of current membership or
+              // membership for related organization.
+              // The value sent via URL get's higher priority.
+              break;
+            }
+            elseif ($opMemTypeId &&
               in_array($opMemTypeId, $this->_currentMemberships) &&
               !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
-              if ($val['html_type'] == 'CheckBox') {
-                $this->_defaults["price_{$key}"][$keys] = 1;
-              }
-              else {
-                $this->_defaults["price_{$key}"] = $keys;
-              }
+              CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
               $selectedCurrentMemTypes[] = $values['membership_type_id'];
             }
             elseif (!empty($values['is_default']) &&
               !$opMemTypeId &&
-              (!isset($this->_defaults["price_{$key}"]) ||
-                ($val['html_type'] == 'CheckBox' && !isset($this->_defaults["price_{$key}"][$keys]))
-              )
-            ) {
-              if ($val['html_type'] == 'CheckBox') {
-                $this->_defaults["price_{$key}"][$keys] = 1;
-              }
-              else {
-                $this->_defaults["price_{$key}"] = $keys;
-              }
+              (!isset($this->_defaults[$priceFieldName]) ||
+                ($val['html_type'] == 'CheckBox' &&
+                !isset($this->_defaults[$priceFieldName][$keys]))
+              )) {
+                CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
             }
           }
         }
