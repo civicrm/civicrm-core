@@ -56,7 +56,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param CRM_Core_Form_Search $form
    * @return array
    */
-  function buildTaskList(CRM_Core_Form_Search $form) {
+  public function buildTaskList(CRM_Core_Form_Search $form) {
     return $form->getVar('_taskList');
   }
 
@@ -241,6 +241,20 @@ class CRM_Contact_Form_Search_Custom_Base {
    */
   public function getQueryObj() {
     return NULL;
+  }
+
+  /**
+   * Set the title.
+   *
+   * @param string $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
   }
 
 }
