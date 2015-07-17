@@ -1765,7 +1765,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
       $result = $payment->doPayment($form->_params, 'contribute');
 
-
       if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
         // Refer to CRM-16737. Payment processors 'should' return payment_status_id
         // to denote the outcome of the transaction.
