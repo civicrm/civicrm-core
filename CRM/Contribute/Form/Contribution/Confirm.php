@@ -1600,7 +1600,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipParams, $contactID, &$form, $premiumParams,
     $customFieldsFormatted = NULL, $includeFieldTypes = NULL, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
     $isProcessSeparateMembershipTransaction, $financialTypeID, $membershipLineItems, $isPayLater, $isPending) {
-    $result = $membershipContribution = NULL;
+    $membershipContribution = NULL;
     $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
     $errors = $createdMemberships = $paymentResult = array();
 
@@ -1618,14 +1618,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $isTest,
         $isPayLater
       );
-      if (is_a($result[1], 'CRM_Core_Error')) {
-        $errors[1] = CRM_Core_Error::getMessages($paymentResult[1]);
-      }
 
-      if (is_a($paymentResult, 'CRM_Core_Error')) {
-        $errors[1] = CRM_Core_Error::getMessages($paymentResult);
-      }
-      elseif (!empty($paymentResult['contribution'])) {
+      if (!empty($paymentResult['contribution'])) {
         $this->postProcessPremium($premiumParams, $paymentResult['contribution']);
         //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
         $membershipContribution = $paymentResult['contribution'];
@@ -1760,22 +1754,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (count($createdMemberships)) {
       $form->_values['isMembership'] = TRUE;
     }
-    if ($form->_contributeMode == 'notify') {
-      if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
-        // call postProcess hook before leaving
-        $form->postProcessHook();
-        // this does not return
-        $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
-        $payment->doPayment($form->_params, 'contribute');
-      }
-    }
-
     if (isset($membershipContributionID)) {
       $form->_values['contribution_id'] = $membershipContributionID;
     }
+    if ($form->_contributeMode) {
+      if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
+        // call postProcess hook before leaving
+        $form->postProcessHook();
+      }
+      $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
+      $result = $payment->doPayment($form->_params, 'contribute');
 
-    if ($form->_contributeMode == 'direct') {
-      if (CRM_Utils_Array::value('payment_status_id', $paymentResult) == 1) {
+
+      if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
         // Refer to CRM-16737. Payment processors 'should' return payment_status_id
         // to denote the outcome of the transaction.
         try {
@@ -2376,9 +2367,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         ($this->_mode == 'test') ? 1 : 0,
         $isPayLater
       );
+
+      if (!empty($result['is_payment_failure'])) {
+        return $result;
+      }
       // @todo move premium processing to complete transaction if it truly is an 'after' action.
       $this->postProcessPremium($premiumParams, $result['contribution']);
-      if (CRM_Utils_Array::value('contribution_status_id', $result) == 1) {
+      if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
         civicrm_api3('contribution', 'completetransaction', array(
           'id' => $result['contribution']->id,
           'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
