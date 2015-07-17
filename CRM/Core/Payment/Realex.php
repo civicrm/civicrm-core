@@ -77,15 +77,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public function doTransferCheckout(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
    * Submit a payment using Advanced Integration Method.
    *
    * @param array $params

@@ -597,14 +597,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $value['participant_status_id'] = $value['participant_status'] = array_search($status, $pendingStatuses);
           }
         }
-        elseif ($this->_contributeMode == 'express' && !empty($value['is_primary'])) {
-          if (is_object($payment)) {
-            $result = $payment->doExpressCheckout($value);
-          }
-          else {
-            CRM_Core_Error::fatal($paymentObjError);
-          }
-        }
         elseif (!empty($value['is_primary'])) {
           CRM_Core_Payment_Form::mapParams($this->_bltID, $value, $value, TRUE);
           // payment email param can be empty for _bltID mapping
@@ -614,20 +606,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           if (is_object($payment)) {
-            $result = $payment->doDirectPayment($value);
+            try {
+              $result = $payment->doPayment($value);
+              $value = array_merge($value, $result);
+            }
+            catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+              CRM_Core_Error::displaySessionError($result);
+              CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
+            }
           }
           else {
             CRM_Core_Error::fatal($paymentObjError);
           }
-        }
-
-        if (is_a($result, 'CRM_Core_Error')) {
-          CRM_Core_Error::displaySessionError($result);
-          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
-        }
-
-        if ($result) {
-          $value = array_merge($value, $result);
         }
 
         $value['receive_date'] = $now;
@@ -865,7 +855,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // call postprocess hook before leaving
           $this->postProcessHook();
           // this does not return
-          $payment->doTransferCheckout($primaryParticipant, 'event');
+          $payment->doPayment($primaryParticipant, 'event');
         }
         else {
           CRM_Core_Error::fatal($paymentObjError);
