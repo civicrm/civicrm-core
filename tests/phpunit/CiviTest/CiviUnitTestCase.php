@@ -119,11 +119,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public static $populateOnce = FALSE;
 
   /**
-   * Allow classes to state E-notice compliance
-   */
-  public $_eNoticeCompliant = TRUE;
-
-  /**
    * @var boolean DBResetRequired allows skipping DB reset
    *               in specific test case. If you still need
    *               to reset single test (method) of such case, call
@@ -433,12 +428,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     //flush component settings
     CRM_Core_Component::getEnabledComponents(TRUE);
 
-    if ($this->_eNoticeCompliant) {
-      error_reporting(E_ALL);
-    }
-    else {
-      error_reporting(E_ALL & ~E_NOTICE);
-    }
+    error_reporting(E_ALL);
+
     $this->_sethtmlGlobals();
   }
 

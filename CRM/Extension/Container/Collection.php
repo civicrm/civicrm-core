@@ -155,7 +155,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
     if ($this->cache) {
       $k2c = $this->cache->get($this->cacheKey);
     }
-    if (!is_array($k2c)) {
+    if (!isset($k2c) || !is_array($k2c)) {
       $k2c = array();
       $containerNames = array_reverse(array_keys($this->containers));
       foreach ($containerNames as $name) {
