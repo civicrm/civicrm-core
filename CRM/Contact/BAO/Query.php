@@ -5181,7 +5181,19 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
           // widely used and consistent across the codebase
           // adding this here won't accept the search functions which don't submit an array
           if (($queryString = CRM_Core_DAO::createSqlFilter($field, $value, $dataType)) != FALSE) {
+
             return $queryString;
+          }
+
+          // This is the here-be-dragons zone. We have no other hopes left for an array so lets assume it 'should' be array('IN' => array(2,5))
+          // but we got only array(2,5) from the form.
+          // We could get away with keeping this in 4.6 if we make it such that it throws an enotice in 4.7 so
+          // people have to de-slopify it.
+          if (!empty($value[0])) {
+            $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReport;
+            if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => $value), $dataType)) != FALSE) {
+              return $queryString;
+            }
           }
         }
         $value = CRM_Utils_Type::escape($value, $dataType);
