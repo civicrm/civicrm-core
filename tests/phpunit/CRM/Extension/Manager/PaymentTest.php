@@ -122,14 +122,14 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     }
     catch (CRM_Extension_Exception_DependencyException $e) {
     }
-    $this->assertEquals(0, test_extension_manager_paymenttest::$counts['uninstall']);
+    $this->assertEquals(0, test_extension_manager_paymenttest::getCount('uninstall'));
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
 
     $ppDAO->delete();
 
     // second attempt to uninstall -- ok
     $manager->uninstall(array('test.extension.manager.paymenttest'));
-    $this->assertEquals(1, test_extension_manager_paymenttest::$counts['uninstall']);
+    $this->assertEquals(1, test_extension_manager_paymenttest::getCount('uninstall'));
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_payment_processor_type WHERE class_name = "test.extension.manager.paymenttest"');
   }
 

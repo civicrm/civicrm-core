@@ -30,4 +30,15 @@ class test_extension_manager_paymenttest extends CRM_Core_Payment {
   public function checkConfig() {
   }
 
+  /**
+   * Get the desired value from $counts.
+   *
+   * @param string $type
+   *
+   * @return int
+   */
+  public static function getCount($type) {
+    return isset(self::$counts[$type]) ? self::$counts[$type] : 0;
+  }
+
 }
