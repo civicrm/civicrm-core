@@ -1343,41 +1343,16 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Check if price set id provides option for
-   * user to select both auto-renew and non-auto-renew memberships
+   * Check if price set id provides option for user to select both auto-renew and non-auto-renew memberships
    *
    * @param int $id
    *
    * @return bool
    */
-  public static function checkMembershipPriceSet($id) {
-    $query
-      = "SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
-FROM        civicrm_price_field_value pfv
-LEFT JOIN   civicrm_price_field pf ON pf.id = pfv.price_field_id
-LEFT JOIN   civicrm_price_set ps ON ps.id = pf.price_set_id
-LEFT JOIN   civicrm_membership_type mt ON mt.id = pfv.membership_type_id
-WHERE       ps.id = %1
-";
-
-    $params = array(1 => array($id, 'Integer'));
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    $autoRenew = array();
-    //FIXME: do a comprehensive check of whether
-    //2 membership types can be selected
-    //instead of comparing all of them
-    while ($dao->fetch()) {
-      //temp fix for #CRM-10370
-      //if its NULL consider it '0' i.e. 'No auto-renew option'
-      $daoAutoRenew = $dao->auto_renew;
-      if ($daoAutoRenew === NULL) {
-        $daoAutoRenew = 0;
-      }
-      if (!empty($autoRenew) && !in_array($daoAutoRenew, $autoRenew)) {
-        return TRUE;
-      }
-      $autoRenew[] = $daoAutoRenew;
+  public static function isMembershipPriceSetContainsMixOfRenewNonRenew($id) {
+    $membershipTypes = self::getMembershipTypesFromPriceSet($id);
+    if (!empty($membershipTypes['autorenew']) && !empty($membershipTypes['non_renew'])) {
+      return TRUE;
     }
     return FALSE;
   }
