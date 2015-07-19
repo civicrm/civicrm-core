@@ -745,6 +745,7 @@ WHERE  option_group_id = (
       'userFrameworkClass',
       'userHookClass',
       'userPermissionClass',
+      'userPermissionTemp',
       'userFrameworkURLVar',
       'userFrameworkVersion',
       'newBaseURL',

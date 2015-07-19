@@ -2274,7 +2274,7 @@ SELECT contact_id
     // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
     // support for other syntaxes is discussed in ticket but being put off for now
     foreach ($filter as $operator => $criteria) {
-      if (in_array($operator, self::acceptedSQLOperators())) {
+      if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {
           // unary operators
           case 'IS NULL':

@@ -1784,7 +1784,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       $statusMsg = $this->getStatusMessageForUpdate($membership, $endDate, $receiptSend);
-
     }
     elseif (($this->_action & CRM_Core_Action::ADD)) {
       $statusMsg = $this->getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
@@ -1885,7 +1884,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
     $statusMsg = implode('<br/>', $statusMsg);
-    if ($receiptSend && $mailSent) {
+    if ($receiptSend && !empty($mailSent)) {
       $statusMsg .= ' ' . ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
     }
     return $statusMsg;

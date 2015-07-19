@@ -58,6 +58,7 @@ class CRM_Utils_Check_Security {
    */
   public function checkAll() {
     $messages = array_merge(
+      $this->checkCxnOverrides(),
       $this->checkLogFileIsNotAccessible(),
       $this->checkUploadsAreNotAccessible(),
       $this->checkDirectoriesAreNotBrowseable(),
@@ -239,6 +240,34 @@ class CRM_Utils_Check_Security {
         );
       }
     }
+    return $messages;
+  }
+
+  /**
+   * Check that the sysadmin has not modified the Cxn
+   * security setup.
+   */
+  public function checkCxnOverrides() {
+    $list = array();
+    if (defined('CIVICRM_CXN_CA') && CIVICRM_CXN_CA !== 'CiviRootCA') {
+      $list[] = 'CIVICRM_CXN_CA';
+    }
+    if (defined('CIVICRM_CXN_APPS_URL') && CIVICRM_CXN_APPS_URL !== \Civi\Cxn\Rpc\Constants::OFFICIAL_APPMETAS_URL) {
+      $list[] = 'CIVICRM_CXN_APPS_URL';
+    }
+
+    $messages = array();
+
+    if (!empty($list)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkCxnOverrides',
+        ts('The system administrator has disabled security settings (%1). Connections to remote applications are insecure.', array(
+          1 => implode(', ', $list),
+        )),
+        ts('Security Warning')
+      );
+    }
+
     return $messages;
   }
 

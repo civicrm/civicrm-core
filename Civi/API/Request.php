@@ -66,7 +66,8 @@ class Request {
     $apiRequest['extra'] = $extra;
     $apiRequest['fields'] = NULL;
 
-    self::normalizeNames($entity, $action, $apiRequest);
+    $apiRequest['entity'] = $entity = self::normalizeEntityName($entity, $apiRequest['version']);
+    $apiRequest['action'] = $action = self::normalizeActionName($action, $apiRequest['version']);
 
     // APIv1-v3 mix data+options in $params which means that each API callback is responsible
     // for splitting the two. In APIv4, the split is done systematically so that we don't
@@ -133,28 +134,38 @@ class Request {
    * Normalize/validate entity and action names
    *
    * @param string $entity
-   * @param string $action
-   * @param array $apiRequest
+   * @param int $version
+   * @return string
    * @throws \API_Exception
    */
-  protected static function normalizeNames(&$entity, &$action, &$apiRequest) {
-    if ($apiRequest['version'] <= 3) {
+  public static function normalizeEntityName($entity, $version) {
+    if ($version <= 3) {
       // APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
-      // We normalize entity to be CamelCase and action to be lowercase.
-      $apiRequest['entity'] = $entity = \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
-      $apiRequest['action'] = $action = strtolower(\CRM_Utils_String::munge($action));
+      // We normalize entity to be CamelCase.
+      return \CRM_Utils_String::convertStringToCamel(\CRM_Utils_String::munge($entity));
     }
     else {
       // APIv4 requires exact spelling & capitalization of entity/action name; deviations should cause errors
       if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $entity)) {
         throw new \API_Exception("Malformed entity");
       }
+      return $entity;
+    }
+  }
+
+  public static function normalizeActionName($action, $version) {
+    if ($version <= 3) {
+      // APIv1-v3 munges entity/action names, and accepts any mixture of case and underscores.
+      // We normalize action to be lowercase.
+      return strtolower(\CRM_Utils_String::munge($action));
+    }
+    else {
+      // APIv4 requires exact spelling & capitalization of entity/action name; deviations should cause errors
       if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $action)) {
         throw new \API_Exception("Malformed action");
       }
-      $apiRequest['entity'] = $entity;
       // TODO: Not sure about camelCase actions - in v3 they are all lowercase.
-      $apiRequest['action'] = strtolower($action{0}) . substr($action, 1);
+      return strtolower($action{0}) . substr($action, 1);
     }
   }
 
