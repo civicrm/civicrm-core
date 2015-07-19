@@ -63,7 +63,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         break;
       }
     }
-    $this->assertEquals($testedCheck['severity'], 'warning', ' in line ' . __LINE__);
+    $this->assertEquals($testedCheck['severity'], '3', ' in line ' . __LINE__);
   }
 
   /**
