@@ -3109,10 +3109,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_saved_search', {$this->_permissionedDisabledGroup}, 1
       );
       ");
-      //flush cache
-      CRM_ACL_BAO_Cache::resetCache();
-      CRM_Contact_BAO_Group::getPermissionClause(TRUE);
-      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
     }
 
     $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
@@ -3120,6 +3116,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'group_id' => $this->_permissionedGroup,
       'contact_id' => $this->_loggedInUser,
     ));
+
+    if (!$isProfile) {
+      //flush cache
+      CRM_ACL_BAO_Cache::resetCache();
+      CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+    }
   }
 
   /**

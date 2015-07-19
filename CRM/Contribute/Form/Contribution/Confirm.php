@@ -2095,10 +2095,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (CRM_Utils_Array::value('id', $this->_paymentProcessor)) {
       $this->_params['payment_processor_id'] = $this->_paymentProcessor['id'];
     }
+
+    $premiumParams = $membershipParams = $params = $this->_params;
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
-    $premiumParams = $membershipParams = $params = $this->_params;
+
     $fields = array('email-Primary' => 1);
 
     // get the add to groups

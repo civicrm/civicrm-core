@@ -293,6 +293,8 @@
      <title>Schedule Reminders</title>[A
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
+     <access_callback>1</access_callback>
+     <access_arguments>administer CiviCRM;edit all events</access_arguments>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/template.png</icon>
      <weight>40</weight>

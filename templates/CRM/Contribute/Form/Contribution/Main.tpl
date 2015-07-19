@@ -430,6 +430,7 @@
           flag = true;
       }
     });
+
     cj('.price-set-option-content input[data-amount]').change( function () {
       if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
         flag = true;

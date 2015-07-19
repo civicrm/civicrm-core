@@ -97,6 +97,12 @@ class Container {
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
+    $container->setDefinition('cxn_reg_client', new Definition(
+      '\Civi\Cxn\Rpc\RegistrationClient',
+      array()
+    ))
+      ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
+
     // Expose legacy singletons as services in the container.
     $singletons = array(
       'resources' => 'CRM_Core_Resources',
@@ -134,9 +140,9 @@ class Container {
     $dispatcher->addListener('DAO::post-update', array('\CRM_Core_BAO_RecurringEntity', 'triggerUpdate'));
     $dispatcher->addListener('DAO::post-delete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
     $dispatcher->addListener('hook_civicrm_unhandled_exception', array(
-        'CRM_Core_LegacyErrorHandler',
-        'handleException',
-      ));
+      'CRM_Core_LegacyErrorHandler',
+      'handleException',
+    ));
     return $dispatcher;
   }
 

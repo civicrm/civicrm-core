@@ -30,4 +30,5 @@
 <xi:include href="Report/files.xml"            parse="xml" />
 <xi:include href="Price/files.xml"             parse="xml" />
 <xi:include href="PCP/files.xml"             parse="xml" />
+<xi:include href="Cxn/files.xml"              parse="xml" />
 </database>
