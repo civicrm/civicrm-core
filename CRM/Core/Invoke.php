@@ -257,7 +257,7 @@ class CRM_Core_Invoke {
       }
       else {
         $template->assign('urlIsPublic', FALSE);
-        self::versionCheck($template);
+        self::statusCheck($template);
       }
 
       if (isset($item['return_url'])) {
@@ -344,23 +344,19 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * Show the message about CiviCRM versions.
+   * Show status in the footer
    *
    * @param CRM_Core_Smarty $template
    */
-  public static function versionCheck($template) {
+  public static function statusCheck($template) {
     if (CRM_Core_Config::isUpgradeMode()) {
       return;
     }
-    $newerVersion = $securityUpdate = NULL;
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'versionAlert', NULL, 1) & 1) {
-      $newerVersion = CRM_Utils_VersionCheck::singleton()->isNewerVersionAvailable();
-    }
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityUpdateAlert', NULL, 3) & 1) {
-      $securityUpdate = CRM_Utils_VersionCheck::singleton()->isSecurityUpdateAvailable();
-    }
-    $template->assign('newer_civicrm_version', $newerVersion);
-    $template->assign('security_update', $securityUpdate);
+    $statusSeverity = 0;
+    $statusMessage = ts('System status OK');
+    // TODO: get status from CRM_Utils_Check, if cached
+    $template->assign('footer_status_severity', $statusSeverity);
+    $template->assign('footer_status_message', $statusMessage);
   }
 
   /**

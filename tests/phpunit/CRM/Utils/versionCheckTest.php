@@ -113,7 +113,8 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $vc->localVersion = $localVersion;
     $vc->localMajorVersion = $vc->getMajorVersion($localVersion);
     $vc->versionInfo = $versionInfo;
-    $this->assertEquals($vc->isNewerVersionAvailable(), $expectedResult);
+    $available = $vc->isNewerVersionAvailable();
+    $this->assertEquals($available['version'], $expectedResult);
   }
 
   /**
@@ -135,6 +136,14 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     // Make sure alerts prioritize the localMajorVersion
     $data[] = array('4.4.1', $this->sampleVersionInfo, '4.4.11');
 
+    // Make sure new security release on newest version doesn't trigger security
+    // notice on site running LTS version that doesn't have a security release
+    $data[] = array('4.3.9', $this->sampleVersionInfo, NULL);
+
+    // Make sure new security release on newest version DOES trigger security
+    // notice on site running EOL version that doesn't have a security release
+    $data[] = array('4.2.19', $this->sampleVersionInfo, '4.5.5');
+
     return $data;
   }
 
@@ -150,7 +159,8 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $vc->localVersion = $localVersion;
     $vc->localMajorVersion = $vc->getMajorVersion($localVersion);
     $vc->versionInfo = $versionInfo;
-    $this->assertEquals($vc->isSecurityUpdateAvailable(), $expectedResult);
+    $available = $vc->isNewerVersionAvailable();
+    $this->assertEquals($available['upgrade'], $expectedResult);
   }
 
   /**
@@ -161,20 +171,28 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $data = array();
 
     // Make sure we get alerted if a security release is available
-    $data[] = array('4.5.1', $this->sampleVersionInfo, TRUE);
+    $data[] = array('4.5.1', $this->sampleVersionInfo, 'security');
 
     // Make sure we do not get alerted if a security release is not available
-    $data[] = array('4.5.5', $this->sampleVersionInfo, FALSE);
+    $data[] = array('4.5.5', $this->sampleVersionInfo, NULL);
 
     // Make sure we get false (and no errors) if no versionInfo available (this will be the case for pre-alphas)
-    $data[] = array('4.7.alpha1', array(), FALSE);
+    $data[] = array('4.7.alpha1', array(), NULL);
 
     // If there are 2 security updates on the same day (e.g. lts and stable majorVersions)
     // we should not get alerted to one if we are using the other
     $data[] = array('4.4.11', $this->sampleVersionInfo, FALSE);
 
     // This version predates the ones in the info array, it should be assumed to be EOL and insecure
-    $data[] = array('4.0.1', $this->sampleVersionInfo, TRUE);
+    $data[] = array('4.0.1', $this->sampleVersionInfo, 'security');
+
+    // Make sure new security release on newest version doesn't trigger security
+    // notice on site running LTS version that doesn't have a security release
+    $data[] = array('4.3.9', $this->sampleVersionInfo, NULL);
+
+    // Make sure new security release on newest version DOES trigger security
+    // notice on site running EOL version that doesn't have a security release
+    $data[] = array('4.2.19', $this->sampleVersionInfo, 'security');
 
     return $data;
   }
