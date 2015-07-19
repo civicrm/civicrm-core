@@ -450,27 +450,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
     }
-
-    // if auto renew checkbox is set, initiate a open-ended recurring membership
-    if ((!empty($this->_params['selectMembership']) || !empty($this->_params['priceSetId'])) && !empty($this->_paymentProcessor['is_recur']) &&
-      CRM_Utils_Array::value('auto_renew', $this->_params) && empty($this->_params['is_recur']) && empty($this->_params['frequency_interval'])
-    ) {
-
-      $this->_params['is_recur'] = $this->_values['is_recur'] = 1;
-      // check if price set is not quick config
-      if (!empty($this->_params['priceSetId']) && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config')) {
-        list($this->_params['frequency_interval'], $this->_params['frequency_unit']) = CRM_Price_BAO_PriceSet::getRecurDetails($this->_params['priceSetId']);
-      }
-      else {
-        // FIXME: set interval and unit based on selected membership type
-        $this->_params['frequency_interval'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-          $this->_params['selectMembership'], 'duration_interval'
-        );
-        $this->_params['frequency_unit'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-          $this->_params['selectMembership'], 'duration_unit'
-        );
-      }
-    }
+    $this->setRecurringMembershipParams();
 
     if ($this->_pcpId) {
       $params = $this->processPcp($this, $this->_params);
