@@ -239,7 +239,7 @@ class CRM_Utils_Check {
     }
     if ($spid) {
       // If so, compare severity to StatusPreference->severity.
-      $severity = self::severityMap($message->getSeverity());
+      $severity = $message->getSeverity();
       if ($severity <= $statusPreference['values'][$spid]['ignore_severity']) {
         // A hush or a snooze has been set.  Find out which.
         if (isset($statusPreference['values'][$spid]['hush_until'])) {
