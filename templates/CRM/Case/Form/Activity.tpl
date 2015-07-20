@@ -62,7 +62,7 @@
     || $activityTypeFile EQ 'ChangeCaseStartDate'}
       {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
       <tr class="crm-case-activity-form-block-details">
-        <td class="label">{ts}Notes{/ts}</td>
+        <td class="label">{ts}Details{/ts}</td>
         <td class="view-value">
           {* If using plain textarea, assign class=huge to make input large enough. *}
           {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
