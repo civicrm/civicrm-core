@@ -379,11 +379,16 @@ SELECT label, value
         }
 
         // fix $value here to escape sql injection attacks
+        $qillValue = NULL;
         if (!is_array($value)) {
           $value = CRM_Core_DAO::escapeString(trim($value));
+          $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
+        }
+        elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $op = key($value);
+          $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
         }
 
-        $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
         $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
 
         switch ($field['data_type']) {

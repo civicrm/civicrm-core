@@ -381,6 +381,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contribution_product_id',
       'payment_instrument_id',
     );
+    $specialParams += preg_grep('/^custom_/', array_keys($this->_formValues));
     foreach ($specialParams as $element) {
       $value = CRM_Utils_Array::value($element, $this->_formValues);
       if ($value) {
