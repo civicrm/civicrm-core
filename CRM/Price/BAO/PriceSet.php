@@ -1427,9 +1427,9 @@ WHERE       ps.id = %1
    * @param int $id
    *
    * @return array(
-   *  Membership types in the price set
+   *   Membership types in the price set
    */
-  static function getMembershipTypesFromPriceSet($id) {
+  public static function getMembershipTypesFromPriceSet($id) {
     $query
       = "SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
 FROM        civicrm_price_field_value pfv
