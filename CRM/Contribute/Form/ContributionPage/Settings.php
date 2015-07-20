@@ -58,15 +58,14 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $ufJoinDAO->module = $module;
         $ufJoinDAO->entity_id = $this->_id;
         if ($ufJoinDAO->find(TRUE)) {
+          $jsonData = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoinDAO->module_data, TRUE, $module);
           if ($module == 'soft_credit') {
             $defaults['honoree_profile'] = $ufJoinDAO->uf_group_id;
-            $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($ufJoinDAO->module_data, TRUE);
             $defaults = array_merge($defaults, $jsonData);
             $defaults['honor_block_is_active'] = $ufJoinDAO->is_active;
           }
           else {
             $defaults['onbehalf_profile_id'] = $ufJoinDAO->uf_group_id;
-            $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualOnBehalfParams($ufJoinDAO->module_data, TRUE);
             $defaults = array_merge($defaults, $jsonData);
             $defaults['is_organization'] = $ufJoinDAO->is_active;
           }
@@ -362,11 +361,11 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $ufJoinParam['is_active'] = 1;
         if ($index == 'honor_block_is_active') {
           $ufJoinParam['uf_group_id'] = $params['honoree_profile'];
-          $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($params);
+          $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatModuleData($params, FALSE, 'soft_credit');
         }
         else {
           $ufJoinParam['uf_group_id'] = $params['onbehalf_profile_id'];
-          $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatMultilingualOnBehalfParams($params);
+          $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatModuleData($params, FALSE, 'on_behalf');
         }
         CRM_Core_BAO_UFJoin::create($ufJoinParam);
       }

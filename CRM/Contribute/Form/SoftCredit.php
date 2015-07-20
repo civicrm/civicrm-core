@@ -74,7 +74,7 @@ class CRM_Contribute_Form_SoftCredit {
       $ufJoinDAO->module = 'soft_credit';
       $ufJoinDAO->entity_id = $form->_id;
       if ($ufJoinDAO->find(TRUE)) {
-        $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($ufJoinDAO->module_data, TRUE);
+        $jsonData = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoinDAO->module_data, TRUE, 'soft_credit');
         if ($jsonData) {
           foreach (array('honor_block_title', 'honor_block_text') as $name) {
             $form->assign($name, $jsonData[$name]);
