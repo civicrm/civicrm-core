@@ -931,7 +931,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   protected function mapPaypalParamsToCivicrmParams($fieldMap, $paypalParams) {
     $params = array();
     foreach ($fieldMap as $civicrmField => $paypalField) {
-      $params[$civicrmField] = isset($result[$paypalField]) ? $paypalParams[$paypalField] : NULL;
+      $params[$civicrmField] = isset($paypalParams[$paypalField]) ? $paypalParams[$paypalField] : NULL;
     }
     return $params;
   }
