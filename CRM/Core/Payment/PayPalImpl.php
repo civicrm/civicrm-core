@@ -230,7 +230,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'middle_name' => 'middlename',
       'last_name' => 'lastname',
       'street_address' => 'shiptostreet',
-      'supplemental_address_1' =>'shiptostreet2',
+      'supplemental_address_1' => 'shiptostreet2',
       'city' => 'shiptocity',
       'postal_code' => 'shiptozip',
       'state_province' => 'shiptostate',
