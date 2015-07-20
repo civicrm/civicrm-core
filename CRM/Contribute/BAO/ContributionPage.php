@@ -770,145 +770,100 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * Get or Set multilingually affected honor params for processing module_data or setting default values.
+   * Get or Set honor/on_behalf params for processing module_data or setting default values.
    *
-   * @param string $params :
+   * @param array $params :
    * @param bool $setDefault : If yes then returns array to used for setting default value afterward
+   * @param string $module : processing module_data for which module? e.g. soft_credit, on_behalf
    *
    * @return array|string
    */
-  public static function formatMultilingualHonorParams($params, $setDefault = FALSE) {
+  public static function formatModuleData($params, $setDefault = FALSE, $module) {
     $config = CRM_Core_Config::singleton();
-    $sctJson = $sctJsonDecode = NULL;
+    $json = $jsonDecode = NULL;
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
+
+    $moduleDataFormat = array(
+      'soft_credit' => array(
+        'soft_credit_types',
+        'multilingual' => array(
+          'honor_block_title',
+          'honor_block_text'
+        ),
+      ),
+      'on_behalf' => array(
+        'is_for_organization',
+        'multilingual' => array(
+          'for_organization'
+        ),
+      ),
+    );
 
     //When we are fetching the honor params respecting both multi and mono lingual state
     //and setting it to default param of Contribution Page's Main and Setting form
     if ($setDefault) {
-      $sctJsonDecode = json_decode($params);
-      $sctJsonDecode = (array) $sctJsonDecode->soft_credit;
-      if (!$domain->locales && !empty($sctJsonDecode['default'])) {
+      $jsonDecode = json_decode($params);
+      $jsonDecode = (array) $jsonDecode->$module;
+      if (!$domain->locales && !empty($jsonDecode['default'])) {
         //monolingual state
-        $sctJsonDecode += (array) $sctJsonDecode['default'];
+        $jsonDecode += (array) $jsonDecode['default'];
+        unset($jsonDecode['default']);
       }
-      elseif (!empty($sctJsonDecode[$config->lcMessages])) {
+      elseif (!empty($jsonDecode[$config->lcMessages])) {
         //multilingual state
-        foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
-          $sctJsonDecode[$column] = $value;
+        foreach ($jsonDecode[$config->lcMessages] as $column => $value) {
+          $jsonDecode[$column] = $value;
         }
-        unset($sctJsonDecode[$config->lcMessages]);
+        unset($jsonDecode[$config->lcMessages]);
       }
-      return $sctJsonDecode;
+      return $jsonDecode;
     }
 
     //check and handle multilingual honoree params
     if (!$domain->locales) {
       //if in singlelingual state simply return the array format
-      $sctJson = json_encode(
-        array(
-          'soft_credit' => array(
-            'soft_credit_types' => $params['soft_credit_types'],
-            'default' => array(
-              'honor_block_title' => $params['honor_block_title'],
-              'honor_block_text' => $params['honor_block_text'],
-            ),
-          ),
-        )
-      );
+      $json = array($module => NULL);
+      foreach ($moduleDataFormat[$module] as $key => $attribute) {
+        if ($key === 'multilingual') {
+          $json[$module]['default'] = array();
+          foreach ($attribute as $attr) {
+            $json[$module]['default'][$attr] = $params[$attr];
+          }
+        }
+        else {
+          $json[$module][$attribute] = $params[$attribute];
+        }
+      }
+      $json = json_encode($json);
     }
     else {
       //if in multilingual state then retrieve the module_data against this contribution and
       //merge with earlier module_data json data to current so not to lose earlier multilingual module_data information
-      $sctJson = array(
-        'soft_credit' => array(
-          'soft_credit_types' => $params['soft_credit_types'],
-          $config->lcMessages => array(
-            'honor_block_title' => $params['honor_block_title'],
-            'honor_block_text' => $params['honor_block_text'],
-          ),
-        ),
-      );
-
-      $ufJoinDAO = new CRM_Core_DAO_UFJoin();
-      $ufJoinDAO->module = 'soft_credit';
-      $ufJoinDAO->entity_id = $params['id'];
-      $ufJoinDAO->find(TRUE);
-      $jsonData = json_decode($ufJoinDAO->module_data);
-      if ($jsonData) {
-        $sctJson['soft_credit'] = array_merge((array) $jsonData->soft_credit, $sctJson['soft_credit']);
-      }
-      $sctJson = json_encode($sctJson);
-    }
-    return $sctJson;
-  }
-
-  /**
-   * Get or Set multilingually affected on behalf params for processing module_data or setting default values.
-   *
-   * @param string $params :
-   * @param bool $setDefault : If yes then returns array to used for setting default value afterward
-   *
-   * @return array|string
-   */
-  public static function formatMultilingualOnBehalfParams($params, $setDefault = FALSE) {
-    $config = CRM_Core_Config::singleton();
-    $onBehalfJson = $onBehalfJsonDecode = NULL;
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-
-    if ($setDefault) {
-      $onBehalfJsonDecode = json_decode($params);
-      $onBehalfJsonDecode = (array) $onBehalfJsonDecode->on_behalf;
-      if (!$domain->locales && !empty($onBehalfJsonDecode['default'])) {
-        //monolingual state
-        $onBehalfJsonDecode += (array) $onBehalfJsonDecode['default'];
-      }
-      elseif (!empty($onBehalfJsonDecode[$config->lcMessages])) {
-        //multilingual state
-        foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
-          $onBehalfJsonDecode[$column] = $value;
+      $json = array($module => NULL);
+      foreach ($moduleDataFormat[$module] as $key => $attribute) {
+        if ($key === 'multilingual') {
+          $json[$module][$config->lcMessages] = array();
+          foreach ($attribute as $attr) {
+            $json[$module][$config->lcMessages][$attr] = $params[$attr];
+          }
         }
-        unset($onBehalfJsonDecode[$config->lcMessages]);
+        else {
+          $json[$module][$attribute] = $params[$attribute];
+        }
       }
-      return $onBehalfJsonDecode;
-    }
-
-    //check and handle multilingual honoree params
-    if (!$domain->locales) {
-      //if in singlelingual state simply return the array format
-      $onBehalfJson = json_encode(
-        array(
-          'on_behalf' => array(
-            'is_for_organization' => $params['is_for_organization'],
-            'default' => array(
-              'for_organization' => $params['for_organization'],
-            ),
-          ),
-        )
-      );
-    }
-    else {
-      $onBehalfJson = array(
-        'on_behalf' => array(
-          'is_for_organization' => $params['is_for_organization'],
-          $config->lcMessages => array(
-            'for_organization' => $params['for_organization'],
-          ),
-        ),
-      );
 
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
-      $ufJoinDAO->module = 'on_behalf';
+      $ufJoinDAO->module = $module;
       $ufJoinDAO->entity_id = $params['id'];
       $ufJoinDAO->find(TRUE);
       $jsonData = json_decode($ufJoinDAO->module_data);
       if ($jsonData) {
-        $onBehalfJson['on_behalf'] = array_merge((array) $jsonData->on_behalf, $onBehalfJson['on_behalf']);
+        $json[$module] = array_merge((array) $jsonData->$module, $json[$module]);
       }
-      $onBehalfJson = json_encode($onBehalfJson);
+      $json = json_encode($json);
     }
-    return $onBehalfJson;
+    return $json;
   }
 
   /**

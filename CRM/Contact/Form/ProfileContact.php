@@ -58,6 +58,7 @@ class CRM_Contact_Form_ProfileContact {
 
       if ($module == 'soft_credit') {
         $form->_honoreeProfileId = $ufJoin->uf_group_id;
+        $form->_honor_block_is_active = $ufJoin->is_active;
 
         if (!$form->_honoreeProfileId ||
           !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $form->_honoreeProfileId, 'is_active')
@@ -78,7 +79,8 @@ class CRM_Contact_Form_ProfileContact {
       }
       else {
         $form->_onbehalf = FALSE;
-        $params = CRM_Contribute_BAO_ContributionPage::formatMultilingualOnBehalfParams($ufJoin->module_data, TRUE);
+        $params = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoin->module_data, TRUE, 'on_behalf');
+        $form->_values = array_merge($params, $form->_values);
         if (CRM_Utils_Array::value('is_for_organization', $params)) {
           if ($params['is_for_organization'] == 2) {
             $form->_onBehalfRequired = TRUE;
@@ -92,16 +94,16 @@ class CRM_Contact_Form_ProfileContact {
             !empty($_POST['is_for_organization'])
           ) {
             $form->_onbehalf = TRUE;
-            $form->_profileId = $ufJoin->uf_group_id;
+            $form->_onBehalfProfileId = $ufJoin->uf_group_id;
 
-            if (!$form->_profileId ||
-              !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $form->_profileId, 'is_active')
+            if (!$form->_onBehalfProfileId ||
+              !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $form->_onBehalfProfileId, 'is_active')
             ) {
               CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of an organization and the selected onbehalf profile is either disabled or not found.'));
             }
 
             $requiredProfileFields = array('organization_name', 'email');
-            $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($form->_profileId, $requiredProfileFields);
+            $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($form->_onBehalfProfileId, $requiredProfileFields);
             if (!$validProfile) {
               CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of an organization and the required fields of the selected onbehalf profile are disabled.'));
             }
@@ -110,7 +112,7 @@ class CRM_Contact_Form_ProfileContact {
             $member = CRM_Member_BAO_Membership::getMembershipBlock($form->_id);
             if (empty($member['is_active'])) {
               $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
-              $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($form->_profileId);
+              $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($form->_onBehalfProfileId);
               foreach (array(
                   'Individual',
                   'Organization',
@@ -143,7 +145,7 @@ class CRM_Contact_Form_ProfileContact {
               }
             }
 
-            $form->assign('profileId', $form->_profileId);
+            $form->assign('profileId', $form->_onBehalfProfileId);
             $form->assign('mode', $form->_mode);
 
             if ($contactID) {
@@ -260,8 +262,8 @@ class CRM_Contact_Form_ProfileContact {
   }
 
   public static function buildOnBehalfBlock(&$form) {
-    $form->assign('fieldSetTitle', ts('Organization Details'));
     $form->assign('buildOnBehalfForm', TRUE);
+    $form->assign('fieldSetTitle', ts('Organization Details'));
 
     $contactID = $form->_contactID;
 
@@ -296,7 +298,7 @@ class CRM_Contact_Form_ProfileContact {
     }
 
     $prefix = 'onbehalf';
-    $profileFields = CRM_Core_BAO_UFGroup::getFields($form->_profileId, FALSE, CRM_Core_Action::VIEW, NULL,
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($form->_onBehalfProfileId, FALSE, CRM_Core_Action::VIEW, NULL,
       NULL, FALSE, NULL, FALSE, NULL,
       CRM_Core_Permission::CREATE, NULL
     );
@@ -323,6 +325,6 @@ class CRM_Contact_Form_ProfileContact {
     }
 
     $form->assign('onBehalfOfFields', $profileFields);
-    $form->addElement('hidden', 'hidden_onbehalf_profile', 1);
+    $form->addElement('hidden', 'onbehalf_profile_id', $form->_onBehalfProfileId);
   }
 }

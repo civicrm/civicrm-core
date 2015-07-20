@@ -228,7 +228,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
     // if onbehalf-of-organization
-    if (!empty($this->_params['hidden_onbehalf_profile'])) {
+    if (!empty($this->_params['onbehalf_profile_id'])) {
       // CRM-15182
       if (empty($this->_params['org_option']) && empty($this->_params['organization_id'])) {
         if (!empty($this->_params['onbehalfof_id'])) {
@@ -467,15 +467,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
+      CRM_Core_Error::debug( '$params', $params );
 
-    if (!empty($params['hidden_onbehalf_profile'])) {
-      $ufJoinParams = array(
-        'module' => 'onBehalf',
-        'entity_table' => 'civicrm_contribution_page',
-        'entity_id' => $this->_id,
-      );
-      $OnBehalfProfile = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-      $profileId = $OnBehalfProfile[0];
+    if (!empty($params['onbehalf_profile_id'])) {
 
       $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
@@ -487,7 +481,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $fieldTypes = array_merge($fieldTypes, array('Contribution'));
       }
 
-      $this->buildCustom($profileId, 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
+      $this->buildCustom($params['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
 
     $this->_separateMembershipPayment = $this->get('separateMembershipPayment');
