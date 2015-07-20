@@ -271,27 +271,6 @@
     <add>1.3</add>
   </field>
   <field>
-    <name>is_for_organization</name>
-    <title>Allow For Organization</title>
-    <type>boolean</type>
-    <comment>if true, signup is done on behalf of an organization</comment>
-    <default>0</default>
-    <add>2.1</add>
-  </field>
-  <field>
-    <name>for_organization</name>
-    <title>On Behalf Of Organization</title>
-    <type>text</type>
-    <html>
-      <type>TextArea</type>
-      <rows>2</rows>
-      <cols>50</cols>
-    </html>
-    <localizable>true</localizable>
-    <comment>This text field is shown when is_for_organization is checked. For example - I am contributing on behalf on an organization.</comment>
-    <add>2.1</add>
-  </field>
-  <field>
     <name>is_email_receipt</name>
     <title>Send email Receipt</title>
     <type>boolean</type>

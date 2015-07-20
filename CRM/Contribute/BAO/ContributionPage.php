@@ -844,8 +844,75 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * Generate html for pdf in confirmation receipt email attachment.
+   * Get or Set multilingually affected on behalf params for processing module_data or setting default values.
    *
+   * @param string $params :
+   * @param bool $setDefault : If yes then returns array to used for setting default value afterward
+   *
+   * @return array|string
+   */
+  public static function formatMultilingualOnBehalfParams($params, $setDefault = FALSE) {
+    $config = CRM_Core_Config::singleton();
+    $onBehalfJson = $onBehalfJsonDecode = NULL;
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+
+    if ($setDefault) {
+      $onBehalfJsonDecode = json_decode($params);
+      $onBehalfJsonDecode = (array) $onBehalfJsonDecode->is_for_organization;
+      if (!$domain->locales && !empty($onBehalfJsonDecode['default'])) {
+        //monolingual state
+        $onBehalfJsonDecode += (array) $onBehalfJsonDecode['default'];
+      }
+      elseif (!empty($onBehalfJsonDecode[$config->lcMessages])) {
+        //multilingual state
+        foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
+          $onBehalfJsonDecode[$column] = $value;
+        }
+        unset($onBehalfJsonDecode[$config->lcMessages]);
+      }
+      return $onBehalfJsonDecode;
+    }
+
+    //check and handle multilingual honoree params
+    if (!$domain->locales) {
+      //if in singlelingual state simply return the array format
+      $onBehalfJson = json_encode(
+        array(
+          'on_behalf' => array(
+            'is_for_organization' => $params['is_for_organization'],
+            'default' => array(
+              'for_organization' => $params['for_organization'],
+            ),
+          ),
+        )
+      );
+    }
+    else {
+      $onBehalfJson = array(
+        'on_behalf' => array(
+          'is_for_organization' => $params['is_for_organization'],
+          $config->lcMessages => array(
+            'for_organization' => $params['for_organization'],
+          ),
+        ),
+      );
+
+      $ufJoinDAO = new CRM_Core_DAO_UFJoin();
+      $ufJoinDAO->module = 'on_behalf';
+      $ufJoinDAO->entity_id = $params['id'];
+      $ufJoinDAO->find(TRUE);
+      $jsonData = json_decode($ufJoinDAO->module_data);
+      if ($jsonData) {
+        $onBehalfJson['on_behalf'] = array_merge((array) $jsonData->soft_credit, $onBehalfJson['on_behalf']);
+      }
+      $onBehalfJson = json_encode($onBehalfJson);
+    }
+    return $onBehalfJson;
+  }
+
+  /**
+   * Generate html for pdf in confirmation receipt email  attachment.
    * @param int $contributionId
    *   Contribution Page Id.
    * @param int $userID
