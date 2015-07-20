@@ -222,22 +222,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     /* Success */
-
-    $params = array();
-    $params['token'] = $result['token'];
-    $params['payer_id'] = $result['payerid'];
-    $params['payer_status'] = $result['payerstatus'];
-    $params['first_name'] = $result['firstname'];
-    $params['middle_name'] = CRM_Utils_Array::value('middlename', $result);
-    $params['last_name'] = $result['lastname'];
-    $params['street_address'] = $result['shiptostreet'];
-    $params['supplemental_address_1'] = CRM_Utils_Array::value('shiptostreet2', $result);
-    $params['city'] = $result['shiptocity'];
-    $params['state_province'] = $result['shiptostate'];
-    $params['postal_code'] = $result['shiptozip'];
-    $params['country'] = $result['shiptocountrycode'];
-
-    return $params;
+    $fieldMap = array(
+      'token' => 'token',
+      'payer_status' => 'payerstatus',
+      'payer_id' => 'payerid',
+      'first_name' => 'firstname',
+      'middle_name' => 'middlename',
+      'last_name' => 'lastname',
+      'street_address' => 'shiptostreet',
+      'supplemental_address_1' =>'shiptostreet2',
+      'city' => 'shiptocity',
+      'postal_code' => 'shiptozip',
+      'state_province' => 'shiptostate',
+      'country' => 'shiptocountrycode',
+    );
+    return $this->mapPaypalParamsToCivicrmParams($fieldMap, $result);
   }
 
   /**
@@ -300,7 +299,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   public function createRecurringPayments(&$params) {
     $args = array();
-
+    // @todo this function is riddled with enotices - perhaps use $this->mapPaypalParamsToCivicrmParams($fieldMap, $result)
     $this->initialize($args, 'CreateRecurringPaymentsProfile');
 
     $start_time = strtotime(date('m/d/Y'));
@@ -323,7 +322,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['totalbillingcycles'] = $params['installments'];
     $args['version'] = '56.0';
     $args['profilereference'] = "i={$params['invoiceID']}" .
-      "&m=$component" .
+      "&m=" .
       "&c={$params['contactID']}" .
       "&r={$params['contributionRecurID']}" .
       "&b={$params['contributionID']}" .
@@ -918,6 +917,22 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     return $result;
+  }
+
+  /**
+   * Map the paypal params to CiviCRM params using a field map.
+   *
+   * @param array $fieldMap
+   * @param array $paypalParams
+   *
+   * @return array
+   */
+  protected function mapPaypalParamsToCivicrmParams($fieldMap, $paypalParams) {
+    $params = array();
+    foreach ($fieldMap as $civicrmField => $paypalField) {
+      $params[$civicrmField] = isset($result[$paypalField]) ? $paypalParams[$paypalField] : NULL;
+    }
+    return $params;
   }
 
 }
