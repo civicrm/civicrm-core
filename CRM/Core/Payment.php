@@ -45,7 +45,8 @@ abstract class CRM_Core_Payment {
    *
    * @var string
    */
-   protected $_component;
+  protected $_component;
+
   /**
    * How are we getting billing information.
    *
