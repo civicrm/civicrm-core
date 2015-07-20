@@ -49,7 +49,7 @@ function civicrm_api3_payment_get($params) {
       $map[$efts['financial_trxn_id']] = $efts['entity_id'];
     }
     $ftParams = array(
-      'id' => array( 'IN' => $eftIds ),
+      'id' => array('IN' => $eftIds),
       'is_payment' => 1,
     );
     $financialTrxn = civicrm_api3('FinancialTrxn', 'get', $ftParams);
@@ -93,10 +93,10 @@ function civicrm_api3_payment_cancel(&$params) {
   $contributionId = $entity['entity_id'];
   $params['total_amount'] = $entity['amount'];
   unset($params['id']);
-  
+
   $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', NULL, FALSE);
-  
-  $values = array(); 
+
+  $values = array();
   _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
   return civicrm_api3_create_success($values, $params, 'Payment', 'cancel', $trxn);
 }
@@ -128,7 +128,7 @@ function civicrm_api3_payment_create(&$params) {
     $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
     $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
     $cmp = bccomp($total, $paid, 5);
-    if ($cmp == 0 || $cmp == -1) { // If paid amount is greater or equal to total amount
+    if ($cmp == 0 || $cmp == -1) {// If paid amount is greater or equal to total amount
       civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
     }
   }
@@ -165,7 +165,7 @@ function civicrm_api3_payment_create(&$params) {
     // Assign the lineitems proportionally
     CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn, $contribution);
   }
-  $values = array(); 
+  $values = array();
   _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
   return civicrm_api3_create_success($values, $params, 'Payment', 'create', $trxn);
 }
@@ -179,7 +179,7 @@ function civicrm_api3_payment_create(&$params) {
  *   Array of parameters.
  */
 function _civicrm_api3_payment_create_spec(&$params) {
-  $params = array( 
+  $params = array(
     'contribution_id' => array(
       'api.required' => 1 ,
       'title' => 'Contribution ID',
@@ -212,11 +212,11 @@ function _civicrm_api3_payment_create_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_payment_get_spec(&$params) {
-  $params = array( 
+  $params = array(
     'contribution_id' => array(
       'title' => 'Contribution ID',
       'type' => CRM_Utils_Type::T_INT,
-    )
+    ),
   );
   $params['entity_table']['api.default'] = 'civicrm_contribution';
   $params['entity_id']['api.aliases'] = array('contribution_id');
@@ -231,14 +231,14 @@ function _civicrm_api3_payment_get_spec(&$params) {
  *   Array of parameters.
  */
 function _civicrm_api3_payment_delete_spec(&$params) {
-  $params = array( 
+  $params = array(
     'id' => array(
       'api.required' => 1 ,
       'title' => 'Payment ID',
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => array('payment_id'),
-    )
-  ); 
+    ),
+  );
 }
 
 /**
@@ -250,12 +250,12 @@ function _civicrm_api3_payment_delete_spec(&$params) {
  *   Array of parameters.
  */
 function _civicrm_api3_payment_cancel_spec(&$params) {
-  $params = array( 
+  $params = array(
     'id' => array(
       'api.required' => 1 ,
       'title' => 'Payment ID',
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => array('payment_id'),
-    )
-  ); 
+    ),
+  );
 }
