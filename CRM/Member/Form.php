@@ -87,7 +87,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
-    $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, NULL, TRUE);
+    $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, array(), TRUE);
     foreach ($this->allMembershipTypeDetails as $index => $membershipType) {
       if ($membershipType['auto_renew']) {
         $this->_recurMembershipTypes[$index] = $membershipType;
@@ -286,6 +286,52 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       $this->_membershipIDs[] = $this->_id;
     }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
+  }
+
+  /**
+   * Create a recurring contribution record.
+   *
+   * Recurring contribution parameters are set explicitly rather than merging paymentParams because it's hard
+   * to know the downstream impacts if we keep passing around the same array.
+   *
+   * @param $paymentParams
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function processRecurringContribution($paymentParams) {
+    $membershipID = $paymentParams['membership_type_id'][1];
+    $contributionRecurParams = array(
+      'contact_id' => $paymentParams['contactID'],
+      'amount' => $paymentParams['total_amount'],
+      'payment_processor_id' => $paymentParams['payment_processor_id'],
+      'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams),
+      'financial_type_id' => $paymentParams['financial_type_id'],
+      'is_email_receipt' => CRM_Utils_Array::value('is_email_receipt', $paymentParams),
+      // This is not great as it could also be direct debit - but is consistent with elsewhere & all need fixing.
+      'payment_instrument_id' => 1,
+      'invoice_id' => CRM_Utils_Array::value('invoiceID ', $paymentParams),
+    );
+
+    $mapping = array(
+      'frequency_interval' => 'duration_interval',
+      'frequency_unit' => 'duration_unit',
+    );
+    $membershipType = civicrm_api3('MembershipType', 'getsingle', array(
+      'id' => $membershipID,
+      'return' => $mapping,
+    ));
+
+    foreach ($mapping as $recurringFieldName => $membershipTypeFieldName) {
+      $contributionRecurParams[$recurringFieldName] = $membershipType[$membershipTypeFieldName];
+    }
+
+    $contributionRecur = civicrm_api3('ContributionRecur', 'create', $contributionRecurParams);
+    $returnParams = array(
+      'contributionRecurID' => $contributionRecur['id'],
+      'is_recur' => TRUE,
+    );
+    return $returnParams;
   }
 
 }

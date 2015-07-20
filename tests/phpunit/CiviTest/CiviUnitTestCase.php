@@ -1440,6 +1440,35 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create test Authorize.net instance.
+   *
+   * @param array $params
+   *
+   * @return mixed
+   */
+  public function paymentProcessorAuthorizeNetCreate($params = array()) {
+    $params = array_merge(array(
+      'name' => 'Authorize',
+      'domain_id' => CRM_Core_Config::domainID(),
+      'payment_processor_type_id' => 'AuthNet',
+      'title' => 'AuthNet',
+      'is_active' => 1,
+      'is_default' => 0,
+      'is_test' => 1,
+      'is_recur' => 1,
+      'user_name' => '4y5BfuW7jm',
+      'password' => '4cAmW927n8uLf5J8',
+      'url_site' => 'https://test.authorize.net/gateway/transact.dll',
+      'url_recur' => 'https://apitest.authorize.net/xml/v1/request.api',
+      'class_name' => 'Payment_AuthorizeNet',
+      'billing_mode' => 1,
+    ), $params);
+
+    $result = $this->callAPISuccess('payment_processor', 'create', $params);
+    return $result['id'];
+  }
+
+  /**
    * Create Participant.
    *
    * @param array $params
@@ -1607,38 +1636,34 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create contribution.
    *
-   * @param int $cID
-   *   Contact_id.
+   * @param array $params
+   *   Array of parameters.
    * @param int $cTypeID
    *   Id of financial type.
    * @param int $invoiceID
    * @param int $trxnID
    * @param int $paymentInstrumentID
-   * @param bool $isFee
    *
    * @return int
    *   id of created contribution
    */
-  public function contributionCreate($cID, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345, $paymentInstrumentID = 1, $isFee = TRUE) {
-    $params = array(
+  public function contributionCreate($params, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345,
+    $paymentInstrumentID = 1) {
+
+    $params = array_merge(array(
       'domain_id' => 1,
-      'contact_id' => $cID,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
-      'financial_type_id' => empty($cTypeID) ? 1 : $cTypeID,
+      'fee_amount' => 5.00,
+      'net_ammount' => 95.00,
+      'financial_type_id' => $cTypeID,
       'payment_instrument_id' => empty($paymentInstrumentID) ? 1 : $paymentInstrumentID,
       'non_deductible_amount' => 10.00,
       'trxn_id' => $trxnID,
       'invoice_id' => $invoiceID,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      // 'note'                   => 'Donating for Nobel Cause', *Fixme
-    );
-
-    if ($isFee) {
-      $params['fee_amount'] = 5.00;
-      $params['net_amount'] = 95.00;
-    }
+    ), $params);
 
     $result = $this->callAPISuccess('contribution', 'create', $params);
     return $result['id'];
@@ -3030,7 +3055,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
    */
-  public function setupACL() {
+  public function setupACL($isProfile = FALSE) {
     global $_REQUEST;
     $_REQUEST = $this->_params;
 
@@ -3052,36 +3077,52 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
     CRM_Core_DAO::executeQuery("
     INSERT INTO civicrm_acl_entity_role (
-    `acl_role_id`, `entity_table`, `entity_id`
-    ) VALUES (55, 'civicrm_group', {$this->_permissionedGroup});
+    `acl_role_id`, `entity_table`, `entity_id`, `is_active`
+    ) VALUES (55, 'civicrm_group', {$this->_permissionedGroup}, 1);
     ");
 
-    CRM_Core_DAO::executeQuery("
-    INSERT INTO civicrm_acl (
-    `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
-    )
-    VALUES (
-    'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_saved_search', {$this->_permissionedGroup}, 1
-    );
-    ");
+    if ($isProfile) {
+      CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_acl (
+      `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+      )
+      VALUES (
+      'view picked', 'civicrm_acl_role', 55, 'Edit', 'civicrm_uf_group', 0, 1
+      );
+      ");
+    }
+    else {
+      CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_acl (
+      `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+      )
+      VALUES (
+      'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_saved_search', {$this->_permissionedGroup}, 1
+      );
+      ");
 
-    CRM_Core_DAO::executeQuery("
-    INSERT INTO civicrm_acl (
-    `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
-    )
-    VALUES (
-    'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_saved_search', {$this->_permissionedDisabledGroup}, 1
-    );
-    ");
+      CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_acl (
+      `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+      )
+      VALUES (
+      'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_saved_search', {$this->_permissionedDisabledGroup}, 1
+      );
+      ");
+    }
+
     $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
     $this->callAPISuccess('group_contact', 'create', array(
       'group_id' => $this->_permissionedGroup,
       'contact_id' => $this->_loggedInUser,
     ));
-    //flush cache
-    CRM_ACL_BAO_Cache::resetCache();
-    CRM_Contact_BAO_Group::getPermissionClause(TRUE);
-    CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+
+    if (!$isProfile) {
+      //flush cache
+      CRM_ACL_BAO_Cache::resetCache();
+      CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+    }
   }
 
   /**
@@ -3179,6 +3220,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'contact_id' => $this->_contactID,
         'contribution_page_id' => $this->_contributionPageID,
         'payment_processor_id' => $this->_paymentProcessorID,
+        'is_test' => 0,
       ),
     ));
     $this->_contributionRecurID = $contributionRecur['id'];
@@ -3191,7 +3233,10 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function setupMembershipRecurringPaymentProcessorTransaction() {
     $this->ids['membership_type'] = $this->membershipTypeCreate();
     //create a contribution so our membership & contribution don't both have id = 1
-    $this->contributionCreate($this->_contactID, 1, 'abcd', '345j');
+    $this->contributionCreate(array(
+      'contact_id' => $this->_contactID,
+      'is_test' => 1),
+      1, 'abcd', '345j');
     $this->setupRecurringPaymentProcessorTransaction();
 
     $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(

@@ -523,7 +523,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    *
    */
   public function testDeleteContribution() {
-    $contributionID = $this->contributionCreate($this->_individualId, $this->financialtypeID, 'dfsdf', 12389);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->financialtypeID, 'dfsdf', 12389);
     $params = array(
       'id' => $contributionID,
     );

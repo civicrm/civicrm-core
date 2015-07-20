@@ -914,17 +914,17 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 elseif ($relationField == 'provider_id') {
                   $fieldValue = CRM_Utils_Array::value($relationValue, $imProviders);
                 }
-              }
-              // CRM-13995
-              elseif (is_object($relDAO) && in_array($relationField, array(
-                  'email_greeting',
-                  'postal_greeting',
-                  'addressee',
-                ))
-              ) {
-                //special case for greeting replacement
-                $fldValue = "{$relationField}_display";
-                $fieldValue = $relDAO->$fldValue;
+                // CRM-13995
+                elseif (is_object($relDAO) && in_array($relationField, array(
+                    'email_greeting',
+                    'postal_greeting',
+                    'addressee',
+                  ))
+                ) {
+                  //special case for greeting replacement
+                  $fldValue = "{$relationField}_display";
+                  $fieldValue = $relDAO->$fldValue;
+                }
               }
               elseif (is_object($relDAO) && $relationField == 'state_province') {
                 $fieldValue = CRM_Core_PseudoConstant::stateProvince($relDAO->state_province_id);

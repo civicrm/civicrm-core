@@ -155,7 +155,14 @@
     </tr>
     <tr class="crm-preferences-display-form-block-editor_id">
       <td class="label">{$form.editor_id.label}</td>
-      <td>{$form.editor_id.html}</td>
+      <td>
+        {$form.editor_id.html}
+        &nbsp;
+        <span class="crm-button crm-icon-button" style="display:inline-block;vertical-align:middle;float:none!important;">
+          <span class="crm-button-icon ui-icon-gear"> </span>
+          {$form.ckeditor_config.html}
+        </span>
+      </td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -228,6 +235,11 @@
           placeholder: 'ui-state-highlight',
           update: getSorting
         });
+
+        function showCKEditorConfig() {
+          $('.crm-preferences-display-form-block-editor_id .crm-button').toggle($(this).val() == 'CKEditor');
+        }
+        $('select[name=editor_id]').each(showCKEditorConfig).change(showCKEditorConfig);
       });
     </script>
   {/literal}

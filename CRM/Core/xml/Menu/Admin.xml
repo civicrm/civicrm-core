@@ -293,6 +293,8 @@
      <title>Schedule Reminders</title>[A
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
+     <access_callback>1</access_callback>
+     <access_arguments>administer CiviCRM;edit all events</access_arguments>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/template.png</icon>
      <weight>40</weight>
@@ -757,6 +759,12 @@
   <item>
     <path>civicrm/admin/badgelayout/add</path>
     <page_callback>CRM_Badge_Form_Layout</page_callback>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/ckeditor</path>
+    <title>Configure CKEditor</title>
+    <page_callback>CRM_Admin_Page_CKEditorConfig</page_callback>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>

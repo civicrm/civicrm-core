@@ -29,21 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ */
+
+/**
+ * Class CRM_Core_Payment_PayPalImpl for paypal pro, paypal standard & paypal express.
  */
 class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   const CHARSET = 'iso-8859-1';
 
   protected $_mode = NULL;
-
-  /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
 
   /**
    * Constructor.
@@ -77,6 +71,24 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   protected function supportsBackOffice() {
     if ($this->_processorName == ts('PayPal Pro')) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Does this processor support pre-approval.
+   *
+   * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
+   *
+   * Currently Paypal express supports this, with a redirect to paypal after the 'Main' form is submitted in the
+   * contribution page. This token can then be processed at the confirm phase. Although this flow 'looks' like the
+   * 'notify' flow a key difference is that in the notify flow they don't have to return but in this flow they do.
+   *
+   * @return bool
+   */
+  protected function supportsPreApproval() {
+    if ($this->_processorName == ts('PayPal Express')) {
       return TRUE;
     }
     return FALSE;
@@ -136,7 +148,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @return array
    *   the result in an nice formatted array (or an error object)
    */
-  public function setExpressCheckOut(&$params) {
+  protected function setExpressCheckOut(&$params) {
     $args = array();
 
     $this->initialize($args, 'SetExpressCheckout');
@@ -170,6 +182,20 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     /* Success */
 
     return $result['token'];
+  }
+
+  /**
+   * Get any details that may be available to the payment processor due to an approval process having happened.
+   *
+   * In some cases the browser is redirected to enter details on a processor site. Some details may be available as a
+   * result.
+   *
+   * @param array $storedDetails
+   *
+   * @return array
+   */
+  public function getPreApprovalDetails($storedDetails) {
+    return $this->getExpressCheckoutDetails($storedDetails['token']);
   }
 
   /**
@@ -225,6 +251,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    */
   public function doExpressCheckout(&$params) {
+
+    if (!empty($params['is_recur'])) {
+      return $this->createRecurringPayments($params);
+    }
     $args = array();
 
     $this->initialize($args, 'DoExpressCheckoutPayment');
@@ -596,6 +626,24 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Function to action pre-approval if supported
+   *
+   * @param array $params
+   *   Parameters from the form
+   *
+   * @return array
+   *   - pre_approval_parameters (this will be stored on the calling form & available later)
+   *   - redirect_url (if set the browser will be redirected to this.
+   */
+  public function doPreApproval(&$params) {
+    $token = $this->setExpressCheckOut($params);
+    return array(
+      'pre_approval_parameters' => array('token' => $token),
+      'redirect_url' => $this->_paymentProcessor['url_site'] . "/cgi-bin/webscr?cmd=_express-checkout&token=$token",
+    );
   }
 
   /**

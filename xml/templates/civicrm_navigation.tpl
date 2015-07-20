@@ -54,7 +54,7 @@ VALUES
 {contact.country}{/literal}{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'display_name_format', '{serialize}{literal}{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}{/literal}{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'sort_name_format', '{serialize}{literal}{contact.last_name}{, }{contact.first_name}{/literal}{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'editor_id', '{serialize}2{/serialize}' ),
+  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'editor_id', '{serialize}CKEditor{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_ajax_check_similar', '{serialize}1{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'activity_assignee_notification', '{serialize}1{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'activity_assignee_notification_ics', '{serialize}0{/serialize}' ),

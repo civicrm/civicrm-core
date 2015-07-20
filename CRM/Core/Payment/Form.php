@@ -210,7 +210,7 @@ class CRM_Core_Payment_Form {
    * @return array
    */
   public static function getPaymentFields($paymentProcessor) {
-    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
+    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     return $paymentProcessorObject->getPaymentFormFields();
   }
 
@@ -220,7 +220,7 @@ class CRM_Core_Payment_Form {
    * @return array
    */
   public static function getPaymentFieldMetadata($paymentProcessor) {
-    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
+    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     return $paymentProcessorObject->getPaymentFormFieldsMetadata();
   }
 
@@ -230,7 +230,7 @@ class CRM_Core_Payment_Form {
    * @return string
    */
   public static function getPaymentTypeName($paymentProcessor) {
-    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
+    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     return $paymentProcessorObject->getPaymentTypeName();
   }
 
@@ -240,7 +240,7 @@ class CRM_Core_Payment_Form {
    * @return string
    */
   public static function getPaymentTypeLabel($paymentProcessor) {
-    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
+    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     return ts(($paymentProcessorObject->getPaymentTypeLabel()) . ' Information');
   }
 
@@ -299,8 +299,6 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
    * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
    *
@@ -321,7 +319,6 @@ class CRM_Core_Payment_Form {
   }
 
   /**
->>>>>>> 65e3e1ce2d1e407fa768966606173c79b12ba81f
    * Validate the payment instrument values before passing it to the payment processor
    * We want this to be overrideable by the payment processor, and default to using
    * this object's validCreditCard for credit cards (implemented as the default in the Payment class).
@@ -329,8 +326,7 @@ class CRM_Core_Payment_Form {
   public static function validatePaymentInstrument($payment_processor_id, $values, &$errors, $form) {
     // ignore if we don't have a payment instrument to validate (e.g. backend payments)
     if ($payment_processor_id > 0) {
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($payment_processor_id, 'live');
-      $payment = CRM_Core_Payment::singleton('live', $paymentProcessor, $form);
+      $payment = Civi\Payment\System::singleton()->getById($payment_processor_id);
       $payment->validatePaymentInstrument($values, $errors);
     }
   }

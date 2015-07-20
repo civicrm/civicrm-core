@@ -82,17 +82,24 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'title' => ts('Edit CiviCRM Profile Group'),
         ),
         CRM_Core_Action::ADD => array(
-          'name' => ts('Use Profile-Create Mode'),
+          'name' => ts('Use - Create Mode'),
           'url' => 'civicrm/profile/create',
           'qs' => 'gid=%%id%%&reset=1',
-          'title' => ts('Use Profile-Create Mode'),
+          'title' => ts('Use - Create Mode'),
+          'fe' => TRUE,
+        ),
+        CRM_Core_Action::ADVANCED => array(
+          'name' => ts('Use - Edit Mode'),
+          'url' => 'civicrm/profile/edit',
+          'qs' => 'gid=%%id%%&reset=1',
+          'title' => ts('Use - Edit Mode'),
           'fe' => TRUE,
         ),
         CRM_Core_Action::BASIC => array(
-          'name' => ts('Use Profile-Listings Mode'),
+          'name' => ts('Use - Listings Mode'),
           'url' => 'civicrm/profile',
           'qs' => 'gid=%%id%%&reset=1',
-          'title' => ts('Use Profile-Listings Mode'),
+          'title' => ts('Use - Listings Mode'),
           'fe' => TRUE,
         ),
         CRM_Core_Action::DISABLE => array(
@@ -118,7 +125,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'title' => ts('HTML Form Snippet for this Profile'),
         ),
         CRM_Core_Action::COPY => array(
-          'name' => ts('Copy Profile'),
+          'name' => ts('Copy'),
           'url' => 'civicrm/admin/uf/group',
           'qs' => 'action=copy&gid=%%id%%',
           'title' => ts('Make a Copy of CiviCRM Profile Group'),

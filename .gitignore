@@ -93,6 +93,7 @@ CRM/Core/DAO/Website.php
 CRM/Core/DAO/WordReplacement.php
 CRM/Core/DAO/Worldregion.php
 CRM/Core/I18n/SchemaStructure.php
+CRM/Cxn/DAO
 CRM/Dedupe/DAO
 CRM/Event/Cart/DAO
 CRM/Event/DAO

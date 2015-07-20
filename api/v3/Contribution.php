@@ -258,6 +258,7 @@ function _civicrm_api3_contribution_get_spec(&$params) {
     'title' => 'Get Test Contributions?',
     'api.aliases' => array('is_test'),
   );
+
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
   $params['payment_instrument_id']['api.aliases'] = array('contribution_payment_instrument', 'payment_instrument');
   $params['contact_id'] = $params['contribution_contact_id'];
@@ -326,16 +327,7 @@ function civicrm_api3_contribution_transact($params) {
   $params['invoice_id'] = CRM_Utils_Array::value('invoice_id', $params, md5(uniqid(rand(), TRUE)));
 
   $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor'], $params['payment_processor_mode']);
-  if (civicrm_error($paymentProcessor)) {
-    return $paymentProcessor;
-  }
-
-  $payment = CRM_Core_Payment::singleton($params['payment_processor_mode'], $paymentProcessor);
-  if (civicrm_error($payment)) {
-    return $payment;
-  }
-
-  $transaction = $payment->doPayment($params);
+  $paymentProcessor['object']->doPayment($params);
 
   $params['payment_instrument_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', $paymentProcessor['payment_processor_type_id'], 'payment_type') == 1 ? 'Credit Card' : 'Debit Card';
   return civicrm_api('Contribution', 'create', $params);

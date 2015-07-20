@@ -68,6 +68,30 @@ class CRM_Upgrade_Incremental_php_FourSeven {
    * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev == '4.7.alpha1') {
+      $config = CRM_Core_Config::singleton();
+      $editor_id = self::updateWysiwyg();
+      $msg = NULL;
+      $ext_href = 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"';
+      $dsp_href = 'href="' . CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1') . '"';
+      $blog_href = 'href="https://civicrm.org/blogs/colemanw/big-changes-wysiwyg-editing-47"';
+      switch ($editor_id) {
+        // TinyMCE
+        case 1:
+          $msg = ts('Your configured editor "TinyMCE" is no longer part of the main CiviCRM download. To continue using it, visit the <a %1>Manage Extensions</a> page to download and install the TinyMCE extension.', array(1 => $ext_href));
+          break;
+
+        // Drupal/Joomla editor
+        case 3:
+        case 4:
+          $msg = ts('CiviCRM no longer integrates with the "%1 Default Editor." Your wysiwyg setting has been reset to the built-in CKEditor. <a %2>Learn more...</a>', array(1 => $config->userFramework, 2 => $blog_href));
+          break;
+      }
+      if ($msg) {
+        $postUpgradeMessage .= '<p>' . $msg . '</p>';
+      }
+      $postUpgradeMessage .= '<p>' . ts('CiviCRM now includes the easy-to-use CKEditor Configurator. To customize the features and display of your wysiwyg editor, visit the <a %1>Display Preferences</a> page. <a %2>Learn more...</a>', array(1 => $dsp_href, 2 => $blog_href)) . '</p>';
+    }
   }
 
 
@@ -111,25 +135,22 @@ class CRM_Upgrade_Incremental_php_FourSeven {
    * @param string $rev
    */
   public function upgrade_4_7_alpha1($rev) {
-    // Task to process sql.
-    $this->addTask(ts('Update wysiwyg editor settings.'), 'updateWysiwyg');
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_7_x_runSql', $rev);
   }
 
   /**
    * CRM-16354
    *
-   * @param \CRM_Queue_TaskContext $ctx
-   *
-   * @return bool
+   * @return int
    */
-  public static function updateWysiwyg(CRM_Queue_TaskContext $ctx) {
+  public static function updateWysiwyg() {
     $editorID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
-    // Previously any value indicated one of 4 wysiwyg editors shipped in core, and no value indicated 'Textfield'
-    // Now Textfield is 1, CKEditor is 2, and the rest have been dropped from core.
-    $editorID = $editorID ? 2 : 1;
-    CRM_Core_BAO_Setting::setItem($editorID, CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
+    // Previously a numeric value indicated one of 4 wysiwyg editors shipped in core, and no value indicated 'Textarea'
+    // Now the options are "Textarea", "CKEditor", and the rest have been dropped from core.
+    $newEditor = $editorID ? "CKEditor" : "Textarea";
+    CRM_Core_BAO_Setting::setItem($newEditor, CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
 
-    return TRUE;
+    return $editorID;
   }
 
 }

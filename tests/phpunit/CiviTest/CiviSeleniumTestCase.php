@@ -635,7 +635,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->fireEvent($fieldName, 'focus');
     if ($editor == 'CKEditor') {
       if ($compressed) {
-        $this->click("{$fieldName}-plain");
+        $this->click("xpath=//textarea[@id='{$fieldName}']/../div[1]");
       }
       $this->waitForElementPresent("xpath=//div[@id='cke_{$fieldName}']//iframe");
       $this->runScript("CKEDITOR.instances['{$fieldName}'].setData('<p>{$text}</p>');");

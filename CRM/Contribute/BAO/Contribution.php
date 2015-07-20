@@ -229,7 +229,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return CRM_Contribute_BAO_Contribution|null
    *   The found object or null
    */
-  public static function &getValues($params, &$values, &$ids) {
+  public static function getValues($params, &$values, &$ids) {
     if (empty($params)) {
       return NULL;
     }
@@ -269,6 +269,62 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (!isset($params['net_amount'])) {
       $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
     }
+  }
+
+  /**
+   * @param $params
+   * @param $billingLocationTypeID
+   *
+   * @return array
+   */
+  protected static function getBillingAddressParams($params, $billingLocationTypeID) {
+    $hasBillingField = FALSE;
+    $billingFields = array(
+      'street_address',
+      'city',
+      'state_province_id',
+      'postal_code',
+      'country_id',
+    );
+
+    //build address array
+    $addressParams = array();
+    $addressParams['location_type_id'] = $billingLocationTypeID;
+    $addressParams['is_billing'] = 1;
+
+    $billingFirstName = CRM_Utils_Array::value('billing_first_name', $params);
+    $billingMiddleName = CRM_Utils_Array::value('billing_middle_name', $params);
+    $billingLastName = CRM_Utils_Array::value('billing_last_name', $params);
+    $addressParams['address_name'] = "{$billingFirstName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingMiddleName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingLastName}";
+
+    foreach ($billingFields as $value) {
+      $addressParams[$value] = CRM_Utils_Array::value("billing_{$value}-{$billingLocationTypeID}", $params);
+      if (!empty($addressParams[$value])) {
+        $hasBillingField = TRUE;
+      }
+    }
+    return array($hasBillingField, $addressParams);
+  }
+
+  /**
+   * Get address params ready to be passed to the payment processor.
+   *
+   * We need address params in a couple of formats. For the payment processor we wan state_province_id-5.
+   * To create an address we need state_province_id.
+   *
+   * @param array $params
+   * @param int $billingLocationTypeID
+   *
+   * @return array
+   */
+  public static function getPaymentProcessorReadyAddressParams($params, $billingLocationTypeID) {
+    list($hasBillingField, $addressParams) = self::getBillingAddressParams($params, $billingLocationTypeID);
+    foreach ($addressParams as $name => $field) {
+      if (substr($name, 0, 8) == 'billing_') {
+        $addressParams[substr($name, 9)] = $addressParams[$field];
+      }
+    }
+    return array($hasBillingField, $addressParams);
   }
 
   /**
@@ -369,14 +425,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // Handle soft credit and / or link to personal campaign page
     $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
 
-    //Delete PCP against this contribution and create new on submitted PCP information
     $pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id, TRUE);
-    if ($pcpId) {
-      $deleteParams = array('id' => $pcpId);
-      CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
-    }
+
     if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
       $softParams = array();
+      $softParams['id'] = $pcpId ? $pcpId : NULL;
       $softParams['contribution_id'] = $contribution->id;
       $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
       $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
@@ -390,12 +443,31 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
       $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
       //Send notification to owner for PCP
-      if ($contributionSoft->pcp_id) {
+      if ($contributionSoft->pcp_id && empty($pcpId)) {
         CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
       }
     }
+    //Delete PCP against this contribution and create new on submitted PCP information
+    elseif (array_key_exists('pcp', $params) && $pcpId) {
+      $deleteParams = array('id' => $pcpId);
+      CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+    }
     if (isset($params['soft_credit'])) {
       $softParams = $params['soft_credit'];
+      foreach ($softParams as $softParam) {
+        if (!empty($softIDs)) {
+          $key = key($softIDs);
+          $softParam['id'] = $softIDs[$key];
+          unset($softIDs[$key]);
+        }
+        $softParam['contribution_id'] = $contribution->id;
+        $softParam['currency'] = $contribution->currency;
+        //case during Contribution Import when we assign soft contribution amount as contribution's total_amount by default
+        if (empty($softParam['amount'])) {
+          $softParam['amount'] = $contribution->total_amount;
+        }
+        CRM_Contribute_BAO_ContributionSoft::add($softParam);
+      }
 
       if (!empty($softIDs)) {
         foreach ($softIDs as $softID) {
@@ -404,16 +476,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
             CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
           }
         }
-      }
-
-      foreach ($softParams as $softParam) {
-        $softParam['contribution_id'] = $contribution->id;
-        $softParam['currency'] = $contribution->currency;
-        //case during Contribution Import when we assign soft contribution amount as contribution's total_amount by default
-        if (empty($softParam['amount'])) {
-          $softParam['amount'] = $contribution->total_amount;
-        }
-        CRM_Contribute_BAO_ContributionSoft::add($softParam);
       }
     }
 
@@ -1286,38 +1348,25 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   /**
    * Create address associated with contribution record.
    *
+   * As long as there is one or more billing field in the parameters we will create the address.
+   *
+   * (historically the decision to create or not was based on the payment 'type' but these lines are greyer than once
+   * thought).
+   *
    * @param array $params
    * @param int $billingLocationTypeID
    *
    * @return int
    *   address id
    */
-  public static function createAddress(&$params, $billingLocationTypeID) {
-    $billingFields = array(
-      'street_address',
-      'city',
-      'state_province_id',
-      'postal_code',
-      'country_id',
-    );
-
-    //build address array
-    $addressParams = array();
-    $addressParams['location_type_id'] = $billingLocationTypeID;
-    $addressParams['is_billing'] = 1;
-
-    $billingFirstName = CRM_Utils_Array::value('billing_first_name', $params);
-    $billingMiddleName = CRM_Utils_Array::value('billing_middle_name', $params);
-    $billingLastName = CRM_Utils_Array::value('billing_last_name', $params);
-    $addressParams['address_name'] = "{$billingFirstName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingMiddleName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingLastName}";
-
-    foreach ($billingFields as $value) {
-      $addressParams[$value] = CRM_Utils_Array::value("billing_{$value}-{$billingLocationTypeID}", $params);
+  public static function createAddress($params, $billingLocationTypeID) {
+    list($hasBillingField, $addressParams) = self::getBillingAddressParams($params, $billingLocationTypeID);
+    if ($hasBillingField) {
+      $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
+      return $address->id;
     }
+    return NULL;
 
-    $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
-
-    return $address->id;
   }
 
   /**
@@ -2031,9 +2080,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $paymentProcessorID = CRM_Utils_Array::value('paymentProcessor', $ids);
     $contributionType = new CRM_Financial_BAO_FinancialType();
     $contributionType->id = $this->financial_type_id;
-    if (!$contributionType->find(TRUE)) {
-      throw new Exception("Could not find financial type record: " . $this->financial_type_id);
-    }
+    $contributionType->find(TRUE);
+
     if (!empty($ids['contact'])) {
       $this->_relatedObjects['contact'] = new CRM_Contact_BAO_Contact();
       $this->_relatedObjects['contact']->id = $ids['contact'];
@@ -2159,7 +2207,7 @@ WHERE  contribution_id = %1 ";
         $this->is_test ? 'test' : 'live'
       );
       $ids['paymentProcessor'] = $paymentProcessorID;
-      $this->_relatedObjects['paymentProcessor'] = &$paymentProcessor;
+      $this->_relatedObjects['paymentProcessor'] = $paymentProcessor;
     }
     elseif ($required) {
       throw new Exception("Could not find payment processor for contribution record: " . $this->id);
@@ -3013,6 +3061,12 @@ WHERE  contribution_id = %1 ";
     ) {
       return;
     }
+    if (($params['prevContribution']->contribution_status_id == array_search('Partially paid', $contributionStatus))
+      && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
+      && $context == 'changedStatus'
+    ) {
+      return;
+    }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
       $itemAmount = $params['trxnParams']['total_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
     }
@@ -3851,9 +3905,9 @@ WHERE con.id = {$contributionId}
         return $mode;
 
       case 'median':
-        $midValue = 0;
         $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
         foreach ($currencies as $currency => $val) {
+          $midValue = 0;
           $where = "AND {$alias}.currency = '{$currency}'";
           $rowCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) as count {$sql} {$where}");
 

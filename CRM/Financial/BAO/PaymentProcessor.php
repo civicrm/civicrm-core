@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -81,6 +79,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       );
       CRM_Financial_BAO_FinancialTypeAccount::add($values);
     }
+    Civi\Payment\System::singleton()->flushProcessors();
     return $processor;
   }
 
@@ -170,12 +169,14 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $testDAO->delete();
 
     $dao->delete();
+    Civi\Payment\System::singleton()->flushProcessors();
   }
 
   /**
    * Get the payment processor details.
    *
-   * @deprecated Use Civi\Payment\System::singleton->getByID();
+   * This returns an array whereas Civi\Payment\System::singleton->getByID() returns an object.
+   * The object is a key in the array.
    *
    * @param int $paymentProcessorID
    *   Payment processor id.
@@ -186,30 +187,37 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   associated array with payment processor related fields
    */
   public static function getPayment($paymentProcessorID, $mode = 'based_on_id') {
-    if (!$paymentProcessorID) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to getPayment function'));
-    }
-
-    $dao = new CRM_Financial_DAO_PaymentProcessor();
-    $dao->id = $paymentProcessorID;
-    $dao->is_active = 1;
-    if (!$dao->find(TRUE)) {
-      return NULL;
-    }
-
-    if ($mode == 'test') {
-      $testDAO = new CRM_Financial_DAO_PaymentProcessor();
-      $testDAO->name = $dao->name;
-      $testDAO->is_active = 1;
-      $testDAO->is_test = 1;
-      if (!$testDAO->find(TRUE)) {
-        CRM_Core_Error::fatal(ts('Could not retrieve payment processor details'));
+    $capabilities = ($mode == 'test') ? array('TestMode') : array();
+    $processors = self::getPaymentProcessors($capabilities, array($paymentProcessorID));
+    $processor = $processors[$paymentProcessorID];
+    $fields = array(
+      'id',
+      'name',
+      'payment_processor_type_id',
+      'user_name',
+      'password',
+      'signature',
+      'url_site',
+      'url_api',
+      'url_recur',
+      'url_button',
+      'subject',
+      'class_name',
+      'is_recur',
+      'billing_mode',
+      'is_test',
+      'payment_type',
+      'is_default',
+    );
+    // Just to prevent e-Notices elsewhere we set all fields.
+    foreach ($fields as $name) {
+      if (!isset($processor)) {
+        $processor[$name] = NULL;
       }
-      return self::buildPayment($testDAO, $mode);
     }
-    else {
-      return self::buildPayment($dao, $mode);
-    }
+    $processor['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE,
+      $processor['payment_processor_type_id'], 'name');
+    return $processors[$paymentProcessorID];
   }
 
   /**
@@ -247,50 +255,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       return 0;
     }
     return ($p1 > $p2) ? -1 : 1;
-  }
-
-  /**
-   * Build payment processor details.
-   *
-   * @deprecated
-   *
-   * @param object $dao
-   *   Payment processor object.
-   * @param string $mode
-   *   Payment mode ie test or live.
-   *
-   * @return array
-   *   associated array with payment processor related fields
-   */
-  protected static function buildPayment($dao, $mode) {
-    $fields = array(
-      'id',
-      'name',
-      'payment_processor_type_id',
-      'user_name',
-      'password',
-      'signature',
-      'url_site',
-      'url_api',
-      'url_recur',
-      'url_button',
-      'subject',
-      'class_name',
-      'is_recur',
-      'billing_mode',
-      'is_test',
-      'payment_type',
-      'is_default',
-    );
-    $result = array();
-    foreach ($fields as $name) {
-      $result[$name] = $dao->$name;
-    }
-    $result['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $dao->payment_processor_type_id, 'name');
-
-    $result['instance'] = $result['object'] = CRM_Core_Payment::singleton($mode, $result);
-
-    return $result;
   }
 
   /**
@@ -482,7 +446,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
     }
     elseif ($type == 'obj') {
       $payment = self::getPayment($ppID, $mode);
-      $result = CRM_Core_Payment::singleton($mode, $payment);
+      $result = Civi\Payment\System::singleton()->getByProcessor($payment);
     }
 
     return $result;

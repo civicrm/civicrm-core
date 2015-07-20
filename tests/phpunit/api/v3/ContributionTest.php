@@ -1150,7 +1150,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateUpdateContribution() {
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'idofsh', 212355);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId,
+    'idofsh', 212355);
     $old_params = array(
       'contribution_id' => $contributionID,
 
@@ -1241,7 +1242,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   public function testDeleteContribution() {
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'dfsdf', 12389);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId, 'dfsdf', 12389);
     $params = array(
       'id' => $contributionID,
     );

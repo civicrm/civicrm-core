@@ -83,6 +83,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     parent::setUp();
     $this->enableCiviCampaign();
     $this->toBeImplemented['get'] = array(
+      'CxnApp', // CxnApp.get exists but relies on remote data outside our control; QA w/UtilsTest::testBasicArrayGet
       'Profile',
       'CustomValue',
       'Constant',
@@ -93,6 +94,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Setting',
     );
     $this->toBeImplemented['create'] = array(
+      'Cxn',
+      'CxnApp',
+      'JobLog',
       'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
@@ -105,6 +109,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'User',
     );
     $this->toBeImplemented['delete'] = array(
+      'Cxn',
+      'CxnApp',
+      'JobLog',
       'MembershipPayment',
       'OptionGroup',
       'SurveyRespondant',
@@ -602,6 +609,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'PriceFieldValue' => array(
         'cant_update' => array(
           'weight', //won't update as there is no 1 in the same price set
+        ),
+      ),
+      'SavedSearch' => array(
+        // I think the fields below are generated based on form_values.
+        'cant_update' => array(
+          'search_custom_id',
+          'where_clause',
+          'select_tables',
+          'where_tables',
         ),
       ),
     );
@@ -1141,7 +1157,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_TEXT:
         case CRM_Utils_Type::T_LONGTEXT:
         case CRM_Utils_Type::T_EMAIL:
-          $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
+          if ($fieldName == 'form_values' && $entityName == 'SavedSearch') {
+            // This is a hack for the SavedSearch API.
+            // It expects form_values to be an array.
+            // If you want to fix this, you should definitely read this forum
+            // post.
+            // http://forum.civicrm.org/index.php/topic,33990.0.html
+            // See also my question on the CiviCRM Stack Exchange:
+            // https://civicrm.stackexchange.com/questions/3437
+            $entity[$fieldName] = array('sort_name' => "SortName2");
+          }
+          else {
+            $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
+          }
           break;
 
         case CRM_Utils_Type::T_INT:

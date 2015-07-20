@@ -16,9 +16,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->_paymentProcessorID = $this->paymentProcessorCreate(array(
-      'payment_processor_type_id' => 'AuthNet',
-    ));
+    $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate(array('is_test' => 0));
     $this->_contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', array(
       'title' => "Test Contribution Page",

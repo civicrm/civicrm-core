@@ -82,7 +82,7 @@
       else if (subName && subName != 'null') {
         fname += subName;
       }
-      
+
       CRM.loadPage(dataUrl, {target: fname});
     };
   })(CRM.$);
