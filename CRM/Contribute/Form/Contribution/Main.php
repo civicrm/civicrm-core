@@ -1358,6 +1358,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   protected function handlePreApproval(&$params) {
     try {
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+      $params['component'] = 'contribute';
       $result = $payment->doPreApproval($params);
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
