@@ -88,7 +88,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @return bool
    */
   protected function supportsPreApproval() {
-    if ($this->_processorName == ts('PayPal_Express')) {
+    if ($this->_processorName == ts('PayPal Express')) {
       return TRUE;
     }
     return FALSE;
