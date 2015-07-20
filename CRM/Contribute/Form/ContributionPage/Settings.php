@@ -47,36 +47,52 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $soft_credit_types = CRM_Core_OptionGroup::values('soft_credit_type', TRUE, FALSE, FALSE, NULL, 'name');
 
     if ($this->_id) {
-      $ufJoinParams = array(
-        'module' => 'OnBehalf',
-        'entity_table' => 'civicrm_contribution_page',
-        'entity_id' => $this->_id,
+      $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
+        $this->_id,
+        'title'
       );
-      $onBehalfIDs = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-      if ($onBehalfIDs) {
-        // get the first one only
-        $defaults['onbehalf_profile_id'] = $onBehalfIDs[0];
-      }
+      CRM_Utils_System::setTitle(ts('Title and Settings') . " ($title)");
 
-      $ufJoinDAO = new CRM_Core_DAO_UFJoin();
-      $ufJoinDAO->module = 'soft_credit';
-      $ufJoinDAO->entity_id = $this->_id;
-      if ($ufJoinDAO->find(TRUE)) {
-        $defaults['honoree_profile'] = $ufJoinDAO->uf_group_id;
-        $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($ufJoinDAO->module_data, TRUE);
-        $defaults = array_merge($defaults, $jsonData);
-        $defaults['honor_block_is_active'] = $ufJoinDAO->is_active;
-      }
-      else {
-        $ufGroupDAO = new CRM_Core_DAO_UFGroup();
-        $ufGroupDAO->name = 'honoree_individual';
-        if ($ufGroupDAO->find(TRUE)) {
-          $defaults['honoree_profile'] = $ufGroupDAO->id;
+      foreach (array('on_behalf', 'soft_credit') as $module) {
+        $ufJoinDAO = new CRM_Core_DAO_UFJoin();
+        $ufJoinDAO->module = $module;
+        $ufJoinDAO->entity_id = $this->_id;
+        if ($ufJoinDAO->find(TRUE)) {
+          if ($module == 'soft_credit') {
+            $defaults['honoree_profile'] = $ufJoinDAO->uf_group_id;
+            $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($ufJoinDAO->module_data, TRUE);
+            $defaults = array_merge($defaults, $jsonData);
+            $defaults['honor_block_is_active'] = $ufJoinDAO->is_active;
+          }
+          else {
+            $defaults['onbehalf_profile_id'] = $ufJoinDAO->uf_group_id;
+            $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualOnBehalfParams($ufJoinDAO->module_data, TRUE);
+            $defaults = array_merge($defaults, $jsonData);
+            $defaults['is_organization'] = $ufJoinDAO->is_active;
+          }
         }
-        $defaults['soft_credit_types'] = array(
-          CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
-          CRM_Utils_Array::value('in_memory_of', $soft_credit_types),
-        );
+        else {
+          if ($module == 'soft_credit') {
+            $ufGroupDAO = new CRM_Core_DAO_UFGroup();
+            $ufGroupDAO->name = 'honoree_individual';
+            if ($ufGroupDAO->find(TRUE)) {
+              $defaults['honoree_profile'] = $ufGroupDAO->id;
+            }
+            $defaults['soft_credit_types'] = array(
+              CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
+              CRM_Utils_Array::value('in_memory_of', $soft_credit_types),
+            );
+          }
+          else {
+            $ufGroupDAO = new CRM_Core_DAO_UFGroup();
+            $ufGroupDAO->name = 'on_behalf_organization';
+            if ($ufGroupDAO->find(TRUE)) {
+              $defaults['onbehalf_profile_id'] = $ufGroupDAO->id;
+            }
+            $defaults['for_organization'] = ts('I am contributing on behalf of an organization.');
+            $defaults['is_for_organization'] = 1;
+          }
+        }
       }
     }
     else {
@@ -147,7 +163,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $options[] = $this->createElement('radio', NULL, NULL, ts('Optional'), 1);
     $options[] = $this->createElement('radio', NULL, NULL, ts('Required'), 2);
     $this->addGroup($options, 'is_for_organization', '');
-    $this->add('textarea', 'for_organization', ts('On behalf of Label'), $attributes['for_organization']);
+    $this->add('textarea', 'for_organization', ts('On behalf of Label'), array('rows' => 2, 'cols' => 50));
 
     // collect goal amount
     $this->add('text', 'goal_amount', ts('Goal Amount'), array('size' => 8, 'maxlength' => 12));
@@ -292,6 +308,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+    CRM_Core_Error::debug( '$params', $params );
+    exit;
 
     // we do this in case the user has hit the forward/back button
     if ($this->_id) {
@@ -325,12 +343,13 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $sctJSON = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($params);
     }
 
+
+
     $dao = CRM_Contribute_BAO_ContributionPage::create($params);
 
     $ufJoinParams = array(
-      'onbehalf_profile_id' => array(
-        'is_active' => 1,
-        'module' => 'OnBehalf',
+      'is_organization' => array(
+        'module' => 'on_behalf',
         'entity_table' => 'civicrm_contribution_page',
         'entity_id' => $dao->id,
       ),
@@ -343,21 +362,32 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     foreach ($ufJoinParams as $index => $ufJoinParam) {
       if (!empty($params[$index])) {
+        // first delete all past entries
+        CRM_Core_BAO_UFJoin::deleteAll($ufJoinParam);
+        $ufJoinParam['uf_group_id'] = $params[$index];
         $ufJoinParam['weight'] = 1;
+        $ufJoinParam['is_active'] = 1;
         if ($index == 'honor_block_is_active') {
-          $ufJoinParam['is_active'] = 1;
           $ufJoinParam['module'] = 'soft_credit';
           $ufJoinParam['uf_group_id'] = $params['honoree_profile'];
-          $ufJoinParam['module_data'] = $sctJSON;
+          $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($params);
         }
         else {
-          // first delete all past entries
-          CRM_Core_BAO_UFJoin::deleteAll($ufJoinParam);
-          $ufJoinParam['uf_group_id'] = $params[$index];
+          $ufJoinParam['module'] = 'on_behalf';
+          $ufJoinParam['uf_group_id'] = $params['onbehalf_profile_id'];
+          $ufJoinParam['module_data'] = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($params);
         }
         CRM_Core_BAO_UFJoin::create($ufJoinParam);
       }
-      elseif ($index == 'honor_block_is_active') {
+      else {
+        if ($index == 'honor_block_is_active') {
+          $params['honor_block_title'] = NULL;
+          $params['honor_block_text'] = NULL;
+        }
+        else {
+          $params['for_organization'] = NULL;
+        }
+
         //On subsequent honor_block_is_active uncheck, disable(don't delete)
         //that particular honoree profile entry in UFjoin table, CRM-13981
         $ufId = CRM_Core_BAO_UFJoin::findJoinEntryId($ufJoinParam);
