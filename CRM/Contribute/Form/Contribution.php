@@ -1114,7 +1114,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->_params['total_amount'];
     $this->_params['amount_level'] = 0;
-    $this->_params['description'] = ts('Office Credit Card contribution');
+    $this->_params['description'] = ts("Contribution submitted by a staff person using contributor's credit card");
     $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
       $this->_params,
       CRM_Core_Config::singleton()->defaultCurrency
