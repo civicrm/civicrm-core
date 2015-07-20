@@ -39,7 +39,17 @@ use Civi\Payment\Exception\PaymentProcessorException;
 abstract class CRM_Core_Payment {
 
   /**
-   * How are we getting billing information?
+   * Component - ie. event or contribute.
+   *
+   * This is used for setting return urls.
+   *
+   * @var string
+   */
+   protected $_component;
+  /**
+   * How are we getting billing information.
+   *
+   * We are trying to completely deprecate these parameters.
    *
    * FORM   - we collect it on the same page
    * BUTTON - the processor collects it and sends it back to us via some protocol
@@ -660,6 +670,7 @@ abstract class CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
+    $this->_component = $component;
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
