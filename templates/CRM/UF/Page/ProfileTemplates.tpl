@@ -115,7 +115,7 @@
     <div>
         <span class="crm-profile-selector-select"></span>
         <button type="button" class="crm-profile-selector-preview" title="{ts}Preview{/ts}"><div class="icon ui-icon-zoomin">{ts}Preview{/ts}</div></button>
-        {if $perm EQ 1}
+        {if $perm}
           <button class="crm-profile-selector-edit">{ts}Edit{/ts}</button>
           <button class="crm-profile-selector-copy">{ts}Copy{/ts}</button>
           <button class="crm-profile-selector-create">{ts}Create{/ts}</button>
