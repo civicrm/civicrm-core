@@ -332,6 +332,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *   (reference)   reminder list
    */
   public static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
+    // These variables may appear unused, but there's some $$ stuff going on.
     $activity_type = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
     $activity_status = CRM_Core_PseudoConstant::activityStatus();
 
@@ -339,7 +340,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $civicrm_event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
     $civicrm_participant_status_type = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event_template = CRM_Event_PseudoConstant::eventTemplates();
-    $civicrm_contact = CRM_Core_BAO_ActionSchedule::getDateFields();
+    $civicrm_contact = self::getDateFields();
 
     $auto_renew_options = CRM_Core_OptionGroup::values('auto_renew_options');
     $contact_date_reminder_options = CRM_Core_OptionGroup::values('contact_date_reminder_options');
