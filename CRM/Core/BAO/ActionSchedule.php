@@ -95,7 +95,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *   associated array of all the drop downs in the form
    */
   public static function getSelection($id = NULL) {
-    $mapping = self::getMapping();
+    $mapping = CRM_Core_BAO_ActionSchedule::getMapping();
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
 
@@ -106,7 +106,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $autoRenew = CRM_Core_OptionGroup::values('auto_renew_options');
     $membershipType = CRM_Member_PseudoConstant::membershipType();
     $dateFieldParams = array('data_type' => 'Date');
-    $dateFields = self::getDateFields();
+    $dateFields = CRM_Core_BAO_ActionSchedule::getDateFields();
     $contactOptions = CRM_Core_OptionGroup::values('contact_date_reminder_options');
 
     asort($activityType);
@@ -270,7 +270,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @return array
    */
   public static function getSelection1($id = NULL, $isLimit = NULL) {
-    $mapping = self::getMapping($id);
+    $mapping = CRM_Core_BAO_ActionSchedule::getMapping($id);
     $sel4 = $sel5 = array();
     $options = array(
       'manual' => ts('Choose Recipient(s)'),
@@ -339,7 +339,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $civicrm_event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
     $civicrm_participant_status_type = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event_template = CRM_Event_PseudoConstant::eventTemplates();
-    $civicrm_contact = self::getDateFields();
+    $civicrm_contact = CRM_Core_BAO_ActionSchedule::getDateFields();
 
     $auto_renew_options = CRM_Core_OptionGroup::values('auto_renew_options');
     $contact_date_reminder_options = CRM_Core_OptionGroup::values('contact_date_reminder_options');
@@ -698,8 +698,8 @@ AND   cas.entity_value = $id AND
         $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
       }
 
-      list($tokenEntity, $tokenFields) = self::listMailingTokens($mapping);
-      $query = self::prepareMailingQuery($mapping, $actionSchedule);
+      list($tokenEntity, $tokenFields) = CRM_Core_BAO_ActionSchedule::listMailingTokens($mapping);
+      $query = CRM_Core_BAO_ActionSchedule::prepareMailingQuery($mapping, $actionSchedule);
       $dao = CRM_Core_DAO::executeQuery($query,
         array(1 => array($actionSchedule->id, 'Integer'))
       );
@@ -712,7 +712,7 @@ AND   cas.entity_value = $id AND
           CRM_Core_BAO_ActionSchedule::setCommunicationLanguage($actionSchedule->communication_language, $preferred_language);
         }
 
-        $entityTokenParams = self::prepareMailingTokens($tokenEntity, $tokenFields, $dao);
+        $entityTokenParams = CRM_Core_BAO_ActionSchedule::prepareMailingTokens($tokenEntity, $tokenFields, $dao);
 
         $isError = 0;
         $errorMsg = $toEmail = $toPhoneNumber = '';
@@ -765,7 +765,7 @@ AND   cas.entity_value = $id AND
         // insert activity log record if needed
         if ($actionSchedule->record_activity && !$isError) {
           $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
-          self::createMailingActivity($actionSchedule, $mapping, $dao->contactID, $dao->entityID, $caseID);
+          CRM_Core_BAO_ActionSchedule::createMailingActivity($actionSchedule, $mapping, $dao->contactID, $dao->entityID, $caseID);
         }
       }
 
@@ -931,7 +931,7 @@ AND   cas.entity_value = $id AND
 
         $where[] = "( e.is_override IS NULL OR e.is_override = 0 )";
         $dateField = str_replace('membership_', 'e.', $actionSchedule->start_action_date);
-        $notINClause = self::permissionedRelationships($contactField);
+        $notINClause = CRM_Core_BAO_ActionSchedule::permissionedRelationships($contactField);
 
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
         $mStatus = implode(',', $membershipStatus);
@@ -1319,10 +1319,10 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   public static function processQueue($now = NULL, $params = array()) {
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
 
-    $mappings = self::getMapping();
+    $mappings = CRM_Core_BAO_ActionSchedule::getMapping();
     foreach ($mappings as $mappingID => $mapping) {
-      self::buildRecipientContacts($mappingID, $now, $params);
-      self::sendMailings($mappingID, $now);
+      CRM_Core_BAO_ActionSchedule::buildRecipientContacts($mappingID, $now, $params);
+      CRM_Core_BAO_ActionSchedule::sendMailings($mappingID, $now);
     }
 
     $result = array(
@@ -1362,7 +1362,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
       return $options;
     }
 
-    $mapping = self::getMapping($mappingID);
+    $mapping = CRM_Core_BAO_ActionSchedule::getMapping($mappingID);
 
     switch ($mapping['entity']) {
       case 'civicrm_participant':
