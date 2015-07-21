@@ -36,61 +36,6 @@ class WebTest_Contact_SignatureTest extends CiviSeleniumTestCase {
   }
 
   /**
-   * Test Signature in TinyMC.
-   */
-  public function testTinyMCE() {
-    $this->webtestLogin();
-
-    $this->openCiviPage('dashboard', 'reset=1', 'crm-recently-viewed');
-    $this->click("//div[@id='crm-recently-viewed']/ul/li/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-    $name = $this->getText("xpath=//div[@class='crm-summary-display_name']");
-
-    // Get contact id from url.
-    $contactId = $this->urlArg('cid');
-
-    // Select Your Editor
-    $this->_selectEditor('TinyMCE');
-
-    $this->openCiviPage("contact/add", "reset=1&action=update&cid=$contactId");
-
-    $this->click("//tr[@id='Email_Block_1']/td[1]/div[3]/div[1]");
-    // HTML format message
-    $signature = 'Contact Signature in html';
-
-    $this->fireEvent('email_1_signature_html', 'focus');
-    $this->fillRichTextField('email_1_signature_html', $signature, 'TinyMCE');
-
-    // TEXT Format Message
-    $this->type('email_1_signature_text', 'Contact Signature in text');
-    $this->click('_qf_Contact_upload_view-top');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    // Is status message correct?
-    $this->waitForText('crm-notification-container', "Contact Saved");
-
-    // Go for Ckeck Your Editor, Click on Send Mail
-    $this->click("//a[@id='crm-contact-actions-link']/span");
-    // the other test checks this in a popup, we'll try it full-page here
-    $this->clickLinkSuppressPopup('link=Send an Email', "xpath=//body[@id='tinymce']/p[2]");
-
-    $this->click('subject');
-    $subject = 'Subject_' . substr(sha1(rand()), 0, 8);
-    $this->type('subject', $subject);
-
-    // Is signature correct? in Editor
-    $this->_checkSignature('html_message', $signature, 'TinyMCE');
-
-    $this->click('_qf_Email_upload-top');
-
-    // Go for Activity Search
-    $this->_checkActivity($subject, $signature);
-
-    // Set Editor back to default so we don't break other tests
-    $this->_selectEditor('CKEditor');
-  }
-
-  /**
    *  Test Signature in CKEditor.
    */
   public function testCKEditor() {

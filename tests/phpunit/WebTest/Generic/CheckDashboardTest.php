@@ -149,7 +149,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     }
     else {
       // click 'Delete Activity' link
-      $this->click("//table[@class='contact-activity-selector-dashlet dataTable no-footer']/tbody/tr[1]/td[8]/span//a[text()='Delete']");
+      $this->click("//table[@class='contact-activity-selector-dashlet crm-ajax-table dataTable no-footer']/tbody/tr[1]/td[8]/span//a[text()='Delete']");
     }
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Activity_next-bottom");

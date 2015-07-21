@@ -280,8 +280,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
-    $this->click('intro_text-plain');
-    $this->fillRichTextField('intro_text', $registerIntro);
+    $this->fillRichTextField('intro_text', $registerIntro, 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click('CIVICRM_QFID_1_is_email_confirm');
@@ -440,8 +439,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
     $this->check('is_online_registration');
     $this->assertChecked('is_online_registration');
 
-    $this->click('intro_text-plain');
-    $this->fillRichTextField('intro_text', $registerIntro);
+    $this->fillRichTextField('intro_text', $registerIntro, 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click('CIVICRM_QFID_1_is_email_confirm');
