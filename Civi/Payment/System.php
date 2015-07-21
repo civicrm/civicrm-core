@@ -60,14 +60,15 @@ class System {
       }
 
       $processorObject = new $paymentClass(!empty($processor['is_test']) ? 'test' : 'live', $processor);
-      if (!$force && !$processorObject->checkConfig()) {
+      if (!$force && $processorObject->checkConfig()) {
         $processorObject = NULL;
       }
       else {
         $processorObject->setPaymentProcessor($processor);
       }
+      $this->cache[$id] = $processorObject;
     }
-    $this->cache[$id] = $processorObject;
+
     return $this->cache[$id];
   }
 
