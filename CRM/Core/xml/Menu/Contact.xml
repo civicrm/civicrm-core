@@ -390,6 +390,11 @@
      <access_arguments>merge duplicate contacts</access_arguments>
 </item>
 <item>
+     <path>civicrm/ajax/flipDupePairs</path>
+     <page_callback>CRM_Contact_Page_AJAX::flipDupePairs</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
   <path>civicrm/activity/sms/add</path>
   <path_arguments>action=add</path_arguments>
   <title>Activities</title>

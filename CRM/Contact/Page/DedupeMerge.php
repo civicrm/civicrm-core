@@ -66,6 +66,13 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
     $cacheKeyString .= $rgid ? "_{$rgid}" : '_0';
     $cacheKeyString .= $gid ? "_{$gid}" : '_0';
 
+    $urlQry = "reset=1&action=update&rgid={$rgid}";
+    $urlQry = $gid ? ($urlQry . "&gid={$gid}") : $urlQry;
+
+    if ($mode == 'aggressive' && !CRM_Core_Permission::check('force merge duplicate contacts')) {
+      CRM_Core_Session::setStatus(ts('You do not have permission to force merge duplicate contact records'), ts('Permission Denied'), 'error');
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry));
+    }
     // Setup the Queue
     $queue = CRM_Queue_Service::singleton()->create(array(
       'name'  => $cacheKeyString,
@@ -81,9 +88,6 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
       // else merge all (2)
       $isSelected = 2; 
     }
-
-    $urlQry = "reset=1&action=update&rgid={$rgid}";
-    $urlQry = $gid ? ($urlQry . "&gid={$gid}") : $urlQry;
 
     $total  = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, NULL, $where);
     if ($total <= 0) {

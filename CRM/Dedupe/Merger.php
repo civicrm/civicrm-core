@@ -731,6 +731,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
         // store  any conflicts
         if (!empty($conflicts)) {
+          foreach ($conflicts as $key => $dnc) {
+            $conflicts[$key] = "{$migrationInfo['rows'][$key]['title']}: '{$migrationInfo['rows'][$key]['main']}' vs. '{$migrationInfo['rows'][$key]['other']}'";
+          }
           CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts);
         } else {
           // delete entry from PrevNextCache table so we don't consider the pair next time
@@ -798,15 +801,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // particular field or not
         if (!empty($migrationInfo['rows'][$key]['main'])) {
           // if main also has a value its a conflict
-          if ($mode == 'safe') {
-            // note it down & lets wait for response from the hook.
-            // For no response skip this merge
-            $conflicts[$key] = NULL;
-          }
-          elseif ($mode == 'aggressive') {
-            // let the main-field be overwritten
-            continue;
-          }
+
+          // note it down & lets wait for response from the hook.
+          // For no response $mode will decide if to skip this merge
+          $conflicts[$key] = NULL;
         }
       }
       elseif (substr($key, 0, 14) == 'move_location_' and $val != NULL) {
@@ -831,15 +829,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               // try insert address at new available loc-type
               $migrationInfo['location'][$fieldName][$fieldCount]['locTypeId'] = $newTypeId;
             }
-            elseif ($mode == 'safe') {
+            else {
               // note it down & lets wait for response from the hook.
-              // For no response skip this merge
+              // For no response $mode will decide if to skip this merge
               $conflicts[$key] = NULL;
-            }
-            elseif ($mode == 'aggressive') {
-              // let the loc-type-id be same as that of other-contact & go ahead
-              // with merge assuming aggressive mode
-              continue;
             }
           }
         }
@@ -856,6 +849,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // merge happens with new values filled in here. For a particular field / row not to be merged
     // field should be unset from fields_in_conflict.
     $migrationData['fields_in_conflict'] = $conflicts;
+    $migrationData['merge_mode']         = $mode;
     CRM_Utils_Hook::merge('batch', $migrationData, $mainId, $otherId);
     $conflicts = $migrationData['fields_in_conflict'];
     // allow hook to override / manipulate migrationInfo as well
@@ -871,6 +865,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // copy over the resolved values
           $migrationInfo[$key] = $val;
         }
+      }
+      // if there are conflicts and mode is aggressive, allow hooks to decide if to skip merges
+      if (array_key_exists('skip_merge', $migrationData)) {
+        return (bool) $migrationData['skip_merge'];
       }
     }
     return FALSE;
