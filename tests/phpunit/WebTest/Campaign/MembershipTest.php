@@ -114,7 +114,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
    * @param int $id
    */
   public function memberAddTest($campaignTitle, $id) {
-    //Add new memebershipType
+    //Add new membershipType
     $memTypeParams = $this->webtestAddMembershipType();
 
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
