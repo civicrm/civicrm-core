@@ -2070,7 +2070,12 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
    */
   public static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL) {
     $pendingAmount = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
-    $balanceAmt = $updatedAmount - $paidAmount - CRM_Utils_Array::value('total_amount', $pendingAmount, 0);
+    $pendingAmount = CRM_Utils_Array::value('total_amount', $pendingAmount, 0);
+    $balanceAmt = $updatedAmount - $paidAmount;
+    if ($paidAmount != $pendingAmount) {
+      $balanceAmt -= $pendingAmount;
+    }
+
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
@@ -2113,7 +2118,7 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
         'from_financial_account_id' => NULL,
         'to_financial_account_id' => $toFinancialAccount,
         'total_amount' => $balanceAmt,
-        'status_id' => CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name'),
+        'status_id' => $completedStatusId,
         'payment_instrument_id' => $updatedContribution->payment_instrument_id,
         'contribution_id' => $updatedContribution->id,
         'trxn_date' => date('YmdHis'),
