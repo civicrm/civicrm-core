@@ -28,6 +28,8 @@
 /**
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
