@@ -530,7 +530,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     // retrieve all memberships
     $allMemberships = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
-
+    // Throw status bounce when no Membership type or priceset is present
+    if (empty($allMemberships) && empty($priceSets)) {
+      CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
+    }
     $allMembershipInfo = $membershipType = array();
     foreach ($allMemberships as $key => $values) {
       if (!empty($values['is_active'])) {
