@@ -88,7 +88,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_status_pref` (
 -- CRM-17005
 UPDATE civicrm_country SET name = 'PALESTINIAN TERRITORY' WHERE name = 'PALESTINIAN TERRITORY, OCCUPIED';
 
-
 -- CRM-17145 update Activity detail data type
 ALTER TABLE `civicrm_activity` CHANGE `details` `details` LONGTEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'Details about the activity (agenda, notes, etc).';
 
@@ -166,3 +165,13 @@ INSERT INTO
    (@option_group_id_date_filter, '{ts escape="sql"}Next Quarter{/ts}', 'next.quarter', 'next.quarter', NULL, NULL, NULL,57, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}Next Fiscal Year{/ts}', 'next.fiscal_year', 'next.fiscal_year', NULL, NULL, NULL,58, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}Next Year{/ts}', 'next.year', 'next.year', NULL, NULL, NULL,59, NULL, 0, 0, 1, NULL, NULL);
+
+-- CRM-16873
+{if $multilingual}
+  {foreach from=$locales item=loc}
+     ALTER TABLE civicrm_contribution_page DROP for_organization_{$loc};
+  {/foreach}
+{else}
+     ALTER TABLE civicrm_contribution_page DROP for_organization;
+{/if}
+ALTER TABLE civicrm_contribution_page DROP is_for_organization;

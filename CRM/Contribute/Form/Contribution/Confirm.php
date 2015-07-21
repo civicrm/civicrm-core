@@ -467,7 +467,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
-      CRM_Core_Error::debug( '$params', $params );
 
     if (!empty($params['onbehalf_profile_id'])) {
 
