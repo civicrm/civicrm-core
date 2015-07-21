@@ -1242,6 +1242,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
     // Send receipt mail.
+    array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
     if ($contribution->id && !empty($this->_params['is_email_receipt'])) {
       $this->_params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
       $this->_params['contact_id'] = $contactID;
