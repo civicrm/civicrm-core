@@ -1353,7 +1353,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $params['payment_action'] = 'Sale';
 
           $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
-          $token = $payment->setExpressCheckout($params);
+          // Really this setting of $this->_params & params within it should be done earlier on in the function
+          // probably the values determined here should be reused in confirm postProcess as there is no opportunity to alter anything
+          // on the confirm page. However as we are dealing with a stable release we go as close to where it is used
+          // as possible.
+          // In general the form has a lack of clarity of the logic of why things are set on the form in some cases &
+          // the logic around when $this->_params is used compared to other params arrays.
+          $this->_params = array_merge($params, $this->_params);
+          $this->setRecurringMembershipParams();
+          $token = $payment->setExpressCheckout($this->_params);
           if (is_a($token, 'CRM_Core_Error')) {
             CRM_Core_Error::displaySessionError($token);
             CRM_Utils_System::redirect($params['cancelURL']);
