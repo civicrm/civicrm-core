@@ -102,6 +102,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Add Getting Started dashlet to %1: SQL', array(1 => $rev)), 'addGettingStartedDashlet', $rev);
+    $this->addTask(ts('Migrate \'on behalf of\' information to module_data'), 'migrateOnBehalfOfInfo');
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_7_x_runSql', $rev);
   }
 
   /**
@@ -143,4 +145,58 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
     return TRUE;
   }
 
+  /**
+   * Migrate on-behalf information to uf_join.module_data as on-behalf columns will be dropped
+   * on DB upgrade
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   *   TRUE for success
+   */
+  public static function migrateOnBehalfOfInfo(CRM_Queue_TaskContext $ctx) {
+
+    $ufGroupDAO = new CRM_Core_DAO_UFJoin();
+    $ufGroupDAO->module = 'OnBehalf';
+    $ufGroupDAO->find(TRUE);
+
+    $query = "SELECT cp.*, uj.id as join_id
+   FROM civicrm_contribution_page cp
+    INNER JOIN civicrm_uf_join uj ON uj.entity_id = cp.id AND uj.module = 'OnBehalf'";
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    if ($dao->N) {
+      $domain = new CRM_Core_DAO_Domain();
+      $domain->find(TRUE);
+      while ($dao->fetch()) {
+        $onBehalfParams['on_behalf'] = array('is_for_organization' => $dao->is_for_organization);
+        if ($domain->locales) {
+          $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+          foreach ($locales as $locale) {
+            $for_organization = "for_organization_{$locale}";
+            $onBehalfParams['on_behalf'] += array(
+              $locale => array(
+                'for_organization' => $dao->$for_organization,
+              ),
+            );
+          }
+        }
+        else {
+          $onBehalfParams['on_behalf'] += array(
+            'default' => array(
+              'for_organization' => $dao->for_organization,
+            ),
+          );
+        }
+        $ufJoinParam = array(
+          'id' => $dao->join_id,
+          'module' => 'on_behalf',
+          'module_data' => json_encode($onBehalfParams),
+        );
+        CRM_Core_BAO_UFJoin::create($ufJoinParam);
+      }
+    }
+
+    return TRUE;
+  }
 }
