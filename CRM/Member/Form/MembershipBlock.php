@@ -302,8 +302,8 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             $errors['is_separate_payment'] = ts('You need to enable Separate Membership Payment when online contribution page is configured for both Membership and Recurring Contribution');
           }
           elseif (!empty($params['is_separate_payment'])) {
-            foreach ($params['membership_type'] as $mt => $dontCare) {
-              if (!empty($params["auto_renew_$mt"])) {
+            foreach ($params['membership_type'] as $mt => $isEnabled) {
+              if (!empty($params["auto_renew_$mt"]) && $isEnabled) {
                 $errors["auto_renew_$mt"] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page');
                 break;
               }
