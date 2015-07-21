@@ -128,19 +128,21 @@
 {if $context eq 'search'}
    {crmButton href=$backURL icon="close"}{ts}Done{/ts}{/crmButton}
 {elseif $context eq 'conflicts'}
-   {if $gid}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map&mode=aggressive" a=1}{/capture}
-   {else}
-      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&action=map&mode=aggressive" a=1}{/capture}
-   {/if}
-   <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in force merge mode - all selected duplicates will be merged into main contacts even in case of any conflicts. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Force Merge Selected Duplicates{/ts}</span></a>
+   {if call_user_func(array('CRM_Core_Permission','check'), 'force merge duplicate contacts')}
+     {if $gid}
+       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map&mode=aggressive" a=1}{/capture}
+     {else}
+       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&action=map&mode=aggressive" a=1}{/capture}
+     {/if}
+     <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in force merge mode - all selected duplicates will be merged into main contacts even in case of any conflicts. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Force Merge Selected Duplicates{/ts}</span></a>
 
-   {if $gid}
-     {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&mode=aggressive" a=1}{/capture}
-   {else}
-     {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&mode=aggressive" a=1}{/capture}
+     {if $gid}
+       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map" a=1}{/capture}
+     {else}
+       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`&action=map" a=1}{/capture}
+     {/if}
+     <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Safe Merge Selected Duplicates{/ts}</span></a>
    {/if}
-   <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Force Merge All Duplicates{/ts}</span></a>
 
    {if $gid}
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=`$rgid`&gid=`$gid`" a=1}{/capture}
@@ -171,6 +173,8 @@
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="reset=1&rgid=`$rgid`" a=1}{/capture}
    {/if}
    <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><div class="icon ui-icon-script"></div>{ts}Batch Merge All Duplicates{/ts}</span></a>
+
+   <a href='#' title="{ts}Flip Selected Duplicates{/ts}" class="crm-dedupe-flip-selections button"><span>{ts}Flip Selected Duplicates{/ts}</span></a>
 
    {capture assign=backURL}{crmURL p="civicrm/contact/deduperules" q="reset=1" a=1}{/capture}
    <a href="{$backURL}" class="button crm-button-type-cancel">
@@ -208,7 +212,10 @@ CRM.$(function($) {
       {data: "dst_street"},
       {data: "src_postcode"},
       {data: "dst_postcode"},
-      {data: "conflicts"},
+      {
+        data: "conflicts",
+        className: "crm-pair-conflict"
+      },
       {data: "weight"},
       {data: "actions"},
     ],
@@ -231,6 +238,8 @@ CRM.$(function($) {
       }
       // for action column at the last, set nowrap
       $('td:last', row).attr('nowrap','nowrap');
+      // for conflcts column
+      $('td.crm-pair-conflict', row).attr('nowrap','nowrap');
     }
   });
 
@@ -246,13 +255,14 @@ CRM.$(function($) {
   $('#dupePairs_length_selection').appendTo('#dupePairs_length');
   
   // apply selected class on click of a row
-  $('#dupePairs tbody').on('click', 'tr', function() {
+  $('#dupePairs tbody').on('click', 'tr', function(e) {
     $(this).toggleClass('crm-row-selected');
     $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));
     var ele = $('input.crm-dedupe-select', this);
     toggleDedupeSelect(ele, 0);
   });
-  
+
+  // when select-all checkbox is checked
   $('#dupePairs thead tr .crm-dedupe-selection').on('click', function() {
     var checked = $('.crm-dedupe-select-all').prop('checked');
     if (checked) {
@@ -291,17 +301,68 @@ CRM.$(function($) {
     var column = table.column( $(this).attr('data-column-main') );
     column.visible( ! column.visible() );
 
+    // nowrap to conflicts column is applied only during initial rendering
+    // for show / hide clicks we need to set it explicitly
+    $('#dupePairs tbody td.crm-pair-conflict').attr('nowrap', 'nowrap');
+
     if ($(this).attr('data-column-dupe')) {
       column = table.column( $(this).attr('data-column-dupe') );
       column.visible( ! column.visible() );
     }
   });
   
+  // keep the conflicts checkbox checked when context is "conflicts"
   if(context == 'conflicts') {
     $('#conflicts').attr('checked', true);  
     var column = table.column( $('#conflicts').attr('data-column-main') );
     column.visible( ! column.visible() );
   }
+
+  // on click of flip link of a row
+  $('#dupePairs tbody').on('click', 'tr .crm-dedupe-flip', function(e) {
+    e.stopPropagation();
+    var $el   = $(this);
+    var $elTr = $(this).closest('tr');
+    var postUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
+    var request = $.post(postUrl, {pnid : $el.data('pnid')});
+    request.done(function(dt) {
+      var mapper = {2:4, 5:6, 7:8, 9:10}
+      var idx = table.row($elTr).index();
+      $.each(mapper, function(key, val) {
+        var v1  = table.cell(idx, key).data();
+        var v2  = table.cell(idx, val).data();
+        table.cell(idx, key).data(v2);
+        table.cell(idx, val).data(v1);
+      });
+      // keep the checkbox checked if needed
+      $('input.crm-dedupe-select', $elTr).prop('checked', $elTr.hasClass('crm-row-selected'));
+    });
+  });
+
+  $(".crm-dedupe-flip-selections").on('click', function(e) {
+    var ids = [];
+    $('.crm-row-selected').each(function() {
+      var ele = CRM.$('input.crm-dedupe-select', this);
+      ids.push(CRM.$(ele).attr('name').substr(5));
+    });
+    if (ids.length > 0) {
+      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
+      CRM.$.post(dataUrl, {pnid: ids}, function (response) {
+        var mapper = {2:4, 5:6, 7:8, 9:10}
+        $('.crm-row-selected').each(function() {
+          var idx = table.row(this).index();
+          $.each(mapper, function(key, val) {
+            var v1  = table.cell(idx, key).data();
+            var v2  = table.cell(idx, val).data();
+            table.cell(idx, key).data(v2);
+            table.cell(idx, val).data(v1);
+          });
+          // keep the checkbox checked if needed
+          $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));
+        });
+      }, 'json');
+    }
+  });
 });
 
 function toggleDedupeSelect(element, isMultiple) {
