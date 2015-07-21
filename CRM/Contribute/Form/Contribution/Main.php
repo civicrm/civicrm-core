@@ -1302,11 +1302,18 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       ((float ) $params['amount'] > 0.0 || $memFee > 0.0)
     ) {
       $this->setContributeMode();
-
+      // Really this setting of $this->_params & params within it should be done earlier on in the function
+      // probably the values determined here should be reused in confirm postProcess as there is no opportunity to alter anything
+      // on the confirm page. However as we are dealing with a stable release we go as close to where it is used
+      // as possible.
+      // In general the form has a lack of clarity of the logic of why things are set on the form in some cases &
+      // the logic around when $this->_params is used compared to other params arrays.
+      $this->_params = array_merge($params, $this->_params);
+      $this->setRecurringMembershipParams();
       if ($this->_paymentProcessor &&
         $this->_paymentProcessor['object']->supports('preApproval')
       ) {
-        $this->handlePreApproval($params);
+        $this->handlePreApproval($this->_params);
       }
     }
 
@@ -1351,6 +1358,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   protected function handlePreApproval(&$params) {
     try {
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+      $params['component'] = 'contribute';
       $result = $payment->doPreApproval($params);
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
