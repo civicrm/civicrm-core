@@ -1365,13 +1365,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->click('_qf_AddProduct_next-bottom');
       $this->waitForElementPresent('_qf_Premium_cancel-bottom');
       $this->click('_qf_Premium_next-bottom');
+      $this->waitForPageToLoad($this->getTimeoutMsec());
     }
 
     if ($widget) {
       // fill in step 8 (Widget Settings)
       $this->click('link=Widgets');
       $this->waitForElementPresent('_qf_Widget_next-bottom');
-
       $this->click('is_active');
       $this->type('url_logo', "URL to Logo Image $hash");
       $this->type('button_title', "Button Title $hash");

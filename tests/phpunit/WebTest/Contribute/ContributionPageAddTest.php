@@ -358,10 +358,8 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
 
     // fill in Receipt details
     $this->type('thankyou_title', "Thank-you Page Title $hash");
-    $this->click("thankyou_text-plain");
-    $this->fillRichTextField('thankyou_text', 'This is thankyou message for ' . $pageTitle, 'CKEditor');
-    $this->click("thankyou_footer-plain");
-    $this->fillRichTextField('thankyou_footer', 'This is thankyou footer message for ' . $pageTitle, 'CKEditor');
+    $this->fillRichTextField('thankyou_text', 'This is thankyou message for ' . $pageTitle, 'CKEditor', TRUE);
+    $this->fillRichTextField('thankyou_footer', 'This is thankyou footer message for ' . $pageTitle, 'CKEditor', TRUE);
     $this->click('is_email_receipt');
     $this->waitForElementPresent('bcc_receipt');
     $this->type('receipt_from_name', "Receipt From Name $hash");
