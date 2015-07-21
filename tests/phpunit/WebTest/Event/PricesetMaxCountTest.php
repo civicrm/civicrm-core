@@ -1141,8 +1141,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       $this->click('is_multiple_registrations');
     }
 
-    $this->click('intro_text-plain');
-    $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.');
+    $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.', 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click('CIVICRM_QFID_1_is_email_confirm');
