@@ -217,7 +217,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     foreach ($financialTypes as $id => $type) {
       $permissions['add contributions of type ' . $type] = array(
         $prefix . ts('add contributions of type ') . $type,
-        ts('add contributions of type ') . $type,
+        ts('Add contributions of type ') . $type,
       );
       $permissions['view contributions of type ' . $type] = array(
         $prefix . ts('view contributions of type ') . $type,
