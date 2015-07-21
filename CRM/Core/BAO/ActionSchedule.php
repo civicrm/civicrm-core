@@ -693,135 +693,13 @@ AND   cas.entity_value = $id AND
     $actionSchedule->is_active = 1;
     $actionSchedule->find(FALSE);
 
-    $tokenFields = array();
-    $session = CRM_Core_Session::singleton();
-
     while ($actionSchedule->fetch()) {
-      $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
-
       if ($actionSchedule->from_email) {
         $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
       }
 
-      $activityTypeID = FALSE;
-      $activityStatusID = FALSE;
-      if ($actionSchedule->record_activity) {
-        if ($mapping->entity == 'civicrm_membership') {
-          $activityTypeID
-            = CRM_Core_OptionGroup::getValue('activity_type', 'Membership Renewal Reminder', 'name');
-        }
-        else {
-          $activityTypeID
-            = CRM_Core_OptionGroup::getValue('activity_type', 'Reminder Sent', 'name');
-        }
-
-        $activityStatusID
-          = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
-      }
-
-      if ($mapping->entity == 'civicrm_activity') {
-        $compInfo = CRM_Core_Component::getEnabledComponents();
-        $tokenEntity = 'activity';
-        $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
-        $extraSelect = ', ov.label as activity_type, e.id as activity_id';
-        $extraJoin = "
-INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
-INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
-        $extraOn = ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
-        if ($actionSchedule->limit_to == 0) {
-          $extraJoin = "
-LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
-LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
-        }
-
-        //join for caseId
-        // if CiviCase component is enabled
-        if (array_key_exists('CiviCase', $compInfo)) {
-          $extraSelect .= ", civicrm_case_activity.case_id as case_id";
-          $extraJoin .= "
-            LEFT JOIN `civicrm_case_activity` ON `e`.`id` = `civicrm_case_activity`.`activity_id`";
-        }
-      }
-
-      if ($mapping->entity == 'civicrm_participant') {
-        $tokenEntity = 'event';
-        $tokenFields = array(
-          'event_type',
-          'title',
-          'event_id',
-          'start_date',
-          'end_date',
-          'summary',
-          'description',
-          'location',
-          'info_url',
-          'registration_url',
-          'fee_amount',
-          'contact_email',
-          'contact_phone',
-          'balance',
-        );
-        $extraSelect = ', ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone ';
-
-        $extraJoin = "
-INNER JOIN civicrm_event ev ON e.event_id = ev.id
-INNER JOIN civicrm_option_group og ON og.name = 'event_type'
-INNER JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
-LEFT  JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
-LEFT  JOIN civicrm_address address ON address.id = lb.address_id
-LEFT  JOIN civicrm_email email ON email.id = lb.email_id
-LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
-";
-        if ($actionSchedule->limit_to == 0) {
-          $extraJoin = "
-LEFT JOIN civicrm_event ev ON e.event_id = ev.id
-LEFT JOIN civicrm_option_group og ON og.name = 'event_type'
-LEFT JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
-LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
-LEFT JOIN civicrm_address address ON address.id = lb.address_id
-LEFT JOIN civicrm_email email ON email.id = lb.email_id
-LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
-";
-        }
-      }
-
-      if ($mapping->entity == 'civicrm_membership') {
-        $tokenEntity = 'membership';
-        $tokenFields = array('fee', 'id', 'join_date', 'start_date', 'end_date', 'status', 'type');
-        $extraSelect = ', mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type';
-        $extraJoin = '
- INNER JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
- INNER JOIN civicrm_membership_status ms ON e.status_id = ms.id';
-
-        if ($actionSchedule->limit_to == 0) {
-          $extraJoin = '
- LEFT JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
- LEFT JOIN civicrm_membership_status ms ON e.status_id = ms.id';
-        }
-      }
-
-      if ($mapping->entity == 'civicrm_contact') {
-        $tokenEntity = 'contact';
-        //TODO: get full list somewhere!
-        $tokenFields = array('birth_date', 'last_name');
-        //TODO: is there anything to add here?
-      }
-
-      $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
-      if ($actionSchedule->limit_to == 0) {
-        $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
-        $extraWhere .= " AND (e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact')";
-      }
-      $entityJoinClause .= $extraOn;
-
-      $query = "
-SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id as entityID, e.* {$extraSelect}
-FROM  civicrm_action_log reminder
-{$entityJoinClause}
-{$extraJoin}
-WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
-{$extraWhere}";
-
+      list($tokenEntity, $tokenFields) = self::listMailingTokens($mapping);
+      $query = self::prepareMailingQuery($mapping, $actionSchedule);
       $dao = CRM_Core_DAO::executeQuery($query,
         array(1 => array($actionSchedule->id, 'Integer'))
       );
@@ -830,49 +708,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       while ($dao->fetch()) {
         // switch language if necessary
         if ($multilingual) {
-          $cid = $dao->contactID;
-          $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'preferred_language');
+          $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $dao->contactID, 'preferred_language');
           CRM_Core_BAO_ActionSchedule::setCommunicationLanguage($actionSchedule->communication_language, $preferred_language);
         }
 
-        $entityTokenParams = array();
-        foreach ($tokenFields as $field) {
-          if ($field == 'location') {
-            $loc = array();
-            $stateProvince = CRM_Core_PseudoConstant::stateProvince();
-            $loc['street_address'] = $dao->street_address;
-            $loc['city'] = $dao->city;
-            $loc['state_province'] = CRM_Utils_Array::value($dao->state_province_id, $stateProvince);
-            $loc['postal_code'] = $dao->postal_code;
-            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Address::format($loc);
-          }
-          elseif ($field == 'info_url') {
-            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
-          }
-          elseif ($field == 'registration_url') {
-            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
-          }
-          elseif (in_array($field, array('start_date', 'end_date', 'join_date', 'activity_date_time'))) {
-            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
-          }
-          elseif ($field == 'balance') {
-            if ($dao->entityTable == 'civicrm_contact') {
-              $balancePay = 'N/A';
-            }
-            elseif (!empty($dao->entityID)) {
-              $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
-              $balancePay = CRM_Utils_Array::value('balance', $info);
-              $balancePay = CRM_Utils_Money::format($balancePay);
-            }
-            $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
-          }
-          elseif ($field == 'fee_amount') {
-            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Money::format($dao->$field);
-          }
-          else {
-            $entityTokenParams["{$tokenEntity}." . $field] = $dao->$field;
-          }
-        }
+        $entityTokenParams = self::prepareMailingTokens($tokenEntity, $tokenFields, $dao);
 
         $isError = 0;
         $errorMsg = $toEmail = $toPhoneNumber = '';
@@ -924,25 +764,8 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
         // insert activity log record if needed
         if ($actionSchedule->record_activity && !$isError) {
-          $activityParams = array(
-            'subject' => $actionSchedule->title,
-            'details' => $actionSchedule->body_html,
-            'source_contact_id' => $session->get('userID') ? $session->get('userID') : $dao->contactID,
-            'target_contact_id' => $dao->contactID,
-            'activity_date_time' => date('YmdHis'),
-            'status_id' => $activityStatusID,
-            'activity_type_id' => $activityTypeID,
-            'source_record_id' => $dao->entityID,
-          );
-          $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-          //file reminder on case if source activity is a case activity
-          if (!empty($dao->case_id)) {
-            $caseActivityParams = array();
-            $caseActivityParams['case_id'] = $dao->case_id;
-            $caseActivityParams['activity_id'] = $activity->id;
-            CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
-          }
+          $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
+          self::createMailingActivity($actionSchedule, $mapping, $dao->contactID, $dao->entityID, $caseID);
         }
       }
 
@@ -1584,6 +1407,241 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     // change the language
     $i18n = CRM_Core_I18n::singleton();
     $i18n->setLanguage($language);
+  }
+
+  /**
+   * Save a record about the delivery of a reminder email.
+   *
+   * WISHLIST: Instead of saving $actionSchedule->body_html, call this immediately after
+   * sending the message and pass in the fully rendered text of the message.
+   *
+   * @param CRM_Core_DAO_ActionSchedule $actionSchedule
+   * @param CRM_Core_DAO_ActionMapping $mapping
+   * @param int $contactID
+   * @param int $entityID
+   * @param int|NULL $caseID
+   * @throws CRM_Core_Exception
+   */
+  protected static function createMailingActivity($actionSchedule, $mapping, $contactID, $entityID, $caseID) {
+    $session = CRM_Core_Session::singleton();
+
+    if ($mapping->entity == 'civicrm_membership') {
+      $activityTypeID
+        = CRM_Core_OptionGroup::getValue('activity_type', 'Membership Renewal Reminder', 'name');
+    }
+    else {
+      $activityTypeID
+        = CRM_Core_OptionGroup::getValue('activity_type', 'Reminder Sent', 'name');
+    }
+
+    $activityParams = array(
+      'subject' => $actionSchedule->title,
+      'details' => $actionSchedule->body_html,
+      'source_contact_id' => $session->get('userID') ? $session->get('userID') : $contactID,
+      'target_contact_id' => $contactID,
+      'activity_date_time' => CRM_Utils_Time::getTime('YmdHis'),
+      'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
+      'activity_type_id' => $activityTypeID,
+      'source_record_id' => $entityID,
+    );
+    $activity = CRM_Activity_BAO_Activity::create($activityParams);
+
+    //file reminder on case if source activity is a case activity
+    if (!empty($caseID)) {
+      $caseActivityParams = array();
+      $caseActivityParams['case_id'] = $caseID;
+      $caseActivityParams['activity_id'] = $activity->id;
+      CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
+    }
+  }
+
+  /**
+   * @param $tokenEntity
+   * @param $tokenFields
+   * @param $dao
+   * @return array
+   */
+  protected static function prepareMailingTokens($tokenEntity, $tokenFields, $dao) {
+    $entityTokenParams = array();
+    foreach ($tokenFields as $field) {
+      if ($field == 'location') {
+        $loc = array();
+        $stateProvince = CRM_Core_PseudoConstant::stateProvince();
+        $loc['street_address'] = $dao->street_address;
+        $loc['city'] = $dao->city;
+        $loc['state_province'] = CRM_Utils_Array::value($dao->state_province_id, $stateProvince);
+        $loc['postal_code'] = $dao->postal_code;
+        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Address::format($loc);
+      }
+      elseif ($field == 'info_url') {
+        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
+      }
+      elseif ($field == 'registration_url') {
+        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
+      }
+      elseif (in_array($field, array('start_date', 'end_date', 'join_date', 'activity_date_time'))) {
+        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
+      }
+      elseif ($field == 'balance') {
+        if ($dao->entityTable == 'civicrm_contact') {
+          $balancePay = 'N/A';
+        }
+        elseif (!empty($dao->entityID)) {
+          $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
+          $balancePay = CRM_Utils_Array::value('balance', $info);
+          $balancePay = CRM_Utils_Money::format($balancePay);
+        }
+        $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
+      }
+      elseif ($field == 'fee_amount') {
+        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Money::format($dao->$field);
+      }
+      else {
+        $entityTokenParams["{$tokenEntity}." . $field] = $dao->$field;
+      }
+    }
+    return $entityTokenParams;
+  }
+
+  /**
+   * @param $mapping
+   * @param $actionSchedule
+   * @return string
+   */
+  protected static function prepareMailingQuery($mapping, $actionSchedule) {
+    $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
+
+    if ($mapping->entity == 'civicrm_activity') {
+      $compInfo = CRM_Core_Component::getEnabledComponents();
+      $extraSelect = ', ov.label as activity_type, e.id as activity_id';
+      $extraJoin = "
+INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
+INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
+      $extraOn = ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
+      if ($actionSchedule->limit_to == 0) {
+        $extraJoin = "
+LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
+LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
+      }
+
+      //join for caseId
+      // if CiviCase component is enabled
+      if (array_key_exists('CiviCase', $compInfo)) {
+        $extraSelect .= ", civicrm_case_activity.case_id as case_id";
+        $extraJoin .= "
+            LEFT JOIN `civicrm_case_activity` ON `e`.`id` = `civicrm_case_activity`.`activity_id`";
+      }
+    }
+
+    if ($mapping->entity == 'civicrm_participant') {
+      $extraSelect = ', ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone ';
+
+      $extraJoin = "
+INNER JOIN civicrm_event ev ON e.event_id = ev.id
+INNER JOIN civicrm_option_group og ON og.name = 'event_type'
+INNER JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
+LEFT  JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
+LEFT  JOIN civicrm_address address ON address.id = lb.address_id
+LEFT  JOIN civicrm_email email ON email.id = lb.email_id
+LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
+";
+      if ($actionSchedule->limit_to == 0) {
+        $extraJoin = "
+LEFT JOIN civicrm_event ev ON e.event_id = ev.id
+LEFT JOIN civicrm_option_group og ON og.name = 'event_type'
+LEFT JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
+LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
+LEFT JOIN civicrm_address address ON address.id = lb.address_id
+LEFT JOIN civicrm_email email ON email.id = lb.email_id
+LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
+";
+      }
+    }
+
+    if ($mapping->entity == 'civicrm_membership') {
+      $extraSelect = ', mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type';
+      $extraJoin = '
+ INNER JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
+ INNER JOIN civicrm_membership_status ms ON e.status_id = ms.id';
+
+      if ($actionSchedule->limit_to == 0) {
+        $extraJoin = '
+ LEFT JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
+ LEFT JOIN civicrm_membership_status ms ON e.status_id = ms.id';
+      }
+    }
+
+    $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
+    if ($actionSchedule->limit_to == 0) {
+      $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
+      $extraWhere .= " AND (e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact')";
+    }
+    $entityJoinClause .= $extraOn;
+
+    $query = "
+SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id as entityID, e.* {$extraSelect}
+FROM  civicrm_action_log reminder
+{$entityJoinClause}
+{$extraJoin}
+WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
+{$extraWhere}";
+    return $query;
+  }
+
+  /**
+   * @param $mapping
+   * @return array
+   */
+  protected static function listMailingTokens($mapping) {
+    $tokenEntity = NULL;
+    $tokenFields = array();
+
+    if ($mapping->entity == 'civicrm_activity') {
+      $tokenEntity = 'activity';
+      $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
+    }
+
+    if ($mapping->entity == 'civicrm_participant') {
+      $tokenEntity = 'event';
+      $tokenFields = array(
+        'event_type',
+        'title',
+        'event_id',
+        'start_date',
+        'end_date',
+        'summary',
+        'description',
+        'location',
+        'info_url',
+        'registration_url',
+        'fee_amount',
+        'contact_email',
+        'contact_phone',
+        'balance',
+      );
+    }
+
+    if ($mapping->entity == 'civicrm_membership') {
+      $tokenEntity = 'membership';
+      $tokenFields = array(
+        'fee',
+        'id',
+        'join_date',
+        'start_date',
+        'end_date',
+        'status',
+        'type',
+      );
+    }
+
+    if ($mapping->entity == 'civicrm_contact') {
+      $tokenEntity = 'contact';
+      //TODO: get full list somewhere!
+      $tokenFields = array('birth_date', 'last_name');
+      //TODO: is there anything to add here?
+    }
+
+    return array($tokenEntity, $tokenFields);
   }
 
 }
