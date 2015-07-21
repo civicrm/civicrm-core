@@ -299,20 +299,12 @@ SELECT id
     $membershipBlock->entity_id = $self->_id;
     $membershipBlock->is_active = 1;
     $hasMembershipBlk = FALSE;
-
     if ($membershipBlock->find(TRUE)) {
-      $setID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $self->_id, NULL, NULL);
       if (!empty($fields['amount_block_is_active']) &&
-        // I don't think setID could ever not be set.
-        ($setID)
+        ($setID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $self->_id, NULL, 1))
       ) {
-        // If we are using quick config for the contribution part we need quick config for the membership part.
-        // Note that having 2 price sets against a page may allow our code to be more sensible when managing separate payments.
-        // The quick config is intended to make it possible not to force people to use price sets until the price set UI
-        // is easier to use, but should have no effect on form processing but the separate membership payment complicates this
-        // as there is no linking of the contribution price set to the page.
-        $priceSet = civicrm_api3('PriceSet', 'getsingle', array('id' => $setID));
-        if (empty($priceSet['is_quick_config']) && CRM_Utils_Array::value('extends', $priceSet) == CRM_Core_Component::getComponentID('CiviMember')) {
+        $extends = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'extends');
+        if ($extends && $extends == CRM_Core_Component::getComponentID('CiviMember')) {
           $errors['amount_block_is_active'] = ts('You cannot use a Membership Price Set when the Contribution Amounts section is enabled. Click the Memberships tab above, and select your Membership Price Set on that form. Membership Price Sets may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription) or an additional voluntary contribution.');
           return $errors;
         }
@@ -322,13 +314,13 @@ SELECT id
         $errors['amount_block_is_active'] = ts('To disable Contribution Amounts section you need to first disable Separate Membership Payment option from Membership Settings.');
       }
 
-      //CRM-16165, Don't allow recurring contribution if membership block contain any renewable membership option
-      $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($setID);
-      if (!empty($fields['is_recur']) && !empty($membershipTypes['autorenew'])) {
+      //CRM-16165, Don't allow reccuring contribution if membership block contain any renewable membership option
+      $membershipTypes = unserialize($membershipBlock->membership_types);
+      if (!empty($fields['is_recur']) && !empty($membershipTypes)) {
         if (!$membershipBlock->is_separate_payment) {
           $errors['is_recur'] = ts('You need to enable Separate Membership Payment when online contribution page is configured for both Membership and Recurring Contribution.');
         }
-        else {
+        elseif (count(array_filter($membershipTypes)) != 0) {
           $errors['is_recur'] = ts('You cannot enable both Recurring Contributions and Auto-renew memberships on the same online contribution page.');
         }
       }
