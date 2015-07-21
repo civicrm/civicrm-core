@@ -123,10 +123,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
     $params = $this->exportValues();
 
     // Process / save websites
-    // CRM-10551
-    // Use updateBlankLocInfo to overwrite blanked values of matching type
-    $params['updateBlankLocInfo'] = TRUE;
-    CRM_Core_BAO_Website::create($params, $this->_contactId);
+    CRM_Core_BAO_Website::create($params['website'], $this->_contactId, TRUE);
 
     $this->log();
     $this->response();

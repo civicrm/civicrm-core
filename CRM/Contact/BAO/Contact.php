@@ -276,6 +276,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param bool $invokeHooks
    *   If we need to invoke hooks.
    *
+   * @param bool $skipDelete
+   *   Unclear parameter, passed to website create
+   *
    * @todo explain this parameter
    *
    * @throws Exception
@@ -283,7 +286,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *   Created or updated contribution object. We are deprecating returning an error in
    *   favour of exceptions
    */
-  public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE) {
+  public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE, $skipDelete = FALSE) {
     $contact = NULL;
     if (empty($params['contact_type']) && empty($params['contact_id'])) {
       return $contact;
@@ -363,10 +366,8 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       $contact->$name = $value;
     }
 
-    // Process website(s) if present in params
-    if (!empty($params['website'])) {
-      CRM_Core_BAO_Website::create($params, $contact->id);
-    }
+    //add website
+    CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
 
     //get userID from session
     $session = CRM_Core_Session::singleton();
@@ -1864,15 +1865,6 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     if ($contactID) {
-      // CRM-10551
-      // If a user has logged in, or accessed via a checksum
-      // Then deliberately 'blanking' a value in the profile should remove it from their record
-      $session = CRM_Core_Session::singleton();
-      $params['updateBlankLocInfo'] = TRUE;
-      if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
-        $params['updateBlankLocInfo'] = FALSE;
-      }
-
       $editHook = TRUE;
       CRM_Utils_Hook::pre('edit', 'Profile', $contactID, $params);
     }
