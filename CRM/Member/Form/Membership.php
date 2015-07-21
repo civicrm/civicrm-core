@@ -499,7 +499,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
     // Throw status bounce when no Membership type or priceset is present
-    if (empty($this->allMembershipTypeDetails) && empty($priceSets)) {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && empty($this->allMembershipTypeDetails) && empty($priceSets)
+    ) {
       CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
     }
     // retrieve all memberships
