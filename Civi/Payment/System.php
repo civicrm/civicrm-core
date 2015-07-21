@@ -78,7 +78,7 @@ class System {
    * @throws \CiviCRM_API3_Exception
    */
   public function getById($id) {
-    $processor = civicrm_api3('payment_processor', 'getsingle', array('id' => $id));
+    $processor = civicrm_api3('payment_processor', 'getsingle', array('id' => $id, 'is_test' => NULL));
     return self::getByProcessor($processor);
   }
 
