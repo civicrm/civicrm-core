@@ -1455,7 +1455,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'billing_mode' => 1,
     ), $params);
 
-    $result = $this->callAPISuccess('payment_processor', 'create', $params);
+    $result = $this->callAPISuccess('PaymentProcessor', 'create', $params);
     return $result['id'];
   }
 
