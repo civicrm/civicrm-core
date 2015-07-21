@@ -196,7 +196,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
           && !CRM_Core_Permission::check('add contributions of type ' . $financialTypeName))
       ) {
         unset($financialType[$key]);
-      }      
+      }
     }
     return $financialType;
   }
@@ -286,7 +286,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
         $whereClauses[] = ' ' . $alias . '.financial_type_id IN (0)';
       }
       else {
-        $whereClauses[] = ' ' . $alias . '.financial_type_id IN (' . implode(',' , array_keys($types)) .')';
+        $whereClauses[] = ' ' . $alias . '.financial_type_id IN (' . implode(',', array_keys($types)) . ')';
       }
     }
     else {
@@ -302,7 +302,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
         $whereClauses .= " AND civicrm_{$component}.{$column} IN (0)";
         return;
       }
-      $whereClauses .= " AND civicrm_{$component}.{$column} IN (" . implode(',', array_keys($types)) .")";
+      $whereClauses .= " AND civicrm_{$component}.{$column} IN (" . implode(',', array_keys($types)) . ")";
     }
   }
 
@@ -345,4 +345,5 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     return self::$_statusACLFt['acl_financial_type'];
   }
+
 }
