@@ -34,7 +34,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
-   * @var object see CiviTest/CiviMailUtils
+   * @var CiviMailUtils
    */
   public $mut;
 
@@ -116,7 +116,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_date' => 'activity_date_time',
       'start_action_offset' => '1',
       'start_action_unit' => 'day',
-      'subject' => '1-Day (non-repeating)',
+      'subject' => '1-Day (non-repeating) (about {activity.activity_type})',
     );
     $this->fixtures['sched_activity_1day_r'] = array(
       'name' => 'One_Day_Phone_Call_Notice_R',
@@ -146,7 +146,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_date' => 'activity_date_time',
       'start_action_offset' => '1',
       'start_action_unit' => 'day',
-      'subject' => '1-Day (repeating)',
+      'subject' => '1-Day (repeating) (about {activity.activity_type})',
     );
     $this->fixtures['sched_membership_join_2week'] = array(
       'name' => 'sched_membership_join_2week',
@@ -175,7 +175,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_date' => 'membership_join_date',
       'start_action_offset' => '2',
       'start_action_unit' => 'week',
-      'subject' => 'subject sched_membership_join_2week',
+      'subject' => 'subject sched_membership_join_2week (joined {membership.join_date})',
     );
     $this->fixtures['sched_membership_end_2week'] = array(
       'name' => 'sched_membership_end_2week',
@@ -545,11 +545,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         // Before the 24-hour mark, no email
         'time' => '2012-06-14 04:00:00',
         'recipients' => array(),
+        'subjects' => array(),
       ),
       array(
         // After the 24-hour mark, an email
         'time' => '2012-06-14 15:00:00',
         'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('1-Day (non-repeating) (about Phone Call)'),
       ),
       array(
         // Run cron again; message already sent
@@ -579,21 +581,25 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         // Before the 24-hour mark, no email
         'time' => '012-06-14 04:00:00',
         'recipients' => array(),
+        'subjects' => array(),
       ),
       array(
         // After the 24-hour mark, an email
         'time' => '2012-06-14 15:00:00',
         'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('1-Day (repeating) (about Phone Call)'),
       ),
       array(
         // Run cron 4 hours later; first message already sent
         'time' => '2012-06-14 20:00:00',
         'recipients' => array(),
+        'subjects' => array(),
       ),
       array(
         // Run cron 6 hours later; send second message.
         'time' => '2012-06-14 21:00:01',
         'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('1-Day (repeating) (about Phone Call)'),
       ),
     ));
   }
@@ -630,11 +636,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         // Before the 2-week mark, no email.
         'time' => '2012-03-28 01:00:00',
         'recipients' => array(),
+        'subjects' => array(),
       ),
       array(
         // After the 2-week mark, send an email.
         'time' => '2012-03-29 01:00:00',
         'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('subject sched_membership_join_2week (joined March 15th, 2012)'),
       ),
     ));
   }
@@ -1219,6 +1227,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       CRM_Utils_Time::setTime($cronRun['time']);
       $this->callAPISuccess('job', 'send_reminder', array());
       $this->mut->assertRecipients($cronRun['recipients']);
+      if (array_key_exists('subjects', $cronRun)) {
+        $this->mut->assertSubjects($cronRun['subjects']);
+      }
       $this->mut->clearMessages();
     }
   }
