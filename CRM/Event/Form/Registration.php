@@ -243,7 +243,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // check for is_monetary status
       $isMonetary = CRM_Utils_Array::value('is_monetary', $this->_values['event']);
       // check for ability to add contributions of type
-      if ($isMonetary 
+      if ($isMonetary
         && CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
         && !CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($this->_values['event']['financial_type_id']))
       ) {
@@ -683,7 +683,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     else {
       $isPaidEvent = CRM_Utils_Array::value('is_monetary', $form->_values['event']);
     }
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() 
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
       && !empty($form->_values['fee'])
     ) {
       foreach ($form->_values['fee'] as $k => $fees) {
