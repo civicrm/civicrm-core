@@ -410,6 +410,12 @@ SELECT  id, html_type
           $element->freeze();
         }
       }
+      if (!CRM_Utils_Array::value('fee',  $form->_values) 
+        && CRM_Utils_Array::value('snippet',  $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
+      ) {
+        $form->assign('isFTPermissionDenied', TRUE);
+        return FALSE;
+      }
       if ($form->_mode) {
         CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE);
       }
