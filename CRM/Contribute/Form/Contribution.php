@@ -592,6 +592,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($this->_recurPaymentProcessors)) {
       $buildRecurBlock = FALSE;
     }
+    if ($this->_ppID) {
+      foreach ($this->_paymentProcessors as $processor) {
+        if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('recurContributionsForPledges')) {
+          $buildRecurBlock = TRUE;
+          break;
+        }
+        $buildRecurBlock = FALSE;
+      }
+    }
     if ($buildRecurBlock) {
       CRM_Contribute_Form_Contribution_Main::buildRecur($this);
       $this->setDefaults(array('is_recur' => 0));
