@@ -535,7 +535,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
       );
       $this->assign('credit_card_type', $this->_params['credit_card_type']);
-      $this->_params['description'] = ts('Office Credit Card Membership Renewal Contribution');
+      $this->_params['description'] = ts("Contribution submitted by a staff person using member's credit card for renewal");
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $this->_params['total_amount'];
 
