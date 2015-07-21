@@ -622,7 +622,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       'reminder_date',
     );
 
-    // get the price set associated with offline memebership
+    // get the price set associated with offline membership
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
     $this->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
 
