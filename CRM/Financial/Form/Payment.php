@@ -35,8 +35,6 @@
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -45,8 +43,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
     $this->assignBillingType();
 
-    // @todo - round about way to load it - just load as an object using civi\payment\system::getByProcessor
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID, 'unused');
+    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID);
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
     self::addCreditCardJs();
