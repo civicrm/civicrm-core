@@ -695,6 +695,8 @@ LIMIT {$offset}, {$rowCount}
     $join  = '';
     $where = array();
     $searchData = CRM_Utils_Array::value('search', $_REQUEST);
+    $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
+
     if ($src || !empty($searchData['value']) ) {
       $src = $src ? $src : $searchData['value'];
       $where[] = " cc1.display_name LIKE '%{$src}%'";

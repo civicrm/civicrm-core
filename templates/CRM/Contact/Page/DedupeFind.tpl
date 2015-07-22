@@ -38,11 +38,11 @@
           </td>
           <td class="crm-contact-form-block-contact2">
             <label for="contact2">{ts}Contact 2{/ts}</label><br />
-            <input type="text" placeholder="Search Contact2" search-column="5" />
+            <input type="text" placeholder="Search Contact2" search-column="4" />
           </td>
           <td class="crm-contact-form-block-email1">
             <label for="email1">{ts}Email 1{/ts}</label><br />
-            <input type="text" placeholder="Search Email1" search-column="3" />
+            <input type="text" placeholder="Search Email1" search-column="5" />
           </td>
           <td class="crm-contact-form-block-email2">
             <label for="email2">{ts}Email 2{/ts}</label><br />
@@ -85,7 +85,7 @@
     <input type='checkbox' id ='crm-dedupe-display-selection' name="display-selection">
     <label for="display-selection">{ts}Within Selections{/ts}&nbsp;</label>  
   </span>
-  <table id="dupePairs" class="nestedActivitySelector form-layout-compressed" cellspacing="0" width="100%">
+  <table id="dupePairs" class="form-layout-compressed" cellspacing="0" width="100%">
     <thead>
       <tr class="columnheader"> 
         <th class="crm-dedupe-selection"><input type="checkbox" value="0" name="pnid_all" class="crm-dedupe-select-all"></th>
