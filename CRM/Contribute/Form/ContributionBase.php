@@ -932,7 +932,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
           elseif ($memType['is_active']) {
             $javascriptMethod = NULL;
-            $allowAutoRenewOpt = 1;
+            $allowAutoRenewOpt = (int) $memType['auto_renew'];
             if (is_array($this->_paymentProcessors)) {
               foreach ($this->_paymentProcessors as $id => $val) {
                 if (!$val['is_recur']) {
