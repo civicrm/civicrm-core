@@ -208,7 +208,7 @@ function civicrm_config(&$config) {
   );
 
   $params['baseURL'] = isset($config['base_url']) ? $config['base_url'] : civicrm_cms_base();
-  if ($installType == 'drupal') {
+  if ($installType == 'drupal' && defined('VERSION')) {
     if (version_compare(VERSION, '7.0-rc1') >= 0) {
       $params['cms'] = 'Drupal';
       $params['CMSdbUser'] = addslashes($config['drupal']['username']);
@@ -223,6 +223,13 @@ function civicrm_config(&$config) {
       $params['CMSdbHost'] = $config['drupal']['server'];
       $params['CMSdbName'] = addslashes($config['drupal']['database']);
     }
+  }
+  else if ($installType == 'drupal') {
+    $params['cms'] = $config['cms'];
+    $params['CMSdbUser'] = addslashes($config['cmsdb']['username']);
+    $params['CMSdbPass'] = addslashes($config['cmsdb']['password']);
+    $params['CMSdbHost'] = $config['cmsdb']['server'];
+    $params['CMSdbName'] = addslashes($config['cmsdb']['database']);
   }
   else {
     $params['cms'] = 'WordPress';
