@@ -224,7 +224,7 @@ function civicrm_config(&$config) {
       $params['CMSdbName'] = addslashes($config['drupal']['database']);
     }
   }
-  else if ($installType == 'drupal') {
+  elseif ($installType == 'drupal') {
     $params['cms'] = $config['cms'];
     $params['CMSdbUser'] = addslashes($config['cmsdb']['username']);
     $params['CMSdbPass'] = addslashes($config['cmsdb']['password']);
