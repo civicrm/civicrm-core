@@ -388,7 +388,9 @@ AND li.entity_id = {$entityId}
       }
 
       foreach ($values as $line) {
-        $line['entity_table'] = $entityTable;
+        if (empty($line['entity_table'])) {
+          $line['entity_table'] = $entityTable;
+        }
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
         }
