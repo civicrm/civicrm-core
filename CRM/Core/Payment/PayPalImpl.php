@@ -638,6 +638,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   - redirect_url (if set the browser will be redirected to this.
    */
   public function doPreApproval(&$params) {
+    $this->_component = $params['component'];
     $token = $this->setExpressCheckOut($params);
     return array(
       'pre_approval_parameters' => array('token' => $token),

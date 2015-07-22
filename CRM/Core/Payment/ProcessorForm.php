@@ -39,7 +39,7 @@ use Civi\Payment\System;
 class CRM_Core_Payment_ProcessorForm {
 
   /**
-   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
+   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register|CRM_Financial_Form_Payment $form
    * @param null $type
    * @param null $mode
    *

@@ -1170,6 +1170,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           );
           $params['invoiceID'] = $invoiceID;
 
+          $params['component'] = 'event';
           $token = $payment->doPreApproval($params);
           if (is_a($token, 'CRM_Core_Error')) {
             CRM_Core_Error::displaySessionError($token);
