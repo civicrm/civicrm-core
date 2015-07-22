@@ -199,20 +199,34 @@ WHERE      e.id = %1
           $action = 'browse';
         }
 
-        if (isset($value['link'])) {
-          $tabs[$key]['link'] = $value['link'];
-        } else {
-          $link = "civicrm/event/manage/{$key}";
-          $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
-          $tabs[$key]['link'] = CRM_Utils_System::url($link, $query);
-        }
+        $link = "civicrm/event/manage/{$key}";
+        $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
 
+        $tabs[$key]['link'] = (isset($value['link']) ? self::url($value['link']) :
+          CRM_Utils_System::url($link, $query));
       }
     }
 
-//    var_dump($tabs); die();
-
     return $tabs;
+  }
+
+  // wraps CRM_Utils_System. assumes relative URL. needs real doc :-)
+  public static function url($url) {
+    // parse_url doesn't work with relative URLs, so we make the URL absolute
+    $url = 'http://discard/' . $url;
+    $urlParts = parse_url($url);
+    $path = (strpos($urlParts['path'], '/') === 0 ? substr($urlParts['path'], 1) : $urlParts['path']);
+
+    $params = parse_str(CRM_Utils_Array::value('query', $urlParts));
+
+    // PHP doesn't know about URL fragments (i.e, what comes after the #), so
+    // we translate this to a URL param
+    $params['route'] = $urlParts['fragment'];
+
+    // Force the Angular route to load as a snippet. This is being rendered in a tab, after all.
+    $params['snippet'] = CRM_Core_Smarty::PRINT_SNIPPET;
+
+    return CRM_Utils_System::url($path, http_build_query($params));
   }
 
   /**
