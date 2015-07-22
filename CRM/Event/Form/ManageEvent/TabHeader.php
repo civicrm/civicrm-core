@@ -199,11 +199,18 @@ WHERE      e.id = %1
           $action = 'browse';
         }
 
-        $tabs[$key]['link'] = CRM_Utils_System::url("civicrm/event/manage/{$key}",
-          "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}"
-        );
+        if (isset($value['link'])) {
+          $link = $value['link'];
+          $query = NULL;
+        } else {
+          $link = "civicrm/event/manage/{$key}";
+          $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
+        }
+        $tabs[$key]['link'] = CRM_Utils_System::url($link, $query);
       }
     }
+
+//    var_dump($tabs); die();
 
     return $tabs;
   }
