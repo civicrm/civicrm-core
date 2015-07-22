@@ -3483,6 +3483,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $amount = $params['total_amount'];
             }
           }
+          elseif (CRM_Utils_Array::value('diff_amount', $fieldValues)) {
+            // change in amount for line item
+            $amount = $fieldValues['diff_amount'];
+          }
           else {
             $amount = $diff * $fieldValues['line_total'];
           }
