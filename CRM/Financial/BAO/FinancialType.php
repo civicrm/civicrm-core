@@ -113,6 +113,15 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $financialType->copyValues($params);
     if (!empty($ids['financialType'])) {
       $financialType->id = CRM_Utils_Array::value('financialType', $ids);
+      if (self::isACLFinancialTypeStatus()) {
+        $prevName = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $financialType->id, 'name');
+        if ($prevName != $params['name']) {
+          CRM_Core_Session::setStatus(ts("Changing the name of a Financial Type will result in losing the current permissions associated with that Financial Type. 
+            Before making this change you should likely note the existing permissions at Administer > Users and Permissions > Permissions (Access Control), 
+            then clicking the Access Control link for your Content Management System, then noting down the permissions for 'CiviCRM: {financial type name} view', etc. 
+            Then after making the change of name, reset the permissions to the way they were."), ts('Warning'), 'warning');
+        }
+      }
     }
     $financialType->save();
     // CRM-12470
