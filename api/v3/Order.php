@@ -55,10 +55,8 @@ function civicrm_api3_order_create(&$params) {
     $priceSetID = NULL;
     foreach ($params['line_items'] as $lineItems) {
       $entityParams = CRM_Utils_Array::value('params', $lineItems, array());
-      if (CRM_Utils_Array::value('line_item', $lineItems)) {
-        if (!empty($lineItems['line_item'])) {
-          $entity = str_replace('civicrm_', '', $lineItems['line_item']['entity_table']);
-        }
+      if (!empty($entityParams) && !empty($lineItems['line_item'])) {
+        $entity = str_replace('civicrm_', '', $lineItems['line_item']['entity_table']);
       }
       if ($entityParams) {
         if (in_array($entity, array('participant', 'membership'))) {
