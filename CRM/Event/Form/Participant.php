@@ -202,12 +202,6 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
   public $_onlinePendingContributionId = NULL;
 
   /**
-   * @todo add explanatory note about this
-   * @var null
-   */
-  public $_onlinePendingContributionId = NULL;
-
-  /**
    * Function to set variables up before form is built
    *
    * @return void
