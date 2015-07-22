@@ -210,10 +210,8 @@ WHERE      e.id = %1
     return $tabs;
   }
 
-  // wraps CRM_Utils_System. assumes relative URL. needs real doc :-)
+  // wraps CRM_Utils_System. needs real doc :-)
   public static function url($url) {
-    // parse_url doesn't work with relative URLs, so we make the URL absolute
-    $url = 'http://discard/' . $url;
     $urlParts = parse_url($url);
     $path = (strpos($urlParts['path'], '/') === 0 ? substr($urlParts['path'], 1) : $urlParts['path']);
 
