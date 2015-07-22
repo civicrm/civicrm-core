@@ -70,7 +70,7 @@ class CRM_Utils_JSON {
     $sOutput .= '"iTotalRecords": ' . $iTotal . ', ';
     $sOutput .= '"iTotalDisplayRecords": ' . $iFilteredTotal . ', ';
     $sOutput .= '"aaData": [ ';
-    foreach ($params as $key => $value) {
+    foreach ((array) $params as $key => $value) {
       $addcomma = FALSE;
       $sOutput .= "[";
       foreach ($selectorElements as $element) {
