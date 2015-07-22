@@ -211,89 +211,39 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // lineItem isn't set until Register postProcess
     $this->_lineItem = $this->get('lineItem');
     $this->_paymentProcessor = $this->get('paymentProcessor');
-
-    if ($this->_contributeMode == 'express') {
-      // rfp == redirect from paypal
-      $rfp = CRM_Utils_Request::retrieve('rfp', 'Boolean',
-        CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET'
-      );
-      if ($rfp) {
-        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-        $expressParams = $payment->getPreApprovalDetails($this->get('pre_approval_parameters'));
-
-        $this->_params['payer'] = CRM_Utils_Array::value('payer', $expressParams);
-        $this->_params['payer_id'] = $expressParams['payer_id'];
-        $this->_params['payer_status'] = $expressParams['payer_status'];
-
-        CRM_Core_Payment_Form::mapParams($this->_bltID, $expressParams, $this->_params, FALSE);
-
-        // fix state and country id if present
-        if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-          $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-        }
-        if (!empty($this->_params["billing_country_id-{$this->_bltID}"]) && $this->_params["billing_country_id-{$this->_bltID}"]) {
-          $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
-        }
-
-        // set a few other parameters for PayPal
-        $this->_params['token'] = $this->get('token');
-
-        $this->_params['amount'] = $this->get('amount');
-
-        if (!empty($this->_membershipBlock)) {
-          $this->_params['selectMembership'] = $this->get('selectMembership');
-        }
-        // we use this here to incorporate any changes made by folks in hooks
-        $this->_params['currencyID'] = $config->defaultCurrency;
-
-        // also merge all the other values from the profile fields
-        $values = $this->controller->exportValues('Main');
-        $skipFields = array(
-          'amount',
-          'amount_other',
-          "billing_street_address-{$this->_bltID}",
-          "billing_city-{$this->_bltID}",
-          "billing_state_province_id-{$this->_bltID}",
-          "billing_postal_code-{$this->_bltID}",
-          "billing_country_id-{$this->_bltID}",
-        );
-        foreach ($values as $name => $value) {
-          // skip amount field
-          if (!in_array($name, $skipFields)) {
-            $this->_params[$name] = $value;
-          }
-        }
-        $this->set('getExpressCheckoutDetails', $this->_params);
-      }
-      else {
-        $this->_params = $this->get('getExpressCheckoutDetails');
-      }
+    $this->_params = $this->controller->exportValues('Main');
+    $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
+    $this->_params['amount'] = $this->get('amount');
+    if (isset($this->_params['amount'])) {
+      $this->setFormAmountFields($this->_params['priceSetId']);
     }
-    else {
-      $this->_params = $this->controller->exportValues('Main');
 
-      if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-        $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-      }
-      if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
-        $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
-      }
+    $this->_params['tax_amount'] = $this->get('tax_amount');
+    $this->_useForMember = $this->get('useForMember');
 
-      if (isset($this->_params['credit_card_exp_date'])) {
-        $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-        $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-      }
+    if (isset($this->_params['credit_card_exp_date'])) {
+      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
+      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+    }
 
-      $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
-      $this->_params['amount'] = $this->get('amount');
-      $this->_params['tax_amount'] = $this->get('tax_amount');
+    $this->_params['currencyID'] = $config->defaultCurrency;
 
-      $this->_useForMember = $this->get('useForMember');
+    if (!empty($this->_membershipBlock)) {
+      $this->_params['selectMembership'] = $this->get('selectMembership');
+    }
+    if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
+      $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
+      $this->_params = array_merge($this->_params, $preApprovalParams);
+    }
 
-      if (isset($this->_params['amount'])) {
-        $this->setFormAmountFields($this->_params['priceSetId']);
-      }
-      $this->_params['currencyID'] = $config->defaultCurrency;
+    // We may have fetched some billing details from the getPreApprovalDetails function so we
+    // want to ensure we set this after that function has been called.
+    CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $this->_params, FALSE);
+    if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
+      $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
+    }
+    if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
+      $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
     }
 
     $this->_params['is_pay_later'] = $this->get('is_pay_later');
