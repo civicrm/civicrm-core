@@ -734,6 +734,7 @@
           $('#api-params').html('<tr><td colspan="4" class="crm-loading-element"></td></tr>');
           $('#api-params-table thead').show();
           getFields(this);
+	  buildParams();
 	  checkBookKeepingEntity(entity, action);
         } else {
           $('#api-params, #api-generated pre').empty();
