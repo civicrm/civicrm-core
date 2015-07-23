@@ -17,6 +17,7 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
   public function setupCms() {
     if (!in_array($this->config->cms, array(
       'drupal',
+      'drupal8',
       'joomla',
       'wordpress',
     ))) {
@@ -53,6 +54,11 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
       case 'drupal':
         $candidates[] = "../drupal/civicrm.config.php.drupal";
         $candidates[] = "../../drupal/civicrm.config.php.drupal";
+        break;
+
+      case 'drupal8':
+        $candidates[] = "../../modules/civicrm/civicrm.config.php.drupal";
+        $candidates[] = "../../../modules/civicrm/civicrm.config.php.drupal";
         break;
 
       case 'wordpress':
