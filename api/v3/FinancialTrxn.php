@@ -65,3 +65,18 @@ function civicrm_api3_financial_trxn_get($params) {
 function civicrm_api3_financial_trxn_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+
+/**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ * Array of parameters determined by getfields.
+ */
+function _civicrm_api3_financial_trxn_create_spec(&$params) {
+  $params['to_financial_account_id']['api.required'] = 1;
+  $params['status_id']['api.required'] = 1;
+  $params['payment_instrument_id']['api.required'] = 1;
+  $params['total_amount']['api.required'] = 1;
+}
