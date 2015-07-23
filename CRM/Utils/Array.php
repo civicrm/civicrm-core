@@ -904,4 +904,21 @@ class CRM_Utils_Array {
     return $result;
   }
 
+  /**
+   * Copy all properties of $other into $array (recursively).
+   *
+   * @param array|ArrayAccess $array
+   * @param array $other
+   */
+  public static function extend(&$array, $other) {
+    foreach ($other as $key => $value) {
+      if (is_array($value)) {
+        self::extend($array[$key], $value);
+      }
+      else {
+        $array[$key] = $value;
+      }
+    }
+  }
+
 }
