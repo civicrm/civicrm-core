@@ -231,7 +231,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
     if (!empty($params['member_price_set_id'])) {
       //check if this price set has membership type both auto-renew and non-auto-renew memberships.
-      $bothTypes = CRM_Price_BAO_PriceSet::checkMembershipPriceSet($params['member_price_set_id']);
+      $bothTypes = CRM_Price_BAO_PriceSet::isMembershipPriceSetContainsMixOfRenewNonRenew($params['member_price_set_id']);
 
       //check for supporting payment processors
       //if both auto-renew and non-auto-renew memberships
