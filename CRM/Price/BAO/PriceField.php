@@ -580,6 +580,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     static $options = array();
     if ($reset) {
       $options = array();
+      // This would happen if the function was only called to clear the cache.
+      if (empty($fieldId)) {
+        return array();
+      }
     }
 
     if (empty($options[$fieldId])) {
