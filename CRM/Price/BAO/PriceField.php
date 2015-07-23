@@ -571,15 +571,22 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param bool $inactiveNeeded
    *   Include inactive options.
    * @param bool $reset
-   *   Ignore stored values\.
+   *   Discard stored values.
    *
    * @return array
    *   array of options
    */
   public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE) {
     static $options = array();
+    if ($reset) {
+      $options = array();
+      // This would happen if the function was only called to clear the cache.
+      if (empty($fieldId)) {
+        return array();
+      }
+    }
 
-    if ($reset || empty($options[$fieldId])) {
+    if (empty($options[$fieldId])) {
       $values = array();
       CRM_Price_BAO_PriceFieldValue::getValues($fieldId, $values, 'weight', !$inactiveNeeded);
       $options[$fieldId] = $values;
