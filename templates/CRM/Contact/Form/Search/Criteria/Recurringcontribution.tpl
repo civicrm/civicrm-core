@@ -24,58 +24,11 @@
  +--------------------------------------------------------------------+
 *}
 
-<tr>
-  <td colspan=2">{$form.contribution_recur_payment_made.html}</td>
-</tr>
-<tr>
-  <td>{ts}Start Date{/ts}</td>
-  <td>
-    {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_start_date" from='_low' to='_high'}
-  </td>
-</tr>
-<tr>
-  <td>{ts}End Date{/ts}</td>
-  <td>
-    {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_end_date" from='_low' to='_high'}
-  </td>
-</tr>
-<tr>
-  <td>{ts}Modified Date{/ts}</td>
-  <td>
-    {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_modified_date" from='_low' to='_high'}
-  </td>
-</tr>
-<tr>
-  <td>{ts}Next Scheduled{/ts}</td>
-  <td>
-    {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_next_sched_contribution_date" from='_low' to='_high'}
-  </td>
-</tr>
-<tr>
-  <td>{ts}Retry Date{/ts}</td>
-  <td>
-    {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_failure_retry_date" from='_low' to='_high'}
-  </td>
-</tr>
-<tr>
-  <td>{ts}Cancel Date{/ts}</td>
-  <td>
-    {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
-  </td>
-</tr>
-<tr>
-    <td colspan=2">{$form.contribution_recur_processor_id.label}</td>
-    <td>{$form.contribution_recur_processor_id.html}</td>
-</tr>
-<tr>
-    <td colspan=2">{$form.contribution_recur_trxn_id.label}</td>
-    <td>{$form.contribution_recur_trxn_id.html}</td>
-</tr>
+<div id="recurringcontribution" class="form-item">
+    <table class="form-layout">
+        {include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+    </table>
+</div>
 
-{if $contributeRecurGroupTree}
-<tr>
-    <td colspan="3">
-    {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributeRecurGroupTree showHideLinks=false}</td>
-</tr>
-{/if}
+
 

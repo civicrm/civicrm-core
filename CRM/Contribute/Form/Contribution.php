@@ -618,6 +618,29 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
       );
     }
+    
+    if ($this->_context == 'standalone') {
+      $this->assign('showRecurringField', 1);
+      $backOfficePaymentProcessors = CRM_Contribute_BAO_ContributionRecur::getBackOfficePaymentProcessors();
+      $this->assign('backOfficePaymentProcessors', json_encode($backOfficePaymentProcessors));
+      $recurringContribution = $this->add('select', 'contribution_recur_id', ts('Recurring Contribution'), FALSE, NULL);
+    } else {
+      $recurContributions = array();
+        $existingRecurContributions = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($this->_contactID);
+        // Get all backoffice payment processors
+        $backOfficePaymentProcessors = CRM_Contribute_BAO_ContributionRecur::getBackOfficePaymentProcessors();
+        if (!empty($existingRecurContributions)) {
+          foreach ($existingRecurContributions as $ids => $recur) {
+            if (array_key_exists($recur['payment_processor_id'], $backOfficePaymentProcessors)) {
+             $recurContributions[$ids] = CRM_Utils_Money::format($recur['amount']) . ' / ' . $backOfficePaymentProcessors[$recur['payment_processor_id']] . ' / ' . CRM_Contribute_PseudoConstant::contributionStatus($recur['contribution_status_id']) . ' / ' . CRM_Utils_Date::customFormat($recur['start_date']);
+            }
+          }
+      }
+      if (!empty($recurContributions)) {
+        $this->assign('showRecurringField', 1);
+        $recurringContribution = $this->add('select', 'contribution_recur_id', ts('Recurring Contribution'), array('' => ts('- select -')) + $recurContributions, FALSE, NULL);
+      }
+    }
 
     $trxnId = $this->add('text', 'trxn_id', ts('Transaction ID'), array('class' => 'twelve') + $attributes['trxn_id']);
 
@@ -944,6 +967,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $tCnt = CRM_Core_DAO::singleValueQuery($query, $queryParams);
       if ($tCnt) {
         $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', array(1 => $fields['trxn_id']));
+      }
+    }
+    
+    if (!empty($fields['contribution_recur_id'])) {
+      $contributionRecur = new CRM_Contribute_DAO_ContributionRecur();
+      $contributionRecur->id = $fields['contribution_recur_id'];
+      $contributionRecur->find(TRUE);
+
+      if ($fields['financial_type_id'] != $contributionRecur->financial_type_id || $fields['payment_instrument_id'] != $contributionRecur->payment_instrument_id) {
+        $errors['contribution_recur_id'] = ts("Financial Type OR Paid By of the recurring contribution does not match with this contribution record.");
       }
     }
 
@@ -1584,6 +1617,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $fields = array(
         'financial_type_id',
+        'contribution_recur_id',
         'contribution_status_id',
         'payment_instrument_id',
         'cancel_reason',
