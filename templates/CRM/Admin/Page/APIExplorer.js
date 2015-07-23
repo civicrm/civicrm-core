@@ -690,9 +690,7 @@
    * and Action is Create, delete, update etc then display warning
    */
   function checkBookKeepingEntity(entity, action) {      
-    if ($.inArray(entity, ['EntityFinancialTrxn', 'FinancialTrxn']) > -1 
-      && $.inArray(action, ['delete', 'setvalue', 'replace', 'create']) > -1
-    ) {
+    if ($.inArray(entity, ['EntityFinancialTrxn', 'FinancialTrxn']) > -1 && $.inArray(action, ['delete', 'setvalue', 'replace', 'create']) > -1) {
       var msg = ts('Given the importance of auditability, extension developers are strongly discouraged from writing code to add, update or delete entries in the civicrm_financial_item, civicrm_entity_financial_trxn, and civicrm_financial_trxn tables. Before publishing an extension on civicrm.org that does any of this, please ask for a special bookkeeping code review for the extension.');
       CRM.alert(msg, 'warning');
     }
