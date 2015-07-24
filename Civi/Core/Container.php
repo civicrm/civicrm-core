@@ -194,6 +194,11 @@ class Container {
         ->setFactoryClass($class)->setFactoryMethod('singleton');
     }
 
+    $container->setDefinition('civi_token_compat', new Definition(
+      'Civi\Token\TokenCompatSubscriber',
+      array()
+    ))->addTag('kernel.event_subscriber');
+
     \CRM_Utils_Hook::container($container);
 
     return $container;
@@ -208,7 +213,7 @@ class Container {
 
   /**
    * @param ContainerInterface $container
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
   public function createEventDispatcher($container) {
     $dispatcher = new ContainerAwareEventDispatcher($container);
