@@ -42,6 +42,16 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    */
   const MINIMUM_THREAD_STACK = 192;
 
+  /**
+   * Minimum previous CiviCRM version we can directly upgrade from
+   */
+  const MINIMUM_UPGRADABLE_VERSION = '4.0.8';
+
+  /**
+   * Minimum php version we support
+   */
+  const MINIMUM_PHP_VERSION = '5.3.3';
+
   protected $_config;
 
   /**
@@ -486,7 +496,7 @@ SET    version = '$version'
     elseif (version_compare($currentVer, $latestVer) > 0) {
       // DB version number is higher than codebase being upgraded to. This is unexpected condition-fatal error.
       $error = ts('Your database is marked with an unexpected version number: %1. The automated upgrade to version %2 can not be run - and the %2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using prior to beginning this upgrade until you resolve this problem.',
-        array(1 => $currentVer, 2 => $latestVer, 3 => $dbToolsLink)
+        array(1 => $currentVer, 2 => $latestVer)
       );
     }
     elseif (version_compare($currentVer, $latestVer) == 0) {
@@ -494,14 +504,17 @@ SET    version = '$version'
         array(1 => $latestVer)
       );
     }
+    elseif (version_compare($currentVer, self::MINIMUM_UPGRADABLE_VERSION) < 0) {
+      $error = ts('CiviCRM versions prior to %1 cannot be upgraded directly to %2. This upgrade will need to be done in stages. First download an intermediate version (the LTS may be a good choice) and upgrade to that before proceeding to this version.',
+        array(1 => self::MINIMUM_UPGRADABLE_VERSION, 2 => $latestVer)
+      );
+    }
 
-    $phpVersion = phpversion();
-    $minPhpVersion = '5.3.3';
-    if (version_compare($phpVersion, $minPhpVersion) < 0) {
+    if (version_compare(phpversion(), self::MINIMUM_PHP_VERSION) < 0) {
       $error = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
         array(
-          1 => $minPhpVersion,
-          2 => $phpVersion,
+          1 => self::MINIMUM_PHP_VERSION,
+          2 => phpversion(),
           3 => $latestVer,
         ));
     }
