@@ -162,10 +162,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    */
   public function checkVersionRelease($version, $release) {
     $versionParts = explode('.', $version);
-    if ($versionParts[2] == $release) {
-      return TRUE;
-    }
-    return FALSE;
+    return ($versionParts[2] == $release);
   }
 
   /**
@@ -368,12 +365,6 @@ SET    version = '$version'
       }
     }
 
-    // sample test list
-    /*         $revList = array(
-    '2.1.0', '2.2.beta2', '2.2.beta1', '2.2.alpha1', */
-
-    /*                          '2.2.alpha3', '2.2.0', '2.2.2', '2.1.alpha1', '2.1.3'); */
-
     usort($revList, 'version_compare');
     return $revList;
   }
@@ -461,18 +452,6 @@ SET    version = '$version'
     }
     if (!$latestVer) {
       CRM_Core_Error::fatal(ts('Version information missing in civicrm codebase.'));
-    }
-
-    // hack to make past ver compatible /w new incremental upgrade process
-    $convertVer = array(
-      '2.1' => '2.1.0',
-      '2.2' => '2.2.alpha1',
-      '2.2.alph' => '2.2.alpha3',
-      // since 3.1.1 had domain.version set as 3.1.0
-      '3.1.0' => '3.1.1',
-    );
-    if (isset($convertVer[$currentVer])) {
-      $currentVer = $convertVer[$currentVer];
     }
 
     return array($currentVer, $latestVer);
@@ -569,7 +548,7 @@ SET    version = '$version'
    * @param string $postUpgradeMessageFile
    *   path of a modifiable file which lists the post-upgrade messages.
    *
-   * @return CRM_Queue
+   * @return CRM_Queue_Service
    */
   public static function buildQueue($currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
