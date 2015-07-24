@@ -34,10 +34,9 @@
  */
 
 /**
- * This class is a container for legacy upgrade logic which predates
- * the current 'CRM/Incremental/php/*' structure.
+ * This class contains generic upgrade logic which runs regardless of version.
  */
-class CRM_Upgrade_Incremental_Legacy {
+class CRM_Upgrade_Incremental_General {
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -48,12 +47,6 @@ class CRM_Upgrade_Incremental_Legacy {
    * @param $latestVer
    */
   public static function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
-    $upgrade = new CRM_Upgrade_Form();
-    $template = CRM_Core_Smarty::singleton();
-
-    // check for changed message templates
-    self::checkMessageTemplate($template, $preUpgradeMessage, $latestVer, $currentVer);
-
     // http://issues.civicrm.org/jira/browse/CRM-13572
     // Depending on how the code was upgraded, some sites may still have copies of old
     // source files left behind. This is often a forgivable offense, but it's quite
@@ -88,12 +81,11 @@ class CRM_Upgrade_Incremental_Legacy {
   }
 
   /**
-   * @param $template
    * @param $message
    * @param $latestVer
    * @param $currentVer
    */
-  public static function checkMessageTemplate(&$template, &$message, $latestVer, $currentVer) {
+  public static function checkMessageTemplate(&$message, $latestVer, $currentVer) {
 
     $sql = "SELECT orig.workflow_id as workflow_id,
              orig.msg_title as title
@@ -106,7 +98,7 @@ class CRM_Upgrade_Incremental_Legacy {
                 )
             )";
 
-    $dao = &CRM_Core_DAO::executeQuery($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $workflows[$dao->workflow_id] = $dao->title;
     }
