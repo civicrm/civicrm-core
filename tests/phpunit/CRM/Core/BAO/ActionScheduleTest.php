@@ -81,6 +81,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'is_deceased' => 0,
       'contact_type' => 'Individual',
       'email' => 'test-member@example.com',
+      'gender_id' => 'Female',
     );
     $this->fixtures['contact_birthdate'] = array(
       'is_deceased' => 0,
@@ -523,6 +524,144 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'civicrm_email',
     ));
     $this->_tearDown();
+  }
+
+  public function mailerExamples() {
+    $cases = array();
+
+    $manyTokensTmpl = implode(';;', array(
+      '{contact.display_name}', // basic contact token
+      '{contact.gender}', // funny legacy contact token
+      '{contact.gender_id}', // funny legacy contact token
+      '{domain.name}', // domain token
+      '{activity.activity_type}', // action-scheduler token
+    ));
+    $manyTokensExpected = 'test-member@example.com;;Female;;Female;;Second Domain;;Phone Call';
+
+    // In this example, we use a lot of tokens cutting across multiple components..
+    $cases[0] = array(
+      // Schedule definition.
+      array(
+        'subject' => "subj $manyTokensTmpl",
+        'body_html' => "html $manyTokensTmpl",
+        'body_text' => "text $manyTokensTmpl",
+      ),
+      // Assertions (regex).
+      array(
+        'from_name' => "/^FIXME\$/",
+        'from_email' => "/^info@EXAMPLE.ORG\$/",
+        'subject' => "/^subj $manyTokensExpected\$/",
+        'body_html' => "/^html $manyTokensExpected\$/",
+        'body_text' => "/^text $manyTokensExpected\$/",
+      ),
+    );
+
+    // In this example, we customize the from address.
+    $cases[1] = array(
+      // Schedule definition.
+      array(
+        'from_name' => 'Bob',
+        'from_email' => 'bob@example.org',
+      ),
+      // Assertions (regex).
+      array(
+        'from_name' => "/^Bob\$/",
+        'from_email' => "/^bob@example.org\$/",
+      ),
+    );
+
+    // In this example, we autoconvert HTML to text
+    $cases[2] = array(
+      // Schedule definition.
+      array(
+        'body_html' => '<p>Hello &amp; stuff.</p>',
+        'body_text' => '',
+      ),
+      // Assertions (regex).
+      array(
+        'body_html' => '/^' . preg_quote('<p>Hello &amp; stuff.</p>', '/') . '/',
+        'body_text' => '/^' . preg_quote('Hello & stuff.', '/') . '/',
+      ),
+    );
+
+    // In this example, we autoconvert HTML to text
+    $cases[3] = array(
+      // Schedule definition.
+      array(
+        'body_html' => '',
+        'body_text' => 'Hello world',
+      ),
+      // Assertions (regex).
+      array(
+        'body_html' => '/^--UNDEFINED--$/',
+        'body_text' => '/^Hello world$/',
+      ),
+    );
+
+    return $cases;
+  }
+
+  /**
+   * This generates a single mailing through the scheduled-reminder
+   * system (using an activity-reminder as a baseline) and
+   * checks that the resulting message satisfies various
+   * regular expressions.
+   *
+   * @param array $schedule
+   *   Values to set/override in the schedule.
+   *   Ex: array('subject' => 'Hello, {contact.first_name}!').
+   * @param array $patterns
+   *   A list of regexes to compare with the actual email.
+   *   Ex: array('subject' => '/^Hello, Alice!/').
+   *   Keys: subject, body_text, body_html, from_name, from_email.
+   * @dataProvider mailerExamples
+   */
+  public function testMailer($schedule, $patterns) {
+    $actionSchedule = array_merge($this->fixtures['sched_activity_1day'], $schedule);
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
+    $this->assertTrue(is_numeric($activity->id));
+    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $activity->save();
+
+    $source['contact_id'] = $contact['id'];
+    $source['activity_id'] = $activity->id;
+    $source['record_type_id'] = 2;
+    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
+    $activityContact->save();
+
+    CRM_Utils_Time::setTime('2012-06-14 15:00:00');
+    $this->callAPISuccess('job', 'send_reminder', array());
+    $this->mut->assertRecipients(array(array('test-member@example.com')));
+    foreach ($this->mut->getAllMessages('ezc') as $message) {
+      /** @var ezcMail $message */
+
+      $messageArray = array();
+      $messageArray['subject'] = $message->subject;
+      $messageArray['from_name'] = $message->from->name;
+      $messageArray['from_email'] = $message->from->email;
+      $messageArray['body_text'] = '--UNDEFINED--';
+      $messageArray['body_html'] = '--UNDEFINED--';
+
+      foreach ($message->fetchParts() as $part) {
+        /** @var ezcMailText ezcMailText */
+        if ($part instanceof ezcMailText && $part->subType == 'html') {
+          $messageArray['body_html'] = $part->text;
+        }
+        if ($part instanceof ezcMailText && $part->subType == 'plain') {
+          $messageArray['body_text'] = $part->text;
+        }
+      }
+
+      foreach ($patterns as $field => $pattern) {
+        $this->assertRegExp($pattern, $messageArray[$field],
+          "Check that '$field'' matches regex. " . print_r(array('expected' => $patterns, 'actual' => $messageArray), 1));
+      }
+    }
+    $this->mut->clearMessages();
+
   }
 
   public function testActivityDateTimeMatchNonRepeatableSchedule() {
