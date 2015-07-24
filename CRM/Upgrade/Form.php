@@ -763,21 +763,19 @@ SET    version = '$version'
    * @param $latestVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
-    CRM_Upgrade_Incremental_Legacy::setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+    // check for changed message templates
+    CRM_Upgrade_Incremental_General::checkMessageTemplate($preUpgradeMessage, $latestVer, $currentVer);
+    // set global messages
+    CRM_Upgrade_Incremental_General::setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
 
     // Scan through all php files and see if any file is interested in setting pre-upgrade-message
     // based on $currentVer, $latestVer.
     // Please note, at this point upgrade hasn't started executing queries.
     $revisions = $this->getRevisionSequence();
     foreach ($revisions as $rev) {
-      if (version_compare($currentVer, $rev) < 0 &&
-        version_compare($rev, '3.2.alpha1') > 0
-      ) {
+      if (version_compare($currentVer, $rev) < 0) {
         $versionObject = $this->incrementalPhpObject($rev);
-        if (is_callable(array(
-          $versionObject,
-          'setPreUpgradeMessage',
-        ))) {
+        if (is_callable(array($versionObject, 'setPreUpgradeMessage'))) {
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }
       }
