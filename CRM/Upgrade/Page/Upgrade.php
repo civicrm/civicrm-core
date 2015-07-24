@@ -95,18 +95,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
     CRM_Core_Menu::store();
 
-    // This could be removed in later rev
-    if ($currentVer == '2.1.6') {
-      $config = CRM_Core_Config::singleton();
-      // also cleanup the templates_c directory
-      $config->cleanupCaches();
-    }
-    else {
-      $config = CRM_Core_Config::singleton();
-      // cleanup only the templates_c directory
-      $config->cleanup(1, FALSE);
-    }
-    // end of hack
+    // cleanup only the templates_c directory
+    $config->cleanup(1, FALSE);
 
     $preUpgradeMessage = NULL;
     $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
