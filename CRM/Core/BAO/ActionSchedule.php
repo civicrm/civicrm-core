@@ -519,7 +519,6 @@ AND   cas.entity_value = $id AND
     $actionSchedule->find(FALSE);
 
     while ($actionSchedule->fetch()) {
-      list($tokenEntity, $tokenFields) = CRM_Core_BAO_ActionSchedule::listMailingTokens($mapping);
       $query = CRM_Core_BAO_ActionSchedule::prepareMailingQuery($mapping, $actionSchedule);
       $dao = CRM_Core_DAO::executeQuery($query,
         array(1 => array($actionSchedule->id, 'Integer'))
@@ -533,67 +532,37 @@ AND   cas.entity_value = $id AND
           CRM_Core_BAO_ActionSchedule::setCommunicationLanguage($actionSchedule->communication_language, $preferred_language);
         }
 
-        $isError = 0;
-        $errorMsg = $toEmail = $toPhoneNumber = '';
-
-        if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
-          $filters = array('is_deceased' => 0, 'is_deleted' => 0, 'do_not_sms' => 0);
-          $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($dao->contactID, FALSE, 'Mobile', $filters);
-          //to get primary mobile ph,if not get a first mobile phONE
-          if (!empty($toPhoneNumbers)) {
-            $toPhoneNumberDetails = reset($toPhoneNumbers);
-            $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
-            //contact allows to send sms
-            $toDoNotSms = 0;
-          }
-        }
-        if ($actionSchedule->mode == 'Email' or $actionSchedule->mode == 'User_Preference') {
-          $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
-        }
-        if ($toEmail || !(empty($toPhoneNumber) or $toDoNotSms)) {
-          // FIXME: Shouldn't SMS & email errors be independent+equal?
-          try {
-            $result = NULL;
-            $tokenProcessor = self::createTokenProcessor($actionSchedule);
-            $tokenProcessor->addRow()
-              ->context('contactId', $dao->contactID)
-              ->tokens(CRM_Core_BAO_ActionSchedule::prepareMailingTokens($tokenEntity, $tokenFields, $dao));
-            foreach ($tokenProcessor->evaluate()->getRows() as $tokenRow) {
-              if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
-                self::sendReminderSms($tokenRow, $actionSchedule, $toPhoneNumber);
-              }
-
-              if ($actionSchedule->mode == 'Email' or $actionSchedule->mode == 'User_Preference') {
-                $result = self::sendReminderEmail($tokenRow, $actionSchedule, $toEmail);
-              }
+        $errors = array();
+        try {
+          $tokenProcessor = self::createTokenProcessor($actionSchedule);
+          $tokenProcessor->addRow()
+            ->context('contactId', $dao->contactID)
+            ->tokens(CRM_Core_BAO_ActionSchedule::prepareMailingTokens($mapping, $dao));
+          foreach ($tokenProcessor->evaluate()->getRows() as $tokenRow) {
+            if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
+              CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID));
             }
 
-            if (!$result || is_a($result, 'PEAR_Error')) {
-              // we could not send an email, for now we ignore, CRM-3406
-              $isError = 1;
+            if ($actionSchedule->mode == 'Email' or $actionSchedule->mode == 'User_Preference') {
+              CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID));
             }
           }
-          catch (\Civi\Token\TokenException $e) {
-            $isError = 1;
-            $errorMsg = $e->getMessage();
-          }
         }
-        else {
-          $isError = 1;
-          $errorMsg = "Couldn\'t find recipient\'s email address.";
+        catch (\Civi\Token\TokenException $e) {
+          $errors['token_exception'] = $e->getMessage();
         }
 
         // update action log record
         $logParams = array(
           'id' => $dao->reminderID,
-          'is_error' => $isError,
-          'message' => $errorMsg ? $errorMsg : "null",
+          'is_error' => !empty($errors),
+          'message' => empty($errors) ? "null" : implode(' ', $errors),
           'action_date_time' => $now,
         );
         CRM_Core_BAO_ActionLog::create($logParams);
 
         // insert activity log record if needed
-        if ($actionSchedule->record_activity && !$isError) {
+        if ($actionSchedule->record_activity && empty($errors)) {
           $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
           CRM_Core_BAO_ActionSchedule::createMailingActivity($actionSchedule, $mapping, $dao->contactID, $dao->entityID, $caseID);
         }
@@ -1286,13 +1255,14 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   }
 
   /**
-   * @param $tokenEntity
-   * @param $tokenFields
+   * @param CRM_Core_DAO_ActionMapping $mapping
    * @param $dao
    * @return array
    *   Ex: array('activity' => array('subject' => 'Hello world)).
    */
-  protected static function prepareMailingTokens($tokenEntity, $tokenFields, $dao) {
+  protected static function prepareMailingTokens($mapping, $dao) {
+    list($tokenEntity, $tokenFields) = CRM_Core_BAO_ActionSchedule::listMailingTokens($mapping);
+
     $entityTokenParams = array();
     foreach ($tokenFields as $field) {
       if ($field == 'location') {
@@ -1476,12 +1446,19 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
   }
 
   /**
-   * @param $tokenRow
-   * @param $toPhoneNumber
-   * @param $schedule
+   * @param TokenRow $tokenRow
+   * @param CRM_Core_DAO_ActionSchedule $schedule
+   * @param int $toContactID
    * @throws CRM_Core_Exception
+   * @return array
+   *   List of error messages.
    */
-  protected static function sendReminderSms($tokenRow, $schedule, $toPhoneNumber) {
+  protected static function sendReminderSms($tokenRow, $schedule, $toContactID) {
+    $toPhoneNumber = self::pickSmsPhoneNumber($toContactID);
+    if (!$toPhoneNumber) {
+      return array("sms_phone_missing" => "Couldn't find recipient's phone number.");
+    }
+
     $messageSubject = $tokenRow->render('subject');
     $sms_body_text = $tokenRow->render('sms_body_text');
 
@@ -1513,6 +1490,8 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $activity->id,
       $userID
     );
+
+    return array();
   }
 
   /**
@@ -1531,12 +1510,18 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
   }
 
   /**
-   * @param $tokenRow
-   * @param $schedule
-   * @param $toEmail
-   * @return bool
+   * @param TokenRow $tokenRow
+   * @param CRM_Core_DAO_ActionSchedule $schedule
+   * @param int $toContactID
+   * @return array
+   *   List of error messages.
    */
-  protected static function sendReminderEmail($tokenRow, $schedule, $toEmail) {
+  protected static function sendReminderEmail($tokenRow, $schedule, $toContactID) {
+    $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID);
+    if (!$toEmail) {
+      return array("email_missing" => "Couldn't find recipient's email address.");
+    }
+
     $body_text = $tokenRow->render('body_text');
     $body_html = $tokenRow->render('body_html');
     if (!$schedule->body_text) {
@@ -1567,7 +1552,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $mailParams['html'] = $body_html;
     }
     $result = CRM_Utils_Mail::send($mailParams);
-    return $result;
+    if (!$result || is_a($result, 'PEAR_Error')) {
+      return array('email_fail' => 'Failed to send message');
+    }
+
+    return array();
   }
 
   /**
@@ -1585,6 +1574,25 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     $tp->addMessage('sms_body_text', $schedule->sms_body_text, 'text/plain');
     $tp->addMessage('subject', $schedule->subject, 'text/plain');
     return $tp;
+  }
+
+  /**
+   * @param $dao
+   * @return string|NULL
+   */
+  protected static function pickSmsPhoneNumber($smsToContactId) {
+    $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($smsToContactId, FALSE, 'Mobile', array(
+      'is_deceased' => 0,
+      'is_deleted' => 0,
+      'do_not_sms' => 0,
+    ));
+    //to get primary mobile ph,if not get a first mobile phONE
+    if (!empty($toPhoneNumbers)) {
+      $toPhoneNumberDetails = reset($toPhoneNumbers);
+      $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
+      return $toPhoneNumber;
+    }
+    return NULL;
   }
 
 }
