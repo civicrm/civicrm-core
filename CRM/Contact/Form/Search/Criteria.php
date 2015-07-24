@@ -489,9 +489,9 @@ class CRM_Contact_Form_Search_Criteria {
     }
     $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
 
-    $form->add('text', 'age_low', ts('Min Age'));
+    $form->add('text', 'age_low', ts('Min Age'), array('size' => 6));
     $form->addRule('age_low', ts('Please enter a positive integer'), 'positiveInteger');
-    $form->add('text', 'age_high', ts('Max Age'));
+    $form->add('text', 'age_high', ts('Max Age'), array('size' => 6));
     $form->addRule('age_high', ts('Please enter a positive integer'), 'positiveInteger');
     $form->addDate('age_asof_date', ts('Age as of Date'), FALSE, array('formatType' => 'searchDate'));
 
