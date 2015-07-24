@@ -533,8 +533,6 @@ AND   cas.entity_value = $id AND
           CRM_Core_BAO_ActionSchedule::setCommunicationLanguage($actionSchedule->communication_language, $preferred_language);
         }
 
-        $entityTokenParams = CRM_Core_BAO_ActionSchedule::prepareMailingTokens($tokenEntity, $tokenFields, $dao);
-
         $isError = 0;
         $errorMsg = $toEmail = $toPhoneNumber = '';
 
@@ -559,7 +557,7 @@ AND   cas.entity_value = $id AND
             $tokenProcessor = self::createTokenProcessor($actionSchedule);
             $tokenProcessor->addRow()
               ->context('contactId', $dao->contactID)
-              ->context('tmpTokenParams', $entityTokenParams);
+              ->tokens(CRM_Core_BAO_ActionSchedule::prepareMailingTokens($tokenEntity, $tokenFields, $dao));
             foreach ($tokenProcessor->evaluate()->getRows() as $tokenRow) {
               if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
                 self::sendReminderSms($tokenRow, $actionSchedule, $toPhoneNumber);
@@ -1291,6 +1289,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
    * @param $tokenFields
    * @param $dao
    * @return array
+   *   Ex: array('activity' => array('subject' => 'Hello world)).
    */
   protected static function prepareMailingTokens($tokenEntity, $tokenFields, $dao) {
     $entityTokenParams = array();
@@ -1302,16 +1301,16 @@ WHERE     m.owner_membership_id IS NOT NULL AND
         $loc['city'] = $dao->city;
         $loc['state_province'] = CRM_Utils_Array::value($dao->state_province_id, $stateProvince);
         $loc['postal_code'] = $dao->postal_code;
-        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Address::format($loc);
+        $entityTokenParams[$tokenEntity][$field] = CRM_Utils_Address::format($loc);
       }
       elseif ($field == 'info_url') {
-        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
+        $entityTokenParams[$tokenEntity][$field] = CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
       }
       elseif ($field == 'registration_url') {
-        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
+        $entityTokenParams[$tokenEntity][$field] = CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
       }
       elseif (in_array($field, array('start_date', 'end_date', 'join_date', 'activity_date_time'))) {
-        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
+        $entityTokenParams[$tokenEntity][$field] = CRM_Utils_Date::customFormat($dao->$field);
       }
       elseif ($field == 'balance') {
         if ($dao->entityTable == 'civicrm_contact') {
@@ -1322,13 +1321,13 @@ WHERE     m.owner_membership_id IS NOT NULL AND
           $balancePay = CRM_Utils_Array::value('balance', $info);
           $balancePay = CRM_Utils_Money::format($balancePay);
         }
-        $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
+        $entityTokenParams[$tokenEntity][$field] = $balancePay;
       }
       elseif ($field == 'fee_amount') {
-        $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Money::format($dao->$field);
+        $entityTokenParams[$tokenEntity][$field] = CRM_Utils_Money::format($dao->$field);
       }
       else {
-        $entityTokenParams["{$tokenEntity}." . $field] = $dao->$field;
+        $entityTokenParams[$tokenEntity][$field] = $dao->$field;
       }
     }
     return $entityTokenParams;
