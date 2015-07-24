@@ -3140,9 +3140,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
 
       $params['trxnParams'] = $trxnParams;
-
       if (!empty($params['prevContribution'])) {
         $updated = FALSE;
+        //check if line item is changed
+        CRM_Price_BAO_LineItem::updateLineItemParams(
+          CRM_Utils_Array::value('line_item', $params),
+          $params['contribution']->id
+        );
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $params['prevContribution']->total_amount;
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;

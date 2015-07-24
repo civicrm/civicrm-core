@@ -562,4 +562,22 @@ AND li.entity_id = {$entityId}
     return $tax;
   }
 
+  /**
+   * Update line item array.
+   *
+   * @param array $lineItemId
+   *   An assoc array of lineItem.
+   *
+   * @param Int $contributionId
+   *   Contribution Id.
+   *
+   */
+  public static function updateLineItemParams(&$lineItems, $contributionId) {
+    if (empty($lineItems) || !$contributionId) {
+      return FALSE;
+    }
+    // get previous line item for contribution
+    $oldLineItem = self::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
+  }
+
 }
