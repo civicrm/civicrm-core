@@ -370,6 +370,8 @@ class CRM_Contact_BAO_Query {
     'email',
     'im',
     'address_name',
+    'master_id',
+    'location_type',
   );
 
   /**
@@ -1948,7 +1950,6 @@ class CRM_Contact_BAO_Query {
    */
   public function restWhere(&$values) {
     $name = CRM_Utils_Array::value(0, $values);
-    CRM_Core_Error::debug_var( '$values', $values );
     $op = CRM_Utils_Array::value(1, $values);
     $value = CRM_Utils_Array::value(2, $values);
     $grouping = CRM_Utils_Array::value(3, $values);
@@ -2021,7 +2022,6 @@ class CRM_Contact_BAO_Query {
         'String',
         TRUE
       );
-      CRM_Core_Error::debug_var( 'pseudoconstant', $field );
       if ($name == 'gender_id') {
         self::$_openedPanes[ts('Demographics')] = TRUE;
       }
@@ -2161,7 +2161,6 @@ class CRM_Contact_BAO_Query {
         list($tName, $fldName) = self::getLocationTableName($field['where'], $locType);
 
         $fieldName = "LOWER(`$tName`.$fldName)";
-        CRM_Core_Error::debug_var( '$fieldName', $fieldName );
 
         // we set both _tables & whereTables because whereTables doesn't seem to do what the name implies it should
         $this->_tables[$tName] = $this->_whereTables[$tName] = 1;
@@ -2209,7 +2208,7 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($fieldName, $value, $type);
       }
       else {
-        if ($op != 'IN') {
+        if (strpos($op, 'IN') === FALSE) {
           $value = $strtolower($value);
         }
         if ($wildcard) {
@@ -2612,8 +2611,8 @@ class CRM_Contact_BAO_Query {
           continue;
 
         default:
-          $locationTypeName = '';
-          if (strpos($name, '-address') != 0) {
+          $locationTypeName = $extraLocationTypeClause = '';
+          if (strpos($name, '-address') != 0 || strpos($name, '-master_id') != 0) {
             $locationTypeName = 'address';
           }
           elseif (strpos($name, '-phone') != 0) {
@@ -2622,11 +2621,26 @@ class CRM_Contact_BAO_Query {
           elseif (strpos($name, '-email') != 0) {
             $locationTypeName = 'email';
           }
+          elseif (strpos($name, '-im') != 0) {
+            $locationTypeName = 'im';
+            $extraLocationType = "provider_id";
+          }
+          elseif (strpos($name, '-openid') != 0) {
+            $extraLocationType = $locationTypeName = 'openid';
+          }
+          elseif (strpos($name, '-location_type') != 0) {
+            $locationTypeName = 'address';
+            $extraLocationTypeClause = "\n $side JOIN civicrm_location_type `{$name}` ON ( `{$name}`.id = `{$name}_address`.location_type_id)";
+            $name .= "_address";
+          }
           if ($locationTypeName) {
             //we have a join on an location table - possibly in conjunction with search builder - CRM-14263
             $parts = explode('-', $name);
             $locationID = array_search($parts[0], CRM_Core_BAO_Address::buildOptions('location_type_id', 'get', array('name' => $parts[0])));
-            $from .= " $side JOIN civicrm_{$locationTypeName} `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID ";
+            if (!empty($extraLocationType) && !empty($parts[2]) && is_numeric($parts[2])) {
+              $extraLocationTypeClause = " and `{$name}`.{$extraLocationType} = $parts[2]";
+            }
+            $from .= " $side JOIN civicrm_{$locationTypeName} `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID $extraLocationTypeClause ";
           }
           else {
             $from .= CRM_Core_Component::from($name, $mode, $side);
@@ -3122,7 +3136,7 @@ WHERE  $smartGroupClause
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $n = trim($value);
     $value = $strtolower(CRM_Core_DAO::escapeString($n));
-    if ($wildcard || $op == 'LIKE') {
+    if ($wildcard) {
       if (strpos($value, '%') === FALSE) {
         $value = "%$value%";
       }
@@ -3143,7 +3157,8 @@ WHERE  $smartGroupClause
       $label = $label ? ts('Note: Body and Subject') : ts('Note: Subject Only');
     }
     $this->_where[$grouping][] = "( " . implode(' OR ', $clauses) . " )";
-    $this->_qill[$grouping][] = $label . " $op - '$n'";
+    list($qillOp, $qillVal) = self::buildQillForFieldValue(NULL, $name, $n, $op);
+    $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $label, 2 => $qillOp, 3 => $qillVal));
   }
 
   /**
@@ -3924,50 +3939,17 @@ WHERE  $smartGroupClause
   public function preferredCommunication(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $pref = array();
-    if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-      $value = NULL;
-    }
-    elseif (!is_array($value)) {
-      $v = array();
-      $value = trim($value, ' ()');
-      if (strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-        $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-      }
-      else {
-        $v = explode(",", $value);
-      }
+    $value = str_replace(array('(', ')'), '', explode(",", $value));
+    list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Contact', $name, $value, $op);
 
-      foreach ($v as $item) {
-        if ($item) {
-          $pref[] = $item;
-        }
-      }
-    }
-    else {
-      foreach ($value as $key => $checked) {
-        if ($checked) {
-          $pref[] = $key;
-        }
-      }
+    if (self::caseImportant($op)) {
+      $value = implode("[[:cntrl:]]|[[:cntrl:]]", (array) $value);
+      $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
+      $value = "[[:cntrl:]]" . $value . "[[:cntrl:]]";
     }
 
-    $commPref = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
-
-    $sqlValue = array();
-    $showValue = array();
-    $sql = "contact_a.preferred_communication_method";
-    if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-      $sqlValue[] = "{$sql} {$op}";
-    }
-    else {
-      foreach ($pref as $val) {
-        $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $val . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
-        $showValue[] = $commPref[$val];
-      }
-    }
-    $this->_where[$grouping][] = "( " . implode(' OR ', $sqlValue) . " )";
-    $this->_qill[$grouping][] = ts('Preferred Communication Method') . " $op " . implode(' ' . ts('or') . ' ', $showValue);
+    $this->_where[$grouping][] = self::buildClause("contact_a.preferred_communication_method", $op, $value);
+    $this->_qill[$grouping][] = ts('Preferred Communication Method %1 %2', array(1 => $qillop, 2 => $qillVal));
   }
 
   /**
