@@ -544,13 +544,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $config = CRM_Core_Config::singleton();
     }
 
-    if ($mailing->language && $mailing->language != 'en_US') {
-      // Since we are called from cron, CiviCRM runs in the default language,
-      // which causes issues for multi-lingual environments.
-      // NB: we do not switch back once the mailing is finished,
-      // assuming that CiviCRM stops running after the mail run.
-      $i18n = CRM_Core_I18n::singleton();
-      $i18n->setLocale($mailing->language);
+    if (property_exists($mailing, 'language') && $mailing->language && $mailing->language != 'en_US') {
+      $swapLang = CRM_Utils_AutoClean::swap('global://dbLocale?getter', 'call://i18n/setLocale', $mailing->language);
     }
 
     $job_date = CRM_Utils_Date::isoToMysql($this->scheduled_date);
