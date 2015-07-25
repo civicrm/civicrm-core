@@ -123,6 +123,11 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
+          'name' => ts('Language'),
+          'sort' => 'language',
+          'direction' => CRM_Utils_Sort::DONTCARE,
+        ),
+        array(
           'name' => ts('Status'),
           'sort' => 'status',
           'direction' => CRM_Utils_Sort::DONTCARE,
@@ -588,6 +593,11 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $campaignIds = array($campaignIds);
       }
       $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
+    }
+
+    if ($language = $this->_parent->get('language')) {
+      $clauses[] = "civicrm_mailing.language = %6";
+      $params[6] = array($language, 'String');
     }
 
     if (empty($clauses)) {

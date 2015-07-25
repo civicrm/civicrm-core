@@ -439,4 +439,19 @@
     </pseudoconstant>
     <add>4.6</add>
   </field>
+  <field>
+    <name>language</name>
+    <title>Mailing Language</title>
+    <type>varchar</type>
+    <length>5</length>
+    <comment>Language of the content of the mailing. Useful for tokens.</comment>
+    <add>4.6</add>
+    <pseudoconstant>
+      <optionGroupName>languages</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
 </table>
