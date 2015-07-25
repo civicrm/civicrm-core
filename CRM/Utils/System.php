@@ -1365,7 +1365,7 @@ class CRM_Utils_System {
    * For example, a mailing will want to change the CMS language so that
    * URLs are in the correct language (such as the Drupal language prefix).
    *
-   * @param String $civicrm_language
+   * @param string $civicrm_language
    *   An array of parameters (see CRM_Utils_System::docURL2 method for names)
    *
    * @return bool
