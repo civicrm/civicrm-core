@@ -176,6 +176,7 @@ class Container {
     $singletons = array(
       'resources' => 'CRM_Core_Resources',
       'httpClient' => 'CRM_Utils_HttpClient',
+      'i18n' => 'CRM_Core_I18n',
       // Maybe? 'config' => 'CRM_Core_Config',
       // Maybe? 'smarty' => 'CRM_Core_Smarty',
     );
