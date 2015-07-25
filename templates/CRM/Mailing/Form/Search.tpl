@@ -63,6 +63,15 @@
         {/if}
     </tr>
 
+    {* language *}
+    {if $form.language}
+      <tr>
+        <td>{$form.language.label} {help id="id-language"}<br />
+            {$form.language.html|crmAddClass:big}
+        </td>
+      </tr>
+    {/if}
+
     {* campaign in mailing search *}
     {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
     campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
