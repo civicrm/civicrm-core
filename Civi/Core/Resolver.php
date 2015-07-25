@@ -19,6 +19,8 @@ namespace Civi\Core;
  *   - 'api3://EntityName/action?first=@1&second=@2' - Call an API method, mapping the
  *     first & second args to named parameters.
  *     (Performance note: Requires parsing/interpolating arguments).
+ *   - 'global://Variable/Key2/Key3?getter' - A dummy which looks up a global variable.
+ *   - 'global://Variable/Key2/Key3?setter' - A dummy which updates a global variable.
  *   - '0' or '1' - A dummy which returns the constant '0' or '1'.
  *
  * Note: To differentiate classes and functions, there is a hard requirement that
@@ -80,6 +82,10 @@ class Resolver {
         case 'api3':
           // Callback: API.
           return new ResolverApi($url);
+
+        case 'global':
+          // Lookup in a global variable.
+          return new ResolverGlobalCallback($url['query'], $url['host'] . (isset($url['path']) ? rtrim($url['path'], '/') : ''));
 
         default:
           throw new \RuntimeException("Unsupported callback scheme: " . $url['scheme']);
@@ -238,6 +244,40 @@ class ResolverApi {
           $array[$key] = $newVal;
         }
       }
+    }
+  }
+
+}
+
+class ResolverGlobalCallback {
+  private $mode, $path;
+
+  /**
+   * Class constructor.
+   *
+   * @param string $mode
+   *   'getter' or 'setter'.
+   * @param string $path
+   */
+  public function __construct($mode, $path) {
+    $this->mode = $mode;
+    $this->path = $path;
+  }
+
+  /**
+   * Invoke function.
+   *
+   * @return mixed
+   */
+  public function __invoke($arg1 = NULL) {
+    if ($this->mode === 'getter') {
+      return \CRM_Utils_Array::pathGet($GLOBALS, explode('/', $this->path));
+    }
+    elseif ($this->mode === 'setter') {
+      \CRM_Utils_Array::pathSet($GLOBALS, explode('/', $this->path), $arg1);
+    }
+    else {
+      throw new \RuntimeException("Resolver failed: global:// must specify getter or setter mode.");
     }
   }
 
