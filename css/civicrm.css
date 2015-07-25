@@ -2161,10 +2161,6 @@ div.grippie {
   top: -2px;
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
-.crm-container .button:hover .icon,
-.crm-container .crm-button:hover .icon {
-  background-image: url("../i/icons/jquery-ui-2786C2.png");
-}
 
 .crm-container span.crm-button .icon {
   margin-top: 3px;
