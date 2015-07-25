@@ -183,6 +183,7 @@ class Container {
       'resources' => 'CRM_Core_Resources',
       'httpClient' => 'CRM_Utils_HttpClient',
       'cache.default' => 'CRM_Utils_Cache',
+      'i18n' => 'CRM_Core_I18n',
       // Maybe? 'config' => 'CRM_Core_Config',
       // Maybe? 'smarty' => 'CRM_Core_Smarty',
     );
