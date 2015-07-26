@@ -25,7 +25,6 @@
 *}
 
   <div id="paypalExpress">
-    {assign var=expressButtonName value='_qf_Main_upload_express'}
     <fieldset class="crm-group paypal_checkout-group">
       <legend>{ts}Checkout with PayPal{/ts}</legend>
       <div class="section">
