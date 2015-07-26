@@ -112,11 +112,6 @@ INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1068", "ERITREA", "ER", "5", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1069", "ESTONIA", "EE", "1", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1070", "ETHIOPIA", "ET", "5", "0");
-INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1066", "EL SALVADOR", "SV", "2", "0");
-INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1067", "EQUATORIAL GUINEA", "GQ", "5", "0");
-INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1068", "ERITREA", "ER", "5", "0");
-INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1069", "ESTONIA", "EE", "1", "0");
-INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1070", "ETHIOPIA", "ET", "5", "0");
 -- INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1071", "EUROPEAN UNION", "EU", "1", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1072", "FALKLAND ISLANDS (MALVINAS)", "FK", "2", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1073", "FAROE ISLANDS", "FO", "1", "0");
