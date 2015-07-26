@@ -140,7 +140,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     );
     $display = CRM_Core_BAO_CustomField::getDisplayValue($fields['default_value'], $customFieldID1, $options);
 
-    $this->assertEquals('United States', $display, 'Confirm Country display Name');
+    $this->assertEquals('UNITED STATES', $display, 'Confirm Country display Name');
 
     Custom::deleteGroup($customGroup);
   }
