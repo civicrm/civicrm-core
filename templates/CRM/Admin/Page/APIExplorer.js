@@ -682,6 +682,18 @@
       $('#doc-result').html(entityDoc);
       prettyPrint('#doc-result pre');
     }
+    checkBookKeepingEntity(entity, action);
+  }
+    
+  /**
+   * Check if entity is Financial Trxn and Entity Financial Trxn
+   * and Action is Create, delete, update etc then display warning
+   */
+  function checkBookKeepingEntity(entity, action) {      
+    if ($.inArray(entity, ['EntityFinancialTrxn', 'FinancialTrxn']) > -1 && $.inArray(action, ['delete', 'setvalue', 'replace', 'create']) > -1) {
+      var msg = ts('Given the importance of auditability, extension developers are strongly discouraged from writing code to add, update or delete entries in the civicrm_financial_item, civicrm_entity_financial_trxn, and civicrm_financial_trxn tables. Before publishing an extension on civicrm.org that does any of this, please ask for a special bookkeeping code review for the extension.');
+      CRM.alert(msg, 'warning');
+    }
   }
 
   $(document).ready(function() {
@@ -720,7 +732,8 @@
           $('#api-params').html('<tr><td colspan="4" class="crm-loading-element"></td></tr>');
           $('#api-params-table thead').show();
           getFields(this);
-          buildParams();
+	  buildParams();
+	  checkBookKeepingEntity(entity, action);
         } else {
           $('#api-params, #api-generated pre').empty();
           $('#api-param-buttons, #api-params-table thead').hide();
