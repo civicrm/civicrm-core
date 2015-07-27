@@ -224,6 +224,10 @@ WHERE  inst.report_id = %1";
             elseif (CRM_Utils_Array::value('group_by', $form->_columnHeaders[$v]) == 'YEAR') {
               $value = CRM_Utils_Date::customFormat($value, $config->dateformatYear);
             }
+            elseif ($form->_columnHeaders[$v]['type'] == 12) {
+              // This is a datetime format
+              $value = CRM_Utils_Date::customFormat($value, '%Y-%m-%d %H:%i');
+            }
             else {
               $value = CRM_Utils_Date::customFormat($value, '%Y-%m-%d');
             }
