@@ -2582,7 +2582,7 @@ class CRM_Contact_BAO_Query {
           continue;
 
         default:
-          $locationTypeName = $extraLocationTypeClause = '';
+          $locationTypeName = '';
           if (strpos($name, '-address') != 0) {
             $locationTypeName = 'address';
           }
