@@ -92,8 +92,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         if ($isTemplate) {
           $field = 'event_template';
         }
-        $this->_mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', $field, 'id', 'entity_value');
-        if (!$this->_mappingID) {
+        $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+          'entity_value' => $field,
+        )));
+        if ($mapping) {
+          $this->_mappingID = $mapping->id;
+        }
+        else {
           CRM_Core_Error::fatal('Could not find mapping for event scheduled reminders.');
         }
       }
@@ -159,7 +164,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->_freqUnits = CRM_Core_SelectValues::getRecurringFrequencyUnits();
 
     //pass the mapping ID in UPDATE mode
-    $mappings = CRM_Core_BAO_ActionSchedule::getMapping($mappingID);
+    $mappings = CRM_Core_BAO_ActionSchedule::getMappings(array(
+      'id' => $mappingID,
+    ));
 
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(0, 30);
 
@@ -221,10 +228,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $recipientListingOptions = array();
 
     if ($mappingID) {
-      $recipient = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping',
-        $mappingID,
-        'entity_recipient'
-      );
+      $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+        'id' => $mappingID,
+      )));
+      $recipient = $mapping->entity_recipient;
     }
 
     $limitOptions = array('' => '-neither-', 1 => ts('Limit to'), 0 => ts('Also include'));

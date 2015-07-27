@@ -192,6 +192,11 @@ class Container {
       array()
     ))->addTag('kernel.event_subscriber');
 
+    $container->setDefinition('actionscheduletmp', new Definition(
+      'CRM_Core_ActionScheduleTmp',
+      array()
+    ))->addTag('kernel.event_subscriber');
+
     \CRM_Utils_Hook::container($container);
 
     return $container;
