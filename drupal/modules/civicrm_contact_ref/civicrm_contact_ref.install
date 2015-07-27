@@ -1,0 +1,22 @@
+<?php
+
+/*
+ * Implemenation of hook_enable()
+ */
+function civicrm_contact_ref_enable() {
+  db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_contact_ref'");
+}
+
+/*
+ * Implemenation of hook_field_schema()
+ */
+function civicrm_contact_ref_field_schema($field) {
+  return array(
+    'columns' =>
+    array(
+      'contact_id' => array('type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      )),
+  );
+}

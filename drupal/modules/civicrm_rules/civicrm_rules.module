@@ -1,0 +1,220 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
+ */
+
+/*
+ * Implemenation of hook_enable()
+ */
+function civicrm_rules_enable() {
+  db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_rules'");
+}
+
+/**
+ * Implement the post hook and fire the corresponding rules event
+ */
+function civicrm_rules_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  if (!module_exists('rules')) {
+    return;
+  }
+
+  if (in_array($objectName,
+      array('Individual', 'Household', 'Organization')
+    )) {
+    $objectName = 'Contact';
+  }
+
+  // process only contacts for now
+  $validObjects = array_merge(
+    variable_get('civicrm_rules_post_entities', array()),
+    array('contact' => 'contact')
+  );
+
+  if (!in_array(strtolower($objectName), $validObjects, true)) {
+    return;
+  }
+
+  $eventObject = strtolower($objectName);
+  if (!in_array($eventObject, $validObjects) &&
+    !in_array($eventObject, array('contact'))
+  ) {
+    return;
+  }
+
+  if ($eventObject != 'contact') {
+    // without the civicrm prefix too much chance of another drupal module being enabled
+    $eventObject = 'civicrm_' . $eventObject;
+  }
+
+  $eventName = NULL;
+  switch ($op) {
+    case 'create':
+    case 'edit':
+    case 'delete':
+      $eventName = "{$eventObject}_{$op}";
+      break;
+
+    default:
+      break;
+  }
+
+  if ($eventName) {
+    rules_invoke_event($eventName, $objectRef);
+  }
+}
+
+/**
+ * Implement civicrm pageRun hook and fire the corresponding rules event
+ */
+function civicrm_rules_civicrm_pageRun(&$page) {
+  if (!module_exists('rules')) {
+    return;
+  }
+
+  // process only contacts for now
+  $validObjects = array('CRM_Contact_Page_View_Summary');
+
+  $className = get_class($page);
+  if (!in_array($className, $validObjects)) {
+    return;
+  }
+
+  $eventName = NULL;
+  switch ($className) {
+    case 'CRM_Contact_Page_View_Summary':
+      $eventName = 'contact_view';
+      break;
+
+    default:
+      break;
+  }
+
+  if ($eventName) {
+    rules_invoke_event($eventName, $page);
+  }
+}
+
+/**
+ * Implement the postProcess hook and fire the corresponding rules event
+ * We'll do this for specific forms only (for now)
+ */
+function civicrm_rules_civicrm_postProcess($formName, &$form) {
+  require_once 'CRM/Mailing/Info.php';
+  if (CRM_Mailing_Info::workflowEnabled()) {
+    $eventName = $eventParams = NULL;
+
+    switch ($formName) {
+      case 'CRM_Mailing_Form_Group':
+        if ($form->get('continue') == TRUE) {
+          $eventName = 'mailing_edit';
+          $mailingId = $form->get('mid');
+        }
+        else {
+          $query = "
+SELECT max(id)
+FROM   civicrm_mailing
+";
+          $mailingId = CRM_Core_DAO::singleValueQuery($query);
+          $eventName = 'mailing_create';
+        }
+        break;
+
+      case 'CRM_Mailing_Form_Schedule':
+        if ($form->get('mid')) {
+          $mailingId = $form->get('mid');
+        }
+        else {
+          $mailingId = $form->_mailingID;
+        }
+        $eventName = 'mailing_scheduled';
+        break;
+
+      case 'CRM_Mailing_Form_Approve':
+        if ($form->_mailingID) {
+          $mailingId = $form->_mailingID;
+        }
+        else {
+          $mailingId = $form->get('mid');
+        }
+        $eventName = 'mailing_approved';
+        break;
+
+      case 'CRM_Mailing_Form_Upload':
+        $eventName = 'mailing_uploaded';
+        $mailingId = $form->_mailingID;
+        break;
+
+      case 'CRM_Mailing_Form_Test':
+        $eventName = 'mailing_inform';
+        $mailingId = $form->get('mailing_id') ? $form->get('mailing_id') : $form->get('mid');
+        break;
+
+      default:
+        break;
+    }
+
+    if ($eventName) {
+      require_once 'CRM/Mailing/DAO/Mailing.php';
+      $eventParams = new CRM_Mailing_DAO_Mailing();
+      $eventParams->id = $mailingId;
+      $eventParams->find(TRUE);
+      rules_invoke_event($eventName, $eventParams);
+    }
+  }
+}
+/**
+ * Implementation of hook_permission().
+ */
+function civicrm_rules_permission() {
+  return array(
+    'access civicrm rules settings' =>
+    array('title' => t('Access CiviCRM Rules Settings'),
+      'description' => t('Access CiviCRM Rules Settings.'),
+    ),
+  );
+}
+
+function civicrm_rules_menu() {
+
+  $items['admin/config/civicrm/rules'] = array(
+    'title' => t('CiviCRM Rules settings'),
+    'description' => t('CiviCRM Rules Configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('civicrm_rules_admin_settings'),
+    'access arguments' => array('access civicrm rules settings'),
+    'file' => 'civicrm_rules_admin_form.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+

@@ -1,0 +1,12 @@
+{* Help for Export - select options form *}
+
+{htxt id="id-export_merge_options-title"}
+  {ts}Merge Options{/ts}
+{/htxt}
+{htxt id="id-export_merge_options"}
+<p>{ts}Use one of the merge contact options when exporting records to reduce your mailing size by sending a single piece of mail to each address.{/ts}</p>
+
+<p>{ts}Merge Contacts with the Same Address will combine any records having the same address (street address, city, postal code, country) into a single record. If a household record already exists in which multiple individuals share an address, the household will be exported as the combined record. If no household record exists, the records will be combined and the Addressee field will list the contact names, comma-separated.{/ts}</p>
+
+<p>{ts}Merge Household Members into their Households will export the household record for any contacts sharing a household address.{/ts}</p>
+{/htxt}

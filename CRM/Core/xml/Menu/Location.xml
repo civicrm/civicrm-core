@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/ajax/jqState</path>
+     <page_callback>CRM_Core_Page_AJAX_Location::jqState</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+  </item>
+  <item>
+     <path>civicrm/ajax/jqCounty</path>
+     <page_callback>CRM_Core_Page_AJAX_Location::jqCounty</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+  </item>
+</menu>

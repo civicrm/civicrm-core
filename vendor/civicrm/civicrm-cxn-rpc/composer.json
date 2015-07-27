@@ -1,0 +1,23 @@
+{
+    "name": "civicrm/civicrm-cxn-rpc",
+    "description": "RPC library for CiviConnect",
+    "require": {
+        "psr/log": "1.0.0",
+        "phpseclib/phpseclib": "0.3.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Civi\\Cxn\\Rpc\\": "src/"
+         }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tim Otten",
+            "email": "totten@civicrm.org"
+        }
+    ]
+}

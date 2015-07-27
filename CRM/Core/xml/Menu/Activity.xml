@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/activity</path>
+     <title>New Activity</title>
+     <page_callback>CRM_Activity_Form_Activity</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <page_arguments>attachUpload=1</page_arguments>
+     <path_arguments>action=add&amp;context=standalone</path_arguments>
+  </item>
+  <item>
+     <path>civicrm/activity/view</path>
+     <title>View Activity</title>
+     <page_callback>CRM_Activity_Form_ActivityView</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/activity</path>
+     <page_callback>CRM_Activity_Page_AJAX::getCaseActivity</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/globalrelationships</path>
+     <page_callback>CRM_Activity_Page_AJAX::getCaseGlobalRelationships</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+   </item>
+  <item>
+     <path>civicrm/ajax/clientrelationships</path>
+     <page_callback>CRM_Activity_Page_AJAX::getCaseClientRelationships</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+   </item>
+   <item>
+     <path>civicrm/ajax/caseroles</path>
+     <page_callback>CRM_Activity_Page_AJAX::getCaseRoles</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+   </item>
+   <item>
+     <path>civicrm/ajax/contactactivity</path>
+     <page_callback>CRM_Activity_Page_AJAX::getContactActivity</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/ajax/activity/convert</path>
+     <page_callback>CRM_Activity_Page_AJAX::convertToCaseActivity</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <page_type>3</page_type>
+  </item>
+  <item>
+     <path>civicrm/activity/search</path>
+     <title>Find Activities</title>
+     <page_callback>CRM_Activity_Controller_Search</page_callback>
+  </item>
+</menu>

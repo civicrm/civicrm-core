@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/profile</path>
+     <access_callback>1</access_callback>
+     <page_callback>CRM_Profile_Page_Router</page_callback>
+     <is_public>true</is_public>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/profile/create</path>
+     <title>CiviCRM Profile Create</title>
+     <access_callback>1</access_callback>
+     <page_callback>CRM_Profile_Page_Router</page_callback>
+     <is_public>true</is_public>
+     <weight>0</weight>
+  </item>
+  <item>
+     <path>civicrm/profile/view</path>
+     <page_callback>CRM_Profile_Page_View</page_callback>
+     <is_public>true</is_public>
+  </item>
+</menu>

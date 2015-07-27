@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CaseType>
+  <name>Gender Issues</name>
+  <ActivityTypes>
+    <ActivityType>
+      <name>Open Case</name>
+      <max_instances>1</max_instances>
+    </ActivityType>
+  <ActivityType>
+      <name>Change Case Type</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Status</name>
+    </ActivityType>
+  <ActivityType>
+      <name>Follow up</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Source(incoming)</name>
+     </ActivityType>
+    <ActivityType>
+      <name>Incoming correspondence</name>
+     </ActivityType>
+    <ActivityType>
+      <name>Incoming Press Release</name>
+     </ActivityType>
+    <ActivityType>
+      <name>Complaint</name>
+     </ActivityType>
+    <ActivityType>
+      <name>Urgent Action(incoming)</name>
+     </ActivityType>
+    <ActivityType>
+      <name>Outgoing correspondence</name>
+     </ActivityType>
+    <ActivityType>
+      <name>Outgoing Press Release</name>
+     </ActivityType>
+    <ActivityType>
+      <name>FL Action(outgoing)</name>
+     </ActivityType>
+    <ActivityType>
+      <name>FL Urgent Action(outgoing)</name>
+     </ActivityType>
+    <ActivityType>
+      <name>Lobbying(outgoing)</name>
+    </ActivityType>
+  </ActivityTypes>
+  <ActivitySets>
+    <ActivitySet>
+      <name>standard_timeline</name>
+      <label>Standard Timeline</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>Open Case</name>
+          <status>Closed</status>
+        </ActivityType>
+        <ActivityType>
+          <name>Source(incoming)</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>2</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+    <ActivityType>
+          <name>Follow up</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>14</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+  </ActivitySets>
+  <CaseRoles>
+    <RelationshipType>
+        <name>Case Coordinator</name>
+        <creator>1</creator>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Supervisor</name>
+    </RelationshipType>
+  </CaseRoles>
+</CaseType>

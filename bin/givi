@@ -1,0 +1,781 @@
+#!/usr/bin/env php
+<?php
+
+// This is the minimalist denialist implementation that doesn't check it's
+// pre-conditions and will screw up if you don't know what you're doing.
+
+/**
+ * Manage the current working directory as a stack.
+ */
+class DirStack {
+  protected $dirs;
+
+  /**
+   * @param array $dirs
+   */
+  function __construct($dirs = array()) {
+    $this->dirs = $dirs;
+  }
+
+  /**
+   * @param $dir
+   *
+   * @throws Exception
+   */
+  function push($dir) {
+    $this->dirs[] = getcwd();
+    if (!chdir($dir)) {
+      throw new Exception("Failed to chdir($dir)");
+    }
+  }
+
+  function pop() {
+    $oldDir = array_pop($this->dirs);
+    chdir($oldDir);
+  }
+}
+
+/**
+ * FIXME: Why am I doing this? Can't we get a proper build-system for little
+ * CLI tools -- and then use prepackaged libraries?
+ */
+class PullRequest {
+
+  /**
+   * Given a link to a pull-request, determine which local repo
+   * it applies to and fetch any metadata.
+   *
+   * @param string $url
+   * @param array $repos list of locally known repos
+   * @return PullRequest|NULL
+   */
+  public static function get($url, $repos) {
+    foreach ($repos as $repo => $relPath) {
+      if (preg_match("/^https:\/\/github.com\/(.*)\/(civicrm-{$repo})\/pull\/([0-9]+)(|\/commits|\/files)$/", $url, $matches)) {
+        list ($full, $githubUser, $githubRepo, $githubPr) = $matches;
+
+        $pr = new PullRequest();
+        $pr->repo = $repo;
+        $pr->data = HttpClient::getJson("https://api.github.com/repos/$githubUser/$githubRepo/pulls/$githubPr");
+        if (empty($pr->data)) {
+          return NULL;
+        }
+
+        return $pr;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * @var string local repo name e.g. "core", "drupal"
+   */
+  public $repo;
+
+  protected $data;
+
+  /**
+   * @return mixed
+   */
+  public function getNumber() {
+    return $this->data->number;
+  }
+
+  /**
+   * @return string name of the branch on the requestor's repo
+   */
+  public function getRequestorBranch() {
+    return $this->data->head->ref;
+  }
+
+  /**
+   * @return string URL of the requestor's repo
+   */
+  public function getRequestorRepoUrl() {
+    return $this->data->head->repo->git_url;
+  }
+}
+
+/**
+ * Class Givi
+ */
+class Givi {
+
+  /**
+   * @var string 'checkout', 'begin', 'help', etc
+   */
+  protected $action;
+
+  /**
+   * @var string
+   */
+  protected $baseBranch;
+
+  /**
+   * @var array ($repoName => $gitRef)
+   */
+  protected $branches;
+
+  /**
+   * @var string
+   */
+  protected $civiRoot = '.';
+
+  /**
+   * @var int
+   */
+  protected $drupalVersion = 7;
+
+  /**
+   * @var bool
+   */
+  protected $dryRun = FALSE;
+
+  /**
+   * @var bool
+   */
+  protected $fetch = FALSE;
+
+  /**
+   * @var bool
+   */
+  protected $force = FALSE;
+
+  /**
+   * @var bool
+   */
+  protected $rebase = FALSE;
+
+  /**
+   * @var string, the word 'all' or comma-delimited list of repo names
+   */
+  protected $repoFilter = 'all';
+
+  /**
+   * @var array ($repoName => $relPath)
+   */
+  protected $repos;
+
+  /**
+   * @var bool
+   */
+  protected $useGencode = FALSE;
+
+  /**
+   * @var bool
+   */
+  protected $useSetup = FALSE;
+
+  /**
+   * @var array, non-hyphenated arguments after the basedir
+   */
+  protected $arguments;
+
+  /**
+   * @var string, the name of this program
+   */
+  protected $program;
+
+  /**
+   * @var DirStack
+   */
+  protected $dirStack;
+
+  /**
+   *
+   */
+  function __construct() {
+    $this->dirStack = new DirStack();
+    $this->repos = array(
+      'core' => '.',
+      'drupal' => 'drupal',
+      'joomla' => 'joomla',
+      'packages' => 'packages',
+      'wordpress' => 'WordPress',
+    );
+  }
+
+  /**
+   * @param $args
+   *
+   * @throws Exception
+   */
+  function main($args) {
+    if (!$this->parseOptions($args)) {
+      printf("Error parsing arguments\n");
+      $this->doHelp();
+      return FALSE;
+    }
+
+    // All operations relative to civiRoot
+    $this->dirStack->push($this->civiRoot);
+
+    // Filter branch list based on what repos actually exist
+    foreach (array_keys($this->repos) as $repo) {
+      if (!is_dir($this->repos[$repo])) {
+        unset($this->repos[$repo]);
+      }
+    }
+    if (!isset($this->repos['core']) || !isset($this->repos['packages'])) {
+      return $this->returnError("Root appears to be invalid -- missing too many repos. Try --root=<dir>\n");
+    }
+
+    $this->repos = $this->filterRepos($this->repoFilter, $this->repos);
+
+    // Run the action
+    switch ($this->action) {
+      case 'checkout':
+        call_user_func_array(array($this, 'doCheckoutAll'), $this->arguments);
+        break;
+      case 'fetch':
+        call_user_func_array(array($this, 'doFetchAll'), $this->arguments);
+        break;
+      case 'status':
+        call_user_func_array(array($this, 'doStatusAll'), $this->arguments);
+        break;
+      case 'begin':
+        call_user_func_array(array($this, 'doBegin'), $this->arguments);
+        break;
+      case 'resume':
+        call_user_func_array(array($this, 'doResume'), $this->arguments);
+        break;
+      case 'review':
+        call_user_func_array(array($this, 'doReview'), $this->arguments);
+        break;
+      //case 'merge-forward':
+      //  call_user_func_array(array($this, 'doMergeForward'), $this->arguments);
+      //  break;
+      case 'push':
+        call_user_func_array(array($this, 'doPush'), $this->arguments);
+        break;
+      case 'help':
+      case '':
+        $this->doHelp();
+        break;
+      default:
+        return $this->returnError("unrecognized action: {$this->action}\n");
+    }
+
+    if ($this->useSetup) {
+      $this->run('core', $this->civiRoot . '/bin', 'bash', 'setup.sh');
+    }
+    elseif ($this->useGencode) {
+      $this->run('core', $this->civiRoot . '/xml', 'php', 'GenCode.php');
+    }
+
+    $this->dirStack->pop();
+  }
+
+  /**
+   * @param $args
+   * @return bool
+   */
+  function parseOptions($args) {
+    $this->branches = array();
+    $this->arguments = array();
+
+    foreach ($args as $arg) {
+      if ($arg == '--fetch') {
+        $this->fetch = TRUE;
+      }
+      elseif ($arg == '--rebase') {
+        $this->rebase = TRUE;
+      }
+      elseif ($arg == '--dry-run' || $arg == '-n') {
+        $this->dryRun = TRUE;
+      }
+      elseif ($arg == '--force' || $arg == '-f') {
+        $this->force = TRUE;
+      }
+      elseif ($arg == '--gencode') {
+        $this->useGencode = TRUE;
+      }
+      elseif ($arg == '--setup') {
+        $this->useSetup = TRUE;
+      }
+      elseif (preg_match('/^--d([678])/', $arg, $matches)) {
+        $this->drupalVersion = $matches[1];
+      }
+      elseif (preg_match('/^--root=(.*)/', $arg, $matches)) {
+        $this->civiRoot = $matches[1];
+      }
+      elseif (preg_match('/^--repos=(.*)/', $arg, $matches)) {
+        $this->repoFilter = $matches[1];
+      }
+      elseif (preg_match('/^--(core|packages|joomla|drupal|wordpress)=(.*)/', $arg, $matches)) {
+        $this->branches[$matches[1]] = $matches[2];
+      }
+      elseif (preg_match('/^-/', $arg)) {
+        printf("unrecognized argument: %s\n", $arg);
+        return FALSE;
+      }
+      else {
+        $this->arguments[] = $arg;
+      }
+    }
+
+    $this->program = @array_shift($this->arguments);
+    $this->action = @array_shift($this->arguments);
+
+    return TRUE;
+  }
+
+  function doHelp() {
+    $program = basename($this->program);
+    echo "Givi - Coordinate git checkouts across CiviCRM repositories\n";
+    echo "Scenario:\n";
+    echo "  You have cloned and forked the CiviCRM repos. Each of the repos has two\n";
+    echo "  remotes (origin + upstream). When working on a new PR, you generally want\n";
+    echo "  to checkout official code (eg upstream/master) in all repos, but 1-2 repos\n";
+    echo "  should use a custom branch (which tracks upstream/master).\n";
+    echo "Usage:\n";
+    echo "  $program [options] checkout <branch>\n";
+    echo "  $program [options] fetch\n";
+    echo "  $program [options] status\n";
+    echo "  $program [options] begin <base-branch> [--core=<new-branch>|--drupal=<new-branch>|...] \n";
+    echo "  $program [options] resume [--rebase] <base-branch> [--core=<custom-branch>|--drupal=<custom-branch>|...] \n";
+    echo "  $program [options] review <base-branch> <pr-url-1> <pr-url-2>...\n";
+    #echo "  $program [options] merge-forward <maintenace-branch> <development-branch>\n";
+    #echo "  $program [options] push <remote> <branch>[:<branch>]\n";
+    echo "Actions:\n";
+    echo "  checkout: Checkout same branch name on all repos\n";
+    echo "  fetch: Fetch remote changes on all repos\n";
+    echo "  status: Display status on all repos\n";
+    echo "  begin: Begin work on a new branch on some repo (and use base-branch for all others)\n";
+    echo "  resume: Resume work on an existing branch on some repo (and use base-branch for all others)\n";
+    echo "  review: Test work provided by someone else's pull-request. (If each repo has related PRs, then you can link to each of them.)\n";
+    #echo "  merge-forward: On each repo, merge changes from maintenance branch to development branch\n";
+    #echo "  push: On each repo, push a branch to a remote (Note: only intended for use with merge-forward)\n";
+    echo "Common options:\n";
+    echo "  --dry-run: Don't do anything; only print commands that would be run\n";
+    echo "  --d6: Specify that Drupal branches should use 6.x-* prefixes\n";
+    echo "  --d7: Specify that Drupal branches should use 7.x-* prefixes (default)\n";
+    echo "  -f: When switching branches, proceed even if the index or the working tree differs from HEAD. This is used to throw away local changes.\n";
+    echo "  --fetch: Fetch the latest code before creating, updating, or checking-out anything\n";
+    echo "  --repos=X: Restrict operations to the listed repos (comma-delimited list) (default: all)";
+    echo "  --root=X: Specify CiviCRM root directory (default: .)\n";
+    echo "  --gencode: Run xml/GenCode after checking out code\n";
+    echo "  --setup: Run bin/setup.sh (incl xml/GenCode) after checking out code\n";
+    echo "Special options:\n";
+    echo "  --core=X: Specify the branch to use on the core repository\n";
+    echo "  --packages=X: Specify the branch to use on the packages repository\n";
+    echo "  --drupal=X: Specify the branch to use on the drupal repository\n";
+    echo "  --joomla=X: Specify the branch to use on the joomla repository\n";
+    echo "  --wordpress=X: Specify the branch to use on the wordpress repository\n";
+    echo "  --rebase: Perform a rebase before starting work\n";
+    echo "Known repositories:\n";
+    foreach ($this->repos as $repo => $relPath) {
+      printf("  %-12s: %s\n", $repo, realpath($this->civiRoot . DIRECTORY_SEPARATOR . $relPath));
+    }
+    echo "When using 'begin' or 'resume' with a remote base-branch, most repositories\n";
+    echo "will have a detached HEAD. Only repos with an explicit branch will be real,\n";
+    echo "local branches.\n";
+  }
+
+  /**
+   * @param null $baseBranch
+   *
+   * @return bool
+   */
+  function doCheckoutAll($baseBranch = NULL) {
+    if (!$baseBranch) {
+      return $this->returnError("Missing <branch>\n");
+    }
+    $branches = $this->resolveBranches($baseBranch, $this->branches);
+    if ($this->fetch) {
+      $this->doFetchAll();
+    }
+
+    foreach ($this->repos as $repo => $relPath) {
+      $filteredBranch = $this->filterBranchName($repo, $branches[$repo]);
+      $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch, $this->force ? '-f' : NULL);
+    }
+    return TRUE;
+  }
+
+  /**
+   * @return bool
+   */
+  function doStatusAll() {
+    foreach ($this->repos as $repo => $relPath) {
+      $this->run($repo, $relPath, 'git', 'status');
+    }
+    return TRUE;
+  }
+
+  /**
+   * @param null $baseBranch
+   *
+   * @return bool
+   */
+  function doBegin($baseBranch = NULL) {
+    if (!$baseBranch) {
+      return $this->returnError("Missing <base-branch>\n");
+    }
+    if (empty($this->branches)) {
+      return $this->returnError("Must specify a custom branch for at least one repository.\n");
+    }
+    $branches = $this->resolveBranches($baseBranch, $this->branches);
+    if ($this->fetch) {
+      $this->doFetchAll();
+    }
+
+    foreach ($this->repos as $repo => $relPath) {
+      $filteredBranch = $this->filterBranchName($repo, $branches[$repo]);
+      $filteredBaseBranch = $this->filterBranchName($repo, $baseBranch);
+
+      if ($filteredBranch == $filteredBaseBranch) {
+        $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch, $this->force ? '-f' : NULL);
+      }
+      else {
+        $this->run($repo, $relPath, 'git', 'checkout', '-b', $filteredBranch, $filteredBaseBranch, $this->force ? '-f' : NULL);
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * @param null $baseBranch
+   *
+   * @return bool
+   * @throws Exception
+   */
+  function doResume($baseBranch = NULL) {
+    if (!$baseBranch) {
+      return $this->returnError("Missing <base-branch>\n");
+    }
+    if (empty($this->branches)) {
+      return $this->returnError("Must specify a custom branch for at least one repository.\n");
+    }
+    $branches = $this->resolveBranches($baseBranch, $this->branches);
+    if ($this->fetch) {
+      $this->doFetchAll();
+    }
+
+    foreach ($this->repos as $repo => $relPath) {
+      $filteredBranch = $this->filterBranchName($repo, $branches[$repo]);
+      $filteredBaseBranch = $this->filterBranchName($repo, $baseBranch);
+
+      $this->run($repo, $relPath, 'git', 'checkout', $filteredBranch, $this->force ? '-f' : NULL);
+      if ($filteredBranch != $filteredBaseBranch && $this->rebase) {
+        list ($baseRemoteRepo, $baseRemoteBranch) = $this->parseBranchRepo($filteredBaseBranch);
+        $this->run($repo, $relPath, 'git', 'pull', '--rebase', $baseRemoteRepo, $baseRemoteBranch);
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * @param null $baseBranch
+   *
+   * @return bool
+   */
+  function doReview($baseBranch = NULL) {
+    if (!$this->doCheckoutAll($baseBranch)) {
+      return FALSE;
+    }
+
+    $args = func_get_args();
+    array_shift($args); // $baseBranch
+
+    $pullRequests = array();
+    foreach ($args as $prUrl) {
+      $pullRequest = PullRequest::get($prUrl, $this->repos);
+      if ($pullRequest) {
+        $pullRequests[] = $pullRequest;
+      }
+      else {
+        return $this->returnError("Invalid pull-request URL: $prUrl");
+      }
+    }
+
+    foreach ($pullRequests as $pullRequest) {
+      $repo = $pullRequest->repo;
+      $branchName = 'pull-request-' . $pullRequest->getNumber();
+      if ($this->hasLocalBranch($repo, $branchName)) {
+        $this->run($repo, $this->repos[$repo], 'git', 'branch', '-D', $branchName);
+      }
+      $this->run($repo, $this->repos[$repo], 'git', 'checkout', '-b', $branchName); ## based on whatever was chosen by doCheckoutAll()
+      $this->run($repo, $this->repos[$repo], 'git', 'pull', $pullRequest->getRequestorRepoUrl(), $pullRequest->getRequestorBranch());
+    }
+
+    return TRUE;
+  }
+
+  /*
+
+  If we want merge-forward changes to be subject to PR process, then this
+  should useful.  Currently using a simpler process based on
+  toosl/scripts/merge-forward
+
+  function doMergeForward($maintBranch, $devBranch) {
+    if (!$maintBranch) {
+      return $this->returnError("Missing <maintenace-base-branch>\n");
+    }
+    if (!$devBranch) {
+      return $this->returnError("Missing <development-base-branch>\n");
+    }
+    list ($maintBranchRepo, $maintBranchName) = $this->parseBranchRepo($maintBranch);
+    list ($devBranchRepo, $devBranchName) = $this->parseBranchRepo($devBranch);
+
+    $newBranchRepo = $devBranchRepo;
+    $newBranchName = $maintBranchName . '-' . $devBranchName . '-' . date('Y-m-d-H-i-s');
+
+    if ($this->fetch) {
+      $this->doFetchAll();
+    }
+
+    foreach ($this->repos as $repo => $relPath) {
+      $filteredMaintBranch = $this->filterBranchName($repo, $maintBranch);
+      $filteredDevBranch = $this->filterBranchName($repo, $devBranch);
+      $filteredNewBranchName = $this->filterBranchName($repo, $newBranchName);
+
+      $this->run($repo, $relPath, 'git', 'checkout', '-b', $filteredNewBranchName, $filteredDevBranch);
+      $this->run($repo, $relPath, 'git', 'merge', $filteredMaintBranch);
+    }
+  }
+  */
+
+  /**
+   * @param $newBranchRepo
+   * @param $newBranchNames
+   *
+   * @return bool
+   */
+  function doPush($newBranchRepo, $newBranchNames) {
+    if (!$newBranchRepo) {
+      return $this->returnError("Missing <remote>\n");
+    }
+    if (!$newBranchNames) {
+      return $this->returnError("Missing <branch>[:<branch>]\n");
+    }
+    if (FALSE !== strpos($newBranchNames, ':')) {
+      list ($newBranchFromName, $newBranchToName) = explode(':', $newBranchNames);
+      foreach ($this->repos as $repo => $relPath) {
+        $filteredFromName = $this->filterBranchName($repo, $newBranchFromName);
+        $filteredToName = $this->filterBranchName($repo, $newBranchToName);
+
+        $this->run($repo, $relPath, 'git', 'push', $newBranchRepo, $filteredFromName . ':' . $filteredToName);
+      }
+    }
+    else {
+      foreach ($this->repos as $repo => $relPath) {
+        $filteredName = $this->filterBranchName($repo, $newBranchNames);
+        $this->run($repo, $relPath, 'git', 'push', $newBranchRepo, $filteredName);
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Determine if a branch exists locally
+   *
+   * @param string $repo
+   * @param string $name branch name
+   * @return bool
+   */
+  function hasLocalBranch($repo, $name) {
+    $path = $this->repos[$repo] . '/.git/refs/heads/' . $name;
+    return file_exists($path);
+  }
+
+  /**
+   * Given a ref name, determine the repo and branch
+   *
+   * FIXME: only supports $refs like "foo" (implicit origin) or "myremote/foo"
+   *
+   * @param $ref
+   * @param string $defaultRemote
+   *
+   * @throws Exception
+   * @return array
+   */
+  function parseBranchRepo($ref, $defaultRemote = 'origin') {
+    $parts = explode('/', $ref);
+    if (count($parts) == 1) {
+      return array($defaultRemote, $parts[1]);
+    }
+    elseif (count($parts) == 2) {
+      return $parts;
+    }
+    else {
+      throw new Exception("Failed to parse branch name ($ref)");
+    }
+  }
+
+  /**
+   * Run a command
+   *
+   * Any items after $command will be escaped and added to $command
+   *
+   * @param $repoName
+   * @param string $runDir
+   * @param string $command
+   *
+   * @return string
+   */
+  function run($repoName, $runDir, $command) {
+    $this->dirStack->push($runDir);
+
+    $args = func_get_args();
+    array_shift($args);
+    array_shift($args);
+    array_shift($args);
+    foreach ($args as $arg) {
+      if ($arg !== NULL) {
+        $command .= ' ' . escapeshellarg($arg);
+      }
+    }
+    printf("\n\n\nRUN [%s]: %s\n", $repoName, $command);
+    if ($this->dryRun) {
+      $r = NULL;
+    }
+    else {
+      $r = system($command);
+    }
+
+    $this->dirStack->pop();
+    return $r;
+  }
+
+  function doFetchAll() {
+    foreach ($this->repos as $repo => $relPath) {
+      $this->run($repo, $relPath, 'git', 'fetch', '--all');
+    }
+  }
+
+  /**
+   * @param string $default branch to use by default
+   * @param $overrides
+   *
+   * @return array ($repoName => $gitRef)
+   */
+  function resolveBranches($default, $overrides) {
+    $branches = $overrides;
+    foreach ($this->repos as $repo => $relPath) {
+      if (!isset($branches[$repo])) {
+        $branches[$repo] = $default;
+      }
+    }
+    return $branches;
+  }
+
+  /**
+   * @param $repoName
+   * @param $branchName
+   *
+   * @return string
+   */
+  function filterBranchName($repoName, $branchName) {
+    if ($branchName == '') {
+      return '';
+    }
+    if ($repoName == 'drupal') {
+      $parts = explode('/', $branchName);
+      $last = $this->drupalVersion . '.x-' . array_pop($parts);
+      array_push($parts, $last);
+      return implode('/', $parts);
+    }
+    return $branchName;
+  }
+
+  /**
+   * @param string $filter e.g. "all" or "repo1,repo2"
+   * @param array $repos ($repoName => $repoDir)
+   *
+   * @throws Exception
+   * @return array ($repoName => $repoDir)
+   */
+  function filterRepos($filter, $repos) {
+    if ($filter == 'all') {
+      return $repos;
+    }
+
+    $inclRepos = explode(',', $filter);
+    $unknowns = array_diff($inclRepos, array_keys($repos));
+    if (!empty($unknowns)) {
+      throw new Exception("Unknown Repos: " . implode(',', $unknowns));
+    }
+    $unwanted = array_diff(array_keys($repos), $inclRepos);
+    foreach ($unwanted as $repo) {
+      unset($repos[$repo]);
+    }
+    return $repos;
+  }
+
+  /**
+   * @param $message
+   *
+   * @return bool
+   */
+  function returnError($message) {
+    echo "\nERROR: ", $message, "\n\n";
+    $this->doHelp();
+    return FALSE;
+  }
+}
+
+/**
+ * Class HttpClient
+ */
+class HttpClient {
+  /**
+   * @param $url
+   * @param $file
+   *
+   * @return bool
+   */
+  static function download($url, $file) {
+    // PHP native client is unreliable PITA for HTTPS
+    if (exec("which wget")) {
+      self::run('wget', '-q', '-O', $file, $url);
+    }
+    elseif (exec("which curl")) {
+      self::run('curl', '-o', $file, $url);
+    }
+
+    // FIXME: really detect errors
+    return TRUE;
+  }
+
+  /**
+   * @param $url
+   *
+   * @return mixed
+   */
+  static function getJson($url) {
+    $file = tempnam(sys_get_temp_dir(), 'givi-json-');
+    HttpClient::download($url, $file);
+    $data = json_decode(file_get_contents($file));
+    unlink($file);
+    return $data;
+  }
+
+  /**
+   * Run a command
+   *
+   * Any items after $command will be escaped and added to $command
+   *
+   * @param string $command
+   *
+   * @internal param string $runDir
+   * @return string
+   */
+  static function run($command) {
+    $args = func_get_args();
+    array_shift($args);
+    foreach ($args as $arg) {
+      $command .= ' ' . escapeshellarg($arg);
+    }
+    printf("\n\n\nRUN: %s\n", $command);
+    $r = system($command);
+
+    return $r;
+  }
+}
+
+$givi = new Givi();
+$givi->main($argv);

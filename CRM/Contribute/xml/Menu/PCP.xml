@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/admin/pcp</path>
+     <title>Personal Campaign Pages</title>
+     <page_callback>CRM_PCP_Page_PCP</page_callback>
+     <path_arguments>context=contribute</path_arguments>
+     <desc>View and manage existing personal campaign pages.</desc>
+     <adminGroup>CiviContribute</adminGroup>
+     <icon>admin/small/contribution_types.png</icon>
+     <weight>362</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/contribute/pcp</path>
+     <title>Personal Campaign Pages</title>
+     <page_callback>CRM_PCP_Form_Contribute</page_callback>
+     <weight>450</weight>
+  </item>
+  <item>
+     <path>civicrm/contribute/campaign</path>
+     <title>Setup a Personal Campaign Page - Account Information</title>
+     <page_callback>CRM_PCP_Controller_PCP</page_callback>
+     <access_arguments>make online contributions</access_arguments>
+     <is_public>true</is_public>
+     <weight>0</weight>
+  </item>
+</menu>

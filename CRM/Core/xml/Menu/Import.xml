@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+     <path>civicrm/import</path>
+     <title>Import</title>
+     <access_arguments>import contacts,access CiviCRM</access_arguments>
+     <page_type>1</page_type>
+     <page_callback>CRM_Contact_Import_Controller</page_callback>
+     <weight>400</weight>
+  </item>
+  <item>
+     <path>civicrm/import/contact</path>
+     <title>Import Contacts</title>
+     <access_arguments>import contacts,access CiviCRM</access_arguments>
+     <page_type>1</page_type>
+     <page_callback>CRM_Contact_Import_Controller</page_callback>
+     <weight>410</weight>
+  </item>
+  <item>
+     <path>civicrm/import/activity</path>
+     <title>Import Activities</title>
+     <access_arguments>import contacts,access CiviCRM</access_arguments>
+     <page_type>1</page_type>
+     <page_callback>CRM_Activity_Import_Controller</page_callback>
+     <weight>420</weight>
+  </item>
+  <item>
+     <path>civicrm/import/custom</path>
+     <path_arguments>id=%%id%%</path_arguments>
+     <title>Import Multi-value Custom Data</title>
+     <access_arguments>access CiviCRM</access_arguments>
+     <page_type>1</page_type>
+     <page_callback>CRM_Custom_Import_Controller</page_callback>
+     <weight>420</weight>
+  </item>
+  <item>
+    <path>civicrm/ajax/status</path>
+    <page_callback>CRM_Contact_Import_Page_AJAX::status</page_callback>
+    <access_arguments>import contacts,access CiviCRM</access_arguments>
+  </item>
+</menu>

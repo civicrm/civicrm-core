@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+		<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
+		<script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+
+		<script src="dialog-service.js"></script>
+		<script src="app.js"></script>
+	</head>
+
+	<body ng-app="dialogApp">
+
+		<h1>Angular jQuery Dialog Service</h1>
+
+		<p>
+			The buttons below use the dialog service to display
+			a modal dialog. One button demonstrates using a
+			template in a script block and the other retrieving
+			the template using an http request to the server.
+		</p>
+
+		<!--
+			The button that displays the dialog when pressed
+		-->
+		<p ng-controller="buttonCtrl">
+			<button ng-click="openFromScriptClick()">Open</button>
+			Pressing this button will launch the modal dialog
+			using a template stored in a script tag in the
+			page.
+		</p>
+
+		<!--
+			The button that displays the dialog when pressed
+		-->
+		<p ng-controller="buttonCtrl">
+			<button ng-click="openFromUrlClick()">Open</button>
+			Pressing this button will launch the modal dialog
+			using a template retrieved using from the server
+			using the url specified as the template.
+		</p>
+
+
+		<!--
+			This is the template for the main dialog that is displayed. It uses the
+			dialogCtrl controller in app.js.
+		-->
+		<script type="text/ng-template" id="template-from-script.html">
+			<div ng-controller="dialogCtrl" title="From Script Block">
+
+				First Name<br>
+				<input type="text" ng-model="model.firstName" /><br>
+				Last Name<br>
+				<input type="text" ng-model="model.lastName" /><br>
+
+				<button ng-click="cancelClick()">Cancel</button>
+				<button ng-click="saveClick()">Save</button>
+				<button ng-click="confirmClick()">Confirm</button>
+			</div>
+		</script>
+
+
+
+		<!--
+			This is the template for the confirmation popup. It uses the confirmCtrl
+			controller in app.js.
+		-->
+		<script type="text/ng-template" id="confirmTemplate.html">
+			<div ng-controller="confirmCtrl">
+				Are you sure?
+				<button ng-click="confirmClick()">Yes</button>
+				<button ng-click="cancelClick()">No</button>
+			</div>
+		</script>
+
+
+
+	</body>
+
+</html>

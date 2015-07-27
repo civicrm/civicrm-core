@@ -1,0 +1,59 @@
+# Define the path for civicrm source directory here
+CIVISOURCEDIR=
+
+# define your schema file name here, will be overriden by
+# FIRST command line argument if given
+SCHEMA=schema/Schema.xml
+
+## define your database host and port here
+DBHOST=
+DBPORT=
+
+# define your database name here, will be overriden by
+# SECOND command line argument if given
+DBNAME=
+
+# define your database usernamename here, will be overriden by
+# THIRD command line argument if given
+DBUSER=
+
+# define your database password here, will be overriden by
+# FOURTH command line argument if given
+DBPASS=
+
+# any extra args you need in your mysql connect string
+# number of arguments should be specified within ""
+# FIFTH command line argument if given
+DBARGS=""
+
+# set your PHP5 bin dir path here, if it's not in PATH
+# The path should be terminated with dir separator!
+PHP5PATH=
+
+# Set a special DB load filename here for custom installs
+# If a filename is passed, civicrm_data.mysql AND the
+# passed file will be loaded instead of civicrm_generated.mysql.
+# The DBLOAD file must be in the sql directory.
+DBLOAD=
+
+# Set a special SQL filename here which you want to load
+# IN ADDITION TO either civicrm_generated or civicrm_data.
+# The DBADD file must be in the sql directory.
+# DBADD=
+
+# GenCode produces localized data files for all known
+# locales. This is good for stable-releases but
+# cumbersome during development. To speed it up,
+# list the desired locales.
+# export CIVICRM_LOCALES=en_US,fr_FR
+
+# GenCode produces some CMS-specific config files
+# If omitted, defaults to drupal.
+GENCODE_CMS=""
+# GENCODE_CMS=drupal
+# GENCODE_CMS=wordpress
+
+# GenCode is relatively slow; and, usually, it only needs
+# to run if the gencode files have changed. Set
+# this option to enable caching (and speed up setup.sh)
+# export CIVICRM_GENCODE_DIGEST=/tmp/gencode.md5

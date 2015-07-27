@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html class="no-js" ng-app="app">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Angular Unsaved Changes</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="../src/unsavedChanges.js"></script>
+        <script src="app.js"></script>
+    </head>
+    <body>
+        <a id="page1" href="#/page1">Page 1</a>
+        <a id="page2" href="#/page2">Page 2</a>
+        <div ng-view></div>
+    </body>
+</html>

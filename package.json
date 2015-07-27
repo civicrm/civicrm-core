@@ -1,0 +1,23 @@
+{
+  "description": "CiviCRM",
+  "main": "index.js",
+  "license": "MIT",
+  "name": "civicrm",
+  "version": "4.6.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/civicrm/civicrm-core.git"
+  },
+  "devDependencies": {
+    "bower": "^1.3.1",
+    "karma": "^0.12.16",
+    "karma-ng-html2js-preprocessor": "^0.1.2",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "jasmine-core": "~2.1.2",
+    "karma-jasmine": "~0.3.2"
+  },
+  "scripts": {
+    "postinstall": "bash tools/scripts/npm/postinstall.sh",
+    "test": "bash tools/scripts/npm/test.sh"
+  }
+}

@@ -1,0 +1,88 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
+ */
+function civicrm_install() {}
+
+/**
+ * Implementation of hook_uninstall( )
+ */
+function civicrm_uninstall() {
+  require_once 'civicrm.module';
+
+  if (!civicrm_initialize()) {
+    return;
+  }
+
+  require_once 'CRM/Core/Config.php';
+  $config = CRM_Core_Config::singleton();
+
+  require_once 'CRM/Core/DAO.php';
+  CRM_Core_DAO::dropAllTables();
+}
+
+function civicrm_requirements($phase) {
+  global $base_url;
+  $civicrm_path = drupal_get_path('module', 'civicrm');
+
+  //remove the last occurrence of 'drupal' from path
+  $pos = strrpos($civicrm_path, 'drupal');
+
+  if ($pos !== false) {
+    $civicrm_path = substr_replace($civicrm_path, '', $pos, strlen($civicrm_path));
+  }
+
+  $url = $base_url . '/' . $civicrm_path . 'install/index.php';
+
+  $settings = glob('sites/*/civicrm.settings.php');
+  $problems = array();
+  if (empty($settings) && $phase == 'install') {
+    $problems[] = array(
+      'title' => t('CiviCRM settings does not exist'),
+      'value' =>
+      t('CiviCRM settings file does not exist. It should be created by CiviCRM <a href="!link">install</a>',
+        array('!link' => $url)),
+      'severity' => REQUIREMENT_ERROR,
+    );
+  }
+
+  return $problems;
+}
+
+/**
+ * Update CiviCRM module weight
+ */
+function civicrm_update_7400(&$sandbox) {
+  db_query("UPDATE {system} SET weight = 100 WHERE name = 'civicrm'");
+}
+

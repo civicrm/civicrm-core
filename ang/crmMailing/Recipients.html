@@ -1,0 +1,20 @@
+<!--
+Directive: crmMailingRecipients
+-->
+<select multiple>
+  <optgroup label="{{ts('Mandatory Group')}}">
+    <option ng-repeat="grp in mandatoryGroups" value="{{grp.id}} civicrm_group include">{{ts('Search Results')}}</option>
+  </optgroup>
+  <optgroup label="{{ts('Include Group')}}">
+    <option ng-repeat="grp in groups|orderBy:'title'" value="{{grp.id}} civicrm_group include">{{grp.title}}</option>
+  </optgroup>
+  <optgroup label="{{ts('Exclude Group')}}">
+    <option ng-repeat="grp in groups|orderBy:'title'" value="{{grp.id}} civicrm_group exclude">{{grp.title}}</option>
+  </optgroup>
+  <optgroup label="{{ts('Include Past Recipients From')}}">
+    <option ng-repeat="ml in mailings|orderBy:'name'" value="{{ml.id}} civicrm_mailing include">{{ml.name}} ({{parseDate(ml.scheduled_date) | date:'mediumDate'}})</option>
+  </optgroup>
+  <optgroup label="{{ts('Exclude Past Recipients From')}}">
+    <option ng-repeat="ml in mailings|orderBy:'name'" value="{{ml.id}} civicrm_mailing exclude">{{ml.name}} ({{parseDate(ml.scheduled_date) | date:'mediumDate'}})</option>
+  </optgroup>
+</select>
