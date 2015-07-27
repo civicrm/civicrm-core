@@ -97,7 +97,7 @@ VALUES
 ('Core ACL', 0, 'civicrm_acl_role', 2, 'All', 'view event info', NULL, NULL, NULL, 1);
 
 -- Create default Groups for User Permissioning
-INSERT INTO civicrm_group (`id`, `name`, `title`, `description`, `source`, `saved_search_id`, `is_active`, `visibility`, `group_type`) VALUES (1, 'Administrators', '', '', NULL, NULL, 1, 'User and User Admin Only', '1');
+INSERT INTO civicrm_group (`id`, `name`, `title`, `description`, `source`, `saved_search_id`, `is_active`, `visibility`, `group_type`) VALUES (1, 'Administrators', 'Administrators', 'Contacts in this group are assigned Administrator role permissions.', NULL, NULL, 1, 'User and User Admin Only', '1');
 
 -- Assign above Group (entity) to the Administrator Role
 INSERT INTO civicrm_acl_entity_role

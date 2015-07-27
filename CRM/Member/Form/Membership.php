@@ -1702,7 +1702,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         }
       }
       $statusMsg = implode('<br/>', $statusMsg);
-      if ($receiptSend && !empty($mailSend)) {
+      if ($receiptSend && $mailSend) {
         $statusMsg .= ' ' . ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
       }
     }

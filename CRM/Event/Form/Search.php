@@ -197,10 +197,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
         if (!empty($this->_formValues['participant_status_id'])) {
-          $seatClause[] = CRM_Contact_BAO_Query::buildClause("participant.status_id", '=', $this->_formValues['participant_status_id'], 'Int');
-          if ($status = CRM_Utils_Array::value('IN', $this->_formValues['participant_status_id'])) {
-            $this->_formValues['participant_status_id'] = $status;
-          }
+          $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', (array) $this->_formValues['participant_status_id']) . ' ) )';
         }
         if (!empty($this->_formValues['participant_role_id'])) {
           $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', (array) $this->_formValues['participant_role_id']) . ' ) )';
@@ -395,11 +392,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       elseif (is_numeric($status)) {
         $statusTypes = (int) $status;
       }
-
-      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? array('IN' => array_keys($statusTypes)) : $statusTypes;
-    }
-    elseif ($statusTypes = CRM_Utils_Array::value('participant_status_id', $this->_formValues)) {
-      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? array('IN' => $statusTypes) : $statusTypes;
+      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? array_keys($statusTypes) : $statusTypes;
     }
 
     $role = CRM_Utils_Request::retrieve('role', 'String',
