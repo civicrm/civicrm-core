@@ -205,6 +205,20 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $this->assign('isRepeatingEntity', $isRepeatingEntity);
     }
 
+    // CRM-16776 - show edit/copy/create buttons for Profiles if user has required permission.
+    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufCreate = CRM_ACL_API::group(CRM_Core_Permission::CREATE, NULL, 'civicrm_uf_group', $ufGroups);
+    $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
+    $checkPermission = array(
+      array(
+        'administer CiviCRM',
+        'manage event profiles',
+      ),
+    );
+    if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
+      $this->assign('perm', TRUE);
+    }
+
     // also set up tabs
     CRM_Event_Form_ManageEvent_TabHeader::build($this);
 

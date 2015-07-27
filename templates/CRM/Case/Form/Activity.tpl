@@ -59,7 +59,7 @@
     || $activityTypeFile EQ 'ChangeCaseStartDate'}
       {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
       <tr class="crm-case-activity-form-block-details">
-        <td class="label">{ts}Notes{/ts}</td>
+        <td class="label">{ts}Details{/ts}</td>
         <td class="view-value">
           {$form.details.html}
         </td>

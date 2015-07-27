@@ -1452,6 +1452,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         // we should not created contribution record for related contacts, CRM-3371
         unset($params['contribution_status_id']);
 
+        //CRM-16857: Do not create multiple line-items for inherited membership through priceset.
+        unset($params['lineItems']);
+        unset($params['line_item']);
+
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           CRM_Member_BAO_Membership::create($params, $relMemIds);
