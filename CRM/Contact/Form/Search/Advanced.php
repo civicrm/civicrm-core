@@ -348,22 +348,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     }
 
     $config = CRM_Core_Config::singleton();
-    $group = CRM_Utils_Array::value('group', $this->_formValues);
-    if ($group && is_array($group)) {
-      unset($this->_formValues['group']);
-      foreach ($group as $key => $value) {
-        $this->_formValues['group'][$value] = 1;
-      }
-    }
-
-    $tag = CRM_Utils_Array::value('contact_tags', $this->_formValues);
-    if ($tag && is_array($tag)) {
-      unset($this->_formValues['contact_tags']);
-      foreach ($tag as $key => $value) {
-        $this->_formValues['contact_tags'][$value] = 1;
-      }
-    }
-
     $specialParams = array(
       'financial_type_id',
       'contribution_soft_credit_type_id',
@@ -380,6 +364,9 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contribution_page_id',
       'contribution_product_id',
       'payment_instrument_id',
+      'group',
+      'contact_tags',
+      'preferred_communication_method',
     );
     foreach ($specialParams as $element) {
       $value = CRM_Utils_Array::value($element, $this->_formValues);
@@ -404,11 +391,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       foreach ($taglist as $value) {
         if ($value) {
           $value = explode(',', $value);
-          foreach ($value as $tId) {
-            if (is_numeric($tId)) {
-              $this->_formValues['contact_tags'][$tId] = 1;
-            }
-          }
+          $this->_formValues['contact_tags'] = (array) $value;
         }
       }
     }

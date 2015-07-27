@@ -1022,15 +1022,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           $value = $params['value'][$key][$k];
-          if ($fldName == 'group' || $fldName == 'tag') {
-            $value = trim($value);
-
-            $v = explode(',', $value);
-            $value = array();
-            foreach ($v as $i) {
-              $value[$i] = 1;
-            }
-          }
 
           if ($v[0] == 'Contribution' && substr($fldName, 0, 7) != 'custom_'
             && substr($fldName, 0, 10) != 'financial_'

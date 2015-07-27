@@ -370,7 +370,6 @@ class CRM_Contact_BAO_Query {
     'email',
     'im',
     'address_name',
-    'master_id',
     'location_type',
   );
 
@@ -1337,10 +1336,10 @@ class CRM_Contact_BAO_Query {
         // make sure there is only one element
         // this is used when we are running under smog and need to know
         // how the contact was added (CRM-1203)
+        $groups = CRM_Utils_Array::value($this->_paramLookup['group'][0][1], $this->_paramLookup['group'][0][2], $this->_paramLookup['group'][0][2]);
         if ((count($this->_paramLookup['group']) == 1) &&
-          (count($this->_paramLookup['group'][0][2]) == 1)
+          (count($groups) == 1)
         ) {
-          $groups = array_keys($this->_paramLookup['group'][0][2]);
           $groupId = $groups[0];
 
           //check if group is saved search
@@ -1570,38 +1569,6 @@ class CRM_Contact_BAO_Query {
     }
     elseif (is_string($values) && strpos($values, '%') !== FALSE) {
       $result = array($id, 'LIKE', $values, 0, 0);
-    }
-    elseif ($id == 'group') {
-      if (is_array($values)) {
-        foreach ($values as $groupIds => $val) {
-          $matches = array();
-          if (preg_match('/-(\d+)$/', $groupIds, $matches)) {
-            if (strlen($matches[1]) > 0) {
-              $values[$matches[1]] = 1;
-              unset($values[$groupIds]);
-            }
-          }
-        }
-      }
-      else {
-        $groupIds = explode(',', $values);
-        unset($values);
-        foreach ($groupIds as $groupId) {
-          $values[$groupId] = 1;
-        }
-      }
-
-      $result = array($id, 'IN', $values, 0, 0);
-    }
-    elseif ($id == 'contact_tags' || $id == 'tag') {
-      if (!is_array($values)) {
-        $tagIds = explode(',', $values);
-        unset($values);
-        foreach ($tagIds as $tagId) {
-          $values[$tagId] = 1;
-        }
-      }
-      $result = array($id, 'IN', $values, 0, 0);
     }
     elseif ($id == 'contact_type' ||
       (!empty($values) && is_array($values) && !in_array(key($values), CRM_Core_DAO::acceptedSQLOperators(), TRUE))
@@ -1997,21 +1964,9 @@ class CRM_Contact_BAO_Query {
         $where = "civicrm_address.state_province_id";
       }
 
-      $states = CRM_Core_PseudoConstant::stateProvince();
-      if (is_numeric($value)) {
-        $this->_where[$grouping][] = self::buildClause($where, $op, $value, 'Positive');
-        $value = $states[(int ) $value];
-      }
-      else {
-        $intVal = CRM_Utils_Array::key($value, $states);
-        $this->_where[$grouping][] = self::buildClause($where, $op, $intVal, 'Positive');
-      }
-      if (!$lType) {
-        $this->_qill[$grouping][] = ts('State') . " $op '$value'";
-      }
-      else {
-        $this->_qill[$grouping][] = ts('State') . " ($lType) $op '$value'";
-      }
+      $this->_where[$grouping][] = self::buildClause($where, $op, $value, 'Positive');
+      list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_Address', "state_province_id", $value, $op);
+      $this->_qill[$grouping][] = ts("State %1 %2", array(1 => $qillop, 2 => $qillVal));
     }
     elseif (!empty($field['pseudoconstant'])) {
       $this->optionValueQuery(
@@ -2208,7 +2163,7 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($fieldName, $value, $type);
       }
       else {
-        if (strpos($op, 'IN') === FALSE) {
+        if (strpos($op, 'IN') === FALSE)  {
           $value = $strtolower($value);
         }
         if ($wildcard) {
@@ -2260,6 +2215,9 @@ class CRM_Contact_BAO_Query {
         array(
           'address_name',
           'street_address',
+          'street_name',
+          'street_number_suffix',
+          'street_unit',
           'supplemental_address_1',
           'supplemental_address_2',
           'city',
@@ -2267,13 +2225,27 @@ class CRM_Contact_BAO_Query {
           'postal_code_suffix',
           'geo_code_1',
           'geo_code_2',
+          'master_id',
         )
       )) {
         //fix for search by profile with address fields.
         $tName = "{$locationType[$locType[1]]}-address";
       }
-      elseif ($locType[0] == 'on_hold') {
+      elseif (in_array($locType[0],
+          array(
+            'on_hold',
+            'signature_html',
+            'signature_text',
+            'is_bulkmail',
+          )
+        )) {
         $tName = "{$locationType[$locType[1]]}-email";
+      }
+      elseif ($locType[0] == 'provider_id') {
+        $tName = "{$locationType[$locType[1]]}-im";
+      }
+      elseif ($locType[0] == 'openid') {
+        $tName = "{$locationType[$locType[1]]}-openid";
       }
       else {
         $tName = "{$locationType[$locType[1]]}-{$locType[0]}";
@@ -2612,7 +2584,7 @@ class CRM_Contact_BAO_Query {
 
         default:
           $locationTypeName = $extraLocationTypeClause = '';
-          if (strpos($name, '-address') != 0 || strpos($name, '-master_id') != 0) {
+          if (strpos($name, '-address') != 0) {
             $locationTypeName = 'address';
           }
           elseif (strpos($name, '-phone') != 0) {
@@ -2623,24 +2595,24 @@ class CRM_Contact_BAO_Query {
           }
           elseif (strpos($name, '-im') != 0) {
             $locationTypeName = 'im';
-            $extraLocationType = "provider_id";
           }
           elseif (strpos($name, '-openid') != 0) {
-            $extraLocationType = $locationTypeName = 'openid';
+            $locationTypeName = 'openid';
           }
           elseif (strpos($name, '-location_type') != 0) {
-            $locationTypeName = 'address';
-            $extraLocationTypeClause = "\n $side JOIN civicrm_location_type `{$name}` ON ( `{$name}`.id = `{$name}_address`.location_type_id)";
-            $name .= "_address";
+            $extraLocationType = "\n$side JOIN civicrm_location_type `{$name}` ON ( `{$name}`.id = `{$name}-address`.location_type_id )";
+            $locationTypeName = "address";
+            $name .= "-address";
           }
+
           if ($locationTypeName) {
             //we have a join on an location table - possibly in conjunction with search builder - CRM-14263
             $parts = explode('-', $name);
             $locationID = array_search($parts[0], CRM_Core_BAO_Address::buildOptions('location_type_id', 'get', array('name' => $parts[0])));
-            if (!empty($extraLocationType) && !empty($parts[2]) && is_numeric($parts[2])) {
-              $extraLocationTypeClause = " and `{$name}`.{$extraLocationType} = $parts[2]";
+            $from .= " $side JOIN civicrm_{$locationTypeName} `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID ";
+            if (!empty($extraLocationType)) {
+              $from .= $extraLocationType;
             }
-            $from .= " $side JOIN civicrm_{$locationTypeName} `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID $extraLocationTypeClause ";
           }
           else {
             $from .= CRM_Core_Component::from($name, $mode, $side);
@@ -2802,19 +2774,14 @@ class CRM_Contact_BAO_Query {
       $this->_useDistinct = TRUE;
     }
 
+    if (isset($value)) {
+      $value = CRM_Utils_Array::value($op, $value, $value);
+    }
+
     $groupIds = NULL;
     $names = array();
     $isSmart = FALSE;
     $isNotOp = ($op == 'NOT IN' || $op == '!=');
-
-    if ($value) {
-      if (strpos($op, 'IN') === FALSE) {
-        $value = key($value);
-      }
-      else {
-        $value = array_keys($value);
-      }
-    }
 
     $statii = array();
     $gcsValues = &$this->getWhereValues('group_contact_status', $grouping);
@@ -3042,19 +3009,17 @@ WHERE  $smartGroupClause
   public function tag(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $tagNames = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
+    list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_EntityTag', "tag_id", $value, $op, array('onlyActive' => FALSE));
+    // API/Search Builder format array(operator => array(values))
     if (is_array($value)) {
+      if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $op = key($value);
+        $value = $value[$op];
+      }
       if (count($value) > 1) {
         $this->_useDistinct = TRUE;
       }
-      foreach ($value as $id => $dontCare) {
-        $names[] = CRM_Utils_Array::value($id, $tagNames);
-      }
-      $names = implode(' ' . ts('or') . ' ', $names);
-      $value = implode(',', array_keys($value));
-    }
-    else {
-      $names = CRM_Utils_Array::value($value, $tagNames);
+      $value = implode(',', (array) $value);
     }
 
     $useAllTagTypes = $this->getWhereValues('all_tag_types', $grouping);
@@ -3094,7 +3059,6 @@ WHERE  $smartGroupClause
       else {
         $this->_where[$grouping][] = "({$etTable}.tag_id $op (" . $value . ") OR {$etCaseTable}.tag_id $op (" . $value . ") OR {$etActTable}.tag_id $op (" . $value . "))";
       }
-      $this->_qill[$grouping][] = ts('Tag %1 %2', array(1 => $op, 2 => $tagTypesText[2])) . ' ' . $names;
     }
     else {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
@@ -3109,9 +3073,8 @@ WHERE  $smartGroupClause
       else {
         $this->_where[$grouping][] = "{$etTable}.tag_id $op (" . $value . ')';
       }
-      $this->_qill[$grouping][] = ts('Tagged %1', array(1 => $op)) . ' ' . $names;
     }
-
+    $this->_qill[$grouping][] = ts('Tagged %1 %2', array(1 => $qillop, 2 => $qillVal));
   }
 
   /**
@@ -3939,7 +3902,13 @@ WHERE  $smartGroupClause
   public function preferredCommunication(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $value = str_replace(array('(', ')'), '', explode(",", $value));
+    if (!is_array($values)) {
+      $value = str_replace(array('(', ')'), '', explode(",", $value));
+    }
+    elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Contact', $name, $value, $op);
 
     if (self::caseImportant($op)) {
