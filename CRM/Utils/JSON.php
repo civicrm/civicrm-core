@@ -99,7 +99,7 @@ class CRM_Utils_JSON {
    * @return string
    *
    */
-  static function encodeDataTable($params, $iTotal, $iFilteredTotal, $selectorElements) {
+  public static function encodeDataTable($params, $iTotal, $iFilteredTotal, $selectorElements) {
     $sOutput = '{';
     $sOutput .= '"recordsTotal": ' . $iTotal . ', ';
     $sOutput .= '"recordsFiltered": ' . $iFilteredTotal . ', ';
@@ -127,4 +127,5 @@ class CRM_Utils_JSON {
 
     return $sOutput;
   }
+
 }

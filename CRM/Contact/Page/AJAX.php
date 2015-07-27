@@ -668,7 +668,7 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_JSON::output(array('status' => ($status) ? $oper : $status));
   }
 
-  static function getDedupes() {
+  public static function getDedupes() {
     $offset    = isset($_REQUEST['start']) ? CRM_Utils_Type::escape($_REQUEST['start'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['length']) ? CRM_Utils_Type::escape($_REQUEST['length'], 'Integer') : 25;
 
@@ -697,7 +697,7 @@ LIMIT {$offset}, {$rowCount}
     $searchData = CRM_Utils_Array::value('search', $_REQUEST);
     $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
 
-    if ($src || !empty($searchData['value']) ) {
+    if ($src || !empty($searchData['value'])) {
       $src = $src ? $src : $searchData['value'];
       $where[] = " cc1.display_name LIKE '%{$src}%'";
     }
@@ -730,13 +730,13 @@ LIMIT {$offset}, {$rowCount}
       $where[] = " (ca2.is_primary = 1 AND ca2.street_address LIKE '%{$dst_street}%')";
     }
     if (!empty($searchData['value'])) {
-      $whereClause   = ' ( '.implode(' OR ', $where).' ) ';
+      $whereClause   = ' ( ' . implode(' OR ', $where) . ' ) ';
     }
     else {
       if (!empty($where)) {
         $whereClause  = implode(' AND ', $where);
       }
-    } 
+    }
     $whereClause .= $whereClause ? ' AND de.id IS NULL' : ' de.id IS NULL';
 
     if ($selected) {
@@ -744,23 +744,22 @@ LIMIT {$offset}, {$rowCount}
     }
     $join .= " LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND pn.entity_id2 = de.contact_id2 )";
 
-
     $select = array(
-      'cc1.contact_type'    => 'src_contact_type',
-      'cc1.display_name'    => 'src_display_name',
-      'cc1.contact_sub_type'=> 'src_contact_sub_type',
-      'cc2.contact_type'    => 'dst_contact_type',
-      'cc2.display_name'    => 'dst_display_name',
-      'cc2.contact_sub_type'=> 'dst_contact_sub_type',
-      'ce1.email'           => 'src_email',
-      'ce2.email'           => 'dst_email',
-      'ca1.postal_code'     => 'src_postcode', 
-      'ca2.postal_code'     => 'dst_postcode',
-      'ca1.street_address'  => 'src_street',
-      'ca2.street_address'  => 'dst_street'
+      'cc1.contact_type'     => 'src_contact_type',
+      'cc1.display_name'     => 'src_display_name',
+      'cc1.contact_sub_type' => 'src_contact_sub_type',
+      'cc2.contact_type'     => 'dst_contact_type',
+      'cc2.display_name'     => 'dst_display_name',
+      'cc2.contact_sub_type' => 'dst_contact_sub_type',
+      'ce1.email'            => 'src_email',
+      'ce2.email'            => 'dst_email',
+      'ca1.postal_code'      => 'src_postcode',
+      'ca2.postal_code'      => 'dst_postcode',
+      'ca1.street_address'   => 'src_street',
+      'ca2.street_address'   => 'dst_street',
     );
 
-    if($select) {
+    if ($select) {
       $join .= " INNER JOIN civicrm_contact cc1 ON cc1.id = pn.entity_id1";
       $join .= " INNER JOIN civicrm_contact cc2 ON cc2.id = pn.entity_id2";
       $join .= " LEFT JOIN civicrm_email ce1 ON (ce1.contact_id = pn.entity_id1 AND ce1.is_primary = 1 )";
@@ -776,34 +775,42 @@ LIMIT {$offset}, {$rowCount}
       }
     }
     $columnDetails = CRM_Utils_Array::value($orderColumnNumber, $_REQUEST['columns']);
-    if(!empty($columnDetails)) {
+    if (!empty($columnDetails)) {
       switch ($columnDetails['data']) {
-      case 'src':
-        $whereClause .= " ORDER BY cc1.display_name {$dir}";
-        break;
-      case 'src_email':
-        $whereClause .= " ORDER BY ce1.email {$dir}";
-        break;
-      case 'src_street':
-        $whereClause .= " ORDER BY ca1.street_address {$dir}";
-        break;
-      case 'src_postcode':
-        $whereClause .= " ORDER BY ca1.postal_code {$dir}";
-        break;
-      case 'dst':
-        $whereClause .= " ORDER BY cc2.display_name {$dir}";
-        break;
-      case 'dst_email':
-        $whereClause .= " ORDER BY ce2.email {$dir}";
-        break;
-      case 'dst_street':
-        $whereClause .= " ORDER BY ca2.street_address {$dir}";
-        break;
-      case 'dst_postcode':
-        $whereClause .= " ORDER BY ca2.postal_code {$dir}";
-        break;
-      default:
-        break;
+        case 'src':
+          $whereClause .= " ORDER BY cc1.display_name {$dir}";
+          break;
+
+        case 'src_email':
+          $whereClause .= " ORDER BY ce1.email {$dir}";
+          break;
+
+        case 'src_street':
+          $whereClause .= " ORDER BY ca1.street_address {$dir}";
+          break;
+
+        case 'src_postcode':
+          $whereClause .= " ORDER BY ca1.postal_code {$dir}";
+          break;
+
+        case 'dst':
+          $whereClause .= " ORDER BY cc2.display_name {$dir}";
+          break;
+
+        case 'dst_email':
+          $whereClause .= " ORDER BY ce2.email {$dir}";
+          break;
+
+        case 'dst_street':
+          $whereClause .= " ORDER BY ca2.street_address {$dir}";
+          break;
+
+        case 'dst_postcode':
+          $whereClause .= " ORDER BY ca2.postal_code {$dir}";
+          break;
+
+        default:
+          break;
       }
     }
 
@@ -885,7 +892,7 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_JSON::output($paperSize);
   }
 
-  static function flipDupePairs($prevNextId = NULL) {
+  public static function flipDupePairs($prevNextId = NULL) {
     if (!$prevNextId) {
       $prevNextId = $_REQUEST['pnid'];
     }
@@ -897,7 +904,8 @@ LIMIT {$offset}, {$rowCount}
       $prevNextId = implode(', ', $prevNextId);
       $prevNextId = CRM_Utils_Type::escape($prevNextId, 'String');
       $query     .= "WHERE cpc.id IN ({$prevNextId}) AND cpc.is_selected = 1";
-    } else {
+    }
+    else {
       $prevNextId = CRM_Utils_Type::escape($prevNextId, 'Positive');
       $query     .= "WHERE cpc.id = $prevNextId";
     }
@@ -970,7 +978,7 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_JSON::output($addressVal);
   }
 
-  static function toggleDedupeSelect() {
+  public static function toggleDedupeSelect() {
     $rgid = CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer');
     $gid  = CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer');
     $pnid = $_REQUEST['pnid'];
@@ -983,7 +991,7 @@ LIMIT {$offset}, {$rowCount}
 
     $params = array(
       1 => array($isSelected, 'Boolean'),
-      3 => array("$cacheKeyString%", 'String') // using % to address rows with conflicts as well
+      3 => array("$cacheKeyString%", 'String'), // using % to address rows with conflicts as well
     );
 
     //check pnid is_array or integer
