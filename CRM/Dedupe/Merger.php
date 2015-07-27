@@ -565,7 +565,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *                              Does a force merge otherwise.
    * @param bool $autoFlip to let api decide which contact to retain and which to delete.
    *   Wether to let api decide which contact to retain and which to delete.
-   * @param bool $redirectForPerformance
+   * @param int $batchLimit number of merges to carry out in one batch.
+   * @param int $isSelected if records with is_selected column needs to be processed.
    *
    * @return array|bool
    */
@@ -601,7 +602,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $autoFlip, $redirectForPerformance);
   }
 
-  static function updateMergeStats($cacheKeyString, $result = array()) {
+  public static function updateMergeStats($cacheKeyString, $result = array()) {
     // gather latest stats
     $merged  = count($result['merged']);
     $skipped = count($result['skipped']);
@@ -636,11 +637,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     CRM_Core_BAO_PrevNextCache::setItem($values);
   }
 
-  static function resetMergeStats($cacheKeyString) {
+  public static function resetMergeStats($cacheKeyString) {
     return CRM_Core_BAO_PrevNextCache::deleteItem(NULL, "{$cacheKeyString}_stats");
   }
 
-  static function getMergeStats($cacheKeyString) {
+  public static function getMergeStats($cacheKeyString) {
     $stats = CRM_Core_BAO_PrevNextCache::retrieve("{$cacheKeyString}_stats");
     if (!empty($stats)) {
       $stats = $stats[0];
@@ -648,7 +649,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     return $stats;
   }
 
-  static function getMergeStatsMsg($cacheKeyString) {
+  public static function getMergeStatsMsg($cacheKeyString) {
     $msg   = '';
     $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
     if (!empty($stats['merged'])) {
@@ -735,7 +736,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $conflicts[$key] = "{$migrationInfo['rows'][$key]['title']}: '{$migrationInfo['rows'][$key]['main']}' vs. '{$migrationInfo['rows'][$key]['other']}'";
           }
           CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts);
-        } else {
+        }
+        else {
           // delete entry from PrevNextCache table so we don't consider the pair next time
           // pair may have been flipped, so make sure we delete using both orders
           CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString, TRUE);

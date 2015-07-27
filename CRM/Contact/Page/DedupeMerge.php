@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
+class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
 
   const BATCHLIMIT = 2;
 
@@ -42,12 +42,13 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
    * @return void
    * @access public
    */
-  function run() {
+  public function run() {
     $runner = self::getRunner();
     if ($runner) {
       // Run Everything in the Queue via the Web.
       $runner->runAllViaWeb();
-    } else {
+    }
+    else {
       CRM_Core_Session::setStatus(ts('Nothing to merge.'));
     }
 
@@ -55,7 +56,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
     return parent::run();
   }
 
-  static function getRunner() {
+  public static function getRunner() {
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
     $gid  = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
     $action = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
@@ -84,9 +85,10 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
     if ($action == CRM_Core_Action::MAP) {
       $where = "pn.is_selected = 1";
       $isSelected = 1;
-    } else {
+    }
+    else {
       // else merge all (2)
-      $isSelected = 2; 
+      $isSelected = 2;
     }
 
     $total  = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, NULL, $where);
@@ -98,11 +100,11 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
     // reset merge stats, so we compute new stats
     CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
 
-    for ($i = 1; $i <= ceil($total/self::BATCHLIMIT); $i++) {
+    for ($i = 1; $i <= ceil($total / self::BATCHLIMIT); $i++) {
       $task  = new CRM_Queue_Task(
-        array ('CRM_Contact_Page_DedupeMerge', 'callBatchMerge'),
+        array('CRM_Contact_Page_DedupeMerge', 'callBatchMerge'),
         array($rgid, $gid, $mode, TRUE, self::BATCHLIMIT, $isSelected),
-        "Processed " . $i*self::BATCHLIMIT . " pair of duplicates out of " . $total
+        "Processed " . $i * self::BATCHLIMIT . " pair of duplicates out of " . $total
       );
 
       // Add the Task to the Queue
@@ -112,10 +114,10 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
     // Setup the Runner
     $urlQry .= "&context=conflicts";
     $runner = new CRM_Queue_Runner(array(
-      'title' => ts('Merging Duplicates..'),
-      'queue' => $queue,
-      'errorMode'=> CRM_Queue_Runner::ERROR_ABORT,
-      'onEndUrl' => CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry, TRUE, NULL, FALSE),
+      'title'     => ts('Merging Duplicates..'),
+      'queue'     => $queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      'onEndUrl'  => CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry, TRUE, NULL, FALSE),
     ));
 
     return $runner;
@@ -124,10 +126,10 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page{
   /**
    * Collect Mailchimp data into temporary working table.
    */
-  static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
+  public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
     $result = CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $autoFlip, $batchLimit, $isSelected);
 
     return CRM_Queue_Task::TASK_SUCCESS;
   }
-}
 
+}
