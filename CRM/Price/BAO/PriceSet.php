@@ -1445,6 +1445,54 @@ WHERE       ps.id = %1
   }
 
   /**
+   * Get an array of the membership types in a price set.
+   *
+   * @param int $id
+   *
+   * @return array(
+   *   Membership types in the price set
+   */
+  public static function getMembershipTypesFromPriceSet($id) {
+    $query
+      = "SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
+FROM        civicrm_price_field_value pfv
+LEFT JOIN   civicrm_price_field pf ON pf.id = pfv.price_field_id
+LEFT JOIN   civicrm_price_set ps ON ps.id = pf.price_set_id
+LEFT JOIN   civicrm_membership_type mt ON mt.id = pfv.membership_type_id
+WHERE       ps.id = %1
+";
+
+    $params = array(1 => array($id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+    $membershipTypes = array(
+      'all' => array(),
+      'autorenew' => array(),
+      'autorenew_required' => array(),
+      'autorenew_optional' => array(),
+    );
+    while ($dao->fetch()) {
+      if (empty($dao->membership_type_id)) {
+        continue;
+      }
+      $membershipTypes['all'][] = $dao->membership_type_id;
+      if (!empty($dao->auto_renew)) {
+        $membershipTypes['autorenew'][] = $dao->membership_type_id;
+        if ($dao->auto_renew == 2) {
+          $membershipTypes['autorenew_required'][] = $dao->membership_type_id;
+        }
+        else {
+          $membershipTypes['autorenew_optional'][] = $dao->membership_type_id;
+        }
+      }
+      else {
+        $membershipTypes['non_renew'][] = $dao->membership_type_id;
+      }
+    }
+    return $membershipTypes;
+  }
+
+  /**
    * Copy priceSet when event/contibution page is copied
    *
    * @param string $baoName

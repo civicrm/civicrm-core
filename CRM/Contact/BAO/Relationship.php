@@ -698,7 +698,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   public static function disableEnableRelationship($id, $action, $params = array(), $ids = array(), $active = FALSE) {
     $relationship = self::clearCurrentEmployer($id, $action);
 
-    if (CRM_Core_Permission::access('CiviMember')) {
+    if ($id) {
       // create $params array which is required to delete memberships
       // of the related contacts.
       if (empty($params)) {

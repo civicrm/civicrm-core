@@ -1204,7 +1204,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $options = $props['options'];
     }
     else {
-      $info = civicrm_api3($props['entity'], 'getoptions', $props);
+      $info = civicrm_api3($props['entity'], 'getoptions', $props + array('check_permissions' => 1));
       $options = $info['values'];
     }
     if (!array_key_exists('placeholder', $props)) {

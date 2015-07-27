@@ -114,6 +114,10 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       }
     }
 
+    // CRM-16776 - show edit/copy/create buttons on Profiles Tab if user has required permission.
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $this->assign('perm', TRUE);
+    }
     // set up tabs
     CRM_Contribute_Form_ContributionPage_TabHeader::build($this);
 
