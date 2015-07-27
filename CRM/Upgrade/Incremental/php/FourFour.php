@@ -307,7 +307,6 @@ ALTER TABLE civicrm_dashboard
 
     $dashboard = new CRM_Core_DAO_Dashboard();
     $dashboard->find();
-    $values = '';
     while ($dashboard->fetch()) {
       $urlElements = explode('/', $dashboard->url);
       if ($urlElements[1] == 'dashlet') {

@@ -192,22 +192,6 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Can recurring contributions be set against pledges.
-   *
-   * In practice all processors that use the baseIPN function to finish transactions or
-   * call the completetransaction api support this by looking up previous contributions in the
-   * series and, if there is a prior contribution against a pledge, and the pledge is not complete,
-   * adding the new payment to the pledge.
-   *
-   * However, only enabling for processors it has been tested against.
-   *
-   * @return bool
-   */
-  protected function supportsRecurContributionsForPledges() {
-    return FALSE;
-  }
-
-  /**
    * Default payment instrument validation.
    *
    * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card

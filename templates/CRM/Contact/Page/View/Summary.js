@@ -332,12 +332,15 @@
         }
       })
       .on('crmFormSuccess', function(e, data) {
-        // Advanced logging... just increment the changelog tab count to avoid the overhead of reloading the data
-        if (CRM.incrementChangeLogTab) {
-          CRM.incrementChangeLogTab();
+        // Refresh changeLog - advanced logging
+        if (CRM.reloadChangeLogTab) {
+          CRM.reloadChangeLogTab();
         }
-        // Refresh changelog tab next time it is opened
-        CRM.tabHeader.resetTab('#tab_log');
+        // Refresh changeLog - simple logging
+        // If we didn't get a changelog count in the response, force refresh the changelog tab to populate it
+        else {
+          CRM.tabHeader.resetTab('#tab_log', !(data && data.changeLog && data.changeLog.count));
+        }
         // Refresh dependent blocks
         if (data && data.reloadBlocks) {
           reloadBlock(data.reloadBlocks.join(','));

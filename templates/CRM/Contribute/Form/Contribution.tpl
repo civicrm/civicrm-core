@@ -118,7 +118,7 @@
       </td>
     </tr>
 
-      {if $buildRecurBlock}
+      {if $buildRecurBlock && !$ppID}
       <tr id='recurringPaymentBlock' class='hiddenElement'>
         <td></td>
         <td>

@@ -65,9 +65,6 @@
       }
       $('#changeLog .instance_data').crmSnippet('refresh');
     };
-    CRM.incrementChangeLogTab = function() {
-      CRM.tabHeader.updateCount('#tab_log', 1 + CRM.tabHeader.getCount('#tab_log'));
-    };
     CRM.reloadChangeLogTab({/literal}"{$instanceUrl}"{literal});
   });
 

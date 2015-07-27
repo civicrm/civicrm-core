@@ -308,11 +308,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 //set date and time format
                 switch ($timeFormat) {
                   case 1:
-                    $dateFormat[1] = 'g:iA';
+                    $dateFormat[] = 'g:iA';
                     break;
 
                   case 2:
-                    $dateFormat[1] = 'G:i';
+                    $dateFormat[] = 'G:i';
                     break;
 
                   default:

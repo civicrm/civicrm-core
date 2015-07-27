@@ -592,15 +592,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($this->_recurPaymentProcessors)) {
       $buildRecurBlock = FALSE;
     }
-    if ($this->_ppID) {
-      foreach ($this->_paymentProcessors as $processor) {
-        if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('recurContributionsForPledges')) {
-          $buildRecurBlock = TRUE;
-          break;
-        }
-        $buildRecurBlock = FALSE;
-      }
-    }
     if ($buildRecurBlock) {
       CRM_Contribute_Form_Contribution_Main::buildRecur($this);
       $this->setDefaults(array('is_recur' => 0));
@@ -1104,13 +1095,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-        //CRM-16833: Ensure tax is applied only once for membership conribution, when status changed.(e.g Pending to Completed).
-        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (!CRM_Utils_Array::value('membership', $componentDetails) || !CRM_Utils_Array::value('participant', $componentDetails)) {
-          if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
-            $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
-          }
-        }
+        $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
+
         // Update line total and total amount with tax on edit.
         $financialItemsId = CRM_Core_PseudoConstant::getTaxRates();
         if (array_key_exists($submittedValues['financial_type_id'], $financialItemsId)) {
