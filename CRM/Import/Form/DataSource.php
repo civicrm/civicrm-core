@@ -79,6 +79,9 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
 
     $this->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
 
+    $this->add('text', 'fieldSeparator', ts('Import Field Separator'), array('size' => 2), TRUE);
+    $this->setDefaults(array('fieldSeparator' => $config->fieldSeparator));
+
     //get the saved mapping details
     $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
       'Import ' . static::IMPORT_ENTITY,
@@ -164,15 +167,14 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->set("dateTypes", $this->get('dateFormats'));
 
-    $config = CRM_Core_Config::singleton();
-    $seperator = $config->fieldSeparator;
+    $separator = $this->controller->exportValue($this->_name, 'fieldSeparator');
 
     $mapper = array();
 
     $parser = new $parserClassName($mapper);
     $parser->setMaxLinesToProcess(100);
     $parser->run($fileName,
-      $seperator,
+      $separator,
       $mapper,
       $skipColumnHeader,
       CRM_Import_Parser::MODE_MAPFIELD,
