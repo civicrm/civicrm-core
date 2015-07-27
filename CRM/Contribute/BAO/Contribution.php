@@ -3457,6 +3457,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $trxnIds['id'] = $params['entity_id'];
       foreach ($params['line_item'] as $fieldId => $fields) {
         foreach ($fields as $fieldValueId => $fieldValues) {
+          if (!CRM_Utils_Array::value('id', $fieldValues)) {
+            continue;
+          }
           $prevParams['entity_id'] = $fieldValues['id'];
           $prevfinancialItem = CRM_Financial_BAO_FinancialItem::retrieve($prevParams, CRM_Core_DAO::$_nullArray);
 
