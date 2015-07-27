@@ -2001,10 +2001,9 @@ class CRM_Contact_BAO_Query {
       $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
     }
     elseif ($name === 'world_region') {
-      $field['where'] = 'civicrm_worldregion.id';
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
-        CRM_Core_PseudoConstant::worldRegion(),
+        NULL,
         $field,
         ts('World Region'),
         'Positive',
@@ -5492,13 +5491,15 @@ AND   displayRelType.is_active = 1
     else {
       $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
     }
-
     if (in_array($name, $pseudoFields)) {
       if (!in_array($name, array('gender_id', 'prefix_id', 'suffix_id', 'communication_style_id'))) {
         $wc = "contact_a.{$name}_id";
       }
       $dataType = 'Positive';
       $value = (!$value) ? 0 : $value;
+    }
+    if ($name == "world_region") {
+      $field['name'] = $name;
     }
 
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue($daoName, $field['name'], $value, $op);
@@ -5706,6 +5707,9 @@ AND   displayRelType.is_active = 1
     }
     elseif ($fieldName == 'county_id') {
       $pseduoOptions = CRM_Core_PseudoConstant::county();
+    }
+    elseif ($fieldName == 'world_region') {
+      $pseduoOptions = CRM_Core_PseudoConstant::worldRegion();
     }
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
       $pseduoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
