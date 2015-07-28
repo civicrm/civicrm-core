@@ -64,7 +64,7 @@ class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLette
       );
 
       if (civicrm_error($contact)) {
-        $notSent[] = $contactId;
+        $notSent[] = $participant['contact_id'];
         continue;
       }
 
