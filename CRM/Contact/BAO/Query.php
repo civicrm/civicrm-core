@@ -370,7 +370,6 @@ class CRM_Contact_BAO_Query {
     'email',
     'im',
     'address_name',
-    'location_type',
   );
 
   /**
@@ -2598,20 +2597,12 @@ class CRM_Contact_BAO_Query {
           elseif (strpos($name, '-openid') != 0) {
             $locationTypeName = 'openid';
           }
-          elseif (strpos($name, '-location_type') != 0) {
-            $extraLocationType = "\n$side JOIN civicrm_location_type `{$name}` ON ( `{$name}`.id = `{$name}-address`.location_type_id )";
-            $locationTypeName = "address";
-            $name .= "-address";
-          }
 
           if ($locationTypeName) {
             //we have a join on an location table - possibly in conjunction with search builder - CRM-14263
             $parts = explode('-', $name);
             $locationID = array_search($parts[0], CRM_Core_BAO_Address::buildOptions('location_type_id', 'get', array('name' => $parts[0])));
             $from .= " $side JOIN civicrm_{$locationTypeName} `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID ";
-            if (!empty($extraLocationType)) {
-              $from .= $extraLocationType;
-            }
           }
           else {
             $from .= CRM_Core_Component::from($name, $mode, $side);
