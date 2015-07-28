@@ -5198,7 +5198,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
               return $queryString;
             }
           }
+          else {
+            $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReportUsingOldFormat;
+            if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => array_keys($value)), $dataType)) != FALSE) {
+              return $queryString;
+            }
+          }
         }
+
         $value = CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
         if ($dataType == 'String' || $dataType == 'Text') {
