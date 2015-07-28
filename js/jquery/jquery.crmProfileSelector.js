@@ -29,10 +29,14 @@
         $select = $(this).hide().addClass('rendered');
 
       var validTypesId = [];
+      var usedByFilter = null;
       if (options.groupTypeFilter) {
         matchingUfGroups = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
-            return ufGroupModel.checkGroupType(options.groupTypeFilter, options.allowAllSubtypes);
+            if(!$.isEmptyObject(options.usedByFilter)) {
+              usedByFilter = options.usedByFilter;
+            }
+            return ufGroupModel.checkGroupType(options.groupTypeFilter, options.allowAllSubtypes, usedByFilter);
           }
         });
       } else {
@@ -85,7 +89,8 @@
         groupTypeFilter: $(this).data('groupType'),
         entities: $(this).data('entities'),
         //CRM-15427
-        allowAllSubtypes: $(this).data('default')
+        allowAllSubtypes: $(this).data('default'),
+        usedByFilter: $(this).data('usedfor')
       });
     });
   });
