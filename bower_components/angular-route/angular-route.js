@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.3.17
+ * @license AngularJS v1.3.16
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -596,8 +596,9 @@ function $RouteProvider() {
                 if (angular.isFunction(templateUrl)) {
                   templateUrl = templateUrl(nextRoute.params);
                 }
+                templateUrl = $sce.getTrustedResourceUrl(templateUrl);
                 if (angular.isDefined(templateUrl)) {
-                  nextRoute.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                  nextRoute.loadedTemplateUrl = templateUrl;
                   template = $templateRequest(templateUrl);
                 }
               }
