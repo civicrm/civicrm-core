@@ -1791,7 +1791,7 @@ class CRM_Utils_Token {
 
     switch ($token) {
       case 'balance':
-        $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($params['entity_id'], 'event');
+        $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($params['participant_id'], 'event');
         $balancePay = CRM_Utils_Array::value('balance', $info);
         $balancePay = CRM_Utils_Money::format($balancePay);
         $value = $balancePay;
