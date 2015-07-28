@@ -52,7 +52,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'sort_name' => array(
             'title' => ts('Contact Name'),
-            'default' => TRUE,
             'no_repeat' => TRUE,
           ),
         ),
@@ -65,7 +64,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           'sort_name' => array(
             'name' => 'id',
             'title' => ts('Contact'),
-            'default' => TRUE,
           ),
         ),
         'order_bys' => array(
@@ -80,7 +78,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'fields' => array(
           'email' => array(
             'title' => 'Email',
-            'default' => TRUE,
           ),
         ),
         'order_bys' => array(
@@ -114,6 +111,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'duration' => array(
             'title' => 'Duration',
+            'default' => TRUE,
             'statistics' => array(
               'sum' => ts('Duration'),
             ),
@@ -133,6 +131,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'default' => FALSE,
             'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           ),
           'status_id' => array(
@@ -295,6 +294,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->_from = "
         FROM civicrm_activity {$this->_aliases['civicrm_activity']}
 
+             LEFT JOIN civicrm_activity_contact contact_activity
+                    ON {$this->_aliases['civicrm_activity']}.id = contact_activity.activity_id
+             LEFT JOIN civicrm_contact contact_civireport
+                    ON contact_civireport.id = contact_activity.contact_id
              LEFT JOIN civicrm_activity_contact target_activity
                     ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
                        target_activity.record_type_id = {$targetID}
@@ -304,8 +307,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
              LEFT JOIN civicrm_activity_contact source_activity
                     ON {$this->_aliases['civicrm_activity']}.id = source_activity.activity_id AND
                        source_activity.record_type_id = {$sourceID}
-             LEFT JOIN civicrm_contact contact_civireport
-                    ON target_activity.contact_id = contact_civireport.id
+             LEFT JOIN civicrm_contact civicrm_contact_target
+                    ON target_activity.contact_id = civicrm_contact_target.id
              LEFT JOIN civicrm_contact civicrm_contact_assignee
                     ON assignment_activity.contact_id = civicrm_contact_assignee.id
              LEFT JOIN civicrm_contact civicrm_contact_source
@@ -471,9 +474,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $totalType = $totalActivity = $totalDuration = 0;
 
     $actSQL = "SELECT
-      COUNT(DISTINCT {$this->_aliases['civicrm_activity']}.activity_type_id ) as civicrm_activity_activity_type_id_count,
-      COUNT({$this->_aliases['civicrm_activity']}.activity_type_id ) as civicrm_activity_activity_type_count,
-      SUM({$this->_aliases['civicrm_activity']}.duration ) as civicrm_activity_activity_duration
+      COUNT(DISTINCT({$this->_aliases['civicrm_activity']}.activity_type_id)) as civicrm_activity_activity_type_id_count,
+      COUNT(DISTINCT({$this->_aliases['civicrm_activity']}.id)) as civicrm_activity_activity_type_count,
+      SUM({$this->_aliases['civicrm_activity']}.duration) as civicrm_activity_activity_duration
       {$this->_from} {$this->_where}";
 
     $actDAO = CRM_Core_DAO::executeQuery($actSQL);
