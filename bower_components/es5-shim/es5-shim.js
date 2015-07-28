@@ -839,12 +839,21 @@ var equalsConstructorPrototype = function (o) {
     var ctor = o.constructor;
     return ctor && ctor.prototype === o;
 };
-var blacklistedKeys = ['window', 'console', 'parent', 'self', 'frames'];
+var blacklistedKeys = {
+    $window: true,
+    $console: true,
+    $parent: true,
+    $self: true,
+    $frames: true,
+    $frameElement: true,
+    $webkitIndexedDB: true,
+    $webkitStorageInfo: true
+};
 var hasAutomationEqualityBug = (function () {
     /* globals window */
     if (typeof window === 'undefined') { return false; }
     for (var k in window) {
-        if (blacklistedKeys.indexOf(k) === -1 && owns(window, k) && window[k] !== null && typeof window[k] === 'object') {
+        if (!blacklistedKeys['$' + k] && owns(window, k) && window[k] !== null && typeof window[k] === 'object') {
             try {
                 equalsConstructorPrototype(window[k]);
             } catch (e) {
@@ -854,6 +863,14 @@ var hasAutomationEqualityBug = (function () {
     }
     return false;
 }());
+var equalsConstructorPrototypeIfNotBuggy = function (object) {
+    if (typeof window === 'undefined' || !hasAutomationEqualityBug) { return equalsConstructorPrototype(object); }
+    try {
+        return equalsConstructorPrototype(object);
+    } catch (e) {
+        return false;
+    }
+};
 var dontEnums = [
     'toString',
     'toLocaleString',
@@ -907,7 +924,7 @@ defineProperties($Object, {
         }
 
         if (hasDontEnumBug) {
-            var skipConstructor = hasAutomationEqualityBug || equalsConstructorPrototype(object);
+            var skipConstructor = equalsConstructorPrototypeIfNotBuggy(object);
             for (var j = 0; j < dontEnumsLength; j++) {
                 var dontEnum = dontEnums[j];
                 if (!(skipConstructor && dontEnum === 'constructor') && owns(object, dontEnum)) {
@@ -1410,8 +1427,8 @@ if (
             var output = [];
             var flags = (separator.ignoreCase ? 'i' : '') +
                         (separator.multiline ? 'm' : '') +
-                        (separator.extended ? 'x' : '') + // Proposed for ES6
-                        (separator.sticky ? 'y' : ''), // Firefox 3+
+                        (separator.unicode ? 'u' : '') + // in ES6
+                        (separator.sticky ? 'y' : ''), // Firefox 3+ and ES6
                 lastLastIndex = 0,
                 // Make `global` and avoid `lastIndex` issues by working with a copy
                 separator2, match, lastIndex, lastLength;

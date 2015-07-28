@@ -26,7 +26,6 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
@@ -34,7 +33,7 @@
  */
 
 /**
- * form to process actions on the group aspect of Custom Data
+ * Form to process actions on the group aspect of Custom Data.
  */
 class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_ContributionPage {
 
@@ -98,9 +97,6 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
       CRM_Utils_System::setTitle(ts('Include Profiles') . " ($title)");
     }
 
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->assign('perm', 1);
-    }
     $ufJoinParams = array(
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',

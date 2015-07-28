@@ -100,7 +100,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @var array
    */
-  public $_params;
+  public $_params = array();
 
   /**
    * The fields involved in this contribution page
