@@ -381,7 +381,6 @@ AND li.entity_id = {$entityId}
     ) {
       return;
     }
-
     foreach ($lineItem as $priceSetId => $values) {
       if (!$priceSetId) {
         continue;
@@ -410,7 +409,7 @@ AND li.entity_id = {$entityId}
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $lineItems = CRM_Price_BAO_LineItem::create($line);
-        if (!$update && $contributionDetails) {
+        if ((!$update && $contributionDetails) || (!CRM_Utils_Array::value('id', $line))) {
           CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails);
           if (isset($line['tax_amount'])) {
             CRM_Financial_BAO_FinancialItem::add($lineItems, $contributionDetails, TRUE);
