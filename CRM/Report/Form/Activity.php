@@ -228,6 +228,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         ),
         'filters' => array(
           'activity_date_time' => array(
+            'default' => 'this.month',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'activity_subject' => array('title' => ts('Activity Subject')),
@@ -742,6 +743,10 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
   }
 
   public function postProcess() {
+    //reset value of activity_date
+    if (!empty($this->_force)) {
+      $this->_formValues["activity_date_time_relative"] = NULL;
+    }
     $this->beginPostProcess();
 
     //Assign those recordtype to array which have filter operator as 'Is not empty' or 'Is empty'
