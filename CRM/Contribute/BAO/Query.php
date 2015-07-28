@@ -919,12 +919,12 @@ class CRM_Contribute_BAO_Query {
     // stores the label
     $form->add('hidden', 'pcp_made_through');
 
-    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status');
+    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
     // Remove status values that are only used for recurring contributions or pledges (In Progress, Overdue).
     unset($statusValues['5'], $statusValues['6']);
-
-    $form->addSelect('contribution_status_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'label' => ts('Contribution Status(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+    $form->add('select', 'contribution_status_id',
+      ts('Contribution Status'), $statusValues,
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
     );
 
     // Add fields for thank you and receipt
