@@ -798,7 +798,7 @@
   </field>
   <field>
     <name>employer_id</name>
-    <title>Current Employer ID</title>
+    <title>Current Employer</title>
     <uniqueName>current_employer_id</uniqueName>
     <type>int unsigned</type>
     <comment>OPTIONAL FK to civicrm_contact record.</comment>
