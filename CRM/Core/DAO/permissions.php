@@ -495,7 +495,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       ),
     ),
   );
-  $permissions['uf_field'] = $permissions['uf_group'];
+  $permissions['uf_field'] = $permissions['uf_join'] = $permissions['uf_group'];
   $permissions['uf_field']['delete'] = array(
     'access CiviCRM',
     array(

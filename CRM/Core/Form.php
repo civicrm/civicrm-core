@@ -1115,7 +1115,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $default
    *   //CRM-15427.
    */
-  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE) {
+  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE, $usedFor = NULL) {
     // Output widget
     // FIXME: Instead of adhoc serialization, use a single json_encode()
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
@@ -1127,6 +1127,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'data-entities' => json_encode($entities),
       //CRM-15427
       'data-default' => $default,
+      'data-usedfor' => json_encode($usedFor),
     ));
   }
 
