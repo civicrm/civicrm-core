@@ -203,6 +203,15 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return method_exists(CRM_Utils_System::getClassName($this), 'cancelSubscription');
+  }
+
+  /**
    * Does this processor support pre-approval.
    *
    * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
@@ -876,6 +885,8 @@ abstract class CRM_Core_Payment {
 
   /**
    * Check whether a method is present ( & supported ) by the payment processor object.
+   *
+   * @deprecated - use $paymentProcessor->supports(array('cancelRecurring');
    *
    * @param string $method
    *   Method to check for.
