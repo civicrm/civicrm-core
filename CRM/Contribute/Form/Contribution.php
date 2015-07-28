@@ -549,7 +549,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE) == TRUE) {
         if (!empty($this->_recurPaymentProcessors)) {
           $buildRecurBlock = TRUE;
-           if ($this->_ppID) {
+          if ($this->_ppID) {
             // ppID denotes a pledge payment.
             foreach ($this->_paymentProcessors as $processor) {
               if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('recurContributionsForPledges')) {
