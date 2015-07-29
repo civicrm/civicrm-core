@@ -131,15 +131,11 @@
         {ts}for{/ts} {$form.installments.html} {$form.installments.label}
         </span>
       {/if}
-      <div id="recurHelp" class="description">
-        {ts}Your recurring contribution will be processed automatically.{/ts}
-        {if $is_recur_installments}
-          {ts}You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
-        {/if}
+      <p><span class="description">{ts}Your recurring contribution will be processed automatically for the number of installments you specify. You can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.{/ts}
         {if $is_email_receipt}
-          {ts}You will receive an email receipt for each recurring contribution.{/ts}
+          {ts}You will receive an email receipt for each recurring contribution. The receipts will include a link you can use if you decide to modify or cancel your future contributions.{/ts}
         {/if}
-      </div>
+      </span></p>
     </div>
     <div class="clear"></div>
   </div>
