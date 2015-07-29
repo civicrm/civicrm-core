@@ -1818,7 +1818,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'is_primary' => 1,
         'name' => 'Saint Helier St',
         'county' => 'Marin',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'state_province' => 'Michigan',
         'supplemental_address_1' => 'Hallmark Ct',
         'supplemental_address_2' => 'Jersey Village',
