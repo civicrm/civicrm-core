@@ -1704,6 +1704,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             'id' => $paymentResult['contribution']->id,
             'trxn_id' => $paymentResult['contribution']->trxn_id,
             'is_transactional' => FALSE,
+            'payment_processor_id' => $form->_paymentProcessor['id'],
           ));
         }
         catch (CiviCRM_API3_Exception $e) {
@@ -2309,6 +2310,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         civicrm_api3('contribution', 'completetransaction', array(
           'id' => $result['contribution']->id,
           'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+          'payment_processor_id' => $this->_paymentProcessor['id'],
           )
         );
       }

@@ -402,6 +402,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'completetransaction', array(
       'id' => $contribution['id'],
       'trxn_id' => 'ipn_called',
+      'payment_processor_id' => $this->_paymentProcessor['id'],
     ));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership

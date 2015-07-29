@@ -19,7 +19,7 @@ function contribution_page_submit_example() {
     'selectMembership' => array(
       '0' => 1,
     ),
-    'payment_processor' => 1,
+    'payment_processor_id' => 1,
     'credit_card_number' => '4111111111111111',
     'credit_card_type' => 'Visa',
     'credit_card_exp_date' => array(
