@@ -25,3 +25,6 @@ UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Summar
 {include file='../CRM/Upgrade/4.7.alpha1.msg_template/civicrm_msg_template.tpl'}
 
 UPDATE civicrm_state_province SET name = 'Bataan' WHERE name = 'Batasn';
+
+-- CRM-16876 Set country names to UPPERCASE
+UPDATE civicrm_country SET `name` = UPPER( `name` );
