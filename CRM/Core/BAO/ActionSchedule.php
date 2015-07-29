@@ -48,76 +48,10 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     static $_action_mapping;
 
     if ($_action_mapping === NULL) {
-      $_action_mapping = array(
-        1 => \Civi\ActionSchedule\Mapping::create(array(
-          'id' => 1,
-          'entity' => 'civicrm_activity',
-          'entity_label' => ts('Activity'),
-          'entity_value' => 'activity_type',
-          'entity_value_label' => 'Activity Type',
-          'entity_status' => 'activity_status',
-          'entity_status_label' => 'Activity Status',
-          'entity_date_start' => 'activity_date_time',
-          'entity_recipient' => 'activity_contacts',
-        )),
-        2 => \Civi\ActionSchedule\Mapping::create(array(
-          'id' => 2,
-          'entity' => 'civicrm_participant',
-          'entity_label' => ts('Event Type'),
-          'entity_value' => 'event_type',
-          'entity_value_label' => 'Event Type',
-          'entity_status' => 'civicrm_participant_status_type',
-          'entity_status_label' => 'Participant Status',
-          'entity_date_start' => 'event_start_date',
-          'entity_date_end' => 'event_end_date',
-          'entity_recipient' => 'event_contacts',
-        )),
-        3 => \Civi\ActionSchedule\Mapping::create(array(
-          'id' => 3,
-          'entity' => 'civicrm_participant',
-          'entity_label' => ts('Event Name'),
-          'entity_value' => 'civicrm_event',
-          'entity_value_label' => 'Event Name',
-          'entity_status' => 'civicrm_participant_status_type',
-          'entity_status_label' => 'Participant Status',
-          'entity_date_start' => 'event_start_date',
-          'entity_date_end' => 'event_end_date',
-          'entity_recipient' => 'event_contacts',
-        )),
-        4 => \Civi\ActionSchedule\Mapping::create(array(
-          'id' => 4,
-          'entity' => 'civicrm_membership',
-          'entity_label' => ts('Membership'),
-          'entity_value' => 'civicrm_membership_type',
-          'entity_value_label' => 'Membership Type',
-          'entity_status' => 'auto_renew_options',
-          'entity_status_label' => 'Auto Renew Options',
-          'entity_date_start' => 'membership_join_date',
-          'entity_date_end' => 'membership_end_date',
-        )),
-        5 => \Civi\ActionSchedule\Mapping::create(array(
-          'id' => 5,
-          'entity' => 'civicrm_participant',
-          'entity_label' => ts('Event Template'),
-          'entity_value' => 'event_template',
-          'entity_value_label' => 'Event Template',
-          'entity_status' => 'civicrm_participant_status_type',
-          'entity_status_label' => 'Participant Status',
-          'entity_date_start' => 'event_start_date',
-          'entity_date_end' => 'event_end_date',
-          'entity_recipient' => 'event_contacts',
-        )),
-        6 => \Civi\ActionSchedule\Mapping::create(array(
-          'id' => 6,
-          'entity' => 'civicrm_contact',
-          'entity_label' => ts('Contact'),
-          'entity_value' => 'civicrm_contact',
-          'entity_value_label' => 'Date Field',
-          'entity_status' => 'contact_date_reminder_options',
-          'entity_status_label' => 'Annual Options',
-          'entity_date_start' => 'date_field',
-        )),
-      );
+      $event = \Civi\Core\Container::singleton()->get('dispatcher')
+        ->dispatch(\Civi\ActionSchedule\Events::MAPPINGS,
+          new \Civi\ActionSchedule\Event\MappingRegisterEvent());
+      $_action_mapping = $event->getMappings();
     }
 
     if ($filters === NULL) {

@@ -19,9 +19,81 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return array(
-      \Civi\Token\Events::TOKEN_REGISTER => 'onRegister',
-      \Civi\Token\Events::TOKEN_EVALUATE => 'onEvaluate',
+      \Civi\Token\Events::TOKEN_REGISTER => 'onRegisterTokens',
+      \Civi\Token\Events::TOKEN_EVALUATE => 'onEvaluateTokens',
+      \Civi\ActionSchedule\Events::MAPPINGS => 'onRegisterMappings',
     );
+  }
+
+  public function onRegisterMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
+    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+      'id' => 1,
+      'entity' => 'civicrm_activity',
+      'entity_label' => ts('Activity'),
+      'entity_value' => 'activity_type',
+      'entity_value_label' => 'Activity Type',
+      'entity_status' => 'activity_status',
+      'entity_status_label' => 'Activity Status',
+      'entity_date_start' => 'activity_date_time',
+      'entity_recipient' => 'activity_contacts',
+    )));
+    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+      'id' => 2,
+      'entity' => 'civicrm_participant',
+      'entity_label' => ts('Event Type'),
+      'entity_value' => 'event_type',
+      'entity_value_label' => 'Event Type',
+      'entity_status' => 'civicrm_participant_status_type',
+      'entity_status_label' => 'Participant Status',
+      'entity_date_start' => 'event_start_date',
+      'entity_date_end' => 'event_end_date',
+      'entity_recipient' => 'event_contacts',
+    )));
+    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+      'id' => 3,
+      'entity' => 'civicrm_participant',
+      'entity_label' => ts('Event Name'),
+      'entity_value' => 'civicrm_event',
+      'entity_value_label' => 'Event Name',
+      'entity_status' => 'civicrm_participant_status_type',
+      'entity_status_label' => 'Participant Status',
+      'entity_date_start' => 'event_start_date',
+      'entity_date_end' => 'event_end_date',
+      'entity_recipient' => 'event_contacts',
+    )));
+    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+      'id' => 4,
+      'entity' => 'civicrm_membership',
+      'entity_label' => ts('Membership'),
+      'entity_value' => 'civicrm_membership_type',
+      'entity_value_label' => 'Membership Type',
+      'entity_status' => 'auto_renew_options',
+      'entity_status_label' => 'Auto Renew Options',
+      'entity_date_start' => 'membership_join_date',
+      'entity_date_end' => 'membership_end_date',
+    )));
+    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+      'id' => 5,
+      'entity' => 'civicrm_participant',
+      'entity_label' => ts('Event Template'),
+      'entity_value' => 'event_template',
+      'entity_value_label' => 'Event Template',
+      'entity_status' => 'civicrm_participant_status_type',
+      'entity_status_label' => 'Participant Status',
+      'entity_date_start' => 'event_start_date',
+      'entity_date_end' => 'event_end_date',
+      'entity_recipient' => 'event_contacts',
+    )));
+    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+      'id' => 6,
+      'entity' => 'civicrm_contact',
+      'entity_label' => ts('Contact'),
+      'entity_value' => 'civicrm_contact',
+      'entity_value_label' => 'Date Field',
+      'entity_status' => 'contact_date_reminder_options',
+      'entity_status_label' => 'Annual Options',
+      'entity_date_start' => 'date_field',
+    )));
   }
 
   /**
@@ -87,7 +159,7 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
    *
    * @param TokenRegisterEvent $e
    */
-  public function onRegister(TokenRegisterEvent $e) {
+  public function onRegisterTokens(TokenRegisterEvent $e) {
     if (!isset($e->getTokenProcessor()->context['actionMapping'])) {
       return;
     }
@@ -106,7 +178,7 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
    * @param TokenValueEvent $e
    * @throws TokenException
    */
-  public function onEvaluate(TokenValueEvent $e) {
+  public function onEvaluateTokens(TokenValueEvent $e) {
     foreach ($e->getRows() as $row) {
       /** @var \Civi\Token\TokenRow $row */
       if (!isset($row->context['actionSearchResult'])) {
