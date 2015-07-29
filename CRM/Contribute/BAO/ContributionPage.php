@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -69,6 +67,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Update the is_active flag in the db.
    *
+   * @deprecated - this bypasses hooks.
+   *
    * @param int $id
    *   Id of the database record.
    * @param bool $is_active
@@ -82,8 +82,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
+   * Load values for a contribution page.
+   *
    * @param int $id
-   * @param $values
+   * @param array $values
    */
   public static function setValues($id, &$values) {
     $params = array(
@@ -106,10 +108,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     else {
       $values['custom_post_id'] = '';
     }
-    // // add an accounting code also
-    // if ($values ['financial_type_id']) {
-    //   $values ['accountingCode'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $values ['financial_type_id'], 'accounting_code' );
-    // }
   }
 
   /**
@@ -124,9 +122,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param bool $returnMessageText
    *   Return the message text instead of sending the mail.
    *
-   * @param null $fieldTypes
-   *
-   * @return void
+   * @param array $fieldTypes
    */
   public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = $params = array();
@@ -544,11 +540,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $params
    *   Params to build component whereclause.
    *
-   * @param null $fieldTypes
-   *
-   * @return void
+   * @param array $fieldTypes
    */
-  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
+  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = array()) {
     if ($gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = array();
@@ -586,8 +580,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * make a copy of a contribution page, including
-   * all the blocks in the page
+   * Make a copy of a contribution page, including all the blocks in the page.
    *
    * @param int $id
    *   The contribution page id to copy.
@@ -665,7 +658,7 @@ WHERE entity_table = 'civicrm_contribution_page'
     $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery, CRM_Core_DAO::$_nullArray);
     while ($premiumDao->fetch()) {
       if ($premiumDao->id) {
-        $copyPremiumProduct = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
+        CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
           'premiums_id' => $premiumDao->id,
         ), array(
           'premiums_id' => $copyPremium->id,
@@ -678,34 +671,6 @@ WHERE entity_table = 'civicrm_contribution_page'
     CRM_Utils_Hook::copy('ContributionPage', $copy);
 
     return $copy;
-  }
-
-  /**
-   * Check if contribution page contains payment
-   * processor that supports recurring payment
-   *
-   * @param int $contributionPageId
-   *   Contribution Page Id.
-   *
-   * @return bool
-   *   true if payment processor supports recurring
-   *   else false
-   *
-   */
-  public static function checkRecurPaymentProcessor($contributionPageId) {
-    //FIXME
-    $sql = "
-  SELECT pp.is_recur
-  FROM   civicrm_contribution_page  cp,
-         civicrm_payment_processor  pp
-  WHERE  cp.payment_processor = pp.id
-    AND  cp.id = {$contributionPageId}
-";
-
-    if ($recurring = &CRM_Core_DAO::singleValueQuery($sql, CRM_Core_DAO::$_nullArray)) {
-      return TRUE;
-    }
-    return FALSE;
   }
 
   /**
@@ -878,7 +843,8 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * Generate html for pdf in confirmation receipt email  attachment.
+   * Generate html for pdf in confirmation receipt email attachment.
+   *
    * @param int $contributionId
    *   Contribution Page Id.
    * @param int $userID
