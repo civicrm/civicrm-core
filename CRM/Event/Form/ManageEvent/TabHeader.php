@@ -110,7 +110,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     if ($eventID) {
       // disable tabs based on their configuration status
       $eventNameMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
-        'entity_value' => 'civicrm_event',
+        'id' => CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID,
       )));
       $sql = "
 SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder, re.id as is_repeating_event

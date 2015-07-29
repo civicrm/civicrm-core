@@ -52,7 +52,7 @@ class Mapping {
    * @var string
    *   Ex: 'activity_type', 'civicrm_event', 'event_template'.
    */
-  public $entity_value;
+  private $entity_value;
 
   /**
    * Level 1 filter -- The field label.
@@ -67,7 +67,7 @@ class Mapping {
    * @var string
    *   Ex: 'activity_status, 'civicrm_participant_status_type', 'auto_renew_options'.
    */
-  public $entity_status;
+  private $entity_status;
 
   /**
    * Level 2 filter -- the field label.
@@ -81,14 +81,14 @@ class Mapping {
    * @var string|NULL
    *   Ex: 'event_start_date'
    */
-  public $entity_date_start;
+  private $entity_date_start;
 
   /**
    * Date filter -- the field name.
    * @var string|NULL
    *   Ex: 'event_end_date'.
    */
-  public $entity_date_end;
+  private $entity_date_end;
 
   /**
    * Contact selector -- The field/relationship/option-group name.
@@ -145,6 +145,23 @@ class Mapping {
     return $dateFieldLabels;
   }
 
+  public function getRecipientListing($recipientType) {
+    if (!$recipientType) {
+      return array();
+    }
+
+    $options = array();
+    switch ($this->entity) {
+      case 'civicrm_participant':
+        $eventContacts = \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
+        if (!empty($eventContacts[$recipientType]) && $eventContacts[$recipientType] == 'participant_role') {
+          $options = \CRM_Event_PseudoConstant::participantRole();
+        }
+        break;
+    }
+    return $options;
+  }
+
   /**
    * @param bool|NULL $noThanksJustKidding
    *   This is ridiculous and should not exist.
@@ -173,6 +190,23 @@ class Mapping {
       'group' => ts('Select Group'),
     );
     return $entityRecipientLabels;
+  }
+
+  /**
+   * FIXME: Seems to duplicate getRecipientTypes?
+   * @return array|null
+   */
+  public function getRecipientOptions() {
+    $recipientOptions = NULL;
+    if (!\CRM_Utils_System::isNull($this->entity_recipient)) {
+      if ($this->entity_recipient == 'event_contacts') {
+        $recipientOptions = \CRM_Core_OptionGroup::values($this->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
+      }
+      else {
+        $recipientOptions = \CRM_Core_OptionGroup::values($this->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
+      }
+    }
+    return $recipientOptions;
   }
 
   protected static function getValueLabelMap($name) {

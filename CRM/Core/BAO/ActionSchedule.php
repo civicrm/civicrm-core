@@ -97,7 +97,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
       $entityValueLabels[$mapping->id] = $mapping->getValueLabels();
       // Not sure why: everything *except* contact-dates have a $valueLabel.
-      if ($mapping->entity_value !== 'civicrm_contact') {
+      if ($mapping->id !== CRM_Core_ActionScheduleTmp::CONTACT_MAPPING_ID) {
         $valueLabel = array('- ' . strtolower($mapping->entity_value_label) . ' -');
         $entityValueLabels[$mapping->id] = $valueLabel + $entityValueLabels[$mapping->id];
       }
@@ -157,13 +157,15 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @param bool $namesOnly
    *   Return simple list of names.
    *
-   * @param null $entityValue
-   * @param int $id
+   * @param \Civi\ActionSchedule\Mapping|NULL $filterMapping
+   *   Filter by the schedule's mapping type.
+   * @param int $filterValue
+   *   Filter by the schedule's entity_value.
    *
    * @return array
    *   (reference)   reminder list
    */
-  public static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
+  public static function &getList($namesOnly = FALSE, $filterMapping = NULL, $filterValue = NULL) {
     $query = "
 SELECT
        title,
@@ -183,20 +185,17 @@ FROM civicrm_action_schedule cas
 ";
     $queryParams = array();
     $where = " WHERE 1 ";
-    if ($entityValue and $id) {
-      $mappings = self::getMappings(array(
-        'entity_value' => $entityValue,
-      ));
-      $mappingIds = implode(',', array_keys($mappings));
-      $where .= " AND cas.entity_value = %1 AND cas.mapping_id IN ($mappingIds)";
-      $queryParams[1] = array($id, 'Integer');
+    if ($filterMapping and $filterValue) {
+      $where .= " AND cas.entity_value = %1 AND cas.mapping_id = %2";
+      $queryParams[1] = array($filterValue, 'Integer');
+      $queryParams[2] = array($filterMapping->id, 'Integer');
     }
     $where .= " AND cas.used_for IS NULL";
     $query .= $where;
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     while ($dao->fetch()) {
-      /** @var Civi\ActionSchedule\Mapping $mapping */
-      $mapping = CRM_Utils_Array::first(self::getMappings(array(
+      /** @var Civi\ActionSchedule\Mapping $filterMapping */
+      $filterMapping = CRM_Utils_Array::first(self::getMappings(array(
         'id' => $dao->mapping_id,
       )));
       $list[$dao->id]['id'] = $dao->id;
@@ -206,13 +205,13 @@ FROM civicrm_action_schedule cas
       $list[$dao->id]['start_action_condition'] = $dao->start_action_condition;
       $list[$dao->id]['entityDate'] = ucwords(str_replace('_', ' ', $dao->entityDate));
       $list[$dao->id]['absolute_date'] = $dao->absolute_date;
-      $list[$dao->id]['entity'] = $mapping->entity_label;
+      $list[$dao->id]['entity'] = $filterMapping->entity_label;
       $list[$dao->id]['value'] = implode(', ', CRM_Utils_Array::subset(
-        $mapping->getValueLabels(),
+        $filterMapping->getValueLabels(),
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->entityValueIds)
       ));
       $list[$dao->id]['status'] = implode(', ', CRM_Utils_Array::subset(
-        $mapping->getStatusLabels($dao->entityValueIds),
+        $filterMapping->getStatusLabels($dao->entityValueIds),
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->entityStatusIds)
       ));
       $list[$dao->id]['is_repeat'] = $dao->is_repeat;
@@ -391,6 +390,7 @@ FROM civicrm_action_schedule cas
     $actionSchedule->find();
 
     while ($actionSchedule->fetch()) {
+      /** @var \Civi\ActionSchedule\Mapping $mapping */
       $mapping = CRM_Utils_Array::first(self::getMappings(array(
         'id' => $mappingID,
       )));
@@ -414,14 +414,6 @@ FROM civicrm_action_schedule cas
 
       $anniversary = FALSE;
 
-      if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
-        if ($mapping->entity_recipient == 'event_contacts') {
-          $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
-        }
-        else {
-          $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
-        }
-      }
       $from = "{$mapping->entity} e";
 
       if ($mapping->entity == 'civicrm_activity') {
@@ -438,7 +430,7 @@ FROM civicrm_action_schedule cas
             $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
           }
           else {
-            switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
+            switch (CRM_Utils_Array::value($actionSchedule->recipient, $mapping->getRecipientOptions())) {
               case 'Activity Assignees':
                 $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
                 break;
@@ -480,7 +472,7 @@ FROM civicrm_action_schedule cas
           );
           $rList = implode(',', $rList);
 
-          switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
+          switch (CRM_Utils_Array::value($actionSchedule->recipient, $mapping->getRecipientOptions())) {
             case 'participant_role':
               $where[] = "e.role_id IN ({$rList})";
               break;
@@ -492,10 +484,10 @@ FROM civicrm_action_schedule cas
 
         // build where clause
         if (!empty($value)) {
-          $where[] = ($mapping->entity_value == 'event_type') ? "r.event_type_id IN ({$value})" : "r.id IN ({$value})";
+          $where[] = ($mapping->id == CRM_Core_ActionScheduleTmp::EVENT_TYPE_MAPPING_ID) ? "r.event_type_id IN ({$value})" : "r.id IN ({$value})";
         }
         else {
-          $where[] = ($mapping->entity_value == 'event_type') ? "r.event_type_id IS NULL" : "r.id IS NULL";
+          $where[] = ($mapping->id == CRM_Core_ActionScheduleTmp::EVENT_TYPE_MAPPING_ID) ? "r.event_type_id IS NULL" : "r.id IS NULL";
         }
 
         // participant status criteria not to be implemented
@@ -958,28 +950,15 @@ WHERE     m.owner_membership_id IS NOT NULL AND
    * @return array
    */
   public static function getRecipientListing($mappingID, $recipientType) {
-    $options = array();
-    if (!$mappingID || !$recipientType) {
-      return $options;
+    if (!$mappingID) {
+      return array();
     }
 
+    /** @var \Civi\ActionSchedule\Mapping $mapping */
     $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
       'id' => $mappingID,
     )));
-
-    switch ($mapping->entity) {
-      case 'civicrm_participant':
-        $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
-        if (empty($eventContacts[$recipientType])) {
-          return $options;
-        }
-        if ($eventContacts[$recipientType] == 'participant_role') {
-          $options = CRM_Event_PseudoConstant::participantRole();
-        }
-        break;
-    }
-
-    return $options;
+    return $mapping->getRecipientListing($recipientType);
   }
 
   /**

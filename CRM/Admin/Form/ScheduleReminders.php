@@ -87,13 +87,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     elseif (!empty($this->_context)) {
       if ($this->_context == 'event') {
         $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
-        $field = 'civicrm_event';
         $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_compId, 'is_template');
-        if ($isTemplate) {
-          $field = 'event_template';
-        }
         $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
-          'entity_value' => $field,
+          'id' => $isTemplate ? CRM_Core_ActionScheduleTmp::EVENT_TPL_MAPPING_ID : CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID,
         )));
         if ($mapping) {
           $this->_mappingID = $mapping->id;
