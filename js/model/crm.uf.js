@@ -719,10 +719,10 @@
         }
       });
 
+      // CRM-16915 - filter with usedBy module if specified.
       if (usedByFilter && this.get('module') != usedByFilter) {
         allMatched = false;
       }
-
       //CRM-15427 allow all subtypes
       if (!$.isEmptyObject(validTypes.subTypes) && !allowAllSubtypes) {
         // Every actual.subType is a valid.subType

@@ -33,7 +33,8 @@
       if (options.groupTypeFilter) {
         matchingUfGroups = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
-            if(!$.isEmptyObject(options.usedByFilter)) {
+            //CRM-16915 - filter with module used by the profile
+            if (!$.isEmptyObject(options.usedByFilter)) {
               usedByFilter = options.usedByFilter;
             }
             return ufGroupModel.checkGroupType(options.groupTypeFilter, options.allowAllSubtypes, usedByFilter);

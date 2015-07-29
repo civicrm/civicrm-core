@@ -23,8 +23,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         $ufGroups = civicrm_api3('UFGroup', 'get', array(
           'sequential' => 1,
           'is_active' => 1,
-          'rowCount' => 1000, // FIXME
+          'options' => array('limit' => 0),
         ));
+        //CRM-16915 - insert 'module' param for the profile used by CiviEvent.
         if (CRM_Core_Permission::check('manage event profiles') && !CRM_Core_Permission::check('administer CiviCRM')) {
           foreach ($ufGroups['values'] as $key => $value) {
             $ufJoin = CRM_Core_BAO_UFGroup::getUFJoinRecord($value['id']);
