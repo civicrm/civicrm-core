@@ -33,7 +33,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
-  protected $_contributionTypeId;
+  protected $_financialTypeId;
   protected $_contributionParams;
   protected $_contactId;
   protected $_contributionId;
@@ -53,24 +53,23 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->_processorId = $this->paymentProcessorAuthorizeNetCreate();
+    $this->_processorId = $this->paymentProcessorAuthorizeNetCreate(array('is_test' => 0));
     $this->input = $this->ids = $this->objects = array();
     $this->IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->input);
 
     $this->_contactId = $this->individualCreate();
     $this->ids['contact'] = $this->_contactId;
-    $this->_contributionTypeId = 1;
+    $this->_financialTypeId = 1;
 
     $this->_contributionParams = array(
       'contact_id' => $this->_contactId,
       'version' => 3,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'receive_date' => date('Ymd'),
       'total_amount' => 150.00,
       'invoice_id' => 'c8acb91e080ad7bd8a2adc119c192885',
       'currency' => 'USD',
       'contribution_recur_id' => $this->_recurId,
-      'is_test' => 1,
       'contribution_status_id' => 2,
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $this->_contributionParams);
@@ -98,7 +97,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertFalse(empty($this->objects['membership']));
     $this->assertArrayHasKey($this->_membershipTypeID, $this->objects['membership']);
     $this->assertTrue(is_a($this->objects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
-    $this->assertTrue(is_a($this->objects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
+    $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($this->objects['contributionRecur']));
     $this->assertFalse(empty($this->objects['paymentProcessor']));
   }
@@ -117,7 +116,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertFalse(empty($contribution->_relatedObjects['membership']));
     $this->assertArrayHasKey($this->_membershipTypeID, $contribution->_relatedObjects['membership']);
     $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
-    $this->assertTrue(is_a($contribution->_relatedObjects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
+    $this->assertTrue(is_a($contribution->_relatedObjects['financialType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($contribution->_relatedObjects['contributionRecur']));
     $this->assertFalse(empty($contribution->_relatedObjects['paymentProcessor']));
   }
@@ -157,7 +156,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->assertFalse(empty($this->objects['participant']));
     $this->assertTrue(is_a($this->objects['participant'], 'CRM_Event_BAO_Participant'));
-    $this->assertTrue(is_a($this->objects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
+    $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($this->objects['event']));
     $this->assertTrue(is_a($this->objects['event'], 'CRM_Event_BAO_Event'));
     $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
@@ -237,11 +236,11 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpPledgeObjects();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->assertFalse(empty($this->objects['pledge_payment'][0]));
-    $this->assertTrue(is_a($this->objects['contributionType'], 'CRM_Financial_BAO_FinancialType'));
+    $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
     $this->assertTrue(is_a($this->objects['pledge_payment'][0], 'CRM_Pledge_BAO_PledgePayment'));
     $this->assertFalse(empty($this->objects['pledge_payment'][0]->id));
-    $this->assertEquals($this->_contributionTypeId, $this->objects['contributionType']->id);
+    $this->assertEquals($this->_financialTypeId, $this->objects['financialType']->id);
     $this->assertEquals($this->_processorId, $this->objects['paymentProcessor']['id']);
     $this->assertEquals($this->_contributionId, $this->objects['contribution']->id);
     $this->assertEquals($this->_contactId, $this->objects['contact']->id);
@@ -503,8 +502,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'create_date' => date('Ymd'),
       'invoice_id' => 'c8acb91e080ad7bd8a2adc119c192885',
       'contribution_status_id' => 2,
-      'is_test' => 1,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'version' => 3,
       'payment_processor_id' => $this->_processorId,
     );

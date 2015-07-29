@@ -2081,6 +2081,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
+    // If the object is not fully populated then make sure it is - this is a more about legacy paths & cautious
+    // refactoring than anything else, and has unit test coverage.
+    if (empty($this->financial_type_id)) {
+      $this->find(TRUE);
+    }
+
     $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
       'paymentProcessor',
       $ids
@@ -2096,26 +2102,29 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    if (!empty($ids['contributionRecur'])) {
-      $recur = new CRM_Contribute_BAO_ContributionRecur();
-      $recur->id = $ids['contributionRecur'];
-      if (!$recur->find(TRUE)) {
-        throw new Exception("Could not find recur record: " . $ids['contributionRecur']);
+
+    $ids['contributionType'] = $this->financial_type_id;
+    $ids['financialType'] = $this->financial_type_id;
+
+    $entities = array(
+      'contact' => 'CRM_Contact_BAO_Contact',
+      'contributionRecur' => 'CRM_Contribute_BAO_ContributionRecur',
+      'contributionType' => 'CRM_Financial_BAO_FinancialType',
+      'financialType' => 'CRM_Financial_BAO_FinancialType',
+    );
+    foreach ($entities as $entity => $bao) {
+      if (!empty($ids[$entity])) {
+        $this->_relatedObjects[$entity] = new $bao();
+        $this->_relatedObjects[$entity]->id = $ids[$entity];
+        if (!$this->_relatedObjects[$entity]->find(TRUE)) {
+          throw new CRM_Core_Exception($entity . ' could not be loaded');
+        }
       }
-      $this->_relatedObjects['contributionRecur'] = $recur;
-      $paymentProcessorID = $recur->payment_processor_id;
     }
 
-    $contributionType = new CRM_Financial_BAO_FinancialType();
-    $contributionType->id = $this->financial_type_id;
-    $contributionType->find(TRUE);
-
-    if (!empty($ids['contact'])) {
-      $this->_relatedObjects['contact'] = new CRM_Contact_BAO_Contact();
-      $this->_relatedObjects['contact']->id = $ids['contact'];
-      $this->_relatedObjects['contact']->find(TRUE);
+    if (!empty($ids['contributionRecur']) && !$paymentProcessorID) {
+      $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
     }
-    $this->_relatedObjects['contributionType'] = $contributionType;
 
     if (!empty($ids['pledge_payment'])) {
       foreach ($ids['pledge_payment'] as $key => $paymentID) {
