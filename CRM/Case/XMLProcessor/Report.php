@@ -979,10 +979,11 @@ LIMIT  1
     $extends = array('case');
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
     $caseCustomFields = array();
-    while(list($id, $group_values) = each($groupTree)) {
-      while(list($id, $field_values) = each($group_values['fields'])) {
-        if(array_key_exists($id, $customValues)) {
-          $caseCustomFields[$id] = array(
+    while (list($gid, $group_values) = each($groupTree)) {
+      while (list($id, $field_values) = each($group_values['fields'])) {
+        if (array_key_exists($id, $customValues)) {
+          $caseCustomFields[$gid]['title'] = $group_values['title'];
+          $caseCustomFields[$gid]['values'][$id] = array(
             'label' => $field_values['label'],
             'value' => $customValues[$id],
           );
