@@ -174,4 +174,83 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals('second multi value 3', $result['values'][$firstCustomField]['latest']);
   }
 
+  /**
+   * Ensure custom data is updated when option values are modified
+   *
+   * @link https://issues.civicrm.org/jira/browse/CRM-11856
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testAlterOptionValue() {
+    $selectField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->ids['single']['custom_group_id'],
+      'label' => 'Custom Select',
+      'html_type' => 'Select',
+      'option_values' => array(
+        'one' => 'Option1',
+        'two' => 'Option2',
+        'notone' => 'OptionNotOne',
+      ),
+    ));
+    $selectField = civicrm_api3('customField', 'getsingle', array('id' => $selectField['id']));
+    $radioField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->ids['single']['custom_group_id'],
+      'label' => 'Custom Radio',
+      'html_type' => 'Radio',
+      'option_group_id' => $selectField['option_group_id'],
+    ));
+    $multiSelectField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->ids['single']['custom_group_id'],
+      'label' => 'Custom Multi-Select',
+      'html_type' => 'Multi-Select',
+      'option_group_id' => $selectField['option_group_id'],
+    ));
+    $selectName = 'custom_' . $selectField['id'];
+    $radioName = 'custom_' . $radioField['id'];
+    $multiSelectName = 'custom_' . $multiSelectField['id'];
+    $controlFieldName = 'custom_' . $this->ids['single']['custom_field_id'];
+
+    $params = array(
+      'first_name' => 'abc4',
+      'last_name' => 'xyz4',
+      'contact_type' => 'Individual',
+      'email' => 'man4@yahoo.com',
+      $selectName => 'one',
+      $multiSelectName => array('one', 'two', 'notone'),
+      $radioName => 'notone',
+      // The control group in a science experiment should be unaffected
+      $controlFieldName => 'one',
+    );
+
+    $contact = $this->callAPISuccess('Contact', 'create', $params);
+
+    $result = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $contact['id'],
+      'return' => array($selectName, $multiSelectName),
+    ));
+    $this->assertEquals('one', $result[$selectName]);
+    $this->assertEquals(array('one', 'two', 'notone'), $result[$multiSelectName]);
+
+    $this->callAPISuccess('OptionValue', 'create', array(
+      'value' => 'one-modified',
+      'option_group_id' => $selectField['option_group_id'],
+      'name' => 'Option1',
+      'options' => array(
+        'match-mandatory' => array('option_group_id', 'name'),
+      ),
+    ));
+
+    $result = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $contact['id'],
+      'return' => array($selectName, $multiSelectName, $controlFieldName, $radioName),
+    ));
+    // Ensure the relevant fields have been updated
+    $this->assertEquals('one-modified', $result[$selectName]);
+    $this->assertEquals(array('one-modified', 'two', 'notone'), $result[$multiSelectName]);
+    // This field should not have changed because we didn't alter this option
+    $this->assertEquals('notone', $result[$radioName]);
+    // This should not have changed because this field doesn't use the affected option group
+    $this->assertEquals('one', $result[$controlFieldName]);
+  }
+
 }

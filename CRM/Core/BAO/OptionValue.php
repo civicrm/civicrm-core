@@ -182,6 +182,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
       $params['filter'] = CRM_Utils_Array::value('filter', $params, FALSE);
     }
+    // Update custom field data to reflect the new value
+    elseif (isset($params['value'])) {
+      CRM_Core_BAO_CustomOption::updateValue($ids['optionValue'], $params['value']);
+    }
 
     // action is taken depending upon the mode
     $optionValue = new CRM_Core_DAO_OptionValue();
