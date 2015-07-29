@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
