@@ -51,12 +51,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $soft_credit_types = CRM_Core_OptionGroup::values('soft_credit_type', TRUE, FALSE, FALSE, NULL, 'name');
 
     if ($this->_id) {
-      $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
-        $this->_id,
-        'title'
-      );
-      CRM_Utils_System::setTitle(ts('Title and Settings') . " ($title)");
-
       $ufJoinParams = array(
         'module' => 'OnBehalf',
         'entity_table' => 'civicrm_contribution_page',
@@ -90,8 +84,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       }
     }
     else {
-      CRM_Utils_System::setTitle(ts('Title and Settings'));
-
       $ufGroupDAO = new CRM_Core_DAO_UFGroup();
       $ufGroupDAO->name = 'honoree_individual';
       if ($ufGroupDAO->find(TRUE)) {
