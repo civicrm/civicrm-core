@@ -140,7 +140,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     );
     $display = CRM_Core_BAO_CustomField::getDisplayValue($fields['default_value'], $customFieldID1, $options);
 
-    $this->assertEquals('United States', $display, 'Confirm Country display Name');
+    $this->assertEquals('UNITED STATES', $display, 'Confirm Country display Name');
 
     Custom::deleteGroup($customGroup);
   }
@@ -169,7 +169,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    */
   public function testMoveField() {
     $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
-    $this->assertTrue($countriesByName['Andorra'] > 0);
+    $this->assertTrue($countriesByName['ANDORRA'] > 0);
     $groups = array(
       'A' => Custom::createGroup(array(
         'title' => 'Test_Group A',
@@ -214,20 +214,20 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       'alice' => Contact::createIndividual(array(
         'first_name' => 'Alice',
         'last_name' => 'Albertson',
-        'custom_' . $fields['countryA']->id => $countriesByName['Andorra'],
-        'custom_' . $fields['countryB']->id => $countriesByName['Barbados'],
+        'custom_' . $fields['countryA']->id => $countriesByName['ANDORRA'],
+        'custom_' . $fields['countryB']->id => $countriesByName['BARBADOS'],
       )),
       'bob' => Contact::createIndividual(array(
         'first_name' => 'Bob',
         'last_name' => 'Roberts',
-        'custom_' . $fields['countryA']->id => $countriesByName['Austria'],
-        'custom_' . $fields['countryB']->id => $countriesByName['Bermuda'],
-        'custom_' . $fields['countryC']->id => $countriesByName['Chad'],
+        'custom_' . $fields['countryA']->id => $countriesByName['AUSTRIA'],
+        'custom_' . $fields['countryB']->id => $countriesByName['BERMUDA'],
+        'custom_' . $fields['countryC']->id => $countriesByName['CHAD'],
       )),
       'carol' => Contact::createIndividual(array(
         'first_name' => 'Carol',
         'last_name' => 'Carolson',
-        'custom_' . $fields['countryC']->id => $countriesByName['Cambodia'],
+        'custom_' . $fields['countryC']->id => $countriesByName['CAMBODIA'],
       )),
     );
 
@@ -252,7 +252,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
             AND {$fields['countryC']->column_name} is null",
       array(
         1 => array($contacts['alice'], 'Integer'),
-        3 => array($countriesByName['Barbados'], 'Integer'),
+        3 => array($countriesByName['BARBADOS'], 'Integer'),
       )
     );
 
@@ -264,8 +264,8 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
             AND {$fields['countryC']->column_name} = %4",
       array(
         1 => array($contacts['bob'], 'Integer'),
-        3 => array($countriesByName['Bermuda'], 'Integer'),
-        4 => array($countriesByName['Chad'], 'Integer'),
+        3 => array($countriesByName['BERMUDA'], 'Integer'),
+        4 => array($countriesByName['CHAD'], 'Integer'),
       )
     );
 
@@ -277,7 +277,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
             AND {$fields['countryC']->column_name} = %4",
       array(
         1 => array($contacts['carol'], 'Integer'),
-        4 => array($countriesByName['Cambodia'], 'Integer'),
+        4 => array($countriesByName['CAMBODIA'], 'Integer'),
       )
     );
 

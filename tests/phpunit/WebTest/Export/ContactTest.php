@@ -282,7 +282,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->type("address_1_street_address", "121A Sherman St. Apt. 12");
     $this->type("address_1_city", "Dumfries");
     $this->type("address_1_postal_code", "1234");
-    $this->select("address_1_country_id", "United States");
+    $this->select("address_1_country_id", "UNITED STATES");
     $this->select("address_1_state_province_id", "value=1019");
 
     $this->click('_qf_Contact_upload_view');
