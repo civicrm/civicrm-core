@@ -35,3 +35,6 @@ ALTER TABLE civicrm_payment_processor_type
 ADD COLUMN
 `payment_instrument_id` int unsigned   DEFAULT 1 COMMENT 'Payment Instrument ID';
 
+-- CRM-16876 Set country names to UPPERCASE
+UPDATE civicrm_country SET `name` = UPPER( `name` );
+
