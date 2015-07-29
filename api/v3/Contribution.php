@@ -410,6 +410,9 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
 function civicrm_api3_contribution_completetransaction(&$params) {
 
   $input = $ids = array();
+  if (isset($params['payment_processor_id'])) {
+    $input['payment_processor_id'] = $params['payment_processor_id'];
+  }
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   $contribution->find(TRUE);
@@ -459,6 +462,12 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
     'title' => 'Name to send receipt from',
     'description' => '. If not provided this will default to domain mail or contribution page',
     'type' => CRM_Utils_Type::T_STRING,
+  );
+
+  $params['payment_processor_id'] = array(
+    'title' => 'Payment processor ID',
+    'description' => '. Providing this is strongly recommended, as not possible to calculate it accurately always',
+    'type' => CRM_Utils_Type::T_INT,
   );
 }
 
