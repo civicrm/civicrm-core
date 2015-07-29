@@ -73,8 +73,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'is_test' => 1,
       'contribution_status_id' => 2,
     );
-    $contribution = civicrm_api('contribution', 'create', $this->_contributionParams);
-    $this->assertAPISuccess($contribution, ' set-up of contribution ');
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_contributionParams);
     $this->_contributionId = $contribution['id'];
 
     $contribution = new CRM_Contribute_BAO_Contribution();
@@ -475,8 +474,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
     $this->_membershipId = $membership['id'];
     //we'll create membership payment here because to make setup more re-usable
-    civicrm_api('membership_payment', 'create', array(
-      'version' => 3,
+    $this->callAPISuccess('membership_payment', 'create', array(
       'contribution_id' => $this->_contributionId,
       'membership_id' => $this->_membershipId,
     ));
@@ -510,8 +508,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'version' => 3,
       'payment_processor_id' => $this->_processorId,
     );
-    $this->_recurId = civicrm_api('contribution_recur', 'create', $this->_contributionRecurParams);
-    $this->assertAPISuccess($this->_recurId, 'line ' . __LINE__ . ' set-up of recurring contrib');
+    $this->_recurId = $this->callAPISuccess('contribution_recur', 'create', $this->_contributionRecurParams);
     $this->_recurId = $this->_recurId['id'];
     $this->input['contributionRecurId'] = $this->_recurId;
     $this->ids['contributionRecur'] = $this->_recurId;
@@ -522,19 +519,18 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function _setUpParticipantObjects() {
     $event = $this->eventCreate(array('is_email_confirm' => 1));
-    $this->assertAPISuccess($event, 'line ' . __LINE__ . ' set-up of event');
+
     $this->_eventId = $event['id'];
     $this->_participantId = $this->participantCreate(array(
       'event_id' => $this->_eventId,
       'contact_id' => $this->_contactId,
     ));
     //we'll create membership payment here because to make setup more re-usable
-    $participantPayment = civicrm_api('participant_payment', 'create', array(
-      'version' => 3,
+    $participantPayment = $this->callAPISuccess('participant_payment', 'create', array(
       'contribution_id' => $this->_contributionId,
       'participant_id' => $this->_participantId,
     ));
-    $this->assertAPISuccess($participantPayment, 'line ' . __LINE__ . ' set-up of event');
+
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $contribution->find();
@@ -558,14 +554,14 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function _setUpPledgeObjects() {
     $this->_pledgeId = $this->pledgeCreate($this->_contactId);
     //we'll create membership payment here because to make setup more re-usable
-    $pledgePayment = civicrm_api('pledge_payment', 'create', array(
+    $pledgePayment = $this->callAPISuccess('pledge_payment', 'create', array(
       'version' => 3,
       'pledge_id' => $this->_pledgeId,
       'contribution_id' => $this->_contributionId,
       'status_id' => 1,
       'actual_amount' => 50,
     ));
-    $this->assertAPISuccess($pledgePayment, 'line ' . __LINE__ . ' set-up of pledge payment');
+
     $this->input = array(
       'component' => 'contribute',
       'total_amount' => 150.00,
