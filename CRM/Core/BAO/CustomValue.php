@@ -185,7 +185,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       );
 
       if (is_array($formValues[$key])) {
-        if (!in_array(key($formValues[$key]),  CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        if (!in_array(key($formValues[$key]), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $formValues[$key] = array('IN' => $formValues[$key]);
         }
       }
