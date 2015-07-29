@@ -345,9 +345,24 @@ class CRM_Contribute_BAO_Contribution_Utils {
       return $membershipResult;
     }
 
-    //Do not send an email if Recurring contribution is done via Direct Mode
-    //We will send email once the IPN is received.
+    //  Email is done when the payment is completed (now or later)
+    // by completetransaction, rather than the form.
+    // We are moving towards it being done for all payment methods in completetransaction.
     if (!empty($paymentParams['is_recur']) && $form->_contributeMode == 'direct') {
+      if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
+        try {
+          civicrm_api3('contribution', 'completetransaction', array(
+            'id' => $contribution->id,
+            'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+            'is_transactional' => FALSE,
+          ));
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          if ($e->getErrorCode() != 'contribution_completed') {
+            throw new CRM_Core_Exception('Failed to update contribution in database');
+          }
+        }
+      }
       return TRUE;
     }
 
