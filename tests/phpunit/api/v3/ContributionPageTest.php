@@ -157,7 +157,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   public function testSubmitRecurMultiProcessorInstantPayment() {
     $this->setUpContributionPage();
     $this->setupPaymentProcessor();
-    $paymentProcessor2ID =  $this->paymentProcessorCreate(array(
+    $paymentProcessor2ID = $this->paymentProcessorCreate(array(
       'payment_processor_type_id' => 'Dummy',
       'name' => 'processor 2',
       'class_name' => 'Payment_Dummy',
@@ -166,8 +166,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $dummyPP = Civi\Payment\System::singleton()->getById($paymentProcessor2ID);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
     $this->callAPISuccess('ContributionPage', 'create', array(
-      'id' =>$this->_ids['contribution_page'],
-      'payment_processor' => array($paymentProcessor2ID, $this->_ids['payment_processor'])
+      'id' => $this->_ids['contribution_page'],
+      'payment_processor' => array($paymentProcessor2ID, $this->_ids['payment_processor']),
     ));
 
     $priceFieldID = reset($this->_ids['price_field']);
