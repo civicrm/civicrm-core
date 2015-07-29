@@ -314,7 +314,7 @@ ORDER BY start_date desc
     );
     $this->assign('eventCartEnabled', $enableCart);
     $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
-      'entity_value' => 'civicrm_event',
+      'id' => CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID,
     )));
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {

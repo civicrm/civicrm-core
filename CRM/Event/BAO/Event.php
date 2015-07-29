@@ -441,7 +441,7 @@ $event_summary_limit
 
     $params = array(1 => array($optionGroupId, 'Integer'));
     $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
-      'entity_value' => 'civicrm_event',
+      'id' => CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID,
     )));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
@@ -986,10 +986,10 @@ WHERE civicrm_event.is_active = 1
     );
 
     $oldMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
-      'entity_value' => ($eventValues['is_template'] ? 'event_template' : 'civicrm_event'),
+      'id' => ($eventValues['is_template'] ? CRM_Core_ActionScheduleTmp::EVENT_TPL_MAPPING_ID : CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID),
     )));
     $copyMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
-      'entity_value' => ($copyEvent->is_template == 1 ? 'event_template' : 'civicrm_event'),
+      'id' => ($copyEvent->is_template == 1 ? CRM_Core_ActionScheduleTmp::EVENT_TPL_MAPPING_ID : CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID),
     )));
     $copyReminder = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_ActionSchedule',
       array('entity_value' => $id, 'mapping_id' => $oldMapping->id),
