@@ -25,3 +25,13 @@ UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Summar
 {include file='../CRM/Upgrade/4.7.alpha1.msg_template/civicrm_msg_template.tpl'}
 
 UPDATE civicrm_state_province SET name = 'Bataan' WHERE name = 'Batasn';
+
+--CRM-16914
+ALTER TABLE civicrm_payment_processor
+ADD COLUMN
+`payment_instrument_id` int unsigned   DEFAULT 1 COMMENT 'Payment Instrument ID';
+
+ALTER TABLE civicrm_payment_processor_type
+ADD COLUMN
+`payment_instrument_id` int unsigned   DEFAULT 1 COMMENT 'Payment Instrument ID';
+
