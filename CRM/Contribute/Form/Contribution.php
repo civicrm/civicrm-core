@@ -1769,8 +1769,25 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    // Send receipt mail.
-    if ($contribution->id && !empty($this->_params['is_email_receipt'])) {
+    if (!empty($paymentParams['is_recur']) && is_array($result) && CRM_Utils_Array::value('payment_status_id', $result) == 1) {
+      try {
+        civicrm_api3('contribution', 'completetransaction', array(
+          'id' => $contribution->id,
+          'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+          'is_transactional' => FALSE,
+        ));
+        // This has not been set to 1 in the DB - declare it here also
+        $contribution->contribution_status_id = 1;
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        if ($e->getErrorCode() != 'contribution_completed') {
+          throw new CRM_Core_Exception('Failed to update contribution in database');
+        }
+      }
+    }
+    // Send receipt mail. (if the complete transaction ran it will have sent it - so avoid 2
+    // with the elseif. CRM-16926
+    elseif ($contribution->id && !empty($this->_params['is_email_receipt'])) {
       $this->_params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
       $this->_params['contact_id'] = $this->_contactID;
       $this->_params['contribution_id'] = $contribution->id;
