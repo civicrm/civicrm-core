@@ -39,17 +39,20 @@
 class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage {
 
   /**
-   * Takes an associative array and creates a contribution page object.
+   * Creates a contribution page.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_DAO_ContributionPage
    */
-  public static function &create(&$params) {
+  public static function create($params) {
     $financialTypeId = NULL;
     if (!empty($params['id']) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
+    }
+
+    if (isset($params['payment_processor']) && is_array($params['payment_processor'])) {
+      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
     }
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'ContributionPage', CRM_Utils_Array::value('id', $params), $params);
