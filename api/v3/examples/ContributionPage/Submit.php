@@ -70,7 +70,7 @@ function contribution_page_submit_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testLegacySubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed"
+* The test that created it is called "testSubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionPageTest.php
 *
