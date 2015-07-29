@@ -35,7 +35,7 @@
       ajax: {
         url: pcpURL,
         data: function(term, page) {
-          return {term: term, page: page};
+          return {term: term, page_num: page};
         },
         results: function(response) {
           return response;
