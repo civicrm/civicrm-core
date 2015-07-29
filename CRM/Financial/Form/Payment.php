@@ -49,6 +49,8 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     self::addCreditCardJs();
 
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+
+    $this->assign('suppressForm', TRUE);
   }
 
   public function buildQuickForm() {
