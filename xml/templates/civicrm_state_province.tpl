@@ -2505,7 +2505,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4046, 1170, "APA", "Apayao"),
 (4047, 1170, "AUR", "Aurora"),
 (4048, 1170, "BAS", "Basilan"),
-(4049, 1170, "BAN", "Batasn"),
+(4049, 1170, "BAN", "Bataan"),
 (4050, 1170, "BTN", "Batanes"),
 (4051, 1170, "BTG", "Batangas"),
 (4052, 1170, "BEN", "Benguet"),
