@@ -509,7 +509,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         'open_rate',
         'CTR',
         'CTO',
-        'unique_open_rate', 
+        'unique_open_rate',
         'unique_open_count',
       ))) {
         $isError = FALSE;
