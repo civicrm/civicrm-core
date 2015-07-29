@@ -126,6 +126,18 @@
     </table>
 {/if}
 
+{if $caseCustomFields}
+<h2>{ts}Case Custom Fields{/ts}</h2>
+    <table class ="report-layout">
+      {foreach from=$caseCustomFields item=row}
+        <tr>
+          <th class="label">{$row.label}</td>
+          <td class="crm-case-report-custom-field">{$row.value}</td>
+        </tr>
+      {/foreach}
+    </table>
+{/if}
+
 <h2>{ts}Case Activities{/ts}</h2>
 {foreach from=$activities item=activity key=key}
   <table  class ="report-layout">
