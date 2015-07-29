@@ -1242,7 +1242,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
          * = error or success, unless it is a recurring contribution in which case it is pending.
          */
         if ($result['payment_status_id'] == array_search('Completed', $statuses)) {
-          civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id, 'trxn_id' => $result['trxn_id']));
+          civicrm_api3('contribution', 'completetransaction', array(
+            'id' => $contribution->id,
+            'trxn_id' => $result['trxn_id'],
+            'payment_processor_id' => $this->_paymentProcessor['id'],
+          ));
         }
         else {
           // Save the trxn_id.
