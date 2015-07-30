@@ -13,7 +13,7 @@
     "psr/log": "~1.0.0",
     "symfony/finder": "2.3.*",
     "totten/ca-config": "~13.02",
-    "civicrm/civicrm-cxn-rpc": "~0.15.07.07"
+    "civicrm/civicrm-cxn-rpc": "~0.15.07.27"
   },
   "scripts": {
     "post-install-cmd": [

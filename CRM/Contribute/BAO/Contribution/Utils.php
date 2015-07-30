@@ -187,6 +187,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
       }
     }
+
     // Only pay later or unpaid should reach this point. The theory is that paylater should get a receipt now &
     // processor
     // transaction receipts should be outcome driven.

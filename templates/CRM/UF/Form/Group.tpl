@@ -63,11 +63,11 @@
             <td class="html-adjust">{$form.weight.html}</td>
         </tr>
         <tr class="crm-uf_group-form-block-help_pre" >
-            <td class="label">{$form.help_pre.label} {help id='id-help_pre' file="CRM/UF/Form/Group.hlp"}</td>
+            <td class="label">{$form.help_pre.label} {help id='id-help_pre' file="CRM/UF/Form/Group.hlp"} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='help_pre' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.help_pre.html}</td>
         </tr>
         <tr class="crm-uf_group-form-block-help_post" >
-            <td class="label">{$form.help_post.label} {help id='id-help_post' file="CRM/UF/Form/Group.hlp"}</td>
+            <td class="label">{$form.help_post.label} {help id='id-help_post' file="CRM/UF/Form/Group.hlp"} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='help_post' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.help_post.html}</td>
         </tr>
         <tr class="crm-uf_group-form-block-is_active" >

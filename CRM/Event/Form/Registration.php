@@ -1473,14 +1473,8 @@ WHERE  v.option_group_id = g.id
       $this->_values['event']
     ));
     $eventEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
-    if (
-      $endDate &&
-      $endDate < $now
-    ) {
+    if ($endDate && ($endDate < $now) && !empty($eventEndDate) && ($eventEndDate < $now)) {
       CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_end_date', $this->_values['event'])))), $redirect);
-    }
-    if (!empty($eventEndDate) && $eventEndDate < $now) {
-      CRM_Core_Error::statusBounce(ts('Event ended on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event'])))), $redirect);
     }
   }
 
