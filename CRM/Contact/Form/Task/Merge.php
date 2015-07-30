@@ -34,7 +34,7 @@
  */
 
 /**
- * This class provides the functionality to Merge Contacts.
+ * This class provides the functionality to Merge contacts.
  *
  */
 class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {

@@ -125,7 +125,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForElementPresent('search-status');
     $this->assertElementContainsText('search-status', '2 Contact');
 
-    $this->select("task", "label=Add Contacts to Group");
+    $this->select("task", "label=Group - add contacts");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

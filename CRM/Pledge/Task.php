@@ -66,17 +66,17 @@ class CRM_Pledge_Task {
     if (!self::$_tasks) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Pledges'),
+          'title' => ts('Delete pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
         ),
         2 => array(
-          'title' => ts('Print Selected Rows'),
+          'title' => ts('Print selected rows'),
           'class' => 'CRM_Pledge_Form_Task_Print',
           'result' => FALSE,
         ),
         3 => array(
-          'title' => ts('Export Pledges'),
+          'title' => ts('Export pledges'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',

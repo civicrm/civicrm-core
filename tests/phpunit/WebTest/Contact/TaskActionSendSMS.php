@@ -108,7 +108,7 @@ class WebTest_Contact_TaskActionSendSMS extends CiviSeleniumTestCase {
     $this->click('CIVICRM_QFID_ts_all_12');
 
     // Perform a task action
-    $this->select("task", "label=Send SMS to Contacts");
+    $this->select("task", "label=SMS - schedule/send");
     $this->clickLink("Go", 'activity_subject');
     $this->type('activity_subject', "Send SMS to Contacts of {$smsGroupName}");
     $this->type('text_message', "Test SMS to Contacts of {$smsGroupName}");

@@ -250,7 +250,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
     // Select the task action to export
     $this->click("task");
-    $this->select("task", "label=Export Contacts");
+    $this->select("task", "label=Export contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("_qf_Select_next-bottom");
