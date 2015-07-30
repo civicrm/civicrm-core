@@ -112,31 +112,24 @@ class CRM_Core_ScheduledJob {
         $now = CRM_Utils_Date::currentDBDate();
         $dayAgo = strtotime('-1 day', strtotime($now));
         $lastRun = strtotime($this->last_run);
-        $nowDayOfWeek = date('l',strtotime($now));
-        if ($lastRun < $dayAgo and $nowDayOfWeek=='Monday') {
-          return TRUE;
-        }
+        $nowDayOfWeek = date('l', strtotime($now));
+        return ($lastRun < $dayAgo && $nowDayOfWeek == 'Monday');
 
       case '1stOfMth':
         $now = CRM_Utils_Date::currentDBDate();
         $dayAgo = strtotime('-1 day', strtotime($now));
         $lastRun = strtotime($this->last_run);
-        $nowDayOfMonth = date('j',strtotime($now));
-        if ($lastRun < $dayAgo and $nowDayOfMonth=='1') {
-          return TRUE;
-        }
+        $nowDayOfMonth = date('j', strtotime($now));
+        return ($lastRun < $dayAgo && $nowDayOfMonth == '1');
 
       case '1stOfQtr':
         $now = CRM_Utils_Date::currentDBDate();
         $dayAgo = strtotime('-1 day', strtotime($now));
         $lastRun = strtotime($this->last_run);
-        $nowDayOfMonth = date('j',strtotime($now));
-        $nowMonth = date('n',strtotime($now));
-        $qtrMonths = array('1','4','7','10');
-        if ($lastRun < $dayAgo and $nowDayOfMonth=='13' and in_array($nowMonth,$qtrMonths)) {
-          return TRUE;
-        }
-
+        $nowDayOfMonth = date('j', strtotime($now));
+        $nowMonth = date('n', strtotime($now));
+        $qtrMonths = array('1', '4', '7', '10');
+        return ($lastRun < $dayAgo && $nowDayOfMonth == '13' && in_array($nowMonth, $qtrMonths));
     }
 
     $now = CRM_Utils_Date::currentDBDate();
