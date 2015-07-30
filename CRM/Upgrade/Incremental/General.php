@@ -37,6 +37,7 @@
  * This class contains generic upgrade logic which runs regardless of version.
  */
 class CRM_Upgrade_Incremental_General {
+  const MIN_RECOMMENDED_PHP_VER = '5.5';
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -47,6 +48,19 @@ class CRM_Upgrade_Incremental_General {
    * @param $latestVer
    */
   public static function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
+    if (version_compare(phpversion(), self::MIN_RECOMMENDED_PHP_VER) < 0) {
+      $preUpgradeMessage .= '<br />' .
+        ts('This webserver is running an outdated version of PHP (%1). The recommended version is %2 or later.', array(
+          1 => phpversion(),
+          2 => self::MIN_RECOMMENDED_PHP_VER,
+        )) .
+        '<br />' .
+        ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2.', array(
+          1 => $latestVer,
+          2 => self::MIN_RECOMMENDED_PHP_VER,
+        ));
+    }
+
     // http://issues.civicrm.org/jira/browse/CRM-13572
     // Depending on how the code was upgraded, some sites may still have copies of old
     // source files left behind. This is often a forgivable offense, but it's quite
