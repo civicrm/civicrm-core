@@ -79,7 +79,7 @@ function mailing_gettokens_expectedresult() {
       '{contact.preferred_language}' => 'Preferred Language',
       '{contact.preferred_mail_format}' => 'Preferred Mail Format',
       '{contact.hash}' => 'Contact Hash',
-      '{contact.contact_source}' => 'Source of Contact Data',
+      '{contact.contact_source}' => 'Contact Source',
       '{contact.first_name}' => 'First Name',
       '{contact.middle_name}' => 'Middle Name',
       '{contact.last_name}' => 'Last Name',

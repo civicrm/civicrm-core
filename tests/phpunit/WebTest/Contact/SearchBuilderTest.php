@@ -68,7 +68,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $sortName = "adv$firstName, $firstName";
     $displayName = "$firstName adv$firstName";
 
-    $this->_searchBuilder("Zip / Postal Code", "100[0-9]", $sortName, "RLIKE");
+    $this->_searchBuilder("Postal Code", "100[0-9]", $sortName, "RLIKE");
   }
 
   /**
@@ -198,7 +198,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_createContact('Household', $firstName7, "$firstName7@advsearch.co.in", NULL, $postalCode);
 
     // check if the resultset of search builder and advanced search match for the postal code
-    $this->_searchBuilder('Zip / Postal Code', $postalCode, NULL, 'LIKE', '4');
+    $this->_searchBuilder('Postal Code', $postalCode, NULL, 'LIKE', '4');
     $this->_advancedSearch($postalCode, NULL, NULL, '4', 'postal_code');
 
     $firstName8 = "abcc" . substr(sha1(rand()), 0, 7);

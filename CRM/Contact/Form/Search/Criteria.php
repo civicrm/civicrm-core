@@ -270,7 +270,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addSelect('preferred_language', array('class' => 'twenty', 'context' => 'search'));
 
     // Phone search
-    $form->addElement('text', 'phone_numeric', ts('Phone Number'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
+    $form->addElement('text', 'phone_numeric', ts('Phone'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $phoneType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $form->add('select', 'phone_location_type_id', ts('Phone Location'), array('' => ts('- any -')) + $locationType, FALSE, array('class' => 'crm-select2'));
@@ -302,7 +302,7 @@ class CRM_Contact_Form_Search_Criteria {
     $elements = array(
       'street_address' => array(ts('Street Address'), $attributes['street_address'], NULL, NULL),
       'city' => array(ts('City'), $attributes['city'], NULL, NULL),
-      'postal_code' => array(ts('Zip / Postal Code'), $attributes['postal_code'], NULL, NULL),
+      'postal_code' => array(ts('Postal Code'), $attributes['postal_code'], NULL, NULL),
       'country' => array(ts('Country'), $attributes['country_id'], 'country', FALSE),
       'state_province' => array(ts('State/Province'), $attributes['state_province_id'], 'stateProvince', TRUE),
       'county' => array(ts('County'), $attributes['county_id'], 'county', TRUE),
