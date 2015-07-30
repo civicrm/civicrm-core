@@ -2080,17 +2080,65 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $this->_component = strtolower(CRM_Utils_Array::value('component', $input, 'contribute'));
       }
     }
-    $paymentProcessorID = CRM_Utils_Array::value('paymentProcessor', $ids);
-    $contributionType = new CRM_Financial_BAO_FinancialType();
-    $contributionType->id = $this->financial_type_id;
-    $contributionType->find(TRUE);
 
-    if (!empty($ids['contact'])) {
-      $this->_relatedObjects['contact'] = new CRM_Contact_BAO_Contact();
-      $this->_relatedObjects['contact']->id = $ids['contact'];
-      $this->_relatedObjects['contact']->find(TRUE);
+    // If the object is not fully populated then make sure it is - this is a more about legacy paths & cautious
+    // refactoring than anything else, and has unit test coverage.
+    if (empty($this->financial_type_id)) {
+      $this->find(TRUE);
     }
-    $this->_relatedObjects['contributionType'] = $contributionType;
+
+    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
+      'paymentProcessor',
+      $ids
+    ));
+
+    if (!$paymentProcessorID && $this->contribution_page_id) {
+      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
+        $this->contribution_page_id,
+        'payment_processor'
+      );
+      if ($paymentProcessorID) {
+        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
+      }
+    }
+
+
+    $ids['contributionType'] = $this->financial_type_id;
+    $ids['financialType'] = $this->financial_type_id;
+
+    $entities = array(
+      'contact' => 'CRM_Contact_BAO_Contact',
+      'contributionRecur' => 'CRM_Contribute_BAO_ContributionRecur',
+      'contributionType' => 'CRM_Financial_BAO_FinancialType',
+      'financialType' => 'CRM_Financial_BAO_FinancialType',
+    );
+    foreach ($entities as $entity => $bao) {
+      if (!empty($ids[$entity])) {
+        $this->_relatedObjects[$entity] = new $bao();
+        $this->_relatedObjects[$entity]->id = $ids[$entity];
+        if (!$this->_relatedObjects[$entity]->find(TRUE)) {
+          throw new CRM_Core_Exception($entity . ' could not be loaded');
+        }
+      }
+    }
+
+    if (!empty($ids['contributionRecur']) && !$paymentProcessorID) {
+      $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
+    }
+
+    if (!empty($ids['pledge_payment'])) {
+      foreach ($ids['pledge_payment'] as $key => $paymentID) {
+        if (empty($paymentID)) {
+          continue;
+        }
+        $payment = new CRM_Pledge_BAO_PledgePayment();
+        $payment->id = $paymentID;
+        if (!$payment->find(TRUE)) {
+          throw new Exception("Could not find pledge payment record: " . $paymentID);
+        }
+        $this->_relatedObjects['pledge_payment'][] = $payment;
+      }
+    }
 
     if ($this->_component == 'contribute') {
       // retrieve the other optional objects first so
@@ -2132,42 +2180,10 @@ WHERE  contribution_id = %1 ";
         }
       }
 
-      if (!empty($ids['pledge_payment'])) {
-
-        foreach ($ids['pledge_payment'] as $key => $paymentID) {
-          if (empty($paymentID)) {
-            continue;
-          }
-          $payment = new CRM_Pledge_BAO_PledgePayment();
-          $payment->id = $paymentID;
-          if (!$payment->find(TRUE)) {
-            throw new Exception("Could not find pledge payment record: " . $paymentID);
-          }
-          $this->_relatedObjects['pledge_payment'][] = $payment;
-        }
-      }
-
-      if (!empty($ids['contributionRecur'])) {
-        $recur = new CRM_Contribute_BAO_ContributionRecur();
-        $recur->id = $ids['contributionRecur'];
-        if (!$recur->find(TRUE)) {
-          throw new Exception("Could not find recur record: " . $ids['contributionRecur']);
-        }
-        $this->_relatedObjects['contributionRecur'] = &$recur;
-        //get payment processor id from recur object.
-        $paymentProcessorID = $recur->payment_processor_id;
-      }
-      //for normal contribution get the payment processor id.
       if (!$paymentProcessorID) {
-        if ($this->contribution_page_id) {
-          // get the payment processor id from contribution page
-          $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
-            $this->contribution_page_id,
-            'payment_processor'
-          );
-        }
         //fail to load payment processor id.
-        elseif (empty($ids['pledge_payment'])) {
+        // this seems a bit dubious....
+        if (empty($ids['pledge_payment'])) {
           $loadObjectSuccess = TRUE;
           if ($required) {
             throw new Exception("Could not find contribution page for contribution record: " . $this->id);
@@ -2200,8 +2216,13 @@ WHERE  contribution_id = %1 ";
 
       $this->_relatedObjects['participant'] = &$participant;
 
+      // get the payment processor id from event - this is inaccurate see CRM-16923
+      // in future we should look at throwing an exception here rather than an dubious guess.
       if (!$paymentProcessorID) {
         $paymentProcessorID = $this->_relatedObjects['event']->payment_processor;
+        if ($paymentProcessorID) {
+          $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromEvent;
+        }
       }
     }
 
@@ -2409,7 +2430,7 @@ WHERE  contribution_id = %1 ";
         if (!empty($lineItem)) {
           $itemId = key($lineItem);
           foreach ($lineItem as &$eachItem) {
-            if (array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
+            if (is_array($this->_relatedObjects['membership']) && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
               $eachItem['join_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->join_date);
               $eachItem['start_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->start_date);
               $eachItem['end_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->end_date);

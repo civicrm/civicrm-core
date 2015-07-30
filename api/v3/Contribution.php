@@ -410,25 +410,25 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
 function civicrm_api3_contribution_completetransaction(&$params) {
 
   $input = $ids = array();
+  if (isset($params['payment_processor_id'])) {
+    $input['payment_processor_id'] = $params['payment_processor_id'];
+  }
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   $contribution->find(TRUE);
   if (!$contribution->id == $params['id']) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
-  try {
-    if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
-      throw new API_Exception('failed to load related objects');
-    }
-    elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
-      throw new API_Exception(ts('Contribution already completed'));
-    }
-    $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
-    $params = _ipn_process_transaction($params, $contribution, $input, $ids);
+
+  if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
+    throw new API_Exception('failed to load related objects');
   }
-  catch(Exception $e) {
-    throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
+  elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+    throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
+  $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+  $params = _ipn_process_transaction($params, $contribution, $input, $ids);
+
 }
 
 /**
@@ -459,6 +459,12 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
     'title' => 'Name to send receipt from',
     'description' => '. If not provided this will default to domain mail or contribution page',
     'type' => CRM_Utils_Type::T_STRING,
+  );
+
+  $params['payment_processor_id'] = array(
+    'title' => 'Payment processor ID',
+    'description' => '. Providing this is strongly recommended, as not possible to calculate it accurately always',
+    'type' => CRM_Utils_Type::T_INT,
   );
 }
 
