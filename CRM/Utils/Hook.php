@@ -783,7 +783,7 @@ abstract class CRM_Utils_Hook {
    * @param array $tasks
    *   The current set of tasks for that custom field.
    *   You can add/remove existing tasks.
-   *   Each task needs to have a title (eg 'title'  => ts( 'Add Contacts to Group')) and a class
+   *   Each task needs to have a title (eg 'title'  => ts( 'Group - add contacts')) and a class
    *   (eg 'class'  => 'CRM_Contact_Form_Task_AddToGroup').
    *   Optional result (boolean) may also be provided. Class can be an array of classes (not sure what that does :( ).
    *   The key for new Task(s) should not conflict with the keys for core tasks of that $objectType, which can be
