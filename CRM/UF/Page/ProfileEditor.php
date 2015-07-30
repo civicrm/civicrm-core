@@ -29,7 +29,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         if (CRM_Core_Permission::check('manage event profiles') && !CRM_Core_Permission::check('administer CiviCRM')) {
           foreach ($ufGroups['values'] as $key => $value) {
             $ufJoin = CRM_Core_BAO_UFGroup::getUFJoinRecord($value['id']);
-            if (in_array('CiviEvent', $ufJoin)) {
+            if (in_array('CiviEvent', $ufJoin) || in_array('CiviEvent_Additional', $ufJoin)) {
               $ufGroups['values'][$key]['module'] = 'CiviEvent';
             }
           }
