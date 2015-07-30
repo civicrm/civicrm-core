@@ -10,7 +10,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
-    <title>Internal Contact ID</title>
+    <title>Contact ID</title>
     <import>true</import>
     <headerPattern>/internal|contact?|id$/i</headerPattern>
     <required>true</required>
@@ -360,7 +360,7 @@
   </index>
   <field>
     <name>source</name>
-    <title>Source of Contact Data</title>
+    <title>Contact Source</title>
     <uniqueName>contact_source</uniqueName>
     <type>varchar</type>
     <length>255</length>
@@ -370,7 +370,7 @@
     </html>
 
     <import>true</import>
-    <headerPattern>/(S(ource\s)?o(f\s)?C(ontact\s)?Data)$/i</headerPattern>
+    <headerPattern>/(C(ontact\s)?Source)$/i</headerPattern>
     <comment>where contact come from, e.g. import, donate module insert...</comment>
     <add>1.1</add>
   </field>
