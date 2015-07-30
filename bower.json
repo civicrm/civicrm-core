@@ -6,7 +6,7 @@
   "private": true,
   "dependencies": {
     "angular": "~1.3.8",
-    "angular-file-upload": "~1.1.5",
+    "angular-file-upload": ">=1.1.5 <=1.1.6",
     "angular-jquery-dialog-service": "totten/angular-jquery-dialog-service#civicrm",
     "angular-mocks": "~1.3.8",
     "angular-route": "~1.3.8",

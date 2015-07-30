@@ -2924,6 +2924,9 @@ class CRM_Contact_BAO_Query {
     elseif (strpos($op, 'IN') !== FALSE) {
       $groups = array($op => $groups);
     }
+    elseif (is_array($groups) && count($groups)) {
+      $groups = array('IN' => $groups);
+    }
 
     // Find all the groups that are part of a saved search.
     $smartGroupClause = self::buildClause("id", $op, $groups, 'Int');
@@ -5321,7 +5324,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
               return $queryString;
             }
           }
+          else {
+            $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReportUsingOldFormat;
+            if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => array_keys($value)), $dataType)) != FALSE) {
+              return $queryString;
+            }
+          }
         }
+
         $value = CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
         if ($dataType == 'String' || $dataType == 'Text') {
