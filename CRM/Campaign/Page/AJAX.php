@@ -106,7 +106,7 @@ class CRM_Campaign_Page_AJAX {
 
   public static function loadOptionGroupDetails() {
 
-    $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $status = 'fail';
     $opValues = array();
 
@@ -115,7 +115,7 @@ class CRM_Campaign_Page_AJAX {
       CRM_Core_OptionValue::getValues($groupParams, $opValues);
     }
 
-    $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     if ($surveyId) {
       $survey = new CRM_Campaign_DAO_Survey();
       $survey->id = $surveyId;
@@ -146,7 +146,7 @@ class CRM_Campaign_Page_AJAX {
 
   public function voterList() {
     //get the search criteria params.
-    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
@@ -570,7 +570,7 @@ class CRM_Campaign_Page_AJAX {
    */
   public function campaignList() {
     //get the search criteria params.
-    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
@@ -673,7 +673,7 @@ class CRM_Campaign_Page_AJAX {
    */
   public function surveyList() {
     //get the search criteria params.
-    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
@@ -778,7 +778,7 @@ class CRM_Campaign_Page_AJAX {
    */
   public function petitionList() {
     //get the search criteria params.
-    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
