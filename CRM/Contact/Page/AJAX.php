@@ -308,7 +308,7 @@ class CRM_Contact_Page_AJAX {
     header('Content-Type: text/plain');
     $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
     $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
-    $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive', CRM_Core_DAO::$_nullObject );
+    $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive', CRM_Core_DAO::$_nullObject);
     CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID);
     if ($contactId) {
       echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroupID, $contactId);
@@ -451,7 +451,7 @@ LIMIT {$offset}, {$rowCount}
           CRM_Utils_Hook::contactListQuery($query,
             $name,
             CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject),
-            CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)              
+            CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)
           );
 
           $dao = CRM_Core_DAO::executeQuery($query);
@@ -522,7 +522,7 @@ LIMIT {$offset}, {$rowCount}
       CRM_Utils_Hook::contactListQuery($query,
         $name,
         CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject),
-        CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)      
+        CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)
       );
 
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -565,7 +565,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   public static function buildDedupeRules() {
-    $parent = CRM_Utils_Request::retrieve('parentId', 'Positive', CRM_Core_DAO::$_nullObject);      
+    $parent = CRM_Utils_Request::retrieve('parentId', 'Positive', CRM_Core_DAO::$_nullObject);
 
     switch ($parent) {
       case 1:
