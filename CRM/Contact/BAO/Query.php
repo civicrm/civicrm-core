@@ -2161,7 +2161,7 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($fieldName, $value, $type);
       }
       else {
-        if (strpos($op, 'IN') === FALSE)  {
+        if (!strpos($op, 'IN')) {
           $value = $strtolower($value);
         }
         if ($wildcard) {
