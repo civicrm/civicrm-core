@@ -1242,7 +1242,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
          * = error or success, unless it is a recurring contribution in which case it is pending.
          */
         if ($result['payment_status_id'] == array_search('Completed', $statuses)) {
-          civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id, 'trxn_id' => $result['trxn_id']));
+          try {
+            civicrm_api3('contribution', 'completetransaction', array(
+              'id' => $contribution->id,
+              'trxn_id' => $result['trxn_id'],
+              'payment_processor_id' => $this->_paymentProcessor['id'],
+              'is_transactional' => FALSE,
+            ));
+            // This has now been set to 1 in the DB - declare it here also
+            $contribution->contribution_status_id = 1;
+          }
+          catch (CiviCRM_API3_Exception $e) {
+            if ($e->getErrorCode() != 'contribution_completed') {
+              throw new CRM_Core_Exception('Failed to update contribution in database');
+            }
+          }
         }
         else {
           // Save the trxn_id.
