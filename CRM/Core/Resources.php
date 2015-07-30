@@ -749,8 +749,8 @@ class CRM_Core_Resources {
       }
     }
 
-    // CMS-specific resources
-    $config->userSystem->appendCoreResources($items);
+    // Allow hooks to modify this list
+    CRM_Utils_Hook::coreResourceList($items);
 
     return $items;
   }
