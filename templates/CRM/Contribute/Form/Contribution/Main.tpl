@@ -94,7 +94,7 @@
   {if $pledgeBlock}
     {if $is_pledge_payment}
     <div class="crm-section {$form.pledge_amount.name}-section">
-      <div class="label">{$form.pledge_amount.label}&nbsp;<span class="marker">*</span></div>
+      <div class="label">{$form.pledge_amount.label}&nbsp;<span class="crm-marker">*</span></div>
       <div class="content">{$form.pledge_amount.html}</div>
       <div class="clear"></div>
     </div>
