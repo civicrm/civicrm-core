@@ -336,7 +336,7 @@ class CRM_Contact_Page_AJAX {
     }
 
     $config = CRM_Core_Config::singleton();
-    $username = trim(CRM_Utils_Type::escape($_REQUEST['cms_name'], 'String'));
+    $username = trim(CRM_Utils_Array::value('cms_name', $_REQUEST));
 
     $params = array('name' => $username);
 
