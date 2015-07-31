@@ -77,7 +77,7 @@
 
 </div>
      <table class="form-layout-compressed">
-        <tr><td class="label nowrap">{$event.fee_label} <span class="marker">*</span></td>
+        <tr><td class="label nowrap">{$event.fee_label} <span class="crm-marker">*</span></td>
             <td>&nbsp;</td>
             <td>{$form.amount.html}</td>
         </tr>
