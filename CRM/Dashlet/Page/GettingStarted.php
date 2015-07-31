@@ -39,7 +39,7 @@
 class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
 
   const CHECK_TIMEOUT = 5;
-  const CACHE_DAYS = 10;
+  const CACHE_DAYS = 5;
   const GETTING_STARTED_URL = 'https://alert.civicrm.org/welcome?prot=1&ver={ver}&uf={uf}&sid={sid}&lang={lang}&co={co}';
 
   /**
@@ -119,9 +119,6 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
       return NULL;
     }
   
-    // Clean up description - remove tags that would break dashboard layout
-    $html = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $html);
-    $html = strip_tags($html, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br/>");
     $tokensList = CRM_Utils_Token::getTokens($html);
     $this->replaceLinkToken($tokensList, $html);
     if ($html) {
