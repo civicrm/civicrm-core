@@ -24,4 +24,4 @@
  +--------------------------------------------------------------------+
 *}
 
-<div id="civicrm-blog-feed">{$gettingStarted}</div>
+<div id="civicrm-getting-started">{$gettingStarted}</div>
