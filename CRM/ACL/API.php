@@ -227,6 +227,9 @@ class CRM_ACL_API {
       $groups = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
       $cache[$key] = $groups;
     }
+    if (empty($groups)) {
+      return FALSE;
+    }
 
     return in_array($groupID, $groups) ? TRUE : FALSE;
   }
