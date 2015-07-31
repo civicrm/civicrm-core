@@ -69,6 +69,17 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => '20100610',
       'is_override' => 'NULL',
     );
+    $this->fixtures['participant'] = array(
+      'event_id' => array(
+        'is_active' => 1,
+        'is_template' => 0,
+        'title' => 'Example Event',
+        'start_date' => '20120315',
+        'end_date' => '20120615',
+      ),
+      'role_id' => '1', // Attendee.
+      'status_id' => '8', // No-show.
+    );
 
     $this->fixtures['phonecall'] = array(
       'status_id' => 1,
@@ -444,6 +455,65 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'subject sched_contact_mod_anniv',
     );
 
+    $this->fixtures['sched_eventtype_start_1week_before'] = array(
+      'name' => 'sched_eventtype_start_1week_before',
+      'title' => 'sched_eventtype_start_1week_before',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_eventtype_start_1week_before ({event.title})</p>',
+      'body_text' => 'body sched_eventtype_start_1week_before ({event.title})',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => '', // participant status id
+      'entity_value' => '', // event type id
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 2, // event type
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'before',
+      'start_action_date' => 'event_start_date',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'week',
+      'subject' => 'subject sched_eventtype_start_1week_before ({event.title})',
+    );
+    $this->fixtures['sched_eventtype_end_2month_repeat_twice_2_weeks'] = array(
+      'name' => 'sched_eventtype_end_2month_repeat_twice_2_weeks',
+      'title' => 'sched_eventtype_end_2month_repeat_twice_2_weeks',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_eventtype_end_2month_repeat_twice_2_weeks {event.title}</p>',
+      'body_text' => 'body sched_eventtype_end_2month_repeat_twice_2_weeks {event.title}',
+      'end_action' => 'after',
+      'end_date' => 'event_end_date',
+      'end_frequency_interval' => '3',
+      'end_frequency_unit' => 'month',
+      'entity_status' => '', // participant status id
+      'entity_value' => '', // event type id
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '1',
+      'mapping_id' => 2, // event type
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '2',
+      'repetition_frequency_unit' => 'week',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'event_end_date',
+      'start_action_offset' => '2',
+      'start_action_unit' => 'month',
+      'subject' => 'subject sched_eventtype_end_2month_repeat_twice_2_weeks {event.title}',
+    );
+
     $this->fixtures['sched_membership_end_2month_repeat_twice_4_weeks'] = array(
       'name' => 'sched_membership_end_2month',
       'title' => 'sched_membership_end_2month',
@@ -521,6 +591,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'civicrm_action_schedule',
       'civicrm_action_log',
       'civicrm_membership',
+      'civicrm_participant',
+      'civicrm_event',
       'civicrm_email',
     ));
     $this->_tearDown();
@@ -1345,6 +1417,88 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ),
     ));
     $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
+  }
+
+  public function testEventTypeStartDate() {
+    // Create event+participant with start_date = 20120315, end_date = 20120615.
+    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], array('status_id' => 2)));
+    $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $participant->contact_id,
+      'email' => 'test-event@example.com',
+    ));
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $participant->contact_id)));
+
+    $actionSchedule = $this->fixtures['sched_eventtype_start_1week_before'];
+    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $participant->event_id, 'event_type_id');
+    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+
+    //echo "CREATED\n"; ob_flush(); sleep(20);
+
+    // end_date=2012-06-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns(array(
+      array(
+        // 2 weeks before
+        'time' => '2012-03-02 01:00:00',
+        'recipients' => array(),
+      ),
+      array(
+        // 1 week before
+        'time' => '2012-03-08 01:00:00',
+        'recipients' => array(array('test-event@example.com')),
+      ),
+      array(
+        // And then nothing else
+        'time' => '2012-03-16 01:00:00',
+        'recipients' => array(),
+      ),
+    ));
+  }
+
+  public function testEventTypeEndDateRepeat() {
+    // Create event+participant with start_date = 20120315, end_date = 20120615.
+    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], array('status_id' => 2)));
+    $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $participant->contact_id,
+      'email' => 'test-event@example.com',
+    ));
+    $c = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $participant->contact_id)));
+
+    $actionSchedule = $this->fixtures['sched_eventtype_end_2month_repeat_twice_2_weeks'];
+    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $participant->event_id, 'event_type_id');
+    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+
+    $this->assertCronRuns(array(
+      array(
+        // Almost 2 months.
+        'time' => '2012-08-13 01:00:00',
+        'recipients' => array(),
+      ),
+      array(
+        // After the 2-month mark, send an email.
+        'time' => '2012-08-16 01:00:00',
+        'recipients' => array(array('test-event@example.com')),
+      ),
+      array(
+        // After 2 months and 1 week, don't repeat yet.
+        'time' => '2012-08-23 02:00:00',
+        'recipients' => array(),
+      ),
+      array(
+        // After 2 months and 2 weeks
+        'time' => '2012-08-30 02:00:00',
+        'recipients' => array(array('test-event@example.com')),
+      ),
+      array(
+        // After 2 months and 4 week
+        'time' => '2012-09-13 02:00:00',
+        'recipients' => array(array('test-event@example.com')),
+      ),
+      array(
+        // After 2 months and 6 weeks
+        'time' => '2012-09-27 01:00:00',
+        'recipients' => array(),
+      ),
+    ));
   }
 
   // TODO // function testMembershipEndDate_NonMatch() { }
