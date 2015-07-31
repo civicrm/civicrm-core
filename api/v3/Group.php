@@ -77,7 +77,7 @@ function civicrm_api3_group_get($params) {
     if (!$permission) {
       unset($groups[$id]);
     }
-    else if (!empty($options['return']) && in_array('member_count', $options['return'])) {
+    elseif (!empty($options['return']) && in_array('member_count', $options['return'])) {
       $groups[$id]['member_count'] = CRM_Contact_BAO_Group::memberCount($id);
     }
   }
