@@ -5172,6 +5172,12 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $clause = " (NULLIF($field, '') IS NOT NULL) ";
         return $clause;
 
+      case 'IN':
+      case 'NOT IN':
+        if (!empty($value) && is_array($value) && !array_key_exists($op, $value)) {
+          $value = array($op => $value);
+        }
+
       default:
         if (empty($dataType)) {
           $dataType = 'String';
