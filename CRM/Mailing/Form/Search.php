@@ -106,6 +106,8 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
+
     CRM_Contact_BAO_Query::fixDateValues($params["mailing_relative"], $params['mailing_from'], $params['mailing_to']);
 
     $parent = $this->controller->getParent();
