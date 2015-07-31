@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Core\Lock\LockManager;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\FileCacheReader;
@@ -67,6 +68,12 @@ class Container {
     //      }
     //    }
 
+    $container->setDefinition('lockManager', new Definition(
+      '\Civi\Core\Lock\LockManager',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createLockManager');
+
     $container->setDefinition('angular', new Definition(
       '\Civi\Angular\Manager',
       array()
@@ -89,6 +96,12 @@ class Container {
       array(new Reference('dispatcher'), new Reference('magic_function_provider'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
+
+    $container->setDefinition('cxn_reg_client', new Definition(
+      '\Civi\Cxn\Rpc\RegistrationClient',
+      array()
+    ))
+      ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
 
     // Expose legacy singletons as services in the container.
     $singletons = array(
@@ -127,10 +140,29 @@ class Container {
     $dispatcher->addListener('DAO::post-update', array('\CRM_Core_BAO_RecurringEntity', 'triggerUpdate'));
     $dispatcher->addListener('DAO::post-delete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
     $dispatcher->addListener('hook_civicrm_unhandled_exception', array(
-        'CRM_Core_LegacyErrorHandler',
-        'handleException',
-      ));
+      'CRM_Core_LegacyErrorHandler',
+      'handleException',
+    ));
     return $dispatcher;
+  }
+
+  /**
+   * @return LockManager
+   */
+  public function createLockManager() {
+    // Ideally, downstream implementers could override any definitions in
+    // the container. For now, we'll make-do with some define()s.
+    $lm = new LockManager();
+    $lm
+      ->register('/^cache\./', defined('CIVICRM_CACHE_LOCK') ? CIVICRM_CACHE_LOCK : array('CRM_Core_Lock', 'createScopedLock'))
+      ->register('/^data\./', defined('CIVICRM_DATA_LOCK') ? CIVICRM_DATA_LOCK : array('CRM_Core_Lock', 'createScopedLock'))
+      ->register('/^worker\.mailing\.send\./', defined('CIVICRM_WORK_LOCK') ? CIVICRM_WORK_LOCK : array('CRM_Core_Lock', 'createCivimailLock'))
+      ->register('/^worker\./', defined('CIVICRM_WORK_LOCK') ? CIVICRM_WORK_LOCK : array('CRM_Core_Lock', 'createScopedLock'));
+
+    // Registrations may use complex resolver expressions, but (as a micro-optimization)
+    // the default factory is specified as an array.
+
+    return $lm;
   }
 
   /**

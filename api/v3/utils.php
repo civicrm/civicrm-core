@@ -263,6 +263,10 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   }
   // Report deprecations.
   $deprecated = _civicrm_api3_deprecation_check($entity, $result);
+  // The "setvalue" action is deprecated but still in use, so report it only on "getactions".
+  if (!is_string($deprecated) && $action == 'getactions') {
+    $deprecated = ((array) $deprecated) + array('setvalue' => 'The "setvalue" action is deprecated. Use "create" with an id instead.');
+  }
   // Always report "update" action as deprecated.
   if (!is_string($deprecated) && ($action == 'getactions' || $action == 'update')) {
     $deprecated = ((array) $deprecated) + array('update' => 'The "update" action is deprecated. Use "create" with an id instead.');
@@ -2261,4 +2265,62 @@ function _civicrm_api3_field_value_check(&$params, $fieldName) {
     $fieldValue = CRM_Utils_Array::value($op, $fieldValue);
   }
   return array($fieldValue, $op);
+}
+
+/**
+ * A generic "get" API based on simple array data. This is comparable to
+ * _civicrm_api3_basic_get but does not use DAO/BAO. This is useful for
+ * small/mid-size data loaded from external JSON or XML documents.
+ *
+ * @param array $params
+ *   API parameters.
+ * @param array $records
+ *   List of all records.
+ * @param string $idCol
+ *   The property which defines the ID of a record
+ * @param array $fields
+ *   List of filterable fields.
+ * @return array
+ */
+function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fields) {
+  $options = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
+  // TODO // $sort = CRM_Utils_Array::value('sort', $options, NULL);
+  $offset = CRM_Utils_Array::value('offset', $options);
+  $limit = CRM_Utils_Array::value('limit', $options);
+
+  $matches = array();
+
+  $currentOffset = 0;
+  foreach ($records as $record) {
+    if ($idCol != 'id') {
+      $record['id'] = $record[$idCol];
+    }
+    $match = TRUE;
+    foreach ($params as $k => $v) {
+      if ($k == 'id') {
+        $k = $idCol;
+      }
+      if (in_array($k, $fields) && $record[$k] != $v) {
+        $match = FALSE;
+        break;
+      }
+    }
+    if ($match) {
+      if ($currentOffset >= $offset) {
+        $matches[$record[$idCol]] = $record;
+      }
+      if ($limit && count($matches) >= $limit) {
+        break;
+      }
+      $currentOffset++;
+    }
+  }
+
+  $return = CRM_Utils_Array::value('return', $options, array());
+  if (!empty($return)) {
+    $return['id'] = 1;
+    $matches = CRM_Utils_Array::filterColumns($matches, array_keys($return));
+  }
+
+  return civicrm_api3_create_success($matches, $params);
 }

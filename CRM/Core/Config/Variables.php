@@ -259,6 +259,11 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    */
   public $userPermissionClass = 'CRM_Core_Permission_Drupal';
 
+  /**
+   * @var NULL|CRM_Core_Permission_Temp
+   */
+  public $userPermissionTemp = NULL;
+
   public $userFrameworkURLVar = 'q';
   public $userFrameworkDSN = NULL;
   public $userFrameworkBaseURL = NULL;

@@ -1246,7 +1246,7 @@ WHERE civicrm_event.is_active = 1
           $taxAmt = $template->get_template_vars('totalTaxAmount');
           $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
           $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
-          if ($taxAmt && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+          if (isset($invoicing) && isset($prefixValue['is_email_pdf'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;
             $sendTemplateParams['contributionId'] = $values['contributionId'];
           }
@@ -2030,7 +2030,7 @@ WHERE  ce.loc_block_id = $locBlockId";
         $permissions[CRM_Core_Permission::EDIT] = array_keys($allEvents);
       }
       else {
-        $permissions[CRM_Core_Permission::EDIT] = &CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $allEvents, $createdEvents);
+        $permissions[CRM_Core_Permission::EDIT] = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $allEvents, $createdEvents);
       }
 
       if (CRM_Core_Permission::check('edit all events')) {
@@ -2045,7 +2045,7 @@ WHERE  ce.loc_block_id = $locBlockId";
           // at the same time also allow any hook to override if needed.
           $createdEvents = array_keys($allEvents);
         }
-        $permissions[CRM_Core_Permission::VIEW] = &CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, $createdEvents);
+        $permissions[CRM_Core_Permission::VIEW] = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, $createdEvents);
       }
 
       $permissions[CRM_Core_Permission::DELETE] = array();

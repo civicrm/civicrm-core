@@ -24,23 +24,11 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
-  <td><label>{ts}Membership Type(s){/ts}</label><br />
-    <div class="listing-box">
-    {foreach from=$form.member_membership_type_id item="membership_type_val"}
-      <div class="{cycle values='odd-row,even-row'}">
-        {$membership_type_val.html}
-      </div>
-    {/foreach}
-    </div>
+  <td><label>{$form.membership_type_id.label}</label><br />
+      {$form.membership_type_id.html|crmAddClass:twenty}
   </td>
-  <td><label>{ts}Membership Status{/ts}</label><br />
-    <div class="listing-box">
-    {foreach from=$form.member_status_id item="membership_status_val"}
-      <div class="{cycle values='odd-row,even-row'}">
-        {$membership_status_val.html}
-      </div>
-    {/foreach}
-    </div>
+  <td><label>{$form.membership_status_id.label}</label><br />
+      {$form.membership_status_id.html}
   </td>
 </tr>
 

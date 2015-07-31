@@ -175,11 +175,84 @@ function _civicrm_api3_system_log_spec(&$params) {
  * @return array
  */
 function civicrm_api3_system_get($params) {
+  $config = CRM_Core_Config::singleton();
   $returnValues = array(
     array(
-      'version' => CRM_Utils_System::version(),
-      'uf' => CIVICRM_UF,
+      'version' => CRM_Utils_System::version(), // deprecated in favor of civi.version
+      'uf' => CIVICRM_UF, // deprecated in favor of cms.type
+      'php' => array(
+        'version' => phpversion(),
+        'tz' => date_default_timezone_get(),
+        'extensions' => get_loaded_extensions(),
+        'ini' => _civicrm_api3_system_get_redacted_ini(),
+      ),
+      'mysql' => array(
+        'version' => CRM_Core_DAO::singleValueQuery('SELECT @@version'),
+      ),
+      'cms' => array(
+        'type' => CIVICRM_UF,
+        'modules' => CRM_Core_Module::collectStatuses($config->userSystem->getModules()),
+      ),
+      'civi' => array(
+        'version' => CRM_Utils_System::version(),
+        'dev' => (bool) CRM_Utils_System::isDevelopment(),
+        'components' => array_keys(CRM_Core_Component::getEnabledComponents()),
+        'extensions' => preg_grep(
+          '/^uninstalled$/',
+          CRM_Extension_System::singleton()->getManager()->getStatuses(),
+          PREG_GREP_INVERT
+        ),
+        'exampleUrl' => CRM_Utils_System::url('civicrm/example', NULL, TRUE, NULL, FALSE),
+      ),
     ),
   );
+
   return civicrm_api3_create_success($returnValues, $params, 'System', 'get');
+}
+
+/**
+ * Generate a sanitized/anonymized/redacted dump of the PHP configuration.
+ *
+ * Some INI fields contain site-identifying information (SII) -- e.g. URLs,
+ * hostnames, file paths, IP addresses, passwords, or free-form comments
+ * could be used to identify a site or gain access to its resources.
+ *
+ * A number of INI fields have been examined to determine whether they
+ * contain SII. Approved fields are put in a whitelist; all other fields
+ * are redacted.
+ *
+ * Redaction hides the substance of a field but does not completely omit
+ * all information. Consider the field 'mail.log' - setting this field
+ * has a functional effect (it enables or disables the logging behavior)
+ * and also points to particular file. Empty values (FALSE/NULL/0/"")
+ * will pass through redaction, but all other values will be replaced
+ * by a string (eg "REDACTED"). This roughly indicates whether the
+ * option is enabled/disabled without giving away its content.
+ *
+ * @return array
+ */
+function _civicrm_api3_system_get_redacted_ini() {
+  static $whitelist = NULL;
+  if ($whitelist === NULL) {
+    $whitelistFile = __DIR__ . '/System/ini-whitelist.txt';
+    $whitelist = array_filter(
+      explode("\n", file_get_contents($whitelistFile)),
+      function ($k) {
+        return !empty($k) && !preg_match('/^\s*#/', $k);
+      }
+    );
+  }
+
+  $inis = ini_get_all(NULL, FALSE);
+  $result = array();
+  foreach ($inis as $k => $v) {
+    if (empty($v) || in_array($k, $whitelist)) {
+      $result[$k] = $v;
+    }
+    else {
+      $result[$k] = 'REDACTED';
+    }
+  }
+
+  return $result;
 }

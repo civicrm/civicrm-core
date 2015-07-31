@@ -29,16 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * advanced search, extends basic search
+ * Advanced search, extends basic search.
  */
 class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
@@ -72,19 +66,15 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
 
-    /**
-     * set the button names
-     */
     $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
+    // @todo - is this an error - $this->_defaults is used.
     $this->defaults = array();
 
     /*
@@ -161,6 +151,11 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->assign('contributionSummary', $this->get('summary'));
   }
 
+  /**
+   * Set defaults.
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     if (empty($this->_defaults['contribution_status'])) {
       $this->_defaults['contribution_status'][1] = 1;
@@ -170,9 +165,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -228,17 +220,13 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * The post processing of the form gets done here.
    *
    * Key things done during post processing are
-   *      - check for reset or next request. if present, skip post procesing.
+   *      - check for reset or next request. if present, skip post processing.
    *      - now check if user requested running a saved search, if so, then
    *        the form values associated with the saved search are used for searching.
-   *      - if user has done a submit with new values the regular post submissing is
+   *      - if user has done a submit with new values the regular post submission is
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_done) {
@@ -275,6 +263,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'contribution_status_id',
         'contribution_source',
         'contribution_trxn_id',
+        'invoice_id',
       );
       foreach ($specialParams as $element) {
         $value = CRM_Utils_Array::value($element, $this->_formValues);
@@ -377,10 +366,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
+  /**
+   * Use values from $_GET if force is set to TRUE.
+   *
+   * Note that this means that GET over-rides POST. This was a historical decision & the reasoning is not explained.
+   */
   public function fixFormValues() {
-    // if this search has been forced
-    // then see if there are any get values, and if so over-ride the post values
-    // note that this means that GET over-rides POST :)
     if (!$this->_force) {
       return;
     }
@@ -399,6 +390,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
+        // @todo - why do we retrieve these when they are not used?
         list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
           'sort_name'
@@ -460,7 +452,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Return a descriptive name for the page, used in wizard header
+   * Return a descriptive name for the page, used in wizard header.
    *
    * @return string
    */

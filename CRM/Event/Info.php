@@ -93,6 +93,10 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
         ts('delete in CiviEvent'),
         ts('Delete participants and events that you can edit'),
       ),
+      'manage event profiles' => array(
+        ts('manage event profiles'),
+        ts('Allow users to create, edit and copy event-related profile forms used for online event registration.'),
+      ),
     );
 
     if (!$descriptions) {

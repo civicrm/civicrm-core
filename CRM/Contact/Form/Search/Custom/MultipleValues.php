@@ -37,6 +37,8 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   protected $_groupTree;
   protected $_tables;
   protected $_options;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
   /**
    * @param $formValues
@@ -205,7 +207,8 @@ contact_a.sort_name    as sort_name,
    * @return string
    */
   public function from() {
-    $from = "FROM civicrm_contact contact_a";
+    $this->buildACLClause('contact_a');
+    $from = "FROM civicrm_contact contact_a {$this->_aclFrom}";
     $customFrom = array();
     // lets do an INNER JOIN so we get only relevant values rather than all values
     if (!empty($this->_tables)) {
@@ -269,6 +272,9 @@ contact_a.sort_name    as sort_name,
 
     if ($this->_group) {
       $clause[] = "cgc.group_id = {$this->_group}";
+    }
+    if ($this->_aclWhere) {
+      $clause[] = " {$this->_aclWhere}";
     }
 
     $where = '( 1 )';
@@ -352,6 +358,13 @@ contact_a.sort_name    as sort_name,
    */
   public function setTitle($title) {
     CRM_Utils_System::setTitle($title);
+  }
+
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }

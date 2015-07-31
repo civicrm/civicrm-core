@@ -6,7 +6,7 @@
 
 // vim: ts=4 sts=4 sw=4 expandtab
 
-//Add semicolon to prevent IIFE from being passed as argument to concated code.
+// Add semicolon to prevent IIFE from being passed as argument to concatenated code.
 ;
 
 // UMD (Universal Module Definition)
@@ -14,7 +14,7 @@
 (function (root, factory) {
     'use strict';
 
-    /*global define, exports, module */
+    /* global define, exports, module */
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(factory);
@@ -32,6 +32,7 @@
 var call = Function.prototype.call;
 var prototypeOfObject = Object.prototype;
 var owns = call.bind(prototypeOfObject.hasOwnProperty);
+var propertyIsEnumerable = call.bind(prototypeOfObject.propertyIsEnumerable);
 
 // If JS engine supports accessors creating shortcuts.
 var defineGetter;
@@ -40,12 +41,12 @@ var lookupGetter;
 var lookupSetter;
 var supportsAccessors = owns(prototypeOfObject, '__defineGetter__');
 if (supportsAccessors) {
-    /*eslint-disable no-underscore-dangle */
+    /* eslint-disable no-underscore-dangle */
     defineGetter = call.bind(prototypeOfObject.__defineGetter__);
     defineSetter = call.bind(prototypeOfObject.__defineSetter__);
     lookupGetter = call.bind(prototypeOfObject.__lookupGetter__);
     lookupSetter = call.bind(prototypeOfObject.__lookupSetter__);
-    /*eslint-enable no-underscore-dangle */
+    /* eslint-enable no-underscore-dangle */
 }
 
 // ES5 15.2.3.2
@@ -59,9 +60,9 @@ if (!Object.getPrototypeOf) {
     // ... this will nerever possibly return null
     // ... Opera Mini breaks here with infinite loops
     Object.getPrototypeOf = function getPrototypeOf(object) {
-        /*eslint-disable no-proto */
+        /* eslint-disable no-proto */
         var proto = object.__proto__;
-        /*eslint-enable no-proto */
+        /* eslint-enable no-proto */
         if (proto || proto === null) {
             return proto;
         } else if (object.constructor) {
@@ -72,8 +73,8 @@ if (!Object.getPrototypeOf) {
     };
 }
 
-//ES5 15.2.3.3
-//http://es5.github.com/#x15.2.3.3
+// ES5 15.2.3.3
+// http://es5.github.com/#x15.2.3.3
 
 var doesGetOwnPropertyDescriptorWork = function doesGetOwnPropertyDescriptorWork(object) {
     try {
@@ -84,8 +85,7 @@ var doesGetOwnPropertyDescriptorWork = function doesGetOwnPropertyDescriptorWork
     }
 };
 
-//check whether getOwnPropertyDescriptor works if it's given. Otherwise,
-//shim partially.
+// check whether getOwnPropertyDescriptor works if it's given. Otherwise, shim partially.
 if (Object.defineProperty) {
     var getOwnPropertyDescriptorWorksOnObject = doesGetOwnPropertyDescriptorWork({});
     var getOwnPropertyDescriptorWorksOnDom = typeof document === 'undefined' ||
@@ -98,7 +98,7 @@ if (Object.defineProperty) {
 if (!Object.getOwnPropertyDescriptor || getOwnPropertyDescriptorFallback) {
     var ERR_NON_OBJECT = 'Object.getOwnPropertyDescriptor called on a non-object: ';
 
-    /*eslint-disable no-proto */
+    /* eslint-disable no-proto */
     Object.getOwnPropertyDescriptor = function getOwnPropertyDescriptor(object, property) {
         if ((typeof object !== 'object' && typeof object !== 'function') || object === null) {
             throw new TypeError(ERR_NON_OBJECT + object);
@@ -121,9 +121,12 @@ if (!Object.getOwnPropertyDescriptor || getOwnPropertyDescriptorFallback) {
             return descriptor;
         }
 
-        // If object has a property then it's for sure both `enumerable` and
-        // `configurable`.
-        descriptor = { enumerable: true, configurable: true };
+        // If object has a property then it's for sure `configurable`, and
+        // probably `enumerable`. Detect enumerability though.
+        descriptor = {
+            enumerable: propertyIsEnumerable(object, property),
+            configurable: true
+        };
 
         // If JS engine supports accessor properties then property may be a
         // getter or setter.
@@ -169,7 +172,7 @@ if (!Object.getOwnPropertyDescriptor || getOwnPropertyDescriptorFallback) {
         descriptor.writable = true;
         return descriptor;
     };
-    /*eslint-enable no-proto */
+    /* eslint-enable no-proto */
 }
 
 // ES5 15.2.3.4
@@ -195,7 +198,7 @@ if (!Object.create) {
     // No need to use active x approach when document.domain is not set
     // see https://github.com/es-shims/es5-shim/issues/150
     // variation of https://github.com/kitcambridge/es5-shim/commit/4f738ac066346
-    /*global ActiveXObject */
+    /* global ActiveXObject */
     var shouldUseActiveX = function shouldUseActiveX() {
         // return early if document.domain not set
         if (!document.domain) {
@@ -237,9 +240,9 @@ if (!Object.create) {
 
         iframe.style.display = 'none';
         parent.appendChild(iframe);
-        /*eslint-disable no-script-url */
+        /* eslint-disable no-script-url */
         iframe.src = 'javascript:';
-        /*eslint-enable no-script-url */
+        /* eslint-enable no-script-url */
 
         empty = iframe.contentWindow.Object.prototype;
         parent.removeChild(iframe);
@@ -248,7 +251,7 @@ if (!Object.create) {
         return empty;
     };
 
-    /*global document */
+    /* global document */
     if (supportsProto || typeof document === 'undefined') {
         createEmpty = function () {
             return { __proto__: null };
@@ -271,9 +274,9 @@ if (!Object.create) {
             delete empty.toLocaleString;
             delete empty.toString;
             delete empty.valueOf;
-            /*eslint-disable no-proto */
+            /* eslint-disable no-proto */
             empty.__proto__ = null;
-            /*eslint-enable no-proto */
+            /* eslint-enable no-proto */
 
             var Empty = function Empty() {};
             Empty.prototype = empty;
@@ -307,9 +310,9 @@ if (!Object.create) {
             // neither `__proto__`, but this manually setting `__proto__` will
             // guarantee that `Object.getPrototypeOf` will work as expected with
             // objects created using `Object.create`
-            /*eslint-disable no-proto */
+            /* eslint-disable no-proto */
             object.__proto__ = prototype;
-            /*eslint-enable no-proto */
+            /* eslint-enable no-proto */
         }
 
         if (properties !== void 0) {
@@ -396,7 +399,7 @@ if (!Object.defineProperty || definePropertyFallback) {
                 // `__proto__` we can safely override `__proto__` while defining
                 // a property to make sure that we don't hit an inherited
                 // accessor.
-                /*eslint-disable no-proto */
+                /* eslint-disable no-proto */
                 var prototype = object.__proto__;
                 object.__proto__ = prototypeOfObject;
                 // Deleting a property anyway since getter / setter may be
@@ -405,12 +408,12 @@ if (!Object.defineProperty || definePropertyFallback) {
                 object[property] = descriptor.value;
                 // Setting original `__proto__` back now.
                 object.__proto__ = prototype;
-                /*eslint-enable no-proto */
+                /* eslint-enable no-proto */
             } else {
                 object[property] = descriptor.value;
             }
         } else {
-            if (!supportsAccessors) {
+            if (!supportsAccessors && (('get' in descriptor) || ('set' in descriptor))) {
                 throw new TypeError(ERR_ACCESSORS_NOT_SUPPORTED);
             }
             // If we got that far then getters and setters can be defined !!

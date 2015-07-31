@@ -203,7 +203,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
             CRM_Core_Error::statusBounce(ts("You can not add another '%1' activity to this case. %2",
                 array(
                   1 => $this->_activityTypeName,
-                  2 => "Do you want to <a href='$editUrl'>edit the existing activity</a> ?",
+                  2 => ts("Do you want to <a %1>edit the existing activity</a>?", array(1 => "href='$editUrl'")),
                 )
               ),
               $url
@@ -430,9 +430,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $params['parent_id'] = $parentId;
     }
 
-    // required for status msg
-    $recordStatus = 'created';
-
     // store the dates with proper format
     $params['activity_date_time'] = CRM_Utils_Date::processDate($params['activity_date_time'], $params['activity_date_time_time']);
     $params['activity_type_id'] = $this->_activityTypeId;
@@ -500,9 +497,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       if (empty($params['target_contact_id']) && !empty($this->_defaults['target_contact'])) {
         $newActParams['target_contact_id'] = $this->_defaults['target_contact'];
       }
-
-      // record status for status msg
-      $recordStatus = 'updated';
     }
 
     if (!isset($newActParams)) {
@@ -695,18 +689,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
             'case_id' => $vval['case_id'],
           );
           CRM_Case_BAO_Case::processCaseActivity($caseParams);
-          $followupStatus = ts("A followup activity has been scheduled.");
+          $followupStatus = ts("A followup activity has been scheduled.") . '<br /><br />';
         }
       }
-
-      CRM_Core_Session::setStatus('', ts("'%1' activity has been %2. %3 %4",
-        array(
-          1 => $this->_activityTypeName,
-          2 => $recordStatus,
-          3 => $followupStatus,
-          4 => $mailStatus,
-        )
-      ), 'info');
+      $title = ts("%1 Saved", array(1 => $this->_activityTypeName));
+      CRM_Core_Session::setStatus($followupStatus . $mailStatus, $title, 'success');
     }
   }
 

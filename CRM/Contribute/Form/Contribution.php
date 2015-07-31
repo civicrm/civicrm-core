@@ -1153,7 +1153,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
     if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
       //Delete existing soft credit records if soft credit list is empty on update
-      CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id));
+      CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id, 'pcp_id' => 0));
     }
     else {
       //build soft credit params
@@ -1202,13 +1202,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
       }
 
-      if (!empty($pcp)) {
-        $params['pcp'] = $pcp;
-      }
-      if (!empty($softParams)) {
-        $params['soft_credit'] = $softParams;
-        $params['soft_credit_ids'] = $softIDs;
-      }
+      $params['pcp'] = !empty($pcp) ? $pcp : NULL;
+      $params['soft_credit'] = !empty($softParams) ? $softParams : array();
+      $params['soft_credit_ids'] = !empty($softIDs) ? $softIDs : array();
 
       // CRM-5740 if priceset is used, no need to cleanup money.
       if ($priceSetId) {
