@@ -182,7 +182,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     }
 
     if (isset($this->_groupID) && empty($this->_formValues['group'])) {
-      $this->_formValues['group'][$this->_groupID] = 1;
+      $this->_formValues['group'] = $this->_groupID;
     }
     elseif (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
@@ -227,20 +227,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     if ($contactType && !is_array($contactType)) {
       unset($this->_formValues['contact_type']);
       $this->_formValues['contact_type'][$contactType] = 1;
-    }
-
-    $config = CRM_Core_Config::singleton();
-
-    $group = CRM_Utils_Array::value('group', $this->_formValues);
-    if ($group && !is_array($group)) {
-      unset($this->_formValues['group']);
-      $this->_formValues['group'][$group] = 1;
-    }
-
-    $tag = CRM_Utils_Array::value('tag', $this->_formValues);
-    if ($tag && !is_array($tag)) {
-      unset($this->_formValues['tag']);
-      $this->_formValues['tag'][$tag] = 1;
     }
 
     return NULL;
