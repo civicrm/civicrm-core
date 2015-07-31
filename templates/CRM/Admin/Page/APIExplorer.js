@@ -8,7 +8,7 @@
     fields = [],
     getFieldData = {},
     params = {},
-    smartyStub,
+    smartyPhp,
     entityDoc,
     fieldTpl = _.template($('#api-param-tpl').html()),
     optionsTpl = _.template($('#api-options-tpl').html()),
@@ -439,14 +439,16 @@
   }
 
   /**
-   * Smarty doesn't support array literals so we provide a stub
+   * @param value string
    * @param js string
    * @param key string
    */
-  function smartyFormat(js, key) {
+  function smartyFormat(value, js, key) {
+    var varName = 'param_' + key.replace(/[. -]/g, '_').toLowerCase();
+    // Can't pass array literals directly into smarty so we add a php snippet
     if (_.includes(js, '[') || _.includes(js, '{')) {
-      smartyStub = true;
-      return '$' + key.replace(/[. -]/g, '_');
+      smartyPhp.push('$this->assign("'+ varName + '", '+ phpFormat(value) +');');
+      return '$' + varName;
     }
     return js;
   }
@@ -536,14 +538,14 @@
    */
   function formatQuery() {
     var i = 0, q = {
-      smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'",
+      smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'" + (params.sequential ? '' : ' sequential=0'),
       php: "$result = civicrm_api3('" + entity + "', '" + action + "'",
       json: "CRM.api3('" + entity + "', '" + action + "'",
       drush: "drush cvapi " + entity + '.' + action + ' ',
       wpcli: "wp cv api " + entity + '.' + action + ' ',
-      rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&json=" + JSON.stringify(params) + "&api_key=yourkey&key=sitekey"
+      rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&api_key=yourkey&key=sitekey&json=" + JSON.stringify(params)
     };
-    smartyStub = false;
+    smartyPhp = [];
     $.each(params, function(key, value) {
       var js = JSON.stringify(value);
       if (!(i++)) {
@@ -554,7 +556,10 @@
       }
       q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
       q.json += "  \"" + key + '": ' + js;
-      q.smarty += ' ' + key + '=' + smartyFormat(js, key);
+      // smarty already defaults to sequential
+      if (key !== 'sequential') {
+        q.smarty += ' ' + key + '=' + smartyFormat(value, js, key);
+      }
       // FIXME: This is not totally correct cli syntax
       q.drush += key + '=' + js + ' ';
       q.wpcli += key + '=' + js + ' ';
@@ -568,8 +573,8 @@
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (!_.includes(action, 'get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
-    } else if (smartyStub) {
-      q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables from php *}\n" + q.smarty;
+    } else if (smartyPhp.length) {
+      q.smarty = "{php}\n  " + smartyPhp.join("\n  ") + "\n{/php}\n" + q.smarty;
     }
     $.each(q, function(type, val) {
       $('#api-' + type).text(val);
