@@ -118,14 +118,9 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       return NULL;
     }
-    $config = CRM_Core_Config::singleton();
+
     $tokensList = CRM_Utils_Token::getTokens($html);
     $this->replaceLinkToken($tokensList, $html);
-    $patterns = array();
-    $patterns[0] = '/{resourceUrl}/';
-    $replacements = array();
-    $replacements[0] = $config->userFrameworkResourceURL;
-    $html = preg_replace($patterns, $replacements, $html);
     if ($html) {
       CRM_Core_BAO_Cache::setItem($html, 'dashboard', 'gettingStarted');
     }
