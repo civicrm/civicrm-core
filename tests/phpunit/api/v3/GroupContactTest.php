@@ -198,4 +198,47 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('id', $result);
   }
 
+  /**
+   * CRM-16945 duplicate groups are showing up when contacts are hard-added to child groups or smart groups.
+   *
+   * Fix documented in
+   *
+   * Test illustrates this (& ensures once fixed it will stay fixed).
+   */
+  public function testAccurateCountWithSmartGroups() {
+    $childGroupID = $this->groupCreate(array(
+      'name' => 'Child group',
+      'domain_id' => 1,
+      'title' => 'Child group',
+      'description' => 'Child group',
+      'is_active' => 1,
+      'parents' => $this->_groupId1,
+      'visibility' => 'User and User Admin Only',
+    ));
+
+    $params = array(
+      'name' => 'Individuals',
+      'title' => 'Individuals',
+      'is_active' => 1,
+      'parents' => $this->_groupId1,
+      'formValues' => array('contact_type' => 'Goat'),
+    );
+    $smartGroup2 = CRM_Contact_BAO_Group::createSmartGroup($params);
+
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $this->_groupId2));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $smartGroup2->id));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $childGroupID));
+    $groups = $this->callAPISuccess('GroupContact', 'get', array('contact_id' => $this->_contactId));
+
+    // Although the contact is actually hard-added to 4 groups the smart groups are conventionally not returned by the api or displayed
+    // on the main part of the groups tab on the contact (which calls the same function. So, 3 groups is an OK number to return.
+    // However, as of writing this test 4 groups are returned (indexed by group_contact_id, but more seriously 3/4 of those have the group id 1
+    // so 2 on them have group ids that do not match the group contact id they have been keyed by.
+    foreach ($groups['values'] as $groupContactID => $groupContactRecord) {
+      $this->assertEquals($groupContactRecord['group_id'], CRM_Core_DAO::singleValueQuery("SELECT group_id FROM civicrm_group_contact WHERE id = $groupContactID"), 'Group contact record mis-returned for id ' . $groupContactID);
+    }
+    $this->assertEquals(3, $groups['count']);
+
+  }
+
 }
