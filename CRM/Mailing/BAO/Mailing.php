@@ -96,13 +96,14 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   }
 
   /**
+   * @deprecated
+   *
    * @param int $job_id
    * @param int $mailing_id
-   * @param null $mode
    *
    * @return int
    */
-  public static function &getRecipientsCount($job_id, $mailing_id = NULL, $mode = NULL) {
+  public static function getRecipientsCount($job_id, $mailing_id = NULL) {
     // need this for backward compatibility, so we can get count for old mailings
     // please do not use this function if possible
     $eq = self::getRecipients($job_id, $mailing_id);
@@ -115,19 +116,15 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    * @param int $job_id
    *   (misnomer) a nonce value used to name temporary tables.
    * @param int $mailing_id
-   * @param null $offset
-   * @param null $limit
    * @param bool $storeRecipients
    * @param bool $dedupeEmail
    * @param null $mode
    *
    * @return CRM_Mailing_Event_BAO_Queue|string
    */
-  public static function &getRecipients(
+  public static function getRecipients(
     $job_id,
     $mailing_id = NULL,
-    $offset = NULL,
-    $limit = NULL,
     $storeRecipients = FALSE,
     $dedupeEmail = FALSE,
     $mode = NULL) {
@@ -137,8 +134,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $mg = CRM_Mailing_DAO_MailingGroup::getTableName();
     $eq = CRM_Mailing_Event_DAO_Queue::getTableName();
-    $ed = CRM_Mailing_Event_DAO_Delivered::getTableName();
-    $eb = CRM_Mailing_Event_DAO_Bounce::getTableName();
 
     $email = CRM_Core_DAO_Email::getTableName();
     if ($mode == 'sms') {
@@ -530,19 +525,10 @@ AND    $mg.mailing_id = {$mailing_id}
     }
     $mailingGroup->query($query);
 
-    $results = array();
-
     $eq = new CRM_Mailing_Event_BAO_Queue();
 
     list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause();
     $aclWhere = $aclWhere ? "WHERE {$aclWhere}" : '';
-    $limitString = NULL;
-    if ($limit && $offset !== NULL) {
-      $offset = CRM_Utils_Type::escape($offset, 'Int');
-      $limit = CRM_Utils_Type::escape($limit, 'Int');
-
-      $limitString = "LIMIT $offset, $limit";
-    }
 
     if ($storeRecipients && $mailing_id) {
       $sql = "
@@ -625,7 +611,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   /**
    * Returns the regex patterns that are used for preparing the text and html templates.
    */
-  private function &getPatterns($onlyHrefs = FALSE) {
+  private function getPatterns($onlyHrefs = FALSE) {
 
     $patterns = array();
 
@@ -1171,14 +1157,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return Mail_mime               The mail object
    */
-  public function &compose(
+  public function compose(
     $job_id, $event_queue_id, $hash, $contactId,
     $email, &$recipient, $test,
     $contactDetails, &$attachments, $isForward = FALSE,
     $fromEmail = NULL, $replyToEmail = NULL
   ) {
     $config = CRM_Core_Config::singleton();
-    $knownTokens = $this->getTokens();
+    $this->getTokens();
 
     if ($this->_domain == NULL) {
       $this->_domain = CRM_Core_BAO_Domain::getDomain();
@@ -1212,7 +1198,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     else {
       $params = array(array('contact_id', '=', $contactId, 0, 0));
-      list($contact, $_) = CRM_Contact_BAO_Query::apiQuery($params);
+      list($contact) = CRM_Contact_BAO_Query::apiQuery($params);
 
       //CRM-4524
       $contact = reset($contact);
@@ -1752,7 +1738,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
       // Populate the recipients.
       if (empty($params['_skip_evil_bao_auto_recipients_'])) {
-        self::getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, $mailing->dedupe_email);
+        self::getRecipients($job->id, $mailing->id, TRUE, $mailing->dedupe_email);
       }
     }
 
@@ -2836,7 +2822,7 @@ WHERE  civicrm_mailing_job.id = %1
    * @throws Exception
    */
   public static function processQueue($mode = NULL) {
-    $config = &CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
 
     if ($mode == NULL && CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
       throw new CRM_Core_Exception(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(
