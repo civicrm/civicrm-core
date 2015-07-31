@@ -36,7 +36,16 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_contactId;
   protected $_contactId1;
   protected $_apiversion = 3;
+
+  /**
+   * @var int
+   */
   protected $_groupId1;
+
+  /**
+   * @var int
+   */
+  protected $_groupId2;
 
   /**
    * Set up for group contact tests.
@@ -50,23 +59,20 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $this->_contactId = $this->individualCreate();
 
     $this->_groupId1 = $this->groupCreate();
-    $params = array(
+
+    $this->callAPISuccess('group_contact', 'create', array(
       'contact_id' => $this->_contactId,
       'group_id' => $this->_groupId1,
-    );
+    ));
 
-    $result = $this->callAPISuccess('group_contact', 'create', $params);
-
-    $group = array(
+    $this->_groupId2 = $this->groupCreate(array(
       'name' => 'Test Group 2',
       'domain_id' => 1,
       'title' => 'New Test Group2 Created',
       'description' => 'New Test Group2 Created',
       'is_active' => 1,
       'visibility' => 'User and User Admin Only',
-    );
-
-    $this->_groupId2 = $this->groupCreate($group);
+    ));
 
     $this->_group = array(
       $this->_groupId1 => array(
@@ -159,9 +165,9 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('group_contact', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['not_added'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['added'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['total_count'], 2, "in line " . __LINE__);
+    $this->assertEquals($result['not_added'], 1);
+    $this->assertEquals($result['added'], 1);
+    $this->assertEquals($result['total_count'], 2);
   }
 
   ///////////////// civicrm_group_contact_remove methods
@@ -176,8 +182,8 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['removed'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['total_count'], 1, "in line " . __LINE__);
+    $this->assertEquals($result['removed'], 1);
+    $this->assertEquals($result['total_count'], 1);
   }
 
   public function testDeletePermanent() {
@@ -188,8 +194,8 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
     $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
     $result = $this->callAPISuccess('group_contact', 'get', $params);
-    $this->assertEquals(0, $result['count'], "in line " . __LINE__);
-    $this->assertArrayNotHasKey('id', $result, "in line " . __LINE__);
+    $this->assertEquals(0, $result['count']);
+    $this->assertArrayNotHasKey('id', $result);
   }
 
 }
