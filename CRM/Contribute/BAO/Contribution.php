@@ -3509,7 +3509,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           );
           CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
 
-          if ($fieldValues['tax_amount']) {
+          if (!empty($fieldValues['tax_amount'])) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
             $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
