@@ -85,7 +85,7 @@ class CRM_Member_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Email send now'),
+          'title' => ts('Email - send now'),
           'class' => 'CRM_Member_Form_Task_Email',
           'result' => TRUE,
         ),

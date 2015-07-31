@@ -68,7 +68,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     $this->click($id2);
 
     // Change participant status for selected participants
-    $this->select('task', "label=Change Participant Status");
+    $this->select('task', "label=Participant status - change");
     $this->waitForElementPresent('_qf_ParticipantStatus_next');
 
     $this->select('status_change', "label=Attended");

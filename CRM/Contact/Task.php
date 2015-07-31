@@ -92,7 +92,7 @@ class CRM_Contact_Task {
           'class' => 'CRM_Contact_Form_Task_RemoveFromGroup',
         ),
         self::TAG_CONTACTS => array(
-          'title' => ts('Tag - addto contacts'),
+          'title' => ts('Tag - add to contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToTag',
         ),
         self::REMOVE_TAGS => array(
@@ -155,7 +155,7 @@ class CRM_Contact_Task {
           'result' => TRUE,
         ),
         self::EMAIL_UNHOLD => array(
-          'title' => ts('Emails - unhold addresses'),
+          'title' => ts('Email - unhold addresses'),
           'class' => 'CRM_Contact_Form_Task_Unhold',
         ),
         self::COMMUNICATION_PREFS => array(
@@ -185,9 +185,9 @@ class CRM_Contact_Task {
       }
 
       if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-        $label = CRM_Contact_BAO_ContactType::getLabel('Household');
+        $label = CRM_Contact_BAO_ContactType::getLabel('household');
         self::$_tasks[self::HOUSEHOLD_CONTACTS] = array(
-          'title' => ts('Add relationship to %1',
+          'title' => ts('Add relationship - to %1',
             array(1 => $label)
           ),
           'class' => 'CRM_Contact_Form_Task_AddToHousehold',
@@ -195,9 +195,9 @@ class CRM_Contact_Task {
       }
 
       if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-        $label = CRM_Contact_BAO_ContactType::getLabel('Organization');
+        $label = CRM_Contact_BAO_ContactType::getLabel('organization');
         self::$_tasks[self::ORGANIZATION_CONTACTS] = array(
-          'title' => ts('Add relationship to %1',
+          'title' => ts('Add relationship - to %1',
             array(1 => $label)
           ),
           'class' => 'CRM_Contact_Form_Task_AddToOrganization',

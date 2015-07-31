@@ -101,7 +101,7 @@ class CRM_Event_Task {
           'result' => FALSE,
         ),
         6 => array(
-          'title' => ts('Email - send now (to 50 or less)'),
+          'title' => ts('Email - send now'),
           'class' => 'CRM_Event_Form_Task_Email',
           'result' => TRUE,
         ),
@@ -116,12 +116,12 @@ class CRM_Event_Task {
           'result' => TRUE,
         ),
         15 => array(
-          'title' => ts('Change Participant Status'),
+          'title' => ts('Participant status - change'),
           'class' => 'CRM_Event_Form_Task_ParticipantStatus',
           'result' => TRUE,
         ),
         16 => array(
-          'title' => ts('Event name badges - print'),
+          'title' => ts('Name badges - print'),
           'class' => 'CRM_Event_Form_Task_Badge',
           'result' => FALSE,
         ),

@@ -102,17 +102,17 @@ class CRM_Contribute_Task {
           'result' => TRUE,
         ),
         7 => array(
-          'title' => ts('Print or Email Contribution Receipts'),
+          'title' => ts('Receipts - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDF',
           'result' => FALSE,
         ),
         8 => array(
-          'title' => ts('Thank-you Letters for Contributions'),
+          'title' => ts('Thank-you letters - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
         ),
         9 => array(
-          'title' => ts('Print or Email Contribution Invoices'),
+          'title' => ts('Invoices - print or email'),
           'class' => 'CRM_Contribute_Form_Task_Invoice',
           'result' => FALSE,
         ),
@@ -127,7 +127,7 @@ class CRM_Contribute_Task {
         unset(self::$_tasks[4], self::$_tasks[6]);
       }
 
-      // remove action "Print or Email Contribution Invoices"
+      // remove action "Invoices - print or email"
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if (!$invoicing) {
