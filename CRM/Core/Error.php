@@ -291,7 +291,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if (php_sapi_name() == "cli") {
       print ("Sorry. A non-recoverable error has occurred.\n$message \n$code\n$email\n\n");
       // Fix for CRM-16899
-      //debug_print_backtrace();
+      echo static::formatBacktrace(debug_backtrace());
       die("\n");
       // FIXME: Why doesn't this call abend()?
       // Difference: abend() will cleanup transaction and (via civiExit) store session state
