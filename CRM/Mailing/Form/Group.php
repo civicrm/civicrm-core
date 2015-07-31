@@ -483,8 +483,6 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     CRM_Mailing_BAO_Mailing::getRecipients(
       $mailing->id,
       $mailing->id,
-      NULL,
-      NULL,
       TRUE,
       $dedupeEmail
     );
