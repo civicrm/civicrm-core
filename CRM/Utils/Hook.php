@@ -1953,13 +1953,14 @@ abstract class CRM_Utils_Hook {
    * @see CRM_Core_Resources::coreResourceList
    *
    * @param array $list
+   * @param string $region
    */
-  public static function coreResourceList(&$list) {
+  public static function coreResourceList(&$list, $region) {
     // First allow the cms integration to add to the list
     CRM_Core_Config::singleton()->userSystem->appendCoreResources($list);
 
-    self::singleton()->invoke(1, $list,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+    self::singleton()->invoke(2, $list, $region,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_coreResourceList'
     );
   }
