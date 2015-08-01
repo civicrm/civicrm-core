@@ -36,61 +36,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @var int
    */
   const ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
-<<<<<<< HEAD
-
-  /**
-   * Create function - use the API instead.
-   *
-   * Note that the previous create function has been renamed 'legacyCreateMultiple'
-   * and this is new in 4.6
-   * All existing calls have been changed to legacyCreateMultiple except the api call - however, it is recommended
-   * that you call that as the end to end testing here is based on the api & refactoring may still be done.
-   *
-   * @param array $params
-   *
-   * @return \CRM_Contact_BAO_Relationship
-   * @throws \CRM_Core_Exception
-   */
-  public static function create(&$params) {
-    $params = self::loadExistingRelationshipDetails($params);
-    if (self::checkDuplicateRelationship($params, $params['contact_id_a'], $params['contact_id_b'], CRM_Utils_Array::value('id', $params, 0))) {
-      throw new CRM_Core_Exception('Duplicate Relationship');
-    }
-    if (self::checkValidRelationship($params, $params, 0)) {
-      throw new CRM_Core_Exception('Invalid Relationship');
-    }
-    $relationship = self::add($params);
-    if (!empty($params['contact_id_a'])) {
-      $ids = array(
-        'contactTarget' => $relationship->contact_id_b,
-        'contact' => $params['contact_id_a'],
-      );
-
-      //CRM-16087 removed additional call to function relatedMemberships which is already called by disableEnableRelationship
-      //resulting in membership being created twice
-      if (array_key_exists('is_active', $params) && empty($params['is_active'])) {
-        $action = CRM_Core_Action::DISABLE;
-        $active = FALSE;
-      }
-      else {
-        $action = CRM_Core_Action::ENABLE;
-        $active = TRUE;
-      }
-      $id = empty($params['id']) ? $relationship->id : $params['id'];
-      self::disableEnableRelationship($id, $action, $params, $ids, $active);
-    }
-
-    self::addRecent($params, $relationship);
-    return $relationship;
-  }
-
-  /**
-   * Create multiple relationships for one contact.
-   *
-   * The relationship details are the same for each relationship except the secondary contact
-   * id can be an array.
-   *
-=======
 
   /**
    * Create function - use the API instead.
@@ -148,7 +93,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * The relationship details are the same for each relationship except the secondary contact
    * id can be an array.
    *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param array $params
    *   Parameters for creating multiple relationships.
    *   The parameters are the same as for relationship create function except that the non-primary
@@ -617,10 +561,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $value['contact_type_b'] == $otherContactType
         ) &&
         (in_array($value['contact_sub_type_a'], $contactSubType) ||
-<<<<<<< HEAD
-          in_array($value['contact_sub_type_b'], $contactSubType) ||
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           (!$value['contact_sub_type_a'] && !$onlySubTypeRelationTypes)
         )
       ) {
@@ -635,10 +575,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $value['contact_type_a'] == $otherContactType
         ) &&
         (in_array($value['contact_sub_type_b'], $contactSubType) ||
-<<<<<<< HEAD
-          in_array($value['contact_sub_type_a'], $contactSubType) ||
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           (!$value['contact_sub_type_b'] && !$onlySubTypeRelationTypes)
         )
       ) {
@@ -750,17 +686,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
    * Disable/enable the relationship.
-<<<<<<< HEAD
    *
    * @param int $id
    *   Relationship id.
    *
-=======
-   *
-   * @param int $id
-   *   Relationship id.
-   *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param int $action
    * @param array $params
    * @param array $ids
@@ -769,11 +698,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   public static function disableEnableRelationship($id, $action, $params = array(), $ids = array(), $active = FALSE) {
     $relationship = self::clearCurrentEmployer($id, $action);
 
-<<<<<<< HEAD
-    if (CRM_Core_Permission::access('CiviMember')) {
-=======
     if ($id) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       // create $params array which is required to delete memberships
       // of the related contacts.
       if (empty($params)) {
@@ -2082,11 +2007,7 @@ AND cc.sort_name LIKE '%$name%'";
           FALSE,
           $values['cid']
         );
-<<<<<<< HEAD
-        $contactRelationships[$relationshipId]['name'] = $icon . ' ' . CRM_Utils_System::href(
-=======
         $relationship['sort_name'] = $icon . ' ' . CRM_Utils_System::href(
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             $values['name'],
             'civicrm/contact/view',
             "reset=1&cid={$values['cid']}");

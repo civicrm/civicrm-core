@@ -597,17 +597,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $value['participant_status_id'] = $value['participant_status'] = array_search($status, $pendingStatuses);
           }
         }
-<<<<<<< HEAD
-        elseif ($this->_contributeMode == 'express' && !empty($value['is_primary'])) {
-          if (is_object($payment)) {
-            $result = $payment->doExpressCheckout($value);
-          }
-          else {
-            CRM_Core_Error::fatal($paymentObjError);
-          }
-        }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         elseif (!empty($value['is_primary'])) {
           CRM_Core_Payment_Form::mapParams($this->_bltID, $value, $value, TRUE);
           // payment email param can be empty for _bltID mapping

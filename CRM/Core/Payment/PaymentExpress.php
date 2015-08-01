@@ -96,36 +96,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public function setExpressCheckOut(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-   * @param $token
-   *
-   * @throws Exception
-   */
-  public function getExpressCheckoutDetails($token) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public function doExpressCheckout(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *

@@ -45,8 +45,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   protected $_rgid;
 
   /**
-<<<<<<< HEAD
-=======
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -54,7 +52,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Pre processing.
    *
    * @return void

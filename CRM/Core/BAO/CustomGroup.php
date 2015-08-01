@@ -246,11 +246,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   Value we want to set the is_active field.
    *
    * @return Object
-<<<<<<< HEAD
-   *   DAO object on sucess, null otherwise
-=======
    *   DAO object on success, null otherwise
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $is_active) {
     // reset the cache
@@ -321,11 +317,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param string $entityType
    *   Of the contact whose contact type is needed.
    * @param CRM_Core_Form $form
-<<<<<<< HEAD
-   *   Not used but required.
-=======
    *   Not used
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param int $entityID
    * @param int $groupID
    * @param string $subType
@@ -346,10 +338,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @todo - review this  - It also returns an array called 'info' with tables, select, from, where keys
    *   The reason for the info array in unclear and it could be determined from parsing the group tree after creation
    *   With caching the performance impact would be small & the function would be cleaner
-<<<<<<< HEAD
-   *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function &getTree(
     $entityType,

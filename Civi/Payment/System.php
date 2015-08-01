@@ -29,34 +29,6 @@ class System {
   }
 
   /**
-<<<<<<< HEAD
-   * @param array $processor
-   * @throws \CRM_Core_Exception
-   */
-  public function getByProcessor($processor) {
-    $id = $processor['id'];
-
-    if (!isset($this->cache[$id])) {
-      if (!isset($this->cache[$id])) {
-        //does this config need to be called?
-        $config = \CRM_Core_Config::singleton();
-        $ext = \CRM_Extension_System::singleton()->getMapper();
-        if ($ext->isExtensionKey($processor['class_name'])) {
-          $paymentClass = $ext->keyToClass($processor['class_name'], 'payment');
-          require_once $ext->classToPath($paymentClass);
-        }
-        else {
-          $paymentClass = 'CRM_Core_' . $processor['class_name'];
-          if (empty($paymentClass)) {
-            throw new \CRM_Core_Exception('no class provided');
-          }
-          require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
-        }
-
-        $this->cache[$id] = new $paymentClass($processor['is_test'] ? 'test' : 'live', $processor);
-      }
-    }
-=======
    * Starting from the processor as an array retrieve the processor as an object.
    *
    * If there is no valid configuration it will not be retrieved.
@@ -97,36 +69,25 @@ class System {
       $this->cache[$id] = $processorObject;
     }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return $this->cache[$id];
   }
 
   /**
    * @param int $id
-<<<<<<< HEAD
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function getById($id) {
-    $processor = civicrm_api3('payment_processor', 'getsingle', array('id' => $id));
-=======
    *
    * @return \Civi\Payment\CRM_Core_Payment|NULL
    * @throws \CiviCRM_API3_Exception
    */
   public function getById($id) {
     $processor = civicrm_api3('payment_processor', 'getsingle', array('id' => $id, 'is_test' => NULL));
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return self::getByProcessor($processor);
   }
 
   /**
    * @param string $name
    * @param bool $is_test
-<<<<<<< HEAD
-=======
    *
    * @return \Civi\Payment\CRM_Core_Payment|NULL
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @throws \CiviCRM_API3_Exception
    */
   public function getByName($name, $is_test) {
@@ -142,8 +103,6 @@ class System {
    */
   public function flushProcessors() {
     $this->cache = array();
-<<<<<<< HEAD
-=======
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors(NULL, TRUE);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('test', TRUE);
   }
@@ -166,7 +125,6 @@ class System {
       'is_test' => 0,
     ),
     TRUE);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
 }

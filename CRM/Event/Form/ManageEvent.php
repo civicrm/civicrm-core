@@ -84,10 +84,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
   /**
    * Check if repeating event.
-<<<<<<< HEAD
-   */
-  public $_isRepeatingEvent;
-=======
    */
   public $_isRepeatingEvent;
 
@@ -104,7 +100,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public function getDefaultContext() {
     return 'create';
   }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Set variables up before form is built.

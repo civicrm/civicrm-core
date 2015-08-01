@@ -91,8 +91,6 @@ class CRM_Utils_Check {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Determine if a message is important enough to harass the administrator about.
    *
    * @param CRM_Utils_Check_Message $message
@@ -108,7 +106,6 @@ class CRM_Utils_Check {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Throw an exception if any of the checks fail.
    *
    * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched

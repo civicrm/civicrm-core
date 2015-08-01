@@ -26,29 +26,9 @@
  */
 
 /**
-<<<<<<< HEAD
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
- */
-class CRM_Upgrade_Incremental_php_FourThree {
-  const BATCH_SIZE = 5000;
-
-  /**
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
-=======
  * Upgrade logic for 4.3
  */
 class CRM_Upgrade_Incremental_php_FourThree extends CRM_Upgrade_Incremental_Base {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Compute any messages which should be displayed beforeupgrade.
@@ -308,22 +288,14 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
    * @param $rev
    */
   public function upgrade_4_3_alpha3($rev) {
-<<<<<<< HEAD
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.alpha3')), 'task_4_3_x_runSql', $rev);
-=======
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.alpha3')), 'runSql', $rev);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
    * @param $rev
    */
   public function upgrade_4_3_beta2($rev) {
-<<<<<<< HEAD
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta2')), 'task_4_3_x_runSql', $rev);
-=======
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta2')), 'runSql', $rev);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     // CRM-12002
     if (
@@ -338,11 +310,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
    * @param $rev
    */
   public function upgrade_4_3_beta3($rev) {
-<<<<<<< HEAD
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta3')), 'task_4_3_x_runSql', $rev);
-=======
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta3')), 'runSql', $rev);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // CRM-12065
     $query = "SELECT id, form_values FROM civicrm_report_instance WHERE form_values LIKE '%contribution_type%'";
     $this->addTask('Replace contribution_type to financial_type in table civicrm_report_instance', 'replaceContributionTypeId', $query, 'reportInstance');
@@ -354,11 +322,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
    * @param $rev
    */
   public function upgrade_4_3_beta4($rev) {
-<<<<<<< HEAD
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta4')), 'task_4_3_x_runSql', $rev);
-=======
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta4')), 'runSql', $rev);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // add indexes for civicrm_entity_financial_trxn
     // CRM-12141
     $this->addTask('Check/Add indexes for civicrm_entity_financial_trxn', 'task_4_3_x_checkIndexes', $rev);
@@ -395,11 +359,7 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
    * @param $rev
    */
   public function upgrade_4_3_4($rev) {
-<<<<<<< HEAD
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.4')), 'task_4_3_x_runSql', $rev);
-=======
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.4')), 'runSql', $rev);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -1344,41 +1304,4 @@ ADD INDEX UI_entity_financial_trxn_entity_id (entity_id);
     return TRUE;
   }
 
-<<<<<<< HEAD
-  /**
-   * (Queue Task Callback)
-   */
-  public static function task_4_3_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
-    $upgrade = new CRM_Upgrade_Form();
-    $upgrade->processSQL($rev);
-
-    return TRUE;
-  }
-
-  /**
-   * Syntatic sugar for adding a task which (a) is in this class and (b) has
-   * a high priority.
-   *
-   * After passing the $funcName, you can also pass parameters that will go to
-   * the function. Note that all params must be serializable.
-   */
-  protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load(array(
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ));
-
-    $args = func_get_args();
-    $title = array_shift($args);
-    $funcName = array_shift($args);
-    $task = new CRM_Queue_Task(
-      array(get_class($this), $funcName),
-      $args,
-      $title
-    );
-    $queue->createItem($task, array('weight' => -1));
-  }
-
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

@@ -47,8 +47,6 @@ function civicrm_api3_product_create($params) {
 }
 
 /**
-<<<<<<< HEAD
-=======
  * Adjust Metadata for Create action.
  *
  * The metadata is used for setting defaults, documentation & validation.
@@ -61,7 +59,6 @@ function _civicrm_api3_product_create_spec(&$params) {
 }
 
 /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * Get a product.
  *
  * @param array $params

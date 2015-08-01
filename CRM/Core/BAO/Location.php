@@ -95,8 +95,6 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Get the ID of the database billing location.
    *
    * @return int
@@ -117,7 +115,6 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
     return $billingTypeID;
   }
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Creates the entry in the civicrm_loc_block.
    */
   public static function createLocBlock(&$location, &$entityElements) {

@@ -435,8 +435,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     return ts('SMS Content');
   }
 
-<<<<<<< HEAD
-=======
   /**
    * List available tokens for this form.
    *
@@ -447,5 +445,4 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     return $tokens;
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

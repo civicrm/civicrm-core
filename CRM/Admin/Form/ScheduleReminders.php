@@ -135,7 +135,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         )
       );
       $sel->setOptions(array($sel1, $sel2, $sel3));
-<<<<<<< HEAD
 
       if (is_a($sel->_elements[1], 'HTML_QuickForm_select')) {
         // make second selector a multi-select -
@@ -143,15 +142,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $sel->_elements[1]->setSize(5);
       }
 
-=======
-
-      if (is_a($sel->_elements[1], 'HTML_QuickForm_select')) {
-        // make second selector a multi-select -
-        $sel->_elements[1]->setMultiple(TRUE);
-        $sel->_elements[1]->setSize(5);
-      }
-
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       if (is_a($sel->_elements[2], 'HTML_QuickForm_select')) {
         // make third selector a multi-select -
         $sel->_elements[2]->setMultiple(TRUE);
@@ -635,8 +625,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
   }
 
-<<<<<<< HEAD
-=======
   /**
    * List available tokens for this form.
    *
@@ -650,5 +638,4 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     return $tokens;
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

@@ -29,15 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
-<<<<<<< HEAD
- * $Id$
- *
-=======
  */
 
 /**
  * Class CRM_Core_Payment_PayPalImpl for paypal pro, paypal standard & paypal express.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   const CHARSET = 'iso-8859-1';
@@ -47,16 +42,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   /**
    * Constructor.
    *
-<<<<<<< HEAD
-   * @var object
-   */
-  static private $_singleton = NULL;
-
-  /**
-   * Constructor.
-   *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param string $mode
    *   The mode of operation: live or test.
    *
@@ -92,9 +77,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
-=======
    * Does this processor support pre-approval.
    *
    * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
@@ -117,7 +99,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *
    * @param CRM_Core_Form $form
    *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return bool
    *   Should form building stop at this point?
    */
@@ -139,18 +120,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return FALSE;
   }
 
-<<<<<<< HEAD
-  /**
-   * Express checkout code. Check PayPal documentation for more information
-   *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
-   *
-   * @return array
-   *   the result in an nice formatted array (or an error object)
-   */
-  public function setExpressCheckOut(&$params) {
-=======
   /**
    * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
    * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
@@ -196,7 +165,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    */
   protected function setExpressCheckOut(&$params) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $args = array();
 
     $this->initialize($args, 'SetExpressCheckout');
@@ -233,8 +201,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Get any details that may be available to the payment processor due to an approval process having happened.
    *
    * In some cases the browser is redirected to enter details on a processor site. Some details may be available as a
@@ -249,7 +215,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Get details from paypal. Check PayPal documentation for more information
    *
    * @param string $token
@@ -273,24 +238,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     /* Success */
-<<<<<<< HEAD
-
-    $params = array();
-    $params['token'] = $result['token'];
-    $params['payer_id'] = $result['payerid'];
-    $params['payer_status'] = $result['payerstatus'];
-    $params['first_name'] = $result['firstname'];
-    $params['middle_name'] = CRM_Utils_Array::value('middlename', $result);
-    $params['last_name'] = $result['lastname'];
-    $params['street_address'] = $result['shiptostreet'];
-    $params['supplemental_address_1'] = CRM_Utils_Array::value('shiptostreet2', $result);
-    $params['city'] = $result['shiptocity'];
-    $params['state_province'] = $result['shiptostate'];
-    $params['postal_code'] = $result['shiptozip'];
-    $params['country'] = $result['shiptocountrycode'];
-
-    return $params;
-=======
     $fieldMap = array(
       'token' => 'token',
       'payer_status' => 'payerstatus',
@@ -306,7 +253,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'country' => 'shiptocountrycode',
     );
     return $this->mapPaypalParamsToCivicrmParams($fieldMap, $result);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -320,13 +266,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    */
   public function doExpressCheckout(&$params) {
-<<<<<<< HEAD
-=======
 
     if (!empty($params['is_recur'])) {
       return $this->createRecurringPayments($params);
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $args = array();
 
     $this->initialize($args, 'DoExpressCheckoutPayment');
@@ -336,13 +279,8 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['currencyCode'] = $params['currencyID'];
     $args['payerID'] = $params['payer_id'];
     $args['invnum'] = $params['invoiceID'];
-<<<<<<< HEAD
-    $args['returnURL'] = CRM_Utils_Array::value('returnURL', $params);
-    $args['cancelURL'] = CRM_Utils_Array::value('cancelURL', $params);
-=======
     $args['returnURL'] = $this->getReturnSuccessUrl($params['qfKey']);
     $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], NULL);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $args['desc'] = $params['description'];
 
     // add CiviCRM BN code
@@ -400,11 +338,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['totalbillingcycles'] = $params['installments'];
     $args['version'] = '56.0';
     $args['profilereference'] = "i={$params['invoiceID']}" .
-<<<<<<< HEAD
-      "&m=$component" .
-=======
       "&m=" .
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       "&c={$params['contactID']}" .
       "&r={$params['contributionRecurID']}" .
       "&b={$params['contributionID']}" .
@@ -540,17 +474,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   public function checkConfig() {
     $error = array();
     $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
-<<<<<<< HEAD
-    if (
-      $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType) ||
-      $this->_paymentProcessor['payment_processor_type_id'] == CRM_Utils_Array::key('PayPal', $paymentProcessorType)
-    ) {
-      if (empty($this->_paymentProcessor['user_name'])) {
-        $error[] = ts('User Name is not set in the Administer &raquo; System Settings &raquo; Payment Processors.');
-      }
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if ($this->_paymentProcessor['payment_processor_type_id'] != CRM_Utils_Array::key('PayPal_Standard', $paymentProcessorType)) {
       if (empty($this->_paymentProcessor['signature'])) {
@@ -986,11 +909,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   /**
    * This function will take NVPString and convert it to an Associative Array and it will decode the response.
-<<<<<<< HEAD
-   * It is usefull to search for a particular key and displaying arrays.
-=======
    * It is useful to search for a particular key and displaying arrays.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @nvpstr is NVPString.
    * @nvpArray is Associative Array.
    */
@@ -1017,8 +936,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return $result;
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Map the paypal params to CiviCRM params using a field map.
    *
@@ -1035,5 +952,4 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return $params;
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

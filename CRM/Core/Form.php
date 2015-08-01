@@ -74,8 +74,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_action;
 
   /**
-<<<<<<< HEAD
-=======
    * Available payment processors.
    *
    * As part of trying to consolidate various payment pages we store processors here & have functions
@@ -98,7 +96,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $_paymentProcessorIDs;
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * The renderer used for this form
    *
    * @var object
@@ -571,19 +568,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
         if (in_array($button['type'], array('next', 'upload', 'done')) && $button['name'] === ts('Save')) {
           $attrs['accesskey'] = 'S';
-<<<<<<< HEAD
         }
         $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
         if ($icon) {
           $attrs['crm-icon'] = $icon;
         }
-=======
-        }
-        $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
-        if ($icon) {
-          $attrs['crm-icon'] = $icon;
-        }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
         $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
       }
@@ -644,21 +633,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $title
    *   The title of the form.
-<<<<<<< HEAD
-   *
-   * @return void
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function setTitle($title) {
     $this->_title = $title;
   }
 
   /**
-<<<<<<< HEAD
-   * Setter function for options.
-   *
-=======
    * Assign billing type id to bltID.
    *
    * @throws CRM_Core_Exception
@@ -743,7 +723,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Setter function for options.
    *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param mixed $options
    *
    * @return void
@@ -1151,8 +1130,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Based on form action, return a string representing the api action.
    * Used by addField method.
    *
@@ -1189,7 +1166,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Adds a select based on field metadata.
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
    * Perhaps a method like $form->bind($name) which would look up all metadata for named field
@@ -1219,11 +1195,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $options = $props['options'];
     }
     else {
-<<<<<<< HEAD
-      $info = civicrm_api3($props['entity'], 'getoptions', $props);
-=======
       $info = civicrm_api3($props['entity'], 'getoptions', $props + array('check_permissions' => 1));
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $options = $info['values'];
     }
     if (!array_key_exists('placeholder', $props)) {
@@ -1466,11 +1438,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $default
    *   //CRM-15427.
    */
-<<<<<<< HEAD
-  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE) {
-=======
   public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE, $usedFor = NULL) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // Output widget
     // FIXME: Instead of adhoc serialization, use a single json_encode()
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
@@ -1487,53 +1455,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-<<<<<<< HEAD
-   * @param string $name
-   * @param $label
-   * @param $attributes
-   * @param bool $forceTextarea
-   */
-  public function addWysiwyg($name, $label, $attributes, $forceTextarea = FALSE) {
-    // 1. Get configuration option for editor (tinymce, ckeditor, pure textarea)
-    // 2. Based on the option, initialise proper editor
-    $editorID = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'editor_id'
-    );
-    $editor = strtolower(CRM_Utils_Array::value($editorID,
-      CRM_Core_OptionGroup::values('wysiwyg_editor')
-    ));
-    if (!$editor || $forceTextarea) {
-      $editor = 'textarea';
-    }
-    if ($editor == 'joomla default editor') {
-      $editor = 'joomlaeditor';
-    }
-
-    if ($editor == 'drupal default editor') {
-      $editor = 'drupalwysiwyg';
-    }
-
-    //lets add the editor as a attribute
-    $attributes['editor'] = $editor;
-
-    $this->addElement($editor, $name, $label, $attributes);
-    $this->assign('editor', $editor);
-
-    // include wysiwyg editor js files
-    // FIXME: This code does not make any sense
-    $includeWysiwygEditor = FALSE;
-    $includeWysiwygEditor = $this->get('includeWysiwygEditor');
-    if (!$includeWysiwygEditor) {
-      $includeWysiwygEditor = TRUE;
-      $this->set('includeWysiwygEditor', $includeWysiwygEditor);
-    }
-
-    $this->assign('includeWysiwygEditor', $includeWysiwygEditor);
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param int $id
    * @param $title
    * @param null $required

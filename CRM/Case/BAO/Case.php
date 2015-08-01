@@ -740,11 +740,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
       $allCases = FALSE;
     }
 
-<<<<<<< HEAD
-    $condition = " AND civicrm_case.is_deleted = 0 ";
-=======
     $condition = " AND civicrm_case.is_deleted = 0 AND civicrm_contact.is_deleted <> 1";
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if (!$allCases) {
       $condition .= " AND case_relationship.contact_id_b = {$userID} ";
@@ -1182,11 +1178,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $query = $select . $from . $where . $groupBy . $orderBy . $limit;
     $queryParams = array(1 => array($caseID, 'Integer'));
 
-<<<<<<< HEAD
-=======
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
     $activityStatuses = CRM_Core_PseudoConstant::activityStatus();
 
@@ -1379,39 +1372,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         }
       }
 
-<<<<<<< HEAD
-      $values[$dao->id]['links'] = $url;
-      $values[$dao->id]['class'] = "";
-
-      if (!empty($dao->priority)) {
-        if ($dao->priority == CRM_Core_OptionGroup::getValue('priority', 'Urgent', 'name')) {
-          $values[$dao->id]['class'] = $values[$dao->id]['class'] . "priority-urgent ";
-        }
-        elseif ($dao->priority == CRM_Core_OptionGroup::getValue('priority', 'Low', 'name')) {
-          $values[$dao->id]['class'] = $values[$dao->id]['class'] . "priority-low ";
-        }
-      }
-
-      if (CRM_Utils_Array::crmInArray($dao->status, $compStatusValues)) {
-        $values[$dao->id]['class'] = $values[$dao->id]['class'] . " status-completed";
-      }
-      else {
-        if (CRM_Utils_Date::overdue($dao->display_date)) {
-          $values[$dao->id]['class'] = $values[$dao->id]['class'] . " status-overdue";
-        }
-        else {
-          $values[$dao->id]['class'] = $values[$dao->id]['class'] . " status-scheduled";
-        }
-      }
-
-      if ($allowEdit) {
-        $values[$dao->id]['status'] = '<div class="crmf-status_id crm-activity-status-' . $dao->id . ' ' . $values[$dao->id]['class'] . ' crm-editable" data-type="select" data-action="create" data-refresh="true">' . $values[$dao->id]['status'] . '</div>';
-      }
-=======
       $caseActivity['links'] = $url;
 
       array_push($caseActivities, $caseActivity);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     $dao->free();
 
@@ -3130,7 +3093,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
   /**
    * Verify user has permission to access a case.
-<<<<<<< HEAD
    *
    * @param int $caseId
    * @param bool $denyClosed
@@ -3186,63 +3148,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *
    * @return bool
    */
-=======
-   *
-   * @param int $caseId
-   * @param bool $denyClosed
-   *   Set TRUE if one wants closed cases to be treated as inaccessible.
-   *
-   * @return bool
-   */
-  public static function accessCase($caseId, $denyClosed = TRUE) {
-    if (!$caseId || !self::enabled()) {
-      return FALSE;
-    }
-
-    // This permission always has access
-    if (CRM_Core_Permission::check('access all cases and activities')) {
-      return TRUE;
-    }
-
-    // This permission is required at minimum
-    if (!CRM_Core_Permission::check('access my cases and activities')) {
-      return FALSE;
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $userID = CRM_Utils_Type::validate($session->get('userID'), 'Positive');
-    $caseId = CRM_Utils_Type::validate($caseId, 'Positive');
-
-    $condition = " AND civicrm_case.is_deleted = 0 ";
-    $condition .= " AND case_relationship.contact_id_b = {$userID} ";
-    $condition .= " AND civicrm_case.id = {$caseId}";
-
-    if ($denyClosed) {
-      $closedId = CRM_Core_OptionGroup::getValue('case_status', 'Closed', 'name');
-      $condition .= " AND civicrm_case.status_id != $closedId";
-    }
-
-    // We don't actually care about activities in the case, but the underlying
-    // query is verbose, and this allows us to share the basic query with
-    // getCases(). $type=='any' means that activities will be left-joined.
-    $query = self::getCaseActivityQuery('any', $userID, $condition);
-    $queryParams = array();
-    $dao = CRM_Core_DAO::executeQuery($query,
-      $queryParams
-    );
-
-    return (bool) $dao->fetch();
-  }
-
-  /**
-   * Check whether activity is a case Activity.
-   *
-   * @param int $activityID
-   *   Activity id.
-   *
-   * @return bool
-   */
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   public static function isCaseActivity($activityID) {
     $isCaseActivity = FALSE;
     if ($activityID) {

@@ -24,21 +24,12 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
-<<<<<<< HEAD
 
 /**
  * @package CiviCRM_APIv3
  */
 
 /**
-=======
-
-/**
- * @package CiviCRM_APIv3
- */
-
-/**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * Get information about fields for a given api request.
  *
  * Getfields information is used for documentation, validation, default setting
@@ -57,12 +48,9 @@
  *   - function: callback (mixed)
  *   - params: array, varies
  *
-<<<<<<< HEAD
-=======
  * @param bool $unique
  *   Determines whether to key by unique field names (only affects get-type) actions
  *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * @return array
  *   API success object
  */
@@ -97,11 +85,6 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   if (!$action || $action == 'getvalue' || $action == 'getcount') {
     $action = 'get';
   }
-<<<<<<< HEAD
-  // determines whether to use unique field names - see comment block above
-  $unique = TRUE;
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   // If no options, return results from cache
   if (!$apiRequest['params']['options'] && isset($results[$entity . $subentity]) && isset($action, $results[$entity . $subentity])
     && isset($action, $results[$entity . $subentity][$sequential])) {
@@ -222,11 +205,6 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
 }
 
 /**
-<<<<<<< HEAD
- * API return function to reformat results as count.
- *
- * @param array $apiRequest
-=======
  * Get metadata for a field
  *
  * @param array $apiRequest
@@ -293,7 +271,6 @@ function _civicrm_api3_generic_getfield_spec(&$params, $apiRequest) {
  * API return function to reformat results as count.
  *
  * @param array $apiRequest
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  *   Api request as an array. Keys are.
  *
  * @throws API_Exception

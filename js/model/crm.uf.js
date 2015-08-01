@@ -701,10 +701,7 @@
     checkGroupType: function(validTypesExpr, allowAllSubtypes, usedByFilter) {
       var allMatched = true;
       allowAllSubtypes = allowAllSubtypes || false;
-<<<<<<< HEAD
-=======
       usedByFilter = usedByFilter || null;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       if (_.isEmpty(this.get('group_type'))) {
         return true;
       }

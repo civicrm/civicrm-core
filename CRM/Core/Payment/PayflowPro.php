@@ -345,25 +345,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     return self::errorExit(9014, "Check the code - all transactions should have been headed off before they got here. Something slipped through the net");
   }
 
-<<<<<<< HEAD
-  /**
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    //copied from Eway but not working and not really sure it should!
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
-  }
-
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   /*
    * Produces error message and returns from class
    */

@@ -44,11 +44,7 @@
 </table>
 <div class="clear"><br /></div>
 <div class="action-link">
-<<<<<<< HEAD
-    {crmButton p="civicrm/contact/deduperules" q="reset=1" icon="close"}{ts}Done{/ts}{/crmButton}
-=======
   {crmButton p="civicrm/contact/deduperules" q="reset=1" icon="close"}{ts}Done{/ts}{/crmButton}
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 </div>
 
 {* process the dupe contacts *}

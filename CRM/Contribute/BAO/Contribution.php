@@ -29,11 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
-<<<<<<< HEAD
- * $Id$
- *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
@@ -234,16 +229,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-<<<<<<< HEAD
-   * @return CRM_Contribute_BAO_Contribution|null the found object or null
-   */
-  public static function &getValues($params, &$values, &$ids) {
-=======
    * @return CRM_Contribute_BAO_Contribution|null
    *   The found object or null
    */
   public static function getValues($params, &$values, &$ids) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if (empty($params)) {
       return NULL;
     }
@@ -570,11 +559,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *   (reference) the default values, some of which need to be resolved.
    * @param bool $reverse
    *   True if we want to resolve the values in the reverse direction (value -> name).
-<<<<<<< HEAD
-   *
-   * @return void
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
     self::lookupValue($defaults, 'financial_type', CRM_Contribute_PseudoConstant::financialType(), $reverse);
@@ -620,15 +604,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
   /**
    * Retrieve DB object based on input parameters.
-<<<<<<< HEAD
    *
    * It also stores all the retrieved values in the default array.
    *
-=======
-   *
-   * It also stores all the retrieved values in the default array.
-   *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
@@ -802,10 +780,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         ),
       );
 
-<<<<<<< HEAD
-      $fields = array_merge($impFields, $typeField, $contributionStatus, $contributionPage, $optionField, $expFieldProduct,
-        $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount,
-=======
       // CRM-16713 - contribution search by Premiums on 'Find Contribution' form.
       $premiums = array(
         'contribution_product_id' => array(
@@ -818,7 +792,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
       $fields = array_merge($impFields, $typeField, $contributionStatus, $contributionPage, $optionField, $expFieldProduct,
         $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount, $premiums,
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution')
       );
 
@@ -957,16 +930,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
   }
 
   /**
-<<<<<<< HEAD
-   * Check if there is a contribution with the same trxn_id or invoice_id.
-   *
-   * @param array $input
-   *   An assoc array of name/value pairs.
-   * @param array $duplicates
-   *   (reference) store ids of duplicate contribs.
-   * @param int $id
-   *
-=======
    * React to a financial transaction (payment) failure.
    *
    * Prior to CRM-16417 these were simply removed from the database but it has been agreed that seeing attempted
@@ -995,7 +958,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
    *   (reference) store ids of duplicate contribs.
    * @param int $id
    *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return bool
    *   true if duplicate, false otherwise
    */
@@ -1156,22 +1118,12 @@ GROUP BY p.id
 
   /**
    * Get list of contribution In Honor of contact Ids.
-<<<<<<< HEAD
    *
    * @param int $honorId
    *   In Honor of Contact ID.
    *
    * @return array
    *   list of contribution fields
-   *
-=======
-   *
-   * @param int $honorId
-   *   In Honor of Contact ID.
-   *
-   * @return array
-   *   list of contribution fields
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function getHonorContacts($honorId) {
     $params = array();
@@ -1342,10 +1294,6 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    *
    * @return array
    *   associated array
-<<<<<<< HEAD
-   *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function getContributionDetails($exportMode, $componentIds) {
     $paymentDetails = array();
@@ -1403,49 +1351,22 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
   /**
    * Create address associated with contribution record.
    *
-<<<<<<< HEAD
-=======
    * As long as there is one or more billing field in the parameters we will create the address.
    *
    * (historically the decision to create or not was based on the payment 'type' but these lines are greyer than once
    * thought).
    *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param array $params
    * @param int $billingLocationTypeID
    *
    * @return int
    *   address id
    */
-<<<<<<< HEAD
-  public static function createAddress(&$params, $billingLocationTypeID) {
-    $billingFields = array(
-      'street_address',
-      'city',
-      'state_province_id',
-      'postal_code',
-      'country_id',
-    );
-
-    //build address array
-    $addressParams = array();
-    $addressParams['location_type_id'] = $billingLocationTypeID;
-    $addressParams['is_billing'] = 1;
-
-    $billingFirstName = CRM_Utils_Array::value('billing_first_name', $params);
-    $billingMiddleName = CRM_Utils_Array::value('billing_middle_name', $params);
-    $billingLastName = CRM_Utils_Array::value('billing_last_name', $params);
-    $addressParams['address_name'] = "{$billingFirstName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingMiddleName}" . CRM_Core_DAO::VALUE_SEPARATOR . "{$billingLastName}";
-
-    foreach ($billingFields as $value) {
-      $addressParams[$value] = CRM_Utils_Array::value("billing_{$value}-{$billingLocationTypeID}", $params);
-=======
   public static function createAddress($params, $billingLocationTypeID) {
     list($hasBillingField, $addressParams) = self::getBillingAddressParams($params, $billingLocationTypeID);
     if ($hasBillingField) {
       $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
       return $address->id;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     return NULL;
 
@@ -1456,10 +1377,6 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    *
    * @param int $contributionId
    * @param int $contactId
-<<<<<<< HEAD
-   *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function deleteAddress($contributionId = NULL, $contactId = NULL) {
     $clauses = array();
@@ -2260,24 +2177,6 @@ WHERE  contribution_id = %1 ";
             $membership->free();
           }
         }
-<<<<<<< HEAD
-      }
-
-      if (!empty($ids['pledge_payment'])) {
-
-        foreach ($ids['pledge_payment'] as $key => $paymentID) {
-          if (empty($paymentID)) {
-            continue;
-          }
-          $payment = new CRM_Pledge_BAO_PledgePayment();
-          $payment->id = $paymentID;
-          if (!$payment->find(TRUE)) {
-            throw new Exception("Could not find pledge payment record: " . $paymentID);
-          }
-          $this->_relatedObjects['pledge_payment'][] = $payment;
-        }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
 
       if (!$paymentProcessorID) {
@@ -2530,11 +2429,7 @@ WHERE  contribution_id = %1 ";
         if (!empty($lineItem)) {
           $itemId = key($lineItem);
           foreach ($lineItem as &$eachItem) {
-<<<<<<< HEAD
-            if (array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
-=======
             if (is_array($this->_relatedObjects['membership']) && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
               $eachItem['join_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->join_date);
               $eachItem['start_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->start_date);
               $eachItem['end_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->end_date);
@@ -3174,15 +3069,12 @@ WHERE  contribution_id = %1 ";
       && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
       && $context == 'changePaymentInstrument'
     ) {
-<<<<<<< HEAD
-=======
       return;
     }
     if (($params['prevContribution']->contribution_status_id == array_search('Partially paid', $contributionStatus))
       && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
       && $context == 'changedStatus'
     ) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       return;
     }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
@@ -3370,10 +3262,7 @@ WHERE  contribution_id = %1 ";
       'Pending' => array('Cancelled', 'Completed', 'Failed'),
       'In Progress' => array('Cancelled', 'Completed', 'Failed'),
       'Refunded' => array('Cancelled', 'Completed'),
-<<<<<<< HEAD
-=======
       'Partially paid' => array('Completed'),
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     );
 
     if (!in_array($contributionStatuses[$fields['contribution_status_id']], $checkStatus[$contributionStatuses[$values['contribution_status_id']]])) {
@@ -3932,8 +3821,6 @@ WHERE con.id = {$contributionId}
     }
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Update related pledge payment payments.
    *
@@ -4489,5 +4376,4 @@ LIMIT 1;";
     return $contribution->composeMessageArray($input, $ids, $values, $recur, $returnMessageText);
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

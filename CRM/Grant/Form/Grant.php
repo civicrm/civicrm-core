@@ -56,8 +56,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_context;
 
   /**
-<<<<<<< HEAD
-=======
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -65,7 +63,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Set variables up before form is built.
    *
    * @return void
@@ -119,12 +116,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-<<<<<<< HEAD
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $defaults = parent::setDefaultValues();
 

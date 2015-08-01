@@ -296,8 +296,6 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => NULL,
-<<<<<<< HEAD
-=======
   ),
   'weekBegins' => array(
     'group_name' => 'Localization Preferences',
@@ -314,6 +312,5 @@ return array(
     'is_contact' => 0,
     'description' => "",
     'help_text' => NULL,
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   ),
 );

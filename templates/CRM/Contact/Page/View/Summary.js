@@ -7,19 +7,6 @@
     beforeSubmit: function(arr, $form, options) {
       $form.block();
     },
-    beforeSerialize: function(form, options) {
-      // Copied from crm.ajax.js
-      if (window.CKEDITOR && window.CKEDITOR.instances) {
-        $.each(CKEDITOR.instances, function() {
-          if (this.updateElement) this.updateElement();
-        });
-      }
-      if (window.tinyMCE && tinyMCE.editors) {
-        $.each(tinyMCE.editors, function() {
-          this.save();
-        });
-      }
-    },
     success: requestHandler,
     error: errorHandler
   };
@@ -332,24 +319,12 @@
         }
       })
       .on('crmFormSuccess', function(e, data) {
-<<<<<<< HEAD
-        // Refresh changeLog - advanced logging
-        if (CRM.reloadChangeLogTab) {
-          CRM.reloadChangeLogTab();
-        }
-        // Refresh changeLog - simple logging
-        // If we didn't get a changelog count in the response, force refresh the changelog tab to populate it
-        else {
-          CRM.tabHeader.resetTab('#tab_log', !(data && data.changeLog && data.changeLog.count));
-        }
-=======
         // Advanced logging... just increment the changelog tab count to avoid the overhead of reloading the data
         if (CRM.incrementChangeLogTab) {
           CRM.incrementChangeLogTab();
         }
         // Refresh changelog tab next time it is opened
         CRM.tabHeader.resetTab('#tab_log');
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         // Refresh dependent blocks
         if (data && data.reloadBlocks) {
           reloadBlock(data.reloadBlocks.join(','));

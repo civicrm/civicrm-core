@@ -70,11 +70,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   Value we want to set the is_active field.
    *
    * @return Object
-<<<<<<< HEAD
-   *   DAO object on sucess, null otherwise
-=======
    *   DAO object on success, null otherwise
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $id, 'is_active', $is_active);

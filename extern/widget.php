@@ -41,10 +41,7 @@ require_once 'CRM/Utils/Request.php';
 $cpageId = CRM_Utils_Request::retrieve('cpageId', 'Positive', CRM_Core_DAO::$_nullObject);
 $widgetId = CRM_Utils_Request::retrieve('widgetId', 'Positive', CRM_Core_DAO::$_nullObject);
 $format = CRM_Utils_Request::retrieve('format', 'Positive', CRM_Core_DAO::$_nullObject);
-<<<<<<< HEAD
-=======
 $includePending = CRM_Utils_Request::retrieve('includePending', 'Boolean', CRM_Core_DAO::$_nullObject);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
 require_once 'CRM/Contribute/BAO/Widget.php';
 

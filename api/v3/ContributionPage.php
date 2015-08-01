@@ -50,15 +50,9 @@ function civicrm_api3_contribution_page_create($params) {
 
 /**
  * Adjust Metadata for Create action.
-<<<<<<< HEAD
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
-=======
- *
- * The metadata is used for setting defaults, documentation & validation.
- *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * @param array $params
  *   Array per getfields metadata.
  */
@@ -98,25 +92,16 @@ function civicrm_api3_contribution_page_delete($params) {
 
 /**
  * Submit a ContributionPage.
-<<<<<<< HEAD
  *
  * @param array $params
  *   Array per getfields metadata.
  *
-=======
- *
- * @param array $params
- *   Array per getfields metadata.
- *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * @return array
  *   API result array
  */
 function civicrm_api3_contribution_page_submit($params) {
   $result = CRM_Contribute_Form_Contribution_Confirm::submit($params);
   return civicrm_api3_create_success($result, $params, 'ContributionPage', 'submit');
-<<<<<<< HEAD
-=======
 }
 
 
@@ -138,5 +123,4 @@ function _civicrm_api3_contribution_page_getlist_defaults(&$request) {
       'is_active' => 1,
     ),
   );
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

@@ -62,15 +62,7 @@ class CRM_Contact_Form_Edit_IM {
     //IM provider select
     $form->addField("im[$blockId][provider_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
     //Block type select
-<<<<<<< HEAD
-    $form->addSelect("im[$blockId][location_type_id]", array(
-        'entity' => 'im',
-        'class' => 'eight',
-        'placeholder' => NULL,
-      ));
-=======
     $form->addField("im[$blockId][location_type_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     //IM box
     $form->addField("im[$blockId][name]", array('entity' => 'im'));

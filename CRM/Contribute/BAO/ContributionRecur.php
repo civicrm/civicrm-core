@@ -29,11 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
-<<<<<<< HEAD
- * $Id$
- *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
@@ -479,8 +474,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Send start or end notification for recurring payments.
    *
@@ -699,5 +692,4 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     );
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

@@ -31,11 +31,7 @@
         {assign  var="filterCount" value=$table|@count}
         {* Wrap custom field sets in collapsed accordion pane. *}
         {if $filterGroups.$tableName.group_title and $filterCount gte 1}
-<<<<<<< HEAD
-          {* we should close table that contains other filter elements before we start building custom group accordian
-=======
           {* we should close table that contains other filter elements before we start building custom group accordion
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
            *}
           {if $counter eq 1}
     </table>

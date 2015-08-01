@@ -2098,21 +2098,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif (substr($fieldName, 0, 4) === 'url-') {
-<<<<<<< HEAD
-      $form->add('text', $name, $title,
-        array_merge(CRM_Core_DAO::getAttribute('CRM_Core_DAO_Website', 'url'),
-          array(
-            'onfocus' => "if (!this.value) {  this.value='http://';} else return false",
-            'onblur' => "if ( this.value == 'http://') {  this.value='';} else return false",
-          )
-        ), $required
-      );
-
-      $form->addRule($name, ts('Enter a valid Website.'), 'url');
-=======
       $form->add('text', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Website', 'url'), $required);
       $form->addRule($name, ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     // Note should be rendered as textarea
     elseif (substr($fieldName, -4) == 'note') {
@@ -2891,11 +2878,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $contactId
    *
    * @return array
-<<<<<<< HEAD
-   *   assoicated formatted array
-=======
    *   associated formatted array
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function formatFields($params, $contactId = NULL) {
     if ($contactId) {

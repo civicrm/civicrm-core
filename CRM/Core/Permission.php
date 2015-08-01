@@ -605,18 +605,6 @@ class CRM_Core_Permission {
       $perm = $comp->getPermissions(FALSE, $descriptions);
       if ($perm) {
         $info = $comp->getInfo();
-<<<<<<< HEAD
-        if ($descriptions) {
-          foreach ($perm as $p => $attr) {
-            $title = $info['translatedName'] . ': ' . array_shift($attr);
-            array_unshift($attr, $title);
-            $permissions[$p] = $attr;
-          }
-        }
-        else {
-          foreach ($perm as $p) {
-            $permissions[$p] = $info['translatedName'] . ': ' . $p;
-=======
         foreach ($perm as $p => $attr) {
 
           if (!is_array($attr)) {
@@ -630,7 +618,6 @@ class CRM_Core_Permission {
           }
           else {
             $permissions[$p] = $attr[0];
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           }
         }
       }

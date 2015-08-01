@@ -136,14 +136,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    */
   public function setDefaultValues() {
-<<<<<<< HEAD
-    if ($this->_paymentProcessorID && $this->_snippet && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
-      // see function comment block for explanation of this. Note that CRM-15555 will require this to look at the billing form fields not the
-      // billing_mode which
-      return;
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $this->_defaults = array();
     $contactID = $this->getContactID();
     $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
@@ -985,11 +977,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $params['is_primary'] = 1;
 
     if ($this->_values['event']['is_pay_later']
-<<<<<<< HEAD
-      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor'] == 0)
-=======
       && (!array_key_exists('hidden_processor', $params) || $params['payment_processor_id'] == 0)
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     ) {
       $params['is_pay_later'] = 1;
     }

@@ -285,11 +285,7 @@ class CRM_Utils_OpenFlashChart {
       }
 
       $xValueLabels[] = (string) $xVal;
-<<<<<<< HEAD
-      foreach ($criterias as $criteria) {
-=======
       foreach ($criteria as $criteria) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         $xReferences[$criteria][$xVal] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
         $yValues[] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
       }
@@ -320,11 +316,7 @@ class CRM_Utils_OpenFlashChart {
       $xValues[$count] = new bar_3d();
       // set colour pattel
       $xValues[$count]->set_colour(self::$_colours[$count]);
-<<<<<<< HEAD
-      // define colur pattel with bar criterias
-=======
       // define colur pattel with bar criteria
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $xValues[$count]->key((string) $criteria, 12);
       // define bar chart values
       $xValues[$count]->set_values(array_values($values));

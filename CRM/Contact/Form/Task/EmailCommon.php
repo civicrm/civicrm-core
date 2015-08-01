@@ -550,17 +550,10 @@ class CRM_Contact_Form_Task_EmailCommon {
       }
 
       $count_success = count($form->_toContactDetails);
-<<<<<<< HEAD
-      CRM_Core_Session::setStatus(ts('One message was sent successfully.', array(
-            'plural' => '%count messages were sent successfully.',
-            'count' => $count_success,
-          )), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
-=======
       CRM_Core_Session::setStatus(ts('One message was sent successfully. ', array(
             'plural' => '%count messages were sent successfully. ',
             'count' => $count_success,
           )) . $followupStatus, ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     // Display the name and number of contacts for those email is not sent.

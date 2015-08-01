@@ -1,26 +1,3 @@
-<<<<<<< HEAD
-<extension key='test.extension.manager.paymenttest' type='payment'>
-  <file>main</file>
-  <name>test_extension_manager_paymenttest</name>
-  <typeInfo>
-    <userNameLabel>username</userNameLabel>
-    <passwordLabel>password</passwordLabel>
-    <signatureLabel></signatureLabel>
-    <subjectLabel></subjectLabel>
-    <urlSiteDefault>https://example.com/authorize</urlSiteDefault>
-    <urlApiDefault></urlApiDefault>
-    <urlRecurDefault></urlRecurDefault>
-    <urlSiteTestDefault>https://example.com/authorize</urlSiteTestDefault>
-    <urlApiTestDefault>/</urlApiTestDefault>
-    <urlRecurTestDefault></urlRecurTestDefault>
-    <urlButtonDefault></urlButtonDefault>
-    <urlButtonTestDefault></urlButtonTestDefault>
-    <billingMode>form</billingMode>
-    <isRecur>0</isRecur>
-    <paymentType>1</paymentType>
-  </typeInfo>
-</extension>
-=======
 <extension key='test.extension.manager.paymenttest' type='payment'>
   <file>main</file>
   <name>test_extension_manager_paymenttest</name>
@@ -43,4 +20,3 @@
     <paymentType>1</paymentType>
   </typeInfo>
 </extension>
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e

@@ -464,11 +464,7 @@ class CRM_Core_BAO_Block {
     if (!empty($params['is_primary'])) {
       $sql = "UPDATE $table SET is_primary = 0 WHERE contact_id = %1";
       $sqlParams = array(1 => array($contactId, 'Integer'));
-<<<<<<< HEAD
-      // we don't want to create unecessary entries in the log_ tables so exclude the one we are working on
-=======
       // we don't want to create unnecessary entries in the log_ tables so exclude the one we are working on
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       if (!empty($params['id'])) {
         $sql .= " AND id <> %2";
         $sqlParams[2] = array($params['id'], 'Integer');

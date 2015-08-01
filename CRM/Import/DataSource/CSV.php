@@ -113,11 +113,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @param string $table
    *   Name of table from which data imported.
    * @param string $fieldSeparator
-<<<<<<< HEAD
-   *   Character that seperates the various columns in the file.
-=======
    *   Character that separates the various columns in the file.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return string
    *   name of the created table

@@ -168,8 +168,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           ),
         ),
       ),
-<<<<<<< HEAD
-=======
       'civicrm_phone' => array(
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' => array(
@@ -190,7 +188,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           ),
         ),
       ),
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       'civicrm_activity' => array(
         'dao' => 'CRM_Activity_DAO_Activity',
         'fields' => array(
@@ -306,7 +303,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           'type' => CRM_Utils_Type::T_TEXT,
         ),
         'activity_type_id' =>
-<<<<<<< HEAD
         array(
           'title' => ts('Activity Type'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -314,15 +310,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         ),
         'status_id' =>
         array(
-=======
-        array(
-          'title' => ts('Activity Type'),
-          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => $this->activityTypes,
-        ),
-        'status_id' =>
-        array(
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           'title' => ts('Activity Status'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Core_PseudoConstant::activityStatus(),
@@ -462,11 +449,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       foreach ($this->_selectClauses as $key => $clause) {
         if (strstr($clause, 'civicrm_contact_contact_target') ||
           strstr($clause, 'civicrm_contact_contact_assignee') ||
-<<<<<<< HEAD
-          strstr($clause, 'civicrm_contact_contact_source')
-        ) {
-          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR ';') as $clause";
-=======
           strstr($clause, 'civicrm_contact_contact_source') ||
           strstr($clause, 'civicrm_phone_contact_source_phone') ||
           strstr($clause, 'civicrm_phone_contact_assignee_phone') ||
@@ -476,7 +458,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           strstr($clause, 'civicrm_phone_contact_target_phone')
         ) {
           $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR '; ') as $clause";
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         }
       }
     }

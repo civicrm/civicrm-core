@@ -46,8 +46,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   /**
-<<<<<<< HEAD
-=======
    * To what frequency group-by a date column
    *
    * @var array
@@ -61,7 +59,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   );
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function __construct() {
 
@@ -559,20 +556,12 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     $this->from('contribution');
-<<<<<<< HEAD
-    $contriSQL = "SELECT
-=======
     $contriQuery = "
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 COUNT({$this->_aliases['civicrm_contribution']}.total_amount )        as civicrm_contribution_total_amount_count,
 SUM({$this->_aliases['civicrm_contribution']}.total_amount )          as civicrm_contribution_total_amount_sum,
 ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm_contribution_total_amount_avg,
 {$this->_aliases['civicrm_contribution']}.currency                    as currency
-<<<<<<< HEAD
-{$this->_from} {$this->_where} {$group} {$this->_having}";
-=======
 {$this->_from} {$this->_where}";
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if ($softCredit) {
       $this->from();
@@ -584,16 +573,10 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 {$this->_from} {$this->_where} {$group} {$this->_having}";
     }
 
-<<<<<<< HEAD
-    $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
-
-    $totalAmount = $average = $softTotalAmount = $softAverage = array();
-=======
     $contriSQL = "SELECT {$contriQuery} {$group} {$this->_having}";
     $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
 
     $totalAmount = $average = $mode = $median = $softTotalAmount = $softAverage = array();
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $count = $softCount = 0;
     while ($contriDAO->fetch()) {
       $totalAmount[]
@@ -603,8 +586,6 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
       $count += $contriDAO->civicrm_contribution_total_amount_count;
     }
 
-<<<<<<< HEAD
-=======
     $groupBy = "\n{$group}, {$this->_aliases['civicrm_contribution']}.total_amount";
     $orderBy = "\nORDER BY civicrm_contribution_total_amount_count DESC";
     $modeSQL = "SELECT civicrm_contribution_total_amount_count, amount, currency
@@ -616,7 +597,6 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     $medianSQL = "{$this->_from} {$this->_where}";
     $median = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, $this->_aliases['civicrm_contribution']);
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if ($softCredit) {
       $softDAO = CRM_Core_DAO::executeQuery($softSQL);
       while ($softDAO->fetch()) {
@@ -824,15 +804,12 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
             $dateEnd = date("Ymd", mktime(0, 0, 0, $dateEnd['M'],
               $dateEnd['d'] - 1, $dateEnd['Y'] + 1
             ));
-<<<<<<< HEAD
-=======
             break;
 
           case 'fiscalyear':
             $dateEnd = date("Ymd", mktime(0, 0, 0, $dateEnd['M'],
               $dateEnd['d'] - 1, $dateEnd['Y'] + 1
             ));
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             break;
 
           case 'yearweek':

@@ -29,11 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
-<<<<<<< HEAD
- * $Id$
- *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 use Civi\Payment\System;
@@ -44,11 +39,7 @@ use Civi\Payment\System;
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
-<<<<<<< HEAD
-   * The id of the contribution page that we are processsing
-=======
    * The id of the contribution page that we are processing.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @var int
    */
@@ -213,12 +204,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws \Exception
    */
   public function preProcess() {
-<<<<<<< HEAD
-
-    $config = CRM_Core_Config::singleton();
-    $session = CRM_Core_Session::singleton();
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     // current contribution page id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -490,11 +475,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Set the default values.
-<<<<<<< HEAD
-   *
-   * @return void
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function setDefaultValues() {
     return $this->_defaults;
@@ -502,11 +482,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Assign the minimal set of variables to the template.
-<<<<<<< HEAD
-   *
-   * @return void
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function assignToTemplate() {
     $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
@@ -635,13 +610,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @param string $name
    * @param bool $viewOnly
    * @param null $profileContactType
-<<<<<<< HEAD
-   * @param null $fieldTypes
-   *
-   * @return void
-=======
    * @param array $fieldTypes
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
     if ($id) {
@@ -760,12 +729,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Check template file exists.
-<<<<<<< HEAD
-   * @param null $suffix
-=======
    *
    * @param string $suffix
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return null|string
    */
@@ -785,12 +750,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @return string
    */
-<<<<<<< HEAD
-  /**
-   * @return string
-   */
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
@@ -804,12 +763,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @return string
    */
-<<<<<<< HEAD
-  /**
-   * @return string
-   */
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
@@ -817,12 +770,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Authenticate pledge user during online payment.
-<<<<<<< HEAD
-   *
-   *
-   * @return void
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function authenticatePledgeUser() {
     //get the userChecksum and contact id
@@ -876,10 +823,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * In case user cancel recurring contribution,
    * When we get the control back from payment gate way
    * lets delete the recurring and related contribution.
-<<<<<<< HEAD
-   *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function cancelRecurring() {
     $isCancel = CRM_Utils_Request::retrieve('cancel', 'Boolean', CRM_Core_DAO::$_nullObject);
@@ -897,8 +840,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Build Membership  Block in Contribution Pages.
    *
@@ -1139,5 +1080,4 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

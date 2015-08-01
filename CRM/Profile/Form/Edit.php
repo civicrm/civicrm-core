@@ -88,11 +88,8 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
       // make sure we have right permission to edit this user
       $session = CRM_Core_Session::singleton();
       $userID = $session->get('userID');
-<<<<<<< HEAD
-=======
 
       // Set the ID from the query string, otherwise default to the current user
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, $userID);
 
       if ($id) {

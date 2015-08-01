@@ -263,13 +263,8 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   }
   // Report deprecations.
   $deprecated = _civicrm_api3_deprecation_check($entity, $result);
-<<<<<<< HEAD
-  // The "setvalue" action is deprecated but still in use, so report it only on "getactions".
-  if (!is_string($deprecated) && $action == 'getactions') {
-=======
   // Always report "setvalue" action as deprecated.
   if (!is_string($deprecated) && ($action == 'getactions' || $action == 'setvalue')) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $deprecated = ((array) $deprecated) + array('setvalue' => 'The "setvalue" action is deprecated. Use "create" with an id instead.');
   }
   // Always report "update" action as deprecated.
@@ -425,15 +420,9 @@ function _civicrm_api3_separate_values(&$values) {
 
 /**
  * This is a legacy wrapper for api_store_values.
-<<<<<<< HEAD
  *
  * It checks suitable fields using getfields rather than DAO->fields.
  *
-=======
- *
- * It checks suitable fields using getfields rather than DAO->fields.
- *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * Getfields has handling for how to deal with unique names which dao->fields doesn't
  *
  * Note this is used by BAO type create functions - eg. contribution
@@ -1198,11 +1187,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  * @param string $daoName
  * @param bool $return
  *
-<<<<<<< HEAD
- * @daoName string DAO to check params agains
-=======
  * @daoName string DAO to check params against
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  *
  * @return bool
  *   Should the missing fields be returned as an array (core error created as default)
@@ -1370,15 +1355,9 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
 
 /**
  * Function to do a 'standard' api del.
-<<<<<<< HEAD
  *
  * When the api is only doing a $bao::del then use this if api::del doesn't exist it will try DAO delete method.
  *
-=======
- *
- * When the api is only doing a $bao::del then use this if api::del doesn't exist it will try DAO delete method.
- *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * @param string $bao_name
  * @param array $params
  *
@@ -1595,19 +1574,11 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   }
   if ((CRM_Utils_Array::value('name', $fieldInfo) != $fieldName) && !empty($fieldValue)) {
     $fieldValue = _civicrm_api3_getValidDate($fieldValue, $fieldName, $fieldInfo['type']);
-<<<<<<< HEAD
   }
 
   if (!empty($op)) {
     $params[$fieldName][$op] = $fieldValue;
   }
-=======
-  }
-
-  if (!empty($op)) {
-    $params[$fieldName][$op] = $fieldValue;
-  }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   else {
     $params[$fieldName] = $fieldValue;
   }
@@ -2092,11 +2063,7 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, $fieldInfo) {
  * @throws Exception
  */
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
-<<<<<<< HEAD
-  list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
-=======
   list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName, 'String');
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE || CRM_Utils_System::isNull($fieldValue)) {
     return;
   }
@@ -2235,12 +2202,9 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
  *   fieldName or FALSE if the field does not exist
  */
 function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create') {
-<<<<<<< HEAD
-=======
   if (!$fieldName) {
     return FALSE;
   }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
     return $fieldName;
   }
@@ -2299,20 +2263,6 @@ function _civicrm_api3_deprecation_check($entity, $result = array()) {
  * Get the actual field value.
  *
  * In some case $params[$fieldName] holds Array value in this format Array([operator] => [value])
-<<<<<<< HEAD
- * So this function returns the actual field value
- *
- * @param array $params
- * @param string $fieldName
- *
- * @return mixed
- */
-function _civicrm_api3_field_value_check(&$params, $fieldName) {
-  $fieldValue = CRM_Utils_Array::value($fieldName, $params);
-  $op = NULL;
-
-  if (!empty($fieldValue) && is_array($fieldValue) && array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators())) {
-=======
  * So this function returns the actual field value.
  *
  * @param array $params
@@ -2329,7 +2279,6 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
     (array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators()) ||
       $type == 'String' && strstr(key($fieldValue), 'EMPTY'))
   ) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $op = key($fieldValue);
     $fieldValue = CRM_Utils_Array::value($op, $fieldValue);
   }

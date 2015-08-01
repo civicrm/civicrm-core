@@ -109,11 +109,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-<<<<<<< HEAD
-   * Check if username and email exists in the drupal db.
-=======
    * Check if username and email exists in the Joomla db.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param array $params
    *   Array of name and mail values.

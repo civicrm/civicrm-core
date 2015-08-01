@@ -416,8 +416,6 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
     return $options;
   }
 
-<<<<<<< HEAD
-=======
   /**
    * When changing the value of an option this is called to update all corresponding custom data
    *
@@ -461,5 +459,4 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
     $customField->free();
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

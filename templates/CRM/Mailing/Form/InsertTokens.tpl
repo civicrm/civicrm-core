@@ -149,41 +149,6 @@ function selectValue( val, prefix) {
     if (prefix == "SMS") {
       return;
     }
-<<<<<<< HEAD
-    else {
-      cj("#subject").val( data.subject );
-    }
-    var html_body  = "";
-    if (  data.msg_html ) {
-      html_body = data.msg_html;
-    }
-
-    if (editor == "ckeditor") {
-      oEditor = CKEDITOR.instances[html_message];
-      oEditor.setData( html_body );
-    }
-    else if (editor == "tinymce") {
-      tinyMCE.execInstanceCommand('html_message',"mceInsertContent",false, html_body );
-    }
-    else if (editor == "joomlaeditor") {
-      cj("#"+ html_message).val( html_body );
-      tinyMCE.execCommand('mceSetContent',false, html_body);
-    }
-    else if ( editor =="drupalwysiwyg") {
-      if (Drupal.wysiwyg.instances[html_message].setContent) {
-        Drupal.wysiwyg.instances[html_message].setContent(html_body);
-      }
-      // @TODO: Remove this when http://drupal.org/node/614146 drops
-      else if (Drupal.wysiwyg.instances[html_message].insert) {
-        alert("Please note your editor doesn't completely support this function. You may need to clear the contents of the editor prior to choosing a new template.");
-        Drupal.wysiwyg.instances[html_message].insert(html_body);
-      }
-      else {
-        alert("Sorry, your editor doesn't support this function yet.");
-      }
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     else {
       cj("#subject").val( data.subject );
     }

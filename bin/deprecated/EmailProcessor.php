@@ -34,11 +34,7 @@
  */
 
 /**
-<<<<<<< HEAD
- * When runing script from cli :
-=======
  * When running script from cli :
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * 1. By default script is being used for civimail processing.
  * eg : nice -19 php bin/EmailProcessor.php -u<login> -p<password> -s<sites(or default)>
  *

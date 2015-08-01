@@ -575,23 +575,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, TRUE);
     $params['month'] = $params['credit_card_exp_date']['M'];
     $params['year'] = $params['credit_card_exp_date']['Y'];
-<<<<<<< HEAD
-    $result = &$payment->doDirectPayment($params);
-    if (is_a($result, 'CRM_Core_Error')) {
-      CRM_Core_Error::displaySessionError($result);
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/cart_checkout', "_qf_Payment_display=1&qfKey={$this->controller->_key}", TRUE, NULL, FALSE));
-      return NULL;
-    }
-    elseif (!$result['trxn_id']) {
-      CRM_Core_Error::fatal(ts("Financial institution didn't return a transaction id."));
-=======
     try {
       $result = $payment->doPayment($params);
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       CRM_Core_Error::displaySessionError($result);
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/cart_checkout', "_qf_Payment_display=1&qfKey={$this->controller->_key}", TRUE, NULL, FALSE));
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     $trxnDetails = array(

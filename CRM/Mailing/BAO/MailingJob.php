@@ -634,11 +634,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $count = 0;
 
     /**
-<<<<<<< HEAD
-     * CRM-15702: Sending bulk sms to contacts without e-mail addres fails.
-=======
      * CRM-15702: Sending bulk sms to contacts without e-mail address fails.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
      * Solution is to skip checking for on hold
      */
     $skipOnHold = TRUE; //do include a statement to check wether e-mail address is on hold

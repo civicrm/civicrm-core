@@ -76,7 +76,6 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * The list of tasks or actions that a searcher can perform on a result set.
    *
    * @var array
-<<<<<<< HEAD
    */
   protected $_taskList = array();
 
@@ -92,37 +91,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     return $this->_taskList;
   }
 
-  /**
-   * Common buildform tasks required by all searches
-   */
-  public function buildQuickform() {
-    $resources = CRM_Core_Resources::singleton();
-=======
-   */
-  protected $_taskList = array();
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
-
-  /**
-   * Builds the list of tasks or actions that a searcher can perform on a result set.
-   *
-   * To modify the task list, child classes should alter $this->_taskList,
-   * preferably by extending this method.
-   *
-   * @return array
-   */
-  protected function buildTaskList() {
-    return $this->_taskList;
-  }
-
-<<<<<<< HEAD
-    $resources
-=======
   /**
    * Common buildform tasks required by all searches
    */
   public function buildQuickform() {
     CRM_Core_Resources::singleton()
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       ->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header')
       ->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
 

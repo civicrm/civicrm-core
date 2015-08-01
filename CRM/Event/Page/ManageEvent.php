@@ -248,10 +248,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @return void
    */
   public function browse() {
-<<<<<<< HEAD
-    $this->assign('includeWysiwygEditor', TRUE);
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this

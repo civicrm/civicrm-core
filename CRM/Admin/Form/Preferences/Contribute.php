@@ -125,8 +125,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
    * @return void
    */
   public function buildQuickForm() {
-<<<<<<< HEAD
-=======
     //CRM-16691: Changes made related to settings of 'CVV'.
     foreach ($this->_settings as $setting => $group) {
       $settingMetaData = civicrm_api3('setting', 'getfields', array('name' => $setting));
@@ -148,7 +146,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
       }
       $this->assign("{$setting}_description", ts($props['description']));
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $this->add('checkbox', 'invoicing', ts('Enable Tax and Invoicing'));
     parent::buildQuickForm();
   }
@@ -162,8 +159,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
    */
   public function setDefaultValues() {
     $defaults = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-<<<<<<< HEAD
-=======
     //CRM-16691: Changes made related to settings of 'CVV'.
     foreach ($this->_settings as $setting => $group) {
       $settingMetaData = civicrm_api3('setting', 'getfields', array('name' => $setting));
@@ -175,7 +170,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
         )
       );
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return $defaults;
   }
 

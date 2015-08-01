@@ -240,11 +240,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     if (!empty($defaults['payment_processor'])) {
       $defaults['payment_processor'] = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',',
         $defaults['payment_processor']
-<<<<<<< HEAD
-      ), '1');
-=======
       );
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     return $defaults;
   }

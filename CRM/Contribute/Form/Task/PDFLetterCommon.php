@@ -8,10 +8,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
 
   /**
    * Process the form after the input has been submitted and validated.
-<<<<<<< HEAD
-   *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param CRM_Contribute_Form_Task $form
    */

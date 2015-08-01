@@ -64,10 +64,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   public $_params;
 
-<<<<<<< HEAD
-  public $_membershipId = NULL;
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   /**
    * When not to reset sort_name.
    */
@@ -790,15 +786,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         $value['is_renew'] = FALSE;
         if (!empty($params['member_option']) && CRM_Utils_Array::value($key, $params['member_option']) == 2) {
-<<<<<<< HEAD
-          $this->_params = $params;
-          $value['is_renew'] = TRUE;
-          $membership = CRM_Member_BAO_Membership::renewMembershipFormWrapper(
-            $value['contact_id'],
-            $value['membership_type_id'],
-            FALSE, $this, NULL, NULL,
-            $value['custom']
-=======
 
           // The following parameter setting may be obsolete.
           $this->_params = $params;
@@ -816,7 +803,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value['contact_id'], $value['membership_type_id'], FALSE,
             NULL, NULL, $value['custom'], NULL, NULL, FALSE,
             NULL, NULL, $isPayLater, $campaignId
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           );
 
           // make contribution entry

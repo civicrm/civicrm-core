@@ -20,8 +20,6 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
     CRM_Core_Resources::singleton()
       ->addSettingsFactory(function () {
-<<<<<<< HEAD
-=======
         $ufGroups = civicrm_api3('UFGroup', 'get', array(
           'sequential' => 1,
           'is_active' => 1,
@@ -36,7 +34,6 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             }
           }
         }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         return array(
           'PseudoConstant' => array(
             'locationType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),

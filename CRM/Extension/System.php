@@ -102,15 +102,6 @@ class CRM_Extension_System {
       if (!array_key_exists($key, $parameters)) {
         $parameters[$key] = $config->{$key};
       }
-<<<<<<< HEAD
-    }
-    if (!array_key_exists('civicrm_root', $parameters)) {
-      $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
-    }
-    if (!array_key_exists('cmsRootPath', $parameters)) {
-      $parameters['cmsRootPath'] = $config->userSystem->cmsRootPath();
-    }
-=======
     }
     if (!array_key_exists('civicrm_root', $parameters)) {
       $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
@@ -121,7 +112,6 @@ class CRM_Extension_System {
     if (!array_key_exists('domain_id', $parameters)) {
       $parameters['domain_id'] = CRM_Core_Config::domainID();
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     ksort($parameters); // guaranteed ordering - useful for md5(serialize($parameters))
 
     $this->parameters = $parameters;

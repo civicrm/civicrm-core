@@ -66,8 +66,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   /**
    * Should the first payment date be configurable when setting up back office recurring payments.
    * In the case of Authorize.net this is an option
-<<<<<<< HEAD
-=======
    * @return bool
    */
   protected function supportsFutureRecurStartDate() {
@@ -84,7 +82,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * However, only enabling for processors it has been tested against.
    *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return bool
    */
   protected function supportsRecurContributionsForPledges() {
@@ -392,24 +389,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Generate HMAC_MD5
    *
    * @param string $key

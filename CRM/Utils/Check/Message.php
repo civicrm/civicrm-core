@@ -49,13 +49,6 @@ class CRM_Utils_Check_Message {
   private $title;
 
   /**
-<<<<<<< HEAD
-   * @param string $name
-   * @param $message
-   * @param $title
-   */
-  public function __construct($name, $message, $title) {
-=======
    * @var string
    * @see Psr\Log\LogLevel
    */
@@ -74,7 +67,6 @@ class CRM_Utils_Check_Message {
    * @see Psr\Log\LogLevel
    */
   public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $this->name = $name;
     $this->message = $message;
     $this->title = $title;

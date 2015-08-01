@@ -378,11 +378,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     // Test mode always returns trxn_id = 0 - so we fix that here
     //
     // NOTE: This code was taken from the AuthorizeNet payment processor, however it now appears
-<<<<<<< HEAD
-    //       unecessary for the eWAY gateway - Left here in case it proves useful
-=======
     //       unnecessary for the eWAY gateway - Left here in case it proves useful
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     //----------------------------------------------------------------------------------------------------
     if ( $this->_mode == 'test' ) {
     $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test%'";
@@ -413,24 +409,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   // end function doDirectPayment
 
   /**
-<<<<<<< HEAD
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * **********************************************************************************************
    * This function checks the eWAY response status - returning a boolean false if status != 'true'
    * ************************************************************************************************
@@ -462,18 +440,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-   * ************************************************
-   * NOTE: 'doTransferCheckout' not implemented
-   * ************************************************
-   */
-  public function doTransferCheckout(&$params, $component) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * *****************************************************************************************
    * This public function checks to see if we have the right processor config values set
    *

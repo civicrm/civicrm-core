@@ -262,36 +262,7 @@ CRM.strings = CRM.strings || {};
       if (!value) {
         $elect.trigger('crmOptionsUpdated', $.extend({}, options)).trigger('change');
       }
-<<<<<<< HEAD
-=======
     });
-  };
-
-  /**
-   * Render an option list
-   * @param options {array}
-   * @param val {string} default value
-   * @param escapeHtml {bool}
-   * @return string
-   */
-  CRM.utils.renderOptions = function(options, val, escapeHtml) {
-    var rendered = '',
-      esc = escapeHtml === false ? _.identity : _.escape;
-    if (!$.isArray(val)) {
-      val = [val];
-    }
-    _.each(options, function(option) {
-      if (option.children) {
-        rendered += '<optgroup label="' + esc(option.value) + '">' +
-        CRM.utils.renderOptions(option.children, val) +
-        '</optgroup>';
-      } else {
-        var selected = ($.inArray('' + option.key, val) > -1) ? 'selected="selected"' : '';
-        rendered += '<option value="' + esc(option.key) + '"' + selected + '>' + esc(option.value) + '</option>';
-      }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
-    });
-    return rendered;
   };
 
   /**
@@ -688,8 +659,6 @@ CRM.strings = CRM.strings || {};
       }
       $dataField.hide().addClass('crm-hidden-date').on('change', updateInputFields);
       updateInputFields();
-<<<<<<< HEAD
-=======
     });
   };
 
@@ -722,7 +691,6 @@ CRM.strings = CRM.strings || {};
       var settings = $.extend(true, defaults, $(this).data('table'));
       //Make the DataTables call
       $(this).DataTable(settings);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     });
   };
 
@@ -764,52 +732,6 @@ CRM.strings = CRM.strings || {};
       markup += link.label + '</a>';
     });
     markup += '</div>';
-<<<<<<< HEAD
-=======
-    return markup;
-  }
-
-  function getEntityRefFilters($el) {
-    var
-      entity = $el.data('api-entity').toLowerCase(),
-      filters = $.extend([], CRM.config.entityRef.filters[entity] || []),
-      filter = $el.data('user-filter') || {},
-      params = $.extend({params: {}}, $el.data('api-params') || {}).params,
-      result = [];
-    $.each(filters, function() {
-      if (typeof params[this.key] === 'undefined') {
-        result.push(this);
-      }
-      else if (this.key == 'contact_type' && typeof params.contact_sub_type === 'undefined') {
-        this.options = _.remove(this.options, function(option) {
-          return option.key.indexOf(params.contact_type + '__') === 0;
-        });
-        result.push(this);
-      }
-    });
-    return result;
-  }
-
-  function renderEntityRefFilters($el) {
-    var
-      filters = getEntityRefFilters($el),
-      filter = $el.data('user-filter') || {},
-      filterSpec = filter.key ? _.find(filters, {key: filter.key}) : null;
-    if (!filters.length) {
-      return '';
-    }
-    var markup = '<div class="crm-entityref-filters">' +
-      '<select class="crm-entityref-filter-key' + (filter.key ? ' active' : '') + '">' +
-      '<option value="">' + ts('Refine search...') + '</option>' +
-      CRM.utils.renderOptions(filters, filter.key) +
-      '</select> &nbsp; ' +
-      '<select class="crm-entityref-filter-value' + (filter.key ? ' active"' : '"') + (filter.key ? '' : ' style="display:none;"') + '>' +
-      '<option value="">' + ts('- select -') + '</option>';
-    if (filterSpec && filterSpec.options) {
-      markup += CRM.utils.renderOptions(filterSpec.options, filter.value);
-    }
-    markup += '</select></div>';
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return markup;
   }
 
@@ -855,48 +777,6 @@ CRM.strings = CRM.strings || {};
     markup += '</select></div>';
     return markup;
   }
-
-  /**
-   * Fetch options for a filter (via ajax if necessary) and populate the appropriate select list
-   * @param $el
-   */
-  function loadEntityRefFilterOptions($el) {
-    var
-      filters = getEntityRefFilters($el),
-      filter = $el.data('user-filter') || {},
-      filterSpec = filter.key ? _.find(filters, {key: filter.key}) : null,
-      $valField = $('.crm-entityref-filter-value', '#select2-drop');
-    if (filterSpec) {
-      $valField.show().val('');
-      if (filterSpec.options) {
-        CRM.utils.setOptions($valField, filterSpec.options, false, filter.value);
-      } else {
-        $valField.prop('disabled', true);
-        CRM.api3(filterSpec.entity || $el.data('api-entity'), 'getoptions', {field: filter.key, context: 'search', sequential: 1})
-          .done(function(result) {
-            var entity = $el.data('api-entity').toLowerCase(),
-              globalFilterSpec = _.find(CRM.config.entityRef.filters[entity], {key: filter.key}) || {};
-            // Store options globally so we don't have to look them up again
-            globalFilterSpec.options = result.values;
-            $valField.prop('disabled', false);
-            CRM.utils.setOptions($valField, result.values);
-            $valField.val(filter.value || '');
-          });
-      }
-    } else {
-      $valField.hide();
-    }
-  }
-
-  //CRM-15598 - Override url validator method to allow relative url's (e.g. /index.htm)
-  $.validator.addMethod("url", function(value, element) {
-    if (/^\//.test(value)) {
-      // Relative url: prepend dummy path for validation.
-      value = 'http://domain.tld' + value;
-    }
-    // From jQuery Validation Plugin v1.12.0
-    return this.optional(element) || /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(value);
-  });
 
   /**
    * Fetch options for a filter (via ajax if necessary) and populate the appropriate select list
@@ -1477,16 +1357,7 @@ CRM.strings = CRM.strings || {};
 
     $().crmtooltip();
   });
-<<<<<<< HEAD
-  /**
-   * @deprecated
-   */
-  $.fn.crmAccordions = function () {
-    CRM.console('warn', 'Warning: $.crmAccordions was called. This function is deprecated and should not be used.');
-  };
-=======
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   /**
    * Collapse or expand an accordion
    * @param speed
@@ -1506,11 +1377,7 @@ CRM.strings = CRM.strings || {};
   /**
    * Clientside currency formatting
    * @param number value
-<<<<<<< HEAD
-   * @param [optional] boolean onlyNumber - if true, we return formated amount without currency sign
-=======
    * @param [optional] boolean onlyNumber - if true, we return formatted amount without currency sign
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param [optional] string format - currency representation of the number 1234.56
    * @return string
    */

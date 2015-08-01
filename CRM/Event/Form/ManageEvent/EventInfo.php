@@ -51,16 +51,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    * @return void
    */
   public function preProcess() {
-<<<<<<< HEAD
-    //custom data related code
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     parent::preProcess();
 
     if ($this->_id) {
@@ -95,21 +85,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    * @return void
    */
   public function setDefaultValues() {
-<<<<<<< HEAD
-    if ($this->_cdType) {
-      $tempId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
-      // set template custom data as a default for event, CRM-5596
-      if ($tempId && !$this->_id) {
-        $defaults = $this->templateCustomDataValues($tempId);
-      }
-      else {
-        $defaults = CRM_Custom_Form_CustomData::setDefaultValues($this);
-      }
-
-      return $defaults;
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $defaults = parent::setDefaultValues();
 
     // in update mode, we need to set custom data subtype to tpl

@@ -56,11 +56,7 @@
   </td>
     </tr>
     <tr class="crm-contribution-contributionpage-thankyou-form-block-receipt_from_email">
-<<<<<<< HEAD
-      <td class="label">{$form.receipt_from_email.label}{$reqMark} {help id="id_receipt-from-email"}</td>
-=======
       <td class="label">{$form.receipt_from_email.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span> {help id="id_receipt-from-email"}</td>
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       <td class="html-adjust">{$form.receipt_from_email.html}</td>
     </tr>
     <tr class="crm-contribution-contributionpage-thankyou-form-block-receipt_text">

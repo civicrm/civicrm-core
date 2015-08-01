@@ -109,11 +109,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-<<<<<<< HEAD
-    $user = user_load($ufID);
-=======
     $user = entity_load('user', $ufID);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
@@ -226,7 +222,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'html-header':
       case 'page-footer':
         break;
-
       default:
         return FALSE;
     }
@@ -251,7 +246,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'html-header':
       case 'page-footer':
         break;
-
       default:
         return FALSE;
     }
@@ -337,11 +331,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $query = '',
     $absolute = FALSE,
     $fragment = NULL,
-<<<<<<< HEAD
-    $htmlize = TRUE,
-=======
     $htmlize = FALSE,
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {

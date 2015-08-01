@@ -107,8 +107,6 @@ class CRM_Core_ScheduledJob {
       case 'Daily':
         $format = 'Ymd';
         break;
-<<<<<<< HEAD
-=======
 
       case 'Mondays':
         $now = CRM_Utils_Date::currentDBDate();
@@ -132,7 +130,6 @@ class CRM_Core_ScheduledJob {
         $nowMonth = date('n', strtotime($now));
         $qtrMonths = array('1', '4', '7', '10');
         return ($lastRun < $dayAgo && $nowDayOfMonth == '13' && in_array($nowMonth, $qtrMonths));
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     $now = CRM_Utils_Date::currentDBDate();

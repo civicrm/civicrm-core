@@ -1154,15 +1154,9 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
 
   /**
    * Send the message to all the contacts.
-<<<<<<< HEAD
    *
    * Also insert a contact activity in each contacts record.
    *
-=======
-   *
-   * Also insert a contact activity in each contacts record.
-   *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param array $contactDetails
    *   The array of contact details to send the email.
    * @param string $subject
@@ -2543,11 +2537,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           $activity['target_contact_name'] = $values['recipients'];
         }
         elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
-<<<<<<< HEAD
-          $contactActivities[$activityId]['target_contact'] = '';
-=======
           $activity['target_contact_name'] = '';
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           foreach ($values['target_contact_name'] as $tcID => $tcName) {
             $activity['target_contact_name'] .= CRM_Utils_System::href($tcName,
               'civicrm/contact/view', "reset=1&cid={$tcID}");
@@ -2621,11 +2611,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         if ($values['is_recurring_activity']) {
           $contactActivities[$activityId]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getPositionAndCount($values['activity_id'], 'civicrm_activity');
         }
-<<<<<<< HEAD
-=======
 
         array_push($contactActivities, $activity);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
     }
 
@@ -2740,8 +2727,6 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     }
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Send activity as attachment
    *
@@ -2767,5 +2752,4 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     return FALSE;
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

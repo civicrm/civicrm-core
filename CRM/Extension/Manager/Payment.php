@@ -226,49 +226,6 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       array(
         1 => array($info->key, 'String'),
       )
-<<<<<<< HEAD
-    )
-    ) {
-      // If so, load params in the usual way ..
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($processor_id, NULL);
-    }
-    else {
-      // Otherwise, do the best we can to construct some ..
-      $dao = CRM_Core_DAO::executeQuery("
-                    SELECT ppt.*
-                      FROM civicrm_extension ext
-                INNER JOIN civicrm_payment_processor_type ppt
-                        ON ppt.name = ext.name
-                     WHERE ext.name = %1
-                       AND ext.type = 'payment'
-            ",
-        array(
-          1 => array($info->name, 'String'),
-        )
-      );
-      if ($dao->fetch()) {
-        $paymentProcessor = array(
-          'id' => -1,
-          'name' => $dao->title,
-          'payment_processor_type_id' => $dao->id,
-          'user_name' => 'nothing',
-          'password' => 'nothing',
-          'signature' => '',
-          'url_site' => $dao->url_site_default,
-          'url_api' => $dao->url_api_default,
-          'url_recur' => $dao->url_recur_default,
-          'url_button' => $dao->url_button_default,
-          'subject' => '',
-          'class_name' => $dao->class_name,
-          'is_recur' => $dao->is_recur,
-          'billing_mode' => $dao->billing_mode,
-          'payment_type' => $dao->payment_type,
-        );
-      }
-      else {
-        CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
-      }
-=======
     );
 
     while ($processorDAO->fetch()) {
@@ -278,7 +235,6 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
     if (empty($class_name)) {
       CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     // In the case of uninstall, check for instances of PP first.

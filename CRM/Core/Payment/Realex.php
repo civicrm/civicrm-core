@@ -77,56 +77,11 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public function setExpressCheckOut(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-   * @param $token
-   *
-   * @throws Exception
-   */
-  public function getExpressCheckoutDetails($token) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-=======
-   * Submit a payment using Advanced Integration Method.
-   *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
-   *
-<<<<<<< HEAD
-   * @throws Exception
-   */
-  public function doExpressCheckout(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public function doTransferCheckout(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
    * Submit a payment using Advanced Integration Method.
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return array
    *   the result in a nice formatted array (or an error object)
    */
@@ -437,24 +392,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Get the value of a field if set.
    *
    * @param string $field

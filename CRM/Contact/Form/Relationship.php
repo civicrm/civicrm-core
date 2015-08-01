@@ -106,22 +106,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    * Explicitly declare the form context.
    */
-<<<<<<< HEAD
-  public $_cdType;
-
-  public function preProcess() {
-    //custom data related code
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
-=======
   public function getDefaultContext() {
     return 'create';
   }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Explicitly declare the entity api name.
@@ -218,12 +205,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-<<<<<<< HEAD
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $defaults = array();
 
@@ -282,12 +263,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Add the rules for form.
    */
   public function addRules() {
-<<<<<<< HEAD
-    if ($this->_cdType) {
-      return;
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if (!($this->_action & CRM_Core_Action::DELETE)) {
       $this->addFormRule(array('CRM_Contact_Form_Relationship', 'dateRule'));
@@ -337,27 +312,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     $this->assign('relationshipData', $jsData);
 
-<<<<<<< HEAD
-    $this->add(
-      'select',
-      'relationship_type_id',
-      ts('Relationship Type'),
-      array('' => ts('- select -')) + $relationshipList,
-      TRUE,
-      array('class' => 'crm-select2 huge')
-    );
-
-    $label = $this->_action & CRM_Core_Action::ADD ? ts('Contact(s)') : ts('Contact');
-    $contactField = $this->addEntityRef('related_contact_id', $label, array(
-        'multiple' => TRUE,
-        'create' => TRUE,
-      ), TRUE);
-=======
     $this->addField('relationship_type_id', array('options' => array('' => ts('- select -')) + $relationshipList, 'class' => 'huge', 'placeholder' => '- select -'), TRUE);
 
     $label = $this->_action & CRM_Core_Action::ADD ? ts('Contact(s)') : ts('Contact');
     $contactField = $this->addField('related_contact_id', array('label' => $label, 'name' => 'contact_id_b', 'multiple' => TRUE, 'create' => TRUE), TRUE);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // This field cannot be updated
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $contactField->freeze();

@@ -19,11 +19,7 @@ function contribution_page_submit_example() {
     'selectMembership' => array(
       '0' => 1,
     ),
-<<<<<<< HEAD
-    'payment_processor' => 1,
-=======
     'payment_processor_id' => 1,
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     'credit_card_number' => '4111111111111111',
     'credit_card_type' => 'Visa',
     'credit_card_exp_date' => array(
@@ -74,11 +70,7 @@ function contribution_page_submit_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-<<<<<<< HEAD
-* The test that created it is called "testLegacySubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed"
-=======
 * The test that created it is called "testSubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed"
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionPageTest.php
 *

@@ -301,28 +301,8 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   // end function doDirectPayment
 
   /**
-<<<<<<< HEAD
-   * Checks to see if invoice_id already exists in db.
-   *
-   * @param int $invoiceId
-   *   The ID to check.
-   *
-   * @return bool
-   *   True if ID exists, else false
-   */
-  public function _checkDupe($invoiceId) {
-    $contribution = new CRM_Contribute_DAO_Contribution();
-    $contribution->invoice_id = $invoiceId;
-    return $contribution->find();
-  }
-
-  /**
    * Produces error message and returns from class.
    */
-=======
-   * Produces error message and returns from class.
-   */
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 
@@ -336,16 +316,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-   * NOTE: 'doTransferCheckout' not implemented
-   */
-  public function doTransferCheckout(&$params, $component) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * This public function checks to see if we have the right processor config values set.
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying

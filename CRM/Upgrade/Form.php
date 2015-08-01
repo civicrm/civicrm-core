@@ -365,15 +365,6 @@ SET    version = '$version'
       }
     }
 
-<<<<<<< HEAD
-    // sample test list
-    /*         $revList = array(
-    '2.1.0', '2.2.beta2', '2.2.beta1', '2.2.alpha1', */
-
-    /*                          '2.2.alpha3', '2.2.0', '2.2.2', '2.1.alpha1', '2.1.3'); */
-
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     usort($revList, 'version_compare');
     return $revList;
   }
@@ -501,13 +492,8 @@ SET    version = '$version'
     if (version_compare(phpversion(), self::MINIMUM_PHP_VERSION) < 0) {
       $error = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
         array(
-<<<<<<< HEAD
-          1 => $minPhpVersion,
-          2 => $phpVersion,
-=======
           1 => self::MINIMUM_PHP_VERSION,
           2 => phpversion(),
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           3 => $latestVer,
         ));
     }
@@ -700,14 +686,6 @@ SET    version = '$version'
       $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
       $versionObject->setPostUpgradeMessage($postUpgradeMessage, $rev);
       file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
-<<<<<<< HEAD
-    }
-    else {
-      $postUpgradeMessage = file_get_contents($postUpgradeMessageFile);
-      CRM_Upgrade_Incremental_Legacy::setPostUpgradeMessage($postUpgradeMessage, $rev);
-      file_put_contents($postUpgradeMessageFile, $postUpgradeMessage);
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     return TRUE;
@@ -777,14 +755,10 @@ SET    version = '$version'
    * @param $latestVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $currentVer, $latestVer) {
-<<<<<<< HEAD
-    CRM_Upgrade_Incremental_Legacy::setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
-=======
     // check for changed message templates
     CRM_Upgrade_Incremental_General::checkMessageTemplate($preUpgradeMessage, $latestVer, $currentVer);
     // set global messages
     CRM_Upgrade_Incremental_General::setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     // Scan through all php files and see if any file is interested in setting pre-upgrade-message
     // based on $currentVer, $latestVer.
@@ -793,14 +767,7 @@ SET    version = '$version'
     foreach ($revisions as $rev) {
       if (version_compare($currentVer, $rev) < 0) {
         $versionObject = $this->incrementalPhpObject($rev);
-<<<<<<< HEAD
-        if (is_callable(array(
-          $versionObject,
-          'setPreUpgradeMessage',
-        ))) {
-=======
         if (is_callable(array($versionObject, 'setPreUpgradeMessage'))) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }
       }

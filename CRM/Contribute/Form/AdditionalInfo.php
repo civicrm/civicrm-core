@@ -29,21 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
-<<<<<<< HEAD
- * $Id$
- *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 class CRM_Contribute_Form_AdditionalInfo {
 
   /**
    * Build the form object for Premium Information.
    *
-<<<<<<< HEAD
-=======
    * Called from the CRM_Contribute_Form_Contribute function and seemingly nowhere else.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * Probably this should be on the form that uses it since it is not used on multiple forms.
    *
@@ -201,36 +193,22 @@ class CRM_Contribute_Form_AdditionalInfo {
 
   /**
    * Process the Premium Information.
-<<<<<<< HEAD
-   *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param array $params
    * @param int $contributionID
    * @param int $premiumID
-<<<<<<< HEAD
-   * @param NULL $options
-   * @return void
-   */
-  public static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
-=======
    * @param array $options
    */
   public static function processPremium($params, $contributionID, $premiumID = NULL, $options = array()) {
     $selectedProductID = $params['product_name'][0];
     $selectedProductOptionID = $params['product_name'][1];
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $dao = new CRM_Contribute_DAO_ContributionProduct();
     $dao->contribution_id = $contributionID;
     $dao->product_id = $selectedProductID;
     $dao->fulfilled_date = CRM_Utils_Date::processDate($params['fulfilled_date'], NULL, TRUE);
     $isDeleted = FALSE;
-<<<<<<< HEAD
-=======
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     //CRM-11106
     $premiumParams = array(
       'id' => $selectedProductID,
@@ -283,11 +261,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @return void
    */
-<<<<<<< HEAD
-  public static function processNote(&$params, $contactID, $contributionID, $contributionNoteID = NULL) {
-=======
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     //process note
     $noteParams = array(
       'entity_table' => 'civicrm_contribution',
@@ -403,13 +377,8 @@ class CRM_Contribute_Form_AdditionalInfo {
         $params['product_name'] = $productDAO->name;
         $params['product_sku'] = $productDAO->sku;
 
-<<<<<<< HEAD
-        if (empty($params['product_option']) && !empty($form->_options[$params['product_name'][0]])) {
-          $params['product_option'] = $form->_options[$params['product_name'][0]][$params['product_name'][1]];
-=======
         if (empty($params['product_option']) && !empty($form->_options[$productDAO->id])) {
           $params['product_option'] = $form->_options[$productDAO->id][$productOptionID];
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         }
       }
 

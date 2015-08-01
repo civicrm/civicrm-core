@@ -231,11 +231,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
     if (!empty($params['member_price_set_id'])) {
       //check if this price set has membership type both auto-renew and non-auto-renew memberships.
-<<<<<<< HEAD
-      $bothTypes = CRM_Price_BAO_PriceSet::checkMembershipPriceSet($params['member_price_set_id']);
-=======
       $bothTypes = CRM_Price_BAO_PriceSet::isMembershipPriceSetContainsMixOfRenewNonRenew($params['member_price_set_id']);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       //check for supporting payment processors
       //if both auto-renew and non-auto-renew memberships
@@ -247,26 +243,12 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $paymentProcessorId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $paymentProcessorIds);
 
         if (!empty($paymentProcessorId)) {
-<<<<<<< HEAD
-          $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
-          foreach ($paymentProcessorId as $pid) {
-            if ($pid) {
-              $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
-                $pid, 'payment_processor_type_id'
-              );
-            }
-            if (!($paymentProcessorTypeId == CRM_Utils_Array::key('PayPal', $paymentProcessorType) ||
-              ($paymentProcessorTypeId == CRM_Utils_Array::key('AuthNet', $paymentProcessorType)))
-            ) {
-              $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
-=======
           foreach ($paymentProcessorId as $pid) {
             if ($pid) {
               $processor = Civi\Payment\System::singleton()->getById($pid);
               if (!$processor->supports('MultipleConcurrentPayments')) {
                 $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
               }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             }
           }
         }

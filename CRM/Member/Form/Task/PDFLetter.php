@@ -100,19 +100,8 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   }
 
   /**
-<<<<<<< HEAD
-   * List available tokens, at time of writing these were
-   * {membership.id} => Membership ID
-   * {membership.status} => Membership Status
-   * {membership.type} => Membership Type
-   * {membership.start_date} => Membership Start Date
-   * {membership.join_date} => Membership Join Date
-   * {membership.end_date} => Membership End Date
-   * {membership.fee} => Membership Fee
-=======
    * List available tokens for this form.
    *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return array
    */
   public function listTokens() {

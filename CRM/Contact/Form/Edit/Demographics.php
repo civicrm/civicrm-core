@@ -47,20 +47,7 @@ class CRM_Contact_Form_Edit_Demographics {
    * @return void
    */
   public static function buildQuickForm(&$form) {
-<<<<<<< HEAD
-    // radio button for gender
-    $genderOptions = array();
-    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
-    foreach ($gender as $key => $var) {
-      $genderOptions[$key] = $form->createElement('radio', NULL,
-        ts('Gender'), $var, $key,
-        array('id' => "civicrm_gender_{$var}_{$key}")
-      );
-    }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
-=======
     $form->addField('gender_id', array('entity' => 'contact', 'type' => 'Radio', 'allowClear' => TRUE));
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $form->addField('birth_date', array('entity' => 'contact', 'formatType' => 'birth'));
 

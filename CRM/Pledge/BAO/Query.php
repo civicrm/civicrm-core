@@ -266,51 +266,6 @@ class CRM_Pledge_BAO_Query {
         );
         return;
 
-<<<<<<< HEAD
-      case 'pledge_status_id':
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            if ($v) {
-              $val[$k] = $k;
-            }
-          }
-
-          $status = implode(',', $val);
-
-          if (count($val) > 0) {
-            $op = 'IN';
-            $status = "({$status})";
-          }
-        }
-        else {
-          $status = $value;
-        }
-
-        $statusValues = CRM_Core_OptionGroup::values('contribution_status');
-
-        $names = array();
-        if (isset($val) && is_array($val)) {
-          foreach ($val as $id => $dontCare) {
-            $names[] = $statusValues[$id];
-          }
-        }
-        else {
-          if (!empty($value)) {
-            $names[] = $statusValues[$value];
-          }
-        }
-
-        $query->_qill[$grouping][] = ts('Pledge Status %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_pledge.status_id',
-          $op,
-          $status,
-          'Integer'
-        );
-        $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
-        return;
-
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       case 'pledge_payment_status_id':
       case 'pledge_status_id':
         if ($name == 'pledge_status_id') {
@@ -323,16 +278,9 @@ class CRM_Pledge_BAO_Query {
           $query->_tables['civicrm_pledge_payment'] = $query->_whereTables['civicrm_pledge_payment'] = 1;
           $label = "Pledge Payment Status";
         }
-<<<<<<< HEAD
-        else {
-          if (!empty($value)) {
-            $names[] = $statusValues[$value];
-          }
-=======
         $name = 'status_id';
         if (!empty($value) && is_array($value) && !in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $value = array('IN' => $value);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         }
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name",

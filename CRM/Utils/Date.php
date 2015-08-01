@@ -167,31 +167,22 @@ class CRM_Utils_Date {
 
   /**
    * Return abbreviated weekday names according to the locale.
-<<<<<<< HEAD
-=======
    *
    * Array will be in localized order according to 'weekBegins' setting,
    * but array keys will always match to:
    * 0 => Sun
    * 1 => Mon
    * etc.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return array
    *   0-based array with abbreviated weekday names
    *
    */
-<<<<<<< HEAD
-  public static function &getAbbrWeekdayNames() {
-    static $abbrWeekdayNames;
-    if (!isset($abbrWeekdayNames)) {
-=======
   public static function getAbbrWeekdayNames() {
     static $days = array();
     if (!$days) {
       // First day of the week
       $firstDay = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       // set LC_TIME and build the arrays from locale-provided names
       // June 1st, 1970 was a Monday
@@ -205,31 +196,22 @@ class CRM_Utils_Date {
 
   /**
    * Return full weekday names according to the locale.
-<<<<<<< HEAD
-=======
    *
    * Array will be in localized order according to 'weekBegins' setting,
    * but array keys will always match to:
    * 0 => Sunday
    * 1 => Monday
    * etc.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return array
    *   0-based array with full weekday names
    *
    */
-<<<<<<< HEAD
-  public static function &getFullWeekdayNames() {
-    static $fullWeekdayNames;
-    if (!isset($fullWeekdayNames)) {
-=======
   public static function getFullWeekdayNames() {
     static $days = array();
     if (!$days) {
       // First day of the week
       $firstDay = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       // set LC_TIME and build the arrays from locale-provided names
       // June 1st, 1970 was a Monday
@@ -761,11 +743,7 @@ class CRM_Utils_Date {
    *                             format is 2007-12-21 )
    *
    * @return string
-<<<<<<< HEAD
-   *   Return the customized todays date (Y-m-d)
-=======
    *   Return the customized today's date (Y-m-d)
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function getToday($dayParams = NULL, $format = "Y-m-d") {
     if (is_null($dayParams) || empty($dayParams)) {

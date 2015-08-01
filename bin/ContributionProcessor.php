@@ -399,8 +399,6 @@ class CiviContributeProcessor {
     }
   }
 
-<<<<<<< HEAD
-=======
   /**
    * @param array $apiParams
    * @param $mapper
@@ -688,7 +686,6 @@ class CiviContributeProcessor {
     return TRUE;
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }
 
 // bootstrap the environment and run the processor

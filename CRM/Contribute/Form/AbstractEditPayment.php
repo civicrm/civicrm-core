@@ -29,11 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
-<<<<<<< HEAD
- * $Id$
- *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
@@ -65,8 +60,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_paymentProcessor;
 
   /**
-<<<<<<< HEAD
-=======
    * Available recurring processors.
    *
    * @var array
@@ -74,7 +67,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_recurPaymentProcessors = array();
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Array of processor options in the format id => array($id => $label)
    * WARNING it appears that the format used to differ to this and there are places in the code that
    * expect the old format. $this->_paymentProcessors provides the additional data which this
@@ -203,14 +195,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $_formType;
 
   /**
-<<<<<<< HEAD
-   * @var mystery variable screaming out for documentation
-   */
-  protected $_cdType;
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
    * be all in this array in order like
    *  'credit_card' => array('credit_card_number' ...
@@ -222,8 +206,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $billingFieldSets = array();
 
   /**
-<<<<<<< HEAD
-=======
    * Pre process function with common actions.
    */
   public function preProcess() {
@@ -234,7 +216,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param int $id
    */
   public function showRecordLinkMesssage($id) {
@@ -433,25 +414,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
   }
 
   /**
-<<<<<<< HEAD
-   * Assign billing type id to bltID.
-   *
-   * @throws CRM_Core_Exception
-   * @return void
-   */
-  public function assignBillingType() {
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $this->_bltID = array_search('Billing', $locationTypes);
-    if (!$this->_bltID) {
-      throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
-    }
-    $this->set('bltID', $this->_bltID);
-    $this->assign('bltID', $this->_bltID);
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Assign $this->processors, $this->recurPaymentProcessors, and related Smarty variables
    */
   public function assignProcessors() {
@@ -474,18 +436,10 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         if (!empty($processor['description'])) {
           $this->_processors[$id] .= ' : ' . ts($processor['description']);
         }
-<<<<<<< HEAD
-      }
-      //get the valid recurring processors.
-      $test = strtolower($this->_mode) == 'test' ? TRUE : FALSE;
-      $recurring = CRM_Core_PseudoConstant::paymentProcessor(FALSE, $test, 'is_recur = 1');
-      $this->_recurPaymentProcessors = array_intersect_key($this->_processors, $recurring);
-=======
         if ($processor['is_recur']) {
           $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
         }
       }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
@@ -670,10 +624,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
 
         $this->assignBillingType();
 
-<<<<<<< HEAD
-        $this->_fields = array();
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE);
       }
     }

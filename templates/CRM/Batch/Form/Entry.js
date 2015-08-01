@@ -241,30 +241,8 @@ function setFieldValue(fname, fieldValue, blockNo) {
       }
     }
     else {
-<<<<<<< HEAD
-      if (editor) {
-        switch (editor) {
-          case 'ckeditor':
-            elemtId = elementId.attr('id');
-            oEditor = CKEDITOR.instances[elemtId];
-            oEditor.setData(htmlContent);
-            break;
-          case 'tinymce':
-            var elemtId = element.attr('id');
-            tinyMCE.get(elemtId).setContent(htmlContent);
-            break;
-          case 'joomlaeditor':
-            // TO DO
-          case 'drupalwysiwyg':
-            // TO DO
-            break;
-          default:
-            elementId.val(fieldValue);
-        }
-=======
       if (elementId.is('textarea')) {
         CRM.wysiwyg.setVal(elementId, fieldValue);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
       else {
         elementId.val(fieldValue);

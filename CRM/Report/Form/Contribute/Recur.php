@@ -265,10 +265,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     // with the interval unit (e.g. DATE_ADD(start_date, INTERVAL 12 * 1 MONTH)
     $date_suffixes = array('relative', 'from', 'to');
     while (list(, $suffix) = each($date_suffixes)) {
-<<<<<<< HEAD
-=======
       $isBreak = FALSE;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       // Check to see if the user wants to search by calculated date.
       if (!empty($this->_params['calculated_end_date_' . $suffix])) {
         // The calculated date field is in use - spring into action
@@ -295,43 +292,21 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
         $this->_where .= 'AND (' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias,1) month)",
             $relative, $from, $to, $start_date_type, NULL, NULL);
-<<<<<<< HEAD
-        $installment_clause .= " AND $frequency_unit_db_alias = 'month' ) OR \n";
-=======
         $this->_where .= " AND $frequency_unit_db_alias = 'month' ) OR \n";
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
         $this->_where .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias,1) day)",
             $relative, $from, $to, $start_date_type, NULL, NULL);
-<<<<<<< HEAD
-        $installment_clause .= " AND $frequency_unit_db_alias = 'day' ) OR \n";
-=======
         $this->_where .= " AND $frequency_unit_db_alias = 'day' ) OR \n";
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
         $this->_where .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) week)",
             $relative, $from, $to, $start_date_type, NULL, NULL);
-<<<<<<< HEAD
-        $installment_clause .= " AND $frequency_unit_db_alias = 'week' ) OR \n";
-=======
         $this->_where .= " AND $frequency_unit_db_alias = 'week' ) OR \n";
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
         $this->_where .= '(' .
           $this->dateClause("DATE_ADD($start_date_db_alias, INTERVAL $installments_db_alias * COALESCE($frequency_interval_db_alias, 1) year)",
             $relative, $from, $to, $start_date_type, NULL, NULL);
-<<<<<<< HEAD
-        $installment_clause .= " AND $frequency_unit_db_alias = 'year' )\n";
-
-        $this->_where .= " AND ";
-        $this->_where .= "(";
-        $this->_where .= "($end_date_db_alias IS NOT NULL AND $end_date_clause)\n";
-        $this->_where .= " OR \n";
-        $this->_where .= "($installments_db_alias IS NOT NULL AND ($installment_clause))\n";
-        $this->_where .= ')';
-=======
         $this->_where .= " AND $frequency_unit_db_alias = 'year' )
    AND (($end_date_db_alias IS NOT NULL AND $end_date_clause)
     OR ($installments_db_alias IS NOT NULL))
@@ -348,7 +323,6 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
         $isBreak = TRUE;
       }
       if (!empty($isBreak)) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         break;
       }
     }
@@ -388,10 +362,6 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_amount', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_contribution_recur_amount'], $rows[$rowNum]['civicrm_contribution_recur_currency']);
       }
-<<<<<<< HEAD
-
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
   }
 

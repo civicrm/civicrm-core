@@ -106,11 +106,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
       $trxn_id = str_replace('test_', '', $trxn_id);
       $trxn_id = intval($trxn_id) + 1;
-<<<<<<< HEAD
-      $params['trxn_id'] = sprintf('test_%08d', $trxn_id);
-=======
       $params['trxn_id'] = 'test_' . $trxn_id . '_' . uniqid();
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     else {
       $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'live_%'";
@@ -118,11 +114,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
       $trxn_id = str_replace('live_', '', $trxn_id);
       $trxn_id = intval($trxn_id) + 1;
-<<<<<<< HEAD
-      $params['trxn_id'] = sprintf('live_%08d', $trxn_id);
-=======
       $params['trxn_id'] = 'live_' . $trxn_id . '_' . uniqid();
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     $params['gross_amount'] = $params['amount'];
     // Add a fee_amount so we can make sure fees are handled properly in underlying classes.

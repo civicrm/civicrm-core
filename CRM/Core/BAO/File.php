@@ -224,10 +224,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
    *   Was file deleted?
    */
   public static function deleteEntityFile($entityTable, $entityID, $fileTypeID = NULL, $fileID = NULL) {
-<<<<<<< HEAD
-=======
     $isDeleted = FALSE;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if (empty($entityTable) || empty($entityID)) {
       return $isDeleted;
     }

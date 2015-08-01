@@ -30,11 +30,6 @@ use Civi\Payment\System;
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
-<<<<<<< HEAD
- * $Id$
- *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 
@@ -69,10 +64,6 @@ class CRM_Core_Payment_ProcessorForm {
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
-<<<<<<< HEAD
-      $form->_paymentObject = CRM_Core_Payment::singleton($mode, $form->_paymentProcessor, $form);
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL();
     }
 

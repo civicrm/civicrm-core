@@ -26,32 +26,12 @@
  */
 
 /**
-<<<<<<< HEAD
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
-=======
  * Upgrade logic for 4.4
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base {
   const MAX_WORD_REPLACEMENT_SIZE = 255;
 
   /**
-<<<<<<< HEAD
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Compute any messages which should be displayed beforeupgrade.
    *
    * Note: This function is called iteratively for each upcoming
@@ -138,11 +118,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    * @param $rev
    */
   public function upgrade_4_4_beta1($rev) {
-<<<<<<< HEAD
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'task_4_4_x_runSql', $rev);
-=======
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'runSql', $rev);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     // add new 'data' column in civicrm_batch
     $query = 'ALTER TABLE civicrm_batch ADD data LONGTEXT NULL COMMENT "cache entered data"';
@@ -710,19 +686,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   }
 
   /**
-<<<<<<< HEAD
-   * (Queue Task Callback)
-   */
-  public static function task_4_4_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
-    $upgrade = new CRM_Upgrade_Form();
-    $upgrade->processSQL($rev);
-
-    return TRUE;
-  }
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Syntatic sugar for adding a task which (a) is in this class and (b) has
    * a high priority.
    *

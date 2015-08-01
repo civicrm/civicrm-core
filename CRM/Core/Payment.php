@@ -26,10 +26,7 @@
  */
 
 use Civi\Payment\System;
-<<<<<<< HEAD
-=======
 use Civi\Payment\Exception\PaymentProcessorException;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
 /**
  * Class CRM_Core_Payment.
@@ -42,9 +39,6 @@ use Civi\Payment\Exception\PaymentProcessorException;
 abstract class CRM_Core_Payment {
 
   /**
-<<<<<<< HEAD
-   * How are we getting billing information?
-=======
    * Component - ie. event or contribute.
    *
    * This is used for setting return urls.
@@ -57,7 +51,6 @@ abstract class CRM_Core_Payment {
    * How are we getting billing information.
    *
    * We are trying to completely deprecate these parameters.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * FORM   - we collect it on the same page
    * BUTTON - the processor collects it and sends it back to us via some protocol
@@ -90,36 +83,6 @@ abstract class CRM_Core_Payment {
   protected $_paymentProcessor;
 
   /**
-<<<<<<< HEAD
-   * Singleton function used to manage this object.
-   *
-   * We will migrate to calling Civi\Payment\System::singleton()->getByProcessor($paymentProcessor)
-   * & Civi\Payment\System::singleton()->getById($paymentProcessor) directly as the main access methods & work
-   * to remove this function all together
-   *
-   * @param string $mode
-   *   The mode of operation: live or test.
-   * @param array $paymentProcessor
-   *   The details of the payment processor being invoked.
-   * @param object $paymentForm
-   *   Deprecated - avoid referring to this if possible. If you have to use it document why as this is scary interaction.
-   * @param bool $force
-   *   Should we force a reload of this payment object.
-   *
-   * @return CRM_Core_Payment
-   * @throws \CRM_Core_Exception
-   */
-  public static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    // make sure paymentProcessor is not empty
-    // CRM-7424
-    if (empty($paymentProcessor)) {
-      return CRM_Core_DAO::$_nullObject;
-    }
-    //we use two lines because we can't remove the '&singleton' without risking breakage
-    //of extension classes that extend this one
-    $object = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
-    return $object;
-=======
    * Opportunity for the payment processor to override the entire form build.
    *
    * @param CRM_Core_Form $form
@@ -129,7 +92,6 @@ abstract class CRM_Core_Payment {
    */
   public function buildForm(&$form) {
     return FALSE;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -194,8 +156,6 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Can more than one transaction be processed at once?
    *
    * In general processors that process payment by server to server communication support this while others do not.
@@ -214,7 +174,6 @@ abstract class CRM_Core_Payment {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Are live payments supported - e.g dummy doesn't support this.
    *
    * @return bool
@@ -244,46 +203,6 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-   * Default payment instrument validation.
-   *
-   * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
-   * Not a static function, because I need to check for payment_type.
-   *
-   * @param array $values
-   * @param array $errors
-   */
-  public function validatePaymentInstrument($values, &$errors) {
-    if ($this->_paymentProcessor['payment_type'] == 1) {
-      CRM_Core_Payment_Form::validateCreditCard($values, $errors);
-    }
-  }
-
-  /**
-   * Getter for the payment processor.
-   *
-   * The payment processor array is based on the civicrm_payment_processor table entry.
-   *
-   * @return array
-   *   Payment processor array.
-   */
-  public function getPaymentProcessor() {
-    return $this->_paymentProcessor;
-  }
-
-  /**
-   * Setter for the payment processor.
-   *
-   * @param array $processor
-   */
-  public function setPaymentProcessor($processor) {
-    $this->_paymentProcessor = $processor;
-  }
-
-  /**
-   * Setter for the payment form that wants to use the processor.
-   *
-=======
    * Does this processor support cancelling recurring contributions through code.
    *
    * @return bool
@@ -388,7 +307,6 @@ abstract class CRM_Core_Payment {
   /**
    * Setter for the payment form that wants to use the processor.
    *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @deprecated
    *
    * @param CRM_Core_Form $paymentForm
@@ -409,15 +327,9 @@ abstract class CRM_Core_Payment {
 
   /**
    * Getter for accessing member vars.
-<<<<<<< HEAD
    *
    * @todo believe this is unused
    *
-=======
-   *
-   * @todo believe this is unused
-   *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param string $name
    *
    * @return null
@@ -621,8 +533,6 @@ abstract class CRM_Core_Payment {
         'is_required' => TRUE,
 
       ),
-<<<<<<< HEAD
-=======
     );
   }
 
@@ -682,33 +592,10 @@ abstract class CRM_Core_Payment {
       'qfKey' => $qfKey,
     ),
       TRUE, NULL, FALSE
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     );
   }
 
   /**
-<<<<<<< HEAD
-   * Calling this from outside the payment subsystem is deprecated - use doPayment.
-   *
-   * Does a server to server payment transaction.
-   *
-   * Note that doPayment will throw an exception so the code may need to be modified
-   *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
-   *
-   * @return array
-   *   the result in an nice formatted array (or an error object)
-   * @abstract
-   */
-  abstract protected function doDirectPayment(&$params);
-
-  /**
-   * Process payment - this function wraps around both doTransferPayment and doDirectPayment.
-   *
-   * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
-   * more agnostic.
-=======
    * Get URL to return the browser to on failure.
    *
    * @param string $key
@@ -772,7 +659,6 @@ abstract class CRM_Core_Payment {
    * Calling this from outside the payment subsystem is deprecated - use doPayment.
    *
    * Does a server to server payment transaction.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
@@ -802,13 +688,6 @@ abstract class CRM_Core_Payment {
    *
    * @param array $params
    *
-<<<<<<< HEAD
-   * @return array
-   *   (modified)
-   * @throws CRM_Core_Exception
-   */
-  public function doPayment(&$params, $component = 'contribute') {
-=======
    * @param string $component
    *
    * @return array
@@ -819,7 +698,6 @@ abstract class CRM_Core_Payment {
   public function doPayment(&$params, $component = 'contribute') {
     $this->_component = $component;
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
       if (is_array($result) && !isset($result['payment_status_id'])) {
@@ -846,10 +724,6 @@ abstract class CRM_Core_Payment {
     if (is_a($result, 'CRM_Core_Error')) {
       throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
-<<<<<<< HEAD
-    //CRM-15767 - Submit Credit Card Contribution not being saved
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return $result;
   }
 
@@ -1011,11 +885,8 @@ abstract class CRM_Core_Payment {
 
   /**
    * Check whether a method is present ( & supported ) by the payment processor object.
-<<<<<<< HEAD
-=======
    *
    * @deprecated - use $paymentProcessor->supports(array('cancelRecurring');
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param string $method
    *   Method to check for.
@@ -1027,8 +898,6 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Some processors replace the form submit button with their own.
    *
    * Returning false here will leave the button off front end forms.
@@ -1063,7 +932,6 @@ abstract class CRM_Core_Payment {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Get url for users to manage this recurring contribution for this processor.
    *
    * @param int $entityID

@@ -498,13 +498,8 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
     if ($isError) {
       $errors['_qf_default'] = ts('For Chart view, please select at least one field from %1 OR %2.', array(
-<<<<<<< HEAD
-          1 => implode(', ', $criterias['count']),
-          2 => implode(', ', $criterias['rate']),
-=======
           1 => implode(', ', $criteria['count']),
           2 => implode(', ', $criteria['rate']),
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         ));
     }
 

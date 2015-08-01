@@ -29,11 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
-<<<<<<< HEAD
- * $Id$
- *
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -351,16 +346,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    *
    * @return bool
    */
-<<<<<<< HEAD
-  public function checkMD5($ids, $input) {
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ids['paymentProcessor'],
-      $input['is_test'] ? 'test' : 'live'
-    );
-    $paymentObject = CRM_Core_Payment::singleton($input['is_test'] ? 'test' : 'live', $paymentProcessor);
-
-=======
   public function checkMD5($paymentObject, $input) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if (!$paymentObject->checkMD5($input['MD5_Hash'], $input['trxn_id'], $input['amount'], TRUE)) {
       CRM_Core_Error::debug_log_message("MD5 Verification failed.");
       echo "Failure: Security verification failed<p>";

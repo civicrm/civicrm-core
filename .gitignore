@@ -1,5 +1,6 @@
 *~
 *.bak
+bower_components
 CRM/ACL/DAO
 CRM/Activity/DAO
 CRM/Auction/DAO
@@ -92,6 +93,7 @@ CRM/Core/DAO/Website.php
 CRM/Core/DAO/WordReplacement.php
 CRM/Core/DAO/Worldregion.php
 CRM/Core/I18n/SchemaStructure.php
+CRM/Cxn/DAO
 CRM/Dedupe/DAO
 CRM/Event/Cart/DAO
 CRM/Event/DAO
@@ -113,6 +115,7 @@ civicrm-version.php
 civicrm-version.txt
 civicrm.config.php
 install/langs.php
+node_modules
 packages/.channels
 packages/.depdb
 packages/.depdblock
@@ -144,6 +147,7 @@ drupal/
 WordPress
 joomla
 packages/
+tests/output
 tests/phpunit/CiviTest/civicrm.settings.local.php
 tests/phpunit/CiviTest/truncate.xml
 tools/scripts/releaser/releaser.conf

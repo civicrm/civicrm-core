@@ -71,11 +71,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *   Value we want to set the is_active field.
    *
    * @return Object
-<<<<<<< HEAD
-   *   DAO object on sucess, null otherwise
-=======
    *   DAO object on success, null otherwise
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_RelationshipType', $id, 'is_active', $is_active);

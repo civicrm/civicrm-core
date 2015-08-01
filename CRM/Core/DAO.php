@@ -220,11 +220,7 @@ class CRM_Core_DAO extends DB_DataObject {
           break;
 
         case CRM_Utils_Type::T_TIME:
-<<<<<<< HEAD
-          CRM_Core_Error::fatal('T_TIME shouldnt be used.');
-=======
           CRM_Core_Error::fatal("T_TIME shouldn't be used.");
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           //$object->$dbName='000000';
           //break;
         case CRM_Utils_Type::T_CCNUM:
@@ -364,24 +360,9 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function initialize() {
     $this->_connect();
-    $query_string = "SET NAMES utf8"; // default query string
-    if (defined('CIVICRM_DB_TIMEZONE_SYNC'))
-    {
-        if (CIVICRM_DB_TIMEZONE_SYNC)
-        {
-            /*
-             * Set the database timezone to PHP timezone as per
-             * http://stackoverflow.com/questions/3451847/mysql-timezone-change
-             */
-            $n = new \DateTime();
-            $h = $n->getOffset()/3600;
-            $i = 60*($h-floor($h));
-            $offset = sprintf('%+d:%02d', $h, $i);
-            $query_string = "SET time_zone='$offset', NAMES utf8";
+    $this->query("SET NAMES utf8");
   }
-    }
-    $this->query($query_string);  // perform the database setup
-  }
+
   /**
    * Defines the default key as 'id'.
    *

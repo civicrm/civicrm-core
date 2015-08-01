@@ -157,12 +157,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'details' => array(
         'type' => 'wysiwyg',
         'label' => ts('Details'),
-<<<<<<< HEAD
-        // forces a smaller edit window
-        'attributes' => array('rows' => 4, 'cols' => 60),
-=======
         'attributes' => array('class' => 'huge'),
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         'required' => FALSE,
       ),
       'status_id' => array(
@@ -230,15 +225,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @return void
    */
   public function preProcess() {
-<<<<<<< HEAD
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
     $this->_atypefile = CRM_Utils_Array::value('atypefile', $_GET);
     $this->assign('atypefile', FALSE);
@@ -534,12 +520,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @return void
    */
   public function setDefaultValues() {
-<<<<<<< HEAD
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $defaults = $this->_values + CRM_Core_Form_RecurringEntity::setDefaultValues();
     // if we're editing...

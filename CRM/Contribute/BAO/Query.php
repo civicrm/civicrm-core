@@ -215,8 +215,6 @@ class CRM_Contribute_BAO_Query {
       $query->_select['contribution_campaign_title'] = "civicrm_campaign.title as contribution_campaign_title";
       $query->_element['contribution_campaign_title'] = $query->_tables['civicrm_campaign'] = 1;
     }
-<<<<<<< HEAD
-=======
 
     // Adding address_id in a way that is more easily extendable since the above is a bit ... wordy.
     $supportedBasicReturnValues = array('address_id');
@@ -232,7 +230,6 @@ class CRM_Contribute_BAO_Query {
       $query->_select['financial_type_id'] = "civicrm_contribution.financial_type_id as financial_type_id";
       $query->_element['financial_type_id'] = $query->_tables['civicrm_contribution'] = 1;
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // LCD 716 END
   }
 
@@ -584,19 +581,11 @@ class CRM_Contribute_BAO_Query {
 
   /**
    * Get from clause.
-<<<<<<< HEAD
    *
    * @param string $name
    * @param string $mode
    * @param string $side
    *
-=======
-   *
-   * @param string $name
-   * @param string $mode
-   * @param string $side
-   *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return NULL|string
    */
   public static function from($name, $mode, $side) {
@@ -917,22 +906,12 @@ class CRM_Contribute_BAO_Query {
 
     $form->add('select', 'contribution_page_id',
       ts('Contribution Page'),
-<<<<<<< HEAD
-      array(
-        '' => ts('- any -'),
-      ) +
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       CRM_Contribute_PseudoConstant::contributionPage(),
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
     );
 
     $form->addSelect('payment_instrument_id',
-<<<<<<< HEAD
-      array('entity' => 'contribution', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
-=======
       array('entity' => 'contribution', 'multiple' => 'multiple', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     );
 
     // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
@@ -940,21 +919,12 @@ class CRM_Contribute_BAO_Query {
     // stores the label
     $form->add('hidden', 'pcp_made_through');
 
-<<<<<<< HEAD
-    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status');
-    // Remove status values that are only used for recurring contributions or pledges (In Progress, Overdue).
-    unset($statusValues['5'], $statusValues['6']);
-
-    $form->addSelect('contribution_status_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'label' => ts('Contribution Status(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
-=======
     $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
     // Remove status values that are only used for recurring contributions or pledges (In Progress, Overdue).
     unset($statusValues['5'], $statusValues['6']);
     $form->add('select', 'contribution_status_id',
       ts('Contribution Status'), $statusValues,
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     );
 
     // Add fields for thank you and receipt

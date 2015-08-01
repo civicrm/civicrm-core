@@ -85,9 +85,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'name' => ts('Use - Create Mode'),
           'url' => 'civicrm/profile/create',
           'qs' => 'gid=%%id%%&reset=1',
-<<<<<<< HEAD
-          'title' => ts('Use Profile-Create Mode'),
-=======
           'title' => ts('Use - Create Mode'),
           'fe' => TRUE,
         ),
@@ -96,18 +93,13 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'url' => 'civicrm/profile/edit',
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use - Edit Mode'),
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           'fe' => TRUE,
         ),
         CRM_Core_Action::BASIC => array(
           'name' => ts('Use - Listings Mode'),
           'url' => 'civicrm/profile',
           'qs' => 'gid=%%id%%&reset=1',
-<<<<<<< HEAD
-          'title' => ts('Use Profile-Listings Mode'),
-=======
           'title' => ts('Use - Listings Mode'),
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           'fe' => TRUE,
         ),
         CRM_Core_Action::DISABLE => array(
@@ -495,8 +487,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     return $returnGroupTypes;
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Format 'group_type' field for display
    *
@@ -528,5 +518,4 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     return $groupTypesString;
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

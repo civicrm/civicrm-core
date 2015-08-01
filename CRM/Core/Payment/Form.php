@@ -64,16 +64,6 @@ class CRM_Core_Payment_Form {
       $form->assign('paymentTypeLabel', $paymentTypeLabel);
 
       $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
-<<<<<<< HEAD
-      if (in_array('cvv2', $paymentFields) && $isBackOffice) {
-        if (!civicrm_api3('setting', 'getvalue', array('name' => 'cvv_backoffice_required', 'group' => 'Contribute Preferences'))) {
-          $form->billingFieldSets[$paymentTypeName]['fields'][array_search('cvv2', $paymentFields)]['required'] = 0;
-        }
-      }
-
-      $form->billingPane = array($paymentTypeName => $paymentTypeLabel);
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $form->assign('paymentFields', $paymentFields);
     }
 
@@ -220,11 +210,7 @@ class CRM_Core_Payment_Form {
    * @return array
    */
   public static function getPaymentFields($paymentProcessor) {
-<<<<<<< HEAD
-    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
-=======
     $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return $paymentProcessorObject->getPaymentFormFields();
   }
 
@@ -234,11 +220,7 @@ class CRM_Core_Payment_Form {
    * @return array
    */
   public static function getPaymentFieldMetadata($paymentProcessor) {
-<<<<<<< HEAD
-    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
-=======
     $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return $paymentProcessorObject->getPaymentFormFieldsMetadata();
   }
 
@@ -248,11 +230,7 @@ class CRM_Core_Payment_Form {
    * @return string
    */
   public static function getPaymentTypeName($paymentProcessor) {
-<<<<<<< HEAD
-    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
-=======
     $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return $paymentProcessorObject->getPaymentTypeName();
   }
 
@@ -262,11 +240,7 @@ class CRM_Core_Payment_Form {
    * @return string
    */
   public static function getPaymentTypeLabel($paymentProcessor) {
-<<<<<<< HEAD
-    $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
-=======
     $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return ts(($paymentProcessorObject->getPaymentTypeLabel()) . ' Information');
   }
 
@@ -294,14 +268,7 @@ class CRM_Core_Payment_Form {
       $form->assign('profileAddressFields', $profileAddressFields);
     }
 
-<<<<<<< HEAD
-    // $processor->buildForm appears to be an undocumented (possibly unused) option for payment processors
-    // which was previously available only in some form flows
-    if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->isSupported('buildForm')) {
-      $form->_paymentProcessor['object']->buildForm($form);
-=======
     if (!empty($processor['object']) && $processor['object']->buildForm($form)) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       return NULL;
     }
 
@@ -359,12 +326,7 @@ class CRM_Core_Payment_Form {
   public static function validatePaymentInstrument($payment_processor_id, $values, &$errors, $form) {
     // ignore if we don't have a payment instrument to validate (e.g. backend payments)
     if ($payment_processor_id > 0) {
-<<<<<<< HEAD
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($payment_processor_id, 'live');
-      $payment = CRM_Core_Payment::singleton('live', $paymentProcessor, $form);
-=======
       $payment = Civi\Payment\System::singleton()->getById($payment_processor_id);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $payment->validatePaymentInstrument($values, $errors);
     }
   }

@@ -181,8 +181,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   protected $_currentUserID = NULL;
   protected $_session = NULL;
-<<<<<<< HEAD
-=======
 
   /**
    * Explicitly declare the entity api name.
@@ -190,7 +188,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public function getDefaultEntity() {
     return 'Profile';
   }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Pre processing work done here.

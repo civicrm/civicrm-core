@@ -554,11 +554,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    *   Value we want to set the is_active field.
    *
    * @return CRM_Campaign_DAO_Campaign|null
-<<<<<<< HEAD
-   *   DAO object on sucess, null otherwise
-=======
    *   DAO object on success, null otherwise
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);

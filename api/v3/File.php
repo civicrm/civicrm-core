@@ -127,11 +127,7 @@ function civicrm_api3_file_update($params) {
  *   Array per getfields metadata.
  *
  * @return array
-<<<<<<< HEAD
- *   API result array
-=======
  *   API Result Array
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 function civicrm_api3_file_delete($params) {
 

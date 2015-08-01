@@ -79,8 +79,6 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     CRM_Contact_Form_Task_SMSCommon::postProcess($this);
   }
 
-<<<<<<< HEAD
-=======
   /**
    * List available tokens for this form.
    *
@@ -91,5 +89,4 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     return $tokens;
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

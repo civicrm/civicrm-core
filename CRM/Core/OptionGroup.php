@@ -201,11 +201,7 @@ WHERE  v.option_group_id = g.id
    * This function retrieves all the values for the specific option group by id.
    * this is primarily used to create various html based form elements
    * (radio, select, checkbox etc). OptionGroups for most cases have the
-<<<<<<< HEAD
-   * 'label' in the label colum and the 'id' or 'name' in the value column
-=======
    * 'label' in the label column and the 'id' or 'name' in the value column
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param int $id
    *   id of the option group.

@@ -97,11 +97,7 @@
             {$form.group.html}
           </td>
         {/if}
-<<<<<<< HEAD
-        {if !$type || $type eq 'tag'}
-=======
         {if (!$type || $type eq 'tag') && $tree}
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           <td width="70%">{if $title}<span class="label">{$form.tag.label}</span>{/if}
             <div id="tagtree">
               {include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}

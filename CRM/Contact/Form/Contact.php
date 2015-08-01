@@ -128,8 +128,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public $_preEditValues;
 
   /**
-<<<<<<< HEAD
-=======
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -144,7 +142,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Build all the data structures needed to build the form.
    *
    * @return void
@@ -1236,11 +1233,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *   of key value consist of address blocks.
    *
    * @return array
-<<<<<<< HEAD
-   *   as array of sucess/fails for each address block
-=======
    *   as array of success/fails for each address block
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function parseAddress(&$params) {
     $parseSuccess = $parsedFields = array();

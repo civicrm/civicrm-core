@@ -72,14 +72,7 @@ class CRM_Contact_Form_Edit_Address {
     }
 
     //make location type required for inline edit
-<<<<<<< HEAD
-    $form->addSelect("address[$blockId][location_type_id]", array(
-        'entity' => 'address',
-        'class' => 'eight',
-      ) + $js, $inlineEdit);
-=======
     $form->addField("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight') + $js, $inlineEdit);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if (!$inlineEdit) {
       $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
@@ -109,31 +102,6 @@ class CRM_Contact_Form_Edit_Address {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Address');
 
     $elements = array(
-<<<<<<< HEAD
-      'address_name' => array(ts('Address Name'), $attributes['address_name'], NULL),
-      'street_address' => array(ts('Street Address'), $attributes['street_address'], NULL),
-      'supplemental_address_1' => array(ts('Supplemental Address 1'), $attributes['supplemental_address_1'], NULL),
-      'supplemental_address_2' => array(ts('Supplemental Address 2'), $attributes['supplemental_address_2'], NULL),
-      'city' => array(ts('City'), $attributes['city'], NULL),
-      'postal_code' => array(
-        ts('Zip / Postal Code'),
-        array_merge($attributes['postal_code'], array('class' => 'crm_postal_code')),
-        NULL,
-      ),
-      'postal_code_suffix' => array(
-        ts('Postal Code Suffix'),
-        array('size' => 4, 'maxlength' => 12, 'class' => 'crm_postal_code_suffix'),
-        NULL,
-      ),
-      'country_id' => array(ts('Country'), $attributes['country_id'], 'country'),
-      'state_province_id' => array(ts('State/Province'), $attributes['state_province_id'], NULL),
-      'county_id' => array(ts('County'), $attributes['county_id'], NULL),
-      'geo_code_1' => array(ts('Latitude'), array('size' => 9, 'maxlength' => 12), NULL),
-      'geo_code_2' => array(ts('Longitude'), array('size' => 9, 'maxlength' => 12), NULL),
-      'street_number' => array(ts('Street Number'), $attributes['street_number'], NULL),
-      'street_name' => array(ts('Street Name'), $attributes['street_name'], NULL),
-      'street_unit' => array(ts('Apt/Unit/Suite'), $attributes['street_unit'], NULL),
-=======
       'address_name',
       'street_address',
       'supplemental_address_1',
@@ -149,7 +117,6 @@ class CRM_Contact_Form_Edit_Address {
       'street_number',
       'street_name',
       'street_unit',
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     );
 
     foreach ($elements as $name) {

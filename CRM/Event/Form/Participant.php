@@ -190,8 +190,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_onlinePendingContributionId = NULL;
 
   /**
-<<<<<<< HEAD
-=======
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -199,7 +197,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Set variables up before form is built.
    *
    * @return void
@@ -1181,17 +1178,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (!empty($this->_params['send_receipt'])) {
         $paymentParams['email'] = $this->_contributorEmail;
       }
-<<<<<<< HEAD
-
-      // The only reason for merging in the 'contact_id' rather than ensuring it is set
-      // is that this patch is being done around the time of the stable release
-      // so more conservative approach is called for.
-      // In fact the use of $params and $this->_params & $this->_contactId vs $contactID
-      // needs rationalising.
-      $mapParams = array_merge(array('contact_id' => $contactID), $this->_params);
-      CRM_Core_Payment_Form::mapParams($this->_bltID, $mapParams, $paymentParams, TRUE);
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       // The only reason for merging in the 'contact_id' rather than ensuring it is set
       // is that this patch is being done around the time of the stable release

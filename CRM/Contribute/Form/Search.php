@@ -263,14 +263,10 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'contribution_status_id',
         'contribution_source',
         'contribution_trxn_id',
-<<<<<<< HEAD
-        'invoice_id',
-=======
         'contribution_page_id',
         'contribution_product_id',
         'invoice_id',
         'payment_instrument_id',
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       );
       foreach ($specialParams as $element) {
         $value = CRM_Utils_Array::value($element, $this->_formValues);

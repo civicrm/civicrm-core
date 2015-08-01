@@ -58,21 +58,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected $_fromEmails = array();
 
-<<<<<<< HEAD
-  public function preProcess() {
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
-=======
   /**
    * Details of all enabled membership types.
    *
    * @var array
    */
   protected $allMembershipTypeDetails = array();
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Array of membership type IDs and whether they permit autorenewal.
@@ -143,11 +134,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   /**
    * Build the form object.
-<<<<<<< HEAD
-   *
-   * @return void
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function buildQuickForm() {
 
@@ -158,8 +144,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         array('onChange' => "buildAutoRenew( null, this.value );")
       );
       CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
-<<<<<<< HEAD
-=======
     }
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
@@ -184,7 +168,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       );
 
       $this->assignPaymentRelatedVariables();
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     $this->assign('autoRenewOptions', json_encode($this->membershipTypeRenewalStatus));
 
@@ -280,8 +263,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
   }
 
-<<<<<<< HEAD
-=======
   protected function setContextVariables($params) {
     $variables = array(
       'action' => '_action',
@@ -307,7 +288,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   /**
    * Create a recurring contribution record.
    *

@@ -23,18 +23,11 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<<<<<<< HEAD:templates/CRM/Core/paypalexpress.tpl
-
-<div class="crm-section no-label paypal_button_info-section">
-  <div class="content description">
-    {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click <strong>Continue</strong> at the bottom of the page.{/ts}
-=======
 {if $form.$expressButtonName}
   <div class="crm-section no-label paypal_button_info-section">
     <div class="content description">
       {ts}If you have a PayPal account, you can click the PayPal button to continue. Otherwise, fill in the credit card and billing information on this form and click <strong>Continue</strong> at the bottom of the page.{/ts}
     </div>
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e:templates/CRM/Financial/Form/PaypalPro.tpl
   </div>
   <div class="crm-section no-label {$form.$expressButtonName.name}-section">
     <div class="content description">

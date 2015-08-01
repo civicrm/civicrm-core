@@ -161,8 +161,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_openedPanes = array();
 
   /**
-<<<<<<< HEAD
-=======
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -170,7 +168,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Define the set of valid contexts that the search form operates on.
    *
    * @return array
@@ -335,16 +332,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $this->_taskList += CRM_Contact_Task::permissionedTaskTitles($permission,
           CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
         );
-<<<<<<< HEAD
-      } else {
-        $className = $this->_modeValue['taskClassName'];
-        $this->_taskList += $className::permissionedTaskTitles($permission, false);
-=======
       }
       else {
         $className = $this->_modeValue['taskClassName'];
         $this->_taskList += $className::permissionedTaskTitles($permission, FALSE);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
 
       // Only offer the "Update Smart Group" task if a smart group/saved search is already in play

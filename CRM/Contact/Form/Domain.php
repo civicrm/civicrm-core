@@ -73,8 +73,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @const
    */
   const LOCATION_BLOCKS = 1;
-<<<<<<< HEAD
-=======
 
   /**
    * Explicitly declare the entity api name.
@@ -89,7 +87,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   public function getDefaultContext() {
     return 'create';
   }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Organization Address and Contact Info'));

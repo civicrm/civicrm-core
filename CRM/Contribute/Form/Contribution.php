@@ -72,16 +72,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_ppID;
 
   /**
-<<<<<<< HEAD
-   * The id of the pledge that we are processing.
-   *
-   * @var int
-   */
-  public $_pledgeID;
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Is this contribution associated with an online.
    * financial transaction
    *
@@ -167,20 +157,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_honoreeProfileType;
 
   /**
-<<<<<<< HEAD
-   * Array of billing panes to be displayed by billingBlock.tpl.
-   * Currently this is likely to look like
-   * array('Credit Card' => ts('Credit Card') or
-   * array('Direct Debit => ts('Direct Debit')
-   * @todo billing details (address stuff) to be added when we stop hard coding the panes in billingBlock.tpl
-   *
-   * @var array
-   */
-  public $billingPane = array();
-
-  /**
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Array of the payment fields to be displayed in the payment fieldset (pane) in billingBlock.tpl
    * this contains all the information to describe these fields from quickform. See CRM_Core_Form_Payment getPaymentFormFieldsMetadata
    *
@@ -220,13 +196,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $userDisplayName;
 
   /**
-<<<<<<< HEAD
-   * Set variables up before form is built.
-=======
    * Status message to be shown to the user.
    *
    * @var array
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   protected $statusMessage = array();
 
@@ -240,31 +212,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   protected $statusMessageTitle;
 
-<<<<<<< HEAD
-=======
   /**
    * Set variables up before form is built.
    */
   public function preProcess() {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // Check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
-<<<<<<< HEAD
-    // @todo - if anyone ever figures out what this _cdType subroutine is about
-    // (or even if it still applies) please add comments!!!!!!!!!!
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      CRM_Custom_Form_CustomData::preProcess($this);
-      return;
-    }
-=======
     parent::preProcess();
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
@@ -276,14 +233,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Get the pledge payment id
     $this->_ppID = CRM_Utils_Request::retrieve('ppid', 'Positive', $this);
 
-<<<<<<< HEAD
-    // Get the contact id
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-
-    // Get the action.
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $this->assign('action', $this->_action);
 
     // Get the contribution id if update
@@ -366,14 +315,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return array
    */
   public function setDefaultValues() {
-<<<<<<< HEAD
-    if ($this->_cdType) {
-      // @todo document when this function would be called in this way
-      // (and whether it is valid or an overloading of this form).
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $defaults = $this->_values;
 
@@ -604,16 +545,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    $billingPanes = array();
     if ($this->_mode) {
       if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE) == TRUE) {
-<<<<<<< HEAD
-        $buildRecurBlock = TRUE;
-        foreach ($this->billingPane as $name => $label) {
-          if (!empty($this->billingFieldSets[$name]['fields'])) {
-            // @todo reduce variation so we don't have to convert 'credit_card' to 'CreditCard'
-            $billingPanes[$label] = $this->generatePane(CRM_Utils_String::convertStringToCamel($name), $defaults);
-=======
         if (!empty($this->_recurPaymentProcessors)) {
           $buildRecurBlock = TRUE;
           if ($this->_ppID) {
@@ -631,7 +564,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
             $this->setDefaults(array('is_recur' => 0));
             $this->assign('buildRecurBlock', TRUE);
             $recurJs = array('onChange' => "buildRecurBlock( this.value ); return false;");
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           }
         }
       }
@@ -639,17 +571,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     foreach ($paneNames as $name => $type) {
       $allPanes[$name] = $this->generatePane($type, $defaults);
-<<<<<<< HEAD
-    }
-    if (empty($this->_recurPaymentProcessors)) {
-      $buildRecurBlock = FALSE;
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     $qfKey = $this->controller->_key;
     $this->assign('qfKey', $qfKey);
-    $this->assign('billingPanes', $billingPanes);
     $this->assign('allPanes', $allPanes);
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution', 'formRule'), $this);
@@ -1000,11 +925,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $sum = CRM_Utils_Money::format($sum - $self->_values['tax_amount'], NULL, '%a');
         }
       }
-<<<<<<< HEAD
-      if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != CRM_Utils_Rule::cleanMoney($sum)) {
-=======
       if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
       }
     }
@@ -1047,12 +968,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Process the form submission.
    */
   public function postProcess() {
-<<<<<<< HEAD
-    $sendReceipt = $pId = $contribution = $isRelatedId = FALSE;
-    $softParams = $softIDs = array();
-
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contribute_BAO_Contribution::deleteContribution($this->_id);
       CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
@@ -1060,36 +975,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ));
       return;
     }
-<<<<<<< HEAD
-
-    // Get the submitted form values.
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $submittedValues = $this->controller->exportValues($this->_name);
 
-<<<<<<< HEAD
-    // Process price set and get total amount and line items.
-    $lineItem = array();
-    $priceSetId = CRM_Utils_Array::value('price_set_id', $submittedValues);
-    if (empty($priceSetId) && !$this->_id) {
-      $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
-      $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-      $fieldID = key($this->_priceSet['fields']);
-      $fieldValueId = key($this->_priceSet['fields'][$fieldID]['options']);
-      $this->_priceSet['fields'][$fieldID]['options'][$fieldValueId]['amount'] = $submittedValues['total_amount'];
-      $submittedValues['price_' . $fieldID] = 1;
-    }
-
-    if ($priceSetId) {
-      CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $submittedValues, $lineItem[$priceSetId]);
-
-      // Unset tax amount for offline 'is_quick_config' contribution.
-      if ($this->_priceSet['is_quick_config'] &&
-        !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
-      ) {
-        unset($submittedValues['tax_amount']);
-=======
     try {
       // Get the submitted form values.
       $contribution = $this->submit($submittedValues, $this->_action, $this->_ppID);
@@ -1099,7 +986,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $urlParams = "action=add&cid={$this->_contactID}";
       if ($this->_mode) {
         $urlParams .= "&mode={$this->_mode}";
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
       if (!empty($this->_ppID)) {
         $urlParams .= "&context=pledge&ppid={$this->_ppID}";
@@ -1116,45 +1002,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         ));
       }
       else {
-<<<<<<< HEAD
-        $contributionDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (array_key_exists('membership', $contributionDetails)) {
-          $isRelatedId = TRUE;
-        }
-        elseif (array_key_exists('participant', $contributionDetails)) {
-          $pId = $contributionDetails['participant'];
-        }
-      }
-    }
-    if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
-      // CRM-10117 update the line items for participants.
-      if ($pId) {
-        $entityTable = 'participant';
-        $entityID = $pId;
-        $isRelatedId = FALSE;
-        $participantParams = array(
-          'fee_amount' => $submittedValues['total_amount'],
-          'id' => $entityID,
-        );
-        CRM_Event_BAO_Participant::add($participantParams);
-        if (empty($this->_lineItems)) {
-          $this->_lineItems[] = CRM_Price_BAO_LineItem::getLineItems($entityID, 'participant', 1);
-        }
-      }
-      else {
-        $entityTable = 'contribution';
-        $entityID = $this->_id;
-      }
-
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entityTable, NULL, TRUE, $isRelatedId);
-      foreach (array_keys($lineItems) as $id) {
-        $lineItems[$id]['id'] = $id;
-      }
-      $itemId = key($lineItems);
-      if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
-        $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
-      }
-=======
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
           "reset=1&cid={$this->_contactID}&selectedChild=contribute"
         ));
@@ -1199,46 +1046,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($this->_lineItem) && !empty($lineItem)) {
       $this->_lineItem = $lineItem;
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $this->_paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
     $this->_paymentProcessor = $this->_paymentObject->getPaymentProcessor();
 
-<<<<<<< HEAD
-        // Update line total and total amount with tax on edit.
-        $financialItemsId = CRM_Core_PseudoConstant::getTaxRates();
-        if (array_key_exists($submittedValues['financial_type_id'], $financialItemsId)) {
-          $lineItems[$itemId]['tax_rate'] = $financialItemsId[$submittedValues['financial_type_id']];
-        }
-        else {
-          $lineItems[$itemId]['tax_rate'] = $lineItems[$itemId]['tax_amount'] = "";
-          $submittedValues['tax_amount'] = 'null';
-        }
-        if ($lineItems[$itemId]['tax_rate']) {
-          $lineItems[$itemId]['tax_amount'] = ($lineItems[$itemId]['tax_rate'] / 100) * $lineItems[$itemId]['line_total'];
-          $submittedValues['total_amount'] = $lineItems[$itemId]['line_total'] + $lineItems[$itemId]['tax_amount'];
-          $submittedValues['tax_amount'] = $lineItems[$itemId]['tax_amount'];
-        }
-      }
-      // CRM-10117 update the line items for participants.
-      if (!empty($lineItems[$itemId]['price_field_id'])) {
-        $lineItem[$this->_priceSetId] = $lineItems;
-      }
-    }
-
-    $isQuickConfig = 0;
-    if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $isQuickConfig = 1;
-    }
-    //CRM-11529 for quick config back office transactions
-    //when financial_type_id is passed in form, update the
-    //line items with the financial type selected in form
-    if ($isQuickConfig && !empty($submittedValues['financial_type_id']) && CRM_Utils_Array::value($this->_priceSetId, $lineItem)
-    ) {
-      foreach ($lineItem[$this->_priceSetId] as &$values) {
-        $values['financial_type_id'] = $submittedValues['financial_type_id'];
-      }
-=======
     // Set source if not set
     if (empty($submittedValues['source'])) {
       $userID = CRM_Core_Session::singleton()->get('userID');
@@ -1262,7 +1073,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->userEmail
         ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
       $this->assign('displayName', $this->userDisplayName);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     // Set email for primary location.
@@ -1289,15 +1099,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-<<<<<<< HEAD
-    $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
-    if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
-      //Delete existing soft credit records if soft credit list is empty on update
-      CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id, 'pcp_id' => 0));
-=======
     if (!empty($params['source'])) {
       unset($params['source']);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     CRM_Contact_BAO_Contact::createProfileContact($params, $fields,
       $contactID,
@@ -1321,15 +1124,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
     }
 
-<<<<<<< HEAD
-    // Credit Card Contribution.
-    if ($this->_mode) {
-      $this->processCreditCard($submittedValues, $lineItem);
-    }
-    else {
-      // Offline Contribution.
-      $submittedValues = $this->unsetCreditCardFields($submittedValues);
-=======
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->_params['total_amount'];
     $this->_params['amount_level'] = 0;
@@ -1342,7 +1136,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($this->_params['receive_date'])) {
       $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['receive_date'], $this->_params['receive_date_time']);
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if (!empty($params['soft_credit_to'])) {
       $this->_params['soft_credit_to'] = $params['soft_credit_to'];
@@ -1363,16 +1156,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params['invoiceID'] = $this->_params['invoice_id'];
     }
 
-<<<<<<< HEAD
-      $params['pcp'] = !empty($pcp) ? $pcp : NULL;
-      $params['soft_credit'] = !empty($softParams) ? $softParams : array();
-      $params['soft_credit_ids'] = !empty($softIDs) ? $softIDs : array();
-
-      // CRM-5740 if priceset is used, no need to cleanup money.
-      if ($priceSetId) {
-        $params['skipCleanMoney'] = 1;
-      }
-=======
     // At this point we've created a contact and stored its address etc
     // all the payment processors expect the name and address to be in the
     // so we copy stuff over to first_name etc.
@@ -1382,7 +1165,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     // Add some financial type details to the params list
     // if folks need to use it.
@@ -1416,34 +1198,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->assign('receive_date', $this->_params['receive_date']);
 
-<<<<<<< HEAD
-      // Add Additional common information to formatted params.
-      CRM_Contribute_Form_AdditionalInfo::postProcessCommon($formValues, $params, $this);
-      if ($pId) {
-        $params['contribution_mode'] = 'participant';
-        $params['participant_id'] = $pId;
-        $params['skipLineItem'] = 1;
-      }
-      elseif ($isRelatedId) {
-        $params['contribution_mode'] = 'membership';
-      }
-      $params['line_item'] = $lineItem;
-      $params['payment_processor_id'] = $params['payment_processor'] = CRM_Utils_Array::value('id', $this->_paymentProcessor);
-      if (isset($submittedValues['tax_amount'])) {
-        $params['tax_amount'] = $submittedValues['tax_amount'];
-      }
-      //create contribution.
-      if ($isQuickConfig) {
-        $params['is_quick_config'] = 1;
-      }
-=======
     // Result has all the stuff we need
     // lets archive it to a financial transaction
     if ($financialType->is_deductible) {
       $this->assign('is_deductible', TRUE);
       $this->set('is_deductible', TRUE);
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
       $this->_params,
@@ -1522,19 +1282,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     return $contribution;
   }
 
-<<<<<<< HEAD
-      // process associated membership / participant, CRM-4395
-      $relatedComponentStatusMsg = NULL;
-      if ($contribution->id && $this->_action & CRM_Core_Action::UPDATE) {
-        $relatedComponentStatusMsg = $this->updateRelatedComponent($contribution->id,
-          $contribution->contribution_status_id,
-          CRM_Utils_Array::value('contribution_status_id',
-            $this->_values
-          ),
-          $contribution->receive_date
-        );
-      }
-=======
   /**
    * Generate the data to construct a snippet based pane.
    *
@@ -1556,7 +1303,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_mode) {
       $urlParams .= "&mode={$this->_mode}";
     }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $open = 'false';
     if ($type == 'CreditCard' ||
@@ -1571,58 +1317,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'id' => $type,
     );
 
-<<<<<<< HEAD
-      // assign tax calculation for contribution receipts
-      $taxRate = array();
-      $getTaxDetails = FALSE;
-      $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      if ($invoicing) {
-        if ($this->_action & CRM_Core_Action::ADD) {
-          $line = $lineItem;
-        }
-        elseif ($this->_action & CRM_Core_Action::UPDATE) {
-          $line = $this->_lineItems;
-        }
-        foreach ($line as $key => $value) {
-          foreach ($value as $v) {
-            if (isset($taxRate[(string) CRM_Utils_Array::value('tax_rate', $v)])) {
-              $taxRate[(string) $v['tax_rate']] = $taxRate[(string) $v['tax_rate']] + CRM_Utils_Array::value('tax_amount', $v);
-            }
-            else {
-              if (isset($v['tax_rate'])) {
-                $taxRate[(string) $v['tax_rate']] = CRM_Utils_Array::value('tax_amount', $v);
-                $getTaxDetails = TRUE;
-              }
-            }
-          }
-        }
-      }
-
-      if ($invoicing) {
-        if ($this->_action & CRM_Core_Action::UPDATE) {
-          if (isset($submittedValues['tax_amount'])) {
-            $totalTaxAmount = $submittedValues['tax_amount'];
-          }
-          else {
-            $totalTaxAmount = $this->_values['tax_amount'];
-          }
-          $this->assign('totalTaxAmount', $totalTaxAmount);
-          $this->assign('dataArray', $taxRate);
-        }
-        else {
-          if (!empty($submittedValues['price_set_id'])) {
-            $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
-            $this->assign('getTaxDetails', $getTaxDetails);
-            $this->assign('dataArray', $taxRate);
-            $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
-          }
-          else {
-            $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
-          }
-        }
-      }
-=======
     // See if we need to include this paneName in the current form.
     if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
       CRM_Utils_Array::value("hidden_{$type}", $defaults)
@@ -1643,7 +1337,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return $pane;
     }
   }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Wrapper for unit testing the post process submit function.
@@ -1766,15 +1459,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         if (array_key_exists('membership', $contributionDetails)) {
           $isRelatedId = TRUE;
         }
-<<<<<<< HEAD
-        elseif ($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $formValues['contribution_status_id']) ||
-            ($this->_defaults['total_amount'] != $formValues['total_amount']))
-        ) {
-          $updatePledgePaymentStatus = TRUE;
-=======
         elseif (array_key_exists('participant', $contributionDetails)) {
           $pId = $contributionDetails['participant'];
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         }
       }
     }
@@ -1851,29 +1537,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-<<<<<<< HEAD
-    //store contribution ID if not yet set (on create)
-    if (empty($this->_id) && !empty($contribution->id)) {
-      $this->_id = $contribution->id;
-    }
-  }
-
-  /**
-   * Process credit card payment.
-   *
-   * @param array $submittedValues
-   * @param array $lineItem
-   *
-   * @throws CRM_Core_Exception
-   */
-  protected function processCreditCard($submittedValues, $lineItem) {
-    $sendReceipt = $contribution = FALSE;
-=======
     if (!isset($submittedValues['total_amount'])) {
       $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values);
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if (!empty($submittedValues['pcp_made_through_id'])) {
       $pcp = array();
@@ -1936,24 +1603,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // Offline Contribution.
       $submittedValues = $this->unsetCreditCardFields($submittedValues);
 
-<<<<<<< HEAD
-    // Get the payment processor id as per mode.
-    $this->_params['payment_processor'] = $params['payment_processor_id']
-      = $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
-=======
       // get the required field value only.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       $params = $ids = array();
 
       $params['contact_id'] = $this->_contactID;
       $params['currency'] = $this->getCurrency($submittedValues);
 
-<<<<<<< HEAD
-    // Set email for primary location.
-    $fields['email-Primary'] = 1;
-    $params['email-Primary'] = $this->userEmail;
-=======
       $fields = array(
         'financial_type_id',
         'contribution_status_id',
@@ -1965,7 +1621,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
       }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       if (!empty($pcp)) {
         $params['pcp'] = $pcp;
@@ -1992,35 +1647,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['receipt_date'] = date("Y-m-d");
       }
 
-<<<<<<< HEAD
-    // add all the additional payment params we need
-    if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-      $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-    }
-    if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
-      $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
-    }
-    $legacyCreditCardExpiryCheck = FALSE;
-    if ($this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD && !isset($this->_paymentFields)) {
-      $legacyCreditCardExpiryCheck = TRUE;
-    }
-    if ($legacyCreditCardExpiryCheck || in_array('credit_card_exp_date', array_keys($this->_paymentFields))) {
-      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-    }
-    $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
-    $this->_params['amount'] = $this->_params['total_amount'];
-    $this->_params['amount_level'] = 0;
-    $this->_params['description'] = ts('Office Credit Card contribution');
-    $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
-      $this->_params,
-      CRM_Core_Config::singleton()->defaultCurrency
-    );
-    $this->_params['payment_action'] = 'Sale';
-    if (!empty($this->_params['receive_date'])) {
-      $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['receive_date'], $this->_params['receive_date_time']);
-    }
-=======
       if ($params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name')
         || $params['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name')
       ) {
@@ -2031,7 +1657,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       else {
         $params['cancel_date'] = $params['cancel_reason'] = 'null';
       }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
       // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
@@ -2067,14 +1692,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
-<<<<<<< HEAD
-    // At this point we've created a contact and stored its address etc
-    // all the payment processors expect the name and address to be in the
-    // so we copy stuff over to first_name etc.
-    $paymentParams = $this->_params;
-    $paymentParams['contactID'] = $this->_contactID;
-    CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
-=======
       // process associated membership / participant, CRM-4395
       if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
         $this->statusMessage[] = $this->updateRelatedComponent($contribution->id,
@@ -2085,70 +1702,22 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           $contribution->receive_date
         );
       }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
 
-<<<<<<< HEAD
-    // Add some financial type details to the params list
-    // if folks need to use it.
-    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $contributionType->name;
-    $paymentParams['contributionPageID'] = NULL;
-=======
       $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       //send receipt mail.
       if ($contribution->id && !empty($formValues['is_email_receipt'])) {
         $formValues['contact_id'] = $this->_contactID;
         $formValues['contribution_id'] = $contribution->id;
 
-<<<<<<< HEAD
-    // For recurring contribution, create Contribution Record first.
-    // Contribution ID, Recurring ID and Contact ID needed
-    // When we get a callback from the payment processor, CRM-7115
-
-    if (!empty($paymentParams['is_recur'])) {
-      $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
-        $this->_params,
-        NULL,
-        $this->_contactID,
-        $contributionType,
-        TRUE,
-        FALSE,
-        $isTest,
-        $this->_lineItem
-      );
-      $paymentParams['contributionID'] = $contribution->id;
-      $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
-      $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
-      $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
-    }
-    $result = array();
-    if ($paymentParams['amount'] > 0.0) {
-      // force a re-get of the payment processor in case the form changed it, CRM-7179
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
-      try {
-        $result = $payment->doPayment($paymentParams, 'contribute');
-      }
-      catch (CRM_Core_Exception $e) {
-        $message = ts("Payment Processor Error message") . $e->getMessage();
-        $this->cleanupDBAfterPaymentFailure($paymentParams, $message);
-        // Set the contribution mode.
-        $urlParams = "action=add&cid={$this->_contactID}";
-        if ($this->_mode) {
-          $urlParams .= "&mode={$this->_mode}";
-        }
-        if (!empty($this->_ppID)) {
-          $urlParams .= "&context=pledge&ppid={$this->_ppID}";
-=======
         $formValues += CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id);
 
         // to get 'from email id' for send receipt
         $this->fromEmailId = $formValues['from_email_address'];
         if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
           $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         }
       }
 
@@ -2162,58 +1731,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-<<<<<<< HEAD
-    $this->set('params', $this->_params);
-    $this->assign('trxn_id', $result['trxn_id']);
-    $this->assign('receive_date', $this->_params['receive_date']);
-
-    // Result has all the stuff we need
-    // lets archive it to a financial transaction
-    if ($contributionType->is_deductible) {
-      $this->assign('is_deductible', TRUE);
-      $this->set('is_deductible', TRUE);
-    }
-
-    // Set source if not set
-    if (empty($this->_params['source'])) {
-      $userID = CRM_Core_Session::singleton()->get('userID');
-      $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
-        'sort_name'
-      );
-      $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
-    }
-
-    // Build custom data getFields array
-    $customFieldsContributionType = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE,
-      CRM_Utils_Array::value('financial_type_id', $params)
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsContributionType,
-      CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, TRUE)
-    );
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
-      $this->_id,
-      'Contribution'
-    );
-    if (empty($paymentParams['is_recur'])) {
-      $contribution = CRM_Contribute_Form_Contribution_Confirm::processContribution($this,
-        $this->_params,
-        $result,
-        $this->_contactID,
-        $contributionType,
-        FALSE, FALSE,
-        $isTest,
-        $this->_lineItem
-      );
-    }
-
-    // Send receipt mail.
-    if ($contribution->id && !empty($this->_params['is_email_receipt'])) {
-      $this->_params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
-      $this->_params['contact_id'] = $this->_contactID;
-      $this->_params['contribution_id'] = $contribution->id;
-      $sendReceipt = CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $this->_params, TRUE);
-=======
     if ($contribution->id && isset($submittedValues['note'])) {
       CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
@@ -2250,7 +1767,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $getTaxDetails = FALSE;
     if ($action & CRM_Core_Action::ADD) {
       $line = $lineItem;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     elseif ($action & CRM_Core_Action::UPDATE) {
       $line = $this->_lineItems;
@@ -2269,19 +1785,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-<<<<<<< HEAD
-    //update pledge payment status.
-    if ($this->_ppID && $contribution->id) {
-      // Store contribution id in payment record.
-      CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $this->_ppID, 'contribution_id', $contribution->id);
-
-      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($this->_pledgeID,
-        array($this->_ppID),
-        $contribution->contribution_status_id,
-        NULL,
-        $contribution->total_amount
-      );
-=======
     if ($action & CRM_Core_Action::UPDATE) {
       if (isset($submittedValues['tax_amount'])) {
         $totalTaxAmount = $submittedValues['tax_amount'];
@@ -2291,7 +1794,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $this->assign('totalTaxAmount', $totalTaxAmount);
       $this->assign('dataArray', $taxRate);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     else {
       if (!empty($submittedValues['price_set_id'])) {
@@ -2307,9 +1809,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-<<<<<<< HEAD
-   * Clean up DB after payment fails.
-=======
    * Calculate non deductible amount.
    *
    * CRM-11956
@@ -2319,30 +1818,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @param $params
    * @param $formValues
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
-   * This function removes related DB entries. Note that it has been agreed in principle,
-   * but not implemented, that contributions should be retained as 'Failed' rather than
-   * deleted.
-   *
-   * @todo it doesn't clean up line items.
-   *
-   * @param array $paymentParams
-   * @param string $message
+   * @return array
    */
-<<<<<<< HEAD
-  public function cleanupDBAfterPaymentFailure($paymentParams, $message) {
-    // Make sure to cleanup db for recurring case.
-    if (!empty($paymentParams['contributionID'])) {
-      CRM_Core_Error::debug_log_message($message .
-        "contact id={$this->_contactID} (deleting contribution {$paymentParams['contributionID']}");
-      CRM_Contribute_BAO_Contribution::deleteContribution($paymentParams['contributionID']);
-    }
-    if (!empty($paymentParams['contributionRecurID'])) {
-      CRM_Core_Error::debug_log_message($message .
-        "contact id={$this->_contactID} (deleting recurring contribution {$paymentParams['contributionRecurID']}");
-      CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
-=======
   protected function calculateNonDeductibleAmount($params, $formValues) {
     if (!empty($params['non_deductible_amount'])) {
       return $params['non_deductible_amount'];
@@ -2374,7 +1852,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       else {
         return '0.00';
       }
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     // contribution is NOT deductible
     else {
@@ -2384,63 +1861,4 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     return 0;
   }
 
-<<<<<<< HEAD
-  /**
-   * Generate the data to construct a snippet based pane.
-   *
-   * This form also assigns the showAdditionalInfo var based on historical code.
-   * This appears to mean 'there is a pane to show'.
-   *
-   * @param string $type
-   *   Type of Pane - this is generally used to determine the function name used to build it
-   *   - e.g CreditCard, AdditionalDetail
-   * @param array $defaults
-   *
-   * @return array
-   *   We aim to further refactor & simplify this but currently
-   *   - the panes array
-   *   - should additional info be shown?
-   */
-  protected function generatePane($type, $defaults) {
-    $urlParams = "snippet=4&formType={$type}";
-    if ($this->_mode) {
-      $urlParams .= "&mode={$this->_mode}";
-    }
-
-    $open = 'false';
-    if ($type == 'CreditCard' ||
-      $type == 'DirectDebit'
-    ) {
-      $open = 'true';
-    }
-
-    $pane = array(
-      'url' => CRM_Utils_System::url('civicrm/contact/view/contribution', $urlParams),
-      'open' => $open,
-      'id' => $type,
-    );
-
-    // See if we need to include this paneName in the current form.
-    if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
-      CRM_Utils_Array::value("hidden_{$type}", $defaults)
-    ) {
-      $this->assign('showAdditionalInfo', TRUE);
-      $pane['open'] = 'true';
-    }
-
-    if ($type == 'CreditCard' || $type == 'DirectDebit') {
-      // @todo would be good to align tpl name with form name...
-      // @todo document why this hidden variable is required.
-      $this->add('hidden', 'hidden_' . $type, 1);
-      return $pane;
-    }
-    else {
-      $additionalInfoFormFunction = 'build' . $type;
-      CRM_Contribute_Form_AdditionalInfo::$additionalInfoFormFunction($this);
-      return $pane;
-    }
-  }
-
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

@@ -392,8 +392,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     return $updatedStatusId;
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Update contribution status.
    *
@@ -514,5 +512,4 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     return $statusId;
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

@@ -39,72 +39,6 @@
 class CRM_Pledge_Page_AJAX {
 
   /**
-<<<<<<< HEAD
-   * Building Pledge Name combo box.
-   */
-  public static function pledgeName() {
-
-    $getRecords = FALSE;
-    if (isset($_GET['name']) && $_GET['name']) {
-      $name = CRM_Utils_Type::escape($_GET['name'], 'String');
-      $name = str_replace('*', '%', $name);
-      $whereClause = "p.creator_pledge_desc LIKE '%$name%' ";
-      $getRecords = TRUE;
-    }
-
-    if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-      $pledgeId = CRM_Utils_Type::escape($_GET['id'], 'Integer');
-      $whereClause = "p.id = {$pledgeId} ";
-      $getRecords = TRUE;
-    }
-
-    if ($getRecords) {
-      $query = "
-SELECT p.creator_pledge_desc, p.id
-FROM civicrm_pb_pledge p
-WHERE {$whereClause}
-";
-      $dao = CRM_Core_DAO::executeQuery($query);
-      $elements = array();
-      while ($dao->fetch()) {
-        $elements[] = array(
-          'name' => $dao->creator_pledge_desc,
-          'value' => $dao->id,
-        );
-      }
-    }
-
-    if (empty($elements)) {
-      $name = $_GET['name'];
-      if (!$name && isset($_GET['id'])) {
-        $name = $_GET['id'];
-      }
-      $elements[] = array(
-        'name' => trim($name, '*'),
-        'value' => trim($name, '*'),
-      );
-    }
-
-    header('Content-Type: application/json');
-    echo CRM_Utils_JSON::encode($elements, 'value');
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * Function to setDefaults according to Pledge Id
-   * for batch entry pledges
-   */
-  public function getPledgeDefaults() {
-    $details = array();
-    if (!empty($_POST['pid'])) {
-      $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');
-      $details = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
-    }
-    echo json_encode($details);
-    CRM_Utils_System::civiExit();
-  }
-
-=======
    * Function to setDefaults according to Pledge Id
    * for batch entry pledges
    */
@@ -117,5 +51,4 @@ WHERE {$whereClause}
     CRM_Utils_JSON::output($details);
   }
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

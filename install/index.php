@@ -8,8 +8,6 @@
  * Copyright (c) 2006-7, SilverStripe Limited - www.silverstripe.com
  * All rights reserved.
  *
-<<<<<<< HEAD
-=======
  * License: BSD-3-clause
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -38,7 +36,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * Changes and modifications (c) 2007-2015 by CiviCRM LLC
  *
  */
@@ -1455,17 +1452,10 @@ class Installer extends InstallRequirements {
         $output .= "<li>" . ts("WordPress user permissions have been automatically set - giving Anonymous and Subscribers access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", array(1 => "target='_blank' href='{$wpPermissionsURL}'", 2 => "target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'")) . "</li>";
         $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$cmsURL'")) . "</li>";
         $output .= $commonOutputMessage;
-<<<<<<< HEAD
 
         echo '</ul>';
         echo '</div>';
 
-=======
-
-        echo '</ul>';
-        echo '</div>';
-
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         $c = CRM_Core_Config::singleton(FALSE);
         $c->free();
       }

@@ -100,11 +100,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @internal param bool $is_active value we want to set the is_active field
    *
    * @return Object
-<<<<<<< HEAD
-   *   DAO object on sucess, null otherwise
-=======
    *   DAO object on success, null otherwise
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
@@ -740,11 +736,7 @@ WHERE  id = %1";
    *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
    *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
    */
-<<<<<<< HEAD
-  public static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
-=======
   public static function processAmount($fields, &$params, &$lineItem, $component = '') {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // using price set
     $totalPrice = $totalTax = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
@@ -1383,11 +1375,7 @@ GROUP BY     mt.member_of_contact_id";
    *   Value we want to set the is_quick_config field.
    *
    * @return Object
-<<<<<<< HEAD
-   *   DAO object on sucess, null otherwise
-=======
    *   DAO object on success, null otherwise
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_quick_config', $isQuickConfig);
@@ -1400,9 +1388,6 @@ GROUP BY     mt.member_of_contact_id";
    *
    * @return bool
    */
-<<<<<<< HEAD
-  public static function checkMembershipPriceSet($id) {
-=======
   public static function isMembershipPriceSetContainsMixOfRenewNonRenew($id) {
     $membershipTypes = self::getMembershipTypesFromPriceSet($id);
     if (!empty($membershipTypes['autorenew']) && !empty($membershipTypes['non_renew'])) {
@@ -1420,7 +1405,6 @@ GROUP BY     mt.member_of_contact_id";
    *   Membership types in the price set
    */
   public static function getMembershipTypesFromPriceSet($id) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $query
       = "SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
 FROM        civicrm_price_field_value pfv
@@ -1443,10 +1427,6 @@ WHERE       ps.id = %1
       if (empty($dao->membership_type_id)) {
         continue;
       }
-<<<<<<< HEAD
-      if (!empty($autoRenew) && !in_array($daoAutoRenew, $autoRenew)) {
-        return TRUE;
-=======
       $membershipTypes['all'][] = $dao->membership_type_id;
       if (!empty($dao->auto_renew)) {
         $membershipTypes['autorenew'][] = $dao->membership_type_id;
@@ -1459,14 +1439,9 @@ WHERE       ps.id = %1
       }
       else {
         $membershipTypes['non_renew'][] = $dao->membership_type_id;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
     }
-<<<<<<< HEAD
-    return FALSE;
-=======
     return $membershipTypes;
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**

@@ -149,15 +149,6 @@
             <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span>
           </td>
         </tr>
-<<<<<<< HEAD
-        {if !empty($form.auto_renew)}
-          <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
-            <td class="label"> {$form.auto_renew.label} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
-            <td> {$form.auto_renew.html} </td>
-          </tr>
-        {/if}
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         {if !$membershipMode}
           <tr><td class="label">{$form.is_override.label} {help id="id-status-override"}</td><td>{$form.is_override.html}</td></tr>
           {* Show read-only Status block - when action is UPDATE and is_override is FALSE *}
@@ -170,46 +161,6 @@
           {* Show editable status field when is_override is TRUE *}
           <tr id="memberStatus"><td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}<br />
             <span class="description">{ts}If <strong>Status Override</strong> is checked, the selected status will remain in force (it will NOT be modified by the automated status update script).{/ts}</span></td></tr>
-<<<<<<< HEAD
-
-          {elseif $membershipMode}
-          <tr class="crm-membership-form-block-financial_type_id-mode">
-            <td class="label">{$form.financial_type_id.label}</td>
-            <td>{$form.financial_type_id.html}<br />
-              <span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
-          </tr>
-          <tr class="crm-membership-form-block-total_amount">
-            <td class="label">{$form.total_amount.label}</td>
-            <td>{$form.total_amount.html}<br />
-              <span class="description">{ts}Membership payment amount.{/ts}</span><div class="totaltaxAmount"></div></td>
-          </tr>
-          <tr class="crm-membership-form-block-contribution-contact">
-            <td class="label">{$form.is_different_contribution_contact.label}</td>
-            <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
-          </tr>
-          <tr id="record-different-contact">
-            <td>&nbsp;</td>
-            <td>
-              <table class="compressed">
-                <tr class="crm-membership-form-block-soft-credit-type">
-                {*CRM-15366*}
-                  <td class="label">{$form.soft_credit_type_id.label}</td>
-                  <td>{$form.soft_credit_type_id.html}</td>
-                </tr>
-                <tr class="crm-membership-form-block-soft-credit-contact-id">
-                  <td class="label">{$form.soft_credit_contact_id.label}</td>
-                  <td>{$form.soft_credit_contact_id.html}</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr class="crm-membership-form-block-billing">
-            <td colspan="2">
-            {include file='CRM/Core/BillingBlock.tpl'}
-            </td>
-          </tr>
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         {/if}
 
         {if $accessContribution and !$membershipMode AND ($action neq 2 or (!$rows.0.contribution_id AND !$softCredit) or $onlinePendingContributionId)}
@@ -220,69 +171,8 @@
           </tr>
           <tr class="crm-membership-form-block-record_contribution"><td colspan="2">
             <fieldset id="recordContribution"><legend>{ts}Membership Payment and Receipt{/ts}</legend>
-<<<<<<< HEAD
-              <table>
-                <tr class="crm-membership-form-block-contribution-contact">
-                  <td class="label">{$form.is_different_contribution_contact.label}</td>
-                  <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
-                </tr>
-                <tr id="record-different-contact">
-                  <td>&nbsp;</td>
-                  <td>
-                    <table class="compressed">
-                      <tr class="crm-membership-form-block-soft-credit-type">
-                        <td class="label">{$form.soft_credit_type_id.label}</td>
-                        <td>{$form.soft_credit_type_id.html}</td>
-                      </tr>
-                      <tr class="crm-membership-form-block-soft-credit-contact-id">
-                        <td class="label">{$form.soft_credit_contact_id.label}</td>
-                        <td>{$form.soft_credit_contact_id.html}</td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-                  <tr class="crm-membership-form-block-financial_type_id">
-                      <td class="label">{$form.financial_type_id.label}</td>
-                      <td>{$form.financial_type_id.html}<br />
-                      <span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
-                </tr>
-                <tr class="crm-membership-form-block-total_amount">
-                  <td class="label">{$form.total_amount.label}</td>
-                  <td>{$form.total_amount.html}<br />
-                    <span class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span><div class="totaltaxAmount"></div></td>
-                </tr>
-                <tr class="crm-membership-form-block-receive_date">
-                  <td class="label">{$form.receive_date.label}</td>
-                  <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
-                </tr>
-                <tr class="crm-membership-form-block-payment_instrument_id">
-                  <td class="label">{$form.payment_instrument_id.label}<span class="marker"> *</span></td>
-                  <td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
-                </tr>
-                <tr id="checkNumber" class="crm-membership-form-block-check_number">
-                  <td class="label">{$form.check_number.label}</td>
-                  <td>{$form.check_number.html|crmAddClass:six}</td>
-                </tr>
-                {if $action neq 2 }
-                  <tr class="crm-membership-form-block-trxn_id">
-                    <td class="label">{$form.trxn_id.label}</td>
-                    <td>{$form.trxn_id.html}</td>
-                  </tr>
-                {/if}
-                <tr class="crm-membership-form-block-contribution_status_id">
-                  <td class="label">{$form.contribution_status_id.label}</td>
-                  <td>{$form.contribution_status_id.html}</td>
-                </tr>
-              </table>
-            </fieldset>
-          </td></tr>
-          {else}
-          <div class="spacer"></div>
-        {/if}
-=======
          {/if}
         {include file="CRM/Member/Form/MembershipCommon.tpl"}
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
         {if $emailExists and $outBound_option != 2}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
@@ -399,15 +289,9 @@
         var taxRates = JSON.parse(taxRates);
         var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
         var currency = '{/literal}{$currency}{literal}';
-<<<<<<< HEAD
-	var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
-	taxAmount = isNaN (taxAmount) ? 0:taxAmount;
-        if ( term ) {
-=======
         var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if (term) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           if (!taxRate) {
             var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
           }
@@ -463,11 +347,7 @@
       cj('#is_different_contribution_contact').change( function() {
         setDifferentContactBlock();
       });
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       // give option to override end-date for auto-renew memberships
       {/literal}
       {if $isRecur && $endDate}
@@ -496,11 +376,7 @@
         cj('#record-different-contact').hide();
       }
     }
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     </script>
     {/literal}
 

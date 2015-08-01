@@ -26,45 +26,9 @@
  */
 
 /**
-<<<<<<< HEAD
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
- */
-class CRM_Upgrade_Incremental_php_FourFive {
-  const BATCH_SIZE = 5000;
-
-  /**
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
-
-  /**
-   * Compute any messages which should be displayed beforeupgrade.
-   *
-   * Note: This function is called iteratively for each upcoming
-   * revision to the database.
-   *
-   * @param $preUpgradeMessage
-   * @param string $rev
-   *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
-   * @param null $currentVer
-   *
-   * @return void
-   */
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-  }
-=======
  * Upgrade logic for 4.5
  */
 class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_Base {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Compute any messages which should be displayed after upgrade.
@@ -97,11 +61,7 @@ class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_Base 
   public function upgrade_4_5_alpha1($rev) {
     // task to process sql
     $this->addTask(ts('Migrate honoree information to module_data'), 'migrateHonoreeInfo');
-<<<<<<< HEAD
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.alpha1')), 'task_4_5_x_runSql', $rev);
-=======
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.alpha1')), 'runSql', $rev);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $this->addTask(ts('Set default for Individual name fields configuration'), 'addNameFieldOptions');
 
     // CRM-14522 - The below schema checking is done as foreign key name
@@ -138,11 +98,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    * @return bool
    */
   public function upgrade_4_5_beta9($rev) {
-<<<<<<< HEAD
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.beta9')), 'task_4_5_x_runSql', $rev);
-=======
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.beta9')), 'runSql', $rev);
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $entityTable = array(
       'Participant' => 'civicrm_participant_payment',
@@ -331,104 +287,11 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    * Upgrade function.
    *
    * @param string $rev
-<<<<<<< HEAD
-   */
-  public function upgrade_4_5_9($rev) {
-    // Task to process sql.
-    $this->addTask(ts('Upgrade DB to 4.5.9: Fix saved searches consisting of multi-choice custom field(s)'), 'updateSavedSearch');
-
-    return TRUE;
-  }
-
-  /**
-   * Update saved search for multi-select custom fields on DB upgrade
-   *
-   * @param CRM_Queue_TaskContext $ctx
-   *
-   * @return bool TRUE for success
-   */
-  public static function updateSavedSearch(CRM_Queue_TaskContext $ctx) {
-    $sql = "SELECT id, form_values FROM civicrm_saved_search";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $copy = $formValues = unserialize($dao->form_values);
-      $update = FALSE;
-      foreach ($copy as $field => $data_value) {
-        if (preg_match('/^custom_/', $field) && is_array($data_value) && !array_key_exists("${field}_operator", $formValues)) {
-          // Now check for CiviCRM_OP_OR as either key or value in the data_value array.
-          // This is the conclusive evidence of an old-style data format.
-          if (array_key_exists('CiviCRM_OP_OR', $data_value) || FALSE !== array_search('CiviCRM_OP_OR', $data_value)) {
-            // We have old style data. Mark this record to be updated.
-            $update = TRUE;
-            $op = 'and';
-            if (!preg_match('/^custom_([0-9]+)/', $field, $matches)) {
-              // fatal error?
-              continue;
-            }
-            $fieldID = $matches[1];
-            if (array_key_exists('CiviCRM_OP_OR', $data_value)) {
-              // This indicates data structure identified by jamie in the form:
-              // value1 => 1, value2 => , value3 => 1.
-              $data_value = array_keys($data_value, 1);
-
-              // If CiviCRM_OP_OR - change OP from default to OR
-              if ($data_value['CiviCRM_OP_OR'] == 1) {
-                $op = 'or';
-              }
-              unset($data_value['CiviCRM_OP_OR']);
-            }
-            else {
-              // The value is here, but it is not set as a key.
-              // This is using the style identified by Monish - the existence of the value
-              // indicates an OR search and values are set in the form of:
-              // 0 => value1, 1 => value1, 3 => value2.
-              $key = array_search('CiviCRM_OP_OR', $data_value);
-              $op = 'or';
-              unset($data_value[$key]);
-            }
-
-            //If only Or operator has been chosen, means we need to select all values and
-            //so to execute OR operation between these values according to new data structure
-            if (count($data_value) == 0 && $op == 'or') {
-              $customOption = CRM_Core_BAO_CustomOption::getCustomOption($fieldID);
-              foreach ($customOption as $option) {
-                $data_value[] = CRM_Utils_Array::value('value', $option);
-              }
-            }
-
-            $formValues[$field] = $data_value;
-            $formValues["${field}_operator"] = $op;
-          }
-        }
-      }
-
-      if ($update) {
-        $sql = "UPDATE civicrm_saved_search SET form_values = %0 WHERE id = %1";
-        CRM_Core_DAO::executeQuery($sql,
-          array(
-            array(serialize($formValues), 'String'),
-            array($dao->id, 'Integer'),
-          )
-        );
-      }
-    }
-    return TRUE;
-  }
-
-
-  /**
-   * (Queue Task Callback)
-   */
-  public static function task_4_5_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
-    $upgrade = new CRM_Upgrade_Form();
-    $upgrade->processSQL($rev);
-=======
    * @return bool
    */
   public function upgrade_4_5_9($rev) {
     // Task to process sql.
     $this->addTask(ts('Upgrade DB to 4.5.9: Fix saved searches consisting of multi-choice custom field(s)'), 'updateSavedSearch');
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     return TRUE;
   }

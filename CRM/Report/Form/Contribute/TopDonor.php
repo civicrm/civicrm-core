@@ -146,15 +146,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'title' => ts('Birth Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
-<<<<<<< HEAD
-=======
           'contact_type' => array(
             'title' => ts('Contact Type'),
           ),
           'contact_sub_type' => array(
             'title' => ts('Contact Subtype'),
           ),
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           'receive_date' => array(
             'default' => 'this.year',
             'operatorType' => CRM_Report_Form::OP_DATE,

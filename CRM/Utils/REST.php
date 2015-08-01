@@ -309,11 +309,7 @@ class CRM_Utils_REST {
       }
     }
     else {
-<<<<<<< HEAD
-      // or the new format (entity+action)
-=======
       // or the api format (entity+action)
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $args = array();
       $args[0] = 'civicrm';
       $args[1] = CRM_Utils_array::value('entity', $requestParams);
@@ -520,11 +516,7 @@ class CRM_Utils_REST {
 
     }
     else {
-<<<<<<< HEAD
-      $content = "<!-- .tpl file embeded: $tpl -->\n";
-=======
       $content = "<!-- .tpl file embedded: $tpl -->\n";
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       CRM_Utils_System::appendTPLFile($tpl, $content);
       echo $content . $smarty->fetch($tpl);
       CRM_Utils_System::civiExit();

@@ -193,11 +193,7 @@ LIMIT 1;";
    *   Id of the entity usually the contactID.
    *
    * @return array
-<<<<<<< HEAD
-   *   array of catagory id's the contact belongs to.
-=======
    *   array of category id's the contact belongs to.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    */
   public static function getFinancialTrxnTotal($entity_id) {
@@ -273,11 +269,7 @@ WHERE  ef2.financial_trxn_id =%1
    *   Name of the entity table usually 'civicrm_contact'.
    *
    * @return array
-<<<<<<< HEAD
-   *   array of catagory id's the contact belongs to.
-=======
    *   array of category id's the contact belongs to.
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    */
   public static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
@@ -322,8 +314,6 @@ WHERE ceft.entity_id = %1";
   /**
    * Create financial transaction for premium.
    *
-<<<<<<< HEAD
-=======
    * @param array $params
    *   - oldPremium
    *   - financial_type_id
@@ -331,7 +321,6 @@ WHERE ceft.entity_id = %1";
    *   - isDeleted
    *   - cost
    *   - currency
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function createPremiumTrxn($params) {
     if ((empty($params['financial_type_id']) || empty($params['contributionId'])) && empty($params['oldPremium'])) {

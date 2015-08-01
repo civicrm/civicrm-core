@@ -114,17 +114,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $defaults = parent::setDefaultValues();
     parent::cbsDefaultValues($defaults);
 
-<<<<<<< HEAD
-    if ($this->_config->editor_id) {
-      $defaults['editor_id'] = $this->_config->editor_id;
-    }
-    if (empty($this->_config->display_name_format)) {
-      $defaults['display_name_format'] = "{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}";
-    }
-    else {
-=======
     if ($this->_config->display_name_format) {
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $defaults['display_name_format'] = $this->_config->display_name_format;
     }
     if ($this->_config->sort_name_format) {
@@ -148,34 +138,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $this->assign('invoicing', $invoicing);
     $extra = array();
 
-<<<<<<< HEAD
-    //if not using Joomla, remove Joomla default editor option
-    if ($config->userFramework != 'Joomla') {
-      unset($wysiwyg_options[3]);
-    }
-
-    $drupal_wysiwyg = FALSE;
-    if (!$config->userSystem->is_drupal || !module_exists("wysiwyg")) {
-      unset($wysiwyg_options[4]);
-    }
-    else {
-      $extra['onchange'] = '
-      if (this.value==4) {
-        cj("#crm-preferences-display-form-block-wysiwyg_input_format").show();
-      }
-      else {
-        cj("#crm-preferences-display-form-block-wysiwyg_input_format").hide()
-      }';
-
-      $formats = filter_formats();
-      $format_options = array();
-      foreach ($formats as $id => $format) {
-        $format_options[$id] = $format->name;
-      }
-      $drupal_wysiwyg = TRUE;
-    }
-=======
->>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $this->addElement('select', 'editor_id', ts('WYSIWYG Editor'), $wysiwyg_options, $extra);
     $this->addElement('submit', 'ckeditor_config', ts('Configure CKEditor'));
 
