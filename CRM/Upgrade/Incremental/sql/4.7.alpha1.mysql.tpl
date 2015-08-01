@@ -38,3 +38,5 @@ ADD COLUMN
 -- CRM-16876 Set country names to UPPERCASE
 UPDATE civicrm_country SET `name` = UPPER( `name` );
 
+-- CRM-16447
+UPDATE civicrm_state_province SET name = 'Northern Ostrobothnia' WHERE name = 'Nothern Ostrobothnia';
