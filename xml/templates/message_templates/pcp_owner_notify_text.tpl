@@ -11,7 +11,7 @@
     {ts}The donor's name has been added to your honor roll unless they asked not to be included.{/ts}
 {/if}
 
-{ts}Receive Date{/ts}: {$receive_date|crmDate}
+{ts}Received{/ts}: {$receive_date|crmDate}
 
 {ts}Amount{/ts}: {$total_amount|crmMoney:$currency}
 
