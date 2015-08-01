@@ -40,7 +40,11 @@ WHERE option_group_id = @option_group_id_notePrivacy AND value = 1;
   ('group_type', 'safe_file_extension', 'wysiwyg_editor');
 {/if}
 
+<<<<<<< HEAD
 --This one is wierd. What the heck is this anyway?
+=======
+--This one is weird. What the heck is this anyway?
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 UPDATE civicrm_option_value v, civicrm_option_group g
 SET v.name = v.value
 WHERE g.id = v.option_group_id AND g.name = 'redaction_rule';

@@ -69,7 +69,7 @@ WHERE  n.child_group_id  = gc.id
     }
 
     if (self::checkCyclicGraph($tree)) {
-      CRM_Core_Error::fatal(ts('We detected a cycle which we cant handle. aborting'));
+      CRM_Core_Error::fatal(ts("We detected a cycle which we can't handle. aborting"));
     }
 
     // first reset the current cache entries
@@ -105,7 +105,11 @@ WHERE  id = $id
    * @return bool
    */
   public static function checkCyclicGraph(&$tree) {
+<<<<<<< HEAD
     // lets keep this simple, we should probably use a graph algoritm here at some stage
+=======
+    // lets keep this simple, we should probably use a graph algorithm here at some stage
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     // foreach group that has a parent or a child, ensure that
     // the ancestors and descendants dont intersect

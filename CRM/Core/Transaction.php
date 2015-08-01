@@ -176,7 +176,11 @@ class CRM_Core_Transaction {
    * use it again.
    *
    * @param string $callable
+<<<<<<< HEAD
    *   Should exception one paramter (CRM_Core_Transaction $tx).
+=======
+   *   Should exception one parameter (CRM_Core_Transaction $tx).
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return CRM_Core_Transaction
    * @throws Exception
    */

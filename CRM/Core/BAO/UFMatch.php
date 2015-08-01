@@ -39,7 +39,11 @@
 class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
 
   /**
+<<<<<<< HEAD
    * Create UF Match, Note that thsi function is here in it's simplest form @ the moment
+=======
+   * Create UF Match, Note that this function is here in it's simplest form @ the moment
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param $params
    *

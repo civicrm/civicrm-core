@@ -39,6 +39,10 @@
  */
 class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
 
+  public $_settings = array(
+    'weekBegins' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+  );
+
   /**
    * Build the form object.
    *

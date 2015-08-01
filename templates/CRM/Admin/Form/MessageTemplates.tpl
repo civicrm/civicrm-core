@@ -61,6 +61,7 @@
         <tr>
   </table>
 
+<<<<<<< HEAD
       <div class="crm-accordion-wrapper crm-html_email-accordion ">
         <div class="crm-accordion-header">
             {ts}HTML Format{/ts}
@@ -98,6 +99,45 @@
 
       <div class="crm-accordion-wrapper crm-html_email-accordion ">
         <div class="crm-accordion-header">
+=======
+      <div class="crm-accordion-wrapper crm-html_email-accordion ">
+        <div class="crm-accordion-header">
+            {ts}HTML Format{/ts}
+            {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
+        </div><!-- /.crm-accordion-header -->
+         <div class="crm-accordion-body">
+           <div class="helpIcon" id="helphtml">
+             <input class="crm-token-selector big" data-field="html_message" />
+             {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+           </div>
+                <div class="clear"></div>
+                <div class='html'>
+                    {$form.msg_html.html}
+                    <div class="description">{ts}An HTML formatted version of this message will be sent to contacts whose Email Format preference is 'HTML' or 'Both'.{/ts} {ts 1=$tokenDocsRepeated}Tokens may be included (%1).{/ts}</div>
+                </div>
+        </div><!-- /.crm-accordion-body -->
+      </div><!-- /.crm-accordion-wrapper -->
+
+      <div class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
+        <div class="crm-accordion-header">
+                {ts}Plain-Text Format{/ts}
+        </div><!-- /.crm-accordion-header -->
+            <div class="crm-accordion-body">
+              <div class="helpIcon" id="helptext">
+                <input class="crm-token-selector big" data-field="msg_text" />
+                {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
+              </div>
+              <div class="clear"></div>
+                <div class='text'>
+                    {$form.msg_text.html|crmAddClass:huge}
+                    <div class="description">{ts}Text formatted message.{/ts} {ts 1=$tokenDocsRepeated}Tokens may be included (%1).{/ts}</div>
+                </div>
+            </div><!-- /.crm-accordion-body -->
+      </div><!-- /.crm-accordion-wrapper -->
+
+      <div class="crm-accordion-wrapper crm-html_email-accordion ">
+        <div class="crm-accordion-header">
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             {$form.pdf_format_id.label}
         </div><!-- /.crm-accordion-header -->
          <div class="crm-accordion-body">

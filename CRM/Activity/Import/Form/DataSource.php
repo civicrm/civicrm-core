@@ -36,8 +36,9 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
+class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
+<<<<<<< HEAD
   /**
    * Set variables up before form is built.
    *
@@ -49,6 +50,11 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     // check for post max size
     CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
   }
+=======
+  const PATH = 'civicrm/import/activity';
+
+  const IMPORT_ENTITY = 'Activity';
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Build the form object.
@@ -56,6 +62,7 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
+<<<<<<< HEAD
     //Setting Upload File Size
     $config = CRM_Core_Config::singleton();
 
@@ -73,7 +80,11 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
 
     $this->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
+=======
+    parent::buildQuickForm();
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
+    // FIXME: This 'onDuplicate' form element is never used -- copy/paste error?
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
       NULL, NULL, ts('Skip'), CRM_Import_Parser::DUPLICATE_SKIP
@@ -88,6 +99,7 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     $this->addGroup($duplicateOptions, 'onDuplicate',
       ts('On duplicate entries')
     );
+<<<<<<< HEAD
 
     //get the saved mapping details
     $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
@@ -122,6 +134,8 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
         ),
       )
     );
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -130,6 +144,7 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
+<<<<<<< HEAD
     $this->controller->resetPage('MapField');
 
     $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
@@ -149,19 +164,18 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     $seperator = $config->fieldSeparator;
 
     $mapper = array();
+=======
+    $this->storeFormValues(array(
+      'onDuplicate',
+      'dateFormats',
+      'savedMapping',
+    ));
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
-    $parser = new CRM_Activity_Import_Parser_Activity($mapper);
-    $parser->setMaxLinesToProcess(100);
-    $parser->run($fileName, $seperator,
-      $mapper,
-      $skipColumnHeader,
-      CRM_Import_Parser::MODE_MAPFIELD
-    );
-
-    // add all the necessary variables to the form
-    $parser->set($this);
+    $this->submitFileForMapping('CRM_Activity_Import_Parser_Activity');
   }
 
+<<<<<<< HEAD
   /**
    * Return a descriptive name for the page, used in wizard header
    *
@@ -171,4 +185,6 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Core_Form {
     return ts('Upload Data');
   }
 
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

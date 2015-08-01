@@ -207,12 +207,20 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     //List of Transaction Type
     /*
     recurring_payment_profile_created          RP Profile Created
+<<<<<<< HEAD
     recurring_payment           RP Sucessful Payment
+=======
+    recurring_payment           RP Successful Payment
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     recurring_payment_failed                               RP Failed Payment
     recurring_payment_profile_cancel           RP Profile Cancelled
     recurring_payment_expired         RP Profile Expired
     recurring_payment_skipped        RP Profile Skipped
+<<<<<<< HEAD
     recurring_payment_outstanding_payment      RP Sucessful Outstanding Payment
+=======
+    recurring_payment_outstanding_payment      RP Successful Outstanding Payment
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     recurring_payment_outstanding_payment_failed          RP Failed Outstanding Payment
     recurring_payment_suspended        RP Profile Suspended
     recurring_payment_suspended_due_to_max_failed_payment  RP Profile Suspended due to Max Failed Payment
@@ -441,9 +449,20 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       }
     }
 
-    $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
+    // This is an unreliable method as there could be more than one instance.
+    // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
+    // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
+    // entirely). The only thing the IPN class should really do is extract data from the request, validate it
+    // & call completetransaction or call fail? (which may not exist yet).
+    $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
       'PayPal', 'id', 'name'
     );
+    $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
+      'is_test' => 0,
+      'options' => array('limit' => 1),
+      'payment_processor_type_id' => $paymentProcessorTypeID,
+      'return' => 'id',
+    ));
 
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       return FALSE;

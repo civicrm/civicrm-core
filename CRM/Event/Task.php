@@ -125,6 +125,11 @@ class CRM_Event_Task {
           'class' => 'CRM_Event_Form_Task_Badge',
           'result' => FALSE,
         ),
+        17 => array(
+          'title' => ts('Print PDF Letter for Participants'),
+          'class' => 'CRM_Event_Form_Task_PDF',
+          'result' => TRUE,
+        ),
         20 => array(
           'title' => ts('Add Contacts to Group'),
           'class' => 'CRM_Event_Form_Task_AddToGroup',

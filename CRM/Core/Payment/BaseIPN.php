@@ -217,14 +217,14 @@ class CRM_Core_Payment_BaseIPN {
 
     // Add line items for recurring payments.
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+      CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
 
     //add new soft credit against current contribution id and
     //copy initial contribution custom fields for recurring contributions
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      $this->addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-      $this->copyCustomValues($objects['contributionRecur']->id, $contribution->id);
+      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
+      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
     if (empty($input['skipComponentSync'])) {
@@ -312,14 +312,14 @@ class CRM_Core_Payment_BaseIPN {
 
     //add lineitems for recurring payments
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      $this->addRecurLineItems($objects['contributionRecur']->id, $contribution);
+      CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
 
     //add new soft credit against current $contribution and
     //copy initial contribution custom fields for recurring contributions
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      $this->addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-      $this->copyCustomValues($objects['contributionRecur']->id, $contribution->id);
+      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
+      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
     if (empty($input['skipComponentSync'])) {
@@ -424,6 +424,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param bool $recur
    */
   public function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
+<<<<<<< HEAD
     $contribution = &$objects['contribution'];
 
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
@@ -793,6 +794,14 @@ LIMIT 1;";
     if ($this->_isRecurring) {
       $this->sendRecurringStartOrEndNotification($ids, $recur);
     }
+=======
+    $isRecurring = $this->_isRecurring;
+    $isFirstOrLastRecurringPayment = $this->_isFirstOrLastRecurringPayment;
+    $contribution = &$objects['contribution'];
+
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, $recur, $contribution,
+      $isRecurring, $isFirstOrLastRecurringPayment);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -818,6 +827,7 @@ LIMIT 1;";
 
   /**
    * Send receipt from contribution.
+<<<<<<< HEAD
    *
    * Note that the compose message part has been moved to contribution
    * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
@@ -1000,14 +1010,15 @@ LIMIT 1;";
 
   /**
    * Update pledge associated with a recurring contribution.
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
-   * If the contribution has a pledge_payment record pledge, then update the pledge_payment record & pledge based on that linkage.
+   * @deprecated
    *
-   * If a previous contribution in the recurring contribution sequence is linked with a pledge then we assume this contribution
-   * should be  linked with the same pledge also. Currently only back-office users can apply a recurring payment to a pledge &
-   * it should be assumed they
-   * do so with the intention that all payments will be linked
+   * Note that the compose message part has been moved to contribution
+   * In general LoadObjects is called first to get the objects but the composeMessageArray function now calls it
    *
+<<<<<<< HEAD
    * The pledge payment record should already exist & will need to be updated with the new contribution ID.
    * If not the contribution will also need to be linked to the pledge
    *
@@ -1190,4 +1201,25 @@ LIMIT 1;";
     }
   }
 
+=======
+   * @param array $input
+   *   Incoming data from Payment processor.
+   * @param array $ids
+   *   Related object IDs.
+   * @param $objects
+   * @param array $values
+   *   Values related to objects that have already been loaded.
+   * @param bool $recur
+   *   Is it part of a recurring contribution.
+   * @param bool $returnMessageText
+   *   Should text be returned instead of sent. This.
+   *   is because the function is also used to generate pdfs
+   *
+   * @return array
+   */
+  public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
+    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects, $values, $recur, $returnMessageText);
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

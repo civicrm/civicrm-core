@@ -228,7 +228,11 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
       $msgTitle = ts('Update Success');
       $msgType = 'success';
+<<<<<<< HEAD
 
+=======
+      $msg = ts('Recurring Contribution Updated');
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $contactID = $this->_subscriptionDetails->contact_id;
 
       if ($this->_subscriptionDetails->amount != $params['amount']) {
@@ -237,6 +241,15 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
               1 => CRM_Utils_Money::format($this->_subscriptionDetails->amount, $this->_subscriptionDetails->currency),
               2 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
             )) . ' ';
+<<<<<<< HEAD
+=======
+        if ($this->_subscriptionDetails->amount < $params['amount']) {
+          $msg = ts('Recurring Contribution Updated - increased installment amount');
+        }
+        else {
+          $msg = ts('Recurring Contribution Updated - decreased installment amount');
+        }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
 
       if ($this->_subscriptionDetails->installments != $params['installments']) {
@@ -252,7 +265,11 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
           'Update Recurring Contribution',
           'name'
         ),
+<<<<<<< HEAD
         'subject' => ts('Recurring Contribution Updated'),
+=======
+        'subject' => $msg,
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         'details' => $message,
         'activity_date_time' => date('YmdHis'),
         'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
@@ -280,11 +297,19 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
             )
           );
           $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$this->_subscriptionDetails->contribution_page_id]) . '" <' . $value[$this->_subscriptionDetails->contribution_page_id]['receipt_from_email'] . '>';
+<<<<<<< HEAD
         }
         else {
           $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
           $receiptFrom = "$domainValues[0] <$domainValues[1]>";
         }
+=======
+        }
+        else {
+          $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
+          $receiptFrom = "$domainValues[0] <$domainValues[1]>";
+        }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
         list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 

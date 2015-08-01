@@ -56,7 +56,11 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param CRM_Core_Form_Search $form
    * @return array
    */
+<<<<<<< HEAD
   function buildTaskList(CRM_Core_Form_Search $form) {
+=======
+  public function buildTaskList(CRM_Core_Form_Search $form) {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return $form->getVar('_taskList');
   }
 
@@ -243,4 +247,21 @@ class CRM_Contact_Form_Search_Custom_Base {
     return NULL;
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * Set the title.
+   *
+   * @param string $title
+   */
+  public function setTitle($title) {
+    if ($title) {
+      CRM_Utils_System::setTitle($title);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('Search'));
+    }
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

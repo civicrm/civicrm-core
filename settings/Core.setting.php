@@ -181,8 +181,13 @@ return array(
     'group' => 'core',
     'name' => 'editor_id',
     'type' => 'String',
+<<<<<<< HEAD
     'html_type' => 'Text',
     'default' => NULL,
+=======
+    'html_type' => 'Select',
+    'default' => 'CKEditor',
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     'add' => '4.1',
     'title' => 'Wysiwig Editor',
     'is_domain' => 1,

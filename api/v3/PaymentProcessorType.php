@@ -69,6 +69,7 @@ function _civicrm_api3_payment_processor_type_create_spec(&$params) {
   // FIXME bool support // $params['is_recur']['api.required'] = 1;
   $params['name']['api.required'] = 1;
   $params['title']['api.required'] = 1;
+  $params['payment_instrument_id']['api.default'] = 'Credit Card';
 }
 
 /**

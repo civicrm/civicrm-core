@@ -90,7 +90,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       //we lost rfp in case of additional participant. So set it explicitly.
       if ($rfp || CRM_Utils_Array::value('additional_participants', $this->_params[0], FALSE)) {
-        $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+        $payment = $this->_paymentProcessor['object'];
         $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
         if (is_object($payment)) {
           $expressParams = $payment->getExpressCheckoutDetails($this->get('token'));
@@ -126,7 +126,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
         $params['amount_level'] = $this->_params[0]['amount_level'];
         $params['currencyID'] = $this->_params[0]['currencyID'];
-        $params['payment_action'] = 'Sale';
 
         // also merge all the other values from the profile fields
         $values = $this->controller->exportValues('Register');
@@ -172,7 +171,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($this->_values['event']['is_monetary']) {
         $registerParams['ip_address'] = CRM_Utils_System::ipAddress();
         $registerParams['currencyID'] = $this->_params[0]['currencyID'];
-        $registerParams['payment_action'] = 'Sale';
       }
       //assign back primary participant params.
       $this->_params[0] = $registerParams;
@@ -582,7 +580,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // required only if paid event
       if ($this->_values['event']['is_monetary'] && !($this->_allowWaitlist || $this->_requireApproval)) {
         if (is_array($this->_paymentProcessor)) {
-          $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+          $payment = $this->_paymentProcessor['object'];
         }
         $result = NULL;
 
@@ -599,6 +597,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $value['participant_status_id'] = $value['participant_status'] = array_search($status, $pendingStatuses);
           }
         }
+<<<<<<< HEAD
         elseif ($this->_contributeMode == 'express' && !empty($value['is_primary'])) {
           if (is_object($payment)) {
             $result = $payment->doExpressCheckout($value);
@@ -607,6 +606,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             CRM_Core_Error::fatal($paymentObjError);
           }
         }
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         elseif (!empty($value['is_primary'])) {
           CRM_Core_Payment_Form::mapParams($this->_bltID, $value, $value, TRUE);
           // payment email param can be empty for _bltID mapping
@@ -616,20 +617,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           if (is_object($payment)) {
-            $result = $payment->doDirectPayment($value);
+            try {
+              $result = $payment->doPayment($value);
+              $value = array_merge($value, $result);
+            }
+            catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+              CRM_Core_Error::displaySessionError($result);
+              CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
+            }
           }
           else {
             CRM_Core_Error::fatal($paymentObjError);
           }
-        }
-
-        if (is_a($result, 'CRM_Core_Error')) {
-          CRM_Core_Error::displaySessionError($result);
-          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
-        }
-
-        if ($result) {
-          $value = array_merge($value, $result);
         }
 
         $value['receive_date'] = $now;
@@ -774,7 +773,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    //update status and send mail to cancelled additonal participants, CRM-4320
+    //update status and send mail to cancelled additional participants, CRM-4320
     if ($this->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
       $cancelledId = array_search('Cancelled',
         CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")
@@ -867,7 +866,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // call postprocess hook before leaving
           $this->postProcessHook();
           // this does not return
-          $payment->doTransferCheckout($primaryParticipant, 'event');
+          $payment->doPayment($primaryParticipant, 'event');
         }
         else {
           CRM_Core_Error::fatal($paymentObjError);

@@ -53,6 +53,13 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    */
   protected $_context;
 
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Survey';
+  }
+
   public function preProcess() {
     parent::preProcess();
 
@@ -64,13 +71,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       CRM_Utils_System::setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
-    }
-
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
     // when custom data is included in this page
@@ -108,9 +108,12 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    *   array of default values
    */
   public function setDefaultValues() {
+<<<<<<< HEAD
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $defaults = $this->_values;
 
@@ -144,9 +147,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    * @return void
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'title'), TRUE);
 
@@ -159,7 +159,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $this->add('select', 'campaign_id', ts('Campaign'), array('' => ts('- select -')) + $campaigns);
 
     // script / instructions
-    $this->addWysiwyg('instructions', ts('Instructions for interviewers'), array('rows' => 5, 'cols' => 40));
+    $this->add('wysiwyg', 'instructions', ts('Instructions for interviewers'), array('rows' => 5, 'cols' => 40));
 
     // release frequency
     $this->add('text', 'release_frequency', ts('Release Frequency'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'release_frequency'));
@@ -209,7 +209,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_surveyId,
       'Survey'
     );

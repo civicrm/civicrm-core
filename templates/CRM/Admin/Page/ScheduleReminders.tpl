@@ -33,8 +33,11 @@
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
+<<<<<<< HEAD
   {* include wysiwyg related files*}
   {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   {if !$component}
     {capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
     <div class="help">

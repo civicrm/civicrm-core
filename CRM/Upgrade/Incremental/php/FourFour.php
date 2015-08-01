@@ -26,18 +26,21 @@
  */
 
 /**
+<<<<<<< HEAD
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
+=======
+ * Upgrade logic for 4.4
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
-class CRM_Upgrade_Incremental_php_FourFour {
-  const BATCH_SIZE = 5000;
-
+class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base {
   const MAX_WORD_REPLACEMENT_SIZE = 255;
 
   /**
+<<<<<<< HEAD
    * @param $errors
    *
    * @return bool
@@ -47,6 +50,8 @@ class CRM_Upgrade_Incremental_php_FourFour {
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Compute any messages which should be displayed beforeupgrade.
    *
    * Note: This function is called iteratively for each upcoming
@@ -121,7 +126,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    */
   public function upgrade_4_4_alpha1($rev) {
     // task to process sql
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'runSql', $rev);
 
     // Consolidate activity contacts CRM-12274.
     $this->addTask('Consolidate activity contacts', 'activityContacts');
@@ -133,7 +138,11 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    * @param $rev
    */
   public function upgrade_4_4_beta1($rev) {
+<<<<<<< HEAD
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'task_4_4_x_runSql', $rev);
+=======
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'runSql', $rev);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     // add new 'data' column in civicrm_batch
     $query = 'ALTER TABLE civicrm_batch ADD data LONGTEXT NULL COMMENT "cache entered data"';
@@ -254,7 +263,7 @@ VALUES {$insertStatus}";
       CRM_Core_DAO::executeQuery($sql, $p);
     }
 
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'runSql', $rev);
     $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
 
@@ -297,7 +306,7 @@ WHERE a.id IS NULL;
     }
 
     // task to process sql
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'runSql', $rev);
 
     // CRM-13892 : add `name` column to dashboard schema
     $query = "
@@ -701,6 +710,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   }
 
   /**
+<<<<<<< HEAD
    * (Queue Task Callback)
    */
   public static function task_4_4_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
@@ -711,6 +721,8 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Syntatic sugar for adding a task which (a) is in this class and (b) has
    * a high priority.
    *

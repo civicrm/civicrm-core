@@ -10,10 +10,17 @@
     "symfony/dependency-injection": "2.3.*",
     "symfony/event-dispatcher": "2.3.*",
     "symfony/process": "2.3.*",
+<<<<<<< HEAD
     "psr/log": "1.0.0",
     "symfony/finder": "2.3.*",
     "totten/ca-config": "~13.02",
     "civicrm/civicrm-cxn-rpc": "~0.15.07.07"
+=======
+    "psr/log": "~1.0.0",
+    "symfony/finder": "2.3.*",
+    "totten/ca-config": "~13.02",
+    "civicrm/civicrm-cxn-rpc": "~0.15.07.27"
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   },
   "scripts": {
     "post-install-cmd": [

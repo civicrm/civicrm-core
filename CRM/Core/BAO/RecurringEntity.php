@@ -324,7 +324,11 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
+<<<<<<< HEAD
    * This function iterates through when object criterias and
+=======
+   * This function iterates through when object criteria and
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * generates recursive dates based on that
    *
    * @return array
@@ -989,11 +993,19 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
+<<<<<<< HEAD
    * This function takes criterias saved in civicrm_action_schedule table
    * and creates recursion rule
    *
    * @param array $scheduleReminderDetails
    *   Array of repeat criterias saved in civicrm_action_schedule table .
+=======
+   * This function takes criteria saved in civicrm_action_schedule table
+   * and creates recursion rule
+   *
+   * @param array $scheduleReminderDetails
+   *   Array of repeat criteria saved in civicrm_action_schedule table .
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return object
    *   When object

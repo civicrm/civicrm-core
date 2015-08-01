@@ -276,12 +276,20 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
             'options' => CRM_Core_OptionGroup::values('event_type'),
           ),
           'event_start_date' => array(
+<<<<<<< HEAD
             'name' => 'start_date',
+=======
+            'name' => 'event_start_date',
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             'title' => ts('Event Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'event_end_date' => array(
+<<<<<<< HEAD
             'name' => 'end_date',
+=======
+            'name' => 'event_end_date',
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             'title' => ts('Event End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),

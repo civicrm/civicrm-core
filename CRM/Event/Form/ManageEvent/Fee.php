@@ -238,9 +238,13 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $this->assign('inDate', $this->_inDate);
 
     if (!empty($defaults['payment_processor'])) {
-      $defaults['payment_processor'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
+      $defaults['payment_processor'] = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',',
         $defaults['payment_processor']
+<<<<<<< HEAD
       ), '1');
+=======
+      );
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
     return $defaults;
   }
@@ -266,11 +270,11 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
     $this->assign('paymentProcessor', $paymentProcessor);
 
-    $this->addCheckBox('payment_processor', ts('Payment Processor'),
-      array_flip($paymentProcessor),
-      NULL, NULL, NULL, NULL,
-      array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
-    );
+    $this->addEntityRef('payment_processor', ts('Payment Processor'), array(
+      'entity' => 'PaymentProcessor',
+      'multiple' => TRUE,
+      'select' => array('minimumInputLength' => 0),
+    ));
 
     // financial type
     $this->addSelect('financial_type_id');
@@ -282,7 +286,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_text'),
       FALSE
     );
-    $this->addWysiwyg('pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
+    $this->add('wysiwyg', 'pay_later_receipt', ts('Pay Later Instructions'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'pay_later_receipt'));
 
     $this->addElement('checkbox', 'is_billing_required', ts('Billing address required'));
     $this->add('text', 'fee_label', ts('Fee Label'));
@@ -565,10 +569,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       return;
     }
 
-    if (array_key_exists('payment_processor', $params) &&
-      !CRM_Utils_System::isNull($params['payment_processor'])
-    ) {
-      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($params['payment_processor']));
+    if (!empty($params['payment_processor'])) {
+      $params['payment_processor'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
     }
     else {
       $params['payment_processor'] = 'null';

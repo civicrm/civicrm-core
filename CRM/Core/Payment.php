@@ -26,6 +26,10 @@
  */
 
 use Civi\Payment\System;
+<<<<<<< HEAD
+=======
+use Civi\Payment\Exception\PaymentProcessorException;
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
 /**
  * Class CRM_Core_Payment.
@@ -38,7 +42,22 @@ use Civi\Payment\System;
 abstract class CRM_Core_Payment {
 
   /**
+<<<<<<< HEAD
    * How are we getting billing information?
+=======
+   * Component - ie. event or contribute.
+   *
+   * This is used for setting return urls.
+   *
+   * @var string
+   */
+  protected $_component;
+
+  /**
+   * How are we getting billing information.
+   *
+   * We are trying to completely deprecate these parameters.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * FORM   - we collect it on the same page
    * BUTTON - the processor collects it and sends it back to us via some protocol
@@ -71,6 +90,7 @@ abstract class CRM_Core_Payment {
   protected $_paymentProcessor;
 
   /**
+<<<<<<< HEAD
    * Singleton function used to manage this object.
    *
    * We will migrate to calling Civi\Payment\System::singleton()->getByProcessor($paymentProcessor)
@@ -99,6 +119,17 @@ abstract class CRM_Core_Payment {
     //of extension classes that extend this one
     $object = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     return $object;
+=======
+   * Opportunity for the payment processor to override the entire form build.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @return bool
+   *   Should form building stop at this point?
+   */
+  public function buildForm(&$form) {
+    return FALSE;
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -163,6 +194,27 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Can more than one transaction be processed at once?
+   *
+   * In general processors that process payment by server to server communication support this while others do not.
+   *
+   * In future we are likely to hit an issue where this depends on whether a token already exists.
+   *
+   * @return bool
+   */
+  protected function supportsMultipleConcurrentPayments() {
+    if ($this->_paymentProcessor['billing_mode'] == 4 || $this->_paymentProcessor['payment_type'] != 1) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
+
+  /**
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Are live payments supported - e.g dummy doesn't support this.
    *
    * @return bool
@@ -189,6 +241,112 @@ abstract class CRM_Core_Payment {
    */
   protected function supportsFutureRecurStartDate() {
     return FALSE;
+  }
+
+  /**
+<<<<<<< HEAD
+   * Default payment instrument validation.
+   *
+   * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
+   * Not a static function, because I need to check for payment_type.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  public function validatePaymentInstrument($values, &$errors) {
+    if ($this->_paymentProcessor['payment_type'] == 1) {
+      CRM_Core_Payment_Form::validateCreditCard($values, $errors);
+    }
+  }
+
+  /**
+   * Getter for the payment processor.
+   *
+   * The payment processor array is based on the civicrm_payment_processor table entry.
+   *
+   * @return array
+   *   Payment processor array.
+   */
+  public function getPaymentProcessor() {
+    return $this->_paymentProcessor;
+  }
+
+  /**
+   * Setter for the payment processor.
+   *
+   * @param array $processor
+   */
+  public function setPaymentProcessor($processor) {
+    $this->_paymentProcessor = $processor;
+  }
+
+  /**
+   * Setter for the payment form that wants to use the processor.
+   *
+=======
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return method_exists(CRM_Utils_System::getClassName($this), 'cancelSubscription');
+  }
+
+  /**
+   * Does this processor support pre-approval.
+   *
+   * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
+   *
+   * Currently Paypal express supports this, with a redirect to paypal after the 'Main' form is submitted in the
+   * contribution page. This token can then be processed at the confirm phase. Although this flow 'looks' like the
+   * 'notify' flow a key difference is that in the notify flow they don't have to return but in this flow they do.
+   *
+   * @return bool
+   */
+  protected function supportsPreApproval() {
+    return FALSE;
+  }
+
+  /**
+   * Can recurring contributions be set against pledges.
+   *
+   * In practice all processors that use the baseIPN function to finish transactions or
+   * call the completetransaction api support this by looking up previous contributions in the
+   * series and, if there is a prior contribution against a pledge, and the pledge is not complete,
+   * adding the new payment to the pledge.
+   *
+   * However, only enabling for processors it has been tested against.
+   *
+   * @return bool
+   */
+  protected function supportsRecurContributionsForPledges() {
+    return FALSE;
+  }
+
+  /**
+   * Function to action pre-approval if supported
+   *
+   * @param array $params
+   *   Parameters from the form
+   *
+   * This function returns an array which should contain
+   *   - pre_approval_parameters (this will be stored on the calling form & available later)
+   *   - redirect_url (if set the browser will be redirected to this.
+   */
+  public function doPreApproval(&$params) {}
+
+  /**
+   * Get any details that may be available to the payment processor due to an approval process having happened.
+   *
+   * In some cases the browser is redirected to enter details on a processor site. Some details may be available as a
+   * result.
+   *
+   * @param array $storedDetails
+   *
+   * @return array
+   */
+  public function getPreApprovalDetails($storedDetails) {
+    return array();
   }
 
   /**
@@ -230,6 +388,7 @@ abstract class CRM_Core_Payment {
   /**
    * Setter for the payment form that wants to use the processor.
    *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @deprecated
    *
    * @param CRM_Core_Form $paymentForm
@@ -250,9 +409,15 @@ abstract class CRM_Core_Payment {
 
   /**
    * Getter for accessing member vars.
+<<<<<<< HEAD
    *
    * @todo believe this is unused
    *
+=======
+   *
+   * @todo believe this is unused
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param string $name
    *
    * @return null
@@ -456,10 +621,73 @@ abstract class CRM_Core_Payment {
         'is_required' => TRUE,
 
       ),
+<<<<<<< HEAD
+=======
     );
   }
 
   /**
+   * Get base url dependent on component.
+   *
+   * @return string|void
+   */
+  protected function getBaseReturnUrl() {
+    if ($this->_component == 'event') {
+      $baseURL = 'civicrm/event/register';
+    }
+    else {
+      $baseURL = 'civicrm/contribute/transact';
+    }
+    return $baseURL;
+  }
+
+  /**
+   * Get url to return to after cancelled or failed transaction
+   *
+   * @param $qfKey
+   * @param $participantID
+   *
+   * @return string cancel url
+   */
+  protected function getCancelUrl($qfKey, $participantID) {
+    if ($this->_component == 'event') {
+      return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+        'reset' => 1,
+        'cc' => 'fail',
+        'participantId' => $participantID,
+      ),
+        TRUE, NULL, FALSE
+      );
+    }
+
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+      '_qf_Main_display' => 1,
+      'qfKey' => $qfKey,
+      'cancel' => 1,
+    ),
+      TRUE, NULL, FALSE
+    );
+  }
+
+  /**
+   * Get URL to return the browser to on success.
+   *
+   * @param $qfKey
+   *
+   * @return string
+   */
+  protected function getReturnSuccessUrl($qfKey) {
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+      '_qf_ThankYou_display' => 1,
+      'qfKey' => $qfKey,
+    ),
+      TRUE, NULL, FALSE
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
+    );
+  }
+
+  /**
+<<<<<<< HEAD
    * Calling this from outside the payment subsystem is deprecated - use doPayment.
    *
    * Does a server to server payment transaction.
@@ -480,26 +708,148 @@ abstract class CRM_Core_Payment {
    *
    * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
    * more agnostic.
+=======
+   * Get URL to return the browser to on failure.
+   *
+   * @param string $key
+   * @param int $participantID
+   * @param int $eventID
+   *
+   * @return string
+   *   URL for a failing transactor to be redirected to.
+   */
+  protected function getReturnFailUrl($key, $participantID = NULL, $eventID = NULL) {
+    $test = $this->_is_test ? '&action=preview' : '';
+    if ($this->_component == "event") {
+      return CRM_Utils_System::url('civicrm/event/register',
+        "reset=1&cc=fail&participantId={$participantID}&id={$eventID}{$test}&qfKey={$key}",
+        FALSE, NULL, FALSE
+      );
+    }
+    else {
+      return CRM_Utils_System::url('civicrm/contribute/transact',
+        "_qf_Main_display=1&cancel=1&qfKey={$key}{$test}",
+        FALSE, NULL, FALSE
+      );
+    }
+  }
+
+  /**
+   * Get URl for when the back button is pressed.
+   *
+   * @param $qfKey
+   *
+   * @return string url
+   */
+  protected function getGoBackUrl($qfKey) {
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), array(
+      '_qf_Confirm_display' => 'true',
+      'qfKey' => $qfKey,
+    ),
+      TRUE, NULL, FALSE
+    );
+  }
+
+  /**
+   * Get the notify (aka ipn, web hook or silent post) url.
+   *
+   * If there is no '.' in it we assume that we are dealing with localhost or
+   * similar and it is unreachable from the web & hence invalid.
+   *
+   * @return string
+   *   URL to notify outcome of transaction.
+   */
+  protected function getNotifyUrl() {
+    $url = CRM_Utils_System::url(
+      'civicrm/payment/ipn/' . $this->_paymentProcessor['id'],
+      array(),
+      TRUE
+    );
+    return (stristr($url, '.')) ? $url : '';
+  }
+
+  /**
+   * Calling this from outside the payment subsystem is deprecated - use doPayment.
+   *
+   * Does a server to server payment transaction.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
+   *
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   *
+   * @return array
+   *   the result in an nice formatted array (or an error object - but throwing exceptions is preferred)
+   */
+  protected function doDirectPayment(&$params) {
+    return $params;
+  }
+
+  /**
+   * Process payment - this function wraps around both doTransferPayment and doDirectPayment.
+   *
+   * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
+   * more agnostic.
+   *
+   * Payment processors should set payment_status_id. This function adds some historical defaults ie. the
+   * assumption that if a 'doDirectPayment' processors comes back it completed the transaction & in fact
+   * doTransferCheckout would not traditionally come back.
+   *
+   * doDirectPayment does not do an immediate payment for Authorize.net or Paypal so the default is assumed
+   * to be Pending.
+   *
+   * Once this function is fully rolled out then it will be preferred for processors to throw exceptions than to
+   * return Error objects
    *
    * @param array $params
    *
-   * @param $component
-   *
+<<<<<<< HEAD
    * @return array
    *   (modified)
    * @throws CRM_Core_Exception
    */
   public function doPayment(&$params, $component = 'contribute') {
+=======
+   * @param string $component
+   *
+   * @return array
+   *   Result array
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doPayment(&$params, $component = 'contribute') {
+    $this->_component = $component;
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
+      if (is_array($result) && !isset($result['payment_status_id'])) {
+        $result['payment_status_id'] = array_search('Pending', $statuses);
+      }
     }
     else {
-      $result = $this->doDirectPayment($params, $component);
+      if ($this->_paymentProcessor['billing_mode'] == 1) {
+        $result = $this->doDirectPayment($params, $component);
+      }
+      else {
+        $result = $this->doExpressCheckout($params);
+      }
+      if (is_array($result) && !isset($result['payment_status_id'])) {
+        if (!empty($params['is_recur'])) {
+          // See comment block.
+          $result['payment_status_id'] = array_search('Pending', $statuses);
+        }
+        else {
+          $result['payment_status_id'] = array_search('Completed', $statuses);
+        }
+      }
     }
     if (is_a($result, 'CRM_Core_Error')) {
-      throw new CRM_Core_Exception(CRM_Core_Error::getMessages($result));
+      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
+<<<<<<< HEAD
     //CRM-15767 - Submit Credit Card Contribution not being saved
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return $result;
   }
 
@@ -661,6 +1011,11 @@ abstract class CRM_Core_Payment {
 
   /**
    * Check whether a method is present ( & supported ) by the payment processor object.
+<<<<<<< HEAD
+=======
+   *
+   * @deprecated - use $paymentProcessor->supports(array('cancelRecurring');
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param string $method
    *   Method to check for.
@@ -672,6 +1027,43 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Some processors replace the form submit button with their own.
+   *
+   * Returning false here will leave the button off front end forms.
+   *
+   * At this stage there is zero cross-over between back-office processors and processors that suppress the submit.
+   */
+  public function isSuppressSubmitButtons() {
+    return FALSE;
+  }
+
+  /**
+   * Checks to see if invoice_id already exists in db.
+   *
+   * It's arguable if this belongs in the payment subsystem at all but since several processors implement it
+   * it is better to standardise to being here.
+   *
+   * @param int $invoiceId The ID to check.
+   *
+   * @param null $contributionID
+   *   If a contribution exists pass in the contribution ID.
+   *
+   * @return bool
+   *   True if invoice ID otherwise exists, else false
+   */
+  protected function checkDupe($invoiceId, $contributionID = NULL) {
+    $contribution = new CRM_Contribute_DAO_Contribution();
+    $contribution->invoice_id = $invoiceId;
+    if ($contributionID) {
+      $contribution->whereAdd("id <> $contributionID");
+    }
+    return $contribution->find();
+  }
+
+  /**
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Get url for users to manage this recurring contribution for this processor.
    *
    * @param int $entityID
@@ -747,7 +1139,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     }
 
     // Else default
-    return $this->_paymentProcessor['url_recur'];
+    return isset($this->_paymentProcessor['url_recur']) ? $this->_paymentProcessor['url_recur'] : '';
   }
 
 }

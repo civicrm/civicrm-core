@@ -64,6 +64,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     }
 
     $fieldValueBAO->save();
+    // Reset the cached values in this function.
+    CRM_Price_BAO_PriceField::getOptions(CRM_Utils_Array::value('price_field_id', $params), FALSE, TRUE);
     return $fieldValueBAO;
   }
 
@@ -191,7 +193,11 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *   Value we want to set the is_active field.
    *
    * @return Object
+<<<<<<< HEAD
    *   DAO object on sucess, null otherwise
+=======
+   *   DAO object on success, null otherwise
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    */
   public static function setIsActive($id, $is_active) {

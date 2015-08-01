@@ -42,7 +42,7 @@
 
     function save() {
       $row.closest('table').block();
-      CRM.api3(info.entity, info.action, {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
+      CRM.api3(info.entity, info.action, {id: info.id, is_active: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
     }
 
     function checkResponse(e, response) {

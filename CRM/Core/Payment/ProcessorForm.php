@@ -25,21 +25,26 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Payment\System;
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
+
 /**
- * base class for building payment block for online contribution / event pages
+ * Base class for building payment block for online contribution / event pages.
  */
 class CRM_Core_Payment_ProcessorForm {
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register|CRM_Financial_Form_Payment $form
    * @param null $type
    * @param null $mode
    *
@@ -58,10 +63,16 @@ class CRM_Core_Payment_ProcessorForm {
     }
 
     $form->set('paymentProcessor', $form->_paymentProcessor);
+    $form->_paymentObject = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
+
+    $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
+<<<<<<< HEAD
       $form->_paymentObject = CRM_Core_Payment::singleton($mode, $form->_paymentProcessor, $form);
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL();
     }
 
@@ -90,7 +101,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     if (!empty($form->_membershipBlock) && !empty($form->_membershipBlock['is_separate_payment']) &&
       (!empty($form->_paymentProcessor['class_name']) &&
-        !(CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor) & CRM_Core_Payment::BILLING_MODE_FORM)
+        !$form->_paymentObject->supports('MultipleConcurrentPayments')
       )
     ) {
 

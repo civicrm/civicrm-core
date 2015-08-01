@@ -47,6 +47,7 @@ class CRM_Contact_Form_Edit_Demographics {
    * @return void
    */
   public static function buildQuickForm(&$form) {
+<<<<<<< HEAD
     // radio button for gender
     $genderOptions = array();
     $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
@@ -57,11 +58,14 @@ class CRM_Contact_Form_Edit_Demographics {
       );
     }
     $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
+=======
+    $form->addField('gender_id', array('entity' => 'contact', 'type' => 'Radio', 'allowClear' => TRUE));
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
-    $form->addDate('birth_date', ts('Date of Birth'), FALSE, array('formatType' => 'birth'));
+    $form->addField('birth_date', array('entity' => 'contact', 'formatType' => 'birth'));
 
-    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is Deceased'), array('onclick' => "showDeceasedDate()"));
-    $form->addDate('deceased_date', ts('Deceased Date'), FALSE, array('formatType' => 'birth'));
+    $form->addField('is_deceased', array('entity' => 'contact', 'label' => ts('Contact is Deceased'), 'onclick' => "showDeceasedDate()"));
+    $form->addField('deceased_date', array('entity' => 'contact', 'formatType' => 'birth'));
   }
 
   /**

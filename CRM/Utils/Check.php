@@ -60,9 +60,14 @@ class CRM_Utils_Check {
   /**
    * Execute "checkAll".
    *
-   * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
+   * @param array|NULL $messages
+   *   List of CRM_Utils_Check_Message; or NULL if the default list should be fetched.
+   * @param array|string|callable $filter
+   *   Restrict messages using a callback filter.
+   *   By default, only show warnings and errors.
+   *   Set TRUE to show all messages.
    */
-  public function showPeriodicAlerts($messages = NULL) {
+  public function showPeriodicAlerts($messages = NULL, $filter = array(__CLASS__, 'isImportantAlert')) {
     if (CRM_Core_Permission::check('administer CiviCRM')
       && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityAlert', NULL, TRUE)
     ) {
@@ -77,13 +82,33 @@ class CRM_Utils_Check {
           $messages = $this->checkAll();
         }
         foreach ($messages as $message) {
-          CRM_Core_Session::setStatus($message->getMessage(), $message->getTitle());
+          if ($filter === TRUE || call_user_func($filter, $message)) {
+            CRM_Core_Session::setStatus($message->getMessage(), $message->getTitle());
+          }
         }
       }
     }
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Determine if a message is important enough to harass the administrator about.
+   *
+   * @param CRM_Utils_Check_Message $message
+   * @return bool
+   */
+  protected static function isImportantAlert($message) {
+    return in_array($message->getLevel(), array(
+      \Psr\Log\LogLevel::WARNING,
+      \Psr\Log\LogLevel::ALERT,
+      \Psr\Log\LogLevel::CRITICAL,
+      \Psr\Log\LogLevel::EMERGENCY,
+    ));
+  }
+
+  /**
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Throw an exception if any of the checks fail.
    *
    * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
@@ -137,6 +162,9 @@ class CRM_Utils_Check {
     foreach ($checks as $check) {
       $messages = array_merge($messages, $check->checkAll());
     }
+
+    CRM_Utils_Hook::check($messages);
+
     return $messages;
   }
 

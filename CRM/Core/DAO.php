@@ -220,7 +220,11 @@ class CRM_Core_DAO extends DB_DataObject {
           break;
 
         case CRM_Utils_Type::T_TIME:
+<<<<<<< HEAD
           CRM_Core_Error::fatal('T_TIME shouldnt be used.');
+=======
+          CRM_Core_Error::fatal("T_TIME shouldn't be used.");
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           //$object->$dbName='000000';
           //break;
         case CRM_Utils_Type::T_CCNUM:
@@ -2289,7 +2293,7 @@ SELECT contact_id
     // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
     // support for other syntaxes is discussed in ticket but being put off for now
     foreach ($filter as $operator => $criteria) {
-      if (in_array($operator, self::acceptedSQLOperators())) {
+      if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {
           // unary operators
           case 'IS NULL':
@@ -2399,7 +2403,7 @@ SELECT contact_id
     }
 
     // the string is longer than the length and we need a uniq string
-    // for the same tablename we need the same uniq string everytime
+    // for the same tablename we need the same uniq string every time
     // hence we use md5 on the string, which is not random
     // we'll append 8 characters to the end of the tableName
     $md5string = substr(md5($string), 0, 8);

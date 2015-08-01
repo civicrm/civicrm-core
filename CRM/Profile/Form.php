@@ -181,6 +181,16 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   protected $_currentUserID = NULL;
   protected $_session = NULL;
+<<<<<<< HEAD
+=======
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Profile';
+  }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Pre processing work done here.
@@ -320,7 +330,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
             $this->_recordId = NULL;
             $this->set('recordId', NULL);
           }
-          //record id is neccessary for _multiRecord view and update/edit action
+          //record id is necessary for _multiRecord view and update/edit action
           if (!$this->_recordId
             && ($this->_multiRecord == CRM_Core_Action::UPDATE || $this->_multiRecord == CRM_Core_Action::DELETE)
           ) {

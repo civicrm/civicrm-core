@@ -29,13 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id: Email.php 45499 2013-02-08 12:31:05Z kurund $
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
- * This class provides the functionality to email a group of
- * contacts.
+ * This class provides the functionality to email a group of contacts.
  */
 class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
 
@@ -94,4 +96,17 @@ class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

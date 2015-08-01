@@ -18,7 +18,7 @@
       $row = this.first().closest('.crm-entity');
       ret.entity = $row.data('entity') || $row[0].id.split('-')[0];
       ret.id = $row.data('id') || $row[0].id.split('-')[1];
-      ret.action = $row.data('action') || 'setvalue';
+      ret.action = $row.data('action') || 'create';
 
     if (!ret.entity || !ret.id) {
       return false;
@@ -238,7 +238,11 @@
   };
 
   $(document).on('crmLoad', function(e) {
+<<<<<<< HEAD
     $('.crm-editable', e.target).crmEditable();
+=======
+    $('.crm-editable', e.target).not('thead *').crmEditable();
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   });
 
 })(jQuery, CRM._);

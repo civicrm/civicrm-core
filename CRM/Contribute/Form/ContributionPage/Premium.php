@@ -29,27 +29,36 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
- * form to process actions on Premiums
+ * Form to process actions on Premiums.
  */
 class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_ContributionPage {
 
   /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
+<<<<<<< HEAD
    *
    *
    * @return void
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function setDefaultValues() {
     $defaults = array();
     if (isset($this->_id)) {
+<<<<<<< HEAD
       $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
       CRM_Utils_System::setTitle(ts('Premiums') . " ($title)");
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $dao = new CRM_Contribute_DAO_Premium();
       $dao->entity_table = 'civicrm_contribution_page';
       $dao->entity_id = $this->_id;

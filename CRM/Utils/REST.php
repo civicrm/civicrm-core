@@ -165,8 +165,13 @@ class CRM_Utils_REST {
     // check if this is a single element result (contact_get etc)
     // or multi element
     if ($hier) {
-      foreach ($result['values'] as $n => $v) {
-        $xml .= "<Result>\n" . CRM_Utils_Array::xml($v) . "</Result>\n";
+      foreach ($result['values'] as $k => $v) {
+        if (is_array($v)) {
+          $xml .= "<Result>\n" . CRM_Utils_Array::xml($v) . "</Result>\n";
+        }
+        elseif (!is_object($v)) {
+          $xml .= "<Result>\n<id>{$k}</id><value>{$v}</value></Result>\n";
+        }
       }
     }
     else {
@@ -304,7 +309,11 @@ class CRM_Utils_REST {
       }
     }
     else {
+<<<<<<< HEAD
       // or the new format (entity+action)
+=======
+      // or the api format (entity+action)
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $args = array();
       $args[0] = 'civicrm';
       $args[1] = CRM_Utils_array::value('entity', $requestParams);
@@ -324,10 +333,7 @@ class CRM_Utils_REST {
     }
 
     // At this point we know we are not calling ping which does not require authentication.
-    //  Therefore, at this point we need to make sure we're working with a trusted user.
-    //  Valid users are those who provide a valid server key and API key
-
-    $valid_user = FALSE;
+    // Therefore we now need a valid server key and API key
 
     // Check and see if a valid secret API key is provided.
     $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
@@ -514,7 +520,11 @@ class CRM_Utils_REST {
 
     }
     else {
+<<<<<<< HEAD
       $content = "<!-- .tpl file embeded: $tpl -->\n";
+=======
+      $content = "<!-- .tpl file embedded: $tpl -->\n";
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       CRM_Utils_System::appendTPLFile($tpl, $content);
       echo $content . $smarty->fetch($tpl);
       CRM_Utils_System::civiExit();
@@ -530,7 +540,7 @@ class CRM_Utils_REST {
     $requestParams = CRM_Utils_Request::exportValues();
 
     require_once 'api/v3/utils.php';
-    // Why is $config undefined -- $config = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
         $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
       )

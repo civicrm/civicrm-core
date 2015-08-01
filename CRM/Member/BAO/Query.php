@@ -216,7 +216,11 @@ class CRM_Member_BAO_Query {
         }
         else {
           $name = 'membership_type_id';
+<<<<<<< HEAD
           $qillName = 'Memebership Type(s)';
+=======
+          $qillName = 'Membership Type(s)';
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         }
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.$name",
           $op,
@@ -391,7 +395,11 @@ class CRM_Member_BAO_Query {
    */
   public static function buildSearchForm(&$form) {
     $membershipStatus = CRM_Member_PseudoConstant::membershipStatus();
+<<<<<<< HEAD
     $form->add('select', 'membership_status_id', ts('Memebership Status(s)'), $membershipStatus, FALSE,
+=======
+    $form->add('select', 'membership_status_id', ts('Membership Status(s)'), $membershipStatus, FALSE,
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       array('id' => 'membership_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
 

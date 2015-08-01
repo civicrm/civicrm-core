@@ -216,9 +216,6 @@ function setFieldValue(fname, fieldValue, blockNo) {
   //check if it is date element
   var isDateElement = elementId.attr('format');
 
-  // check if it is wysiwyg element
-  var editor = elementId.attr('editor');
-
   //get the element type
   var elementType = elementId.attr('type');
 
@@ -244,6 +241,7 @@ function setFieldValue(fname, fieldValue, blockNo) {
       }
     }
     else {
+<<<<<<< HEAD
       if (editor) {
         switch (editor) {
           case 'ckeditor':
@@ -263,6 +261,10 @@ function setFieldValue(fname, fieldValue, blockNo) {
           default:
             elementId.val(fieldValue);
         }
+=======
+      if (elementId.is('textarea')) {
+        CRM.wysiwyg.setVal(elementId, fieldValue);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
       else {
         elementId.val(fieldValue);

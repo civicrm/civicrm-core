@@ -118,7 +118,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $requestFields['transactionorigin'] = "Eci";
     #32 character string
     $requestFields['invoice_number'] = $params['invoiceID'];
-    $requestFields['ordertype'] = $params['payment_action'];
+    $requestFields['ordertype'] = 'Sale';
     $requestFields['comments'] = $params['description'];
     //**********************set 'result' for live testing **************************
     //  $requestFields[       'result'  ]      =    "";  #set to "Good", "Decline" or "Duplicate"
@@ -178,7 +178,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     // Check to see if we have a duplicate before we send
     //----------------------------------------------------------------------------------------------------
-    if ($this->_checkDupe($params['invoiceID'])) {
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from eWAY.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
     //----------------------------------------------------------------------------------------------------
@@ -301,6 +301,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   // end function doDirectPayment
 
   /**
+<<<<<<< HEAD
    * Checks to see if invoice_id already exists in db.
    *
    * @param int $invoiceId
@@ -318,6 +319,10 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   /**
    * Produces error message and returns from class.
    */
+=======
+   * Produces error message and returns from class.
+   */
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
 
@@ -331,6 +336,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   }
 
   /**
+<<<<<<< HEAD
    * NOTE: 'doTransferCheckout' not implemented
    */
   public function doTransferCheckout(&$params, $component) {
@@ -338,6 +344,8 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * This public function checks to see if we have the right processor config values set.
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying

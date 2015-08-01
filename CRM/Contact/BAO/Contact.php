@@ -327,7 +327,11 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     $contact = self::add($params);
     if (!$contact) {
+<<<<<<< HEAD
       // Not dying here is stupid, since we get into wierd situation and into a bug that
+=======
+      // Not dying here is stupid, since we get into weird situation and into a bug that
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       // is impossible to figure out for the user or for us
       // CRM-7925
       CRM_Core_Error::fatal();
@@ -341,6 +345,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       if (!empty($domainGroupID)) {
         if (!empty($params['group']) && is_array($params['group'])) {
           $params['group'][$domainGroupID] = 1;
+<<<<<<< HEAD
         }
         else {
           $params['group'] = array($domainGroupID => 1);
@@ -348,6 +353,34 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
 
+    if (array_key_exists('group', $params)) {
+      $contactIds = array($params['contact_id']);
+      foreach ($params['group'] as $groupId => $flag) {
+        if ($flag == 1) {
+          CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $groupId);
+        }
+        elseif ($flag == -1) {
+          CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contactIds, $groupId);
+=======
+        }
+        else {
+          $params['group'] = array($domainGroupID => 1);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
+        }
+      }
+    }
+
+<<<<<<< HEAD
+    // Add location Block data.
+    $blocks = CRM_Core_BAO_Location::create($params, $fixAddress);
+    foreach ($blocks as $name => $value) {
+      $contact->$name = $value;
+    }
+
+    //add website
+    CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
+
+=======
     if (array_key_exists('group', $params)) {
       $contactIds = array($params['contact_id']);
       foreach ($params['group'] as $groupId => $flag) {
@@ -369,6 +402,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     //add website
     CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
 
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     //get userID from session
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
@@ -415,10 +449,17 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
         CRM_Core_BAO_Note::add($noteParams, CRM_Core_DAO::$_nullArray);
       }
     }
+<<<<<<< HEAD
 
     // update the UF user_unique_id if that has changed
     CRM_Core_BAO_UFMatch::updateUFName($contact->id);
 
+=======
+
+    // update the UF user_unique_id if that has changed
+    CRM_Core_BAO_UFMatch::updateUFName($contact->id);
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
@@ -456,10 +497,17 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     if ($invokeHooks) {
       if ($isEdit) {
         CRM_Utils_Hook::post('edit', $params['contact_type'], $contact->id, $contact);
+<<<<<<< HEAD
       }
       else {
         CRM_Utils_Hook::post('create', $params['contact_type'], $contact->id, $contact);
       }
+=======
+      }
+      else {
+        CRM_Utils_Hook::post('create', $params['contact_type'], $contact->id, $contact);
+      }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     // process greetings CRM-4575, cache greetings
@@ -2003,7 +2051,15 @@ ORDER BY civicrm_email.is_primary DESC";
       !empty($params['contact_sub_type_hidden'])
     ) {
       // if profile was used, and had any subtype, we obtain it from there
+<<<<<<< HEAD
       $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $params['contact_sub_type_hidden']) . CRM_Core_DAO::VALUE_SEPARATOR;
+=======
+      //CRM-13596 - add to existing contact types, rather than overwriting
+      $data_contact_sub_type_arr = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR));
+      if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
+        $data['contact_sub_type'] = $data['contact_sub_type'] . implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $params['contact_sub_type_hidden']) . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     if ($ctype == 'Organization') {
@@ -2225,14 +2281,20 @@ ORDER BY civicrm_email.is_primary DESC";
             }
           }
 
-          $type = $data['contact_type'];
-          if (!empty($data['contact_sub_type'])) {
-            $type = $data['contact_sub_type'];
-            $type = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($type, CRM_Core_DAO::VALUE_SEPARATOR));
-            // generally a contact even if, has multiple subtypes the parent-type is going to be one only
-            // and since formatCustomField() would be interested in parent type, lets consider only one subtype
-            // as the results going to be same.
-            $type = $type[0];
+          //CRM-13596 - check for contact_sub_type_hidden first
+          if (array_key_exists('contact_sub_type_hidden', $params)) {
+            $type = $params['contact_sub_type_hidden'];
+          }
+          else {
+            $type = $data['contact_type'];
+            if (!empty($data['contact_sub_type'])) {
+              $type = $data['contact_sub_type'];
+              $type = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($type, CRM_Core_DAO::VALUE_SEPARATOR));
+              // generally a contact even if, has multiple subtypes the parent-type is going to be one only
+              // and since formatCustomField() would be interested in parent type, lets consider only one subtype
+              // as the results going to be same.
+              $type = $type[0];
+            }
           }
 
           CRM_Core_BAO_CustomField::formatCustomField($customFieldId,

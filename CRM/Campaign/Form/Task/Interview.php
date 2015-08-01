@@ -498,7 +498,6 @@ WHERE {$clause}
 
     //format custom fields.
     $customParams = CRM_Core_BAO_CustomField::postProcess($params,
-      $surveyFields,
       $activityId,
       'Activity'
     );

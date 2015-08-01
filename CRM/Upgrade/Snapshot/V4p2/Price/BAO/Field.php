@@ -176,7 +176,11 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *   Value we want to set the is_active field.
    *
    * @return Object
+<<<<<<< HEAD
    *   DAO object on sucess, null otherwise
+=======
+   *   DAO object on success, null otherwise
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    */
   public static function setIsActive($id, $is_active) {
@@ -273,7 +277,11 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           $extra = array('onclick' => 'useAmountOther();');
         }
 
+<<<<<<< HEAD
         // if seperate membership payment is used with quick config priceset then change the other amount label
+=======
+        // if separate membership payment is used with quick config priceset then change the other amount label
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         if (property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf, '_contributionAmount')) {
           $label = ts('Additional Contribution');
           $useRequired = 0;

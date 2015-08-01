@@ -100,7 +100,11 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @internal param bool $is_active value we want to set the is_active field
    *
    * @return Object
+<<<<<<< HEAD
    *   DAO object on sucess, null otherwise
+=======
+   *   DAO object on success, null otherwise
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
@@ -736,7 +740,11 @@ WHERE  id = %1";
    *   This parameter appears to only be relevant to determining whether memberships should be auto-renewed.
    *   (and is effectively a boolean for 'is_membership' which could be calculated from the line items.)
    */
+<<<<<<< HEAD
   public static function processAmount(&$fields, &$params, &$lineItem, $component = '') {
+=======
+  public static function processAmount($fields, &$params, &$lineItem, $component = '') {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // using price set
     $totalPrice = $totalTax = 0;
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
@@ -1041,17 +1049,56 @@ WHERE  id = %1";
 
     foreach ($form->_priceSet['fields'] as $key => $val) {
       foreach ($val['options'] as $keys => $values) {
-        if ($values['is_default']) {
-          if ($val['html_type'] == 'CheckBox') {
-            $defaults["price_{$key}"][$keys] = 1;
-          }
-          else {
-            $defaults["price_{$key}"] = $keys;
-          }
+        // build price field index which is passed via URL
+        // url format will be appended by "&price_5=11"
+        $priceFieldName = 'price_' . $values['price_field_id'];
+        $priceFieldValue = self::getPriceFieldValueFromURL($form, $priceFieldName);
+        if (!empty($priceFieldValue)) {
+          self::setDefaultPriceSetField($priceFieldName, $priceFieldValue, $val['html_type'], $defaults);
+          // break here to prevent overwriting of default due to 'is_default'
+          // option configuration. The value sent via URL get's higher priority.
+          break;
+        }
+        elseif ($values['is_default']) {
+          self::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $defaults);
         }
       }
     }
     return $defaults;
+  }
+
+  /**
+   * Get the value of price field if passed via url
+   *
+   * @param string $priceFieldName
+   * @param string $priceFieldValue
+   * @param string $priceFieldType
+   * @param array $defaults
+   *
+   * @return void
+   */
+  public static function setDefaultPriceSetField($priceFieldName, $priceFieldValue, $priceFieldType, &$defaults) {
+    if ($priceFieldType == 'CheckBox') {
+      $defaults[$priceFieldName][$priceFieldValue] = 1;
+    }
+    else {
+      $defaults[$priceFieldName] = $priceFieldValue;
+    }
+  }
+
+  /**
+   * Get the value of price field if passed via url
+   *
+   * @param CRM_Core_Form $form
+   * @param string $priceFieldName
+   *
+   * @return mixed $priceFieldValue
+   */
+  public static function getPriceFieldValueFromURL(&$form, $priceFieldName) {
+    $priceFieldValue = CRM_Utils_Request::retrieve($priceFieldName, 'String', $form, FALSE, NULL, 'GET');
+    if (!empty($priceFieldValue)) {
+      return $priceFieldValue;
+    }
   }
 
   /**
@@ -1336,21 +1383,44 @@ GROUP BY     mt.member_of_contact_id";
    *   Value we want to set the is_quick_config field.
    *
    * @return Object
+<<<<<<< HEAD
    *   DAO object on sucess, null otherwise
+=======
+   *   DAO object on success, null otherwise
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_quick_config', $isQuickConfig);
   }
 
   /**
-   * Check if price set id provides option for
-   * user to select both auto-renew and non-auto-renew memberships
+   * Check if price set id provides option for user to select both auto-renew and non-auto-renew memberships
    *
    * @param int $id
    *
    * @return bool
    */
+<<<<<<< HEAD
   public static function checkMembershipPriceSet($id) {
+=======
+  public static function isMembershipPriceSetContainsMixOfRenewNonRenew($id) {
+    $membershipTypes = self::getMembershipTypesFromPriceSet($id);
+    if (!empty($membershipTypes['autorenew']) && !empty($membershipTypes['non_renew'])) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get an array of the membership types in a price set.
+   *
+   * @param int $id
+   *
+   * @return array(
+   *   Membership types in the price set
+   */
+  public static function getMembershipTypesFromPriceSet($id) {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $query
       = "SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
 FROM        civicrm_price_field_value pfv
@@ -1363,23 +1433,40 @@ WHERE       ps.id = %1
     $params = array(1 => array($id, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $autoRenew = array();
-    //FIXME: do a comprehensive check of whether
-    //2 membership types can be selected
-    //instead of comparing all of them
+    $membershipTypes = array(
+      'all' => array(),
+      'autorenew' => array(),
+      'autorenew_required' => array(),
+      'autorenew_optional' => array(),
+    );
     while ($dao->fetch()) {
-      //temp fix for #CRM-10370
-      //if its NULL consider it '0' i.e. 'No auto-renew option'
-      $daoAutoRenew = $dao->auto_renew;
-      if ($daoAutoRenew === NULL) {
-        $daoAutoRenew = 0;
+      if (empty($dao->membership_type_id)) {
+        continue;
       }
+<<<<<<< HEAD
       if (!empty($autoRenew) && !in_array($daoAutoRenew, $autoRenew)) {
         return TRUE;
+=======
+      $membershipTypes['all'][] = $dao->membership_type_id;
+      if (!empty($dao->auto_renew)) {
+        $membershipTypes['autorenew'][] = $dao->membership_type_id;
+        if ($dao->auto_renew == 2) {
+          $membershipTypes['autorenew_required'][] = $dao->membership_type_id;
+        }
+        else {
+          $membershipTypes['autorenew_optional'][] = $dao->membership_type_id;
+        }
       }
-      $autoRenew[] = $daoAutoRenew;
+      else {
+        $membershipTypes['non_renew'][] = $dao->membership_type_id;
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
+      }
     }
+<<<<<<< HEAD
     return FALSE;
+=======
+    return $membershipTypes;
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**

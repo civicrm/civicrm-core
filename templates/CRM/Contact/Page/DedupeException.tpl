@@ -24,40 +24,32 @@
  +--------------------------------------------------------------------+
 *}
 
-<table id="dedupeExceptions" class="display">
-    <thead>
-       <tr class="columnheader">
-          <th>{ts}Contact 1{/ts}</th>
-          <th>{ts}Contact 2 (Duplicate){/ts}</th>
-    <th></th>
-       </tr>
-    </thead>
-    <tbody>
-       {foreach from=$dedupeExceptions item=exception key=id}
-       <tr id="dupeRow_{$id}" class="{cycle values="odd-row,even-row"}">
-     <td>{$exception.main.name}</td>
-     <td>{$exception.other.name}</td>
-     <td><a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.main.id}, {$exception.other.id}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a></td>
-       </tr>
-       {/foreach}
-    </tbody>
+<table id="dedupeExceptions" class="display crm-sortable">
+  <thead>
+    <tr class="columnheader">
+      <th>{ts}Contact 1{/ts}</th>
+      <th>{ts}Contact 2 (Duplicate){/ts}</th>
+      <th data-orderable="false"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {foreach from=$dedupeExceptions item=exception key=id}
+      <tr id="dupeRow_{$id}" class="{cycle values="odd-row,even-row"}">
+        <td>{$exception.main.name}</td>
+        <td>{$exception.other.name}</td>
+        <td><a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.main.id}, {$exception.other.id}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a></td>
+      </tr>
+    {/foreach}
+  </tbody>
 </table>
 <div class="clear"><br /></div>
 <div class="action-link">
+<<<<<<< HEAD
     {crmButton p="civicrm/contact/deduperules" q="reset=1" icon="close"}{ts}Done{/ts}{/crmButton}
+=======
+  {crmButton p="civicrm/contact/deduperules" q="reset=1" icon="close"}{ts}Done{/ts}{/crmButton}
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 </div>
-
-
-{literal}
-<script type="text/javascript">
-  //load jQuery data table.
-        cj('#dedupeExceptions').dataTable( {
-    "sPaginationType": "full_numbers",
-    "aaSorting": [[0,'asc'], [1,'asc']],
-    "aoColumns": [{sClass:""},{sClass:""},{bSortable:false}],
-        });
-</script>
-{/literal}
 
 {* process the dupe contacts *}
 {include file="CRM/common/dedupe.tpl"}

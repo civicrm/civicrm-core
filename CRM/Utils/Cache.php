@@ -113,7 +113,7 @@ class CRM_Utils_Cache {
           'prefix' => '',
         );
 
-        // Use old constants if needed to ensure backward compatability
+        // Use old constants if needed to ensure backward compatibility
         if (defined('CIVICRM_MEMCACHE_HOST')) {
           $defaults['host'] = CIVICRM_MEMCACHE_HOST;
         }

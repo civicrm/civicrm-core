@@ -59,21 +59,32 @@ class CRM_Contact_Form_Edit_Phone {
     $form->applyFilter('__ALL__', 'trim');
 
     //phone type select
+<<<<<<< HEAD
     $form->addSelect("phone[$blockId][phone_type_id]", array(
         'entity' => 'phone',
         'class' => 'eight',
         'placeholder' => NULL,
       ));
 
+=======
+    $form->addField("phone[$blockId][phone_type_id]", array(
+      'entity' => 'phone',
+      'class' => 'eight',
+      'placeholder' => NULL,
+    ));
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     //main phone number with crm_phone class
-    $form->add('text', "phone[$blockId][phone]", ts('Phone'), array_merge(CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'), array('class' => 'crm_phone twelve')));
-    // phone extension
-    $form->addElement('text', "phone[$blockId][phone_ext]", ts('Extension'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone_ext'));
-
+    $form->addField("phone[$blockId][phone]", array('entity' => 'phone', 'class' => 'crm_phone twelve'));
+    $form->addField("phone[$blockId][phone_ext]", array('entity' => 'phone'));
     if (isset($form->_contactType) || $blockEdit) {
       //Block type select
+<<<<<<< HEAD
       $form->addSelect("phone[$blockId][location_type_id]", array(
           'entity' => 'phone',
+=======
+      $form->addField("phone[$blockId][location_type_id]", array(
+        'entity' => 'phone',
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           'class' => 'eight',
           'placeholder' => NULL,
         ));

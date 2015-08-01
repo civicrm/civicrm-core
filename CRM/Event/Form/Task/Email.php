@@ -91,4 +91,17 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

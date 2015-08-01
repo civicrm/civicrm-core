@@ -37,7 +37,7 @@
  * Core StateMachine. All statemachines subclass for the core one
  * for functionality specific to their needs.
  *
- * A statemachine keeps track of differnt states and forms for a
+ * A statemachine keeps track of different states and forms for a
  * html quickform controller.
  *
  */

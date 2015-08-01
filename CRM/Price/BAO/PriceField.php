@@ -183,12 +183,21 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
   /**
    * Update the is_active flag in the db.
+<<<<<<< HEAD
    *
    * @param int $id
    *   Id of the database record.
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
+=======
+   *
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return Object
    *   DAO object on success, null otherwise.
    */
@@ -201,6 +210,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @param $element
    * @param $fieldOptions
+<<<<<<< HEAD
    *
    * @return null
    */
@@ -214,6 +224,21 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   /**
    * Get the field title.
    *
+=======
+   *
+   * @return null
+   */
+  public static function freezeIfEnabled(&$element, $fieldOptions) {
+    if (!empty($fieldOptions['is_full'])) {
+      $element->freeze();
+    }
+    return NULL;
+  }
+
+  /**
+   * Get the field title.
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param int $id
    *   Id of field.
    *
@@ -571,15 +596,26 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param bool $inactiveNeeded
    *   Include inactive options.
    * @param bool $reset
+<<<<<<< HEAD
    *   Ignore stored values\.
+=======
+   *   Discard stored values.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return array
    *   array of options
    */
   public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE) {
     static $options = array();
+    if ($reset) {
+      $options = array();
+      // This would happen if the function was only called to clear the cache.
+      if (empty($fieldId)) {
+        return array();
+      }
+    }
 
-    if ($reset || empty($options[$fieldId])) {
+    if (empty($options[$fieldId])) {
       $values = array();
       CRM_Price_BAO_PriceFieldValue::getValues($fieldId, $values, 'weight', !$inactiveNeeded);
       $options[$fieldId] = $values;

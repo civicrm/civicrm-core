@@ -39,6 +39,7 @@
 class CRM_Pledge_Page_AJAX {
 
   /**
+<<<<<<< HEAD
    * Building Pledge Name combo box.
    */
   public static function pledgeName() {
@@ -103,4 +104,18 @@ WHERE {$whereClause}
     CRM_Utils_System::civiExit();
   }
 
+=======
+   * Function to setDefaults according to Pledge Id
+   * for batch entry pledges
+   */
+  public function getPledgeDefaults() {
+    $details = array();
+    if (!empty($_POST['pid'])) {
+      $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');
+      $details = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);
+    }
+    CRM_Utils_JSON::output($details);
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

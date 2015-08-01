@@ -145,7 +145,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $requestFields);
 
     // Check to see if we have a duplicate before we send
+<<<<<<< HEAD
     if ($this->_checkDupe($params['invoiceID'])) {
+=======
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
 
@@ -260,6 +264,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
+<<<<<<< HEAD
    * Checks to see if invoice_id already exists in db.
    *
    * @param int $invoiceId
@@ -280,6 +285,13 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    * @param string $errorMessage
    * @return CRM_Core_Error
    */
+=======
+   * Produces error message and returns from class.
+   * @param string $errorCode
+   * @param string $errorMessage
+   * @return CRM_Core_Error
+   */
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {
@@ -292,6 +304,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
+<<<<<<< HEAD
    * NOTE: 'doTransferCheckout' not implemented
    */
   public function doTransferCheckout(&$params, $component) {
@@ -299,6 +312,8 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * This public function checks to see if we have the right processor config values set.
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying

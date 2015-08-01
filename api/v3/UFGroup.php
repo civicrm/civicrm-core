@@ -85,3 +85,79 @@ function civicrm_api3_uf_group_get($params) {
 function civicrm_api3_uf_group_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+<<<<<<< HEAD
+=======
+
+/**
+ * Set default getlist parameters.
+ *
+ * @see _civicrm_api3_generic_getlist_defaults
+ *
+ * @param array $request
+ *
+ * @return array
+ */
+function _civicrm_api3_uf_group_getlist_defaults(&$request) {
+  return array(
+    'description_field' => array(
+      'description',
+      'group_type',
+    ),
+    'params' => array(
+      'is_active' => 1,
+    ),
+  );
+}
+
+/**
+ * Format getlist output
+ *
+ * @see _civicrm_api3_generic_getlist_output
+ *
+ * @param array $result
+ * @param array $request
+ * @param string $entity
+ * @param array $fields
+ *
+ * @return array
+ */
+function _civicrm_api3_uf_group_getlist_output($result, $request, $entity, $fields) {
+  $output = array();
+  if (!empty($result['values'])) {
+    foreach ($result['values'] as $row) {
+      $data = array(
+        'id' => $row[$request['id_field']],
+        'label' => $row[$request['label_field']],
+      );
+      if (!empty($request['description_field'])) {
+        $data['description'] = array();
+        foreach ((array) $request['description_field'] as $field) {
+          if (!empty($row[$field])) {
+            // Special formatting for group_type field
+            if ($field == 'group_type') {
+              $groupTypes = CRM_UF_Page_Group::extractGroupTypes($row[$field]);
+              $data['description'][] = CRM_UF_Page_Group::formatGroupTypes($groupTypes);
+              continue;
+            }
+            if (!isset($fields[$field]['pseudoconstant'])) {
+              $data['description'][] = $row[$field];
+            }
+            else {
+              $data['description'][] = CRM_Core_PseudoConstant::getLabel(
+                _civicrm_api3_get_BAO($entity),
+                $field,
+                $row[$field]
+              );
+            }
+          }
+        }
+      };
+      if (!empty($request['image_field'])) {
+        $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
+      }
+      $output[] = $data;
+    }
+  }
+  return $output;
+}
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e

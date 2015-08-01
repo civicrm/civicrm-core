@@ -122,6 +122,10 @@ class CRM_Core_Region {
     if (!isset($snippet['name'])) {
       $snippet['name'] = count($this->_snippets);
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $this->_snippets[$snippet['name']] = $snippet;
     $this->_isSorted = FALSE;
     return $snippet;
@@ -137,12 +141,17 @@ class CRM_Core_Region {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Get snippet.
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param string $name
    *
    * @return mixed
    */
-  public function &get($name) {
-    return @$this->_snippets[$name];
+  public function get($name) {
+    return !empty($this->_snippets[$name]) ? $this->_snippets[$name] : NULL;
   }
 
   /**

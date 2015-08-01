@@ -34,7 +34,7 @@
  */
 
 /**
- * Auxilary class to provide support to the Contact Form class. Does this by implementing
+ * Auxiliary class to provide support to the Contact Form class. Does this by implementing
  * a small set of static methods
  *
  */
@@ -53,23 +53,25 @@ class CRM_Contact_Form_Edit_Household {
    * @return void
    */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
-
     $form->applyFilter('__ALL__', 'trim');
 
     if (!$inlineEditMode || $inlineEditMode == 1) {
       // household_name
-      $form->add('text', 'household_name', ts('Household Name'), $attributes['household_name']);
+      $form->addField('household_name');
     }
 
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
-      $form->addElement('text', 'nick_name', ts('Nickname'), $attributes['nick_name']);
-      $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
+      $form->addField('nick_name');
+      $form->addField('contact_source', array('label' => ts('Source')));
     }
 
     if (!$inlineEditMode) {
+<<<<<<< HEAD
       $form->add('text', 'external_identifier', ts('External ID'), $attributes['external_identifier'], FALSE);
+=======
+      $form->addField('external_identifier', array('label' => ts('External ID')));
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',

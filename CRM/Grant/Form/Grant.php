@@ -56,19 +56,21 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_context;
 
   /**
+<<<<<<< HEAD
+=======
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Grant';
+  }
+
+  /**
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Set variables up before form is built.
    *
    * @return void
    */
   public function preProcess() {
-    //custom data related code
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      CRM_Custom_Form_CustomData::preProcess($this);
-      return;
-    }
 
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -117,9 +119,12 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
+<<<<<<< HEAD
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $defaults = parent::setDefaultValues();
 
@@ -171,9 +176,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
@@ -295,7 +297,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       CRM_Core_BAO_CustomField::getFields('Grant', FALSE, FALSE, NULL, NULL, TRUE)
     );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $this->_id,
       'Grant'
     );

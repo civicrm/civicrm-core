@@ -177,7 +177,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $triggers = $dao->executeQuery("SHOW TRIGGERS LIKE 'civicrm_%'");
 
       while ($triggers->fetch()) {
-        // note that drop trigger has a wierd syntax and hence we do not
+        // note that drop trigger has a weird syntax and hence we do not
         // send the trigger name as a string (i.e. its not quoted
         $dao->executeQuery("DROP TRIGGER IF EXISTS {$triggers->Trigger}");
       }

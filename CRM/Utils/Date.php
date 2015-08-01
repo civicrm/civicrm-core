@@ -167,44 +167,78 @@ class CRM_Utils_Date {
 
   /**
    * Return abbreviated weekday names according to the locale.
+<<<<<<< HEAD
+=======
+   *
+   * Array will be in localized order according to 'weekBegins' setting,
+   * but array keys will always match to:
+   * 0 => Sun
+   * 1 => Mon
+   * etc.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return array
    *   0-based array with abbreviated weekday names
    *
    */
+<<<<<<< HEAD
   public static function &getAbbrWeekdayNames() {
     static $abbrWeekdayNames;
     if (!isset($abbrWeekdayNames)) {
+=======
+  public static function getAbbrWeekdayNames() {
+    static $days = array();
+    if (!$days) {
+      // First day of the week
+      $firstDay = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       // set LC_TIME and build the arrays from locale-provided names
       // June 1st, 1970 was a Monday
       CRM_Core_I18n::setLcTime();
-      for ($i = 0; $i < 7; $i++) {
-        $abbrWeekdayNames[$i] = strftime('%a', mktime(0, 0, 0, 6, $i, 1970));
+      for ($i = $firstDay; count($days) < 7; $i = $i > 6 ? 0 : $i + 1) {
+        $days[$i] = strftime('%a', mktime(0, 0, 0, 6, $i, 1970));
       }
     }
-    return $abbrWeekdayNames;
+    return $days;
   }
 
   /**
    * Return full weekday names according to the locale.
+<<<<<<< HEAD
+=======
+   *
+   * Array will be in localized order according to 'weekBegins' setting,
+   * but array keys will always match to:
+   * 0 => Sunday
+   * 1 => Monday
+   * etc.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return array
    *   0-based array with full weekday names
    *
    */
+<<<<<<< HEAD
   public static function &getFullWeekdayNames() {
     static $fullWeekdayNames;
     if (!isset($fullWeekdayNames)) {
+=======
+  public static function getFullWeekdayNames() {
+    static $days = array();
+    if (!$days) {
+      // First day of the week
+      $firstDay = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       // set LC_TIME and build the arrays from locale-provided names
       // June 1st, 1970 was a Monday
       CRM_Core_I18n::setLcTime();
-      for ($i = 0; $i < 7; $i++) {
-        $fullWeekdayNames[$i] = strftime('%A', mktime(0, 0, 0, 6, $i, 1970));
+      for ($i = $firstDay; count($days) < 7; $i = $i > 6 ? 0 : $i + 1) {
+        $days[$i] = strftime('%A', mktime(0, 0, 0, 6, $i, 1970));
       }
     }
-    return $fullWeekdayNames;
+    return $days;
   }
 
   /**
@@ -727,7 +761,11 @@ class CRM_Utils_Date {
    *                             format is 2007-12-21 )
    *
    * @return string
+<<<<<<< HEAD
    *   Return the customized todays date (Y-m-d)
+=======
+   *   Return the customized today's date (Y-m-d)
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function getToday($dayParams = NULL, $format = "Y-m-d") {
     if (is_null($dayParams) || empty($dayParams)) {

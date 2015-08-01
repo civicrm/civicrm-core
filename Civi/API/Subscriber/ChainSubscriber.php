@@ -91,7 +91,11 @@ class ChainSubscriber implements EventSubscriberInterface {
 
     // We don't need to worry about nested api in the getfields/getoptions
     // actions, so just return immediately.
+<<<<<<< HEAD
     if (in_array($action, array('getfields', 'getoptions'))) {
+=======
+    if (in_array($action, array('getfields', 'getfield', 'getoptions'))) {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       return;
     }
 
@@ -156,7 +160,11 @@ class ChainSubscriber implements EventSubscriberInterface {
           if ($entity != 'Contact' && \CRM_Utils_Array::value(strtolower($subEntity . "_id"), $parentAPIValues)) {
             //e.g. if event_id is in the values returned & subentity is event
             //then pass in event_id as 'id' don't do this for contact as it
+<<<<<<< HEAD
             //does some wierd things like returning primary email &
+=======
+            //does some weird things like returning primary email &
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             //thus limiting the ability to chain email
             //TODO - this might need the camel treatment
             $subParams['id'] = $parentAPIValues[$subEntity . "_id"];

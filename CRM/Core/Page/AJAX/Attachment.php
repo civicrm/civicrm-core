@@ -142,9 +142,13 @@ class CRM_Core_Page_AJAX_Attachment {
       }
     }
 
+<<<<<<< HEAD
     header('Content-Type: text/javascript');
     echo json_encode(array_merge($result));
     CRM_Utils_System::civiExit();
+=======
+    CRM_Utils_JSON::output(array_merge($result));
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**

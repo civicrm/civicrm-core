@@ -90,6 +90,7 @@
      <page_callback>CRM_Admin_Page_APIExplorer</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <title>CiviCRM API</title>
+<<<<<<< HEAD
   </item>
   <item>
      <path>civicrm/ajax/apiexample</path>
@@ -97,6 +98,15 @@
      <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+=======
+  </item>
+  <item>
+     <path>civicrm/ajax/apiexample</path>
+     <page_callback>CRM_Admin_Page_APIExplorer::getExampleFile</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
      <path>civicrm/ajax/apidoc</path>
      <page_callback>CRM_Admin_Page_APIExplorer::getDoc</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
@@ -200,5 +210,11 @@
     <path>civicrm/ajax/l10n-js</path>
     <page_callback>CRM_Core_Resources::outputLocalizationJS</page_callback>
     <access_callback>1</access_callback>
+  </item>
+  <item>
+    <path>civicrm/shortcode</path>
+    <page_callback>CRM_Core_Form_ShortCode</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+    <title>Insert CiviCRM Content</title>
   </item>
 </menu>

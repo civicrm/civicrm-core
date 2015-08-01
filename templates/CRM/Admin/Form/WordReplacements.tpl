@@ -38,7 +38,11 @@
   {* this template is used for adding/editing string overrides  *}
   <div class="crm-form crm-form-block crm-string_override-form-block">
     <div id="help">
+<<<<<<< HEAD
       {ts}Use <strong>Word Replacements</strong> to change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurences of 'Contribution' with 'Donation').{/ts} {help id="id-word_replace"}
+=======
+      {ts}Use <strong>Word Replacements</strong> to change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurrences of 'Contribution' with 'Donation').{/ts} {help id="id-word_replace"}
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     </div>
     <div class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location='top'}

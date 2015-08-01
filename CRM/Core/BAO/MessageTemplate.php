@@ -69,7 +69,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *   Value we want to set the is_active field.
    *
    * @return Object
+<<<<<<< HEAD
    *   DAO object on sucess, NULL otherwise
+=======
+   *   DAO object on success, NULL otherwise
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_MessageTemplate', $id, 'is_active', $is_active);

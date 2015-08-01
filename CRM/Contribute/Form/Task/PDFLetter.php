@@ -29,13 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
- * This class provides the functionality to create PDF letter for a group of
- * contacts or a single contact.
+ * This class provides the functionality to create PDF letter for a group of contacts or a single contact.
  */
 class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
@@ -170,4 +172,17 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this);
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

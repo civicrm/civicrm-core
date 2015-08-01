@@ -77,7 +77,7 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
     CRM_Core_Session::setStatus($message);
 
     // see if we can figure out the url and redirect to the right search form
-    // note that this happens really early on, so we cant use any of the form or controller
+    // note that this happens really early on, so we can't use any of the form or controller
     // variables
     $config = CRM_Core_Config::singleton();
     $qString = $_GET[$config->userFrameworkURLVar];

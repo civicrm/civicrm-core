@@ -81,7 +81,10 @@ abstract class CRM_Utils_Hook {
     if (self::$_singleton == NULL || $fresh) {
       $config = CRM_Core_Config::singleton();
       $class = $config->userHookClass;
+<<<<<<< HEAD
       require_once str_replace('_', DIRECTORY_SEPARATOR, $config->userHookClass) . '.php';
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       self::$_singleton = new $class();
     }
     return self::$_singleton;
@@ -373,6 +376,7 @@ abstract class CRM_Utils_Hook {
    *   The name of the form.
    * @param CRM_Core_Form $form
    *   Reference to the form object.
+<<<<<<< HEAD
    *
    * @return null
    *   the return value is ignored
@@ -401,6 +405,17 @@ abstract class CRM_Utils_Hook {
   public static function validate($formName, &$fields, &$files, &$form) {
     return self::singleton()
       ->invoke(4, $formName, $fields, $files, $form, self::$_nullObject, self::$_nullObject, 'civicrm_validate');
+=======
+   *
+   * @return null
+   *   the return value is ignored
+   */
+  public static function postProcess($formName, &$form) {
+    return self::singleton()->invoke(2, $formName, $form,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_postProcess'
+    );
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -1340,7 +1355,7 @@ abstract class CRM_Utils_Hook {
    *   float $x x position in user units
    *   float $y y position in user units
    *   boolean $reseth if true reset the last cell height (default true).
-   *   int $stretch stretch carachter mode: <ul><li>0 = disabled</li><li>1 = horizontal scaling only if
+   *   int $stretch stretch character mode: <ul><li>0 = disabled</li><li>1 = horizontal scaling only if
    *                necessary</li><li>2 = forced horizontal scaling</li><li>3 = character spacing only if
    *                necessary</li><li>4 = forced character spacing</li></ul>
    *   boolean $ishtml set to true if $txt is HTML content (default = false).
@@ -1928,6 +1943,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Check system status.
+   *
+   * @param array $messages
+   *   Array<CRM_Utils_Check_Message>. A list of messages regarding system status.
+   * @return mixed
+   */
+  public static function check(&$messages) {
+    return self::singleton()
+      ->invoke(1, $messages, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_check');
+  }
+
+  /**
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * This hook is called when a query string of the CSV Batch export is generated.
    */
   public static function batchQuery(&$query) {

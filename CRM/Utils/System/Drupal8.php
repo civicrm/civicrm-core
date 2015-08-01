@@ -109,7 +109,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
+<<<<<<< HEAD
     $user = user_load($ufID);
+=======
+    $user = entity_load('user', $ufID);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
@@ -185,7 +189,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!$pageTitle) {
       $pageTitle = $title;
     }
-
     \Drupal::service('civicrm.page_state')->setTitle($pageTitle);
   }
 
@@ -217,19 +220,26 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScriptUrl($url, $region) {
-    $options = array('group' => JS_LIBRARY, 'weight' => 10);
+    static $weight = 0;
+
     switch ($region) {
       case 'html-header':
       case 'page-footer':
-        $options['scope'] = substr($region, 5);
         break;
 
       default:
         return FALSE;
     }
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $options['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    \Drupal::service('civicrm.page_state')->addJS($url, $options);
+
+    $script = array(
+      '#tag' => 'script',
+      '#attributes' => array(
+        'src' => $url,
+      ),
+      '#weight' => $weight,
+    );
+    $weight++;
+    \Drupal::service('civicrm.page_state')->addJS($script);
     return TRUE;
   }
 
@@ -237,17 +247,20 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScript($code, $region) {
-    $options = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
     switch ($region) {
       case 'html-header':
       case 'page-footer':
-        $options['scope'] = substr($region, 5);
         break;
 
       default:
         return FALSE;
     }
-    \Drupal::service('civicrm.page_state')->addJS($code, $options);
+
+    $script = array(
+      '#tag' => 'script',
+      '#value' => $code,
+    );
+    \Drupal::service('civicrm.page_state')->addJS($script);
     return TRUE;
   }
 
@@ -258,10 +271,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $options = array();
-    // If the path is within the drupal directory we can use the more efficient 'file' setting
-    $options['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
-    \Drupal::service('civicrm.page_state')->addCSS($url, $options);
+    $css = array(
+      '#tag' => 'link',
+      '#attributes' => array(
+        'href' => $url,
+        'rel' => 'stylesheet',
+      ),
+    );
+    \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
 
@@ -272,8 +289,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $options = array('type' => 'inline');
-    \Drupal::service('civicrm.page_state')->addCSS($code, $options);
+    $css = array(
+      '#tag' => 'style',
+      '#value' => $code,
+    );
+    \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
 
@@ -317,22 +337,37 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $query = '',
     $absolute = FALSE,
     $fragment = NULL,
+<<<<<<< HEAD
     $htmlize = TRUE,
+=======
+    $htmlize = FALSE,
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
     $query = html_entity_decode($query);
+
     $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
 
+    // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal::url($url['route_name'], array(), array(
+      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", [
         'query' => $url['query'],
-        'absolute' => $absolute,
         'fragment' => $fragment,
-      ));
+        'absolute' => $absolute,
+      ])->toString();
     }
     catch (Exception $e) {
+      // @Todo: log to watchdog
       $url = '';
+    }
+
+    // Special case: CiviCRM passes us "*path*?*query*" as a skeleton, but asterisks
+    // are invalid and Drupal will attempt to escape them. We unescape them here:
+    if ($path == '*path*') {
+      // First remove trailing equals sign that has been added since the key '?*query*' has no value.
+      $url = rtrim($url, '=');
+      $url = urldecode($url);
     }
 
     if ($htmlize) {

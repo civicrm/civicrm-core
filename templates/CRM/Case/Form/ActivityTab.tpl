@@ -24,6 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {*this template is used for activity accordion*}
+{assign var=caseid value=$caseID}
 <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
   <div class="crm-accordion-header">
     {ts}Activities{/ts}
@@ -42,6 +43,7 @@
             <td class="crm-case-caseview-form-block-status_id"><label for="status_id">{$form.status_id.label}</label><br />
               {$form.status_id.html}
             </td>
+<<<<<<< HEAD
             <td style="vertical-align: bottom;">
               {assign var=caseid value=$caseID}
               <span class="crm-button crm-icon-button">
@@ -49,17 +51,19 @@
                 <input class="crm-form-submit default" name="_qf_Basic_refresh" value="{ts}Search{/ts}" type="button" data-case-id="{$caseid}" />
               </span>
             </td>
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           </tr>
           <tr>
             <td class="crm-case-caseview-form-block-activity_date_low">
-        {assign var=activitylow  value=activity_date_low_$caseID}
+              {assign var=activitylow  value=activity_date_low_$caseID}
               {$form.$activitylow.label}<br />
-            {include file="CRM/common/jcalendar.tpl" elementName=$activitylow}
+              {include file="CRM/common/jcalendar.tpl" elementName=$activitylow}
             </td>
             <td class="crm-case-caseview-form-block-activity_date_high">
-        {assign var=activityhigh  value=activity_date_high_$caseID}
+              {assign var=activityhigh  value=activity_date_high_$caseID}
               {$form.$activityhigh.label}<br />
-            {include file="CRM/common/jcalendar.tpl" elementName=$activityhigh}
+              {include file="CRM/common/jcalendar.tpl" elementName=$activityhigh}
             </td>
             <td class="crm-case-caseview-form-block-activity_type_filter_id">
               {$form.activity_type_filter_id.label}<br />
@@ -77,21 +81,47 @@
       </div><!-- /.crm-accordion-body -->
     </div><!-- /.crm-accordion-wrapper -->
 
-    <table id=case_id_{$caseid}  class="nestedActivitySelector">
+    <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-order='[[0,"desc"]]' data-page-length="10">
       <thead><tr>
-        <th class='crm-case-activities-date'>{ts}Date{/ts}</th>
-        <th class='crm-case-activities-subject'>{ts}Subject{/ts}</th>
-        <th class='crm-case-activities-type'>{ts}Type{/ts}</th>
-        <th class='crm-case-activities-with'>{ts}With{/ts}</th>
-        <th class='crm-case-activities-assignee'>{ts}Reporter / Assignee{/ts}</th>
-        <th class='crm-case-activities-status'>{ts}Status{/ts}</th>
-        <th class='crm-case-activities-status' id="nosort">&nbsp;</th>
-        <th class='hiddenElement'>&nbsp;</th>
+        <th data-data="activity_date_time" class="crm-case-activities-date">{ts}Date{/ts}</th>
+        <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-case-activities-subject">{ts}Subject{/ts}</th>
+        <th data-data="type" class="crm-case-activities-type">{ts}Type{/ts}</th>
+        <th data-data="target_contact_name" class="crm-case-activities-with">{ts}With{/ts}</th>
+        <th data-data="source_contact_name" class="crm-case-activities-assignee">{ts}Reporter{/ts}</th>
+        <th data-data="assignee_contact_name" class="crm-case-activities-assignee">{ts}Assignee{/ts}</th>
+        <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-type="select" class="crm-case-activities-status">{ts}Status{/ts}</th>
+        <th data-data="links" data-orderable="false" class="crm-case-activities-status">&nbsp;</th>
       </tr></thead>
     </table>
+  {literal}
+    <script type="text/javascript">
+      (function($) {
+        var caseId = {/literal}{$caseID}{literal};
+        CRM.$('table#case_id_' + caseId).data({
+          "ajax": {
+            "url": {/literal}'{crmURL p="civicrm/ajax/activity" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal},
+            "data": function (d) {
+              d.status_id = $("select#status_id_" + caseId).val(),
+              d.reporter_id = $("select#reporter_id_" + caseId).val(),
+              d.activity_type_id = $("select#activity_type_filter_id_" + caseId).val(),
+              d.activity_date_low = $("#activity_date_low_" + caseId).val(),
+              d.activity_date_high = $("#activity_date_high_" + caseId).val(),
+              d.activity_deleted = ($("#activity_deleted_1").prop('checked')) ? 1 : 0; 
+            }
+          }
+        });
+        $(function($) {
+          $('#searchOptions :input').change(function(){
+            CRM.$('table#case_id_' + caseId).DataTable().draw();
+          });
+        });
+      })(CRM.$);
+    </script>
+  {/literal}
 
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
+<<<<<<< HEAD
 
 {literal}
 <script type="text/javascript">
@@ -194,3 +224,5 @@ CRM.$(function($) {
 });
 </script>
 {/literal}
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e

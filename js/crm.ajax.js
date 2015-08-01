@@ -272,6 +272,17 @@
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         if (that.options.crmForm) that.element.trigger('crmFormLoad', data);
+<<<<<<< HEAD
+=======
+        // This is only needed by forms that load via ajax but submit without ajax, e.g. configure contribution page tabs
+        // TODO: remove this when those forms have been converted to use ajax submit
+        if (data.status === 'form_error' && $.isPlainObject(data.errors)) {
+          that.element.trigger('crmFormError', data);
+          $.each(data.errors, function(formElement, msg) {
+            $('[name="'+formElement+'"]', that.element).crmError(msg);
+          });
+        }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }).fail(function(data, msg, status) {
         that._onFailure(data, status);
       });
@@ -440,6 +451,7 @@
             }
           }
         },
+<<<<<<< HEAD
         beforeSerialize: function(form, options) {
           if (window.CKEDITOR && window.CKEDITOR.instances) {
             $.each(CKEDITOR.instances, function() {
@@ -452,6 +464,8 @@
             });
           }
         },
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         beforeSubmit: function(submission) {
           $.each(formErrors, function() {
             if (this && this.close) this.close();
@@ -588,6 +602,15 @@
       .on('dialogcreate', function(e) {
         $('.ui-dialog-content.crm-ajax-container:hidden[data-unsaved-changes=true]').crmSnippet('destroy').dialog('destroy').remove();
       })
+<<<<<<< HEAD
+=======
+      // Ensure wysiwyg content is updated prior to ajax submit
+      .on('form-pre-serialize', function(e) {
+        $('.crm-wysiwyg-enabled', e.target).each(function() {
+          CRM.wysiwyg.updateElement(this);
+        });
+      })
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       // Auto-resize dialogs when loading content
       .on('crmLoad dialogopen', 'div.ui-dialog.ui-resizable.crm-container', function(e) {
         var

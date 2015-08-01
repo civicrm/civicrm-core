@@ -67,9 +67,15 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
 
   /**
    * Retrieve DB object based on input parameters.
+<<<<<<< HEAD
    *
    * It also stores all the retrieved values in the default array.
    *
+=======
+   *
+   * It also stores all the retrieved values in the default array.
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
@@ -296,7 +302,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       $savedSearch->form_values = serialize($params['formValues']);
     }
     else {
-      $savedSearch->form_values = 'null';
+      $savedSearch->form_values = NULL;
     }
 
     $savedSearch->is_active = CRM_Utils_Array::value('is_active', $params, 1);
@@ -309,4 +315,18 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     return $savedSearch;
   }
 
+<<<<<<< HEAD
+=======
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName == 'form_values') {
+      // A dummy value for form_values.
+      $this->{$fieldName} = serialize(
+          array('sort_name' => "SortName{$counter}"));
+    }
+    else {
+      parent::assignTestValues($fieldName, $fieldDef, $counter);
+    }
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

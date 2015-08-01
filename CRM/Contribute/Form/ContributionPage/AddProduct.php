@@ -29,8 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
@@ -43,10 +46,14 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   protected $_pid;
 
   /**
+<<<<<<< HEAD
    * Pre  process the form.
    *
    *
    * @return void
+=======
+   * Pre process the form.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function preProcess() {
     parent::preProcess();

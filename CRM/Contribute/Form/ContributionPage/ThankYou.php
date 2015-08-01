@@ -29,12 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
- * form to configure thank-you messages and receipting features for an online contribution page
+ * Form to configure thank-you messages and receipting features for an online contribution page.
  */
 class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_ContributionPage {
 
@@ -46,8 +49,11 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
    * @return void
    */
   public function setDefaultValues() {
+<<<<<<< HEAD
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
     CRM_Utils_System::setTitle(ts('Thank-you and Receipting') . " ($title)");
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     return parent::setDefaultValues();
   }
 
@@ -62,6 +68,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
     // thank you title and text (html allowed in text)
     $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_title'), TRUE);
 
+<<<<<<< HEAD
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_text');
     $attributes['click_wysiwyg'] = TRUE;
     $this->addWysiwyg('thankyou_text', ts('Thank-you Message'), $attributes);
@@ -73,6 +80,11 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
       'click_wysiwyg' => TRUE,
     );
     $this->addWysiwyg('thankyou_footer', ts('Thank-you Footer'), $footerAttribs);
+=======
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_text') + array('class' => 'collapsed');
+    $this->add('wysiwyg', 'thankyou_text', ts('Thank-you Message'), $attributes);
+    $this->add('wysiwyg', 'thankyou_footer', ts('Thank-you Footer'), $attributes);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $this->addElement('checkbox', 'is_email_receipt', ts('Email Receipt to Contributor?'), NULL, array('onclick' => "showReceipt()"));
     $this->add('text', 'receipt_from_name', ts('Receipt From Name'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'receipt_from_name'));

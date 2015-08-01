@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {* file to handle db changes in 4.6.alpha3 during upgrade *}
 -- update permission for editing message templates (CRM-15819)
 
@@ -7,6 +8,9 @@ UPDATE `civicrm_navigation`
 SET `permission` = 'edit message templates'
 WHERE `parent_id` = @messages_menu_id
 AND name = 'Message Templates';
+=======
+{* CRM-16846 - This file may have been accidentally skipped and so is conditionally re-run during 4.6.6 upgrade *}
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
 -- Use proper names for Slovenian municipalities
 UPDATE `civicrm_state_province` SET `name` = (N'Ajdovščina') WHERE `id` = 4383;
@@ -70,6 +74,7 @@ UPDATE `civicrm_state_province` SET `name` = (N'Žirovnica') WHERE `id` = 4533;
 UPDATE `civicrm_state_province` SET `name` = (N'Žužemberk') WHERE `id` = 4534;
 
 -- Add missing Slovenian municipalities
+<<<<<<< HEAD
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1193, "86", (N'Ankaran'));
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1193, "87", (N'Apače'));
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1193, "88", (N'Cirkulane'));
@@ -130,3 +135,67 @@ INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1193
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1193, "210", (N'Sveti Jurij v Slovenskih goricah'));
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1193, "211", (N'Sveti Tomaž'));
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1193, "212", (N'Vodice'));
+=======
+INSERT INTO civicrm_state_province (country_id, abbreviation, name)
+VALUES
+  (1193, "86", "Ankaran"),
+  (1193, "87", "Apače"),
+  (1193, "88", "Cirkulane"),
+  (1193, "89", "Gorje"),
+  (1193, "90", "Kostanjevica na Krki"),
+  (1193, "91", "Log-Dragomer"),
+  (1193, "92", "Makole"),
+  (1193, "93", "Mirna"),
+  (1193, "94", "Mokronog-Trebelno"),
+  (1193, "95", "Odranci"),
+  (1193, "96", "Oplotnica"),
+  (1193, "97", "Ormož"),
+  (1193, "98", "Osilnica"),
+  (1193, "99", "Pesnica"),
+  (1193, "100", "Piran"),
+  (1193, "101", "Pivka"),
+  (1193, "102", "Podčetrtek"),
+  (1193, "103", "Podlehnik"),
+  (1193, "104", "Podvelka"),
+  (1193, "105", "Poljčane"),
+  (1193, "106", "Polzela"),
+  (1193, "107", "Postojna"),
+  (1193, "108", "Prebold"),
+  (1193, "109", "Preddvor"),
+  (1193, "110", "Prevalje"),
+  (1193, "111", "Ptuj"),
+  (1193, "112", "Puconci"),
+  (1193, "113", "Rače-Fram"),
+  (1193, "114", "Radeče"),
+  (1193, "115", "Radenci"),
+  (1193, "139", "Radlje ob Dravi"),
+  (1193, "145", "Radovljica"),
+  (1193, "171", "Ravne na Koroškem"),
+  (1193, "172", "Razkrižje"),
+  (1193, "173", "Rečica ob Savinji"),
+  (1193, "174", "Renče-Vogrsko"),
+  (1193, "175", "Ribnica"),
+  (1193, "176", "Ribnica na Pohorju"),
+  (1193, "177", "Rogaška Slatina"),
+  (1193, "178", "Rogašovci"),
+  (1193, "179", "Rogatec"),
+  (1193, "180", "Ruše"),
+  (1193, "195", "Selnica ob Dravi"),
+  (1193, "196", "Semič"),
+  (1193, "197", "Šentrupert"),
+  (1193, "198", "Sevnica"),
+  (1193, "199", "Sežana"),
+  (1193, "200", "Slovenj Gradec"),
+  (1193, "201", "Slovenska Bistrica"),
+  (1193, "202", "Slovenske Konjice"),
+  (1193, "203", "Šmarješke Toplice"),
+  (1193, "204", "Sodražica"),
+  (1193, "205", "Solčava"),
+  (1193, "206", "Središče ob Dravi"),
+  (1193, "207", "Starše"),
+  (1193, "208", "Straža"),
+  (1193, "209", "Sveta Trojica v Slovenskih goricah"),
+  (1193, "210", "Sveti Jurij v Slovenskih goricah"),
+  (1193, "211", "Sveti Tomaž"),
+  (1193, "212", "Vodice");
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e

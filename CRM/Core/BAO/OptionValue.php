@@ -153,7 +153,11 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *   Value we want to set the is_active field.
    *
    * @return Object
+<<<<<<< HEAD
    *   DAO object on sucess, null otherwise
+=======
+   *   DAO object on success, null otherwise
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionValue', $id, 'is_active', $is_active);
@@ -181,6 +185,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
       $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
       $params['filter'] = CRM_Utils_Array::value('filter', $params, FALSE);
+    }
+    // Update custom field data to reflect the new value
+    elseif (isset($params['value'])) {
+      CRM_Core_BAO_CustomOption::updateValue($ids['optionValue'], $params['value']);
     }
 
     // action is taken depending upon the mode

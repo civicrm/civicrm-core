@@ -186,7 +186,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
   }
 
   /**
-   * Send a reponse email informing the contact of the groups to which he/she
+   * Send a response email informing the contact of the groups to which he/she
    * has been resubscribed.
    *
    * @param string $queue_id

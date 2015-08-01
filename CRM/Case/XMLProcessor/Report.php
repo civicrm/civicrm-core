@@ -795,7 +795,11 @@ LIMIT  1
       return FALSE;
     }
 
+<<<<<<< HEAD
     // next get activity set Informtion
+=======
+    // next get activity set Information
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $activitySet = array(
       'label' => $form->getActivitySetLabel($xml, $activitySetName),
       'includeActivities' => 'All',
@@ -974,11 +978,28 @@ LIMIT  1
       }
     }
 
+    // Retrieve custom values for cases.
+    $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($caseID, 'Case');
+    $extends = array('case');
+    $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+    $caseCustomFields = array();
+    while (list($gid, $group_values) = each($groupTree)) {
+      while (list($id, $field_values) = each($group_values['fields'])) {
+        if (array_key_exists($id, $customValues)) {
+          $caseCustomFields[$gid]['title'] = $group_values['title'];
+          $caseCustomFields[$gid]['values'][$id] = array(
+            'label' => $field_values['label'],
+            'value' => $customValues[$id],
+          );
+        }
+      }
+    }
     $template->assign('caseRelationships', $caseRelationships);
     $template->assign('caseRoles', $caseRoles);
     $template->assign('otherRelationships', $otherRelationships);
     $template->assign('globalRelationships', $relGlobal);
     $template->assign('globalGroupInfo', $globalGroupInfo);
+    $template->assign('caseCustomFields', $caseCustomFields);
     $contents = self::getCaseReport($clientID,
       $caseID,
       $activitySetName,

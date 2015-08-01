@@ -36,8 +36,9 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
+class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
+<<<<<<< HEAD
   /**
    * Set variables up before form is built.
    *
@@ -49,6 +50,11 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
     // check for post max size
     CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
   }
+=======
+  const PATH = 'civicrm/event/import';
+
+  const IMPORT_ENTITY = 'Participant';
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
   /**
    * Build the form object.
@@ -56,6 +62,7 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
+<<<<<<< HEAD
     //Setting Upload File Size
     $config = CRM_Core_Config::singleton();
 
@@ -74,6 +81,9 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
     $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
 
     $this->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
+=======
+    parent::buildQuickForm();
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
@@ -85,14 +95,11 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
     $duplicateOptions[] = $this->createElement('radio',
       NULL, NULL, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK
     );
-    // for contributions NOCHECK == SKIP
-    //      $duplicateOptions[] = $this->createElement('radio',
-    //          null, null, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK);
-
     $this->addGroup($duplicateOptions, 'onDuplicate',
       ts('On Duplicate Entries')
     );
 
+<<<<<<< HEAD
     //get the saved mapping details
     $mappingArray = CRM_Core_BAO_Mapping::getMappings(CRM_Core_OptionGroup::getValue('mapping_type',
       'Import Participant',
@@ -151,6 +158,11 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
         ),
       )
     );
+=======
+    $this->setDefaults(array('onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP));
+
+    $this->addContactTypeSelector();
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -159,6 +171,7 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
+<<<<<<< HEAD
     $this->controller->resetPage('MapField');
 
     $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
@@ -201,4 +214,16 @@ class CRM_Event_Import_Form_DataSource extends CRM_Core_Form {
     return ts('Upload Data');
   }
 
+=======
+    $this->storeFormValues(array(
+      'onDuplicate',
+      'contactType',
+      'dateFormats',
+      'savedMapping',
+    ));
+
+    $this->submitFileForMapping('CRM_Event_Import_Parser_Participant');
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

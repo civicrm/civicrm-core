@@ -52,11 +52,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Authorize.net');
 
-    $config = CRM_Core_Config::singleton();
     $this->_setParam('apiLogin', $paymentProcessor['user_name']);
     $this->_setParam('paymentKey', $paymentProcessor['password']);
     $this->_setParam('paymentType', 'AIM');
-    $this->_setParam('md5Hash', $paymentProcessor['signature']);
+    $this->_setParam('md5Hash', CRM_Utils_Array::value('signature', $paymentProcessor));
 
     $this->_setParam('emailCustomer', 'TRUE');
     $this->_setParam('timestamp', time());
@@ -67,9 +66,28 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   /**
    * Should the first payment date be configurable when setting up back office recurring payments.
    * In the case of Authorize.net this is an option
+<<<<<<< HEAD
+=======
    * @return bool
    */
   protected function supportsFutureRecurStartDate() {
+    return TRUE;
+  }
+
+  /**
+   * Can recurring contributions be set against pledges.
+   *
+   * In practice all processors that use the baseIPN function to finish transactions or
+   * call the completetransaction api support this by looking up previous contributions in the
+   * series and, if there is a prior contribution against a pledge, and the pledge is not complete,
+   * adding the new payment to the pledge.
+   *
+   * However, only enabling for processors it has been tested against.
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
+   * @return bool
+   */
+  protected function supportsRecurContributionsForPledges() {
     return TRUE;
   }
 
@@ -88,7 +106,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     /*
-     * recurpayment function does not compile an array & then proces it -
+     * recurpayment function does not compile an array & then process it -
      * - the tpl does the transformation so adding call to hook here
      * & giving it a change to act on the params array
      */
@@ -128,7 +146,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     // Authorize.Net will not refuse duplicates, so we should check if the user already submitted this transaction
-    if ($this->_checkDupe($authorizeNetFields['x_invoice_num'])) {
+    if ($this->checkDupe($authorizeNetFields['x_invoice_num'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::error(9004, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
 
@@ -374,6 +392,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
+<<<<<<< HEAD
    * Checks to see if invoice_id already exists in db.
    *
    * @param int $invoiceId
@@ -389,6 +408,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Generate HMAC_MD5
    *
    * @param string $key

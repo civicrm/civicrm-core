@@ -29,12 +29,19 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
  */
 
 /**
  * This class build form elements for select existing or create new soft block
+=======
+ */
+
+/**
+ * This class build form elements for select existing or create new soft block.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 class CRM_Contribute_Form_SoftCredit {
 

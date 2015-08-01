@@ -121,11 +121,11 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
       $this->addElement('text', 'new_title', ts('Title - New Membership'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'new_title'));
 
-      $this->addWysiwyg('new_text', ts('Introductory Message - New Memberships'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'new_text'));
+      $this->add('wysiwyg', 'new_text', ts('Introductory Message - New Memberships'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'new_text'));
 
       $this->addElement('text', 'renewal_title', ts('Title - Renewals'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'renewal_title'));
 
-      $this->addWysiwyg('renewal_text', ts('Introductory Message - Renewals'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'renewal_text'));
+      $this->add('wysiwyg', 'renewal_text', ts('Introductory Message - Renewals'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipBlock', 'renewal_text'));
 
       $this->addElement('checkbox', 'is_required', ts('Require Membership Signup'));
       $this->addElement('checkbox', 'display_min_fee', ts('Display Membership Fee'));
@@ -231,7 +231,11 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
     if (!empty($params['member_price_set_id'])) {
       //check if this price set has membership type both auto-renew and non-auto-renew memberships.
+<<<<<<< HEAD
       $bothTypes = CRM_Price_BAO_PriceSet::checkMembershipPriceSet($params['member_price_set_id']);
+=======
+      $bothTypes = CRM_Price_BAO_PriceSet::isMembershipPriceSetContainsMixOfRenewNonRenew($params['member_price_set_id']);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       //check for supporting payment processors
       //if both auto-renew and non-auto-renew memberships
@@ -243,6 +247,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $paymentProcessorId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $paymentProcessorIds);
 
         if (!empty($paymentProcessorId)) {
+<<<<<<< HEAD
           $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, NULL, 'name');
           foreach ($paymentProcessorId as $pid) {
             if ($pid) {
@@ -254,8 +259,15 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
               ($paymentProcessorTypeId == CRM_Utils_Array::key('AuthNet', $paymentProcessorType)))
             ) {
               $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
+=======
+          foreach ($paymentProcessorId as $pid) {
+            if ($pid) {
+              $processor = Civi\Payment\System::singleton()->getById($pid);
+              if (!$processor->supports('MultipleConcurrentPayments')) {
+                $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
+              }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             }
-
           }
         }
       }

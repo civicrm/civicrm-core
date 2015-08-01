@@ -26,12 +26,22 @@
 <div class="crm-block crm-form-block crm-{$formName}-block">
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $formName == "Contribute_Preferences" }
-      <table class="form-layout">
-        <tr class="crm-preferences-form-block-invoicing">
+      <table class = "form-layout">
+        <tr class="crm-miscellaneous-form-block-cvv-backoffice-required">
+          <td class="label">{$form.cvv_backoffice_required.label}</td>
           <td>
-            {$form.invoicing.html} {$form.invoicing.label}
+            {$form.cvv_backoffice_required.html}<br />
+            <p class="description">{ts}{$cvv_backoffice_required_description}{/ts}</p>
           </td>
         </tr>
+        {if $formName == "Contribute_Preferences" }
+          <tr class="crm-preferences-form-block-invoicing">
+            <td class="label">{$form.invoicing.label}</td>
+            <td>
+              {$form.invoicing.html}
+            </td>
+          </tr>
+        {/if}
       </table>
     {/if}
     <table class="form-layout" id="invoicing_blocks">

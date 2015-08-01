@@ -96,7 +96,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
     // Get the form values and groupTree
     $params = $this->controller->exportValues($this->_name);
     CRM_Core_BAO_CustomValueTable::postProcess($params,
-      $this->_groupTree[$this->_groupID]['fields'],
       'civicrm_contact',
       $this->_contactId,
       $this->_entityType

@@ -98,8 +98,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
     // set currency for CRM-1496
     if (!isset($pledge->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $pledge->currency = $config->defaultCurrency;
+      $pledge->currency = CRM_Core_Config::singleton()->defaultCurrency;
     }
 
     $result = $pledge->save();
@@ -621,7 +620,6 @@ GROUP BY  currency
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
 
     //check for online pledge.
-    $session = CRM_Core_Session::singleton();
     if (!empty($params['receipt_from_email'])) {
       $userName = CRM_Utils_Array::value('receipt_from_name', $params);
       $userEmail = CRM_Utils_Array::value('receipt_from_email', $params);
@@ -629,7 +627,7 @@ GROUP BY  currency
     elseif (!empty($params['from_email_id'])) {
       $receiptFrom = $params['from_email_id'];
     }
-    elseif ($userID = $session->get('userID')) {
+    elseif ($userID = CRM_Core_Session::singleton()->get('userID')) {
       //check for logged in user.
       list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
     }
@@ -663,7 +661,6 @@ GROUP BY  currency
       $activityType,
       'name'
     );
-    $config = CRM_Core_Config::singleton();
 
     // FIXME: Translate
     $details = 'Total Amount ' . CRM_Utils_Money::format($params['total_pledge_amount'], CRM_Utils_Array::value('currency', $params)) . ' To be paid in ' . $params['installments'] . ' installments of ' . CRM_Utils_Money::format($params['scheduled_amount'], CRM_Utils_Array::value('currency', $params)) . ' every ' . $params['frequency_interval'] . ' ' . $params['frequency_unit'] . '(s)';

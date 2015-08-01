@@ -41,6 +41,16 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   protected $_isTagSet;
 
   /**
+<<<<<<< HEAD
+=======
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Tag';
+  }
+
+  /**
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Build the form object.
    *
    * @return void

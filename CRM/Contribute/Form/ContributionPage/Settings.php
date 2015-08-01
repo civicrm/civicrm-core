@@ -29,15 +29,21 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_ContributionPage {
 
   /**
    * Set variables up before form is built.
+<<<<<<< HEAD
    *
    * @return void
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function preProcess() {
     parent::preProcess();
@@ -55,12 +61,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $soft_credit_types = CRM_Core_OptionGroup::values('soft_credit_type', TRUE, FALSE, FALSE, NULL, 'name');
 
     if ($this->_id) {
-      $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
-        $this->_id,
-        'title'
-      );
-      CRM_Utils_System::setTitle(ts('Title and Settings') . " ($title)");
-
       $ufJoinParams = array(
         'module' => 'OnBehalf',
         'entity_table' => 'civicrm_contribution_page',
@@ -94,8 +94,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       }
     }
     else {
-      CRM_Utils_System::setTitle(ts('Title and Settings'));
-
       $ufGroupDAO = new CRM_Core_DAO_UFGroup();
       $ufGroupDAO->name = 'honoree_individual';
       if ($ufGroupDAO->find(TRUE)) {
@@ -129,9 +127,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     //CRM-7362 --add campaigns.
     CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
 
-    $this->addWysiwyg('intro_text', ts('Introductory Message'), $attributes['intro_text']);
+    $this->add('wysiwyg', 'intro_text', ts('Introductory Message'), $attributes['intro_text']);
 
-    $this->addWysiwyg('footer_text', ts('Footer Message'), $attributes['footer_text']);
+    $this->add('wysiwyg', 'footer_text', ts('Footer Message'), $attributes['footer_text']);
 
     //Register schema which will be used for OnBehalOf and HonorOf profile Selector
     CRM_UF_Page_ProfileEditor::registerSchemas(array('OrganizationModel', 'HouseholdModel'));

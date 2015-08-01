@@ -29,12 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
- * form to process actions on the group aspect of Custom Data
+ * Contribution Page form.
  */
 class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
@@ -83,6 +86,16 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   protected $_values;
 
   /**
+<<<<<<< HEAD
+=======
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Contribution';
+  }
+
+  /**
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Set variables up before form is built.
    *
    * @return void
@@ -109,6 +122,10 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       }
     }
 
+    // CRM-16776 - show edit/copy/create buttons on Profiles Tab if user has required permission.
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $this->assign('perm', TRUE);
+    }
     // set up tabs
     CRM_Contribute_Form_ContributionPage_TabHeader::build($this);
 

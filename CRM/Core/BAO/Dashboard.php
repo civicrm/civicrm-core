@@ -177,7 +177,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       foreach ($defaultDashlets as $id => $defaultDashlet) {
         $dashboard_id = $defaultDashlet['dashboard_id'];
         if (!self::checkPermission($getDashlets['values'][$dashboard_id]['permission'],
+<<<<<<< HEAD
           $getDashlets['values'][$dashboard_id]['permission_operator'])
+=======
+          CRM_Utils_Array::value('permission_operator', $getDashlets['values'][$dashboard_id]))
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         ) {
           continue;
         }

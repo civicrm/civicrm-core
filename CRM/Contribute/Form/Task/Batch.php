@@ -29,12 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
- * This class provides the functionality for batch profile update for contributions
+ * This class provides the functionality for batch profile update for contributions.
  */
 class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
 
@@ -221,7 +224,6 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
       foreach ($params['field'] as $key => $value) {
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          CRM_Core_DAO::$_nullObject,
           $key,
           'Contribution'
         );

@@ -182,8 +182,13 @@ class CRM_Contact_Page_AJAX {
     }
 
     $offset = $count = 0;
+<<<<<<< HEAD
     if (!empty($_GET['page'])) {
       $page = (int) $_GET['page'];
+=======
+    if (!empty($_GET['page_num'])) {
+      $page = (int) $_GET['page_num'];
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $offset = $limit * ($page - 1);
       $limit++;
     }
@@ -343,7 +348,7 @@ class CRM_Contact_Page_AJAX {
     $config->userSystem->checkUserNameEmailExists($params, $errors);
 
     if (isset($errors['cms_name']) || isset($errors['name'])) {
-      //user name is not availble
+      //user name is not available
       $user = array('name' => 'no');
       CRM_Utils_JSON::output($user);
     }
@@ -391,7 +396,7 @@ class CRM_Contact_Page_AJAX {
       else {
         $cid = CRM_Utils_Array::value('cid', $_GET);
         if ($cid) {
-          //check cid for interger
+          //check cid for integer
           $contIDS = explode(',', $cid);
           foreach ($contIDS as $contID) {
             CRM_Utils_Type::escape($contID, 'Integer');
@@ -486,7 +491,7 @@ LIMIT {$offset}, {$rowCount}
     else {
       $cid = CRM_Utils_Array::value('cid', $_GET);
       if ($cid) {
-        //check cid for interger
+        //check cid for integer
         $contIDS = explode(',', $cid);
         foreach ($contIDS as $contID) {
           CRM_Utils_Type::escape($contID, 'Integer');
@@ -812,6 +817,7 @@ LIMIT {$offset}, {$rowCount}
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $context = CRM_Utils_Type::escape($_GET['context'], 'String');
+<<<<<<< HEAD
     $relationship_type_id = CRM_Utils_Type::escape(CRM_Utils_Array::value('relationship_type_id', $_GET), 'Integer',
       FALSE);
 
@@ -838,8 +844,25 @@ LIMIT {$offset}, {$rowCount}
     $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
     $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
+=======
+    $relationship_type_id = CRM_Utils_Type::escape(CRM_Utils_Array::value('relationship_type_id', $_GET), 'Integer', FALSE);
 
-    $params = $_POST;
+    if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {
+      return CRM_Utils_System::permissionDenied();
+    }
+
+    $sortMapper = array();
+    foreach ($_GET['columns'] as $key => $value) {
+      $sortMapper[$key] = $value['data'];
+    };
+
+    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
+    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
+    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
+    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
+
+    $params = $_GET;
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
     }
@@ -856,6 +879,7 @@ LIMIT {$offset}, {$rowCount}
     // get the contact relationships
     $relationships = CRM_Contact_BAO_Relationship::getContactRelationshipSelector($params);
 
+<<<<<<< HEAD
     $iFilteredTotal = $iTotal = $params['total'];
     $selectorElements = array(
       'relation',
@@ -874,6 +898,9 @@ LIMIT {$offset}, {$rowCount}
     header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($relationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
+=======
+    CRM_Utils_JSON::output($relationships);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
 }

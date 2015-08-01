@@ -632,7 +632,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * This function create the hidden smart group when user perform
-   * contact seach and want to send mailing to search contacts.
+   * contact search and want to send mailing to search contacts.
    *
    * @param array $params
    *   ( reference ) an assoc array of name/value pairs.
@@ -795,6 +795,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $orderBy = ' ORDER BY groups.title asc';
     if (!empty($params['sort'])) {
       $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
+
+      // CRM-16905 - Sort by count cannot be done with sql
+      if (strpos($params['sort'], 'count') === 0) {
+        $orderBy = $limit = '';
+      }
     }
 
     $select = $from = $where = "";
@@ -976,6 +981,17 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
     }
 
+    // CRM-16905 - Sort by count cannot be done with sql
+    if (!empty($params['sort']) && strpos($params['sort'], 'count') === 0) {
+      usort($values, function($a, $b) {
+        return $a['count'] - $b['count'];
+      });
+      if (strpos($params['sort'], 'desc')) {
+        $values = array_reverse($values, TRUE);
+      }
+      return array_slice($values, $params['offset'], $params['rowCount']);
+    }
+
     return $values;
   }
 
@@ -1006,10 +1022,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // need to return id, title (w/ spacer), description, visibility
 
     // We need to build a list of tags ordered by hierarchy and sorted by
-    // name. The heirarchy will be communicated by an accumulation of
+    // name. The hierarchy will be communicated by an accumulation of
     // separators in front of the name to give it a visual offset.
     // Instead of recursively making mysql queries, we'll make one big
-    // query and build the heirarchy with the algorithm below.
+    // query and build the hierarchy with the algorithm below.
     $groups = array();
     $args = array(1 => array($groupIdString, 'String'));
     $query = "

@@ -104,8 +104,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_caseId;
 
   /**
-   * @var mixed
+   * Explicitly declare the form context.
    */
+<<<<<<< HEAD
   public $_cdType;
 
   public function preProcess() {
@@ -116,7 +117,20 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $this->assign('cdType', TRUE);
       return CRM_Custom_Form_CustomData::preProcess($this);
     }
+=======
+  public function getDefaultContext() {
+    return 'create';
+  }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Relationship';
+  }
+
+  public function preProcess() {
     $this->_contactId = $this->get('contactId');
 
     $this->_contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'contact_type');
@@ -204,9 +218,12 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
+<<<<<<< HEAD
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     $defaults = array();
 
@@ -265,9 +282,12 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Add the rules for form.
    */
   public function addRules() {
+<<<<<<< HEAD
     if ($this->_cdType) {
       return;
     }
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if (!($this->_action & CRM_Core_Action::DELETE)) {
       $this->addFormRule(array('CRM_Contact_Form_Relationship', 'dateRule'));
@@ -278,10 +298,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
           array(
@@ -297,8 +313,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       );
       return;
     }
-    // Just in case custom data includes a rich text field
-    $this->assign('includeWysiwygEditor', TRUE);
 
     // Select list
     $relationshipList = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactId, $this->_rtype, $this->_relationshipId);
@@ -323,6 +337,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     $this->assign('relationshipData', $jsData);
 
+<<<<<<< HEAD
     $this->add(
       'select',
       'relationship_type_id',
@@ -337,6 +352,12 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         'multiple' => TRUE,
         'create' => TRUE,
       ), TRUE);
+=======
+    $this->addField('relationship_type_id', array('options' => array('' => ts('- select -')) + $relationshipList, 'class' => 'huge', 'placeholder' => '- select -'), TRUE);
+
+    $label = $this->_action & CRM_Core_Action::ADD ? ts('Contact(s)') : ts('Contact');
+    $contactField = $this->addField('related_contact_id', array('label' => $label, 'name' => 'contact_id_b', 'multiple' => TRUE, 'create' => TRUE), TRUE);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // This field cannot be updated
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $contactField->freeze();
@@ -344,16 +365,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $this->add('advcheckbox', 'is_current_employer', $this->_contactType == 'Organization' ? ts('Current Employee') : ts('Current Employer'));
 
-    $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'searchDate'));
-    $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'searchDate'));
+    $this->addField('start_date', array('label' => ts('Start Date'), 'formatType' => 'searchDate'));
+    $this->addField('end_date', array('label' => ts('End Date'), 'formatType' => 'searchDate'));
 
-    $this->add('advcheckbox', 'is_active', ts('Enabled?'));
+    $this->addField('is_active', array('label' => ts('Enabled?')));
 
-    // CRM-14612 - Don't use adv-checkbox as it interferes with the form js
-    $this->add('checkbox', 'is_permission_a_b');
-    $this->add('checkbox', 'is_permission_b_a');
+    $this->addField('is_permission_a_b');
+    $this->addField('is_permission_b_a');
 
-    $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Relationship', 'description'));
+    $this->addField('description', array('label' => ts('Description')));
 
     CRM_Contact_Form_Edit_Notes::buildQuickForm($this);
 

@@ -221,7 +221,6 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       foreach ($params['field'] as $key => $value) {
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          CRM_Core_DAO::$_nullObject,
           $key, 'Activity'
         );
         $value['id'] = $key;

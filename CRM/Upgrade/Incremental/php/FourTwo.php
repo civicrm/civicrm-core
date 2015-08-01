@@ -26,18 +26,22 @@
  */
 
 /**
+<<<<<<< HEAD
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
+=======
+ * Upgrade logic for 4.2
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
-class CRM_Upgrade_Incremental_php_FourTwo {
-  const BATCH_SIZE = 5000;
+class CRM_Upgrade_Incremental_php_FourTwo extends CRM_Upgrade_Incremental_Base {
   const SETTINGS_SNIPPET_PATTERN = '/CRM_Core_ClassLoader::singleton\(\)-\>register/';
   const SETTINGS_SNIPPET = "\nrequire_once 'CRM/Core/ClassLoader.php';\nCRM_Core_ClassLoader::singleton()->register();\n";
 
   /**
+<<<<<<< HEAD
    * @param $errors
    *
    * @return bool
@@ -47,6 +51,8 @@ class CRM_Upgrade_Incremental_php_FourTwo {
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Compute any messages which should be displayed beforeupgrade.
    *
    * Note: This function is called iteratively for each upcoming
@@ -211,7 +217,7 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
 
     // Some steps take a long time, so we break them up into separate
     // tasks and enqueue them separately.
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.alpha1')), 'task_4_2_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.alpha1')), 'runSql', $rev);
     $this->addTask(ts('Upgrade DB to 4.2.alpha1: Price Sets'), 'task_4_2_alpha1_createPriceSets', $rev);
     self::convertContribution();
     $this->addTask(ts('Upgrade DB to 4.2.alpha1: Event Profile'), 'task_4_2_alpha1_eventProfile');
@@ -235,7 +241,11 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
    * @param $rev
    */
   public function upgrade_4_2_beta3($rev) {
+<<<<<<< HEAD
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.beta3')), 'task_4_2_x_runSql', $rev);
+=======
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.beta3')), 'runSql', $rev);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $minParticipantId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_participant');
     $maxParticipantId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_participant');
 
@@ -262,14 +272,22 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
    * @param $rev
    */
   public function upgrade_4_2_0($rev) {
+<<<<<<< HEAD
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.0')), 'task_4_2_x_runSql', $rev);
+=======
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.0')), 'runSql', $rev);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
    * @param $rev
    */
   public function upgrade_4_2_2($rev) {
+<<<<<<< HEAD
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.2')), 'task_4_2_x_runSql', $rev);
+=======
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.2')), 'runSql', $rev);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     //create line items for memberships and participants for api/import
     self::convertContribution();
 
@@ -309,7 +327,11 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
    * @param $rev
    */
   public function upgrade_4_2_3($rev) {
+<<<<<<< HEAD
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.3')), 'task_4_2_x_runSql', $rev);
+=======
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.3')), 'runSql', $rev);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     // CRM-10953 Remove duplicate activity type for 'Reminder Sent' which is mistakenly inserted by 4.2.alpha1 upgrade script
     $queryMin = "
 SELECT coalesce(min(value),0) from civicrm_option_value ov
@@ -351,7 +373,11 @@ DELETE from civicrm_option_value
    * @param $rev
    */
   public function upgrade_4_2_5($rev) {
+<<<<<<< HEAD
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.5')), 'task_4_2_x_runSql', $rev);
+=======
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.5')), 'runSql', $rev);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     //CRM-11077
     $sql = " SELECT cpse.entity_id, cpse.price_set_id
 FROM `civicrm_price_set_entity` cpse
@@ -443,6 +469,7 @@ WHERE     cpse.price_set_id IS NULL";
   }
 
   /**
+<<<<<<< HEAD
    * (Queue Task Callback)
    */
   public static function task_4_2_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
@@ -457,6 +484,8 @@ WHERE     cpse.price_set_id IS NULL";
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * create price sets
    */
@@ -878,30 +907,6 @@ VALUES
       CRM_Core_DAO::executeQuery($sql);
     }
     return TRUE;
-  }
-
-  /**
-   * Syntatic sugar for adding a task which (a) is in this class and (b) has
-   * a high priority.
-   *
-   * After passing the $funcName, you can also pass parameters that will go to
-   * the function. Note that all params must be serializable.
-   */
-  protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load(array(
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ));
-
-    $args = func_get_args();
-    $title = array_shift($args);
-    $funcName = array_shift($args);
-    $task = new CRM_Queue_Task(
-      array(get_class($this), $funcName),
-      $args,
-      $title
-    );
-    $queue->createItem($task, array('weight' => -1));
   }
 
   /**

@@ -36,8 +36,9 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
+class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
+<<<<<<< HEAD
   /**
    * Set variables up before form is built.
    *
@@ -53,10 +54,11 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
       $params = "reset=1";
     }
     $session->pushUserContext(CRM_Utils_System::url('civicrm/import/custom', $params));
+=======
+  const PATH = 'civicrm/import/custom';
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
-    // check for post max size
-    CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
-  }
+  const IMPORT_ENTITY = 'Multi value custom data';
 
   /**
    * @return array
@@ -83,9 +85,12 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
+    parent::buildQuickForm();
+
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
     $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), array('' => ts('- select -')) + $multipleCustomData, TRUE);
 
+<<<<<<< HEAD
     //Setting Upload File Size
     $config = CRM_Core_Config::singleton();
 
@@ -159,6 +164,9 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
         ),
       )
     );
+=======
+    $this->addContactTypeSelector();
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -167,6 +175,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
+<<<<<<< HEAD
     $this->controller->resetPage('MapField');
 
     $fileName = $this->controller->exportValue($this->_name, 'uploadFile');
@@ -212,4 +221,16 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Core_Form {
     return ts('Upload Data');
   }
 
+=======
+    $this->storeFormValues(array(
+      'contactType',
+      'dateFormats',
+      'savedMapping',
+      'multipleCustomData',
+    ));
+
+    $this->submitFileForMapping('CRM_Custom_Import_Parser_Api');
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

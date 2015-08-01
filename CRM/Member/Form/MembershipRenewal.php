@@ -63,6 +63,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Display name of the person paying for the membership (used for receipts)
    *
    * @var string
+<<<<<<< HEAD
    */
   protected $_contributorDisplayName = NULL;
 
@@ -76,6 +77,21 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    *
    * @var int
    */
+=======
+   */
+  protected $_contributorDisplayName = NULL;
+
+  /**
+   * email of the person paying for the membership (used for receipts)
+   */
+  protected $_contributorEmail = NULL;
+
+  /**
+   * email of the person paying for the membership (used for receipts)
+   *
+   * @var int
+   */
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   protected $_contributorContactID = NULL;
 
   /**
@@ -92,6 +108,27 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public $_context;
 
   /**
+   * End date of renewed membership.
+   *
+   * @var string
+   */
+  protected $endDate = NULL;
+
+  /**
+   * Has an email been sent.
+   *
+   * @var string
+   */
+  protected $isMailSent = FALSE;
+
+  /**
+   * The name of the renewed membership type.
+   *
+   * @var string
+   */
+  protected $membershipTypeName = '';
+
+  /**
    * An array to hold a list of datefields on the form
    * so that they can be converted to ISO in a consistent manner
    *
@@ -102,14 +139,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   );
 
   public function preProcess() {
-    //custom data related code
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
 
+    // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
+    $this->assign('formClass', 'membershiprenew');
     parent::preProcess();
     // check for edit permission
     if (!CRM_Core_Permission::check('edit memberships')) {
@@ -156,13 +188,15 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Set default values for the form.
    * the default values are retrieved from the database
    *
+<<<<<<< HEAD
    *
    * @return void
+=======
+   * @return array
+   *   Default values.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     $defaults = parent::setDefaultValues();
     $this->_memType = $defaults['membership_type_id'];
@@ -240,13 +274,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
   /**
    * Build the form object.
+<<<<<<< HEAD
    *
    * @return void
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
 
     parent::buildQuickForm();
 
@@ -257,16 +291,17 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('entityID', $this->_id);
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
-    $allMemberships = CRM_Member_BAO_Membership::buildMembershipTypeValues($this);
-
-    $allMembershipInfo = $membershipType = array();
+    $allMembershipInfo = array();
 
     // auto renew options if enabled for the membership
     $options = CRM_Core_SelectValues::memberAutoRenew();
 
+<<<<<<< HEAD
     foreach ($allMemberships as $key => $values) {
+=======
+    foreach ($this->allMembershipTypeDetails as $key => $values) {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       if (!empty($values['is_active'])) {
-        $membershipType[$key] = CRM_Utils_Array::value('name', $values);
         if ($this->_mode && empty($values['minimum_fee'])) {
           continue;
         }
@@ -303,8 +338,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
 
     if ($this->_memType) {
-      $this->assign('orgName', $selMemTypeOrg[$allMemberships[$this->_memType]['member_of_contact_id']]);
-      $this->assign('memType', $allMemberships[$this->_memType]['name']);
+      $this->assign('orgName', $selMemTypeOrg[$this->allMembershipTypeDetails[$this->_memType]['member_of_contact_id']]);
+      $this->assign('memType', $this->allMembershipTypeDetails[$this->_memType]['name']);
     }
 
     // force select of organization by default, if only one organization in
@@ -319,6 +354,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $selOrgMemType[$index] = $orgMembershipType;
     }
 
+<<<<<<< HEAD
     $js = array('onChange' => "setPaymentBlock( ); CRM.buildCustomData( 'Membership', this.value );");
 
     //build the form for auto renew.
@@ -363,6 +399,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
     $this->assign('recurProcessor', json_encode($recurProcessor));
 
+=======
+    $js = array('onChange' => "setPaymentBlock(); CRM.buildCustomData('Membership', this.value);");
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $sel = &$this->addElement('hierselect',
       'membership_type_id',
       ts('Renewal Membership Organization and Type'), $js
@@ -427,6 +466,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->_contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
     $this->assign('email', $this->_contributorEmail);
+    // The member form uses emailExists. Assigning both while we transition / synchronise.
+    $this->assign('emailExists', $this->_contributorEmail);
 
     $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
       'mailing_backend'
@@ -441,6 +482,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
     }
     $this->addFormRule(array('CRM_Member_Form_MembershipRenewal', 'formRule'));
+<<<<<<< HEAD
     if ($this->_context != 'standalone') {
       //CRM-10223 - allow contribution to be recorded against different contact
       // causes a conflict in standalone mode so skip in standalone for now
@@ -448,6 +490,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
       $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
     }
+=======
+    $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different
+      Contact?'));
+    $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
+    $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -491,36 +539,86 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    * @return void
    */
   public function postProcess() {
-
-    $ids = array();
-    $config = CRM_Core_Config::singleton();
-
     // get the submitted form values.
-    $this->_params = $formValues = $this->controller->exportValues($this->_name);
+    $this->_params = $this->controller->exportValues($this->_name);
+    $this->assignBillingName();
 
-    $this->storeContactFields($formValues);
-    // use values from screen
+    try {
+      $this->submit();
+      $statusMsg = ts('%1 membership for %2 has been renewed.', array(1 => $this->membershipTypeName, 2 => $this->_memberDisplayName));
 
-    if ($formValues['membership_type_id'][1] <> 0) {
-      $defaults['receipt_text_renewal'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $formValues['membership_type_id'][1],
-        'receipt_text_renewal'
-      );
+      if ($this->endDate) {
+        $statusMsg .= ' ' . ts('The new membership End Date is %1.', array(
+            1 => CRM_Utils_Date::customFormat(substr($this->endDate, 0, 8)),
+        ));
+      }
+
+      if ($this->isMailSent) {
+        $statusMsg .= ' ' . ts('A renewal confirmation and receipt has been sent to %1.', array(
+            1 => $this->_contributorEmail,
+        ));
+        return $statusMsg;
+      }
+      return $statusMsg;
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      CRM_Core_Error::displaySessionError($e->getMessage());
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
+        "reset=1&action=renew&cid={$this->_contactID}&id={$this->_id}&context=membership&mode={$this->_mode}"
+      ));
     }
 
+    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+  }
+
+  /**
+   * Process form submission.
+   *
+   * This function is also accessed by a unit test.
+   */
+  protected function submit() {
+    $this->storeContactFields($this->_params);
+
+    $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
+    $this->convertDateFieldsToMySQL($this->_params);
+    $this->assign('receive_date', $this->_params['receive_date']);
+    $this->processBillingAddress($now);
+    list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
+    $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
+      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
+    );
+    $this->_membershipId = $this->_id;
+    $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->_params,
+      $this->_id,
+      'Membership'
+    );
+    if (empty($this->_params['financial_type_id'])) {
+      $this->_params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
+    }
+
+<<<<<<< HEAD
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->convertDateFieldsToMySQL($formValues);
     $this->assign('receive_date', $formValues['receive_date']);
+=======
+    $this->assign('membershipID', $this->_id);
+    $this->assign('contactID', $this->_contactID);
+    $this->assign('module', 'Membership');
+    $this->assign('receiptType', 'membership renewal');
+    $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
+    $this->_params['invoice_id'] = $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     if (!empty($this->_params['send_receipt'])) {
-      $formValues['receipt_date'] = $now;
-      $this->assign('receipt_date', CRM_Utils_Date::mysqlToIso($formValues['receipt_date']));
+      $this->_params['receipt_date'] = $now;
+      $this->assign('receipt_date', CRM_Utils_Date::mysqlToIso($this->_params['receipt_date']));
     }
     else {
-      $formValues['receipt_date'] = NULL;
+      $this->_params['receipt_date'] = NULL;
     }
 
     if ($this->_mode) {
+<<<<<<< HEAD
       $formValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params, CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
         $this->_memType, 'minimum_fee'
       ));
@@ -574,15 +672,28 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       // add all the additional payment params we need
       $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
       $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
+=======
+      $this->_params['register_date'] = $now;
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id']);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-      $this->_params['description'] = ts('Office Credit Card Membership Renewal Contribution');
+      $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
+      $this->assign('credit_card_number',
+        CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
+      );
+      $this->assign('credit_card_type', $this->_params['credit_card_type']);
+      $this->_params['description'] = ts("Contribution submitted by a staff person using member's credit card for renewal");
       $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
+<<<<<<< HEAD
       $this->_params['amount'] = $formValues['total_amount'];
       $this->_params['currencyID'] = $config->defaultCurrency;
       $this->_params['payment_action'] = 'Sale';
       $paymentParams['invoiceID'] = $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+=======
+      $this->_params['amount'] = $this->_params['total_amount'];
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the passed params
@@ -596,8 +707,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 
-      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+      $payment = $this->_paymentProcessor['object'];
 
+<<<<<<< HEAD
       if (!empty($paymentParams['auto_renew'])) {
         $contributionRecurParams = $this->processRecurringContribution($paymentParams);
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
@@ -609,128 +721,138 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
           "reset=1&action=renew&cid={$this->_contactID}&id={$this->_id}&context=membership&mode={$this->_mode}"
         ));
+=======
+      if (!empty($this->_params['auto_renew'])) {
+        $contributionRecurParams = $this->processRecurringContribution($paymentParams);
+        $paymentParams = array_merge($paymentParams, $contributionRecurParams);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       }
 
-      if ($result) {
-        $this->_params = array_merge($this->_params, $result);
-      }
-      $formValues['contribution_status_id'] = 1;
-      $formValues['invoice_id'] = $this->_params['invoiceID'];
-      $formValues['trxn_id'] = $result['trxn_id'];
-      $formValues['payment_instrument_id'] = 1;
-      $formValues['is_test'] = ($this->_mode == 'live') ? 0 : 1;
+      $result = $payment->doPayment($paymentParams);
+      $this->_params = array_merge($this->_params, $result);
+
+      $this->_params['contribution_status_id'] = $result['payment_status_id'];
+      $this->_params['trxn_id'] = $result['trxn_id'];
+      $this->_params['payment_instrument_id'] = 1;
+      $this->_params['is_test'] = ($this->_mode == 'live') ? 0 : 1;
       $this->set('params', $this->_params);
       $this->assign('trxn_id', $result['trxn_id']);
     }
 
-    $renewalDate = NULL;
-
-    if ($formValues['renewal_date']) {
-      $this->set('renewalDate', CRM_Utils_Date::processDate($formValues['renewal_date']));
-    }
-    $this->_membershipId = $this->_id;
-
-    // membership type custom data
-    $customFields = CRM_Core_BAO_CustomField::getFields('Membership', FALSE, FALSE,
-      $formValues['membership_type_id'][1]
-    );
-
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-      CRM_Core_BAO_CustomField::getFields('Membership',
-        FALSE, FALSE,
-        NULL, NULL, TRUE
-      )
-    );
-
-    $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($formValues,
-      $customFields,
-      $this->_id,
-      'Membership'
-    );
+    $renewalDate = !empty($this->_params['renewal_date']) ? $renewalDate = CRM_Utils_Date::processDate($this->_params['renewal_date']) : NULL;
 
     // check for test membership.
     $isTestMembership = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_membershipId, 'is_test');
 
     // chk for renewal for multiple terms CRM-8750
     $numRenewTerms = 1;
-    if (is_numeric(CRM_Utils_Array::value('num_terms', $formValues))) {
-      $numRenewTerms = $formValues['num_terms'];
+    if (is_numeric(CRM_Utils_Array::value('num_terms', $this->_params))) {
+      $numRenewTerms = $this->_params['num_terms'];
     }
 
     //if contribution status is pending then set pay later
-    if ($formValues['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) {
+    $this->_params['is_pay_later'] = FALSE;
+    if ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) {
       $this->_params['is_pay_later'] = 1;
     }
-    $renewMembership = CRM_Member_BAO_Membership::renewMembershipFormWrapper($this->_contactID,
-      $formValues['membership_type_id'][1],
-      $isTestMembership, $this, NULL, NULL,
-      $customFieldsFormatted, $numRenewTerms,
-      $this->_membershipId
+
+    // These variable sets prior to renewMembership may not be required for this form. They were in
+    // a function this form shared with other forms.
+    $contributionRecurID = isset($this->_params['contributionRecurID']) ? $this->_params['contributionRecurID'] : NULL;
+    $membershipSource = NULL;
+    if (!empty($this->_params['membership_source'])) {
+      $membershipSource = $this->_params['membership_source'];
+    }
+
+    $isPending = ($this->_params['contribution_status_id'] == 2) ? TRUE : FALSE;
+
+    list($renewMembership) = CRM_Member_BAO_Membership::renewMembership(
+      $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
+      $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
+      $isPending,
+      $contributionRecurID, $membershipSource, $this->_params['is_pay_later'], CRM_Utils_Array::value('campaign_id',
+      $this->_params)
     );
 
-    $endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
+    $this->endDate = CRM_Utils_Date::processDate($renewMembership->end_date);
 
-    // Retrieve the name and email of the current user - this will be the FROM for the receipt email
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $renewMembership->membership_type_id,
+      'name');
 
-    list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
-
-    $memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $renewMembership->membership_type_id, 'name');
-
-    if (!empty($formValues['record_contribution']) || $this->_mode) {
+    if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
-      $formValues['contribution_source'] = "{$memType} Membership: Offline membership renewal (by {$userName})";
+      $this->_params['contribution_source'] = "{$this->membershipTypeName} Membership: Offline membership renewal (by {$userName})";
 
       //create line items
       $lineItem = array();
+<<<<<<< HEAD
       $priceSetId = NULL;
       CRM_Member_BAO_Membership::createLineItems($this, $formValues['membership_type_id'], $priceSetId);
+=======
+
+      $priceSetId = CRM_Member_BAO_Membership::createLineItems($this, $this->_params['membership_type_id']);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $this->_params, $lineItem[$priceSetId]
       );
       //CRM-11529 for quick config backoffice transactions
       //when financial_type_id is passed in form, update the
       //line items with the financial type selected in form
+<<<<<<< HEAD
       if ($submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues)) {
+=======
+      if ($submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $this->_params)) {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         foreach ($lineItem[$priceSetId] as &$li) {
           $li['financial_type_id'] = $submittedFinancialType;
         }
       }
-      $formValues['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
+      $this->_params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
       if (!empty($lineItem)) {
-        $formValues['lineItems'] = $lineItem;
-        $formValues['processPriceSet'] = TRUE;
+        $this->_params['lineItems'] = $lineItem;
+        $this->_params['processPriceSet'] = TRUE;
       }
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
+<<<<<<< HEAD
         $formValues['contribution_contact_id'] = $this->_contributorContactID;
         if (!empty($this->_params['soft_credit_type_id'])) {
           $formValues['soft_credit'] = array(
+=======
+        $this->_params['contribution_contact_id'] = $this->_contributorContactID;
+        if (!empty($this->_params['soft_credit_type_id'])) {
+          $this->_params['soft_credit'] = array(
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             'soft_credit_type_id' => $this->_params['soft_credit_type_id'],
             'contact_id' => $this->_contactID,
           );
         }
       }
+<<<<<<< HEAD
       $formValues['contact_id'] = $this->_contactID;
+=======
+      $this->_params['contact_id'] = $this->_contactID;
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       //recordMembershipContribution receives params as a reference & adds one variable. This is
       // not a great pattern & ideally it would not receive as a reference. We assign our params as a
       // temporary variable to avoid e-notice & to make it clear to future refactorer that
       // this function is NOT reliant on that var being set
+<<<<<<< HEAD
       $temporaryParams = array_merge($formValues, array('membership_id' => $renewMembership->id));
+=======
+      $temporaryParams = array_merge($this->_params, array('membership_id' => $renewMembership->id));
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
-    $receiptSend = FALSE;
-    if (!empty($formValues['send_receipt'])) {
-      $receiptSend = TRUE;
+    if (!empty($this->_params['send_receipt'])) {
 
-      $receiptFrom = $formValues['from_email_address'];
+      $receiptFrom = $this->_params['from_email_address'];
 
-      if (!empty($formValues['payment_instrument_id'])) {
+      if (!empty($this->_params['payment_instrument_id'])) {
         $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-        $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
+        $this->_params['paidBy'] = $paymentInstrument[$this->_params['payment_instrument_id']];
       }
       //get the group Tree
       $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', $this, $this->_id, FALSE, $this->_memType);
@@ -753,34 +875,18 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
       CRM_Core_BAO_UFGroup::getValues($this->_contactID, $customFields, $customValues, FALSE, $members);
 
-      $this->assign_by_ref('formValues', $formValues);
-      if (!empty($formValues['contribution_id'])) {
-        $this->assign('contributionID', $formValues['contribution_id']);
+      $this->assign_by_ref('formValues', $this->_params);
+      if (!empty($this->_params['contribution_id'])) {
+        $this->assign('contributionID', $this->_params['contribution_id']);
       }
-      $this->assign('membershipID', $this->_id);
-      $this->assign('contactID', $this->_contactID);
-      $this->assign('module', 'Membership');
-      $this->assign('receiptType', 'membership renewal');
-      $this->assign('mem_start_date', CRM_Utils_Date::customFormat($renewMembership->start_date));
-      $this->assign('mem_end_date', CRM_Utils_Date::customFormat($renewMembership->end_date));
+
       $this->assign('membership_name', CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
         $renewMembership->membership_type_id
       ));
       $this->assign('customValues', $customValues);
+      $this->assign('mem_start_date', CRM_Utils_Date::customFormat($renewMembership->start_date));
+      $this->assign('mem_end_date', CRM_Utils_Date::customFormat($renewMembership->end_date));
       if ($this->_mode) {
-        if (!empty($this->_params['billing_first_name'])) {
-          $name = $this->_params['billing_first_name'];
-        }
-
-        if (!empty($this->_params['billing_middle_name'])) {
-          $name .= " {$this->_params['billing_middle_name']}";
-        }
-
-        if (!empty($this->_params['billing_last_name'])) {
-          $name .= " {$this->_params['billing_last_name']}";
-        }
-        $this->assign('billingName', $name);
-
         // assign the address formatted up for display
         $addressParts = array(
           "street_address-{$this->_bltID}",
@@ -791,29 +897,23 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         );
         $addressFields = array();
         foreach ($addressParts as $part) {
-          list($n, $id) = explode('-', $part);
+          list($n) = explode('-', $part);
           if (isset($this->_params['billing_' . $part])) {
             $addressFields[$n] = $this->_params['billing_' . $part];
           }
         }
         $this->assign('address', CRM_Utils_Address::format($addressFields));
-        $date = CRM_Utils_Date::format($this->_params['credit_card_exp_date']);
-        $date = CRM_Utils_Date::mysqlToIso($date);
-        $this->assign('credit_card_exp_date', $date);
-        $this->assign('credit_card_number',
-          CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
-        );
-        $this->assign('credit_card_type', $this->_params['credit_card_type']);
         $this->assign('contributeMode', 'direct');
         $this->assign('isAmountzero', 0);
         $this->assign('is_pay_later', 0);
         $this->assign('isPrimary', 1);
+        $this->assign('receipt_text_renewal', $this->_params['receipt_text']);
         if ($this->_mode == 'test') {
           $this->assign('action', '1024');
         }
       }
 
-      list($mailSend, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      list($this->isMailSent) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         array(
           'groupName' => 'msg_tpl_workflow_membership',
           'valueName' => 'membership_offline_receipt',
@@ -825,18 +925,73 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         )
       );
     }
-
-    $statusMsg = ts('%1 membership for %2 has been renewed.', array(1 => $memType, 2 => $this->_memberDisplayName));
-
-    if ($endDate) {
-      $statusMsg .= ' ' . ts('The new membership End Date is %1.', array(1 => CRM_Utils_Date::customFormat(substr($endDate, 0, 8))));
-    }
-
-    if ($receiptSend && $mailSend) {
-      $statusMsg .= ' ' . ts('A renewal confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
-    }
-
-    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
   }
 
+  /**
+   * Wrapper function for unit tests.
+   *
+   * @param array $formValues
+   */
+  public function testSubmit($formValues) {
+    $this->_memType = $formValues['membership_type_id'][1];
+    $this->_params = $formValues;
+    $this->submit($formValues);
+  }
+
+<<<<<<< HEAD
+    if ($endDate) {
+      $statusMsg .= ' ' . ts('The new membership End Date is %1.', array(1 => CRM_Utils_Date::customFormat(substr($endDate, 0, 8))));
+=======
+  protected function assignBillingName() {
+    $name = '';
+    if (!empty($this->_params['billing_first_name'])) {
+      $name = $this->_params['billing_first_name'];
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
+    }
+
+    if (!empty($this->_params['billing_middle_name'])) {
+      $name .= " {$this->_params['billing_middle_name']}";
+    }
+
+    if (!empty($this->_params['billing_last_name'])) {
+      $name .= " {$this->_params['billing_last_name']}";
+    }
+    $this->assign('billingName', $name);
+  }
+
+<<<<<<< HEAD
+=======
+  /**
+   * Add the billing address to the contact who paid.
+   */
+  protected function processBillingAddress() {
+    $fields = array();
+
+    // set email for primary location.
+    $fields['email-Primary'] = 1;
+    $this->_params['email-5'] = $this->_params['email-Primary'] = $this->_contributorEmail;
+
+    // also add location name to the array
+    $this->_params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
+
+    $this->_params["address_name-{$this->_bltID}"] = trim($this->_params["address_name-{$this->_bltID}"]);
+
+    $fields["address_name-{$this->_bltID}"] = 1;
+    $fields["email-{$this->_bltID}"] = 1;
+
+    list($hasBillingField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+
+    $addressParams['preserveDBName'] = TRUE;
+    if ($hasBillingField) {
+      $addressParams = array_merge($this->_params, $addressParams);
+      //here we are setting up the billing contact - if different from the member they are already created
+      // but they will get billing details assigned
+      CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
+        $this->_contributorContactID, NULL, NULL,
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
+      );
+    }
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

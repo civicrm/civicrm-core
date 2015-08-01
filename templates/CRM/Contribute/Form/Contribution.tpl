@@ -25,21 +25,13 @@
 *}
 {* this template is used for adding/editing/deleting contributions and pledge payments *}
 
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{elseif $priceSetId}
+{if $priceSetId}
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution"}
 {elseif $showAdditionalInfo and $formType }
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
   <div class="crm-block crm-form-block crm-contribution-form-block">
-
-  {if $contributionMode == 'test' }
-    {assign var=contribMode value="TEST"}
-    {elseif $contributionMode == 'live'}
-    {assign var=contribMode value="LIVE"}
-  {/if}
 
   {if !$email and $action neq 8 and $context neq 'standalone'}
   <div class="messages status no-popup">
@@ -49,9 +41,10 @@
   {if $contributionMode}
   <div id="help">
     {if $contactId}
-      {ts 1=$displayName 2=$contribMode}Use this form to submit a new contribution on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
+        %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {else}
-      {ts 1=$displayName 2=$contribMode}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+      {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
     {/if}
   </div>
   {/if}
@@ -85,7 +78,7 @@
       <td>{$form.contact_id.html}</td>
     {/if}
     {if $contributionMode}
-    <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
+      <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
     {/if}
     <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
       <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
@@ -118,7 +111,7 @@
       </td>
     </tr>
 
-      {if $buildRecurBlock && !$ppID}
+      {if $buildRecurBlock}
       <tr id='recurringPaymentBlock' class='hiddenElement'>
         <td></td>
         <td>
@@ -219,6 +212,7 @@
 
   </table>
 
+<<<<<<< HEAD
   <div class="accordion ui-accordion ui-widget ui-helper-reset">
     {* Billing Pane is the only billing pane currently *}
     {foreach from=$billingPanes key=paneName item=paneValue}
@@ -232,6 +226,9 @@
       </div>
     {/foreach}
   </div>
+=======
+  {include file='CRM/Core/BillingBlockWrapper.tpl'}
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 
     <!-- start of soft credit -->
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">

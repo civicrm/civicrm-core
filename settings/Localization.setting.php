@@ -296,5 +296,24 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => NULL,
+<<<<<<< HEAD
+=======
+  ),
+  'weekBegins' => array(
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'weekBegins',
+    'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_type' => 'select',
+    'option_values' => CRM_Utils_Date::getFullWeekdayNames(),
+    'default' => '0',
+    'add' => '4.7',
+    'title' => 'Week begins on',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "",
+    'help_text' => NULL,
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   ),
 );

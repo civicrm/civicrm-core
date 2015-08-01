@@ -87,10 +87,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $scheduleStatusId = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
     $this->assign('scheduleStatusId', $scheduleStatusId);
 
-    if ($this->_cdType) {
-      return $result;
-    }
-
     if (!$this->_caseId && $this->_activityId) {
       $this->_caseId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseActivity', $this->_activityId,
         'case_id', 'activity_id'
@@ -245,11 +241,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
       $this->assign('targetContactValues', empty($targetContactValues) ? FALSE : $targetContactValues);
 
-      //return form for ajax
-      if ($this->_cdType) {
-        return $this->_defaults;
-      }
-
       if (isset($this->_encounterMedium)) {
         $this->_defaults['medium_id'] = $this->_encounterMedium;
       }
@@ -288,10 +279,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::DETACH | CRM_Core_Action::RENEW)) {
       return;
-    }
-
-    if ($this->_cdType) {
-      return $result;
     }
 
     $this->assign('urlPath', 'civicrm/case/activity');
@@ -470,7 +457,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         )
       );
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $customFields,
         $this->_activityId,
         'Activity'
       );
@@ -658,23 +644,9 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         }
       }
 
-      if (!CRM_Utils_array::crmIsEmptyArray($mailToContacts)) {
-        //include attachments while sending a copy of activity.
-        $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity',
-          $vval['actId']
-        );
-
-        $ics = new CRM_Activity_BAO_ICalendar($activity);
-        $ics->addAttachment($attachments, $mailToContacts);
-        $result = CRM_Case_BAO_Case::sendActivityCopy($this->_currentlyViewedContactId,
-          $vval['actId'], $mailToContacts, $attachments, $vval['case_id']
-        );
-        $ics->cleanup();
-        if (empty($result)) {
-          $mailStatus = '';
-        }
-      }
-      else {
+      $extraParams = array('case_id' => $vval['case_id'], 'client_id' => $this->_currentlyViewedContactId);
+      $result = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts, $extraParams);
+      if (empty($result)) {
         $mailStatus = '';
       }
 

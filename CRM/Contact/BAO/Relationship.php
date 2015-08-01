@@ -36,6 +36,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @var int
    */
   const ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
+<<<<<<< HEAD
 
   /**
    * Create function - use the API instead.
@@ -89,6 +90,65 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * The relationship details are the same for each relationship except the secondary contact
    * id can be an array.
    *
+=======
+
+  /**
+   * Create function - use the API instead.
+   *
+   * Note that the previous create function has been renamed 'legacyCreateMultiple'
+   * and this is new in 4.6
+   * All existing calls have been changed to legacyCreateMultiple except the api call - however, it is recommended
+   * that you call that as the end to end testing here is based on the api & refactoring may still be done.
+   *
+   * @param array $params
+   *
+   * @return \CRM_Contact_BAO_Relationship
+   * @throws \CRM_Core_Exception
+   */
+  public static function create(&$params) {
+
+    $extendedParams = self::loadExistingRelationshipDetails($params);
+    // When id is specified we always wan't to update, so we don't need to
+    // check for duplicate relations.
+    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, $extendedParams['contact_id_a'], $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
+      throw new CRM_Core_Exception('Duplicate Relationship');
+    }
+    $params = $extendedParams;
+    if (self::checkValidRelationship($params, $params, 0)) {
+      throw new CRM_Core_Exception('Invalid Relationship');
+    }
+    $relationship = self::add($params);
+    if (!empty($params['contact_id_a'])) {
+      $ids = array(
+        'contactTarget' => $relationship->contact_id_b,
+        'contact' => $params['contact_id_a'],
+      );
+
+      //CRM-16087 removed additional call to function relatedMemberships which is already called by disableEnableRelationship
+      //resulting in membership being created twice
+      if (array_key_exists('is_active', $params) && empty($params['is_active'])) {
+        $action = CRM_Core_Action::DISABLE;
+        $active = FALSE;
+      }
+      else {
+        $action = CRM_Core_Action::ENABLE;
+        $active = TRUE;
+      }
+      $id = empty($params['id']) ? $relationship->id : $params['id'];
+      self::disableEnableRelationship($id, $action, $params, $ids, $active);
+    }
+
+    self::addRecent($params, $relationship);
+    return $relationship;
+  }
+
+  /**
+   * Create multiple relationships for one contact.
+   *
+   * The relationship details are the same for each relationship except the secondary contact
+   * id can be an array.
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param array $params
    *   Parameters for creating multiple relationships.
    *   The parameters are the same as for relationship create function except that the non-primary
@@ -557,7 +617,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $value['contact_type_b'] == $otherContactType
         ) &&
         (in_array($value['contact_sub_type_a'], $contactSubType) ||
+<<<<<<< HEAD
           in_array($value['contact_sub_type_b'], $contactSubType) ||
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           (!$value['contact_sub_type_a'] && !$onlySubTypeRelationTypes)
         )
       ) {
@@ -572,7 +635,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $value['contact_type_a'] == $otherContactType
         ) &&
         (in_array($value['contact_sub_type_b'], $contactSubType) ||
+<<<<<<< HEAD
           in_array($value['contact_sub_type_a'], $contactSubType) ||
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           (!$value['contact_sub_type_b'] && !$onlySubTypeRelationTypes)
         )
       ) {
@@ -684,10 +750,17 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
    * Disable/enable the relationship.
+<<<<<<< HEAD
    *
    * @param int $id
    *   Relationship id.
    *
+=======
+   *
+   * @param int $id
+   *   Relationship id.
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param int $action
    * @param array $params
    * @param array $ids
@@ -696,7 +769,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   public static function disableEnableRelationship($id, $action, $params = array(), $ids = array(), $active = FALSE) {
     $relationship = self::clearCurrentEmployer($id, $action);
 
+<<<<<<< HEAD
     if (CRM_Core_Permission::access('CiviMember')) {
+=======
+    if ($id) {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       // create $params array which is required to delete memberships
       // of the related contacts.
       if (empty($params)) {
@@ -1978,7 +2055,7 @@ AND cc.sort_name LIKE '%$name%'";
         $params['total'] = count($relationships);
       }
       else {
-        // FIX ME: we cannot directly determine total permissioned relationship, hence re-fire query
+        // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
         $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
           $relationshipStatus,
           0, 0, 0,
@@ -1989,17 +2066,32 @@ AND cc.sort_name LIKE '%$name%'";
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
+        $relationship = array();
+
+        $relationship['DT_RowClass'] = 'crm-entity';
+        if ($values['is_active'] == 0) {
+          $relationship['DT_RowClass'] .= ' disabled';
+        }
+
+        $relationship['DT_RowData'] = array();
+        $relationship['DT_RowData']['entity'] = 'relationship';
+        $relationship['DT_RowData']['id'] = $values['id'];
+
         //Add image icon for related contacts: CRM-14919
         $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],
           FALSE,
           $values['cid']
         );
+<<<<<<< HEAD
         $contactRelationships[$relationshipId]['name'] = $icon . ' ' . CRM_Utils_System::href(
+=======
+        $relationship['sort_name'] = $icon . ' ' . CRM_Utils_System::href(
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
             $values['name'],
             'civicrm/contact/view',
             "reset=1&cid={$values['cid']}");
 
-        $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
+        $relationship['relation'] = CRM_Utils_System::href(
           $values['relation'],
           'civicrm/contact/view/rel',
           "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
@@ -2008,32 +2100,38 @@ AND cc.sort_name LIKE '%$name%'";
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
-            $contactRelationships[$relationshipId]['name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
+            $relationship['sort_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
           }
 
           if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
-            $contactRelationships[$relationshipId]['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
+            $relationship['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
           }
         }
 
         if (!empty($values['description'])) {
-          $contactRelationships[$relationshipId]['relation'] .= "<p class='description'>{$values['description']}</p>";
+          $relationship['relation'] .= "<p class='description'>{$values['description']}</p>";
         }
 
-        $contactRelationships[$relationshipId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-        $contactRelationships[$relationshipId]['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
-        $contactRelationships[$relationshipId]['city'] = $values['city'];
-        $contactRelationships[$relationshipId]['state'] = $values['state'];
-        $contactRelationships[$relationshipId]['email'] = $values['email'];
-        $contactRelationships[$relationshipId]['phone'] = $values['phone'];
-        $contactRelationships[$relationshipId]['links'] = $values['action'];
-        $contactRelationships[$relationshipId]['id'] = $values['id'];
-        $contactRelationships[$relationshipId]['is_active'] = $values['is_active'];
+        $relationship['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
+        $relationship['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
+        $relationship['city'] = $values['city'];
+        $relationship['state'] = $values['state'];
+        $relationship['email'] = $values['email'];
+        $relationship['phone'] = $values['phone'];
+        $relationship['links'] = $values['action'];
+
+        array_push($contactRelationships, $relationship);
       }
     }
-    return $contactRelationships;
+
+    $relationshipsDT = array();
+    $relationshipsDT['data'] = $contactRelationships;
+    $relationshipsDT['recordsTotal'] = $params['total'];
+    $relationshipsDT['recordsFiltered'] = $params['total'];
+
+    return $relationshipsDT;
   }
 
 }

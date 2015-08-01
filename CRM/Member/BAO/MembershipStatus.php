@@ -75,7 +75,11 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *   Value we want to set the is_active field.
    *
    * @return Object
+<<<<<<< HEAD
    *   DAO object on sucess, null otherwise
+=======
+   *   DAO object on success, null otherwise
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipStatus', $id, 'is_active', $is_active);
@@ -193,8 +197,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     //checking if membership status is present in some other table
     $check = FALSE;
 
-    $dependancy = array('Membership', 'MembershipLog');
-    foreach ($dependancy as $name) {
+    $dependency = array('Membership', 'MembershipLog');
+    foreach ($dependency as $name) {
       $baoString = 'CRM_Member_BAO_' . $name;
       $dao = new $baoString();
       $dao->status_id = $membershipStatusId;

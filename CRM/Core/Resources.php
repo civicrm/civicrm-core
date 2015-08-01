@@ -194,6 +194,7 @@ class CRM_Core_Resources {
     if ($translate) {
       $domain = ($translate === TRUE) ? $ext : $translate;
       $this->addString($this->strings->get($domain, $this->getPath($ext, $file), 'text/javascript'), $domain);
+<<<<<<< HEAD
     }
     // Look for non-minified version if we are in debug mode
     if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.js') !== FALSE) {
@@ -201,7 +202,10 @@ class CRM_Core_Resources {
       if ($this->getPath($ext, $nonMiniFile)) {
         $file = $nonMiniFile;
       }
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
+    $this->resolveFileName($file, $ext);
     return $this->addScriptUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
 
@@ -416,6 +420,7 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
+    $this->resolveFileName($file, $ext);
     return $this->addStyleUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
 
@@ -587,14 +592,22 @@ class CRM_Core_Resources {
 
       // Add resources from coreResourceList
       $jsWeight = -9999;
-      foreach ($this->coreResourceList() as $file) {
-        if (substr($file, -2) == 'js') {
+      foreach ($this->coreResourceList() as $item) {
+        if (is_array($item)) {
+          $this->addSetting($item);
+        }
+        elseif (substr($item, -2) == 'js') {
           // Don't bother  looking for ts() calls in packages, there aren't any
+<<<<<<< HEAD
           $translate = (substr($file, 0, 3) == 'js/');
           $this->addScriptFile('civicrm', $file, $jsWeight++, $region, $translate);
+=======
+          $translate = (substr($item, 0, 3) == 'js/');
+          $this->addScriptFile('civicrm', $item, $jsWeight++, $region, $translate);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
         }
         else {
-          $this->addStyleFile('civicrm', $file, -100, $region);
+          $this->addStyleFile('civicrm', $item, -100, $region);
         }
       }
 
@@ -684,20 +697,23 @@ class CRM_Core_Resources {
 
   /**
    * List of core resources we add to every CiviCRM page.
+<<<<<<< HEAD
+=======
+   *
+   * Note: non-compressed versions of .min files will be used in debug mode
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return array
    */
   public function coreResourceList() {
     $config = CRM_Core_Config::singleton();
-    // Use minified files for production, uncompressed in debug mode
-    // Note, $this->addScriptFile would automatically search for the non-minified file in debug mode but this is probably faster
-    $min = $config->debug ? '' : '.min';
 
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
     $items = array(
       "bower_components/jquery/dist/jquery.min.js",
       "bower_components/jquery-ui/jquery-ui.min.js",
+<<<<<<< HEAD
       "bower_components/jquery-ui/themes/smoothness/jquery-ui$min.css",
       "bower_components/lodash-compat/lodash.min.js",
       "packages/jquery/plugins/jquery.mousewheel$min.js",
@@ -712,16 +728,49 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/DataTables/media/css/jquery.dataTables$min.css",
       "bower_components/jquery-validation/dist/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
+=======
+      "bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css",
+      "bower_components/lodash-compat/lodash.min.js",
+      "packages/jquery/plugins/jquery.mousewheel.min.js",
+      "bower_components/select2/select2.min.js",
+      "bower_components/select2/select2.min.css",
+      "packages/jquery/plugins/jquery.tableHeader.js",
+      "packages/jquery/plugins/jquery.form.min.js",
+      "packages/jquery/plugins/jquery.timeentry.min.js",
+      "packages/jquery/plugins/jquery.blockUI.min.js",
+      "bower_components/datatables/media/js/jquery.dataTables.min.js",
+      "bower_components/datatables/media/css/jquery.dataTables.min.css",
+      "bower_components/jquery-validation/dist/jquery.validate.min.js",
+      "packages/jquery/plugins/jquery.ui.datepicker.validation.min.js",
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       "js/Common.js",
       "js/crm.ajax.js",
     );
+    // add wysiwyg editor
+    $editor = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
+    $items[] = "js/wysiwyg/crm.wysiwyg.js";
+    if ($editor == "CKEditor") {
+      $items[] = "bower_components/ckeditor/ckeditor.js";
+      $items[] = "js/wysiwyg/crm.ckeditor.js";
+      $ckConfig = CRM_Admin_Page_CKEditorConfig::getConfigUrl();
+      if ($ckConfig) {
+        $items[] = array('config' => array('CKEditorCustomConfig' => $ckConfig));
+      }
+    }
 
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
+<<<<<<< HEAD
       $items[] = "packages/jquery/plugins/jquery.menu$min.js";
       $items[] = "css/navigation.css";
       $items[] = "packages/jquery/plugins/jquery.jeditable$min.js";
       $items[] = "packages/jquery/plugins/jquery.notify$min.js";
+=======
+      $items[] = "packages/jquery/plugins/jquery.menu.min.js";
+      $items[] = "css/navigation.css";
+      $items[] = "packages/jquery/plugins/jquery.jeditable.min.js";
+      $items[] = "packages/jquery/plugins/jquery.notify.min.js";
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
       $items[] = "js/jquery/jquery.crmeditable.js";
     }
 
@@ -765,6 +814,7 @@ class CRM_Core_Resources {
         CRM_Core_Smarty::PRINT_NOFORM,
         CRM_Core_Smarty::PRINT_JSON,
       ));
+<<<<<<< HEAD
   }
 
   /**
@@ -808,4 +858,64 @@ class CRM_Core_Resources {
     return $filters;
   }
 
+=======
+  }
+
+  /**
+   * Provide a list of available entityRef filters.
+   * FIXME: This function doesn't really belong in this class
+   * @TODO: Provide a sane way to extend this list for other entities - a hook or??
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    $filters = array();
+
+    $filters['event'] = array(
+      array('key' => 'event_type_id', 'value' => ts('Event Type')),
+      array(
+        'key' => 'start_date',
+        'value' => ts('Start Date'),
+        'options' => array(
+          array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
+          array('key' => '{"BETWEEN":["now - 3 month","now"]}', 'value' => ts('Past 3 Months')),
+          array('key' => '{"BETWEEN":["now - 6 month","now"]}', 'value' => ts('Past 6 Months')),
+          array('key' => '{"BETWEEN":["now - 1 year","now"]}', 'value' => ts('Past Year')),
+        ),
+      ),
+    );
+
+    $filters['activity'] = array(
+      array('key' => 'activity_type_id', 'value' => ts('Activity Type')),
+      array('key' => 'status_id', 'value' => ts('Activity Status')),
+    );
+
+    $filters['contact'] = array(
+      array('key' => 'contact_type', 'value' => ts('Contact Type')),
+      array('key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'),
+      array('key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'),
+      array('key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'),
+      array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
+      array('key' => 'gender_id', 'value' => ts('Gender')),
+      array('key' => 'is_deceased', 'value' => ts('Deceased')),
+    );
+
+    return $filters;
+  }
+
+  /**
+   * In debug mode, look for a non-minified version of this file
+   *
+   * @param string $fileName
+   * @param string $extName
+   */
+  private function resolveFileName(&$fileName, $extName) {
+    if (CRM_Core_Config::singleton()->debug && strpos($fileName, '.min.') !== FALSE) {
+      $nonMiniFile = str_replace('.min.', '.', $fileName);
+      if ($this->getPath($extName, $nonMiniFile)) {
+        $fileName = $nonMiniFile;
+      }
+    }
+  }
+
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
 }

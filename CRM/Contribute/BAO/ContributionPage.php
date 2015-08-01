@@ -29,8 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+<<<<<<< HEAD
  * $Id$
  *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  */
 
 /**
@@ -39,18 +42,31 @@
 class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage {
 
   /**
+<<<<<<< HEAD
    * Takes an associative array and creates a contribution page object.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
+=======
+   * Creates a contribution page.
+   *
+   * @param array $params
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @return CRM_Contribute_DAO_ContributionPage
    */
-  public static function &create(&$params) {
+  public static function create($params) {
     $financialTypeId = NULL;
     if (!empty($params['id']) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
     }
+<<<<<<< HEAD
+=======
+
+    if (isset($params['payment_processor']) && is_array($params['payment_processor'])) {
+      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
+    }
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'ContributionPage', CRM_Utils_Array::value('id', $params), $params);
     $dao = new CRM_Contribute_DAO_ContributionPage();
@@ -65,6 +81,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
   /**
    * Update the is_active flag in the db.
+<<<<<<< HEAD
+=======
+   *
+   * @deprecated - this bypasses hooks.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param int $id
    *   Id of the database record.
@@ -79,8 +100,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
+<<<<<<< HEAD
    * @param int $id
    * @param $values
+=======
+   * Load values for a contribution page.
+   *
+   * @param int $id
+   * @param array $values
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function setValues($id, &$values) {
     $params = array(
@@ -103,10 +131,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     else {
       $values['custom_post_id'] = '';
     }
+<<<<<<< HEAD
     // // add an accounting code also
     // if ($values ['financial_type_id']) {
     //   $values ['accountingCode'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $values ['financial_type_id'], 'accounting_code' );
     // }
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 
   /**
@@ -121,9 +152,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param bool $returnMessageText
    *   Return the message text instead of sending the mail.
    *
+<<<<<<< HEAD
    * @param null $fieldTypes
    *
    * @return void
+=======
+   * @param array $fieldTypes
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = $params = array();
@@ -431,6 +466,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
+<<<<<<< HEAD
    * Construct the message to be sent by the send function.
    *
    * @param array $tplParams
@@ -461,6 +497,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
   /**
    * Send the emails for Recurring Contribution Notication.
+=======
+   * Send the emails for Recurring Contribution Notification.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param string $type
    *   TxnType.
@@ -471,11 +510,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param object $recur
    *   Object of recurring contribution table.
    * @param bool|object $autoRenewMembership is it a auto renew membership.
+<<<<<<< HEAD
    *
    * @return void
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
   public static function recurringNotify($type, $contactID, $pageID, $recur, $autoRenewMembership = FALSE) {
     $value = array();
+    $isEmailReceipt = FALSE;
     if ($pageID) {
       CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id', $pageID, $value, array(
         'title',
@@ -485,14 +528,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'cc_receipt',
         'bcc_receipt',
       ));
+      $isEmailReceipt = CRM_Utils_Array::value('is_email_receipt', $value[$pageID]);
+    }
+    elseif ($recur->id) {
+      // This means we are coming from back-office - ie. no page ID, but recurring.
+      // Ideally this information would be passed into the function clearly rather than guessing by convention.
+      $isEmailReceipt = TRUE;
     }
 
-    $isEmailReceipt = CRM_Utils_Array::value('is_email_receipt', $value[$pageID]);
-    $isOfflineRecur = FALSE;
-    if (!$pageID && $recur->id) {
-      $isOfflineRecur = TRUE;
-    }
-    if ($isEmailReceipt || $isOfflineRecur) {
+    if ($isEmailReceipt) {
       if ($pageID) {
         $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$pageID]) . '" <' . $value[$pageID]['receipt_from_email'] . '>';
 
@@ -548,7 +592,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $template->assign('updateSubscriptionUrl', $url);
       }
 
-      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($templatesParams);
+      list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($templatesParams);
 
       if ($sent) {
         CRM_Core_Error::debug_log_message('Success: mail sent for recurring notification.');
@@ -571,11 +615,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $params
    *   Params to build component whereclause.
    *
+<<<<<<< HEAD
    * @param null $fieldTypes
    *
    * @return void
+=======
+   * @param array $fieldTypes
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    */
-  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
+  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = array()) {
     if ($gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = array();
@@ -613,8 +661,12 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
+<<<<<<< HEAD
    * make a copy of a contribution page, including
    * all the blocks in the page
+=======
+   * Make a copy of a contribution page, including all the blocks in the page.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param int $id
    *   The contribution page id to copy.
@@ -692,7 +744,11 @@ WHERE entity_table = 'civicrm_contribution_page'
     $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery, CRM_Core_DAO::$_nullArray);
     while ($premiumDao->fetch()) {
       if ($premiumDao->id) {
+<<<<<<< HEAD
         $copyPremiumProduct = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
+=======
+        CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           'premiums_id' => $premiumDao->id,
         ), array(
           'premiums_id' => $copyPremium->id,
@@ -708,6 +764,7 @@ WHERE entity_table = 'civicrm_contribution_page'
   }
 
   /**
+<<<<<<< HEAD
    * Check if contribution page contains payment
    * processor that supports recurring payment
    *
@@ -736,6 +793,8 @@ WHERE entity_table = 'civicrm_contribution_page'
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Get info for all sections enable/disable.
    *
    * @param array $contribPageIds
@@ -905,7 +964,12 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
+<<<<<<< HEAD
    * Generate html for pdf in confirmation receipt email  attachment.
+=======
+   * Generate html for pdf in confirmation receipt email attachment.
+   *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @param int $contributionId
    *   Contribution Page Id.
    * @param int $userID

@@ -302,17 +302,25 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
             if (is_numeric($fieldId)) {
               $customValue = &$val;
               if (!empty($dateFields) && array_key_exists($fieldId, $dateFields)) {
-                // formated date capture value capture
+                // formatted date capture value capture
                 $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
 
                 //set date and time format
                 switch ($timeFormat) {
                   case 1:
+<<<<<<< HEAD
                     $dateFormat[] = 'g:iA';
                     break;
 
                   case 2:
                     $dateFormat[] = 'G:i';
+=======
+                    $dateFormat[1] = 'g:iA';
+                    break;
+
+                  case 2:
+                    $dateFormat[1] = 'G:i';
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
                     break;
 
                   default:

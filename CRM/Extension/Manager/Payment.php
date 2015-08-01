@@ -186,7 +186,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    *   The method to call in the payment processor class.
    */
   private function _runPaymentHook(CRM_Extension_Info $info, $method) {
-    // Not concerned about performance at this stage, as these are seldomly performed tasks
+    // Not concerned about performance at this stage, as these are seldom performed tasks
     // (payment processor enable/disable/install/uninstall). May wish to implement some
     // kind of registry/caching system if more hooks are added.
 
@@ -213,13 +213,12 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       return;
     }
 
-    // See if we have any instances of this PP defined ..
-    if ($processor_id = CRM_Core_DAO::singleValueQuery("
-                SELECT pp.id
+    $processorDAO = CRM_Core_DAO::executeQuery(
+      "                SELECT pp.id, ppt.class_name
                   FROM civicrm_extension ext
             INNER JOIN civicrm_payment_processor_type ppt
                     ON ext.name = ppt.name
-            INNER JOIN civicrm_payment_processor pp
+            LEFT JOIN civicrm_payment_processor pp
                     ON ppt.id = pp.payment_processor_type_id
                  WHERE ext.type = 'payment'
                    AND ext.full_name = %1
@@ -227,6 +226,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       array(
         1 => array($info->key, 'String'),
       )
+<<<<<<< HEAD
     )
     ) {
       // If so, load params in the usual way ..
@@ -268,11 +268,22 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       else {
         CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
       }
+=======
+    );
+
+    while ($processorDAO->fetch()) {
+      $class_name = $processorDAO->class_name;
+      $processor_id = $processorDAO->id;
+    }
+
+    if (empty($class_name)) {
+      CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     }
 
     // In the case of uninstall, check for instances of PP first.
     // Don't run hook if any are found.
-    if ($method == 'uninstall' && $paymentProcessor['id'] > 0) {
+    if ($method == 'uninstall' && $processor_id > 0) {
       return;
     }
 
@@ -281,9 +292,8 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       case 'uninstall':
       case 'enable':
       case 'disable':
-
-        // Instantiate PP
-        $processorInstance = $paymentClass::singleton(NULL, $paymentProcessor);
+        // Instantiate PP - the getClass function allows us to do this when no payment processor instances exist.
+        $processorInstance = Civi\Payment\System::singleton()->getByClass($class_name);
 
         // Does PP implement this method, and can we call it?
         if (method_exists($processorInstance, $method) && is_callable(array(

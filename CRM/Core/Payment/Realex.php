@@ -77,6 +77,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
+<<<<<<< HEAD
    * @param array $params
    *
    * @throws Exception
@@ -95,8 +96,14 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * @param array $params
+=======
+   * Submit a payment using Advanced Integration Method.
    *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   *
+<<<<<<< HEAD
    * @throws Exception
    */
   public function doExpressCheckout(&$params) {
@@ -118,6 +125,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * @return array
    *   the result in a nice formatted array (or an error object)
    */
@@ -136,7 +145,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     /**********************************************************
      * Check to see if we have a duplicate before we send
      **********************************************************/
-    if ($this->_checkDupe($this->_getParam('order_id'))) {
+    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
       return self::error(9004, ts('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.'));
     }
 
@@ -205,7 +214,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
 
     curl_close($submit);
 
-    // Tidy up the responce xml
+    // Tidy up the response xml
     $response_xml = preg_replace("/[\s\t]/", " ", $response_xml);
     $response_xml = preg_replace("/[\n\r]/", "", $response_xml);
 
@@ -428,6 +437,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
+<<<<<<< HEAD
    * Checks to see if invoice_id already exists in db.
    *
    * @param int $invoiceId
@@ -443,6 +453,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * Get the value of a field if set.
    *
    * @param string $field

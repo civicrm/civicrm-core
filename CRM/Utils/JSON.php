@@ -49,6 +49,7 @@ class CRM_Utils_JSON {
   }
 
   /**
+<<<<<<< HEAD
    * Create JSON object.
    * @deprecated
    *
@@ -124,6 +125,12 @@ class CRM_Utils_JSON {
    * encode data for dataTable plugin.
    *
    * @param array $params
+=======
+   * encode data for dataTable plugin.
+   * @deprecated
+   *
+   * @param array $params
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *   Associated array of row elements.
    * @param int $sEcho
    *   Datatable needs this to make it more secure.
@@ -141,7 +148,7 @@ class CRM_Utils_JSON {
     $sOutput .= '"iTotalRecords": ' . $iTotal . ', ';
     $sOutput .= '"iTotalDisplayRecords": ' . $iFilteredTotal . ', ';
     $sOutput .= '"aaData": [ ';
-    foreach ($params as $key => $value) {
+    foreach ((array) $params as $key => $value) {
       $addcomma = FALSE;
       $sOutput .= "[";
       foreach ($selectorElements as $element) {

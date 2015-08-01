@@ -292,7 +292,11 @@ WHERE  email = %2
   }
 
   /**
+<<<<<<< HEAD
    * Send a reponse email informing the contact of the groups from which he.
+=======
+   * Send a response email informing the contact of the groups from which he.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    * has been unsubscribed.
    *
    * @param string $queue_id

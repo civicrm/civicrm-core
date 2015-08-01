@@ -6,7 +6,11 @@
   angular.module('crmUi', [])
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
+<<<<<<< HEAD
     // WISHLIST: crmCollapsed should support two-way/continous binding
+=======
+    // WISHLIST: crmCollapsed should support two-way/continuous binding
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     .directive('crmUiAccordion', function() {
       return {
         scope: {
@@ -361,11 +365,15 @@
     // Example:
     //   <a ng-click="$broadcast('my-insert-target', 'some new text')>Insert</a>
     //   <textarea crm-ui-insert-rx='my-insert-target'></textarea>
+<<<<<<< HEAD
     // TODO Consider ways to separate the plain-text/rich-text implementations
+=======
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     .directive('crmUiInsertRx', function() {
       return {
         link: function(scope, element, attrs) {
           scope.$on(attrs.crmUiInsertRx, function(e, tokenName) {
+<<<<<<< HEAD
             var id = element.attr('id');
             if (CKEDITOR.instances[id]) {
               CKEDITOR.instances[id].insertText(tokenName);
@@ -386,6 +394,11 @@
               crmForEl.triggerHandler('change');
               crmForEl.focus();
             }
+=======
+            CRM.wysiwyg.insert(element, tokenName);
+            $(element).select2('close').select2('val', '');
+            CRM.wysiwyg.focus(element);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           });
         }
       };
@@ -397,6 +410,7 @@
       return {
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
+<<<<<<< HEAD
           var ck = CKEDITOR.replace(elm[0]);
 
           if (ck) {
@@ -412,13 +426,22 @@
             });
           }
 
+=======
+
+          var editor = CRM.wysiwyg.create(elm);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           if (!ngModel) {
             return;
           }
 
           if (attr.ngBlur) {
+<<<<<<< HEAD
             ck.on('blur', function(){
               $timeout(function(){
+=======
+            $(elm).on('blur', function() {
+              $timeout(function() {
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
                 scope.$eval(attr.ngBlur);
               });
             });
@@ -439,8 +462,13 @@
             });
           });
 
+<<<<<<< HEAD
           ngModel.$render = function (value) {
             ck.setData(ngModel.$viewValue);
+=======
+          ngModel.$render = function(value) {
+            CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           };
         }
       };

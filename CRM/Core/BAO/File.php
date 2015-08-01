@@ -220,10 +220,16 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   /**
    * Delete all the files and associated object associated with this
    * combination
+   * @return bool
+   *   Was file deleted?
    */
   public static function deleteEntityFile($entityTable, $entityID, $fileTypeID = NULL, $fileID = NULL) {
+<<<<<<< HEAD
+=======
+    $isDeleted = FALSE;
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     if (empty($entityTable) || empty($entityID)) {
-      return;
+      return $isDeleted;
     }
 
     $config = CRM_Core_Config::singleton();
@@ -242,6 +248,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $cefIDs = implode(',', $cefIDs);
       $sql = "DELETE FROM civicrm_entity_file where id IN ( $cefIDs )";
       CRM_Core_DAO::executeQuery($sql);
+      $isDeleted = TRUE;
     }
 
     if (!empty($cfIDs)) {
@@ -267,7 +274,9 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
         $sql = "DELETE FROM civicrm_file where id IN ( $deleteFiles )";
         CRM_Core_DAO::executeQuery($sql);
       }
+      $isDeleted = TRUE;
     }
+    return $isDeleted;
   }
 
   /**

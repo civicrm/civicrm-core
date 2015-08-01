@@ -33,9 +33,15 @@
 
 /**
  * Adjust metadata for "Create" action.
+<<<<<<< HEAD
  *
  * The metadata is used for setting defaults, documentation & validation.
  *
+=======
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * @param array $params
  *   Array of parameters determined by getfields.
  */
@@ -84,9 +90,15 @@ function civicrm_api3_job_delete($params) {
 
 /**
  * Dumb wrapper to execute scheduled jobs.
+<<<<<<< HEAD
  *
  * Always creates success - errors and results are handled in the job log.
  *
+=======
+ *
+ * Always creates success - errors and results are handled in the job log.
+ *
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
  * @param array $params
  *   input parameters (unused).
  *
@@ -568,6 +580,7 @@ function civicrm_api3_job_cleanup($params) {
   $prevNext  = CRM_Utils_Array::value('prevNext', $params, TRUE);
   $dbCache   = CRM_Utils_Array::value('dbCache', $params, FALSE);
   $memCache  = CRM_Utils_Array::value('memCache', $params, FALSE);
+<<<<<<< HEAD
 
   if ($session || $tempTable || $prevNext) {
     CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext);
@@ -583,6 +596,34 @@ function civicrm_api3_job_cleanup($params) {
 
   if ($memCache) {
     CRM_Utils_System::flushCache();
+=======
+  $tplCache  = CRM_Utils_Array::value('tplCache', $params, FALSE);
+  $wordRplc  = CRM_Utils_Array::value('wordRplc', $params, FALSE);
+
+  if ($session || $tempTable || $prevNext) {
+    CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext);
+  }
+
+  if ($jobLog) {
+    CRM_Core_BAO_Job::cleanup();
+  }
+
+  if ($tplCache) {
+    $config = CRM_Core_Config::singleton();
+    $config->cleanup(1, FALSE);
+  }
+
+  if ($dbCache) {
+    CRM_Core_Config::clearDBCache();
+  }
+
+  if ($memCache) {
+    CRM_Utils_System::flushCache();
+  }
+
+  if ($wordRplc) {
+    CRM_Core_BAO_WordReplacement::rebuild();
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
   }
 }
 

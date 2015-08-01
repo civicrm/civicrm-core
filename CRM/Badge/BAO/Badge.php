@@ -75,7 +75,11 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
+<<<<<<< HEAD
    * Funtion to create structure and add meta data according to layout.
+=======
+   * Function to create structure and add meta data according to layout.
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
    *
    * @param array $row
    *   Row element that needs to be formatted.

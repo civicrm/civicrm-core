@@ -638,9 +638,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
             'Individual',
             'Contact',
             'Activity',
+<<<<<<< HEAD
+=======
+            'Formatting',
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
           ))
         ) {
-          $errors['field_name'] = ts('Cannot add or update profile field "%1" with combination of Household or Organization or any subtypes of Household or Organisation.', array(1 => $fieldType));
+          $errors['field_name'] = ts('Cannot add or update profile field "%1" with combination of Household or Organization or any subtypes of Household or Organization.', array(1 => $fieldType));
           break;
         }
       }

@@ -25,9 +25,6 @@
 *}
 
 {* this template is used for adding/editing activities for a case. *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 <div class="crm-block crm-form-block crm-case-activity-form-block">
 
   {if $action neq 8 and $action  neq 32768 }
@@ -62,10 +59,9 @@
     || $activityTypeFile EQ 'ChangeCaseStartDate'}
       {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
       <tr class="crm-case-activity-form-block-details">
-        <td class="label">{ts}Notes{/ts}</td>
+        <td class="label">{ts}Details{/ts}</td>
         <td class="view-value">
-          {* If using plain textarea, assign class=huge to make input large enough. *}
-          {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+          {$form.details.html}
         </td>
       </tr>
       {* Added Activity Details accordion tab *}
@@ -159,6 +155,14 @@
                   <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
                 {/if}
               </tr>
+              {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
+              <tr class="crm-case-activity-form-block-details">
+                <td class="label">{ts}Notes{/ts}</td>
+                <td class="view-value">
+                  {$form.details.html}
+                </td>
+              </tr>
+              {/if}
               <tr>
                 <td colspan="2"><div id="customData"></div></td>
               </tr>
@@ -166,8 +170,7 @@
                 <tr class="crm-case-activity-form-block-details">
                   <td class="label">{$form.details.label}</td>
                   <td class="view-value">
-                  {* If using plain textarea, assign class=huge to make input large enough. *}
-                    {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+                    {$form.details.html}
                   </td>
                 </tr>
               {/if}
@@ -230,6 +233,7 @@
     {/if}
   <tr class="crm-case-activity-form-block-schedule_followup">
     <td colspan="2">
+<<<<<<< HEAD
 
       <div id="follow-up" class="crm-accordion-wrapper collapsed">
         <div class="crm-accordion-header">
@@ -261,6 +265,9 @@
           </table>
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
+=======
+    {include file="CRM/Activity/Form/FollowUp.tpl" type="case-"}
+>>>>>>> 650ff6351383992ec77abface9b7f121f16ae07e
     </td>
   </tr>
   {* Suppress activity status and priority for changes to status, case type and start date. PostProc will force status to completed. *}
@@ -339,4 +346,3 @@
     {/literal}
   {/if}
 </div>
-{/if} {* end of main if block*}
