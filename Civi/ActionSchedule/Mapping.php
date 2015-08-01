@@ -1,7 +1,65 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
+
 namespace Civi\ActionSchedule;
 
-class Mapping {
+/**
+ * Class Mapping
+ * @package Civi\ActionSchedule
+ *
+ * This is the initial implementation of MappingInterface; it was
+ * constructed by cutting out swaths from CRM_Core_BAO_ActionSchedule.
+ * New implementers should consider implementing MappingInterface on
+ * their own.
+ *
+ * Background: The original designers of ActionMappings intended that
+ * one could create and configure new mappings through the database.
+ * To, e.g., define the filtering options for CiviEvent, you
+ * would insert a record in "civicrm_action_mapping" with fields like
+ * "entity" (a table name, eg "civicrm_event"), "entity_value" (an
+ * option-group name, eg "event_types").
+ *
+ * Unfortunately, the metadata in "civicrm_action_mapping" proved
+ * inadequate and was not updated to cope. Instead, a number
+ * of work-arounds for specific entities were hard-coded into
+ * the core action-scheduling code. Ultimately, to add a new
+ * mapping type, one needed to run around and patch a dozen
+ * places.
+ *
+ * The new MappingInterface makes no pretense of database-driven
+ * configuration. The dozen places have been consolidated and
+ * replaced with functions in MappingInterface.
+ *
+ * This "Mapping" implementation is a refactoring of the
+ * hard-coded bits. Internally, it uses the concepts from
+ * "civicrm_action_mapping". The resulting code is more
+ * convoluted than a clean implementation of MappingInterface.
+ */
+abstract class Mapping implements MappingInterface {
 
   private static $fields = array(
     'id',
@@ -67,7 +125,7 @@ class Mapping {
    * @var string
    *   Ex: 'activity_status, 'civicrm_participant_status_type', 'auto_renew_options'.
    */
-  private $entity_status;
+  protected $entity_status;
 
   /**
    * Level 2 filter -- the field label.
@@ -81,14 +139,14 @@ class Mapping {
    * @var string|NULL
    *   Ex: 'event_start_date'
    */
-  private $entity_date_start;
+  protected $entity_date_start;
 
   /**
    * Date filter -- the field name.
    * @var string|NULL
    *   Ex: 'event_end_date'.
    */
-  private $entity_date_end;
+  protected $entity_date_end;
 
   /**
    * Contact selector -- The field/relationship/option-group name.
@@ -131,6 +189,8 @@ class Mapping {
   }
 
   /**
+   * Get a list of available date fields.
+   *
    * @return array
    *   Array(string $fieldName => string $fieldLabel).
    */
@@ -145,6 +205,14 @@ class Mapping {
     return $dateFieldLabels;
   }
 
+  /**
+   * Unsure. Not sure how it differs from getRecipientTypes... but it does...
+   *
+   * @param string $recipientType
+   * @return array
+   *   Array(mixed $name => string $label).
+   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   */
   public function getRecipientListing($recipientType) {
     if (!$recipientType) {
       return array();
@@ -163,6 +231,8 @@ class Mapping {
   }
 
   /**
+   * Unsure. Not sure how it differs from getRecipientListing... but it does...
+   *
    * @param bool|NULL $noThanksJustKidding
    *   This is ridiculous and should not exist.
    *   If true, don't do our main job.
@@ -192,22 +262,6 @@ class Mapping {
     return $entityRecipientLabels;
   }
 
-  /**
-   * FIXME: Seems to duplicate getRecipientTypes?
-   * @return array|null
-   */
-  public function getRecipientOptions() {
-    $recipientOptions = NULL;
-    if (!\CRM_Utils_System::isNull($this->entity_recipient)) {
-      if ($this->entity_recipient == 'event_contacts') {
-        $recipientOptions = \CRM_Core_OptionGroup::values($this->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
-      }
-      else {
-        $recipientOptions = \CRM_Core_OptionGroup::values($this->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
-      }
-    }
-    return $recipientOptions;
-  }
 
   protected static function getValueLabelMap($name) {
     static $valueLabelMap = NULL;
@@ -240,5 +294,16 @@ class Mapping {
 
     return $valueLabelMap[$name];
   }
+
+  /**
+   * Generate a query to locate contacts who match the given
+   * schedule.
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   * @param string $phase
+   *   See, e.g., RecipientBuilder::PHASE_RELATION_FIRST.
+   * @return \CRM_Utils_SQL_Select
+   */
+  public abstract function createQuery($schedule, $phase);
 
 }
