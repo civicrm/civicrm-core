@@ -445,16 +445,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->validateChainSelectFields();
 
-    $hookErrors = CRM_Utils_Hook::validate(
-      get_class($this),
-      $this->_submitValues,
-      $this->_submitFiles,
-      $this
-    );
-
-    if (!is_array($hookErrors)) {
-      $hookErrors = array();
-    }
+    $hookErrors = array();
 
     CRM_Utils_Hook::validateForm(
       get_class($this),
