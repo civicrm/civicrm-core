@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<tr><td><label>{ts}Contribution Dates{/ts}</label></td></tr>
+<tr><td><label>{ts}Date Received{/ts}</label></td></tr>
 <tr>
 {include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
 </tr>
