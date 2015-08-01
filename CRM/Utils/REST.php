@@ -309,7 +309,7 @@ class CRM_Utils_REST {
       }
     }
     else {
-      // or the new format (entity+action)
+      // or the api format (entity+action)
       $args = array();
       $args[0] = 'civicrm';
       $args[1] = CRM_Utils_array::value('entity', $requestParams);
@@ -329,10 +329,7 @@ class CRM_Utils_REST {
     }
 
     // At this point we know we are not calling ping which does not require authentication.
-    //  Therefore, at this point we need to make sure we're working with a trusted user.
-    //  Valid users are those who provide a valid server key and API key
-
-    $valid_user = FALSE;
+    // Therefore we now need a valid server key and API key
 
     // Check and see if a valid secret API key is provided.
     $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
@@ -535,7 +532,7 @@ class CRM_Utils_REST {
     $requestParams = CRM_Utils_Request::exportValues();
 
     require_once 'api/v3/utils.php';
-    // Why is $config undefined -- $config = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
         $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
       )
