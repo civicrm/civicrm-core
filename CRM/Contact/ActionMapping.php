@@ -1,0 +1,106 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
+
+use Civi\ActionSchedule\RecipientBuilder;
+
+/**
+ * Class CRM_Contact_ActionMapping
+ *
+ * This defines the scheduled-reminder functionality for contact
+ * entities. It is useful for, e.g., sending a reminder based on
+ * birth date, modification date, or other custom dates on
+ * the contact record.
+ */
+class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
+
+  private $contactDateFields = array(
+    'birth_date',
+    'created_date',
+    'modified_date',
+  );
+
+  /**
+   * Generate a query to locate recipients who match the given
+   * schedule.
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   *   The schedule as configured by the administrator.
+   * @param string $phase
+   *   See, e.g., RecipientBuilder::PHASE_RELATION_FIRST.
+   * @return \CRM_Utils_SQL_Select
+   * @see RecipientBuilder
+   * @throws \CRM_Core_Exception
+   */
+  public function createQuery($schedule, $phase) {
+    $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
+    $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
+
+    // FIXME: This assumes that $values only has one field, but UI shows multiselect.
+    // Properly supporting multiselect would require total rewrite of this function.
+    if (count($selectedValues) != 1 || !isset($selectedValues[0])) {
+      throw new \CRM_Core_Exception("Error: Scheduled reminders may only have one contact field.");
+    }
+    elseif (in_array($selectedValues[0], $this->contactDateFields)) {
+      $dateDBField = $selectedValues[0];
+      $query = \CRM_Utils_SQL_Select::from("{$this->entity} e");
+      $query->param(array(
+        'casAddlCheckFrom' => 'civicrm_contact e',
+        'casContactIdField' => 'e.id',
+        'casEntityIdField' => 'e.id',
+        'casContactTableAlias' => 'e',
+      ));
+      $query->where('e.is_deleted = 0 AND e.is_deceased = 0');
+    }
+    else {
+      //custom field
+      $customFieldParams = array('id' => substr($selectedValues[0], 7));
+      $customGroup = $customField = array();
+      \CRM_Core_BAO_CustomField::retrieve($customFieldParams, $customField);
+      $dateDBField = $customField['column_name'];
+      $customGroupParams = array('id' => $customField['custom_group_id'], $customGroup);
+      \CRM_Core_BAO_CustomGroup::retrieve($customGroupParams, $customGroup);
+      $query = \CRM_Utils_SQL_Select::from("{$customGroup['table_name']} e");
+      $query->param(array(
+        'casAddlCheckFrom' => "{$customGroup['table_name']} e",
+        'casContactIdField' => 'e.entity_id',
+        'casEntityIdField' => 'e.id',
+        'casContactTableAlias' => NULL,
+      ));
+      $query->where('1'); // possible to have no "where" in this case
+    }
+
+    $query['casDateField'] = 'e.' . $dateDBField;
+
+    if (in_array(2, $selectedStatuses)) {
+      $query['casAnniversaryMode'] = 1;
+      $query['casDateField'] = 'DATE_ADD(' . $query['casDateField'] . ', INTERVAL ROUND(DATEDIFF(DATE(!casNow), ' . $query['casDateField'] . ') / 365) YEAR)';
+    }
+
+    return $query;
+  }
+
+}

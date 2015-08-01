@@ -1,14 +1,129 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
+
 namespace Civi\ActionSchedule;
 
+/**
+ * Class RecipientBuilder
+ * @package Civi\ActionSchedule
+ *
+ * The RecipientBuilder prepares a list of recipients based on an action-schedule.
+ *
+ * This is a four-step process, with different steps depending on:
+ *
+ * (a) How the recipient is identified. Sometimes recipients are identified based
+ *     on their relations (e.g. selecting the assignees of an activity or the
+ *     participants of an event), and sometimes they are manually added using
+ *     a flat contact list (e.g. with a contact ID or group ID).
+ * (b) Whether this is the first reminder or a follow-up/repeated reminder.
+ *
+ * The permutations of these (a)+(b) produce four phases -- RELATION_FIRST,
+ * RELATION_REPEAT, ADDITION_FIRST, ADDITION_REPEAT.
+ *
+ * Each phase requires running a complex query. As a general rule,
+ * MappingInterface::createQuery() produces a base query, and the RecipientBuilder
+ * appends extra bits (JOINs/WHEREs/GROUP BYs) depending on which step is running.
+ *
+ * For example, suppose we want to send reminders to anyone who registers for
+ * a "Conference" or "Exhibition" event with the 'pay later' option, and we want
+ * to fire the reminders X days after the registration date. The
+ * MappingInterface::createQuery() could return a query like:
+ *
+ * @code
+ * CRM_Utils_SQL_Select::from('civicrm_participant e')
+ *   ->join('event', 'INNER JOIN civicrm_event event ON e.event_id = event.id')
+ *   ->where('e.is_pay_later = 1')
+ *   ->where('event.event_type_id IN (#myEventTypes)')
+ *   ->param('myEventTypes', array(2, 5))
+ *   ->param('casDateField', 'e.register_date')
+ *   ...etc...
+ * @endcode
+ *
+ * In the RELATION_FIRST phase, RecipientBuilder adds a LEFT-JOIN+WHERE to find
+ * participants who have *not* yet received any reminder, and filters those
+ * participants based on whether X days have passed since "e.register_date".
+ *
+ * Notice that the query may define several SQL elements directly (eg
+ * via `from()`, `where()`, `join()`, `groupBy()`). Additionally, it
+ * must define some parameters (eg `casDateField`). These parameters will be
+ * read by RecipientBuilder and used in other parts of the query.
+ *
+ * At time of writing, these parameters are required:
+ *  - casAddlCheckFrom: string, SQL FROM expression
+ *  - casContactIdField: string, SQL column expression
+ *  - casDateField: string, SQL column expression
+ *  - casEntityIdField: string, SQL column expression
+ *
+ * Some parameters are optional:
+ *  - casContactTableAlias: string, SQL table alias
+ *  - casAnniversaryMode: bool
+ *  - casUseReferenceDate: bool
+ *
+ * Additionally, some parameters are automatically predefined:
+ *  - casNow
+ *  - casMappingEntity: string, SQL table name
+ *  - casMappingId: int
+ *  - casActionScheduleId: int
+ *
+ * Note: Any parameters defined by the core Civi\ActionSchedule subsystem
+ * use the prefix `cas`. If you define new parameters (like `myEventTypes`
+ * above), then use a different name (to avoid conflicts).
+ */
 class RecipientBuilder {
 
   private $now;
-  private $contactDateFields = array(
-    'birth_date',
-    'created_date',
-    'modified_date',
-  );
+
+  /**
+   * Generate action_log's for new, first-time alerts to related contacts.
+   *
+   * @see buildRelFirstPass
+   */
+  const PHASE_RELATION_FIRST = 'rel-first';
+
+  /**
+   * Generate action_log's for new, first-time alerts to additional contacts.
+   *
+   * @see buildAddlFirstPass
+   */
+  const PHASE_ADDITION_FIRST = 'addl-first';
+
+  /**
+   * Generate action_log's for repeated, follow-up alerts to related contacts.
+   *
+   * @see buildRelRepeatPass
+   */
+  const PHASE_RELATION_REPEAT = 'rel-repeat';
+
+  /**
+   * Generate action_log's for repeated, follow-up alerts to additional contacts.
+   *
+   * @see buildAddlRepeatPass
+   */
+  const PHASE_ADDITION_REPEAT = 'addl-repeat';
 
   /**
    * @var \CRM_Core_DAO_ActionSchedule
@@ -16,10 +131,15 @@ class RecipientBuilder {
   private $actionSchedule;
 
   /**
-   * @var Mapping
+   * @var MappingInterface
    */
   private $mapping;
 
+  /**
+   * @param $now
+   * @param \CRM_Core_DAO_ActionSchedule $actionSchedule
+   * @param MappingInterface $mapping
+   */
   public function __construct($now, $actionSchedule, $mapping) {
     $this->now = $now;
     $this->actionSchedule = $actionSchedule;
@@ -32,35 +152,33 @@ class RecipientBuilder {
    * @throws \CRM_Core_Exception
    */
   public function build() {
-    // Generate action_log's for new, first-time alerts to related contacts.
     $this->buildRelFirstPass();
 
-    // Generate action_log's for new, first-time alerts to additional contacts.
     if ($this->prepareAddlFilter('c.id')) {
       $this->buildAddlFirstPass();
     }
 
-    // Generate action_log's for repeated, follow-up alerts to related contacts.
     if ($this->actionSchedule->is_repeat) {
       $this->buildRelRepeatPass();
     }
 
-    // Generate action_log's for repeated, follow-up alerts to additional contacts.
     if ($this->actionSchedule->is_repeat && $this->prepareAddlFilter('c.id')) {
       $this->buildAddlRepeatPass();
     }
   }
 
   /**
+   * Generate action_log's for new, first-time alerts to related contacts.
+   *
    * @throws \Exception
    */
   protected function buildRelFirstPass() {
-    $query = $this->prepareQuery('rel-first');
+    $query = $this->prepareQuery(self::PHASE_RELATION_FIRST);
 
     $startDateClauses = $this->prepareStartDateClauses($query['casDateField']);
 
     $firstQuery = $query->copy()
-      ->merge($this->selectIntoActionLog('rel-first', $query))
+      ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
       ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
       ->where("reminder.id IS NULL")
       ->where($startDateClauses)
@@ -74,7 +192,7 @@ class RecipientBuilder {
     // value via UNION operation
     if (!empty($query['casUseReferenceDate'])) {
       $referenceQuery = $query->copy()
-        ->merge($this->selectIntoActionLog('rel-first', $query))
+        ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
         ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
         ->where("reminder.id IS NOT NULL")
         ->where($startDateClauses)
@@ -88,13 +206,15 @@ class RecipientBuilder {
   }
 
   /**
+   * Generate action_log's for new, first-time alerts to additional contacts.
+   *
    * @throws \Exception
    */
   protected function buildAddlFirstPass() {
-    $query = $this->prepareQuery('addl-first');
+    $query = $this->prepareQuery(self::PHASE_ADDITION_FIRST);
 
     $insertAdditionalSql = \CRM_Utils_SQL_Select::from("civicrm_contact c")
-      ->merge($this->selectIntoActionLog('addl-first', $query))
+      ->merge($this->selectIntoActionLog(self::PHASE_ADDITION_FIRST, $query))
       ->merge($this->joinReminder('LEFT JOIN', 'addl', $query))
       ->where("c.is_deleted = 0 AND c.is_deceased = 0")
       ->merge($this->prepareAddlFilter('c.id'))
@@ -112,11 +232,13 @@ class RecipientBuilder {
   }
 
   /**
+   * Generate action_log's for repeated, follow-up alerts to related contacts.
+   *
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   protected function buildRelRepeatPass() {
-    $query = $this->prepareQuery('rel-repeat');
+    $query = $this->prepareQuery(self::PHASE_RELATION_REPEAT);
     $startDateClauses = $this->prepareStartDateClauses($query['casDateField']);
 
     // CRM-15376 - do not send our reminders if original criteria no longer applies
@@ -125,14 +247,13 @@ class RecipientBuilder {
     // @todo - this only handles events that get moved later. Potentially they might get moved earlier
     $repeatInsert = $query
       ->merge($this->joinReminder('INNER JOIN', 'rel', $query))
-      ->merge($this->selectActionLogFields('rel-repeat', $query))
+      ->merge($this->selectActionLogFields(self::PHASE_RELATION_REPEAT, $query))
       ->select("MAX(reminder.action_date_time) as latest_log_time")
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : array())
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
-      ->having("TIMEDIFF(!now, latest_log_time) >= !hrs")
+      ->having("TIMEDIFF(!casNow, latest_log_time) >= !hrs")
       ->param(array(
-        '!now' => $this->now, // why not @now ?
         '!hrs' => $this->parseSqlHrs(),
       ))
       ->strict()
@@ -151,12 +272,15 @@ class RecipientBuilder {
       );
     }
   }
+
   /**
+   * Generate action_log's for repeated, follow-up alerts to additional contacts.
+   *
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   protected function buildAddlRepeatPass() {
-    $query = $this->prepareQuery('addl-repeat');
+    $query = $this->prepareQuery(self::PHASE_ADDITION_REPEAT);
 
     $addlCheck = \CRM_Utils_SQL_Select::from($query['casAddlCheckFrom'])
       ->select('*')
@@ -169,15 +293,14 @@ class RecipientBuilder {
     $daoCheck = \CRM_Core_DAO::executeQuery($addlCheck);
     if ($daoCheck->fetch()) {
       $repeatInsertAddl = \CRM_Utils_SQL_Select::from('civicrm_contact c')
-        ->merge($this->selectActionLogFields('addl-repeat', $query))
+        ->merge($this->selectActionLogFields(self::PHASE_ADDITION_REPEAT, $query))
         ->merge($this->joinReminder('INNER JOIN', 'addl', $query))
         ->select("MAX(reminder.action_date_time) as latest_log_time")
         ->merge($this->prepareAddlFilter('c.id'))
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
         ->groupBy("reminder.contact_id")
-        ->having("TIMEDIFF(!now, latest_log_time) >= !hrs")
+        ->having("TIMEDIFF(!casNow, latest_log_time) >= !hrs")
         ->param(array(
-          '!now' => $this->now, // FIXME: use @now ?
           '!hrs' => $this->parseSqlHrs(),
         ))
         ->strict()
@@ -205,27 +328,12 @@ class RecipientBuilder {
    */
   protected function prepareQuery($phase) {
     /** @var \CRM_Utils_SQL_Select $query */
-
-    if ($this->mapping->entity == 'civicrm_activity') {
-      $query = $this->prepareActivityQuery($phase);
-    }
-    elseif ($this->mapping->entity == 'civicrm_participant') {
-      $query = $this->prepareParticipantQuery($phase);
-    }
-    elseif ($this->mapping->entity == 'civicrm_membership') {
-      $query = $this->prepareMembershipQuery($phase);
-    }
-    elseif ($this->mapping->entity == 'civicrm_contact') {
-      $query = $this->prepareContactQuery($phase);
-    }
-    else {
-      throw new \CRM_Core_Exception("Unrecognized entity: {$this->mapping->entity}");
-    }
-
+    $query = $this->mapping->createQuery($this->actionSchedule, $phase);
     $query->param(array(
       'casActionScheduleId' => $this->actionSchedule->id,
       'casMappingId' => $this->mapping->id,
       'casMappingEntity' => $this->mapping->entity,
+      'casNow' => $this->now,
     ));
 
     if ($this->actionSchedule->limit_to /*1*/) {
@@ -383,47 +491,10 @@ WHERE      $group.id = {$groupId}
       . "({$dateField}, INTERVAL {$this->actionSchedule->end_frequency_interval} {$this->actionSchedule->end_frequency_unit})";
 
     return \CRM_Utils_SQL_Select::fragment()
-      ->where("@now <= !repetitionEndDate")
+      ->where("@casNow <= !repetitionEndDate")
       ->param(array(
-        '@now' => $this->now,
         '!repetitionEndDate' => $repeatEventDateExpr,
       ));
-  }
-
-  /**
-   * @return array
-   */
-  protected function prepareMembershipPermissionsFilter() {
-    $query = '
-SELECT    cm.id AS owner_id, cm.contact_id AS owner_contact, m.id AS slave_id, m.contact_id AS slave_contact, cmt.relationship_type_id AS relation_type, rel.contact_id_a, rel.contact_id_b, rel.is_permission_a_b, rel.is_permission_b_a
-FROM      civicrm_membership m
-LEFT JOIN civicrm_membership cm ON cm.id = m.owner_membership_id
-LEFT JOIN civicrm_membership_type cmt ON cmt.id = m.membership_type_id
-LEFT JOIN civicrm_relationship rel ON ( ( rel.contact_id_a = m.contact_id AND rel.contact_id_b = cm.contact_id AND rel.relationship_type_id = cmt.relationship_type_id )
-                                        OR ( rel.contact_id_a = cm.contact_id AND rel.contact_id_b = m.contact_id AND rel.relationship_type_id = cmt.relationship_type_id ) )
-WHERE     m.owner_membership_id IS NOT NULL AND
-          ( rel.is_permission_a_b = 0 OR rel.is_permission_b_a = 0)
-
-';
-    $excludeIds = array();
-    $dao = \CRM_Core_DAO::executeQuery($query, array());
-    while ($dao->fetch()) {
-      if ($dao->slave_contact == $dao->contact_id_a && $dao->is_permission_a_b == 0) {
-        $excludeIds[] = $dao->slave_contact;
-      }
-      elseif ($dao->slave_contact == $dao->contact_id_b && $dao->is_permission_b_a == 0) {
-        $excludeIds[] = $dao->slave_contact;
-      }
-    }
-
-    if (!empty($excludeIds)) {
-      return \CRM_Utils_SQL_Select::fragment()
-        ->where("!casContactIdField NOT IN (#excludeMemberIds)")
-        ->param(array(
-          '#excludeMemberIds' => $excludeIds,
-        ));
-    }
-    return NULL;
   }
 
   /**
@@ -439,197 +510,6 @@ WHERE     m.owner_membership_id IS NOT NULL AND
   }
 
   /**
-   * @return \CRM_Utils_SQL_Select
-   * @throws \CRM_Core_Exception
-   */
-  protected function prepareContactQuery($phase) {
-    $selectedValues = (array) \CRM_Utils_Array::explodePadded($this->actionSchedule->entity_value);
-    $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($this->actionSchedule->entity_status);
-
-    // FIXME: This assumes that $values only has one field, but UI shows multiselect.
-    if (count($selectedValues) != 1 || !isset($selectedValues[0])) {
-      throw new \CRM_Core_Exception("Error: Scheduled reminders may only have one contact field.");
-    }
-    elseif (in_array($selectedValues[0], $this->contactDateFields)) {
-      $dateDBField = $selectedValues[0];
-      $query = \CRM_Utils_SQL_Select::from("{$this->mapping->entity} e");
-      $query->param(array(
-        'casAddlCheckFrom' => 'civicrm_contact e',
-        'casContactIdField' => 'e.id',
-        'casEntityIdField' => 'e.id',
-        'casContactTableAlias' => 'e',
-      ));
-      $query->where('e.is_deleted = 0 AND e.is_deceased = 0');
-    }
-    else {
-      //custom field
-      $customFieldParams = array('id' => substr($selectedValues[0], 7));
-      $customGroup = $customField = array();
-      \CRM_Core_BAO_CustomField::retrieve($customFieldParams, $customField);
-      $dateDBField = $customField['column_name'];
-      $customGroupParams = array('id' => $customField['custom_group_id'], $customGroup);
-      \CRM_Core_BAO_CustomGroup::retrieve($customGroupParams, $customGroup);
-      $query = \CRM_Utils_SQL_Select::from("{$customGroup['table_name']} e");
-      $query->param(array(
-        'casAddlCheckFrom' => "{$customGroup['table_name']} e",
-        'casContactIdField' => 'e.entity_id',
-        'casEntityIdField' => 'e.id',
-        'casContactTableAlias' => NULL,
-      ));
-      $query->where('1'); // possible to have no "where" in this case
-    }
-
-    $query['casDateField'] = 'e.' . $dateDBField;
-
-    if (in_array(2, $selectedStatuses)) {
-      $query['casAnniversaryMode'] = 1;
-      $query['casDateField'] = 'DATE_ADD(' . $query['casDateField'] . ', INTERVAL ROUND(DATEDIFF(DATE(' . $this->now . '), ' . $query['casDateField'] . ') / 365) YEAR)';
-    }
-
-    return $query;
-  }
-
-  /**
-   * @return \CRM_Utils_SQL_Select
-   */
-  protected function prepareMembershipQuery($phase) {
-    $selectedValues = (array) \CRM_Utils_Array::explodePadded($this->actionSchedule->entity_value);
-    $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($this->actionSchedule->entity_status);
-
-    $query = \CRM_Utils_SQL_Select::from("{$this->mapping->entity} e");
-    $query['casAddlCheckFrom'] = 'civicrm_membership e';
-    $query['casContactIdField'] = 'e.contact_id';
-    $query['casEntityIdField'] = 'e.id';
-    $query['casContactTableAlias'] = NULL;
-    $query['casDateField'] = str_replace('membership_', 'e.', $this->actionSchedule->start_action_date);
-
-    if (in_array(2, $selectedStatuses)) {
-      //auto-renew memberships
-      $query->where("e.contribution_recur_id IS NOT NULL");
-    }
-    elseif (in_array(1, $selectedStatuses)) {
-      $query->where("e.contribution_recur_id IS NULL");
-    }
-
-    if (!empty($selectedValues)) {
-      $query->where("e.membership_type_id IN (@memberTypeValues)")
-        ->param('memberTypeValues', $selectedValues);
-    }
-    else {
-      $query->where("e.membership_type_id IS NULL");
-    }
-
-    $query->where("( e.is_override IS NULL OR e.is_override = 0 )");
-    $query->merge($this->prepareMembershipPermissionsFilter());
-    $query->where("e.status_id IN (#memberStatus)")
-      ->param('memberStatus', \CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id'));
-
-    // Why is this only for civicrm_membership?
-    if ($this->actionSchedule->start_action_date && $this->actionSchedule->is_repeat == FALSE) {
-      $query['casUseReferenceDate'] = TRUE;
-    }
-
-    return $query;
-  }
-
-  /**
-   * @return \CRM_Utils_SQL_Select
-   */
-  protected function prepareParticipantQuery($phase) {
-    $selectedValues = (array) \CRM_Utils_Array::explodePadded($this->actionSchedule->entity_value);
-    $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($this->actionSchedule->entity_status);
-
-    $query = \CRM_Utils_SQL_Select::from("{$this->mapping->entity} e");
-    $query['casAddlCheckFrom'] = 'civicrm_event r';
-    $query['casContactIdField'] = 'e.contact_id';
-    $query['casEntityIdField'] = 'e.id';
-    $query['casContactTableAlias'] = NULL;
-    $query['casDateField'] = str_replace('event_', 'r.', $this->actionSchedule->start_action_date);
-
-    $query->join('r', 'INNER JOIN civicrm_event r ON e.event_id = r.id');
-    if ($this->actionSchedule->recipient_listing && $this->actionSchedule->limit_to) {
-      switch (\CRM_Utils_Array::value($this->actionSchedule->recipient, $this->mapping->getRecipientOptions())) {
-        case 'participant_role':
-          $query->where("e.role_id IN (#recipList)")
-            ->param('recipList', \CRM_Utils_Array::explodePadded($this->actionSchedule->recipient_listing));
-          break;
-
-        default:
-          break;
-      }
-    }
-
-    // build where clause
-    if (!empty($selectedValues)) {
-      $valueField = ($this->mapping->id == \CRM_Core_ActionScheduleTmp::EVENT_TYPE_MAPPING_ID) ? 'event_type_id' : 'id';
-      $query->where("r.{$valueField} IN (@selectedValues)")
-        ->param('selectedValues', $selectedValues);
-    }
-    else {
-      $query->where(($this->mapping->id == \CRM_Core_ActionScheduleTmp::EVENT_TYPE_MAPPING_ID) ? "r.event_type_id IS NULL" : "r.id IS NULL");
-    }
-
-    $query->where('r.is_active = 1');
-    $query->where('r.is_template = 0');
-
-    // participant status criteria not to be implemented for additional recipients
-    if (!empty($selectedStatuses)) {
-      switch ($phase) {
-        case 'rel-first':
-        case 'rel-repeat':
-          $query->where("e.status_id IN (#selectedStatuses)")
-            ->param('selectedStatuses', $selectedStatuses);
-          break;
-
-      }
-
-    }
-    return $query;
-  }
-
-  /**
-   * @return \CRM_Utils_SQL_Select
-   */
-  protected function prepareActivityQuery($phase) {
-    $selectedValues = (array) \CRM_Utils_Array::explodePadded($this->actionSchedule->entity_value);
-    $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($this->actionSchedule->entity_status);
-
-    $query = \CRM_Utils_SQL_Select::from("{$this->mapping->entity} e");
-    $query['casAddlCheckFrom'] = 'civicrm_activity e';
-    $query['casContactIdField'] = 'r.contact_id';
-    $query['casEntityIdField'] = 'e.id';
-    $query['casContactTableAlias'] = NULL;
-    $query['casDateField'] = 'e.activity_date_time';
-
-    if (!is_null($this->actionSchedule->limit_to)) {
-      $activityContacts = \CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-      if ($this->actionSchedule->limit_to == 0 || !isset($activityContacts[$this->actionSchedule->recipient])) {
-        $recipientTypeId = \CRM_Utils_Array::key('Activity Targets', $activityContacts);
-      }
-      else {
-        $recipientTypeId = $this->actionSchedule->recipient;
-      }
-      $query->join('r', "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$recipientTypeId}");
-    }
-    // build where clause
-    if (!empty($selectedValues)) {
-      $query->where("e.activity_type_id IN (#selectedValues)")
-        ->param('selectedValues', $selectedValues);
-    }
-    else {
-      $query->where("e.activity_type_id IS NULL");
-    }
-
-    if (!empty($selectedStatuses)) {
-      $query->where("e.status_id IN (#selectedStatuss)")
-        ->param('selectedStatuss', $selectedStatuses);
-    }
-    $query->where('e.is_current_revision = 1 AND e.is_deleted = 0');
-
-    return $query;
-  }
-
-  /**
    * Generate a query fragment like for populating
    * action logs, e.g.
    *
@@ -642,8 +522,8 @@ WHERE     m.owner_membership_id IS NOT NULL AND
    */
   protected function selectActionLogFields($phase, $query) {
     switch ($phase) {
-      case 'rel-first':
-      case 'rel-repeat':
+      case self::PHASE_RELATION_FIRST:
+      case self::PHASE_RELATION_REPEAT:
         $fragment = \CRM_Utils_SQL_Select::fragment();
         // CRM-15376: We are not tracking the reference date for 'repeated' schedule reminders.
         if (!empty($query['casUseReferenceDate'])) {
@@ -659,8 +539,8 @@ WHERE     m.owner_membership_id IS NOT NULL AND
         );
         break;
 
-      case 'addl-first':
-      case 'addl-repeat':
+      case self::PHASE_ADDITION_FIRST:
+      case self::PHASE_ADDITION_REPEAT:
         $fragment = \CRM_Utils_SQL_Select::fragment();
         $fragment->select(
           array(
@@ -696,7 +576,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
       "entity_table",
       "action_schedule_id",
     );
-    if ($phase === 'rel-first' || $phase === 'rel-repeat') {
+    if ($phase === self::PHASE_RELATION_FIRST || $phase === self::PHASE_RELATION_REPEAT) {
       if (!empty($query['casUseReferenceDate'])) {
         array_unshift($actionLogColumns, 'reference_date');
       }
@@ -743,7 +623,7 @@ reminder.action_schedule_id = {$this->actionSchedule->id}";
     // Why do we only include anniversary clause for 'rel' queries?
     if ($for === 'rel' && !empty($query['casAnniversaryMode'])) {
       // only consider reminders less than 11 months ago
-      $joinClause .= " AND reminder.action_date_time > DATE_SUB($this->now, INTERVAL 11 MONTH)";
+      $joinClause .= " AND reminder.action_date_time > DATE_SUB(!casNow, INTERVAL 11 MONTH)";
     }
 
     return \CRM_Utils_SQL_Select::fragment()->join("reminder", "$joinType $joinClause");
