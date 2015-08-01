@@ -1,4 +1,30 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
+
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,7 +59,7 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
   }
 
   public function onRegisterMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+    $registrations->register(CRM_Activity_ActionMapping::create(array(
       'id' => CRM_Core_ActionScheduleTmp::ACTIVITY_MAPPING_ID,
       'entity' => 'civicrm_activity',
       'entity_label' => ts('Activity'),
@@ -44,7 +70,7 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
       'entity_date_start' => 'activity_date_time',
       'entity_recipient' => 'activity_contacts',
     )));
-    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+    $registrations->register(CRM_Event_ActionMapping::create(array(
       'id' => CRM_Core_ActionScheduleTmp::EVENT_TYPE_MAPPING_ID,
       'entity' => 'civicrm_participant',
       'entity_label' => ts('Event Type'),
@@ -56,7 +82,7 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
       'entity_date_end' => 'event_end_date',
       'entity_recipient' => 'event_contacts',
     )));
-    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+    $registrations->register(CRM_Event_ActionMapping::create(array(
       'id' => CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID,
       'entity' => 'civicrm_participant',
       'entity_label' => ts('Event Name'),
@@ -68,7 +94,7 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
       'entity_date_end' => 'event_end_date',
       'entity_recipient' => 'event_contacts',
     )));
-    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+    $registrations->register(CRM_Member_ActionMapping::create(array(
       'id' => CRM_Core_ActionScheduleTmp::MEMBERSHIP_TYPE_MAPPING_ID,
       'entity' => 'civicrm_membership',
       'entity_label' => ts('Membership'),
@@ -79,7 +105,7 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
       'entity_date_start' => 'membership_join_date',
       'entity_date_end' => 'membership_end_date',
     )));
-    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+    $registrations->register(CRM_Event_ActionMapping::create(array(
       'id' => CRM_Core_ActionScheduleTmp::EVENT_TPL_MAPPING_ID,
       'entity' => 'civicrm_participant',
       'entity_label' => ts('Event Template'),
@@ -91,7 +117,7 @@ class CRM_Core_ActionScheduleTmp implements EventSubscriberInterface {
       'entity_date_end' => 'event_end_date',
       'entity_recipient' => 'event_contacts',
     )));
-    $registrations->register(\Civi\ActionSchedule\Mapping::create(array(
+    $registrations->register(CRM_Contact_ActionMapping::create(array(
       'id' => CRM_Core_ActionScheduleTmp::CONTACT_MAPPING_ID,
       'entity' => 'civicrm_contact',
       'entity_label' => ts('Contact'),
