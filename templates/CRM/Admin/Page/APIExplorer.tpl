@@ -53,17 +53,33 @@
   #api-params-table th:first-child,
   #api-params-table td:first-child {
     width: 35%;
+    min-width: 190px;
+  }
+  #api-params-table td[colspan] {
+    width: 100%;
   }
   #api-params-table td:first-child + td,
-  #api-params-table th:first-child + th,
+  #api-params-table th:first-child + th {
+    width: 140px;
+  }
+  #api-params-table td:first-child + td select {
+    width: 132px;
+  }
+  #api-params-table td:first-child + td + td,
+  #api-params-table th:first-child + th + th {
+    width: 65%
+  }
   #api-generated td:first-child {
-    width: 9em;
+    width: 60px;
   }
   #api-params {
     min-height: 1em;
   }
   #api-params .red-icon {
     margin-top: .5em;
+  }
+  .api-param-remove {
+    float: right;
   }
   #mainTabContainer label {
     display: inline;
