@@ -69,6 +69,12 @@ class CRM_Pledge_BAO_Query {
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
     }
 
+    if (!empty($query->_returnProperties['pledge_start_date'])) {
+      $query->_select['pledge_start_date'] = 'civicrm_pledge.start_date as pledge_start_date';
+      $query->_element['pledge_start_date'] = 1;
+      $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+    }
+
     if (!empty($query->_returnProperties['pledge_status_id'])) {
       $query->_select['pledge_status_id'] = 'pledge_status.value as pledge_status_id';
       $query->_element['pledge_status'] = 1;
@@ -438,6 +444,7 @@ class CRM_Pledge_BAO_Query {
         'pledge_amount' => 1,
         'pledge_total_paid' => 1,
         'pledge_create_date' => 1,
+        'pledge_start_date' => 1,
         'pledge_next_pay_date' => 1,
         'pledge_next_pay_amount' => 1,
         'pledge_status' => 1,
