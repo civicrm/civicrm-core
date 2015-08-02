@@ -24,6 +24,9 @@ UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Summar
 
 {include file='../CRM/Upgrade/4.7.alpha1.msg_template/civicrm_msg_template.tpl'}
 
+-- CRM-16478 Remove custom fatal error template path
+DELETE FROM civicrm_setting WHERE name = 'fatalErrorTemplate';
+
 UPDATE civicrm_state_province SET name = 'Bataan' WHERE name = 'Batasn';
 
 --CRM-16914
