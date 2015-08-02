@@ -378,10 +378,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     $template = CRM_Core_Smarty::singleton();
-
     $template->assign($vars);
-
-    $config->userSystem->outputError($template->fetch($config->fatalErrorTemplate));
+    $config->userSystem->outputError($template->fetch('CRM/common/fatal.tpl'));
 
     self::abend(CRM_Core_Error::FATAL_ERROR);
   }
@@ -447,7 +445,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // print to screen
     $template = CRM_Core_Smarty::singleton();
     $template->assign($vars);
-    $content = $template->fetch($config->fatalErrorTemplate);
+    $content = $template->fetch('CRM/common/fatal.tpl');
     if ($config->backtrace) {
       $content = self::formatHtmlException($exception) . $content;
     }

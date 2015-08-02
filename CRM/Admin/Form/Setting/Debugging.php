@@ -42,7 +42,6 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
   protected $_settings = array(
     'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-    'fatalErrorTemplate' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
   );
 

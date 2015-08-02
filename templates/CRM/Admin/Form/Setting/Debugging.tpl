@@ -46,11 +46,6 @@
                 <td>{$form.backtrace.html}<br />
                 <span class="description">{ts}<strong>This feature should NOT be enabled for production sites.</strong><br />Set this value to <strong>Yes</strong> if you want to display a backtrace listing when a fatal error is encountered.{/ts}</span></td>
             </tr>
-            <tr class="crm-debugging-form-block-fatalErrorTemplate">
-                <td class="label">{$form.fatalErrorTemplate.label}</td>
-                <td>{$form.fatalErrorTemplate.html}<br />
-                <span class="description">{ts}Enter the path and filename for a custom Smarty template if you want to define your own screen for displaying fatal errors.{/ts}</span></td>
-            </tr>
             <tr class="crm-debugging-form-block-fatalErrorHandler">
                 <td class="label">{$form.fatalErrorHandler.label}</td>
                 <td>{$form.fatalErrorHandler.html}<br />
