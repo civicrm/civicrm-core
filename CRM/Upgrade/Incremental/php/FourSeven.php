@@ -47,13 +47,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
       // CRM-16478 Remove custom fatal error template path option
       $config = CRM_Core_Config::singleton();
-      if ($config->fatalErrorTemplate != 'CRM/common/fatal.tpl') {
+      if (!empty($config->fatalErrorTemplate) && $config->fatalErrorTemplate != 'CRM/common/fatal.tpl') {
         $preUpgradeMessage .= '<p>' . ts('The custom fatal error template setting will be removed during the upgrade. You are currently using this custom template: %1 . Following the upgrade you will need to use the standard approach to overriding template files, as described in the documentation.', array(1 => $config->fatalErrorTemplate)) . '</p>';
       }
-      else {
-        $preUpgradeMessage .= '<p>' . ts('The custom fatal error template setting will be removed during the upgrade, but you are not currently using this option.') . '</p>';
-      }
-
     }
   }
 
