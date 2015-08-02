@@ -582,23 +582,24 @@ AND li.entity_id = {$entityId}
     }
     // get previous line item for contribution
     $oldLineItems = self::getLineItems($contributionId, 'contribution', NULL, TRUE, TRUE);
-    foreach ($lineItems[1] as &$lineItem){
-      $itemId = CRM_Utils_Array::value('id', $lineItem);
-      if ($itemId) {
-        if (!array_key_exists($itemId, $oldLineItems)) {
-          // throw exception error;
-          CRM_Core_Error::debug( 'exception', 'exception' );
+    foreach ($lineItems as &$items) {    
+      foreach ($items as &$lineItem) {
+        $itemId = CRM_Utils_Array::value('id', $lineItem);
+        if ($itemId) {
+          if (!array_key_exists($itemId, $oldLineItems)) {
+            // throw exception error;
+          }
+          $lineItem['diff_amount'] = $lineItem['line_total'] - $oldLineItems[$itemId]['line_total'];
+          unset($oldLineItems[$itemId]);
         }
-        $lineItem['diff_amount'] = $lineItem['line_total'] - $oldLineItems[$itemId]['line_total'];
-        unset($oldLineItems[$itemId]);
       }
+      foreach ($oldLineItems as $oldkey => &$oldvalue) {
+        $oldvalue['id'] = $oldkey;
+        $oldvalue['diff_amount'] = - $oldvalue['line_total'];
+        $oldvalue['qty'] = 0;
+      }
+      $items = array_merge($item, $oldLineItems);
     }
-    foreach ($oldLineItems as $oldkey => &$oldvalue) {
-      $oldvalue['id'] = $oldkey;
-      $oldvalue['diff_amount'] = - $oldvalue['line_total'];
-      $oldvalue['qty'] = 0;
-    }
-    $lineItems[1] = array_merge($lineItems[1], $oldLineItems);
   }
 
 }
