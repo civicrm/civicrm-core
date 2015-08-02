@@ -351,7 +351,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     throw new Exception('Contribution does not exist');
   }
   $input = $ids = $cvalues = array('receipt_from_email' => $params['receipt_from_email']);
-  $contribution->loadRelatedObjects($input, $ids, FALSE, TRUE);
+  $contribution->loadRelatedObjects($input, $ids, TRUE);
   $contribution->composeMessageArray($input, $ids, $cvalues, FALSE, FALSE);
 }
 
@@ -420,7 +420,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
 
-  if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
+  if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
     throw new API_Exception('failed to load related objects');
   }
   elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
@@ -493,7 +493,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
   }
   $original_contribution = clone $contribution;
   try {
-    if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
+    if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
       throw new API_Exception('failed to load related objects');
     }
 

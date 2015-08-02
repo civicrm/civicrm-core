@@ -158,7 +158,10 @@ class CRM_Core_Payment_BaseIPN {
       $objects['contribution'] = &$contribution;
     }
     try {
-      $success = $contribution->loadRelatedObjects($input, $ids, $required);
+      $success = $contribution->loadRelatedObjects($input, $ids);
+      if ($required && empty($contribution->_relatedObjects['paymentProcessor'])) {
+        throw new CRM_Core_Exception("Could not find payment processor for contribution record: " . $contribution->id);
+      }
     }
     catch (Exception $e) {
       $success = FALSE;
