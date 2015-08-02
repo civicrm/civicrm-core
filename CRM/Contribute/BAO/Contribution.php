@@ -2057,15 +2057,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   Input as delivered from Payment Processor.
    * @param array $ids
    *   Ids as Loaded by Payment Processor.
-   * @param bool $required
-   *   Is Payment processor / contribution page required.
    * @param bool $loadAll
    *   Load all related objects - even where id not passed in? (allows API to call this).
    *
    * @return bool
    * @throws Exception
    */
-  public function loadRelatedObjects(&$input, &$ids, $required = FALSE, $loadAll = FALSE) {
+  public function loadRelatedObjects(&$input, &$ids, $loadAll = FALSE) {
     if ($loadAll) {
       $ids = array_merge($this->getComponentDetails($this->id), $ids);
       if (empty($ids['contact']) && isset($this->contact_id)) {
@@ -2178,18 +2176,6 @@ WHERE  contribution_id = %1 ";
           }
         }
       }
-
-      if (!$paymentProcessorID) {
-        //fail to load payment processor id.
-        // this seems a bit dubious....
-        if (empty($ids['pledge_payment'])) {
-          $loadObjectSuccess = TRUE;
-          if ($required) {
-            throw new Exception("Could not find contribution page for contribution record: " . $this->id);
-          }
-          return $loadObjectSuccess;
-        }
-      }
     }
     else {
       // we are in event mode
@@ -2232,10 +2218,6 @@ WHERE  contribution_id = %1 ";
       $ids['paymentProcessor'] = $paymentProcessorID;
       $this->_relatedObjects['paymentProcessor'] = $paymentProcessor;
     }
-    elseif ($required) {
-      throw new Exception("Could not find payment processor for contribution record: " . $this->id);
-    }
-
     return TRUE;
   }
 
