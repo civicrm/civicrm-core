@@ -532,7 +532,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['title']['api.required']);
+    $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 
   /**
@@ -542,7 +542,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('api_action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['title']['api.required']);
+    $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 
   public function testgetfieldsGet() {

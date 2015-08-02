@@ -42,7 +42,20 @@
  *   API result Array.
  */
 function civicrm_api3_event_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('event_type_id', 'template_id'));
+  // Required fields for creating an event
+  if (empty($params['id']) && empty($params['is_template'])) {
+    civicrm_api3_verify_mandatory($params, NULL, array(
+      'start_date',
+      'title',
+      array('event_type_id', 'template_id'),
+    ));
+  }
+  // Required fields for creating an event template
+  elseif (empty($params['id']) && !empty($params['is_template'])) {
+    civicrm_api3_verify_mandatory($params, NULL, array(
+      'template_title',
+    ));
+  }
 
   // Clone event from template
   if (!empty($params['template_id']) && empty($params['id'])) {
@@ -64,8 +77,6 @@ function civicrm_api3_event_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_event_create_spec(&$params) {
-  $params['start_date']['api.required'] = 1;
-  $params['title']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
   $params['financial_type_id']['api.aliases'] = array('contribution_type_id');
   $params['is_template']['api.default'] = 0;
