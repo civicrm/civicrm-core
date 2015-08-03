@@ -25,7 +25,7 @@
 *}
 {crmRegion name="billing-block"}
 <div id="payment_information">
-  {if $paymentFields|@count && (!$form.$expressButtonName || $paymentProcessor.payment_processor_type EQ 'PayPal')}
+  {if $paymentFields|@count}
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>
         {$paymentTypeLabel}
