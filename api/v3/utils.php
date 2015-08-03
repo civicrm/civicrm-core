@@ -478,7 +478,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
   // nested call you use the id (e.g. "id" => "$value.some_id"), the parent
   // call will get a param "id" => NULL. Not sure whether this is expected
   // behaviour or a bug. But I'll have to work around it.
-  if (array_key_exists('id', $params) && $params['id'] === null) {
+  if (array_key_exists('id', $params) && $params['id'] === NULL) {
     unset($params['id']);
   }
 
@@ -486,7 +486,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
   $entity = _civicrm_api_get_entity_name_from_dao($dao);
   $custom_fields = _civicrm_api3_custom_fields_for_entity($entity);
   $options = _civicrm_api3_get_options_from_params($params);
-  
+
   $entity_field_names = _civicrm_api3_field_names(
     _civicrm_api3_build_fields_array($dao));
   $custom_field_names = array();
