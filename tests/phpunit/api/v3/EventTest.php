@@ -450,6 +450,48 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test searching on custom fields with netsted call with id param.
+   * 
+   * Search for an event on a custom field, and perform a chained call
+   * to retrieve it's (non-existing) loc block, using $value-substitution.
+   * This test just checks whether the event is found, because something
+   * happened in CiviCRM 4.6.5 that broke my fix for CRM-16036, causing 
+   * CiviCRM to return 0 results.
+   * Of course, CRM-16168 should also be fixed for this test to pass.
+   */
+  public function testEventSearchCustomFieldWithChainedCall() {
+    // Create a custom group, and add a custom contact reference field.
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $custom_field_id = $ids['custom_field_id'];
+    
+    // Create an event with a custom value.
+    $params = $this->_params;
+    $params['title'] = "My test event.";
+    $params['start_date'] = "2015-03-14";
+    // Just assume that an event type 1 exists.
+    $params['event_type_id'] = 1;
+    $params['custom_' . $custom_field_id] = "12345";
+
+    $this->callAPISuccess($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+
+    // Retrieve the activity, and chain loc block using $value.
+    $result = $this->callAPIAndDocument($this->_entity, 'get', array(
+      'custom_' . $custom_field_id => "12345",
+      'api.LocBlock.get' => array("id" => '$value.loc_block_id'),
+    ), __FUNCTION__, __FILE__);
+
+    $this->assertEquals(1, $result['count']);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+    $this->callAPISuccess('event', 'delete', array(
+      'id' => $result['id'],
+      'skip_undelete' => TRUE,
+    ));
+  }
+  
+  
+  /**
    * Test that an event with a price set can be created.
    */
   public function testCreatePaidEvent() {
