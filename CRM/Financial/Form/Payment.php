@@ -56,6 +56,15 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   }
 
   /**
+   * Set default values for the form.
+   */
+  public function setDefaultValues() {
+    $contactID = $this->getContactID();
+    CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
+    return $this->_defaults;
+  }
+
+  /**
    * Add JS to show icons for the accepted credit cards
    */
   public static function addCreditCardJs() {

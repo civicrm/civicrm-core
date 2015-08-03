@@ -29,14 +29,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_Payment_Form {
 
 
   /**
-   * Add payment fields depending on payment processor. The payment processor can implement the following functions to override the built in fields.
+   * Add payment fields depending on payment processor.
+   *
+   * The payment processor can implement the following functions to override the built in fields.
    *
    *  - getPaymentFormFields()
    *  - getPaymentFormFieldsMetadata()
@@ -347,6 +347,30 @@ class CRM_Core_Payment_Form {
       $creditCardTypes[$key] = $name;
     }
     return $creditCardTypes;
+  }
+
+  /**
+   * Set default values for the form.
+   *
+   * @param CRM_Core_Form $form
+   * @param int $contactID
+   */
+  public static function setDefaultValues(&$form, $contactID) {
+    $billingDefaults = $form->getProfileDefaults('Billing', $contactID);
+    $form->_defaults = array_merge($form->_defaults, $billingDefaults);
+
+    // set default country & state from config if no country set
+    // note the effect of this is to set the billing country to default to the site default
+    // country if the person has an address but no country (for anonymous country is set above)
+    // this could have implications if the billing profile is filled but hidden.
+    // this behaviour has been in place for a while but the use of js to hide things has increased
+    if (empty($form->_defaults["billing_country_id-{$form->_bltID}"])) {
+      $form->_defaults["billing_country_id-{$form->_bltID}"] = CRM_Core_Config::singleton()->defaultContactCountry;
+    }
+    if (empty($form->_defaults["billing_state_province_id-{$form->_bltID}"])) {
+      $form->_defaults["billing_state_province_id-{$form->_bltID}"] = CRM_Core_Config::singleton()
+        ->defaultContactStateProvince;
+    }
   }
 
   /**
