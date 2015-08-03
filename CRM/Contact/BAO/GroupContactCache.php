@@ -482,6 +482,9 @@ WHERE  id = %1
         $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
         $searchSQL = $customClass->contactIDs();
         $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
+        if (!strstr($searchSQL, 'WHERE')) {
+          $searchSQL .= " WHERE ( 1 ) ";
+        }
         $idName = 'contact_id';
       }
       else {

@@ -582,7 +582,7 @@ class CRM_Core_Resources {
 
       // Add resources from coreResourceList
       $jsWeight = -9999;
-      foreach ($this->coreResourceList() as $item) {
+      foreach ($this->coreResourceList($region) as $item) {
         if (is_array($item)) {
           $this->addSetting($item);
         }
@@ -685,9 +685,10 @@ class CRM_Core_Resources {
    *
    * Note: non-compressed versions of .min files will be used in debug mode
    *
+   * @param string $region
    * @return array
    */
-  public function coreResourceList() {
+  public function coreResourceList($region) {
     $config = CRM_Core_Config::singleton();
 
     // Scripts needed by everyone, everywhere
@@ -756,8 +757,8 @@ class CRM_Core_Resources {
       }
     }
 
-    // CMS-specific resources
-    $config->userSystem->appendCoreResources($items);
+    // Allow hooks to modify this list
+    CRM_Utils_Hook::coreResourceList($items, $region);
 
     return $items;
   }

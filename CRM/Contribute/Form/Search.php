@@ -120,7 +120,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       );
     }
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 1);
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Contribute_Selector_Search($this->_queryParams,
       $this->_action,
       NULL,
@@ -309,7 +309,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
