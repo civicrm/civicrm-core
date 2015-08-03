@@ -56,13 +56,6 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   public $_contactId;
 
   /**
-   * Form defaults.
-   *
-   * @var array
-   */
-  protected $_defaults = array();
-
-  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {

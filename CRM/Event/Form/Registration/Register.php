@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -44,11 +42,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * The fields involved in this page.
    */
   public $_fields;
-
-  /**
-   * The defaults involved in this page.
-   */
-  public $_defaults;
 
   /**
    * The status message that user view.

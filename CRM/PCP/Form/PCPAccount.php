@@ -52,14 +52,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    */
   public $_single;
 
-  /**
-   * The default values for the form.
-   *
-   * @var array
-   */
-  protected $_defaults;
-
-
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
     $config = CRM_Core_Config::singleton();
