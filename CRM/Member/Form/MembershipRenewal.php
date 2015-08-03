@@ -354,7 +354,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->add('text', 'num_terms', ts('Extend Membership by'), array('onchange' => "setPaymentBlock();"), TRUE);
       $this->addRule('num_terms', ts('Please enter a whole number for how many periods to renew.'), 'integer');
 
-      $this->add('select', 'payment_instrument_id', ts('Paid By'),
+      $this->add('select', 'payment_instrument_id', ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
         FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
       );
@@ -439,7 +439,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $errors['total_amount'] = ts('Please enter a Contribution Amount.');
       }
       if (empty($params['payment_instrument_id'])) {
-        $errors['payment_instrument_id'] = ts('Paid By is a required field.');
+        $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
       }
     }
     return empty($errors) ? TRUE : $errors;
