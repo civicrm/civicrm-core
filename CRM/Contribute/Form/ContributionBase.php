@@ -88,12 +88,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var bool
    */
   protected $_separateMembershipPayment;
-  /**
-   * The default values for the form
-   *
-   * @var array
-   */
-  protected $_defaults;
 
   /**
    * The params submitted by the form and computed by the app

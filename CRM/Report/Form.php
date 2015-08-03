@@ -90,8 +90,6 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   protected $_options = array();
 
-  protected $_defaults = array();
-
   /**
    * By default most reports hide contact id.
    * Setting this to true makes it available

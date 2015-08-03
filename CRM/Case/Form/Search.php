@@ -64,8 +64,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_prefix = 'case_';
 
-  protected $_defaults;
-
   /**
    * Processing needed for buildForm and later.
    *

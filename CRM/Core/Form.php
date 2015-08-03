@@ -62,6 +62,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_title = NULL;
 
   /**
+   * The default values for the form.
+   *
+   * @var array
+   */
+  public $_defaults = array();
+
+  /**
    * The options passed into this form
    * @var mixed
    */
@@ -1861,7 +1868,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return NULL|int
    */
-  public function getContactID() {
+  protected function setContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     if (isset($this->_params) && isset($this->_params['select_contact_id'])) {
       $tempID = $this->_params['select_contact_id'];
@@ -1902,6 +1909,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     return is_numeric($userID) ? $userID : NULL;
+  }
+
+  public function getContactID() {
+    return $this->setContactID();
   }
 
   /**
