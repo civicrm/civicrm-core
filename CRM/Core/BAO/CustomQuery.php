@@ -388,6 +388,10 @@ SELECT label, value
           $op = key($value);
           $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
         }
+        else {
+          $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
+          $value = array('IN' => $value);
+        }
 
         $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
 
@@ -419,22 +423,23 @@ SELECT label, value
               if (strstr($op, 'NULL') || strstr($op, 'EMPTY')) {
                 $qillValue = $value = NULL;
               }
-              elseif ($isSerialized && strstr($op, 'IN')) {
+              elseif ($isSerialized) {
+                if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+                  $op = key($value);
+                  $value = $value[$op];
+                }
                 $value = implode(',', $value);
               }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
-              if (!empty($value)) {
-                if ($isSerialized) {
-                  if (strstr($op, 'IN')) {
-                    $value = str_replace(array('(', ')'), '', str_replace(",", "[[:cntrl:]]|[[:cntrl:]]", $value));
-                  }
-                  $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
-                  $value = "[[:cntrl:]]" . $value . "[[:cntrl:]]";
+              if ($isSerialized && !empty($value)) {
+                if (strstr($op, 'IN')) {
+                  $value = str_replace(array('(', ')'), '', str_replace(",", "[[:cntrl:]]|[[:cntrl:]]", $value));
                 }
-                elseif ($wildcard) {
-                  $value = "[[:cntrl:]]%$value%[[:cntrl:]]";
-                  $op = 'LIKE';
+                $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
+                $value = "[[:cntrl:]]" . $value . "[[:cntrl:]]";
+                if (!$wildcard) {
+                  $value = str_replace("[[:cntrl:]]|", '', $value);
                 }
               }
 
