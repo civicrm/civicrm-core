@@ -37,7 +37,6 @@
  */
 class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
-  protected $_defaults;
   protected $_settings = array();
 
   /**

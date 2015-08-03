@@ -36,8 +36,6 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
   protected $_stringName = NULL;
 
-  protected $_defaults = NULL;
-
   public $unsavedChangesWarn = TRUE;
 
   /**

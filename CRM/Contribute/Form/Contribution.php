@@ -182,13 +182,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_priceSet;
 
   /**
-   * Form defaults
-   * @todo can we define this a as protected? can we define higher up the chain
-   * @var array
-   */
-  public $_defaults;
-
-  /**
    * User display name
    *
    * @var string

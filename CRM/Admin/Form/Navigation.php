@@ -45,11 +45,6 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   protected $_currentParentID = NULL;
 
   /**
-   * Default values.
-   */
-  protected $_defaults = array();
-
-  /**
    * Build the form object.
    *
    * @return void
