@@ -1458,13 +1458,13 @@ class CRM_Utils_Date {
             break;
 
           case 'starting':
-              $from['d'] = $now['mday'];
-              $from['M'] = $now['mon'];
-              $from['Y'] = $now['year'];
-              $from['H'] = 00;
-              $from['i'] = $to['s'] = 00;
-              $to = self::intervalAdd('day', 30, $from);
-              $to = self::intervalAdd('second', -1, $to);
+            $from['d'] = $now['mday'];
+            $from['M'] = $now['mon'];
+            $from['Y'] = $now['year'];
+            $from['H'] = 00;
+            $from['i'] = $to['s'] = 00;
+            $to = self::intervalAdd('day', 30, $from);
+            $to = self::intervalAdd('second', -1, $to);
             break;
         }
         break;
