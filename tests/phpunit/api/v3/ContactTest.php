@@ -229,6 +229,22 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test creating individual by display_name.
+   *
+   * Display name & sort name should be set.
+   */
+  public function testCreateDisplayNameIndividual() {
+    $params = array(
+      'display_name' => 'abc1',
+      'contact_type' => 'Individual',
+    );
+
+    $contact = $this->callAPISuccess('contact', 'create', $params);
+    $params['sort_name'] = 'abc1';
+    $this->getAndCheck($params, $contact['id'], 'contact');
+  }
+
+  /**
    * Test old keys still work.
    *
    * Verify that attempt to create individual contact with
