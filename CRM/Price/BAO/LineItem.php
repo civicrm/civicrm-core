@@ -598,7 +598,7 @@ AND li.entity_id = {$entityId}
         $oldvalue['diff_amount'] = - $oldvalue['line_total'];
         $oldvalue['qty'] = 0;
       }
-      $items = array_merge($item, $oldLineItems);
+      $items = array_merge($items, $oldLineItems);
     }
   }
 
