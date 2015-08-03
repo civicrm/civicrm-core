@@ -937,6 +937,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Get array of fields that should be displayed on the payment form.
+   *
+   * @return array
+   * @throws CiviCRM_API3_Exception
+   */
+  public function getPaymentFormFields() {
+    if ($this->_processorName == ts('PayPal Pro')) {
+      return $this->getCreditCardFormFields();
+    }
+    else {
+      return array();
+    }
+  }
+
+  /**
    * Map the paypal params to CiviCRM params using a field map.
    *
    * @param array $fieldMap
