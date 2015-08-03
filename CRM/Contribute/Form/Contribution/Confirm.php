@@ -2307,12 +2307,21 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // @todo move premium processing to complete transaction if it truly is an 'after' action.
       $this->postProcessPremium($premiumParams, $result['contribution']);
       if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
-        civicrm_api3('contribution', 'completetransaction', array(
-          'id' => $result['contribution']->id,
-          'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-          'payment_processor_id' => $this->_paymentProcessor['id'],
-          )
-        );
+        try {
+          civicrm_api3('contribution', 'completetransaction', array(
+              'id' => $result['contribution']->id,
+              'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+              'payment_processor_id' => $this->_paymentProcessor['id'],
+              'is_transactional' => FALSE,
+            )
+          );
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          if ($e->getErrorCode() != 'contribution_completed') {
+            throw new CRM_Core_Exception('Failed to update contribution in database');
+          }
+        }
+
       }
       return $result;
     }
