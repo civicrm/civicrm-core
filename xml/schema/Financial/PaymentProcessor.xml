@@ -194,7 +194,7 @@
   </field>
   <field>
     <name>payment_instrument_id</name>
-    <title>Payment Instrument</title>
+    <title>Payment Method</title>
     <type>int unsigned</type>
     <default>1</default>
     <comment>Payment Instrument ID</comment>

@@ -554,7 +554,7 @@ class CRM_Core_SelectValues {
       '{contribution.net_amount}' => ts('Net Amount'),
       '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
       '{contribution.receive_date}' => ts('Contribution Date Received'),
-      '{contribution.payment_instrument}' => ts('Payment Instrument'),
+      '{contribution.payment_instrument}' => ts('Payment Method'),
       '{contribution.trxn_id}' => ts('Transaction ID'),
       '{contribution.invoice_id}' => ts('Invoice ID'),
       '{contribution.currency}' => ts('Currency'),

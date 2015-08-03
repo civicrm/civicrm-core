@@ -1141,7 +1141,7 @@ SELECT  id
         ),
         'payment_instrument' => array(
           'name' => 'payment_instrument',
-          'title' => ts('Payment Instrument'),
+          'title' => ts('Payment Method'),
         ),
         'contribution_status_id' => array(
           'name' => 'contribution_status_id',

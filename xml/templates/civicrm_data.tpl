@@ -141,7 +141,7 @@ VALUES
    ('individual_suffix'             , '{ts escape="sql"}Individual contact suffixes{/ts}'        , 1, 1, 0),
    ('acl_role'                      , '{ts escape="sql"}ACL Role{/ts}'                           , 1, 1, 0),
    ('accept_creditcard'             , '{ts escape="sql"}Accepted Credit Cards{/ts}'              , 1, 1, 0),
-   ('payment_instrument'            , '{ts escape="sql"}Payment Instruments{/ts}'                , 1, 1, 0),
+   ('payment_instrument'            , '{ts escape="sql"}Payment Methods{/ts}'                    , 1, 1, 0),
    ('contribution_status'           , '{ts escape="sql"}Contribution Status{/ts}'                , 1, 1, 1),
    ('pcp_status'                    , '{ts escape="sql"}PCP Status{/ts}'                         , 1, 1, 1),
    ('pcp_owner_notify'              , '{ts escape="sql"}PCP owner notifications{/ts}'            , 1, 1, 1),
