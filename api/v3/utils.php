@@ -474,13 +474,22 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  * @return array
  */
 function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return_as_success = TRUE) {
+  // In CiviCRM 4.6.5, if your call has a nested call, and in this
+  // nested call you use the id (e.g. "id" => "$value.some_id"), the parent
+  // call will get a param "id" => NULL. Not sure whether this is expected
+  // behaviour or a bug. But I'll have to work around it.
+  if (array_key_exists('id', $params) && $params['id'] === null) {
+    unset($params['id']);
+  }
+
   $dao = new $dao_name();
   $entity = _civicrm_api_get_entity_name_from_dao($dao);
   $custom_fields = _civicrm_api3_custom_fields_for_entity($entity);
   $options = _civicrm_api3_get_options_from_params($params);
-
+  
   $entity_field_names = _civicrm_api3_field_names(
     _civicrm_api3_build_fields_array($dao));
+  $custom_field_names = array();
 
   // $select_fields maps column names to the field names of the result
   // values.
@@ -509,6 +518,7 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
   // custom fields
   foreach ($custom_fields as $cf_id => $custom_field) {
     $field_name = "custom_$cf_id";
+    $custom_field_names[] = $field_name;
     if ($return_all_fields || !empty($options['return'][$field_name])) {
       $table_name = $custom_field["table_name"];
       $column_name = $custom_field["column_name"];
@@ -538,6 +548,11 @@ function _civicrm_api3_get_using_query_object_simple($dao_name, $params, $return
 
   // populate $where_clauses
   foreach ($params as $key => $value) {
+    if (!in_array($key, $entity_field_names) && !in_array($key, $custom_field_names)) {
+      // No valid filter field. This might be a chained call or something.
+      // Just ignore this for the $where_clause.
+      continue;
+    }
     if (!is_array($value)) {
       $operator = "=";
       $rhs = $value;
