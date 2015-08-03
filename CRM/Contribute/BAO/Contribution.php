@@ -2250,9 +2250,8 @@ WHERE  contribution_id = %1 ";
    * @throws Exception
    */
   public function composeMessageArray(&$input, &$ids, &$values, $recur = FALSE, $returnMessageText = TRUE) {
-    if (empty($this->_relatedObjects)) {
-      $this->loadRelatedObjects($input, $ids);
-    }
+    $this->loadRelatedObjects($input, $ids);
+
     if (empty($this->_component)) {
       $this->_component = CRM_Utils_Array::value('component', $input);
     }
@@ -4004,11 +4003,14 @@ WHERE con.id = {$contributionId}
       }
 
       if (!empty($memberships)) {
-        $membershipsUpdate = array();
         foreach ($memberships as $membershipTypeIdKey => $membership) {
-          $membershipParams = (array) $membership;
           if ($membership) {
-            $format = '%Y%m%d';
+            $membershipParams = array(
+              'id' => $membership->id,
+              'contact_id' => $membership->contact_id,
+              'is_test' => $membership->is_test,
+              'membership_type_id' => $membership->membership_type_id,
+            );
 
             $currentMembership = CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
               $membershipParams['membership_type_id'],
@@ -4032,7 +4034,10 @@ LIMIT 1;";
             }
             $dao->free();
 
-            $num_terms = $contribution->getNumTermsByContributionAndMembershipType($membershipParams['membership_type_id'], $primaryContributionID);
+            $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
+              $membershipParams['membership_type_id'],
+              $primaryContributionID
+            );
             if ($currentMembership) {
               /*
                * Fixed FOR CRM-4433
@@ -4044,15 +4049,10 @@ LIMIT 1;";
               // @todo - we should pass membership_type_id instead of null here but not
               // adding as not sure of testing
               $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
-                $changeDate, NULL, $num_terms
+                $changeDate, NULL, $membershipParams['num_terms']
               );
 
               $dates['join_date'] = $currentMembership['join_date'];
-            }
-            else {
-              $membershipParams = array_merge($membershipParams,
-                CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipParams['membership_type_id'], NULL, NULL, NULL, $num_terms)
-              );
             }
 
             //get the status for membership.
@@ -4071,39 +4071,9 @@ LIMIT 1;";
             $membershipParams['is_override'] = FALSE;
             civicrm_api3('Membership', 'create', $membershipParams);
 
-            $membershipLog = $membershipParams;
-
-            $logStartDate = $membershipParams['start_date'];
-            if (!empty($dates['log_start_date'])) {
-              $logStartDate = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
-              $logStartDate = CRM_Utils_Date::isoToMysql($logStartDate);
-            }
-
-            $membershipLog['start_date'] = $logStartDate;
-            $membershipLog['membership_id'] = $membership->id;
-            $membershipLog['modified_id'] = $membership->contact_id;
-            $membershipLog['modified_date'] = date('Ymd');
-            $membershipLog['membership_type_id'] = $membership->membership_type_id;
-
-            CRM_Member_BAO_MembershipLog::add($membershipLog, CRM_Core_DAO::$_nullArray);
-
             //update related Memberships.
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $membershipParams);
-
-            //update the membership type key of membership relatedObjects array
-            //if it has changed after membership update
-            if ($membershipTypeIdKey != $membership->membership_type_id) {
-              $membershipsUpdate[$membership->membership_type_id] = $membership;
-              $contribution->_relatedObjects['membership'][$membership->membership_type_id] = $membership;
-              unset($contribution->_relatedObjects['membership'][$membershipTypeIdKey]);
-              unset($memberships[$membershipTypeIdKey]);
-            }
           }
-        }
-        //update the memberships object with updated membershipTypeId data
-        //if membershipTypeId has changed after membership update
-        if (!empty($membershipsUpdate)) {
-          $memberships = $memberships + $membershipsUpdate;
         }
       }
     }
@@ -4340,7 +4310,7 @@ LIMIT 1;";
    * @return array
    */
   public static function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
-    $contribution = &$objects['contribution'];
+    $contribution = $objects['contribution'];
     $input['is_recur'] = $recur;
     // set receipt from e-mail and name in value
     if (!$returnMessageText) {
