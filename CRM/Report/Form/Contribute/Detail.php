@@ -282,7 +282,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         'order_bys' => array(
           'financial_type_id' => array('title' => ts('Financial Type')),
           'contribution_status_id' => array('title' => ts('Contribution Status')),
-          'payment_instrument_id' => array('title' => ts('Payment Instrument')),
+          'payment_instrument_id' => array('title' => ts('Payment Method')),
           'receive_date' => array('title' => ts('Date Received')),
         ),
         'grouping' => 'contri-fields',

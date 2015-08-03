@@ -291,7 +291,7 @@ class CRM_Core_OptionValue {
         $nameTitle = array(
           'payment_instrument' => array(
             'name' => 'payment_instrument',
-            'title' => ts('Payment Instrument'),
+            'title' => ts('Payment Method'),
             'headerPattern' => '/^payment|(p(ayment\s)?instrument)$/i',
           ),
         );

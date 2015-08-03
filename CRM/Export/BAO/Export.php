@@ -2039,7 +2039,7 @@ WHERE  {$whereClause}";
         'componentPaymentField_total_amount' => ts('Total Amount'),
         'componentPaymentField_contribution_status' => ts('Contribution Status'),
         'componentPaymentField_received_date' => ts('Date Received'),
-        'componentPaymentField_payment_instrument' => ts('Payment Instrument'),
+        'componentPaymentField_payment_instrument' => ts('Payment Method'),
         'componentPaymentField_transaction_id' => ts('Transaction ID'),
       );
     }
