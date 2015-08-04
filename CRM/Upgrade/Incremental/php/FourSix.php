@@ -240,7 +240,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
     }
     return TRUE;
   }
-  
+
   /**
    * Queue Task Callback for CRM-16846
    *
