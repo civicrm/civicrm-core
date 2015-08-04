@@ -55,7 +55,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @see RecipientBuilder
    * @throws \CRM_Core_Exception
    */
-  public function createQuery($schedule, $phase) {
+  public function createQuery($schedule, $phase, $defaultParams) {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
@@ -66,7 +66,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
     }
     elseif (in_array($selectedValues[0], $this->contactDateFields)) {
       $dateDBField = $selectedValues[0];
-      $query = \CRM_Utils_SQL_Select::from("{$this->entity} e");
+      $query = \CRM_Utils_SQL_Select::from("{$this->entity} e")->param($defaultParams);
       $query->param(array(
         'casAddlCheckFrom' => 'civicrm_contact e',
         'casContactIdField' => 'e.id',
@@ -83,7 +83,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
       $dateDBField = $customField['column_name'];
       $customGroupParams = array('id' => $customField['custom_group_id'], $customGroup);
       \CRM_Core_BAO_CustomGroup::retrieve($customGroupParams, $customGroup);
-      $query = \CRM_Utils_SQL_Select::from("{$customGroup['table_name']} e");
+      $query = \CRM_Utils_SQL_Select::from("{$customGroup['table_name']} e")->param($defaultParams);
       $query->param(array(
         'casAddlCheckFrom' => "{$customGroup['table_name']} e",
         'casContactIdField' => 'e.entity_id',
@@ -97,7 +97,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
 
     if (in_array(2, $selectedStatuses)) {
       $query['casAnniversaryMode'] = 1;
-      $query['casDateField'] = 'DATE_ADD(' . $query['casDateField'] . ', INTERVAL ROUND(DATEDIFF(DATE(!casNow), ' . $query['casDateField'] . ') / 365) YEAR)';
+      $query['casDateField'] = 'DATE_ADD(' . $query['casDateField'] . ', INTERVAL ROUND(DATEDIFF(DATE(' . $query['casNow'] . '), ' . $query['casDateField'] . ') / 365) YEAR)';
     }
 
     return $query;
