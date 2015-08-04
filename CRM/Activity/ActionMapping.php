@@ -41,11 +41,11 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @see RecipientBuilder
    * @throws \CRM_Core_Exception
    */
-  public function createQuery($schedule, $phase) {
+  public function createQuery($schedule, $phase, $defaultParams) {
     $selectedValues = (array) \CRM_Utils_Array::explodePadded($schedule->entity_value);
     $selectedStatuses = (array) \CRM_Utils_Array::explodePadded($schedule->entity_status);
 
-    $query = \CRM_Utils_SQL_Select::from("{$this->entity} e");
+    $query = \CRM_Utils_SQL_Select::from("{$this->entity} e")->param($defaultParams);
     $query['casAddlCheckFrom'] = 'civicrm_activity e';
     $query['casContactIdField'] = 'r.contact_id';
     $query['casEntityIdField'] = 'e.id';
