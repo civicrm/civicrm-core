@@ -37,6 +37,7 @@
  * @param array $params
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_payment_processor_create($params) {
   if (empty($params['id']) && empty($params['payment_instrument_id'])) {
@@ -68,7 +69,7 @@ function _civicrm_api3_payment_processor_create_spec(&$params) {
  * @param array $params
  *
  * @return array
- *   API result Array
+ *   API result array
  */
 function civicrm_api3_payment_processor_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -81,7 +82,7 @@ function civicrm_api3_payment_processor_delete($params) {
  *   Array of name/value pairs.
  *
  * @return array
- *   details of found PaymentProcessor
+ *   API result array
  */
 function civicrm_api3_payment_processor_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
