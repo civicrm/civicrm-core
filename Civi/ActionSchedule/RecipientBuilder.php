@@ -60,6 +60,7 @@ namespace Civi\ActionSchedule;
  *   ->where('event.event_type_id IN (#myEventTypes)')
  *   ->param('myEventTypes', array(2, 5))
  *   ->param('casDateField', 'e.register_date')
+ *   ->param($defaultParams)
  *   ...etc...
  * @endcode
  *
@@ -175,7 +176,7 @@ class RecipientBuilder {
   protected function buildRelFirstPass() {
     $query = $this->prepareQuery(self::PHASE_RELATION_FIRST);
 
-    $startDateClauses = $this->prepareStartDateClauses($query['casDateField']);
+    $startDateClauses = $this->prepareStartDateClauses();
 
     $firstQuery = $query->copy()
       ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
@@ -214,6 +215,7 @@ class RecipientBuilder {
     $query = $this->prepareQuery(self::PHASE_ADDITION_FIRST);
 
     $insertAdditionalSql = \CRM_Utils_SQL_Select::from("civicrm_contact c")
+      ->merge($query, array('params'))
       ->merge($this->selectIntoActionLog(self::PHASE_ADDITION_FIRST, $query))
       ->merge($this->joinReminder('LEFT JOIN', 'addl', $query))
       ->where("c.is_deleted = 0 AND c.is_deceased = 0")
@@ -239,7 +241,7 @@ class RecipientBuilder {
    */
   protected function buildRelRepeatPass() {
     $query = $this->prepareQuery(self::PHASE_RELATION_REPEAT);
-    $startDateClauses = $this->prepareStartDateClauses($query['casDateField']);
+    $startDateClauses = $this->prepareStartDateClauses();
 
     // CRM-15376 - do not send our reminders if original criteria no longer applies
     // the first part of the startDateClause array is the earliest the reminder can be sent. If the
@@ -327,14 +329,15 @@ class RecipientBuilder {
    * @throws \CRM_Core_Exception
    */
   protected function prepareQuery($phase) {
-    /** @var \CRM_Utils_SQL_Select $query */
-    $query = $this->mapping->createQuery($this->actionSchedule, $phase);
-    $query->param(array(
+    $defaultParams = array(
       'casActionScheduleId' => $this->actionSchedule->id,
       'casMappingId' => $this->mapping->getId(),
       'casMappingEntity' => $this->mapping->getEntity(),
       'casNow' => $this->now,
-    ));
+    );
+
+    /** @var \CRM_Utils_SQL_Select $query */
+    $query = $this->mapping->createQuery($this->actionSchedule, $phase, $defaultParams);
 
     if ($this->actionSchedule->limit_to /*1*/) {
       $query->merge($this->prepareContactFilter($query['casContactIdField']));
@@ -430,29 +433,26 @@ class RecipientBuilder {
   }
 
   /**
-   * @param $dateField
    * @return array
    */
-  protected function prepareStartDateClauses($dateField) {
+  protected function prepareStartDateClauses() {
     $actionSchedule = $this->actionSchedule;
-    $mapping = $this->mapping;
-    $now = $this->now;
     $startDateClauses = array();
     if ($actionSchedule->start_action_date) {
       $op = ($actionSchedule->start_action_condition == 'before' ? '<=' : '>=');
       $operator = ($actionSchedule->start_action_condition == 'before' ? 'DATE_SUB' : 'DATE_ADD');
-      $date = $operator . "({$dateField}, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
-      $startDateClauses[] = "'{$now}' >= {$date}";
+      $date = $operator . "(!casDateField, INTERVAL {$actionSchedule->start_action_offset} {$actionSchedule->start_action_unit})";
+      $startDateClauses[] = "'!casNow' >= {$date}";
       // This is weird. Waddupwidat?
-      if ($mapping->getEntity() == 'civicrm_participant') {
-        $startDateClauses[] = $operator . "({$now}, INTERVAL 1 DAY ) {$op} " . $dateField;
+      if ($this->mapping->getEntity() == 'civicrm_participant') {
+        $startDateClauses[] = $operator . "(!casNow, INTERVAL 1 DAY ) {$op} " . '!casDateField';
       }
       else {
-        $startDateClauses[] = "DATE_SUB({$now}, INTERVAL 1 DAY ) <= {$date}";
+        $startDateClauses[] = "DATE_SUB(!casNow, INTERVAL 1 DAY ) <= {$date}";
       }
     }
     elseif ($actionSchedule->absolute_date) {
-      $startDateClauses[] = "DATEDIFF(DATE('{$now}'),'{$actionSchedule->absolute_date}') = 0";
+      $startDateClauses[] = "DATEDIFF(DATE('!casNow'),'{$actionSchedule->absolute_date}') = 0";
     }
     return $startDateClauses;
   }

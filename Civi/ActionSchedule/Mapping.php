@@ -345,8 +345,9 @@ abstract class Mapping implements MappingInterface {
    * @param \CRM_Core_DAO_ActionSchedule $schedule
    * @param string $phase
    *   See, e.g., RecipientBuilder::PHASE_RELATION_FIRST.
+   * @param array $defaultParams
    * @return \CRM_Utils_SQL_Select
    */
-  public abstract function createQuery($schedule, $phase);
+  public abstract function createQuery($schedule, $phase, $defaultParams);
 
 }

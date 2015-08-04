@@ -118,9 +118,11 @@ interface MappingInterface {
    * @param \CRM_Core_DAO_ActionSchedule $schedule
    * @param string $phase
    *   See, e.g., RecipientBuilder::PHASE_RELATION_FIRST.
+   * @param array $defaultParams
+   *   Default parameters that should be included with query.
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
    */
-  public function createQuery($schedule, $phase);
+  public function createQuery($schedule, $phase, $defaultParams);
 
 }
