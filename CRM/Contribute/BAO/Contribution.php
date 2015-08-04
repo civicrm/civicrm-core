@@ -1481,6 +1481,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * Update contribution as well as related objects.
    *
+   * This function by-passes hooks - to address this - don't use this function.
+   *
    * @deprecated
    *
    * Use api contribute.completetransaction
@@ -1974,11 +1976,14 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         'options' => array('limit' => 1),
       ));
       $contributionParams['skipLineItem'] = TRUE;
+      $contributionParams['status_id'] = 'Pending';
       $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
       $contributionParams['contact_id'] = $templateContribution['contact_id'];
+      $contributionParams['source'] = empty($templateContribution['source']) ? ts('Recurring contribution') : $templateContribution['source'];
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
       $contribution->id = $createContribution['id'];
       $input['line_item'] = CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($contribution->contribution_recur_id, $contribution);
+      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($contributionParams['contribution_recur_id'], $contribution->id);
       return TRUE;
     }
   }
@@ -4029,6 +4034,7 @@ WHERE con.id = {$contributionId}
     if (!empty($recurContrib->id)) {
       $contributionParams['contribution_recur_id'] = $recurContrib->id;
     }
+    self::repeatTransaction($contribution, $input, $contributionParams);
 
     if (is_numeric($memberships)) {
       $memberships = array($objects['membership']);
@@ -4185,7 +4191,6 @@ LIMIT 1;";
       $participant->save();
     }
 
-    $isNewContribution = self::repeatTransaction($contribution, $input, $contributionParams);
     $contributionParams['id'] = $contribution->id;
 
     civicrm_api3('Contribution', 'create', $contributionParams);
@@ -4193,21 +4198,6 @@ LIMIT 1;";
     // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-    }
-
-    //add line items for recurring payments
-    if (!empty($contribution->contribution_recur_id)) {
-      if ($isNewContribution) {
-      }
-      else {
-        // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
-        $input['line_item'] = array();
-      }
-    }
-
-    //copy initial contribution custom fields for recurring contributions
-    if ($recurContrib && $recurContrib->id) {
-      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($recurContrib->id, $contribution->id);
     }
 
     $paymentProcessorId = '';
