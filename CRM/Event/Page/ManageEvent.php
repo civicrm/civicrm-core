@@ -374,7 +374,7 @@ ORDER BY start_date desc
 
         //show campaigns on selector.
         $manageEvent[$dao->id]['campaign'] = CRM_Utils_Array::value($dao->campaign_id, $allCampaigns);
-        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->id);
+        $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->getId());
         $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
         $manageEvent[$dao->id]['event_type'] = CRM_Utils_Array::value($manageEvent[$dao->id]['event_type_id'], $eventType);
         $manageEvent[$dao->id]['is_repeating_event'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_RecurringEntity', $dao->id, 'parent_id', 'entity_id');

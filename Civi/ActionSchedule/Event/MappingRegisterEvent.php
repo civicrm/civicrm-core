@@ -1,7 +1,7 @@
 <?php
 namespace Civi\ActionSchedule\Event;
 
-use Civi\ActionSchedule\Mapping;
+use Civi\ActionSchedule\MappingInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -21,18 +21,18 @@ class MappingRegisterEvent extends Event {
   /**
    * Register a new mapping.
    *
-   * @param Mapping $mapping
+   * @param MappingInterface $mapping
    *   The new mapping.
    * @return $this
    */
-  public function register(Mapping $mapping) {
-    $this->mappings[$mapping->id] = $mapping;
+  public function register(MappingInterface $mapping) {
+    $this->mappings[$mapping->getId()] = $mapping;
     return $this;
   }
 
   /**
    * @return array
-   *   Array(scalar $id => Mapping $mapping).
+   *   Array(scalar $id => MappingInterface $mapping).
    */
   public function getMappings() {
     return $this->mappings;

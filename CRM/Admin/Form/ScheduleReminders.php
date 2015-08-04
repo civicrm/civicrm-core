@@ -92,7 +92,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
           'id' => $isTemplate ? CRM_Core_ActionScheduleTmp::EVENT_TPL_MAPPING_ID : CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID,
         )));
         if ($mapping) {
-          $this->_mappingID = $mapping->id;
+          $this->_mappingID = $mapping->getId();
         }
         else {
           CRM_Core_Error::fatal('Could not find mapping for event scheduled reminders.');
@@ -159,11 +159,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //get the frequency units.
     $this->_freqUnits = CRM_Core_SelectValues::getRecurringFrequencyUnits();
 
-    //pass the mapping ID in UPDATE mode
-    $mappings = CRM_Core_BAO_ActionSchedule::getMappings(array(
-      'id' => $mappingID,
-    ));
-
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(0, 30);
 
     //reminder_interval
@@ -220,14 +215,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('text', 'from_name', ts('From Name'));
     $this->add('text', 'from_email', ts('From Email'));
 
-    $recipient = 'activity_contacts';
     $recipientListingOptions = array();
 
     if ($mappingID) {
       $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
         'id' => $mappingID,
       )));
-      $recipient = $mapping->entity_recipient;
     }
 
     $limitOptions = array('' => '-neither-', 1 => ts('Limit to'), 0 => ts('Also include'));
@@ -237,7 +230,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions, FALSE, array('onChange' => "showHideByValue('limit_to','','recipient', 'select','select',true);"));
 
-    $this->add('select', 'recipient', $recipientLabels['other'], $sel5[$recipient],
+    $this->add('select', 'recipient', $recipientLabels['other'], $sel5,
       FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
 

@@ -549,7 +549,7 @@ $event_summary_limit
       $eventSummary['events'][$dao->id]['is_show_location'] = $dao->is_show_location;
       $eventSummary['events'][$dao->id]['is_subevent'] = $dao->slot_label_id;
       $eventSummary['events'][$dao->id]['is_pcp_enabled'] = $dao->is_pcp_enabled;
-      $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->id);
+      $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->getId());
       $eventSummary['events'][$dao->id]['is_repeating_event'] = $dao->is_repeating_event;
 
       $statusTypes = CRM_Event_PseudoConstant::participantStatus();
@@ -995,8 +995,8 @@ WHERE civicrm_event.is_active = 1
       'id' => ($copyEvent->is_template == 1 ? CRM_Core_ActionScheduleTmp::EVENT_TPL_MAPPING_ID : CRM_Core_ActionScheduleTmp::EVENT_NAME_MAPPING_ID),
     )));
     $copyReminder = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_ActionSchedule',
-      array('entity_value' => $id, 'mapping_id' => $oldMapping->id),
-      array('entity_value' => $copyEvent->id, 'mapping_id' => $copyMapping->id)
+      array('entity_value' => $id, 'mapping_id' => $oldMapping->getId()),
+      array('entity_value' => $copyEvent->id, 'mapping_id' => $copyMapping->getId())
     );
 
     if (!$afterCreate) {

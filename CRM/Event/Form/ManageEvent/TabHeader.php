@@ -125,7 +125,7 @@ WHERE      e.id = %1
       $eventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
       $params = array(
         1 => array($eventID, 'Integer'),
-        2 => array($eventNameMapping->id, 'Integer'),
+        2 => array($eventNameMapping->getId(), 'Integer'),
       );
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if (!$dao->fetch()) {

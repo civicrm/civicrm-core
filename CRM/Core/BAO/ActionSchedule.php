@@ -40,7 +40,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
   /**
    * @param array $filters
-   *   Filter by property (e.g. 'id', 'entity_value').
+   *   Filter by property (e.g. 'id').
    * @return array
    *   Array(scalar $id => Mapping $mapping).
    */
@@ -54,23 +54,17 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
       $_action_mapping = $event->getMappings();
     }
 
-    if ($filters === NULL) {
+    if (empty($filters)) {
       return $_action_mapping;
     }
-
-    $result = array();
-    foreach ($_action_mapping as $mappingId => $mapping) {
-      $match = TRUE;
-      foreach ($filters as $filterField => $filterValue) {
-        if ($mapping->{$filterField} != $filterValue) {
-          $match = FALSE;
-        }
-      }
-      if ($match) {
-        $result[$mappingId] = $mapping;
-      }
+    elseif (isset($filters['id'])) {
+      return array(
+        $filters['id'] => $_action_mapping[$filters['id']],
+      );
     }
-    return $result;
+    else {
+      throw new CRM_Core_Exception("getMappings() called with unsupported filter: " . implode(', ', array_keys($filters)));
+    }
   }
 
   /**
@@ -95,33 +89,41 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     foreach ($mappings as $mapping) {
       /** @var \Civi\ActionSchedule\Mapping $mapping */
 
-      $entityValueLabels[$mapping->id] = $mapping->getValueLabels();
+      $mappingId = $mapping->getId();
+      $entityValueLabels[$mappingId] = $mapping->getValueLabels();
       // Not sure why: everything *except* contact-dates have a $valueLabel.
-      if ($mapping->id !== CRM_Core_ActionScheduleTmp::CONTACT_MAPPING_ID) {
-        $valueLabel = array('- ' . strtolower($mapping->entity_value_label) . ' -');
-        $entityValueLabels[$mapping->id] = $valueLabel + $entityValueLabels[$mapping->id];
+      if ($mapping->getId() !== CRM_Core_ActionScheduleTmp::CONTACT_MAPPING_ID) {
+        $valueLabel = array('- ' . strtolower($mapping->getValueHeader()) . ' -');
+        $entityValueLabels[$mapping->getId()] = $valueLabel + $entityValueLabels[$mapping->getId()];
       }
 
-      if ($mapping->id == $id) {
+      if ($mapping->getId() == $id) {
         $dateFieldLabels = $mapping->getDateFields();
-        $entityRecipientLabels = array($mapping->entity_recipient => $mapping->getRecipientTypes());
-        $entityRecipientNames = array_combine(array_keys($entityRecipientLabels[$mapping->entity_recipient]), array_keys($entityRecipientLabels[$mapping->entity_recipient]));
+        $entityRecipientLabels = $mapping->getRecipientTypes();
+        $entityRecipientNames = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
       }
 
-      $statusLabel = array('- ' . strtolower($mapping->entity_status_label) . ' -');
-      $entityStatusLabels[$mapping->id] = $entityValueLabels[$mapping->id];
-      foreach ($entityStatusLabels[$mapping->id] as $kkey => & $vval) {
+      $statusLabel = array('- ' . strtolower($mapping->getStatusHeader()) . ' -');
+      $entityStatusLabels[$mapping->getId()] = $entityValueLabels[$mapping->getId()];
+      foreach ($entityStatusLabels[$mapping->getId()] as $kkey => & $vval) {
         $vval = $statusLabel + $mapping->getStatusLabels($kkey);
       }
     }
 
+    $entityLabels = array_map(function ($v) {
+      return $v->getLabel();
+    }, $mappings);
+    $entityNames = array_map(function ($v) {
+      return $v->getEntity();
+    }, $mappings);
+
     return array(
-      'sel1' => CRM_Utils_Array::collect('entity_label', $mappings),
+      'sel1' => $entityLabels,
       'sel2' => $entityValueLabels,
       'sel3' => $entityStatusLabels,
       'sel4' => $dateFieldLabels,
       'sel5' => $entityRecipientLabels,
-      'entityMapping' => CRM_Utils_Array::collect('entity', $mappings),
+      'entityMapping' => $entityNames,
       'recipientMapping' => $entityRecipientNames,
     );
   }
@@ -188,7 +190,7 @@ FROM civicrm_action_schedule cas
     if ($filterMapping and $filterValue) {
       $where .= " AND cas.entity_value = %1 AND cas.mapping_id = %2";
       $queryParams[1] = array($filterValue, 'Integer');
-      $queryParams[2] = array($filterMapping->id, 'Integer');
+      $queryParams[2] = array($filterMapping->getId(), 'Integer');
     }
     $where .= " AND cas.used_for IS NULL";
     $query .= $where;
@@ -205,7 +207,7 @@ FROM civicrm_action_schedule cas
       $list[$dao->id]['start_action_condition'] = $dao->start_action_condition;
       $list[$dao->id]['entityDate'] = ucwords(str_replace('_', ' ', $dao->entityDate));
       $list[$dao->id]['absolute_date'] = $dao->absolute_date;
-      $list[$dao->id]['entity'] = $filterMapping->entity_label;
+      $list[$dao->id]['entity'] = $filterMapping->getLabel();
       $list[$dao->id]['value'] = implode(', ', CRM_Utils_Array::subset(
         $filterMapping->getValueLabels(),
         explode(CRM_Core_DAO::VALUE_SEPARATOR, $dao->entityValueIds)
@@ -503,7 +505,7 @@ FROM civicrm_action_schedule cas
   protected static function createMailingActivity($actionSchedule, $mapping, $contactID, $entityID, $caseID) {
     $session = CRM_Core_Session::singleton();
 
-    if ($mapping->entity == 'civicrm_membership') {
+    if ($mapping->getEntity() == 'civicrm_membership') {
       $activityTypeID
         = CRM_Core_OptionGroup::getValue('activity_type', 'Membership Renewal Reminder', 'name');
     }
@@ -546,18 +548,18 @@ FROM civicrm_action_schedule cas
       ->where("reminder.action_date_time IS NULL");
 
     if ($actionSchedule->limit_to == 0) {
-      $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
+      $entityJoinClause = "LEFT JOIN {$mapping->getEntity()} e ON e.id = reminder.entity_id";
       $select->where("e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact'");
     }
     else {
-      $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
+      $entityJoinClause = "INNER JOIN {$mapping->getEntity()} e ON e.id = reminder.entity_id";
     }
-    if ($mapping->entity == 'civicrm_activity') {
+    if ($mapping->getEntity() == 'civicrm_activity') {
       $entityJoinClause .= ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
     }
     $select->join('a', $entityJoinClause);
 
-    if ($mapping->entity == 'civicrm_activity') {
+    if ($mapping->getEntity() == 'civicrm_activity') {
       $compInfo = CRM_Core_Component::getEnabledComponents();
       $select->select('ov.label as activity_type, e.id as activity_id');
 
@@ -572,7 +574,7 @@ FROM civicrm_action_schedule cas
       }
     }
 
-    if ($mapping->entity == 'civicrm_participant') {
+    if ($mapping->getEntity() == 'civicrm_participant') {
       $select->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
 
       $JOIN_TYPE = ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN';
@@ -587,7 +589,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
 ");
     }
 
-    if ($mapping->entity == 'civicrm_membership') {
+    if ($mapping->getEntity() == 'civicrm_membership') {
       $select->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type');
 
       $JOIN_TYPE = ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN';

@@ -54,10 +54,12 @@ namespace Civi\ActionSchedule;
  * configuration. The dozen places have been consolidated and
  * replaced with functions in MappingInterface.
  *
- * This "Mapping" implementation is a refactoring of the
+ * This "Mapping" implementation is a refactoring of the old
  * hard-coded bits. Internally, it uses the concepts from
  * "civicrm_action_mapping". The resulting code is more
- * convoluted than a clean implementation of MappingInterface.
+ * convoluted than a clean implementation of MappingInterface, but
+ * it strictly matches the old behavior (based on logging/comparing
+ * the queries produced through ActionScheduleTest).
  */
 abstract class Mapping implements MappingInterface {
 
@@ -86,7 +88,7 @@ abstract class Mapping implements MappingInterface {
     }
   }
 
-  public $id;
+  protected $id;
 
   /**
    * The basic entity to query (table name).
@@ -94,7 +96,7 @@ abstract class Mapping implements MappingInterface {
    * @var string
    *   Ex: 'civicrm_activity', 'civicrm_event'.
    */
-  public $entity;
+  protected $entity;
 
   /**
    * The basic entity to query (label).
@@ -102,7 +104,7 @@ abstract class Mapping implements MappingInterface {
    * @var
    *   Ex: 'Activity', 'Event'
    */
-  public $entity_label;
+  private $entity_label;
 
   /**
    * Level 1 filter -- the field/option-list to filter on.
@@ -118,42 +120,83 @@ abstract class Mapping implements MappingInterface {
    * @var string
    *   Ex: 'Activity Type', 'Event Name', 'Event Template'.
    */
-  public $entity_value_label;
+  private $entity_value_label;
 
   /**
    * Level 2 filter -- the field/option-list to filter on.
    * @var string
    *   Ex: 'activity_status, 'civicrm_participant_status_type', 'auto_renew_options'.
    */
-  protected $entity_status;
+  private $entity_status;
 
   /**
    * Level 2 filter -- the field label.
    * @var string
    *   Ex: 'Activity Status', 'Participant Status', 'Auto Rewnewal Options'.
    */
-  public $entity_status_label;
+  private $entity_status_label;
 
   /**
    * Date filter -- the field name.
    * @var string|NULL
    *   Ex: 'event_start_date'
    */
-  protected $entity_date_start;
+  private $entity_date_start;
 
   /**
    * Date filter -- the field name.
    * @var string|NULL
    *   Ex: 'event_end_date'.
    */
-  protected $entity_date_end;
+  private $entity_date_end;
 
   /**
    * Contact selector -- The field/relationship/option-group name.
    * @var string|NULL
    *   Ex: 'activity_contacts', 'event_contacts'.
    */
-  public $entity_recipient;
+  protected $entity_recipient;
+
+  /**
+   * @return mixed
+   */
+  public function getId() {
+    return $this->id;
+  }
+
+  /**
+   * @return string
+   */
+  public function getEntity() {
+    return $this->entity;
+  }
+
+  /**
+   * Get a printable label for this mapping type.
+   *
+   * @return string
+   */
+  public function getLabel() {
+    return $this->entity_label;
+  }
+
+  /**
+   * Get a printable label to use a header on the 'value' filter.
+   *
+   * @return string
+   */
+  public function getValueHeader() {
+    return $this->entity_value_label;
+  }
+
+  /**
+   * Get a printable label to use a header on the 'status' filter.
+   *
+   * @return string
+   */
+  public function getStatusHeader() {
+    return $this->entity_status_label;
+  }
 
   /**
    * Get a list of value options.
