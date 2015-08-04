@@ -95,6 +95,16 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
+  // CRM-16963 - Permissions for country.
+  $permissions['country'] = array(
+    'get' => array(
+      'access CiviCRM',
+    ),
+    'default' => array(
+      'administer CiviCRM',
+    ),
+  );
+
   // Contact-related data permissions.
   // CRM-14094 - Users can edit and delete contact-related objects using inline edit with 'edit all contacts' permission
   $permissions['address'] = array(
