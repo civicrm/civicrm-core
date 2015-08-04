@@ -47,7 +47,7 @@
 {/if}
 {ts}Total Amount{/ts} : {$formValues.total_amount|crmMoney:$currency}
 {if $receive_date}
-{ts}Received Date{/ts}: {$receive_date|truncate:10:''|crmDate}
+{ts}Date Received{/ts}: {$receive_date|truncate:10:''|crmDate}
 {/if}
 {if $receipt_date}
 {ts}Receipt Date{/ts}: {$receipt_date|truncate:10:''|crmDate}

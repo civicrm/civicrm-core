@@ -300,7 +300,7 @@
   </foreignKey>
   <field>
     <name>postal_code_suffix</name>
-    <title>Zip / Postal Code Suffix</title>
+    <title>Postal Code Suffix</title>
     <type>varchar</type>
     <length>12</length>
     <import>true</import>
@@ -310,22 +310,22 @@
     <add>1.1</add>
     <html>
       <type>Text</type>
+      <size>3</size>
     </html>
   </field>
   <field>
     <name>postal_code</name>
-    <title>Zip / Postal Code</title>
+    <title>Postal Code</title>
     <type>varchar</type>
     <length>12</length>
     <import>true</import>
     <headerPattern>/postal|zip/i</headerPattern>
     <dataPattern>/\d?\d{4}(-\d{4})?/</dataPattern>
-    <comment>Store both US (zip5) AND international postal codes. App is responsible for country/region appropriate
-      validation.
-    </comment>
+    <comment>Store both US (zip5) AND international postal codes. App is responsible for country/region appropriate validation.</comment>
     <add>1.1</add>
     <html>
       <type>Text</type>
+      <size>6</size>
     </html>
   </field>
   <field>

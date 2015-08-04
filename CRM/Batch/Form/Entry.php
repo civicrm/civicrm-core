@@ -280,9 +280,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $errors = array();
     $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
     $fields = array(
-      'total_amount' => 'Amount',
-      'financial_type' => 'Financial Type',
-      'payment_instrument' => 'Paid By',
+      'total_amount' => ts('Amount'),
+      'financial_type' => ts('Financial Type'),
+      'payment_instrument' => ts('Payment Method'),
     );
 
     //CRM-16480 if contact is selected, validate financial type and amount field.

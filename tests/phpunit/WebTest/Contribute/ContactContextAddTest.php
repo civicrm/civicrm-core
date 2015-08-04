@@ -154,7 +154,7 @@ class WebTest_Contribute_ContactContextAddTest extends CiviSeleniumTestCase {
       'From' => $firstName . " Anderson",
       'Financial Type' => 'Donation',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Check',
+      'Payment Method' => 'Check',
       'Total Amount' => '$ 100.00',
       'Non-deductible Amount' => '$ 12.50',
       'Check Number' => 'check #1041',

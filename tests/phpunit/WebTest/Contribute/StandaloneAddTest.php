@@ -143,7 +143,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       'Financial Type' => 'Donation',
       'Total Amount' => '$ 100.00',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Check',
+      'Payment Method' => 'Check',
       'Check Number' => 'check #1041',
     );
 
@@ -267,7 +267,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       'Financial Type' => $financialType['name'],
       'Total Amount' => '$ 100.00',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Check',
+      'Payment Method' => 'Check',
       'Check Number' => 'check #1041',
     );
 

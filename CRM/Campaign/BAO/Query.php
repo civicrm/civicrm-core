@@ -354,7 +354,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     $form->add('text', 'street_unit', ts('Street Unit'), $attributes['street_unit']);
     $form->add('text', 'street_address', ts('Street Address'), $attributes['street_address']);
     $form->add('text', 'city', ts('City'), $attributes['city']);
-    $form->add('text', 'postal_code', ts('Zip / Postal Code'), $attributes['postal_code']);
+    $form->add('text', 'postal_code', ts('Postal Code'), $attributes['postal_code']);
 
     //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
     // this is loaded onto then replace with something like '__' & test

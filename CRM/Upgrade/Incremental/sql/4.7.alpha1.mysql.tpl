@@ -43,3 +43,8 @@ UPDATE civicrm_country SET `name` = UPPER( `name` );
 
 -- CRM-16447
 UPDATE civicrm_state_province SET name = 'Northern Ostrobothnia' WHERE name = 'Nothern Ostrobothnia';
+
+-- CRM-14078
+UPDATE civicrm_option_group SET title = '{ts escape="sql"}Payment Methods{/ts}' WHERE name = 'payment_instrument';
+UPDATE civicrm_navigation SET label = '{ts escape="sql"}Payment Methods{/ts}' WHERE name = 'Payment Instruments';
+

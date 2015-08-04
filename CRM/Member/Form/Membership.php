@@ -630,7 +630,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
       $this->add('select', 'payment_instrument_id',
-        ts('Paid By'),
+        ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
         FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
       );
@@ -804,7 +804,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if (!empty($params['record_contribution']) && empty($params['payment_instrument_id'])) {
-      $errors['payment_instrument_id'] = ts('Paid By is a required field.');
+      $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
     }
 
     if (!empty($params['is_different_contribution_contact'])) {

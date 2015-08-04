@@ -153,7 +153,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
       'Financial Type' => 'Donation',
       'Total Amount' => '100.00',
       'Contribution Status' => 'Pending',
-      'Paid By' => 'Check',
+      'Payment Method' => 'Check',
       'Check Number' => 'check #1041',
     );
     $this->webtestVerifyTabularData($expected);

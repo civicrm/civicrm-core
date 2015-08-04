@@ -116,7 +116,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
         'Financial Type' => 'Event Fee',
         'Total Amount' => '$ 800.00',
         'Contribution Status' => 'Completed',
-        'Paid By' => 'Check',
+        'Payment Method' => 'Check',
         'Check Number' => '1044',
       )
     );
@@ -309,7 +309,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
         'From' => $displayName,
         'Financial Type' => 'Event Fee',
         'Contribution Status' => 'Completed',
-        'Paid By' => 'Check',
+        'Payment Method' => 'Check',
         'Check Number' => '1044',
       )
     );
