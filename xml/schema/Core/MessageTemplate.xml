@@ -104,6 +104,7 @@
     <comment>a pseudo-FK to civicrm_option_value containing PDF Page Format.</comment>
     <pseudoconstant>
       <optionGroupName>pdf_format</optionGroupName>
+      <keyColumn>id</keyColumn>
     </pseudoconstant>
     <add>3.4</add>
   </field>
