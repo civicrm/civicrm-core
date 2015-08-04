@@ -252,7 +252,7 @@
   </item>
   <item>
      <path>civicrm/dashlet/getting-started</path>
-     <title>CiviCRM Getting Started</title>
+     <title>Getting Started</title>
      <page_callback>CRM_Dashlet_Page_GettingStarted</page_callback>
   </item>
 
