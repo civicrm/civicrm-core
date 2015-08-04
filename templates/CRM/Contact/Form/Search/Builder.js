@@ -2,6 +2,7 @@
 (function($, CRM) {
   'use strict';
 
+  /* jshint validthis: true */
   /**
    * Handle user input - field or operator selection.
    *
