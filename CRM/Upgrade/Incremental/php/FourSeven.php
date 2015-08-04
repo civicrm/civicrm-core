@@ -75,7 +75,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-    $this->addTask(ts('Add Getting Started dashlet to %1: SQL', array(1 => $rev)), 'add_getting_started_dashlet', $rev);
+    $this->addTask(ts('Add Getting Started dashlet to %1: SQL', array(1 => $rev)), 'addGettingStartedDashlet', $rev);
   }
 
   /**
@@ -93,7 +93,14 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     return $editorID;
   }
 
-  public function add_getting_started_dashlet(CRM_Queue_TaskContext $ctx) {
+  /**
+   * Add Getting Started dashlet to dashboard
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public function addGettingStartedDashlet(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT count(*) FROM civicrm_dashboard WHERE name='gettingStarted'";
     $res = CRM_Core_DAO::singleValueQuery($sql);
     $domainId = CRM_Core_Config::domainID();
@@ -107,6 +114,7 @@ SELECT (SELECT MAX(id) FROM `civicrm_dashboard`), contact_id, 0, IF (SUM(is_acti
 FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
       CRM_Core_DAO::executeQuery($sql);
     }
+    return TRUE;
   }
 
 }
