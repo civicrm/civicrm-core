@@ -59,6 +59,18 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       && $processor->context['actionMapping']->getEntity() === 'civicrm_membership';
   }
 
+  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
+    if ($e->mapping->getEntity() !== 'civicrm_membership') {
+      return;
+    }
+
+    $e->query
+      ->select('e.*') // FIXME: seems too broad.
+      ->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type')
+      ->join('mt', "!casMailingJoinType civicrm_membership_type mt ON e.membership_type_id = mt.id")
+      ->join('ms', "!casMailingJoinType civicrm_membership_status ms ON e.status_id = ms.id");
+  }
+
   /**
    * Evaluate the content of a single token.
    *
