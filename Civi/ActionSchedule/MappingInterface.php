@@ -30,6 +30,37 @@ namespace Civi\ActionSchedule;
 interface MappingInterface {
 
   /**
+   * @return mixed
+   */
+  public function getId();
+
+  /**
+   * @return string
+   */
+  public function getEntity();
+
+  /**
+   * Get a printable label for this mapping type.
+   *
+   * @return string
+   */
+  public function getLabel();
+
+  /**
+   * Get a printable label to use as the header on the 'value' filter.
+   *
+   * @return string
+   */
+  public function getValueHeader();
+
+  /**
+   * Get a printable label to use as the header on the 'status' filter.
+   *
+   * @return string
+   */
+  public function getStatusHeader();
+
+  /**
    * Get a list of value options.
    *
    * @return array
