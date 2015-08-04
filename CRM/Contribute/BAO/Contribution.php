@@ -1946,6 +1946,44 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   }
 
   /**
+   * Repeat a transaction as part of a recurring series.
+   *
+   * Only call this via the api as it is being refactored. The intention is that the repeatTransaction function
+   * (possibly living on the ContributionRecur BAO) would be called first to create a pending contribution with a
+   * subsequent call to the contribution.completetransaction api.
+   *
+   * The completeTransaction functionality has historically been overloaded to both complete and repeat payments.
+   *
+   * @param CRM_Contribute_BAO_Contribution $contribution
+   * @param array $input
+   * @param array $contributionParams
+   *
+   * @return array
+   */
+  protected static function repeatTransaction(&$contribution, &$input, $contributionParams) {
+    if (!empty($contribution->id)) {
+      return FALSE;
+    }
+    if (empty($contribution->id)) {
+      // Unclear why this would only be set for repeats.
+      if (!empty($input['amount'])) {
+        $contribution->total_amount = $contributionParams['total_amount'] = $input['amount'];
+      }
+      $templateContribution = civicrm_api3('Contribution', 'getsingle', array(
+        'contribution_recur_id' => $contributionParams['contribution_recur_id'],
+        'options' => array('limit' => 1),
+      ));
+      $contributionParams['skipLineItem'] = TRUE;
+      $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
+      $contributionParams['contact_id'] = $templateContribution['contact_id'];
+      $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
+      $contribution->id = $createContribution['id'];
+      $input['line_item'] = CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($contribution->contribution_recur_id, $contribution);
+      return TRUE;
+    }
+  }
+
+  /**
    * Get individual id for onbehalf contribution.
    *
    * @param int $contributionId
@@ -3965,9 +4003,32 @@ WHERE con.id = {$contributionId}
       $isFirstOrLastRecurringPayment) {
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
 
+    $inputContributionWhiteList = array(
+      'fee_amount',
+      'net_amount',
+      'trxn_id',
+      'check_number',
+      'payment_instrument_id',
+      'is_test',
+      'campaign_id'
+    );
+
+    $contributionParams = array_merge(array(
+      'contribution_status_id' => 'Completed',
+    ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
+    ));
+
+    if (!empty($contribution->id)) {
+      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(array('id' => $contribution->id),
+        CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    }
+
     $participant = CRM_Utils_Array::value('participant', $objects);
     $memberships = CRM_Utils_Array::value('membership', $objects);
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
+    if (!empty($recurContrib->id)) {
+      $contributionParams['contribution_recur_id'] = $recurContrib->id;
+    }
 
     if (is_numeric($memberships)) {
       $memberships = array($objects['membership']);
@@ -3979,14 +4040,14 @@ WHERE con.id = {$contributionId}
     if (isset($input['is_email_receipt'])) {
       $values['is_email_receipt'] = $input['is_email_receipt'];
     }
-    $source = NULL;
+
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
         CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
-        $source = ts('Online Contribution') . ': ' . $values['title'];
+        $contributionParams['source'] = ts('Online Contribution') . ': ' . $values['title'];
       }
       elseif ($recurContrib && $recurContrib->id) {
-        $contribution->contribution_page_id = NULL;
+        $contributionParams['contribution_page_id'] = NULL;
         $values['amount'] = $recurContrib->amount;
         $values['financial_type_id'] = $objects['contributionType']->id;
         $values['title'] = $source = ts('Offline Recurring Contribution');
@@ -4001,9 +4062,8 @@ WHERE con.id = {$contributionId}
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
 
-      $contribution->source = $source;
       if (!empty($values['is_email_receipt'])) {
-        $contribution->receipt_date = $changeDate;
+        $contributionParams['receipt_date'] = $changeDate;
       }
 
       if (!empty($memberships)) {
@@ -4109,10 +4169,10 @@ LIMIT 1;";
       //and cases involving status updation through ipn
       $values['totalAmount'] = $input['amount'];
 
-      $contribution->source = ts('Online Event Registration') . ': ' . $values['event']['title'];
+      $contributionParams['source'] = ts('Online Event Registration') . ': ' . $values['event']['title'];
 
       if ($values['event']['is_email_confirm']) {
-        $contribution->receipt_date = $changeDate;
+        $contributionParams['receipt_date'] = $changeDate;
         $values['is_email_receipt'] = 1;
       }
       if (empty($input['skipComponentSync'])) {
@@ -4125,70 +4185,10 @@ LIMIT 1;";
       $participant->save();
     }
 
-    if (CRM_Utils_Array::value('net_amount', $input, 0) == 0 &&
-      CRM_Utils_Array::value('fee_amount', $input, 0) != 0
-    ) {
-      $input['net_amount'] = $input['amount'] - $input['fee_amount'];
-    }
-    // This complete transaction function is being overloaded to create new contributions too.
-    // here we record if it is a new contribution.
-    // @todo separate the 2 more appropriately.
-    $isNewContribution = FALSE;
-    if (empty($contribution->id)) {
-      $isNewContribution = TRUE;
-      if (!empty($input['amount']) && $input['amount'] != $contribution->total_amount) {
-        $contribution->total_amount = $input['amount'];
-        // The BAO does this stuff but we are actually kinda bypassing it here (bad code! go sit in the corner)
-        // so we have to handle net_amount in this (naughty) code.
-        if (isset($input['fee_amount']) && is_numeric($input['fee_amount'])) {
-          $contribution->fee_amount = $input['fee_amount'];
-        }
-        $contribution->net_amount = $contribution->total_amount - $contribution->fee_amount;
-      }
-      if (!empty($input['campaign_id'])) {
-        $contribution->campaign_id = $input['campaign_id'];
-      }
-    }
+    $isNewContribution = self::repeatTransaction($contribution, $input, $contributionParams);
+    $contributionParams['id'] = $contribution->id;
 
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
-      'labelColumn' => 'name',
-      'flip' => 1,
-    ));
-
-    // @todo this section should call the api  in order to have hooks called &
-    // because all this 'messiness' setting variables could be avoided
-    // by letting the api resolve pseudoconstants & copy set values and format dates.
-    $contribution->contribution_status_id = $contributionStatuses['Completed'];
-    $contribution->is_test = $input['is_test'];
-
-    // CRM-15960 If we don't have a value we 'want' for the amounts, leave it to the BAO to sort out.
-    if (isset($input['net_amount'])) {
-      $contribution->fee_amount = CRM_Utils_Array::value('fee_amount', $input, 0);
-    }
-    if (isset($input['net_amount'])) {
-      $contribution->net_amount = $input['net_amount'];
-    }
-
-    $contribution->trxn_id = $input['trxn_id'];
-    $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
-    $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
-    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
-    $contribution->cancel_date = 'null';
-
-    if (!empty($input['check_number'])) {
-      $contribution->check_number = $input['check_number'];
-    }
-
-    if (!empty($input['payment_instrument_id'])) {
-      $contribution->payment_instrument_id = $input['payment_instrument_id'];
-    }
-
-    if (!empty($contribution->id)) {
-      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(array('id' => $contribution->id),
-      CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
-    }
-
-    $contribution->save();
+    civicrm_api3('Contribution', 'create', $contributionParams);
 
     // Add new soft credit against current $contribution.
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
@@ -4198,7 +4198,6 @@ LIMIT 1;";
     //add line items for recurring payments
     if (!empty($contribution->contribution_recur_id)) {
       if ($isNewContribution) {
-        $input['line_item'] = CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($contribution->contribution_recur_id, $contribution);
       }
       else {
         // this is just to prevent e-notices when we call recordFinancialAccounts - per comments on that line - intention is somewhat unclear
