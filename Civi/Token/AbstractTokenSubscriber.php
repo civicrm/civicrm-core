@@ -27,6 +27,7 @@
 
 namespace Civi\Token;
 
+use Civi\ActionSchedule\Event\MailingQueryEvent;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -42,8 +43,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *   1. Create a subclass.
  *   2. Override the constructor and set values for $entity and $tokenNames.
  *   3. Implement the evaluateToken() method.
- *   4. Optionally, override checkActive() and/or prefetch().
- *   4. Register the new class with the event-dispatcher.
+ *   4. Optionally, override others:
+ *      + checkActive()
+ *      + prefetch()
+ *      + alterActionScheduleMailing()
+ *   5. Register the new class with the event-dispatcher.
  *
  * Note: There's no obligation to use this base class. You could implement
  * your own class anew -- just subscribe the proper events.
@@ -54,6 +58,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
     return array(
       Events::TOKEN_REGISTER => 'registerTokens',
       Events::TOKEN_EVALUATE => 'evaluateTokens',
+      \Civi\ActionSchedule\Events::MAILING_QUERY => 'alterActionScheduleQuery',
     );
   }
 
@@ -110,6 +115,20 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
         'label' => $label,
       ));
     }
+  }
+
+  /**
+   * Alter the query which prepopulates mailing data
+   * for scheduled reminders.
+   *
+   * This is method is not always appropriate, but if you're specifically
+   * focused on scheduled reminders, it can be convenient.
+   *
+   * @param MailingQueryEvent $e
+   *   The pending query which may be modified. See discussion on
+   *   MailingQueryEvent::$query.
+   */
+  public function alterActionScheduleQuery(MailingQueryEvent $e) {
   }
 
   /**

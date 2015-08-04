@@ -57,6 +57,30 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       && $processor->context['actionMapping']->getEntity() === 'civicrm_activity';
   }
 
+  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
+    if ($e->mapping->getEntity() !== 'civicrm_activity') {
+      return;
+    }
+
+    // The join expression for activities needs some extra nuance to handle
+    // multiple revisions of the activity. Q: Could we simplify & move the
+    // extra AND clauses into `where(...)`?
+    $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
+
+    $e->query->select('e.*'); // FIXME: seems too broad.
+    $e->query->select('ov.label as activity_type, e.id as activity_id');
+
+    $e->query->join("og", "!casMailingJoinType civicrm_option_group og ON og.name = 'activity_type'");
+    $e->query->join("ov", "!casMailingJoinType civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id");
+
+    // if CiviCase component is enabled, join for caseId.
+    $compInfo = CRM_Core_Component::getEnabledComponents();
+    if (array_key_exists('CiviCase', $compInfo)) {
+      $e->query->select("civicrm_case_activity.case_id as case_id");
+      $e->query->join('civicrm_case_activity', "LEFT JOIN `civicrm_case_activity` ON `e`.`id` = `civicrm_case_activity`.`activity_id`");
+    }
+  }
+
   /**
    * Evaluate the content of a single token.
    *
