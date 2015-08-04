@@ -65,7 +65,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'is_active' => 1,
       'record_activity' => 1,
       'start_action_date' => 'activity_date_time',
-      'mapping_id' => CRM_Core_ActionScheduleTmp::ACTIVITY_MAPPING_ID,
+      'mapping_id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,
     );
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
     $this->assertTrue(is_numeric($actionSchedule['id']));
@@ -103,7 +103,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'entity_status' => $scheduledStatus,
       'is_active' => 1,
       'record_activity' => 1,
-      'mapping_id' => CRM_Core_ActionScheduleTmp::ACTIVITY_MAPPING_ID,
+      'mapping_id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,
       'start_action_offset' => 3,
       'start_action_unit' => 'day',
       'start_action_condition' => 'before',

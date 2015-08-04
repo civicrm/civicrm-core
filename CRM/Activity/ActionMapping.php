@@ -27,7 +27,42 @@
 
 use Civi\ActionSchedule\RecipientBuilder;
 
+/**
+ * Class CRM_Activity_ActionMapping
+ *
+ * This defines the scheduled-reminder functionality for contact
+ * entities. It is useful for, e.g., sending a reminder based on
+ * birth date, modification date, or other custom dates on
+ * the contact record.
+ */
 class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
+
+  /**
+   * The value for civicrm_action_schedule.mapping_id which identifies the
+   * "Activity" mapping.
+   *
+   * Note: This value is chosen to match legacy DB IDs.
+   */
+  const ACTIVITY_MAPPING_ID = 1;
+
+  /**
+   * Register Activity-related action mappings.
+   *
+   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
+   */
+  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
+    $registrations->register(CRM_Activity_ActionMapping::create(array(
+      'id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,
+      'entity' => 'civicrm_activity',
+      'entity_label' => ts('Activity'),
+      'entity_value' => 'activity_type',
+      'entity_value_label' => ts('Activity Type'),
+      'entity_status' => 'activity_status',
+      'entity_status_label' => ts('Activity Status'),
+      'entity_date_start' => 'activity_date_time',
+      'entity_recipient' => 'activity_contacts',
+    )));
+  }
 
   /**
    * Generate a query to locate recipients who match the given

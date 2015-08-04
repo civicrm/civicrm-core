@@ -38,6 +38,60 @@ use Civi\ActionSchedule\RecipientBuilder;
 class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
 
   /**
+   * The value for civicrm_action_schedule.mapping_id which identifies the
+   * "Event Type" mapping.
+   *
+   * Note: This value is chosen to match legacy DB IDs.
+   */
+  const EVENT_TYPE_MAPPING_ID = 2;
+  const EVENT_NAME_MAPPING_ID = 3;
+  const EVENT_TPL_MAPPING_ID = 5;
+
+  /**
+   * Register CiviEvent-related action mappings.
+   *
+   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
+   */
+  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
+    $registrations->register(CRM_Event_ActionMapping::create(array(
+      'id' => CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID,
+      'entity' => 'civicrm_participant',
+      'entity_label' => ts('Event Type'),
+      'entity_value' => 'event_type',
+      'entity_value_label' => ts('Event Type'),
+      'entity_status' => 'civicrm_participant_status_type',
+      'entity_status_label' => ts('Participant Status'),
+      'entity_date_start' => 'event_start_date',
+      'entity_date_end' => 'event_end_date',
+      'entity_recipient' => 'event_contacts',
+    )));
+    $registrations->register(CRM_Event_ActionMapping::create(array(
+      'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+      'entity' => 'civicrm_participant',
+      'entity_label' => ts('Event Name'),
+      'entity_value' => 'civicrm_event',
+      'entity_value_label' => ts('Event Name'),
+      'entity_status' => 'civicrm_participant_status_type',
+      'entity_status_label' => ts('Participant Status'),
+      'entity_date_start' => 'event_start_date',
+      'entity_date_end' => 'event_end_date',
+      'entity_recipient' => 'event_contacts',
+    )));
+    $registrations->register(CRM_Event_ActionMapping::create(array(
+      'id' => CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID,
+      'entity' => 'civicrm_participant',
+      'entity_label' => ts('Event Template'),
+      'entity_value' => 'event_template',
+      'entity_value_label' => ts('Event Template'),
+      'entity_status' => 'civicrm_participant_status_type',
+      'entity_status_label' => ts('Participant Status'),
+      'entity_date_start' => 'event_start_date',
+      'entity_date_end' => 'event_end_date',
+      'entity_recipient' => 'event_contacts',
+    )));
+  }
+
+  /**
    * Generate a query to locate recipients who match the given
    * schedule.
    *
@@ -74,12 +128,12 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
 
     // build where clause
     if (!empty($selectedValues)) {
-      $valueField = ($this->id == \CRM_Core_ActionScheduleTmp::EVENT_TYPE_MAPPING_ID) ? 'event_type_id' : 'id';
+      $valueField = ($this->id == \CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID) ? 'event_type_id' : 'id';
       $query->where("r.{$valueField} IN (@selectedValues)")
         ->param('selectedValues', $selectedValues);
     }
     else {
-      $query->where(($this->id == \CRM_Core_ActionScheduleTmp::EVENT_TYPE_MAPPING_ID) ? "r.event_type_id IS NULL" : "r.id IS NULL");
+      $query->where(($this->id == \CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID) ? "r.event_type_id IS NULL" : "r.id IS NULL");
     }
 
     $query->where('r.is_active = 1');
