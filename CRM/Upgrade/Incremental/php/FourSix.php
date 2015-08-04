@@ -205,10 +205,10 @@ class CRM_Upgrade_Incremental_php_FourSix {
   public function upgrade_4_6_6($rev) {
     // CRM-16846 - This sql file may have been previously skipped. Conditionally run it again if it doesn't appear to have run before.
     if (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_state_province WHERE abbreviation = '100' AND country_id = 1193")) {
-      $this->addTask('Update Slovenian municipalities', 'task_4_6_x_runSql', '4.6.alpha3');
+      $this->addTask('Update Slovenian municipalities', 'task_4_6_x_runOnlySql', '4.6.alpha3');
     }
     // CRM-16846 - This sql file may have been previously skipped. No harm in running it again because it's just UPDATE statements.
-    $this->addTask('State-province update from 4.4.7', 'task_4_6_x_runSql', '4.4.7');
+    $this->addTask('State-province update from 4.4.7', 'task_4_6_x_runOnlySql', '4.4.7');
 
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'task_4_6_x_runSql', $rev);
   }
@@ -238,6 +238,23 @@ class CRM_Upgrade_Incremental_php_FourSix {
       $query = "ALTER TABLE log_civicrm_case MODIFY `case_type_id` int(10) unsigned DEFAULT NULL COMMENT 'FK to civicrm_case_type.id';";
       CRM_Core_DAO::executeQuery($query);
     }
+    return TRUE;
+  }
+  
+  /**
+   * Queue Task Callback for CRM-16846
+   *
+   * Run a sql file without resetting locale to that version
+   */
+  public static function task_4_6_x_runOnlySql(CRM_Queue_TaskContext $ctx, $rev) {
+    $upgrade = new CRM_Upgrade_Form();
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('domainID', CRM_Core_Config::domainID());
+
+    $fileName = "CRM/Upgrade/Incremental/sql/$rev.mysql.tpl";
+
+    $upgrade->source($smarty->fetch($fileName), TRUE);
+
     return TRUE;
   }
 
