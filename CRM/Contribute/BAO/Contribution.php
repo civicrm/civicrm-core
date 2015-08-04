@@ -4015,7 +4015,7 @@ WHERE con.id = {$contributionId}
       'check_number',
       'payment_instrument_id',
       'is_test',
-      'campaign_id'
+      'campaign_id',
     );
 
     $contributionParams = array_merge(array(
@@ -4181,14 +4181,11 @@ LIMIT 1;";
         $contributionParams['receipt_date'] = $changeDate;
         $values['is_email_receipt'] = 1;
       }
+      $participantParams['id'] = $participant->id;
       if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
-        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
-          'labelColumn' => 'name',
-          'flip' => 1,
-        ));
-        $participant->status_id = $participantStatuses['Registered'];
+        $participantParams['status_id'] = 'Registered';
       }
-      $participant->save();
+      civicrm_api3('Participant', 'create', $participantParams);
     }
 
     $contributionParams['id'] = $contribution->id;
