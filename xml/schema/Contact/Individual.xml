@@ -181,7 +181,7 @@
   </field>
   <field>
     <name>is_deceased</name>
-    <title>Is Deceased</title>
+    <title>Deceased</title>
     <import>true</import>
     <export>true</export>
     <headerPattern>/i(s\s)?d(eceased)$/i</headerPattern>

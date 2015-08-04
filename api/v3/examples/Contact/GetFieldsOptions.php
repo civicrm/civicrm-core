@@ -577,7 +577,7 @@ function contact_getfields_expectedresult() {
       'is_deceased' => array(
         'name' => 'is_deceased',
         'type' => 16,
-        'title' => 'Is Deceased',
+        'title' => 'Deceased',
         'import' => TRUE,
         'where' => 'civicrm_contact.is_deceased',
         'headerPattern' => '/i(s\\s)?d(eceased)$/i',
