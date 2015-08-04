@@ -4044,6 +4044,7 @@ WHERE con.id = {$contributionId}
       'payment_instrument_id',
       'is_test',
       'campaign_id',
+      'receive_date',
     );
 
     $contributionParams = array_merge(array(
