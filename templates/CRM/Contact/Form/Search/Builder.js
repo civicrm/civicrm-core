@@ -234,7 +234,7 @@
       .on('change', '.crm-search-value select', function() {
         var value = $(this).val() || '';
         if ($(this).attr('multiple') == 'multiple' && value.length) {
-          value = '(' + value.join(',') + ')';
+          value = value.join(',');
         }
         $(this).siblings('input').val(value);
       })
