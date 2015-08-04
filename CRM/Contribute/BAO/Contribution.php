@@ -2325,14 +2325,9 @@ WHERE  contribution_id = %1 ";
         $entityID = $ids['membership'][0];
       }
 
-      $url = $paymentObject->subscriptionURL($entityID, $entity);
-      $template->assign('cancelSubscriptionUrl', $url);
-
-      $url = $paymentObject->subscriptionURL($entityID, $entity, 'billing');
-      $template->assign('updateSubscriptionBillingUrl', $url);
-
-      $url = $paymentObject->subscriptionURL($entityID, $entity, 'update');
-      $template->assign('updateSubscriptionUrl', $url);
+      $template->assign('cancelSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity));
+      $template->assign('updateSubscriptionBillingUrl', $paymentObject->subscriptionURL($entityID, $entity, 'billing'));
+      $template->assign('updateSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity, 'update'));
 
       if ($this->_relatedObjects['paymentProcessor']['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM) {
         //direct mode showing billing block, so use directIPN for temporary
@@ -2341,6 +2336,35 @@ WHERE  contribution_id = %1 ";
     }
     // todo remove strtolower - check consistency
     if (strtolower($this->_component) == 'event') {
+      $eventParams = array('id' => $this->_relatedObjects['participant']->event_id);
+      $values['event'] = array();
+
+      CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
+
+      //get location details
+      $locationParams = array('entity_id' => $this->_relatedObjects['participant']->event_id, 'entity_table' => 'civicrm_event');
+      $values['location'] = CRM_Core_BAO_Location::getValues($locationParams);
+
+      $ufJoinParams = array(
+        'entity_table' => 'civicrm_event',
+        'entity_id' => $ids['event'],
+        'module' => 'CiviEvent',
+      );
+
+      list($custom_pre_id,
+        $custom_post_ids
+        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+
+      $values['custom_pre_id'] = $custom_pre_id;
+      $values['custom_post_id'] = $custom_post_ids;
+      //for tasks 'Change Participant Status' and 'Batch Update Participants Via Profile' case
+      //and cases involving status updation through ipn
+      // whatever that means!
+      $values['totalAmount'] = $input['amount'];
+
+      if ($values['event']['is_email_confirm']) {
+        $values['is_email_receipt'] = 1;
+      }
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
         $this->_relatedObjects['participant']->id, $this->is_test, $returnMessageText
       );
@@ -4007,7 +4031,11 @@ WHERE con.id = {$contributionId}
   public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution, $isRecurring,
       $isFirstOrLastRecurringPayment) {
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
-
+    // The previous details are used when calculating line items so keep it before any code that 'does something'
+    if (!empty($contribution->id)) {
+      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(array('id' => $contribution->id),
+        CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    }
     $inputContributionWhiteList = array(
       'fee_amount',
       'net_amount',
@@ -4022,11 +4050,6 @@ WHERE con.id = {$contributionId}
       'contribution_status_id' => 'Completed',
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
-
-    if (!empty($contribution->id)) {
-      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(array('id' => $contribution->id),
-        CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
-    }
 
     $participant = CRM_Utils_Array::value('participant', $objects);
     $memberships = CRM_Utils_Array::value('membership', $objects);
@@ -4149,43 +4172,18 @@ LIMIT 1;";
       }
     }
     else {
-      // event
-      $eventParams = array('id' => $objects['event']->id);
-      $values['event'] = array();
-
-      CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
-
-      //get location details
-      $locationParams = array('entity_id' => $objects['event']->id, 'entity_table' => 'civicrm_event');
-      $values['location'] = CRM_Core_BAO_Location::getValues($locationParams);
-
-      $ufJoinParams = array(
-        'entity_table' => 'civicrm_event',
-        'entity_id' => $ids['event'],
-        'module' => 'CiviEvent',
-      );
-
-      list($custom_pre_id,
-        $custom_post_ids
-        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-
-      $values['custom_pre_id'] = $custom_pre_id;
-      $values['custom_post_id'] = $custom_post_ids;
-      //for tasks 'Change Participant Status' and 'Batch Update Participants Via Profile' case
-      //and cases involving status updation through ipn
-      $values['totalAmount'] = $input['amount'];
-
-      $contributionParams['source'] = ts('Online Event Registration') . ': ' . $values['event']['title'];
-
-      if ($values['event']['is_email_confirm']) {
-        $contributionParams['receipt_date'] = $changeDate;
-        $values['is_email_receipt'] = 1;
-      }
-      $participantParams['id'] = $participant->id;
       if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
+        $eventDetail = civicrm_api3('Event', 'getsingle', array('id' => $objects['event']->id));
+        $contributionParams['source'] = ts('Online Event Registration') . ': ' . $eventDetail['title'];
+
+        if ($eventDetail['is_email_confirm']) {
+          // @todo this should be set by the function that sends the mail after sending.
+          $contributionParams['receipt_date'] = $changeDate;
+        }
+        $participantParams['id'] = $participant->id;
         $participantParams['status_id'] = 'Registered';
+        civicrm_api3('Participant', 'create', $participantParams);
       }
-      civicrm_api3('Participant', 'create', $participantParams);
     }
 
     $contributionParams['id'] = $contribution->id;
