@@ -689,7 +689,7 @@ function contact_getfields_expectedresult() {
       'source' => array(
         'name' => 'source',
         'type' => 2,
-        'title' => 'Source of Contact Data',
+        'title' => 'Contact Source',
         'maxlength' => 255,
         'size' => 30,
         'import' => TRUE,

@@ -18,7 +18,7 @@
     {/if}
   </p>
   <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
-    <tr><td>{ts}Receive Date{/ts}:</td><td> {$receive_date|crmDate}</td></tr>
+    <tr><td>{ts}Received{/ts}:</td><td> {$receive_date|crmDate}</td></tr>
     <tr><td>{ts}Amount{/ts}:</td><td> {$total_amount|crmMoney:$currency}</td></tr>
     <tr><td>{ts}Name{/ts}:</td><td> {$donors_display_name}</td></tr>
     <tr><td>{ts}Email{/ts}:</td><td> {$donors_email}</td></tr>
