@@ -3954,10 +3954,11 @@ WHERE con.id = {$contributionId}
    * @param int $recur
    * @param CRM_Contribute_BAO_Contribution $contribution
    * @param bool $isRecurring
-   *   Duplication of param needs review.
+   *   Duplication of param needs review. Only used by AuthorizeNetIPN
    * @param int $isFirstOrLastRecurringPayment
+   *   Deprecated param only used by AuthorizeNetIPN.
    */
-  public static function completeOrder(&$input, &$ids, $objects, &$transaction, $recur, $contribution, $isRecurring,
+  public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution, $isRecurring,
       $isFirstOrLastRecurringPayment) {
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
 
@@ -4038,6 +4039,7 @@ LIMIT 1;";
               $membershipParams['membership_type_id'],
               $primaryContributionID
             );
+            $dates = array_fill_keys(array('join_date', 'start_date', 'end_date'), NULL);
             if ($currentMembership) {
               /*
                * Fixed FOR CRM-4433
