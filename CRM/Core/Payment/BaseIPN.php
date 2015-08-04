@@ -494,7 +494,8 @@ class CRM_Core_Payment_BaseIPN {
    * @return array
    */
   public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
-    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects, $values, $recur, $returnMessageText);
+    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution'], $values, $recur,
+      $returnMessageText);
   }
 
 }
