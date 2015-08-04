@@ -493,6 +493,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       'name'
     );
     if (!$activity->find(TRUE)) {
+      if (empty($contribution->contact_id)) {
+        $contribution->find(TRUE);
+      }
       CRM_Activity_BAO_Activity::addActivity($contribution, 'Offline');
     }
     else {
