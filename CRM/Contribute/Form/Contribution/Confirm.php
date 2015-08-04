@@ -1694,23 +1694,23 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $form->postProcessHook();
       }
       $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
-      $result = $payment->doPayment($form->_params, 'contribute');
+      $paymentActionResult = $payment->doPayment($form->_params, 'contribute');
 
-      if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
+      if (CRM_Utils_Array::value('payment_status_id', $paymentActionResult) == 1) {
         // Refer to CRM-16737. Payment processors 'should' return payment_status_id
         // to denote the outcome of the transaction.
         try {
           civicrm_api3('contribution', 'completetransaction', array(
             'id' => $paymentResult['contribution']->id,
-            'trxn_id' => $paymentResult['contribution']->trxn_id,
+            'trxn_id' => CRM_Utils_Array::value('trxn_id', $paymentActionResult, $paymentResult['contribution']->trxn_id),
             'is_transactional' => FALSE,
             'payment_processor_id' => $form->_paymentProcessor['id'],
           ));
         }
         catch (CiviCRM_API3_Exception $e) {
-          // if for any reason it is already completed this will fail - e.g extensions hacking around core not completing transactions prior to CRM-15296
-          // so let's be gentle here
-          CRM_Core_Error::debug_log_message('contribution ' . $membershipContribution->id . ' not completed with trxn_id ' . $membershipContribution->trxn_id . ' and message ' . $e->getMessage());
+          if ($e->getErrorCode() != 'contribution_completed') {
+            throw new CRM_Core_Exception('Failed to update contribution in database');
+          }
         }
       }
       // Do not send an email if Recurring transaction is done via Direct Mode
