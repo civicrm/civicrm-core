@@ -37,6 +37,32 @@ use Civi\ActionSchedule\RecipientBuilder;
  */
 class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
 
+  /**
+   * The value for civicrm_action_schedule.mapping_id which identifies the
+   * "Contact" mapping.
+   *
+   * Note: This value is chosen to match legacy DB IDs.
+   */
+  const CONTACT_MAPPING_ID = 6;
+
+  /**
+   * Register Contact-related action mappings.
+   *
+   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
+   */
+  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
+    $registrations->register(CRM_Contact_ActionMapping::create(array(
+      'id' => CRM_Contact_ActionMapping::CONTACT_MAPPING_ID,
+      'entity' => 'civicrm_contact',
+      'entity_label' => ts('Contact'),
+      'entity_value' => 'civicrm_contact',
+      'entity_value_label' => ts('Date Field'),
+      'entity_status' => 'contact_date_reminder_options',
+      'entity_status_label' => ts('Annual Options'),
+      'entity_date_start' => 'date_field',
+    )));
+  }
+
   private $contactDateFields = array(
     'birth_date',
     'created_date',
