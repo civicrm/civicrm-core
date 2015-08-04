@@ -48,7 +48,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
   static $_tokens = array(
     'crmurl' => array(
       'configbackend' => 'civicrm/admin/configtask',
-    )
+    ),
   );
 
   /**
