@@ -1453,47 +1453,43 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   Line items specifically relating to memberships.
    * @param bool $isPayLater
    */
-  public function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater) {
-    try {
-      $membershipTypeIDs = (array) $membershipParams['selectMembership'];
-      $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
-      $membershipType = empty($membershipTypes) ? array() : reset($membershipTypes);
-      $isPending = $this->getIsPending();
+  protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams,
+                                $membershipLineItems, $isPayLater) {
 
-      $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipType));
+    $membershipTypeIDs = (array) $membershipParams['selectMembership'];
+    $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
+    $membershipType = empty($membershipTypes) ? array() : reset($membershipTypes);
+    $isPending = $this->getIsPending();
 
-      $isPaidMembership = FALSE;
-      if ($this->_amount >= 0.0 && isset($membershipParams['amount'])) {
-        //amount must be greater than zero for
-        //adding contribution record  to contribution table.
-        //this condition arises when separate membership payment is
-        //enabled and contribution amount is not selected. fix for CRM-3010
-        $isPaidMembership = TRUE;
-      }
-      $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id, $this->_values['amount_block_is_active']);
+    $this->assign('membership_name', CRM_Utils_Array::value('name', $membershipType));
 
-      if ($this->_values['amount_block_is_active']) {
-        $financialTypeID = $this->_values['financial_type_id'];
-      }
-      else {
-        $financialTypeID = CRM_Utils_Array::value('financial_type_id', $membershipType, CRM_Utils_Array::value('financial_type_id', $membershipParams));
-      }
-
-      if (CRM_Utils_Array::value('membership_source', $this->_params)) {
-        $membershipParams['contribution_source'] = $this->_params['membership_source'];
-      }
-
-      $this->postProcessMembership($membershipParams, $contactID,
-        $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
-        $membershipLineItems, $isPayLater, $isPending);
-
-      $this->assign('membership_assign', TRUE);
-      $this->set('membershipTypeID', $membershipParams['selectMembership']);
+    $isPaidMembership = FALSE;
+    if ($this->_amount >= 0.0 && isset($membershipParams['amount'])) {
+      //amount must be greater than zero for
+      //adding contribution record  to contribution table.
+      //this condition arises when separate membership payment is
+      //enabled and contribution amount is not selected. fix for CRM-3010
+      $isPaidMembership = TRUE;
     }
-    catch (CRM_Core_Exception $e) {
-      CRM_Core_Session::singleton()->setStatus($e->getMessage());
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
+    $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction($this->_id, $this->_values['amount_block_is_active']);
+
+    if ($this->_values['amount_block_is_active']) {
+      $financialTypeID = $this->_values['financial_type_id'];
     }
+    else {
+      $financialTypeID = CRM_Utils_Array::value('financial_type_id', $membershipType, CRM_Utils_Array::value('financial_type_id', $membershipParams));
+    }
+
+    if (CRM_Utils_Array::value('membership_source', $this->_params)) {
+      $membershipParams['contribution_source'] = $this->_params['membership_source'];
+    }
+
+    $this->postProcessMembership($membershipParams, $contactID,
+      $this, $premiumParams, $customFieldsFormatted, $fieldTypes, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
+      $membershipLineItems, $isPayLater, $isPending);
+
+    $this->assign('membership_assign', TRUE);
+    $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
 
   /**
@@ -2411,7 +2407,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
       }
-      $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater);
+      try {
+        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Core_Session::singleton()->setStatus($e->getMessage());
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
+      }
       if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
         // we need to explicitly create a CMS user in case of free memberships
         // since it is done under processConfirm for paid memberships
