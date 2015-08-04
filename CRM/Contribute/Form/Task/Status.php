@@ -288,6 +288,7 @@ AND    co.id IN ( $contribIDs )";
       }
       $input['trxn_date'] = CRM_Utils_Date::processDate($params["trxn_date_{$row['contribution_id']}"]);
 
+      // @todo calling baseIPN like this is a pattern in it's last gasps. Call contribute.completetransaction api.
       $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
 
       // reset template values before processing next transactions

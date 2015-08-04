@@ -26,37 +26,22 @@
  */
 
 /**
- * This api exposes CiviCRM Scheduled Reminders.
+ * This api exposes CiviCRM MembershipLog records.
  *
  * @package CiviCRM_APIv3
  */
 
 /**
- * Get CiviCRM ActionSchedule details.
+ * API to Create or update a MembershipLog.
  *
  * @param array $params
+ *   Values of MembershipLog.
  *
  * @return array
- *   API result array
+ *   API result array.
  */
-function civicrm_api3_action_schedule_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ActionSchedule');
-}
-
-
-/**
- * Create a new ActionSchedule.
- *
- * @param array $params
- *
- * @return array
- */
-function civicrm_api3_action_schedule_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('start_action_date', 'absolute_date'));
-  if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
-    $params['name'] = CRM_Utils_String::munge($params['title']);
-  }
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ActionSchedule');
+function civicrm_api3_membership_log_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -67,21 +52,37 @@ function civicrm_api3_action_schedule_create($params) {
  * @param array $params
  *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_action_schedule_create_spec(&$params) {
-  $params['title']['api.required'] = TRUE;
-  $params['mapping_id']['api.required'] = TRUE;
-  $params['entity_value']['api.required'] = TRUE;
+function _civicrm_api3_membership_log_create_spec(&$params) {
+  $params['membership_id']['api.required'] = TRUE;
 }
 
 /**
- * Delete an existing ActionSchedule.
+ * Get a Membership Log.
+ *
+ * This api is used for finding an existing membership log.
  *
  * @param array $params
- *   Array containing id of the action_schedule to be deleted.
+ *   An associative array of name/value property values of civicrm_membership_log.
+ * {getfields MembershipLog_get}
  *
  * @return array
  *   API result array
  */
-function civicrm_api3_action_schedule_delete($params) {
+function civicrm_api3_membership_log_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Deletes an existing membership log.
+ *
+ * This API is used for deleting a membership log
+ * Required parameters : id of a membership log
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_membership_log_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

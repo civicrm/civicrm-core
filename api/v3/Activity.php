@@ -40,7 +40,7 @@
  *
  * @throws API_Exception
  * @return array
- *   Array containing 'is_error' to denote success or failure and details of the created activity.
+ *   API result array
  */
 function civicrm_api3_activity_create($params) {
 
@@ -230,6 +230,7 @@ function _civicrm_api3_activity_create_spec(&$params) {
  *   Array per getfields documentation.
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_activity_get($params) {
   if (!empty($params['contact_id'])) {
@@ -325,6 +326,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
  * @throws API_Exception
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_activity_delete($params) {
 
