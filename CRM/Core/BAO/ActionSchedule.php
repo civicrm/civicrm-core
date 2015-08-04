@@ -535,66 +535,34 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param $mapping
-   * @param $actionSchedule
+   * @param \Civi\ActionSchedule\MappingInterface $mapping
+   * @param \CRM_Core_DAO_ActionSchedule $actionSchedule
    * @return string
    */
   protected static function prepareMailingQuery($mapping, $actionSchedule) {
-    $select = CRM_Utils_SQL_Select::from('civicrm_action_log reminder', array('mode' => 'out'))
-      ->select("reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id as entityID, e.*")
-      ->where("reminder.action_schedule_id = #casScheduleId")
-      ->param('casScheduleId', $actionSchedule->id)
-      ->where("reminder.action_date_time IS NULL");
+    $select = CRM_Utils_SQL_Select::from('civicrm_action_log reminder')
+      ->select("reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id AS entityID")
+      ->join('e', "!casMailingJoinType !casMappingEntity e ON !casEntityJoinExpr")
+      ->select("e.id as entityID, e.*")
+      ->where("reminder.action_schedule_id = #casActionScheduleId")
+      ->where("reminder.action_date_time IS NULL")
+      ->param(array(
+        'casActionScheduleId' => $actionSchedule->id,
+        'casMailingJoinType' => ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN',
+        'casMappingId' => $mapping->getId(),
+        'casMappingEntity' => $mapping->getEntity(),
+        'casEntityJoinExpr' => 'e.id = reminder.entity_id',
+      ));
 
     if ($actionSchedule->limit_to == 0) {
-      $entityJoinClause = "LEFT JOIN {$mapping->getEntity()} e ON e.id = reminder.entity_id";
       $select->where("e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact'");
     }
-    else {
-      $entityJoinClause = "INNER JOIN {$mapping->getEntity()} e ON e.id = reminder.entity_id";
-    }
-    if ($mapping->getEntity() == 'civicrm_activity') {
-      $entityJoinClause .= ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
-    }
-    $select->join('a', $entityJoinClause);
 
-    if ($mapping->getEntity() == 'civicrm_activity') {
-      $compInfo = CRM_Core_Component::getEnabledComponents();
-      $select->select('ov.label as activity_type, e.id as activity_id');
-
-      $JOIN_TYPE = ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN';
-      $select->join("og", "$JOIN_TYPE civicrm_option_group og ON og.name = 'activity_type'");
-      $select->join("ov", "$JOIN_TYPE civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id");
-
-      // if CiviCase component is enabled, join for caseId.
-      if (array_key_exists('CiviCase', $compInfo)) {
-        $select->select("civicrm_case_activity.case_id as case_id");
-        $select->join('civicrm_case_activity', "LEFT JOIN `civicrm_case_activity` ON `e`.`id` = `civicrm_case_activity`.`activity_id`");
-      }
-    }
-
-    if ($mapping->getEntity() == 'civicrm_participant') {
-      $select->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
-
-      $JOIN_TYPE = ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN';
-      $select->join('participant_stuff', "
-$JOIN_TYPE civicrm_event ev ON e.event_id = ev.id
-$JOIN_TYPE civicrm_option_group og ON og.name = 'event_type'
-$JOIN_TYPE civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
-LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
-LEFT JOIN civicrm_address address ON address.id = lb.address_id
-LEFT JOIN civicrm_email email ON email.id = lb.email_id
-LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
-");
-    }
-
-    if ($mapping->getEntity() == 'civicrm_membership') {
-      $select->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type');
-
-      $JOIN_TYPE = ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN';
-      $select->join('mt', "$JOIN_TYPE civicrm_membership_type mt ON e.membership_type_id = mt.id");
-      $select->join('ms', "$JOIN_TYPE civicrm_membership_status ms ON e.status_id = ms.id");
-    }
+    \Civi\Core\Container::singleton()->get('dispatcher')
+      ->dispatch(
+        \Civi\ActionSchedule\Events::MAILING_QUERY,
+        new \Civi\ActionSchedule\Event\MailingQueryEvent($actionSchedule, $mapping, $select)
+      );
 
     return $select->toSQL();
   }

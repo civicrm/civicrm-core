@@ -66,6 +66,24 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       && $processor->context['actionMapping']->getEntity() === 'civicrm_participant';
   }
 
+  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
+    if ($e->mapping->getEntity() !== 'civicrm_participant') {
+      return;
+    }
+
+    $e->query->select('e.*'); // FIXME: seems too broad.
+    $e->query->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
+    $e->query->join('participant_stuff', "
+!casMailingJoinType civicrm_event ev ON e.event_id = ev.id
+!casMailingJoinType civicrm_option_group og ON og.name = 'event_type'
+!casMailingJoinType civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
+LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
+LEFT JOIN civicrm_address address ON address.id = lb.address_id
+LEFT JOIN civicrm_email email ON email.id = lb.email_id
+LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
+");
+  }
+
   /**
    * Evaluate the content of a single token.
    *
