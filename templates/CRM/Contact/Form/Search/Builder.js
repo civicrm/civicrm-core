@@ -180,7 +180,7 @@
       $('tr:not(.crm-search-builder-add-row)', block).each(function(rowNo) {
         var row = $(this);
         if ($('select:first', row).val() === '') {
-          if (!skippedRow && (rowNo == 0 || blockNo + 1 == newBlock)) {
+          if (!skippedRow && (rowNo === 0 || blockNo + 1 == newBlock)) {
             skippedRow = true;
           }
           else {
