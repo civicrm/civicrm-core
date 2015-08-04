@@ -192,10 +192,12 @@ class Container {
       array()
     ))->addTag('kernel.event_subscriber');
 
-    $container->setDefinition('actionscheduletmp', new Definition(
-      'CRM_Core_ActionScheduleTmp',
-      array()
-    ))->addTag('kernel.event_subscriber');
+    foreach (array('Activity', 'Event', 'Member') as $comp) {
+      $container->setDefinition("crm_" . strtolower($comp) . "_tokens", new Definition(
+        "CRM_{$comp}_Tokens",
+        array()
+      ))->addTag('kernel.event_subscriber');
+    }
 
     \CRM_Utils_Hook::container($container);
 
@@ -226,6 +228,11 @@ class Container {
       'CRM_Core_LegacyErrorHandler',
       'handleException',
     ));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Activity_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contact_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Event_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Member_ActionMapping', 'onRegisterActionMappings'));
+
     return $dispatcher;
   }
 

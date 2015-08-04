@@ -37,6 +37,33 @@ use Civi\ActionSchedule\RecipientBuilder;
 class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
 
   /**
+   * The value for civicrm_action_schedule.mapping_id which identifies the
+   * "Membership Type" mapping.
+   *
+   * Note: This value is chosen to match legacy DB IDs.
+   */
+  const MEMBERSHIP_TYPE_MAPPING_ID = 4;
+
+  /**
+   * Register CiviMember-related action mappings.
+   *
+   * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
+   */
+  public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
+    $registrations->register(CRM_Member_ActionMapping::create(array(
+      'id' => CRM_Member_ActionMapping::MEMBERSHIP_TYPE_MAPPING_ID,
+      'entity' => 'civicrm_membership',
+      'entity_label' => ts('Membership'),
+      'entity_value' => 'civicrm_membership_type',
+      'entity_value_label' => ts('Membership Type'),
+      'entity_status' => 'auto_renew_options',
+      'entity_status_label' => ts('Auto Renew Options'),
+      'entity_date_start' => 'membership_join_date',
+      'entity_date_end' => 'membership_end_date',
+    )));
+  }
+
+  /**
    * Generate a query to locate recipients who match the given
    * schedule.
    *

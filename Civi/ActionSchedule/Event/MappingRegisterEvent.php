@@ -35,6 +35,7 @@ class MappingRegisterEvent extends Event {
    *   Array(scalar $id => MappingInterface $mapping).
    */
   public function getMappings() {
+    ksort($this->mappings);
     return $this->mappings;
   }
 
