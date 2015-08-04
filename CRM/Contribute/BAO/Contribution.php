@@ -4266,7 +4266,7 @@ LIMIT 1;";
     if (!array_key_exists('is_email_receipt', $values) ||
       $values['is_email_receipt'] == 1
     ) {
-      self::sendMail($input, $ids, $objects, $values, $recur, FALSE);
+      self::sendMail($input, $ids, $objects['contribution'], $values, $recur, FALSE);
       CRM_Core_Error::debug_log_message("Receipt sent");
     }
 
@@ -4289,7 +4289,7 @@ LIMIT 1;";
    *   Incoming data from Payment processor.
    * @param array $ids
    *   Related object IDs.
-   * @param $objects
+   * @param CRM_Contribute_BAO_Contribution $contribution
    * @param array $values
    *   Values related to objects that have already been loaded.
    * @param bool $recur
@@ -4300,8 +4300,7 @@ LIMIT 1;";
    *
    * @return array
    */
-  public static function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
-    $contribution = $objects['contribution'];
+  public static function sendMail(&$input, &$ids, $contribution, &$values, $recur = FALSE, $returnMessageText = FALSE) {
     $input['is_recur'] = $recur;
     // set receipt from e-mail and name in value
     if (!$returnMessageText) {
