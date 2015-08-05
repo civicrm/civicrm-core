@@ -327,15 +327,14 @@ class api_v3_EventTest extends CiviUnitTestCase {
    */
   public function testChainingGetNonExistingLocBlock() {
     $params = $this->_params[0];
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
     $check = $this->callAPISuccess($this->_entity, 'get', array(
       'id' => $result['id'],
       // this chaining request should not break things:
       'api.LocBlock.get' => array('id' => '$value.loc_block_id'),
       ));
-    $this->assertEquals(0, $check['is_error'], ' in line ' . __LINE__);
-    $this->assertEquals($result['id'], $check['id'], ' in line ' . __LINE__);
+    $this->assertEquals($result['id'], $check['id']);
 
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
   }
