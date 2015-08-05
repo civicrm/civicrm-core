@@ -540,4 +540,15 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return 'sidebar_first';
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function flush() {
+    // CiviCRM and Drupal both provide (different versions of) Symfony (and possibly share other classes too).
+    // If we call drupal_flush_all_caches(), Drupal will attempt to rediscover all of its classes, use Civicrm's
+    // alternatives instead and then die. Instead, we only clear cache bins and no more.
+    foreach (Drupal\Core\Cache\Cache::getBins() as $service_id => $cache_backend) {
+      $cache_backend->deleteAll();
+    }
+  }
 }
