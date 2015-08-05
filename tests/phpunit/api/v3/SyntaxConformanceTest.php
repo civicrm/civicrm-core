@@ -1222,7 +1222,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
                 'sequential' => 1,
               ));
             $optionValue = $optionValue['values'];
-            $options[$optionValue[0]['value']] = 'new option value';
+            $keyColumn = CRM_Utils_Array::value('keyColumn', $specs['pseudoconstant'], 'value');
+            $options[$optionValue[0][$keyColumn]] = 'new option value';
           }
         }
         $entity[$field] = array_rand($options);
