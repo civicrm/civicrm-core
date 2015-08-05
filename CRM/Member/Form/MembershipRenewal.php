@@ -305,6 +305,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           $taxAmount = ($taxRate/100) * CRM_Utils_Array::value('minimum_fee', $values);
           $totalAmount = $totalAmount + $taxAmount;
           $allMembershipInfo[$key]['tax_amount'] = $taxAmount;
+          $this->assign('taxAmount', $taxAmount);
         }
 
         // build membership info array, which is used to set the payment information block when
