@@ -128,6 +128,46 @@ class TokenRow {
   }
 
   /**
+   * Update the value of a token. Apply formatting based on DB schema.
+   *
+   * @param string $tokenEntity
+   * @param string $tokenField
+   * @param string $baoName
+   * @param array $baoField
+   * @param mixed $fieldValue
+   */
+  public function dbToken($tokenEntity, $tokenField, $baoName, $baoField, $fieldValue) {
+    if ($fieldValue === NULL || $fieldValue === '') {
+      return $this->tokens($tokenEntity, $tokenField, '');
+    }
+
+    $fields = $baoName::fields();
+    if (!empty($fields[$baoField]['pseudoconstant'])) {
+      $options = $baoName::buildOptions($baoField, 'get');
+      return $this->format('text/plain')->tokens($tokenEntity, $tokenField, $options[$fieldValue]);
+    }
+
+    switch ($fields[$baoField]['type']) {
+      case \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME:
+        return $this->format('text/plain')->tokens($tokenEntity, $tokenField, \CRM_Utils_Date::customFormat($fieldValue));
+
+      case \CRM_Utils_Type::T_MONEY:
+        // Is this something you should ever use? Seems like you need more context
+        // to know which currency to use.
+        return $this->format('text/plain')->tokens($tokenEntity, $tokenField, \CRM_Utils_Money::format($fieldValue));
+
+      case \CRM_Utils_Type::T_STRING:
+      case \CRM_Utils_Type::T_BOOLEAN:
+      case \CRM_Utils_Type::T_INT:
+      case \CRM_Utils_Type::T_TEXT:
+        return $this->format('text/plain')->tokens($tokenEntity, $tokenField, $fieldValue);
+
+    }
+
+    throw new \CRM_Core_Exception("Cannot format token for field '$baoField' in '$baoName'");
+  }
+
+  /**
    * Auto-convert between different formats
    */
   public function fill($format = NULL) {
