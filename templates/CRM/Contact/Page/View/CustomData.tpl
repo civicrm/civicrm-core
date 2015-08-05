@@ -26,7 +26,7 @@
 {* template for custom data *}
 {assign var="customDataGroupName" value=$customDataGroup.name}
 {strip}
-  {if $displayStyle neq 'tableOriented' and $action eq 16 or $action eq 4} {* Browse or View actions *}
+  {if $displayStyle neq 'tableOriented' and ($action eq 16 or $action eq 4)} {* Browse or View actions *}
     <div class="form-item">
       {include file="CRM/Custom/Page/CustomDataView.tpl"}
     </div>
