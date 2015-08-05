@@ -115,7 +115,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
 
     $query->join('r', 'INNER JOIN civicrm_event r ON e.event_id = r.id');
     if ($schedule->recipient_listing && $schedule->limit_to) {
-      switch (\CRM_Utils_Array::value($schedule->recipient, $this->getRecipientOptions())) {
+      switch ($schedule->recipient) {
         case 'participant_role':
           $query->where("e.role_id IN (#recipList)")
             ->param('recipList', \CRM_Utils_Array::explodePadded($schedule->recipient_listing));
@@ -140,6 +140,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query->where('r.is_template = 0');
 
     // participant status criteria not to be implemented for additional recipients
+    // ... why not?
     if (!empty($selectedStatuses)) {
       switch ($phase) {
         case RecipientBuilder::PHASE_RELATION_FIRST:
@@ -151,23 +152,6 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       }
     }
     return $query;
-  }
-
-  /**
-   * FIXME: Seems to duplicate getRecipientTypes?
-   * @return array|null
-   */
-  public function getRecipientOptions() {
-    $recipientOptions = NULL;
-    if (!\CRM_Utils_System::isNull($this->entity_recipient)) {
-      if ($this->entity_recipient == 'event_contacts') {
-        $recipientOptions = \CRM_Core_OptionGroup::values($this->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
-      }
-      else {
-        $recipientOptions = \CRM_Core_OptionGroup::values($this->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
-      }
-    }
-    return $recipientOptions;
   }
 
 }

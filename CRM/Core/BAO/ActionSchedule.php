@@ -99,7 +99,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
       if ($mapping->getId() == $id) {
         $dateFieldLabels = $mapping->getDateFields();
-        $entityRecipientLabels = $mapping->getRecipientTypes();
+        $entityRecipientLabels = $mapping->getRecipientTypes() + self::getAdditionalRecipients();
         $entityRecipientNames = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
       }
 
@@ -143,7 +143,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     foreach ($mappings as $mapping) {
       /** @var \Civi\ActionSchedule\Mapping $mapping */
       $dateFieldLabels = $mapping->getDateFields();
-      $entityRecipientLabels = $mapping->getRecipientTypes(!$isLimit);
+      $entityRecipientLabels = $mapping->getRecipientTypes(!$isLimit) + self::getAdditionalRecipients();
     }
 
     return array(
@@ -718,6 +718,19 @@ FROM civicrm_action_schedule cas
       return $toPhoneNumber;
     }
     return NULL;
+  }
+
+  /**
+   * Get the list of generic recipient types supported by all entities/mappings.
+   *
+   * @return array
+   *   array(mixed $value => string $label).
+   */
+  protected static function getAdditionalRecipients() {
+    return array(
+      'manual' => ts('Choose Recipient(s)'),
+      'group' => ts('Select Group'),
+    );
   }
 
 }
