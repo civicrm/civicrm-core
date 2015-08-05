@@ -128,14 +128,12 @@ function _civicrm_api_get_camel_name($entity) {
  * @param string $separator
  */
 function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '.') {
-
   foreach ($params as $field => $value) {
-
     if (is_string($value) && substr($value, 0, 6) == '$value') {
       $valueSubstitute = substr($value, 7);
 
       if (!empty($parentResult[$valueSubstitute])) {
-        $params[$field] = $parentResult[$valueSubstitute];
+        $substituteResult = $parentResult[$valueSubstitute];
       }
       else {
 
@@ -153,10 +151,31 @@ function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '
             foreach ($stringParts as $key => $innerValue) {
               $arrayLocation = CRM_Utils_Array::value($innerValue, $arrayLocation);
             }
-            $params[$field] = $arrayLocation;
+            $substituteResult = $arrayLocation;
           }
           $count = count($stringParts);
         }
+      }
+
+      if (isset($substituteResult)) {
+        $params[$field] = $substituteResult;
+      }
+      else {
+        // In this case, the $valueSubstitute field probably did not exist in
+        // $parentResult. This might be because it is an invalid field, but it
+        // could also be the case that the field is optional. If the value of
+        // this field should be used to seach for an ID, this should not
+        // generate an exception.
+        // See http://forum.civicrm.org/index.php/topic,36113.0.html
+
+        // This is just a hacky way to guess whether we expect an ID.
+        if ($field === 'id' || substr($field, -3) === '_id') {
+          // Just use -1, hoping that no ID like that exists.
+          $params[$field] = -1;
+        }
+        // If we are not dealing with an ID, the $value expression just stays
+        // as it is. Which is probably not correct. But since it is not clear
+        // to me what should happen in this case, I will leave it as it is.
       }
     }
   }
