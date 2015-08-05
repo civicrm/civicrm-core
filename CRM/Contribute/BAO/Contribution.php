@@ -2360,7 +2360,11 @@ WHERE  contribution_id = %1 ";
       //for tasks 'Change Participant Status' and 'Batch Update Participants Via Profile' case
       //and cases involving status updation through ipn
       // whatever that means!
-      $values['totalAmount'] = $input['amount'];
+      // total_amount appears to be the preferred input param & it is unclear why we support amount here
+      // perhaps we should throw an e-notice if amount is set & force total_amount?
+      if (!empty($input['amount'])) {
+        $values['totalAmount'] = $input['amount'];
+      }
 
       if ($values['event']['is_email_confirm']) {
         $values['is_email_receipt'] = 1;
