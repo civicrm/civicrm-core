@@ -190,7 +190,7 @@ FROM civicrm_action_schedule cas
     if ($filterMapping and $filterValue) {
       $where .= " AND cas.entity_value = %1 AND cas.mapping_id = %2";
       $queryParams[1] = array($filterValue, 'Integer');
-      $queryParams[2] = array($filterMapping->getId(), 'Integer');
+      $queryParams[2] = array($filterMapping->getId(), 'String');
     }
     $where .= " AND cas.used_for IS NULL";
     $query .= $where;
@@ -436,7 +436,7 @@ FROM civicrm_action_schedule cas
                                entity_value = %2";
 
     $params = array(
-      1 => array($mappingID, 'Integer'),
+      1 => array($mappingID, 'String'),
       2 => array($id, 'Integer'),
     );
     return CRM_Core_DAO::singleValueQuery($queryString, $params);
