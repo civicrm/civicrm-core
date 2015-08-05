@@ -192,7 +192,7 @@ class Container {
       array()
     ))->addTag('kernel.event_subscriber');
 
-    foreach (array('Activity', 'Event', 'Member') as $comp) {
+    foreach (array('Activity', 'Contribute', 'Event', 'Member') as $comp) {
       $container->setDefinition("crm_" . strtolower($comp) . "_tokens", new Definition(
         "CRM_{$comp}_Tokens",
         array()
@@ -230,6 +230,7 @@ class Container {
     ));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Activity_ActionMapping', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contact_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByPage', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Event_ActionMapping', 'onRegisterActionMappings'));
     $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Member_ActionMapping', 'onRegisterActionMappings'));
 
