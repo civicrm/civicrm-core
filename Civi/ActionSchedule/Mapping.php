@@ -262,13 +262,8 @@ abstract class Mapping implements MappingInterface {
     }
 
     $options = array();
-    switch ($this->entity) {
-      case 'civicrm_participant':
-        $eventContacts = \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name', TRUE, FALSE, 'name');
-        if (!empty($eventContacts[$recipientType]) && $eventContacts[$recipientType] == 'participant_role') {
-          $options = \CRM_Event_PseudoConstant::participantRole();
-        }
-        break;
+    if ($this->entity === 'civicrm_participant' && $recipientType === 'participant_role') {
+      $options = \CRM_Event_PseudoConstant::participantRole();
     }
     return $options;
   }
@@ -298,10 +293,6 @@ abstract class Mapping implements MappingInterface {
 
       default:
     }
-    $entityRecipientLabels += array(
-      'manual' => ts('Choose Recipient(s)'),
-      'group' => ts('Select Group'),
-    );
     return $entityRecipientLabels;
   }
 
