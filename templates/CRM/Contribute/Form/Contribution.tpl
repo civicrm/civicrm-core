@@ -30,7 +30,7 @@
 {elseif $showAdditionalInfo and $formType }
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
-
+  {include file="CRM/Contribute/Form/AdditionalInfo/Payment.tpl"}
   <div class="crm-block crm-form-block crm-contribution-form-block">
 
   {if !$email and $action neq 8 and $context neq 'standalone'}

@@ -171,8 +171,9 @@
           </tr>
           <tr class="crm-membership-form-block-record_contribution"><td colspan="2">
             <fieldset id="recordContribution"><legend>{ts}Membership Payment and Receipt{/ts}</legend>
-         {/if}
-        {include file="CRM/Member/Form/MembershipCommon.tpl"}
+
+          {include file="CRM/Member/Form/MembershipCommon.tpl"}
+        {/if}
 
         {if $emailExists and $outBound_option != 2}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
