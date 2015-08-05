@@ -45,9 +45,10 @@ UPDATE civicrm_country SET `name` = UPPER( `name` );
 UPDATE civicrm_state_province SET name = 'Northern Ostrobothnia' WHERE name = 'Nothern Ostrobothnia';
 
 -- CRM-14078
-UPDATE civicrm_option_group SET title = '{ts escape="sql"}Payment Methods{/ts}' WHERE name = 'payment_instrument';
+UPDATE civicrm_option_group SET {localize field="title"}title = '{ts escape="sql"}Payment Methods{/ts}'{/localize} WHERE name = 'payment_instrument';
 UPDATE civicrm_navigation SET label = '{ts escape="sql"}Payment Methods{/ts}' WHERE name = 'Payment Instruments';
 
+-- CRM-16176
 {if $multilingual}
   {foreach from=$locales item=locale}
      ALTER TABLE civicrm_relationship_type ADD label_a_b_{$locale} varchar(64);
