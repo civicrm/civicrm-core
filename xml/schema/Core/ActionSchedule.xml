@@ -216,16 +216,11 @@
   <field>
     <name>mapping_id</name>
     <title>Reminder Mapping</title>
-    <type>int unsigned</type>
-    <comment>FK to mapping which is being used by this reminder</comment>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name/ID of the mapping to use on this table</comment>
     <add>3.4</add>
   </field>
-  <foreignKey>
-    <name>mapping_id</name>
-    <table>civicrm_action_mapping</table>
-    <key>id</key>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
   <field>
     <name>group_id</name>
     <title>Reminder Group</title>
