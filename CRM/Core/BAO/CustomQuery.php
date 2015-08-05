@@ -423,14 +423,15 @@ SELECT label, value
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
               if ($isSerialized && !empty($value)) {
-                $specialChar = '[' . CRM_Core_DAO::VALUE_SEPARATOR . ']*';
                 if (strstr($op, 'IN')) {
-                  $value = str_replace(",", "$specialChar|$specialChar", $value);
+                  $value = str_replace(",", "[[:cntrl:]]*|[[:cntrl:]]*", $value);
+                  $value = str_replace('(', '[[.left-parenthesis.]]', $value);
+                  $value = str_replace(')', '[[.right-parenthesis.]]', $value);
                 }
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
-                $value = "$specialChar$value$specialChar";
+                $value = "[[:cntrl:]]*" . $value . "[[:cntrl:]]*";
                 if (!$wildcard) {
-                  $value = str_replace("$specialChar|", '', $value);
+                  $value = str_replace("[[:cntrl:]]*|", '', $value);
                 }
               }
 
