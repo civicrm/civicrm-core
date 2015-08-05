@@ -183,7 +183,7 @@ class ChainSubscriber implements EventSubscriberInterface {
             foreach ($newparams as $entityparams) {
               $subParams = array_merge($genericParams, $entityparams);
               _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
-              $result['values'][$result['id']][$field][] = $apiKernel->run($subEntity, $subaction, $subParams);
+              $result['values'][$idIndex][$field][] = $apiKernel->run($subEntity, $subaction, $subParams);
               if ($result['is_error'] === 1) {
                 throw new \Exception($subEntity . ' ' . $subaction . 'call failed with' . $result['error_message']);
               }
