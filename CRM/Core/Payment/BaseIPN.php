@@ -244,7 +244,7 @@ class CRM_Core_Payment_BaseIPN {
       CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
-    if (empty($input['skipComponentSync'])) {
+    if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
         // if transaction is failed then set "Cancelled" as membership status
         $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
@@ -339,7 +339,7 @@ class CRM_Core_Payment_BaseIPN {
       CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
-    if (empty($input['skipComponentSync'])) {
+    if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
         $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
             'labelColumn' => 'name',
@@ -494,7 +494,8 @@ class CRM_Core_Payment_BaseIPN {
    * @return array
    */
   public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
-    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects, $values, $recur, $returnMessageText);
+    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution'], $values, $recur,
+      $returnMessageText);
   }
 
 }
