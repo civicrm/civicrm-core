@@ -520,7 +520,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $input['fee_amount'] = self::retrieve('mc_fee', 'Money', 'POST', FALSE);
     $input['net_amount'] = self::retrieve('settle_amount', 'Money', 'POST', FALSE);
     $input['trxn_id'] = self::retrieve('txn_id', 'String', 'POST', FALSE);
-    $input['payment_date'] = self::retrieve('payment_date', 'String', 'POST', FALSE);
+    $input['payment_date'] = $input['receive_date'] = self::retrieve('payment_date', 'String', 'POST', FALSE);
   }
 
   /**

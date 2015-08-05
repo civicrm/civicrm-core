@@ -134,7 +134,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
   $params['skipLineItem'] = array(
     'name' => 'skipLineItem',
     'title' => 'Skip adding line items',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_BOOLEAN,
     'api.default' => 0,
     'description' => 'Do not add line items by default (if you wish to add your own)',
   );
