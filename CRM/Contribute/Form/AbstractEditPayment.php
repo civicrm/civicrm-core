@@ -251,9 +251,8 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       $this->_online = CRM_Utils_Array::value('contribution_recur_id', $values);
       // Make additional Details editable if payment processor supports backoffice edit
       if ($this->_online) {
-        $backOfficePaymentProcessors = CRM_Contribute_BAO_ContributionRecur::getBackOfficePaymentProcessors();
         $paymentProcessorId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $this->_online, 'payment_processor_id');
-        if (array_key_exists($paymentProcessorId, $backOfficePaymentProcessors)) {
+        if (array_key_exists($paymentProcessorId, $this->_recurPaymentProcessors)) {
           $this->_online = FALSE;
         }
       }

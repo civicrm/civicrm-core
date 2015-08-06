@@ -619,22 +619,25 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
     
+    $this->_paymentProcessors = $this->getValidProcessors();
+    if (!$this->_mode) {
+      $this->_mode = 'live';
+    }
+    $this->assignProcessors();
     if ($this->_context == 'standalone') {
       $this->assign('showRecurringField', 1);
-      $backOfficePaymentProcessors = CRM_Contribute_BAO_ContributionRecur::getBackOfficePaymentProcessors();
-      $this->assign('backOfficePaymentProcessors', json_encode($backOfficePaymentProcessors));
+      $this->assign('backOfficePaymentProcessors', json_encode($this->_recurPaymentProcessors));
       $recurringContribution = $this->add('select', 'contribution_recur_id', ts('Recurring Contribution'), FALSE, NULL);
     } else {
       $recurContributions = array();
-        $existingRecurContributions = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($this->_contactID);
-        // Get all backoffice payment processors
-        $backOfficePaymentProcessors = CRM_Contribute_BAO_ContributionRecur::getBackOfficePaymentProcessors();
-        if (!empty($existingRecurContributions)) {
-          foreach ($existingRecurContributions as $ids => $recur) {
-            if (array_key_exists($recur['payment_processor_id'], $backOfficePaymentProcessors)) {
-             $recurContributions[$ids] = CRM_Utils_Money::format($recur['amount']) . ' / ' . $backOfficePaymentProcessors[$recur['payment_processor_id']] . ' / ' . CRM_Contribute_PseudoConstant::contributionStatus($recur['contribution_status_id']) . ' / ' . CRM_Utils_Date::customFormat($recur['start_date']);
-            }
+      $existingRecurContributions = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($this->_contactID);
+      // Get all backoffice payment processors
+      if (!empty($existingRecurContributions)) {
+        foreach ($existingRecurContributions as $ids => $recur) {
+          if (array_key_exists($recur['payment_processor_id'], $this->_recurPaymentProcessors)) {
+           $recurContributions[$ids] = CRM_Utils_Money::format($recur['amount']) . ' / ' . $this->_recurPaymentProcessors[$recur['payment_processor_id']] . ' / ' . CRM_Contribute_PseudoConstant::contributionStatus($recur['contribution_status_id']) . ' / ' . CRM_Utils_Date::customFormat($recur['start_date']);
           }
+        }
       }
       if (!empty($recurContributions)) {
         $this->assign('showRecurringField', 1);

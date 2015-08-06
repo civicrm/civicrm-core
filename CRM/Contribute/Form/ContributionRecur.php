@@ -30,7 +30,7 @@ require_once 'CRM/Contribute/DAO/ContributionRecur.php';
 /**
  * This class generates form components for processing a recurring contribution record.
  */
-class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
+class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_AbstractEditPayment {
 
   /**
    * The id of the contact associated with this recurring contribution record.
@@ -105,6 +105,14 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
       return;
     }
 
+    // Get backoffice payment processors
+    $this->assignPaymentRelatedVariables();
+    $this->_paymentProcessors = $this->getValidProcessors();
+    
+    // Get recurring processors
+    $this->_mode = 'live';
+    $this->assignProcessors();
+    
     $this->_values = array();
 
     $ids = array();
@@ -124,11 +132,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
         $this->assign('membershipID', $this->_membershipID);
       }
 
-      // Get all backoffice payment processors
-      $backOfficePaymentProcessors = CRM_Contribute_BAO_ContributionRecur::getBackOfficePaymentProcessors();
-
       // Done allow Edit, if no back office support 
-      if (!array_key_exists($this->_values['payment_processor_id'], $backOfficePaymentProcessors)) {
+      if (!array_key_exists($this->_values['payment_processor_id'], $this->_paymentProcessors)) {
         CRM_Core_Error::fatal(ts('You are not allowed to edit this recurring record, as back office edit is not supported by the related payment processor.'));
       }
 		}
@@ -229,7 +234,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
 
     $paymentProcessor = $this->add('select', 'payment_processor_id',
       ts('Payment Processor'),
-      array('' => ts('- select -')) + CRM_Contribute_BAO_ContributionRecur::getBackOfficePaymentProcessors(),
+      array('' => ts('- select -')) + $this->_recurPaymentProcessors,
       TRUE,
       NULL
     );

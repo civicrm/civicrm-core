@@ -157,28 +157,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     }
     return $result;
   }
-  
-  /**
-   * @param bool $test
-   * @param $mode
-   *
-   * @return array|null
-   */
-  public static function getBackOfficePaymentProcessors($test = FALSE, $mode = 'live') {
-
-    $backOfficePaymentProcessors = array();
-    $allPaymentProcessors = CRM_Core_PseudoConstant::paymentProcessor(TRUE, $test);
-    foreach ($allPaymentProcessors as $paymentProcessorID => $paymentProcessorName) {
-      $paymentProcessorDetails = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID, $mode);
-      // Using the same logic from CRM_Core_Payment::supportsBackOffice
-      // to check back office support
-      if ($paymentProcessorDetails['billing_mode'] == 4 || $paymentProcessorDetails['payment_type'] != 1) {
-        unset($allPaymentProcessors[$paymentProcessorID]);
-      }
-    }
-
-    return $allPaymentProcessors;
-  }
 
   /**
    * @param int $id
