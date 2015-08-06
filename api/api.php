@@ -158,6 +158,10 @@ function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '
           $count = count($stringParts);
         }
       }
+      // CRM-16168 If we have failed to swap it out we should unset it rather than leave the placeholder.
+      if (substr($params[$field], 0, 6) == '$value') {
+        $params[$field] = NULL;
+      }
     }
   }
 }
