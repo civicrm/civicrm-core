@@ -307,6 +307,27 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check searching on custom fields.
+   *
+   * https://issues.civicrm.org/jira/browse/CRM-16036
+   */
+  public function testSearchCustomField() {
+    // create custom group with custom field on event
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    // Search for events having CRM-16036 as the value for this custom
+    // field. This should not return anything.
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+        'custom_' . $ids['custom_field_id'] => 'CRM-16036',
+      ));
+
+    $this->assertEquals(0, $check['count']);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
    * Test that an event with a price set can be created.
    */
   public function testCreatePaidEvent() {
