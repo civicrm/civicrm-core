@@ -451,11 +451,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Test searching on custom fields with netsted call with id param.
-   * 
+   *
    * Search for an event on a custom field, and perform a chained call
    * to retrieve it's (non-existing) loc block, using $value-substitution.
    * This test just checks whether the event is found, because something
-   * happened in CiviCRM 4.6.5 that broke my fix for CRM-16036, causing 
+   * happened in CiviCRM 4.6.5 that broke my fix for CRM-16036, causing
    * CiviCRM to return 0 results.
    * Of course, CRM-16168 should also be fixed for this test to pass.
    */
@@ -463,7 +463,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     // Create a custom group, and add a custom contact reference field.
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $custom_field_id = $ids['custom_field_id'];
-    
+
     // Create an event with a custom value.
     $params = $this->_params;
     $params['title'] = "My test event.";
@@ -489,8 +489,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'skip_undelete' => TRUE,
     ));
   }
-  
-  
+
+
   /**
    * Test that an event with a price set can be created.
    */
