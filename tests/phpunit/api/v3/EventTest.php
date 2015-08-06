@@ -475,11 +475,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
 
     // Retrieve the activity, and chain loc block using $value.
-    $result = $this->callAPIAndDocument($this->_entity, 'get', array(
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
       'custom_' . $custom_field_id => "12345",
       'api.LocBlock.get' => array("id" => '$value.loc_block_id'),
-    ), __FUNCTION__, __FILE__);
-
+    ));
+print_r($result);
     $this->assertEquals(1, $result['count']);
 
     $this->customFieldDelete($ids['custom_field_id']);
