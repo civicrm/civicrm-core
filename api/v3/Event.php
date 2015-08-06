@@ -106,14 +106,6 @@ function _civicrm_api3_event_create_legacy_support_42(&$params) {
  *   Array of all found event property values.
  */
 function civicrm_api3_event_get($params) {
-  // If $params refers to a custom field, use a hack for
-  // CRM-16036
-  foreach (array_keys($params) as $key) {
-    if (substr($key, 0, 7) === 'custom_') {
-      return _civicrm_api3_get_using_query_object_simple(
-        _civicrm_api3_get_BAO(__FUNCTION__), $params);
-    }
-  }
 
   //legacy support for $params['return.sort']
   if (!empty($params['return.sort'])) {
@@ -133,34 +125,25 @@ function civicrm_api3_event_get($params) {
     unset($params['return.max_results']);
   }
 
-  $eventDAO = new CRM_Event_BAO_Event();
-  _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE);
-
+  $extraSql = array();
   if (!empty($params['isCurrent'])) {
-    $eventDAO->whereAdd('(start_date >= CURDATE() || end_date >= CURDATE())');
+    $extraSql['where'] = array('civicrm_event' => '(start_date >= CURDATE() || end_date >= CURDATE())');
   }
 
-  // @todo should replace all this with _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity) - but we still have
-  // the return.is_full to deal with.
-  // NB the std dao_to_array function should only return custom if required.
-  $event = array();
+  $events = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Event', $extraSql, TRUE);
   $options = _civicrm_api3_get_options_from_params($params);
-
-  $eventDAO->find();
-  while ($eventDAO->fetch()) {
-    $event[$eventDAO->id] = array();
-    CRM_Core_DAO::storeValues($eventDAO, $event[$eventDAO->id]);
+  foreach ($events as $id => $event) {
     if (!empty($params['return.is_full'])) {
-      _civicrm_api3_event_getisfull($event, $eventDAO->id);
+      _civicrm_api3_event_getisfull($events, $id);
     }
-    _civicrm_api3_event_get_legacy_support_42($event, $eventDAO->id);
-    _civicrm_api3_custom_data_get($event[$eventDAO->id], 'Event', $eventDAO->id, NULL, $eventDAO->event_type_id);
+    _civicrm_api3_event_get_legacy_support_42($events, $id);
     if (!empty($options['return'])) {
-      $event[$eventDAO->id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventDAO->id);
+      $events[$id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $id);
+      print_r($events);
     }
   }
 
-  return civicrm_api3_create_success($event, $params, 'Event', 'get', $eventDAO);
+  return civicrm_api3_create_success($events, $params, 'Event', 'get');
 }
 
 /**
