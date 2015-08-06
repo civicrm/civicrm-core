@@ -1793,7 +1793,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
     //CRM-15187
     // dusplay message when membership type is changed
-    if ($this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
+    if (($this->_action & CRM_Core_Action::UPDATE) && $this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
       CRM_Core_Session::setStatus(
         ts('The financial types associated with the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its financial type.'),
         ts('Warning')
