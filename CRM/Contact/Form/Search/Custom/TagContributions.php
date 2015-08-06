@@ -35,6 +35,8 @@
 class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
+  protected $_aclFrom;
+  protected $_aclWhere;
   public $_permissionedComponent;
 
   function __construct(&$formValues) {
@@ -137,13 +139,15 @@ WHERE  $where
   }
 
   function from() {
-    return "
+    $this->buildACLClause('contact_a');
+    $from = "
       civicrm_contribution,
       civicrm_contact contact_a
       LEFT JOIN civicrm_entity_tag ON ( civicrm_entity_tag.entity_table = 'civicrm_contact' AND
                                         civicrm_entity_tag.entity_id = contact_a.id )
-      LEFT JOIN civicrm_tag ON civicrm_tag.id = civicrm_entity_tag.tag_id
+      LEFT JOIN civicrm_tag ON civicrm_tag.id = civicrm_entity_tag.tag_id {$this->aclFrom}
 ";
+    return $from;
   }
 
   /*
@@ -190,6 +194,9 @@ WHERE  $where
         $clauses[] = "contact_a.id IN ( $contactIDs )";
       }
     }
+    if ($this->_aclWhere) {
+      $clauses[] = " {$this->_aclWhere} ";
+    }
     return implode(' AND ', $clauses);
   }
 
@@ -226,5 +233,12 @@ WHERE  $where
   function summary() {
     return NULL;
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildAclClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

@@ -35,6 +35,8 @@
 class CRM_Contact_Form_Search_Custom_ContributionAggregate implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   public $_permissionedComponent;
 
   function __construct(&$formValues) {
@@ -159,9 +161,10 @@ $having
   }
 
   function from() {
+    $this->buildACLClause('contact_a');
     return "
 civicrm_contribution AS contrib,
-civicrm_contact AS contact_a
+civicrm_contact AS contact_a {$this->_aclFrom}
 ";
   }
 
@@ -206,7 +209,10 @@ civicrm_contact AS contact_a
       $clauses[] = "contrib.financial_type_id IN ($financial_type_ids)";
     }
 
-    return implode(' AND ', $clauses);
+    if ($this->_aclWhere) {
+      $clauses[]  = " {$this->_aclWhere} ";
+    }
+      return implode(' AND ', $clauses);
   }
 
   function having($includeContactIDs = FALSE) {
@@ -258,5 +264,12 @@ civicrm_contact AS contact_a
   function summary() {
     return NULL;
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

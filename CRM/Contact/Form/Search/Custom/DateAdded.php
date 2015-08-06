@@ -35,6 +35,8 @@
 class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_debug = 0;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
   function __construct(&$formValues) {
     parent::__construct($formValues);
@@ -338,12 +340,12 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       }
     }
     // end if( $this->_groups ) condition
-
+    $this->buildACLClause('contact_a');
     $from = "FROM civicrm_contact contact_a";
 
     /* We need to join to this again to get the date_added value */
 
-    $from .= " INNER JOIN dates_{$this->_tableName} d ON (contact_a.id = d.id)";
+    $from .= " INNER JOIN dates_{$this->_tableName} d ON (contact_a.id = d.id) {$this->_aclFrom}";
 
     // Only include groups in the search query of one or more Include OR Exclude groups has been selected.
     // CRM-6356
@@ -355,7 +357,11 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
   }
 
   function where($includeContactIDs = FALSE) {
-    return '(1)';
+    $where = '(1)';
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
+    return $where;
   }
 
   function templateFile() {
@@ -392,5 +398,12 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
     }
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildAclClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

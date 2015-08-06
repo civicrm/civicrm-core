@@ -227,7 +227,7 @@ AND    $operationClause LIMIT 1";
     }
     else {
       $fromClause = " INNER JOIN civicrm_acl_contact_cache aclContactCache ON {$contactAlias}.id = aclContactCache.contact_id ";
-      $whereClase = " aclContactCache.user_id = $contactID ";
+      $whereClase = " aclContactCache.user_id = $contactID AND $contactAlias.is_deleted = 0 ";
     }
 
     return array($fromClause, $whereClase);
