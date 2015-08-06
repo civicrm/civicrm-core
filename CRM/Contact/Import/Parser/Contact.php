@@ -1718,6 +1718,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       $modeFill = TRUE;
     }
 
+    // @todo - can we remove these lines $groupTree & $defaults are not used!
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($params['contact_type'], CRM_Core_DAO::$_nullObject, $cid, 0, NULL);
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);
 
