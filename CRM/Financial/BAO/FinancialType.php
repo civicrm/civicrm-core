@@ -251,7 +251,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;
-    } 
+    }
     // check cached value
     if (CRM_Utils_Array::value($action, self::$_availableFinancialTypes) && !$resetCache) {
       $financialTypes = self::$_availableFinancialTypes[$action];
@@ -265,7 +265,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     self::$_availableFinancialTypes[$action] = $financialTypes;
     return $financialTypes;
   }
-  
+
   public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = 'view') {
     if (empty($membershipTypes)) {
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();

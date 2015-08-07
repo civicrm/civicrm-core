@@ -4765,7 +4765,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
       civicrm_contribution.currency $from $completedWhere";
     $from .= " LEFT JOIN civicrm_line_item li
                       ON civicrm_contribution.id = li.contribution_id AND
-                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',' , array_keys($financialTypes)) . ") ";
+                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ") ";
     $query = "$select FROM (
       $innerQuery GROUP BY civicrm_contribution.id
     ) as conts
