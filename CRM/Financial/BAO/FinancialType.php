@@ -38,12 +38,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * Static holder for the default LT.
    */
   static $_defaultContributionType = NULL;
-  
   /**
    * Static cache holder of available financial types for this session
    */
   static $_availableFinancialTypes = array();
-  
   /**
    * Static cache holder of status of ACL-FT enabled/disabled for this session
    */

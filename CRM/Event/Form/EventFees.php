@@ -411,8 +411,8 @@ SELECT  id, html_type
         }
       }
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-        && !CRM_Utils_Array::value('fee',  $form->_values) 
-        && CRM_Utils_Array::value('snippet',  $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
+        && !CRM_Utils_Array::value('fee', $form->_values)
+        && CRM_Utils_Array::value('snippet', $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
       ) {
         $form->assign('isFTPermissionDenied', TRUE);
         return FALSE;
