@@ -25,8 +25,7 @@
 *}
 <div class="crm-block crm-form-block crm-{$formName}-block">
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-    {if $formName == "Contribute_Preferences" }
-<<<<<<< HEAD
+    {if $formName == "Contribute_Preferences"}
       <table class = "form-layout">
         <tr class="crm-miscellaneous-form-block-cvv-backoffice-required">
           <td class="label">{$form.cvv_backoffice_required.label}</td>
