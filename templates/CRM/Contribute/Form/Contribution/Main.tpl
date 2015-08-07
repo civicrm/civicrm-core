@@ -418,7 +418,7 @@
   {/if}
   {literal}
 
-  function toggleConfirmButton() {
+  function toggleConfirmButton(flag) {
     var payPalExpressId = "{/literal}{$payPalExpressId}{literal}";
     var elementObj = cj('input[name="payment_processor"]');
     if ( elementObj.attr('type') == 'hidden' ) {
@@ -428,20 +428,24 @@
       var processorTypeId = elementObj.filter(':checked').val();
     }
 
-    if (payPalExpressId !=0 && payPalExpressId == processorTypeId) {
+    if (payPalExpressId !=0 && payPalExpressId == processorTypeId && flag === false) {
       cj("#crm-submit-buttons").hide();
+      cj("#paypalExpress").show();
     }
     else {
       cj("#crm-submit-buttons").show();
+      if (flag === true) {
+        cj("#paypalExpress").hide();
+      }
     }
   }
 
   cj('input[name="payment_processor"]').change( function() {
-    toggleConfirmButton();
+    toggleConfirmButton(false);
   });
 
   CRM.$(function($) {
-    toggleConfirmButton();
+    toggleConfirmButton(false);
     enableHonorType();
     showRecurHelp();
     skipPaymentMethod();
@@ -466,8 +470,6 @@
       payment_options.hide();
       payment_processor.hide();
       payment_information.hide();
-      // also unset selected payment methods
-      cj('input[name="payment_processor"]').removeProp('checked');
     }
     else {
       payment_options.show();
@@ -478,20 +480,28 @@
   
   function skipPaymentMethod() {
     var flag = false;
-    cj('.price-set-option-content input').each( function(){
-      currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
-      if( cj(this).is(':checked') && currentTotal == 0 ) {
+    if (cj('#pricevalue').length !== 0) {
+    currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
+    flag = (currentTotal == 0) ? true : false;
+    }
+    else {
+      cj('.price-set-option-content input').each( function(){
+        currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
+        if( cj(this).is(':checked') && currentTotal == 0 ) {
           flag = true;
-      }
-    });
-    cj('.price-set-option-content input').change( function () {
-      if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
-        flag = true;
-      } else {
-        flag = false;
-      }
-      showHidePayment(flag);
-    });
+        }
+      });
+      cj('.price-set-option-content input').change( function () {
+        if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
+          flag = true;
+        } else {
+          flag = false;
+        }
+        toggleConfirmButton(flag);
+        showHidePayment(flag);
+      });
+    }
+    toggleConfirmButton(flag);
     showHidePayment(flag);
   }
 
