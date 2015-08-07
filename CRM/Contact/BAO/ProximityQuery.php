@@ -309,7 +309,7 @@ ACOS(
       }
     }
 
-    if (isset($proximityAddress['country_id'])) {
+    if (!empty($proximityAddress['country_id'])) {
       $proximityAddress['country'] = CRM_Core_PseudoConstant::country($proximityAddress['country_id']);
       $qill[] = $proximityAddress['country'];
     }
