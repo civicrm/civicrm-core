@@ -223,11 +223,11 @@ WHERE  inst.report_id = %1";
    */
   public static function export2csv(&$form, &$rows) {
     //Mark as a CSV file.
-    header('Content-Type: text/csv');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv');
 
     //Force a download and name the file using the current timestamp.
     $datetime = date('Ymd-Gi', $_SERVER['REQUEST_TIME']);
-    header('Content-Disposition: attachment; filename=Report_' . $datetime . '.csv');
+    CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=Report_' . $datetime . '.csv');
     echo self::makeCsv($form, $rows);
     CRM_Utils_System::civiExit();
   }
