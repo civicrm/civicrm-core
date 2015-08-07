@@ -740,4 +740,12 @@ abstract class CRM_Utils_System_Base {
   public function appendCoreResources(&$list) {
   }
 
+  /**
+   * @param string $name
+   * @param string $value
+   */
+  public function setHttpHeader($name, $value) {
+    header("$name: $value");
+  }
+
 }
