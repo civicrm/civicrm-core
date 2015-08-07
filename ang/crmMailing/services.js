@@ -74,7 +74,7 @@
             dfr.reject(id); 
           }
           else {
-            dfr.resolve(result['values'][0]);
+            dfr.resolve(result.values[0]);
           }
         });
         return dfr.promise;
