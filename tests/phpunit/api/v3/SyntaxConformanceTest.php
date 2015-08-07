@@ -1125,9 +1125,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param $entityName
    */
   public function testCreateSingleValueAlter($entityName) {
-    if ($entityName == 'SavedSearch') {
-      $this->markTestSkipped('Skipping for now as it works fine locally.');
-    }
     if (in_array($entityName, $this->toBeImplemented['create'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
       return;
