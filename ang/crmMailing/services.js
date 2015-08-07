@@ -64,20 +64,11 @@
       // @param id MessageTemplate id  (per APIv3)
       // @return Promise MessageTemplate (per APIv3)
       get: function get(id) {
-        var dfr = $q.defer();
-        var tpl = CRM.api3('MessageTemplate', 'get', {
+        return crmApi('MessageTemplate', 'get', {
           "sequential": 1,
            "return": "id,msg_subject,msg_html,msg_title,msg_text",
            "id": id
-        }).done(function(result) {
-          if (result.is_error) {
-            dfr.reject(id); 
-          }
-          else {
-            dfr.resolve(result.values[0]);
-          }
         });
-        return dfr.promise;
       },
       // Save a template
       // @param tpl MessageTemplate (per APIv3) For new templates, omit "id"
