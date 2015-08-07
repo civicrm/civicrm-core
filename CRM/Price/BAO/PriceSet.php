@@ -444,13 +444,13 @@ WHERE     ct.id = cp.financial_type_id AND
   public static function getAssoc($withInactive = FALSE, $extendComponentName = FALSE, $column = 'title') {
     $query = "
     SELECT
-       DISTINCT ( price_set_id ) as id, {$column}
+       DISTINCT ( price_set_id ) as id, s.{$column}
     FROM
        civicrm_price_set s
        INNER JOIN civicrm_price_field f ON f.price_set_id = s.id
        INNER JOIN civicrm_price_field_value v ON v.price_field_id = f.id
     WHERE
-       civicrm_price_set.id = civicrm_price_field.price_set_id  AND is_quick_config = 0 ";
+       is_quick_config = 0 ";
 
     if (!$withInactive) {
       $query .= ' AND s.is_active = 1 ';
