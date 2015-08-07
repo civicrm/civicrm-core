@@ -241,8 +241,8 @@ class CRM_Utils_PDF_Utils {
       return $pdf;
     }
     else {
-      header('Content-Type: application/pdf');
-      header('Content-Disposition: attachment; filename="' . $fileName . '"');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/pdf');
+      CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"');
       echo $pdf;
     }
   }
@@ -408,9 +408,9 @@ class CRM_Utils_PDF_Utils {
       $len = strlen($buf);
 
       if ($echo) {
-        header('Content-type: application/pdf');
-        header("Content-Length: $len");
-        header("Content-Disposition: inline; filename={$output}.pdf");
+        CRM_Utils_System::setHttpHeader('Content-type', 'application/pdf');
+        CRM_Utils_System::setHttpHeader("Content-Length", $len);
+        CRM_Utils_System::setHttpHeader("Content-Disposition", "inline; filename={$output}.pdf");
         echo $buf;
         CRM_Utils_System::civiExit();
       }

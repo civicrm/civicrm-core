@@ -742,4 +742,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     return $timezone;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function setHttpHeader($name, $value) {
+    drupal_set_header("$name: $value");
+  }
+
 }

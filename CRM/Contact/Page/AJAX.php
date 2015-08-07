@@ -295,7 +295,7 @@ class CRM_Contact_Page_AJAX {
   }
 
   public static function groupTree() {
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     $gids = CRM_Utils_Type::escape($_GET['gids'], 'String');
     echo CRM_Contact_BAO_GroupNestingCache::json($gids);
     CRM_Utils_System::civiExit();
@@ -305,7 +305,7 @@ class CRM_Contact_Page_AJAX {
    * Delete custom value.
    */
   public static function deleteCustomValue() {
-    header('Content-Type: text/plain');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain');
     $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
     $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
     $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive', CRM_Core_DAO::$_nullObject);
@@ -371,7 +371,7 @@ class CRM_Contact_Page_AJAX {
         $userEmail
         ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
 
-      header('Content-Type: text/plain');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain');
       if ($userEmail) {
         echo $userEmail;
       }
@@ -714,7 +714,7 @@ LIMIT {$offset}, {$rowCount}
       }
     }
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
 
     CRM_Utils_System::civiExit();

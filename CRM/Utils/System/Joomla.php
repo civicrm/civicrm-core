@@ -460,7 +460,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function logout() {
     session_destroy();
-    header("Location:index.php");
+    CRM_Utils_System::setHttpHeader("Location", "index.php");
   }
 
   /**

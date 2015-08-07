@@ -1249,11 +1249,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $errorFileName = $parserName::errorFileName($type);
         $saveFileName = $parserName::saveFileName($type);
         if (!empty($errorFileName) && !empty($saveFileName)) {
-          header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-          header('Content-Description: File Transfer');
-          header('Content-Type: text/csv');
-          header('Content-Length: ' . filesize($errorFileName));
-          header('Content-Disposition: attachment; filename=' . $saveFileName);
+          CRM_Utils_System::setHttpHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+          CRM_Utils_System::setHttpHeader('Content-Description', 'File Transfer');
+          CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv');
+          CRM_Utils_System::setHttpHeader('Content-Length', filesize($errorFileName));
+          CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=' . $saveFileName);
 
           readfile($errorFileName);
         }

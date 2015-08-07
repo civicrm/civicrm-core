@@ -3187,7 +3187,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           //Load the image
           $chart = imagecreatefrompng($uploadUrl);
           //convert it into formatted png
-          header('Content-type: image/png');
+          CRM_Utils_System::setHttpHeader('Content-type', 'image/png');
           //overwrite with same image
           imagepng($chart, $uploadImg);
           //delete the object

@@ -410,7 +410,7 @@ class CRM_Utils_System {
       ));
     }
 
-    header('Location: ' . $url);
+    self::setHttpHeader('Location', $url);
     self::civiExit();
   }
 
@@ -813,8 +813,8 @@ class CRM_Utils_System {
   ) {
     $now = gmdate('D, d M Y H:i:s') . ' GMT';
 
-    header('Content-Type: ' . $mimeType);
-    header('Expires: ' . $now);
+    self::setHttpHeader('Content-Type', $mimeType);
+    self::setHttpHeader('Expires', $now);
 
     // lem9 & loic1: IE need specific headers
     $isIE = strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE');
@@ -825,13 +825,13 @@ class CRM_Utils_System {
       $fileString = "filename=\"{$name}\"";
     }
     if ($isIE) {
-      header("Content-Disposition: inline; $fileString");
-      header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-      header('Pragma: public');
+      self::setHttpHeader("Content-Disposition", "inline; $fileString");
+      self::setHttpHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+      self::setHttpHeader('Pragma', 'public');
     }
     else {
-      header("Content-Disposition: $disposition; $fileString");
-      header('Pragma: no-cache');
+      self::setHttpHeader("Content-Disposition", "$disposition; $fileString");
+      self::setHttpHeader('Pragma', 'no-cache');
     }
 
     if ($output) {
@@ -1891,6 +1891,14 @@ class CRM_Utils_System {
     }
 
     return NULL;
+  }
+
+  /**
+   * @param string $name
+   * @param string $value
+   */
+  public static function setHttpHeader($name, $value) {
+    CRM_Core_Config::singleton()->userSystem->setHttpHeader($name, $value);
   }
 
 }
