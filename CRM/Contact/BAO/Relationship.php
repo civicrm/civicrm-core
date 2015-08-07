@@ -189,6 +189,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           continue;
         }
 
+        //CRM-16978:check duplicate relationship as per case id.
+        if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
+          $contactFields['case_id'] = $caseId;
+        }
         if (
         self::checkDuplicateRelationship(
           $contactFields,
