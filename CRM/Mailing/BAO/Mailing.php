@@ -2400,7 +2400,15 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // get all the groups that this user can access
     // if they dont have universal access
-    $groups = CRM_Core_PseudoConstant::group(NULL, FALSE);
+    $groupNames = civicrm_api3('Group', 'get', array(
+      'is_active' => 1,
+      'check_permissions' => TRUE,
+      'return' => array('title', 'id'),
+      'options' => array('limit' => 0),
+    ));
+    foreach ($groupNames['values'] as $group) {
+      $groups[$group['id']] = $group['title'];
+    }
     if (!empty($groups)) {
       $groupIDs = implode(',', array_keys($groups));
 
