@@ -60,17 +60,23 @@
     window.tpls = tpls;
     var lastModifiedTpl = null;
     return {
+      // Get a template
+      // @param id MessageTemplate id  (per APIv3)
       // @return Promise MessageTemplate (per APIv3)
       get: function get(id) {
-        id = '' + id; // parseInt(id);
         var dfr = $q.defer();
-        var tpl = _.where(tpls, {id: id});
-        if (id && tpl && tpl[0]) {
-          dfr.resolve(tpl[0]);
-        }
-        else {
-          dfr.reject(id);
-        }
+        var tpl = CRM.api3('MessageTemplate', 'get', {
+          "sequential": 1,
+           "return": "id,msg_subject,msg_html,msg_title,msg_text",
+           "id": id
+        }).done(function(result) {
+          if (result.is_error) {
+            dfr.reject(id); 
+          }
+          else {
+            dfr.resolve(result['values'][0]);
+          }
+        });
         return dfr.promise;
       },
       // Save a template
