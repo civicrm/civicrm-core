@@ -551,4 +551,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       $cache_backend->deleteAll();
     }
   }
+
+  /**
+   * @inheritDoc
+   */
+  public function setHttpHeader($name, $value) {
+    \Symfony\Component\HttpFoundation\Response->headers->set($name, $value);
+  }
 }

@@ -610,6 +610,7 @@
    * Note: We have to manually execute the ajax in order to add the secret extra "prettyprint" param
    */
   function execute() {
+    var footer;
     $('#api-result').html('<div class="crm-loading-element"></div>');
     $.ajax({
       url: CRM.url('civicrm/ajax/rest'),
@@ -622,8 +623,17 @@
       type: _.includes(action, 'get') ? 'GET' : 'POST',
       dataType: 'text'
     }).done(function(text) {
+      // There may be debug information appended to the end of the json string
+      var footerPos = text.indexOf("\n}<");
+      if (footerPos) {
+        footer = text.substr(footerPos + 2);
+        text = text.substr(0, footerPos + 2);
+      }
       $('#api-result').text(text);
       prettyPrint('#api-result');
+      if (footer) {
+        $('#api-result').append(footer);
+      }
     });
   }
 

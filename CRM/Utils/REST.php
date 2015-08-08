@@ -145,11 +145,11 @@ class CRM_Utils_REST {
     }
 
     if (!empty($requestParams['json'])) {
-      header('Content-Type: application/json');
       if (!empty($requestParams['prettyprint'])) {
-        // Used by the api explorer
+        // Don't set content-type header for api explorer output
         return self::jsonFormated(array_merge($result));
       }
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
       return json_encode(array_merge($result));
     }
 
@@ -451,7 +451,7 @@ class CRM_Utils_REST {
    * @param $pearError
    */
   public static function fatal($pearError) {
-    header('Content-Type: text/xml');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'text/xml');
     $error = array();
     $error['code'] = $pearError->getCode();
     $error['error_message'] = $pearError->getMessage();
@@ -484,7 +484,7 @@ class CRM_Utils_REST {
     $smarty = CRM_Core_Smarty::singleton();
     CRM_Utils_System::setTitle("$entity::$tplfile inline $tpl");
     if (!$smarty->template_exists($tpl)) {
-      header("Status: 404 Not Found");
+      CRM_Utils_System::setHttpHeader("Status", "404 Not Found");
       die ("Can't find the requested template file templates/$tpl");
     }
     if (array_key_exists('id', $_GET)) {// special treatmenent, because it's often used
