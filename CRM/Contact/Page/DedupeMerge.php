@@ -37,7 +37,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
   const BATCHLIMIT = 2;
 
   /**
-   * Browse all rule groups
+   * Browse batch merges.
    *
    * @return void
    * @access public
@@ -56,6 +56,9 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     return parent::run();
   }
 
+  /**
+   * Build a queue of tasks by dividing dupe pairs in batches.
+   */
   public static function getRunner() {
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
     $gid  = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
@@ -124,7 +127,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
   }
 
   /**
-   * Collect Mailchimp data into temporary working table.
+   * Carry out batch merges.
    */
   public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid = NULL, $mode = 'safe', $autoFlip = TRUE, $batchLimit = 1, $isSelected = 2) {
     $result = CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $autoFlip, $batchLimit, $isSelected);
