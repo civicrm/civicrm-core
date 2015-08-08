@@ -591,7 +591,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['title']['api.required']);
+    $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 
   /**
@@ -601,7 +601,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('api_action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['title']['api.required']);
+    $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 
   public function testgetfieldsGet() {
@@ -616,6 +616,31 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = array('action' => 'delete');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['id']['api.required']);
+  }
+
+  public function testCreateFromTemplate() {
+    $templateParams = array(
+      'summary' => 'Sign up now to learn the results of this unit test',
+      'description' => 'This event is created from a template, so all the values should be the same as the original ones.',
+      'event_type_id' => 1,
+      'is_public' => 1,
+      'end_date' => '2018-06-25 17:00:00',
+      'is_online_registration' => 1,
+      'registration_start_date' => '2017-06-25 17:00:00',
+      'registration_end_date' => '2018-06-25 17:00:00',
+      'max_participants' => 100,
+      'event_full_text' => 'Sorry! We are already full',
+    );
+    $templateResult = $this->callAPISuccess('Event', 'create', array('is_template' => 1, 'template_title' => 'Test tpl') + $templateParams);
+    $eventResult = $this->callAPISuccess('Event', 'create', array(
+      'template_id' => $templateResult['id'],
+      'title' => 'Clone1',
+      'start_date' => '2018-06-25 16:00:00',
+    ));
+    $eventResult = $this->callAPISuccess('Event', 'getsingle', array('id' => $eventResult['id']));
+    foreach ($templateParams as $param => $value) {
+      $this->assertEquals($value, $eventResult[$param]);
+    }
   }
 
 }
