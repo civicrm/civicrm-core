@@ -864,10 +864,12 @@ LIMIT {$offset}, {$rowCount}
       $count++;
     }
 
-    header('Content-Type: application/json');
-    echo CRM_Utils_JSON::encodeDataTable($searchRows, $iTotal, $iFilteredTotal, $selectorElements);
-
-    CRM_Utils_System::civiExit();
+    $dupePairs = array(
+      'data'            => $searchRows,
+      'recordsTotal'    => $iTotal,
+      'recordsFiltered' => $iFilteredTotal,
+    );
+    CRM_Utils_JSON::output($dupePairs);
   }
 
   /**
