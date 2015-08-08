@@ -668,6 +668,9 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_JSON::output(array('status' => ($status) ? $oper : $status));
   }
 
+  /**
+   * Retrieve list of duplicate pairs from cache table.
+   */
   public static function getDedupes() {
     $offset    = isset($_REQUEST['start']) ? CRM_Utils_Type::escape($_REQUEST['start'], 'Integer') : 0;
     $rowCount  = isset($_REQUEST['length']) ? CRM_Utils_Type::escape($_REQUEST['length'], 'Integer') : 25;
@@ -894,6 +897,9 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_JSON::output($paperSize);
   }
 
+  /**
+   * Swap contacts in a dupe pair i.e main with duplicate contact.
+   */
   public static function flipDupePairs($prevNextId = NULL) {
     if (!$prevNextId) {
       $prevNextId = $_REQUEST['pnid'];
@@ -980,6 +986,9 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_JSON::output($addressVal);
   }
 
+  /**
+   * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
+   */
   public static function toggleDedupeSelect() {
     $rgid = CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer');
     $gid  = CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer');
