@@ -145,11 +145,11 @@ class CRM_Utils_REST {
     }
 
     if (!empty($requestParams['json'])) {
-      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
       if (!empty($requestParams['prettyprint'])) {
-        // Used by the api explorer
+        // Don't set content-type header for api explorer output
         return self::jsonFormated(array_merge($result));
       }
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
       return json_encode(array_merge($result));
     }
 
