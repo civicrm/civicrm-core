@@ -115,6 +115,9 @@
               <td>{$form.status_id.label}<br/>
                 {$form.status_id.html}
               </td>
+              <td>{$form.is_active.label}<br/>
+                {$form.is_active.html}
+              </td>
             </tr>
 
             <tr>
