@@ -112,6 +112,14 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     $this->set('campaignStatus', $campaignStatus);
     $this->assign('campaignStatus', json_encode($campaignStatus));
 
+    //active campaigns
+    $this->addElement('select', 'is_active', ts('Is Actief?'), array(
+      '' => ts('- select -'),
+      '0' => ts('Yes'),
+      '1' => ts('No'),
+        )
+    );
+
     //build the array of all search params.
     $this->_searchParams = array();
     foreach ($this->_elements as $element) {

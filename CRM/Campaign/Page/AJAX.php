@@ -573,7 +573,7 @@ class CRM_Campaign_Page_AJAX {
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (isset($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
