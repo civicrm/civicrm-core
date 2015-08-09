@@ -413,16 +413,6 @@ SELECT label, value
               if (!is_array($value)) {
                 $value = CRM_Utils_Type::escape($strtolower($value), 'String');
               }
-              // in api sometimes params is in array('sqlOp' => (mixed)'values') format
-              elseif (!empty($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE) || strstr(key($value), 'EMPTY')) {
-                $op = key($value);
-                $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
-                $value = CRM_Utils_Type::escape($strtolower($value[$op]), 'String');
-              }
-
-              if (strstr($op, 'NULL') || strstr($op, 'EMPTY')) {
-                $qillValue = $value = NULL;
-              }
               elseif ($isSerialized) {
                 if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
                   $op = key($value);
