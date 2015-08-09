@@ -144,7 +144,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults
  * @param array $request
  */
 function _civicrm_api3_generic_getlist_params(&$request) {
-  $fieldsToReturn = array($request['id_field'], $request['label_field']);
+  $fieldsToReturn = array($request['id_field'], $request['label_field'], $request['name_field'], $request['custom_group_id_field'], $request['data_type_field'], $request['html_type_field'], $request['is_active_field'], $request['attributes_field'], $request['text_length_field'], $request['date_format_field'], $request['is_view_field']);
   if (!empty($request['image_field'])) {
     $fieldsToReturn[] = $request['image_field'];
   }
