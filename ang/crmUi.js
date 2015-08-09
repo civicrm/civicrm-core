@@ -393,20 +393,6 @@
             });
           }
 
-          // CRM-16445 - When one inserts an image, none of these events seem to fire at the right time:
-          // afterCommandExec, afterInsertHtml, afterPaste, afterSetData, change, insertElement,
-          // insertHtml, insertText, pasteState. It seems that 'pasteState' is the general equivalent of
-          // what 'change' should be, except (in the case of image insertion) it fires too soon.
-          // The 'key' event is needed to detect changes in "Source" mode.
-          var debounce = null;
-          angular.forEach(['key', 'pasteState'], function(evName){
-            ck.on(evName, function(evt) {
-              $timeout.cancel(debounce);
-              debounce = $timeout(function() {
-                ngModel.$setViewValue(ck.getData());
-              }, 50);
-            });
-          });
 
           ngModel.$render = function(value) {
             CRM.wysiwyg.setVal(elm, ngModel.$viewValue);

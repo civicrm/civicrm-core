@@ -62,7 +62,7 @@ class Manager {
       $angularModules = array();
       $angularModules['angularFileUpload'] = array(
         'ext' => 'civicrm',
-        'js' => array('bower_components/angular-file-upload/angular-file-upload.min.js'),
+        'js' => array('bower_components/angular-file-upload/dist/angular-file-upload.min.js'),
       );
       $angularModules['crmApp'] = array(
         'ext' => 'civicrm',
