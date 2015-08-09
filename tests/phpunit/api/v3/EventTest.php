@@ -479,7 +479,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'custom_' . $custom_field_id => "12345",
       'api.LocBlock.get' => array("id" => '$value.loc_block_id'),
     ));
-print_r($result);
+
     $this->assertEquals(1, $result['count']);
 
     $this->customFieldDelete($ids['custom_field_id']);
