@@ -23442,28 +23442,31 @@ VALUES
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, NULL, '', 'Help', NULL, '',  NULL, '1', NULL, 110);
+    ( @domainID, NULL, '', 'Support', NULL, '',  NULL, '1', NULL, 110);
 
 SET @adminHelplastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, 'http://documentation.civicrm.org',   '',      'Documentation',    NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
-    ( @domainID, 'http://forum.civicrm.org',           '',   'Community Forums', NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
-    ( @domainID, 'http://civicrm.org/participate',     '',        'Participate',      NULL, 'AND', @adminHelplastID, '1', NULL, 3 ),
-    ( @domainID, 'http://civicrm.org/what/whatiscivicrm', '',              'About',            NULL, 'AND', @adminHelplastID, '1', NULL, 4 );
+    ( @domainID, 'http://civicrm.org/get-started?src=iam',        '',        'Get started',        NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
+    ( @domainID, 'http://civicrm.org/documentation?src=iam',      '',      'Documentation',      NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
+    ( @domainID, 'http://civicrm.org/ask-a-question?src=iam',     '',     'Ask a question',     NULL, 'AND', @adminHelplastID, '1', NULL, 3 ),
+    ( @domainID, 'http://civicrm.org/experts?src=iam', 		  '',    'Get expert help',    NULL, 'AND', @adminHelplastID, '1', NULL, 4 ),
+    ( @domainID, 'http://civicrm.org/about?src=iam', 		  '',      'About CiviCRM',      NULL, 'AND', @adminHelplastID, '1', 1, 5 ),
+    ( @domainID, 'http://civicrm.org/register-your-site?src=iam', '', 'Register your site', NULL, 'AND', @adminHelplastID, '1', NULL, 6 ),    
+    ( @domainID, 'http://civicrm.org/become-member?src=iam',      '',       'Join CiviCRM',       NULL, 'AND', @adminHelplastID, '1', NULL, 7 );
 
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, NULL, '', 'Developer', 'administer CiviCRM', '', @adminHelplastID, '1', NULL, 5 );
+    ( @domainID, NULL, '', 'Developer', 'administer CiviCRM', '', @adminHelplastID, '1', 1, 8 );
 
 SET @devellastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
 ( @domainID, 'civicrm/api', '','API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1 ),
-( @domainID, 'http://wiki.civicrm.org/confluence/display/CRMDOC/Develop', '', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
+( @domainID, 'http://civicrm.org/developer-documentation?src=iam', '', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )

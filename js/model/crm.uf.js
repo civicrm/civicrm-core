@@ -698,11 +698,15 @@
      * @return {Boolean}
      */
     //CRM-15427
-    checkGroupType: function(validTypesExpr, allowAllSubtypes) {
+    checkGroupType: function(validTypesExpr, allowAllSubtypes, usedByFilter) {
       var allMatched = true;
       allowAllSubtypes = allowAllSubtypes || false;
+      usedByFilter = usedByFilter || null;
       if (_.isEmpty(this.get('group_type'))) {
         return true;
+      }
+      if (usedByFilter && _.isEmpty(this.get('module'))) {
+        return false;
       }
 
       var actualTypes = CRM.UF.parseTypeList(this.get('group_type'));
@@ -715,6 +719,10 @@
         }
       });
 
+      // CRM-16915 - filter with usedBy module if specified.
+      if (usedByFilter && this.get('module') != usedByFilter) {
+        allMatched = false;
+      }
       //CRM-15427 allow all subtypes
       if (!$.isEmptyObject(validTypes.subTypes) && !allowAllSubtypes) {
         // Every actual.subType is a valid.subType

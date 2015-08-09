@@ -1209,7 +1209,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Select':
-        $display = CRM_Utils_Array::value($value, $option);
+        if (is_array($value)) {
+          $display = NULL;
+          foreach ($value as $data) {
+            $display .= $display ? ', ' . $option[$data] : $option[$data];
+          }
+        }
+        else {
+          $display = CRM_Utils_Array::value($value, $option);
+        }
         break;
 
       case 'CheckBox':
@@ -1232,18 +1240,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
 
         $v = array();
-        $p = array();
         foreach ($checkedData as $key => $val) {
-          if ($html_type == 'CheckBox') {
-            if ($val) {
-              $p[] = $key;
-              $v[] = CRM_Utils_Array::value($key, $option);
-            }
-          }
-          else {
-            $p[] = $val;
-            $v[] = CRM_Utils_Array::value($val, $option);
-          }
+          $v[] = CRM_Utils_Array::value($val, $option);
         }
         if (!empty($v)) {
           $display = implode(', ', $v);

@@ -8,7 +8,7 @@
     fields = [],
     getFieldData = {},
     params = {},
-    smartyStub,
+    smartyPhp,
     entityDoc,
     fieldTpl = _.template($('#api-param-tpl').html()),
     optionsTpl = _.template($('#api-options-tpl').html()),
@@ -319,20 +319,23 @@
       operator = $('.api-param-op', $row).val(),
       $valField = $('input.api-param-value', $row),
       multiSelect = isMultiSelect(name, operator),
-      currentVal = $valField.val();
+      currentVal = $valField.val(),
+      wasSelect = $valField.data('select2');
+    if (wasSelect) {
+      $valField.crmEntityRef('destroy');
+    }
+    $valField.attr('placeholder', ts('Value'));
     // Boolean fields only have 1 possible value
     if (_.includes(BOOL, operator)) {
-      if ($valField.data('select2')) {
-        $valField.select2('destroy');
-      }
       $valField.css('visibility', 'hidden').val('1');
       return;
     }
     $valField.css('visibility', '');
     // Option list or entityRef input
     if (isSelect(name, operator)) {
+      $valField.attr('placeholder', ts('- select -'));
       // Reset value before switching to a select from something else
-      if ($(this).is('.api-param-name') || !$valField.data('select2')) {
+      if ($(this).is('.api-param-name') || !wasSelect) {
         $valField.val('');
       }
       // When switching from multi-select to single select
@@ -356,19 +359,16 @@
       }
       // EntityRef
       else {
+        var entity = getFieldData[name].FKApiName;
+        $valField.attr('placeholder', entity == 'Contact' ? '[' + ts('Auto-Select Current User') + ']' : ts('- select -'));
         $valField.crmEntityRef({
-          entity: getFieldData[name].FKApiName,
+          entity: entity,
           select: {
             multiple: multiSelect,
-            minimumInputLength: _.includes(OPEN_IMMEDIATELY, getFieldData[name].FKApiName) ? 0 : 1
+            minimumInputLength: _.includes(OPEN_IMMEDIATELY, entity) ? 0 : 1
           }
         });
       }
-      return;
-    }
-    // Plain text input
-    if ($valField.data('select2')) {
-      $valField.select2('destroy');
     }
   }
 
@@ -419,6 +419,7 @@
 
   /**
    * Format value to look like php code
+   * TODO: Use short array syntax when we drop support for php 5.3
    * @param val
    */
   function phpFormat(val) {
@@ -439,14 +440,16 @@
   }
 
   /**
-   * Smarty doesn't support array literals so we provide a stub
+   * @param value string
    * @param js string
    * @param key string
    */
-  function smartyFormat(js, key) {
+  function smartyFormat(value, js, key) {
+    var varName = 'param_' + key.replace(/[. -]/g, '_').toLowerCase();
+    // Can't pass array literals directly into smarty so we add a php snippet
     if (_.includes(js, '[') || _.includes(js, '{')) {
-      smartyStub = true;
-      return '$' + key.replace(/[. -]/g, '_');
+      smartyPhp.push('$this->assign("'+ varName + '", '+ phpFormat(value) +');');
+      return '$' + varName;
     }
     return js;
   }
@@ -483,6 +486,10 @@
         if (op) {
           name = 'options';
         }
+      }
+      // Default for contact ref fields
+      if ($(this).is('.crm-contact-ref') && input === '') {
+        val = evaluate('user_contact_id', makeArray);
       }
       if (name && val !== undefined) {
         params[name] = op === '=' ? val : (params[name] || {});
@@ -536,14 +543,14 @@
    */
   function formatQuery() {
     var i = 0, q = {
-      smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'",
+      smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'" + (params.sequential ? '' : ' sequential=0'),
       php: "$result = civicrm_api3('" + entity + "', '" + action + "'",
       json: "CRM.api3('" + entity + "', '" + action + "'",
       drush: "drush cvapi " + entity + '.' + action + ' ',
       wpcli: "wp cv api " + entity + '.' + action + ' ',
-      rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&json=" + JSON.stringify(params) + "&api_key=yourkey&key=sitekey"
+      rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&api_key=yourkey&key=sitekey&json=" + JSON.stringify(params)
     };
-    smartyStub = false;
+    smartyPhp = [];
     $.each(params, function(key, value) {
       var js = JSON.stringify(value);
       if (!(i++)) {
@@ -554,7 +561,10 @@
       }
       q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
       q.json += "  \"" + key + '": ' + js;
-      q.smarty += ' ' + key + '=' + smartyFormat(js, key);
+      // smarty already defaults to sequential
+      if (key !== 'sequential') {
+        q.smarty += ' ' + key + '=' + smartyFormat(value, js, key);
+      }
       // FIXME: This is not totally correct cli syntax
       q.drush += key + '=' + js + ' ';
       q.wpcli += key + '=' + js + ' ';
@@ -568,8 +578,8 @@
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (!_.includes(action, 'get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
-    } else if (smartyStub) {
-      q.smarty = "{* Smarty does not have a syntax for array literals; assign complex variables from php *}\n" + q.smarty;
+    } else if (smartyPhp.length) {
+      q.smarty = "{php}\n  " + smartyPhp.join("\n  ") + "\n{/php}\n" + q.smarty;
     }
     $.each(q, function(type, val) {
       $('#api-' + type).text(val);
@@ -732,8 +742,10 @@
       .on('change', 'input.api-param-name, select.api-param-op', renderValueField)
       .on('change', 'input.api-param-name, .api-option-name', function() {
         if ($(this).val() === '-' && $(this).data('select2')) {
-          $(this).select2('destroy');
-          $(this).val('').focus();
+          $(this)
+            .crmSelect2('destroy')
+            .val('')
+            .focus();
         }
       })
       .on('click', '.api-param-remove', function(e) {

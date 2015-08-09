@@ -474,17 +474,17 @@
     },
     {
         "name": "civicrm/civicrm-cxn-rpc",
-        "version": "v0.15.07.07",
-        "version_normalized": "0.15.07.07",
+        "version": "v0.15.07.27",
+        "version_normalized": "0.15.07.27",
         "source": {
             "type": "git",
             "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-            "reference": "e56f4a3e19cbb78b3df83425600f485361d12ca3"
+            "reference": "b6738943aec5b94be5bdc157453142c87851b684"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/e56f4a3e19cbb78b3df83425600f485361d12ca3",
-            "reference": "e56f4a3e19cbb78b3df83425600f485361d12ca3",
+            "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/b6738943aec5b94be5bdc157453142c87851b684",
+            "reference": "b6738943aec5b94be5bdc157453142c87851b684",
             "shasum": ""
         },
         "require": {
@@ -494,7 +494,7 @@
         "require-dev": {
             "phpunit/phpunit": "3.7.*"
         },
-        "time": "2015-07-08 00:58:37",
+        "time": "2015-07-28 02:17:20",
         "type": "library",
         "installation-source": "source",
         "autoload": {

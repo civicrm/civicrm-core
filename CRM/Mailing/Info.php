@@ -117,6 +117,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
     $groupNames = civicrm_api3('Group', 'get', $params + array(
       'is_active' => 1,
+      'check_permissions' => TRUE,
       'return' => array('title', 'visibility', 'group_type', 'is_hidden'),
     ));
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + array(
@@ -143,6 +144,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     $fromAddress = civicrm_api3('OptionValue', 'get', $params + array(
       'option_group_id' => "from_email_address",
+      'domain_id' => CRM_Core_Config::domainID(),
     ));
     CRM_Core_Resources::singleton()
       ->addSetting(array(

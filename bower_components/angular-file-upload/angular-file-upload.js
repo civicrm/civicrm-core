@@ -1,5 +1,5 @@
 /*
- angular-file-upload v1.1.5
+ angular-file-upload v1.1.6
  https://github.com/nervgh/angular-file-upload
 */
 (function(angular, factory) {
@@ -97,7 +97,7 @@ module
                         this.queue.push(fileItem);
                         this._onAfterAddingFile(fileItem);
                     } else {
-                        var filter = this.filters[this._failFilterIndex];
+                        var filter = arrayOfFilters[this._failFilterIndex];
                         this._onWhenAddingFileFailed(temp, filter, options);
                     }
                 }, this);
@@ -467,6 +467,10 @@ module
                     });
                 });
 
+                if ( typeof(item._file.size) != 'number' ) {
+                    throw new TypeError('The file specified is no longer valid');
+                }
+
                 form.append(item.alias, item._file, item.file.name);
 
                 xhr.upload.onprogress = function(event) {
@@ -812,7 +816,12 @@ module
              * Uploads a FileItem
              */
             FileItem.prototype.upload = function() {
-                this.uploader.uploadItem(this);
+                try {
+                    this.uploader.uploadItem(this);
+                } catch (e) {
+                    this.uploader._onCompleteItem( this, '', 0, [] );
+                    this.uploader._onErrorItem( this, '', 0, [] );
+                }
             };
             /**
              * Cancels uploading of FileItem

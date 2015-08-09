@@ -795,6 +795,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $orderBy = ' ORDER BY groups.title asc';
     if (!empty($params['sort'])) {
       $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
+
+      // CRM-16905 - Sort by count cannot be done with sql
+      if (strpos($params['sort'], 'count') === 0) {
+        $orderBy = $limit = '';
+      }
     }
 
     $select = $from = $where = "";
@@ -974,6 +979,17 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       while ($dao->fetch()) {
         $values[$dao->group_id]['count'] = $dao->count;
       }
+    }
+
+    // CRM-16905 - Sort by count cannot be done with sql
+    if (!empty($params['sort']) && strpos($params['sort'], 'count') === 0) {
+      usort($values, function($a, $b) {
+        return $a['count'] - $b['count'];
+      });
+      if (strpos($params['sort'], 'desc')) {
+        $values = array_reverse($values, TRUE);
+      }
+      return array_slice($values, $params['offset'], $params['rowCount']);
     }
 
     return $values;

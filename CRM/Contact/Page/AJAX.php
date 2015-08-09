@@ -182,8 +182,8 @@ class CRM_Contact_Page_AJAX {
     }
 
     $offset = $count = 0;
-    if (!empty($_GET['page'])) {
-      $page = (int) $_GET['page'];
+    if (!empty($_GET['page_num'])) {
+      $page = (int) $_GET['page_num'];
       $offset = $limit * ($page - 1);
       $limit++;
     }

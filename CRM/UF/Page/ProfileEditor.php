@@ -20,18 +20,27 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
     CRM_Core_Resources::singleton()
       ->addSettingsFactory(function () {
+        $ufGroups = civicrm_api3('UFGroup', 'get', array(
+          'sequential' => 1,
+          'is_active' => 1,
+          'options' => array('limit' => 0),
+        ));
+        //CRM-16915 - insert 'module' param for the profile used by CiviEvent.
+        if (CRM_Core_Permission::check('manage event profiles') && !CRM_Core_Permission::check('administer CiviCRM')) {
+          foreach ($ufGroups['values'] as $key => $value) {
+            $ufJoin = CRM_Core_BAO_UFGroup::getUFJoinRecord($value['id']);
+            if (in_array('CiviEvent', $ufJoin) || in_array('CiviEvent_Additional', $ufJoin)) {
+              $ufGroups['values'][$key]['module'] = 'CiviEvent';
+            }
+          }
+        }
         return array(
           'PseudoConstant' => array(
             'locationType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
             'websiteType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
             'phoneType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
           ),
-          'initialProfileList' => civicrm_api('UFGroup', 'get', array(
-            'version' => 3,
-            'sequential' => 1,
-            'is_active' => 1,
-            'rowCount' => 1000, // FIXME
-          )),
+          'initialProfileList' => $ufGroups,
           'contactSubTypes' => CRM_Contact_BAO_ContactType::subTypes(),
           'profilePreviewKey' => CRM_Core_Key::get('CRM_UF_Form_Inline_Preview', TRUE),
         );

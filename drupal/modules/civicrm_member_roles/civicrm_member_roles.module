@@ -554,7 +554,8 @@ function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL) {
     $roleCondition = is_array($rid) ? 'IN' : '=';
 
     if (empty($contactMemberships) && !empty($rid)) {
-      db_delete('users_roles')->condition('uid', $uid)->condition('rid', $rid, $roleCondition)->execute();
+      // Do nothing, since we synchronize roles based on membership status not
+      // the presence/absence of a membership.
     }
     else {
       foreach ($contactMemberships as $membership) {

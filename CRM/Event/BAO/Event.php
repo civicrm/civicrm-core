@@ -1923,10 +1923,7 @@ WHERE  ce.loc_block_id = $locBlockId";
     if ($startDate && $startDate >= $now) {
       $validDate = FALSE;
     }
-    if ($endDate && $endDate < $now) {
-      $validDate = FALSE;
-    }
-    if ($eventEnd && $eventEnd < $now) {
+    if ($endDate && $endDate < $now && $eventEnd && $eventEnd < $now) {
       $validDate = FALSE;
     }
 
