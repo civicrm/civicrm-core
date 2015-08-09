@@ -1,0 +1,24 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing
+-->
+<!--
+Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
+-->
+<div class="crmMailing-email-preview-cluster">
+	<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+      {{ts('Select Email Services to fetch a preview for:')}}
+	  <div class="crm-group">
+	    <div crm-ui-field="{name: 'subform.gmail_preview', title: ts('Gmail'), help: hs('gmail_help')}" crm-layout="checkbox">
+	      <input crm-ui-id="subform.gmail_preview" name="gmail_preview" type="checkbox" ng-model="mailing.renderers.gmail" ng-true-value="1" ng-false-value="0" />
+	    </div>
+	    <div crm-ui-field="{name: 'subform.yahoo_preview', title: ts('YahooMail'), help: hs('yahoo_help')}" crm-layout="checkbox">
+	      <input crm-ui-id="subform.yahoo_preview" name="yahoo_preview" type="checkbox" ng-model="mailing.renderers.yahoo" ng-true-value="1" ng-false-value="0" />
+	    </div>
+	  </div>
+    <button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid || !(mailing.renderers.gmail|| mailing.renderers.yahoo)" ng-click="requestPreview()">{{ts('Request Preview')}}</button>
+	<a crm-ui-help="hs({id: 'test', title: ts('Test Email')})"></a>
+  	<button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid || !testGroup.gid" crm-confirm="{resizable: true, width: '40%', height: '40%', open: previewTestGroup}" on-yes="doSend({gid: testGroup.gid})">{{ts('Cancel')}}</button>
+  </div>
+  <div class="clear"></div>
+</div>

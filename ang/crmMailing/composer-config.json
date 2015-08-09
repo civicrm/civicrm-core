@@ -1,0 +1,5 @@
+{
+	"prevemURL": "http://0.0.0.0:3000/api/",
+	"emailURL": "http://localhost/htmlEmail.json",
+	"customerId": "1234"
+}

@@ -259,6 +259,58 @@
         });
       },
 
+      composerPreviewBatch: function composerPreviewBatch(message, renderers) {
+        var http = require ('http');
+        var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+        var fs = require ('fs');
+
+        var configFile = fs.readFileSync('composer-config.json');
+        var  config= JSON.parse(configFile);
+
+        var prevemURL = config.prevemURL;
+        var statusURL = prevemURL + 'PreviewBatches/status?batchId=';
+        var postURL = prevemURL + 'PreviewBatches';
+        var customerId = config.customerId;
+        var batchId = customerId + new Date().getTime()/1000;     //unique everytime. Needs to be saved in order for the composer to be able to look the batch up.
+
+        var Interval;
+        postNewBatch (statusURL, batchId, postURL, message, renderers);
+
+        function postNewBatch(statusURL, batchId, customerId, postURL, messageObject, renderers) {
+          var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+          xmlhttp.open("POST", postURL);
+          xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+          var postData = JSON.stringify(
+            [{  "batchId": batchId,
+                "consumerId": customerId,
+                "message": messageObject,
+                "renderers": renderers
+            }]);
+          xmlhttp.send(postData);
+          Interval = setInterval( function(){
+            checkStatus(statusURL, batchId);
+          }, 5000);
+        }
+
+        function checkStatus(statusURL, batchId) {
+            http.get(statusURL+batchId, function(res) {
+              var body = '';
+              res.on('data', function(chunk) {
+                  body += chunk;
+              });
+
+              res.on('end', function() {
+                  var status = JSON.parse(body);
+                console.log(status.response);
+                if (status.response.finished == 1) {
+                  clearInterval(Interval);
+                }
+              });
+          });
+        }        
+      },
+
+
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
@@ -414,6 +466,26 @@
   // The preview manager performs preview actions while putting up a visible UI (e.g. dialogs & status alerts)
   angular.module('crmMailing').factory('crmMailingPreviewMgr', function (dialogService, crmMailingMgr, crmStatus) {
     return {
+
+      previewCluster: function previewCluster(mailing){
+        var message = {
+          subject: mailing.subject,
+          html: mailing.body_html,
+          text: mailing.body_text
+        };
+        var renderers = new Array();
+        for(var index in mailing.renderers) { 
+            if (mailing.renderers[index]) {
+              renderers.push(index);
+            }
+        };
+        var p = crmMailingMgr
+          .composerPreviewBatch(message, renderers)
+          .then(function () {
+            console.log("done");
+          });           
+      },
+
       // @param mode string one of 'html', 'text', or 'full'
       // @return Promise
       preview: function preview(mailing, mode) {
