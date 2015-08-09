@@ -3355,7 +3355,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
     $clause = "{$field['dbAlias']} IN (" . implode(', ', $value) . ")";
 
-    return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
+    $contactAlias = $this->_aliases['civicrm_contact'];
+    if (!empty($this->relationType) && $this->relationType == 'b_a') {
+      $contactAlias = $this->_aliases['civicrm_contact_b'];
+    }
+    return " {$contactAlias}.id {$sqlOp} (
                           SELECT DISTINCT {$this->_aliases['civicrm_group']}.contact_id
                           FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
                           WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added'
