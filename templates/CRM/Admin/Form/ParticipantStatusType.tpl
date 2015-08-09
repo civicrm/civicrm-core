@@ -45,7 +45,7 @@
         </tr>
 
         <tr class="crm-participant-status-form-block-label">
-           <td class="label">{$form.label.label}</td>
+           <td class="label">{$form.label.label}{if $action == 2} {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_participant_status_type' field='label' id=$id}{/if}</td>
            <td>{$form.label.html}<br />
            <span class="description">{ts}Display label for this status.{/ts}</span></td>
         </tr>
