@@ -32,6 +32,10 @@
       return crmMailingPreviewMgr.preview(mailing, mode);
     };
 
+    $scope.previewCluster = function previewCluster(mailing) {
+      return crmMailingPreviewMgr.previewCluster(mailing);
+    };
+
     // @return Promise
     $scope.sendTest = function sendTest(mailing, attachments, recipient) {
       var savePromise = crmMailingMgr.save(mailing)
