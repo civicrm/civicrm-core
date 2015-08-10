@@ -82,8 +82,8 @@
                 {if $totalTaxAmount }
                      {ts}Total Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
                 {/if}
-                {if $amount }
-                    {ts}Total Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
+		{if $amount}
+                    {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if} : <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
                 {else}
                     {$membership_name} {ts}Membership{/ts}: <strong>{$minimum_fee|crmMoney}</strong>
                 {/if}
