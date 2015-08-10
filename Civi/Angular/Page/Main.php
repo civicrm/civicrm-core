@@ -70,11 +70,11 @@ class Main extends \CRM_Core_Page {
     $this->res->addSettingsFactory(function () use (&$modules, $page) {
       // TODO optimization; client-side caching
       return array_merge($page->angular->getResources(array_keys($modules), 'settings', 'settings'), array(
-          'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
-          'angular' => array(
-              'modules' => array_merge(array('ngRoute'), array_keys($modules)),
-              'cacheCode' => $page->res->getCacheCode(),
-          ),
+        'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
+        'angular' => array(
+          'modules' => array_merge(array('ngRoute'), array_keys($modules)),
+          'cacheCode' => $page->res->getCacheCode(),
+        ),
       ));
     });
 
