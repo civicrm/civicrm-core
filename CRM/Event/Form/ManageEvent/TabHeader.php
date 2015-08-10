@@ -210,7 +210,15 @@ WHERE      e.id = %1
     return $tabs;
   }
 
-  // wraps CRM_Utils_System. needs real doc :-)
+  /**
+   * Parses a link passed via hook_civicrm_tabset formats it so CiviCRM can use it.
+   *
+   * Wraps CRM_Utils_System::url. Allows for passing routes to Angular.
+   *
+   * @param string $url
+   * @return string
+   *   An HTML string containing a link to the given path.
+   */
   public static function url($url) {
     $urlParts = parse_url($url);
     $path = (strpos($urlParts['path'], '/') === 0 ? substr($urlParts['path'], 1) : $urlParts['path']);
@@ -221,7 +229,7 @@ WHERE      e.id = %1
     // we translate this to a URL param
     $params['route'] = $urlParts['fragment'];
 
-    // Force the Angular route to load as a snippet. This is being rendered in a tab, after all.
+    // Force the page to load as a snippet. This is being rendered in a tab, after all.
     $params['snippet'] = CRM_Core_Smarty::PRINT_SNIPPET;
 
     return CRM_Utils_System::url($path, http_build_query($params));
