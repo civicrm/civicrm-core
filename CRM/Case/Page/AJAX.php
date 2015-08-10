@@ -57,7 +57,7 @@ class CRM_Case_Page_AJAX {
         'id' => $caseId,
         'label' => $details['sort_name'] . ' - ' . $details['case_type'] . ($details['end_date'] ? ' (' . ts('closed') . ')' : ''),
         'label_class' => $details['end_date'] ? 'strikethrough' : '',
-        'description' => array($details['case_subject'] . ' (' . $details['case_status'] . ')'),
+        'description' => array("#$caseId: " . $details['case_subject'] . ' (' . $details['case_status'] . ')'),
         'extra' => $details,
       );
     }
