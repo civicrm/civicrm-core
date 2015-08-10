@@ -121,6 +121,9 @@ function civicrm_api3_event_get($params) {
 
   $events = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Event', $extraSql, TRUE);
   $options = _civicrm_api3_get_options_from_params($params);
+  if ($options['is_count']) {
+    return civicrm_api3_create_success($events, $params, 'Event', 'get');
+  }
   foreach ($events as $id => $event) {
     if (!empty($params['return.is_full'])) {
       _civicrm_api3_event_getisfull($events, $id);
@@ -128,7 +131,6 @@ function civicrm_api3_event_get($params) {
     _civicrm_api3_event_get_legacy_support_42($events, $id);
     if (!empty($options['return'])) {
       $events[$id]['price_set_id'] = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $id);
-      print_r($events);
     }
   }
 
