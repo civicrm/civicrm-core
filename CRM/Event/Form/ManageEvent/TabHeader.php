@@ -227,7 +227,7 @@ WHERE      e.id = %1
 
     // PHP doesn't know about URL fragments (i.e, what comes after the #), so
     // we translate this to a URL param
-    $params['route'] = $urlParts['fragment'];
+    $params['route'] = CRM_Utils_Array::value('fragment', $urlParts);
 
     // Force the page to load as a snippet. This is being rendered in a tab, after all.
     $params['snippet'] = CRM_Core_Smarty::PRINT_SNIPPET;
