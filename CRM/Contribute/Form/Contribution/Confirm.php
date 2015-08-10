@@ -1513,9 +1513,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $contactID,
         $financialTypeID,
         'membership',
-        array(),
-        $isTest,
-        $isPayLater
+        $isTest
       );
 
       if (!empty($paymentResult['contribution'])) {
@@ -2250,9 +2248,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // all the payment processors expect the name and address to be in the
       // so we copy stuff over to first_name etc.
       $paymentParams = $this->_params;
-      $contributionTypeId = $this->_values['financial_type_id'];
 
-      $fieldTypes = array();
       if (!empty($paymentParams['onbehalf']) &&
         is_array($paymentParams['onbehalf'])
       ) {
@@ -2261,17 +2257,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $this->_params[$key] = $value;
           }
         }
-        $fieldTypes = array('Contact', 'Organization', 'Contribution');
       }
-      $financialTypeID = $this->wrangleFinancialTypeID($contributionTypeId);
 
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
         $contactID,
-        $financialTypeID,
+        $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
         'contribution',
-        $fieldTypes,
-        ($this->_mode == 'test') ? 1 : 0,
-        $isPayLater
+        ($this->_mode == 'test') ? 1 : 0
       );
 
       if (!empty($result['is_payment_failure'])) {

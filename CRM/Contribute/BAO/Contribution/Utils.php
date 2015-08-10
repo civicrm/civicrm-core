@@ -46,10 +46,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $contributionTypeId
    *   Financial type id.
    * @param int|string $component component id
-   * @param array $fieldTypes
-   *   Presumably relates to custom field types - used when building data for sendMail.
    * @param $isTest
-   * @param $isPayLater
    *
    * @throws CRM_Core_Exception
    * @throws Exception
@@ -63,9 +60,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $contactID,
     $contributionTypeId,
     $component = 'contribution',
-    $fieldTypes = NULL,
-    $isTest,
-    $isPayLater
+    $isTest
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
     $lineItems = $form->_lineItem;
