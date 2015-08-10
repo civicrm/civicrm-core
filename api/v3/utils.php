@@ -554,14 +554,20 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
   foreach ($params as $key => $value) {
     $type = 'String';
     if (array_key_exists($key, $getFieldsResult)) {
-      $type = $getFieldsResult['type'];
+      $type = $getFieldsResult[$key]['type'];
       $key = $getFieldsResult[$key]['name'];
     }
     if (in_array($key, $entity_field_names)) {
       $table_name = 'a';
+      $column_name = $key;
     }
     elseif (($cf_id = CRM_Core_BAO_CustomField::getKeyID($key)) != FALSE) {
       $table_name = $custom_fields[$cf_id]["table_name"];
+      $column_name = $custom_fields[$cf_id]["column_name"];
+
+      if (!in_array($table_name, $custom_value_tables)) {
+        $custom_value_tables[] = $table_name;
+      }
     }
     // I don't know why I had to specifically exclude 0 as a key - wouldn't the others have caught it?
     // We normally silently ignore null values passed in - if people want IS_NULL they can use acceptedSqlOperator syntax.
@@ -571,9 +577,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
       continue;
     }
     if (!is_array($value)) {
-      $query->where("!columnName.!key = @value", array(
-        "!columnName" => $table_name,
-        "!key" => $key,
+      $query->where(array("{$table_name}.{$column_name} = @value"), array(
         "@value" => $value,
       ));
     }
@@ -582,36 +586,15 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
       // "operator" => "rhs".
       $operator = CRM_Utils_Array::first(array_keys($value));
       if (!in_array($operator, CRM_Core_DAO::acceptedSQLOperators())) {
-        $query->where("!columnName.!key = @value", array(
-          "!columnName" => $table_name,
-          "!key" => $key,
-          "@value" => $value,
-        ));
+        $query->where(array(
+          "{$table_name}.{$column_name} = @value"), array("@value" => $value)
+        );
       }
       else {
-        $query->where(CRM_Core_DAO::createSQLFilter('a.' . $key, $value, $type));
-      }
-
-    }
-
-    if (in_array($key, $entity_field_names)) {
-    }
-    else {
-      $cf_id = CRM_Core_BAO_CustomField::getKeyID($key);
-      if ($cf_id) {
-        $table_name = $custom_fields[$cf_id]["table_name"];
-        $column_name = $custom_fields[$cf_id]["column_name"];
-        $where_clauses[] = array(
-          "$table_name.$column_name",
-          $operator,
-          $rhs,
-        );
-        if (!in_array($table_name, $custom_value_tables)) {
-          $custom_value_tables[] = $table_name;
-        }
+        $query->where(CRM_Core_DAO::createSQLFilter('a.' . $column_name, $value, $type));
       }
     }
-  };
+  }
 
   $i = 0;
   if (!$options['is_count']) {
