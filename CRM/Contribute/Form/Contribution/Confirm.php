@@ -56,9 +56,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $params
    * @param int $financialTypeID
-   * @param bool $online
    * @param float $nonDeductibleAmount
-   * @param bool $isMonetary
    * @param bool $pending
    * @param array $paymentProcessorOutcome
    * @param string $receiptDate
@@ -67,7 +65,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    */
   public static function getContributionParams(
-    $params, $financialTypeID, $online, $nonDeductibleAmount, $isMonetary, $pending,
+    $params, $financialTypeID, $nonDeductibleAmount, $pending,
     $paymentProcessorOutcome, $receiptDate, $recurringContributionID) {
     $contributionParams = array(
       'financial_type_id' => $financialTypeID,
@@ -78,7 +76,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'amount_level' => CRM_Utils_Array::value('amount_level', $params),
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
-      'source' => (!$online || !empty($params['source'])) ? CRM_Utils_Array::value('source', $params) : CRM_Utils_Array::value('description', $params),
       'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
       //configure cancel reason, cancel date and thankyou date
       //from 'contribution' type profile if included
@@ -88,15 +85,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //setting to make available to hook - although seems wrong to set on form for BAO hook availability
       'skipLineItem' => CRM_Utils_Array::value('skipLineItem', $params, 0),
     );
-    if (!$online && isset($params['thankyou_date'])) {
-      $contributionParam['thankyou_date'] = $params['thankyou_date'];
-    }
-    if (!$online || $isMonetary) {
-      if (empty($params['is_pay_later'])) {
-        // @todo look up payment_instrument_id on payment processor table.
-        $contributionParams['payment_instrument_id'] = 1;
-      }
-    }
+
     if ($paymentProcessorOutcome) {
       $contributionParams['payment_processor'] = CRM_Utils_Array::value('payment_processor', $paymentProcessorOutcome);
     }
@@ -809,9 +798,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param array $result
    * @param array $contributionParams
    *   Parameters to be passed to contribution create action.
+   *   This differs from params in that we are currently adding params to it and 1) ensuring they are being
+   *   passed consistently & 2) documenting them here.
+   *   - contact_id
+   *   - line_item
+   *   - is_test
+   *   - campaign_id
+   *   - contribution_page_id
+   *   - source
+   *   - payment_type_id
+   *   - thankyou_date (not all forms will set this)
+   *
    * @param CRM_Financial_DAO_FinancialType $financialType
    * @param bool $pending
+   *   The intention is this should always be TRUE and we are refactoring towards any completion happening elsewhere.
    * @param bool $online
+   *   Is the form a front end form? If so set a bunch of unpredictable things that should be passed in from the form.
    *
    * @param int $billingLocationID
    *   ID of billing location type.
@@ -832,7 +834,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $transaction = new CRM_Core_Transaction();
     $contactID = $contributionParams['contact_id'];
 
-    $isMonetary = !empty($form->_values['is_monetary']);
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
     // How do these vary from params? These are currently passed to
     // - custom data function....
@@ -850,7 +851,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
 
-    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $billingLocationID);
+    $contributionParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $billingLocationID);
 
     //@todo - this is being set from the form to resolve CRM-10188 - an
     // eNotice caused by it not being set @ the front end
@@ -891,7 +892,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (isset($params['amount'])) {
       $contributionParams = array_merge(self::getContributionParams(
-        $params, $financialType->id, $online, $nonDeductibleAmount, $isMonetary, $pending,
+        $params, $financialType->id, $nonDeductibleAmount, $pending,
         $result, $receiptDate,
         $recurringContributionID), $contributionParams
       );
@@ -987,7 +988,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $pledgeParams['original_installment_amount'] = $pledgeParams['installment_amount'];
 
         //inherit campaign from contirb page.
-        $pledgeParams['campaign_id'] = $campaignId;
+        $pledgeParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $contributionParams);
 
         $pledge = CRM_Pledge_BAO_Pledge::create($pledgeParams);
 
@@ -1513,9 +1514,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $contactID,
         $financialTypeID,
         'membership',
-        array(),
-        $isTest,
-        $isPayLater
+        $isTest
       );
 
       if (!empty($paymentResult['contribution'])) {
@@ -1777,17 +1776,26 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     //so for differentiating membership contribution from
     //main contribution.
     $form->_params['separate_membership_payment'] = 1;
+    $contributionParams = array(
+      'contact_id' => $contactID,
+      'line_item' => $lineItems,
+      'is_test' => $isTest,
+      'campaign_id' => CRM_Utils_Array::value('campaign_id', $tempParams, CRM_Utils_Array::value('campaign_id',
+        $form->_values)),
+      'contribution_page_id' => $form->_id,
+      'source' => CRM_Utils_Array::value('source', $tempParams, CRM_Utils_Array::value('description', $tempParams)),
+    );
+    $isMonetary = !empty($form->_values['is_monetary']);
+    if ($isMonetary) {
+      if (empty($paymentParams['is_pay_later'])) {
+        // @todo look up payment_instrument_id on payment processor table.
+        $contributionParams['payment_instrument_id'] = 1;
+      }
+    }
     $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
       $tempParams,
       $result,
-      array(
-        'contact_id' => $contactID,
-        'line_item' => $lineItems,
-        'is_test' => $isTest,
-        'campaign_id' => CRM_Utils_Array::value('campaign_id', $tempParams, CRM_Utils_Array::value('campaign_id',
-          $form->_values)),
-        'contribution_page_id' => $form->_id,
-      ),
+      $contributionParams,
       $financialType,
       $pending,
       TRUE,
@@ -2250,9 +2258,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // all the payment processors expect the name and address to be in the
       // so we copy stuff over to first_name etc.
       $paymentParams = $this->_params;
-      $contributionTypeId = $this->_values['financial_type_id'];
 
-      $fieldTypes = array();
       if (!empty($paymentParams['onbehalf']) &&
         is_array($paymentParams['onbehalf'])
       ) {
@@ -2261,17 +2267,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $this->_params[$key] = $value;
           }
         }
-        $fieldTypes = array('Contact', 'Organization', 'Contribution');
       }
-      $financialTypeID = $this->wrangleFinancialTypeID($contributionTypeId);
 
       $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($this, $paymentParams,
         $contactID,
-        $financialTypeID,
+        $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
         'contribution',
-        $fieldTypes,
-        ($this->_mode == 'test') ? 1 : 0,
-        $isPayLater
+        ($this->_mode == 'test') ? 1 : 0
       );
 
       if (!empty($result['is_payment_failure'])) {

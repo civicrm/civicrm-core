@@ -807,6 +807,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
           // make contribution entry
           $contrbutionParams = array_merge($value, array('membership_id' => $membership->id));
+          // @todo - calling this from here is pretty hacky since it is called from membership.create anyway
+          // This form should set the correct params & not call this fn directly.
           CRM_Member_BAO_Membership::recordMembershipContribution($contrbutionParams);
         }
         else {
