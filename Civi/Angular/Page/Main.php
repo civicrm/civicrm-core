@@ -109,11 +109,9 @@ class Main extends \CRM_Core_Page {
       }
     }
 
-    //This will enable setting of the lacation hash so that Angular knows
-    //Which page it is trying to load.
-    $this->assign("setRoute", ($this->region == "ajax-snippet"));
-    if($this->region == "ajax-snippet") {
-      $this->assign("route", $_REQUEST['route']);
-    }
+    // Set the location hash so that Angular knows which page it is trying to load.
+    $route = \CRM_Utils_Request::retrieve('route', 'String');
+    $this->assign("route", $route);
   }
+
 }
