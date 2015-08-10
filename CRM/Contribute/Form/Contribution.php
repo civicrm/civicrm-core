@@ -1197,17 +1197,25 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('is_deductible', TRUE);
       $this->set('is_deductible', TRUE);
     }
+    $contributionParams = array(
+      'contact_id' => $contactID,
+      'line_item' => $lineItem,
+      'is_test' => $isTest,
+      'campaign_id' => CRM_Utils_Array::value('campaign_id', $this->_params),
+      'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $this->_params),
+      'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+      'thankyou_date' => CRM_Utils_Array::value('thankyou_date', $this->_params),
+    );
+
+    if (empty($paymentParams['is_pay_later'])) {
+      // @todo look up payment_instrument_id on payment processor table.
+      $contributionParams['payment_instrument_id'] = 1;
+    }
 
     $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
       $this->_params,
       NULL,
-      array(
-        'contact_id' => $contactID,
-        'line_item' => $lineItem,
-        'is_test' => $isTest,
-        'campaign_id' => CRM_Utils_Array::value('campaign_id', $this->_params),
-        'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $this->_params),
-      ),
+      $contributionParams,
       $financialType,
       TRUE,
       FALSE,
