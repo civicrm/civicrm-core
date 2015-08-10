@@ -1201,12 +1201,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
       $this->_params,
       NULL,
-      $contactID,
+      array(
+        'contact_id' => $contactID,
+        'line_item' => $lineItem,
+        'is_test' => $isTest,
+        'campaign_id' => CRM_Utils_Array::value('campaign_id', $this->_params),
+        'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $this->_params),
+      ),
       $financialType,
       TRUE,
       FALSE,
-      $isTest,
-      $lineItem,
       $this->_bltID
     );
 
