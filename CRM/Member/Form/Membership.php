@@ -1157,11 +1157,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $allMemberStatus = CRM_Member_PseudoConstant::membershipStatus();
     $allContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
 
-    $lineItems = NULL;
-    if (!empty($this->_lineItem)) {
-      $lineItems = $this->_lineItem;
-    }
-
     if ($this->_id) {
       $ids['membership'] = $params['id'] = $this->_id;
     }
@@ -1499,7 +1494,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $result,
           array(
             'contact_id' => $this->_contributorContactID,
-            'line_item' => $lineItems,
+            'line_item' => $lineItem,
             'is_test' => $isTest,
             'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams),
             'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $this->_params),
