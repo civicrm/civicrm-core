@@ -649,6 +649,12 @@ input.crm-form-entityref {
   padding: 4px;
 }
 
+.crm-container .status.crm-ok {
+  border-color: #B0D730;
+  background-color: #F1F8EB;
+  color: #3E3E3E;
+}
+
 .crm-container .crm-footer {
   font-size: 0.8em;
 }
@@ -3338,33 +3344,6 @@ div.m ul#civicrm-menu,
 
 #crm-container .crm-fb-tweet-buttons {
   width: 93%;
-}
-#crm-container div.finalconf-button {
-  float: right;
-  padding: 5px 0 0 0;
-}
-#crm-container div.finalconf-button input {
-  margin: 0;
-}
-#crm-container div.finalconf-intro {
-  padding-bottom: 12px;
-  font-style: italic;
-}
-#crm-container h4.finalconf-item {
-  border-top: 1px solid #ccc;
-  padding: 8px 0 8px 10px;
-  margin: 0;
-}
-#crm-container div.finalconf-itemdesc {
-  font-style: italic;
-  padding: 6px 12px 6px 12px;
-  color: #666;
-  float: right;
-  width: 60%;
-}
-#crm-container h4.finalconf-btm {
-  border-bottom: 1px solid #ccc;
-  margin-bottom: 20px;
 }
 
 /* classes related to batch entry operation */
