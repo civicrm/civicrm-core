@@ -620,6 +620,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'where_tables',
         ),
       ),
+      'StatusPreference' => array(
+        'break_return' => array(
+          'ignore_severity',
+        ),
+      ),
     );
     if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])) {
       return array();

@@ -219,8 +219,7 @@ class CRM_Core_Page {
 
     $config = CRM_Core_Config::singleton();
 
-    // Version check and intermittent alert to admins
-    CRM_Utils_VersionCheck::singleton()->versionAlert();
+    // Intermittent alert to admins
     CRM_Utils_Check::singleton()->showPeriodicAlerts();
 
     if ($this->useLivePageJS &&
