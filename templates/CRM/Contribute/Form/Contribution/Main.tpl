@@ -480,19 +480,22 @@
   
   function skipPaymentMethod() {
     var flag = false;
+    // If price-set is used then calculate the Total Amount
     if (cj('#pricevalue').length !== 0) {
-    currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
-    flag = (currentTotal == 0) ? true : false;
+      currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
+      flag = (currentTotal == 0) ? true : false;
     }
+    // Else quick-config w/o other-amount scenarios
     else {
-      cj('.price-set-option-content input').each( function(){
-        currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
-        if( cj(this).is(':checked') && currentTotal == 0 ) {
+      cj('.price-set-option-content input').each( function() {
+        currentTotal = cj(this).is('[data-amount]') ? cj(this).attr('data-amount').replace(/[^\/\d]/g,'') : 0;
+        if( cj(this).is(':checked') &&  currentTotal == 0 ) {
           flag = true;
         }
       });
-      cj('.price-set-option-content input').change( function () {
-        if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
+      cj('.price-set-option-content input, .other_amount-content input').change( function () {
+        currentTotal = cj(this).is('[data-amount]') ? cj(this).attr('data-amount').replace(/[^\/\d]/g,'') : (cj(this).val() ? cj(this).val() : 0);
+        if (currentTotal == 0 ) {
           flag = true;
         } else {
           flag = false;
