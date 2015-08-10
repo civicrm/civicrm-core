@@ -1,7 +1,7 @@
-{if $setRoute}
-    <script type="text/javascript">
-        location.hash = '{$route}';
-    </script>
+{if $route}
+  <script type="text/javascript">
+    location.hash = '{$route}';
+  </script>
 {/if}
 {literal}
 <div ng-app="crmApp">
