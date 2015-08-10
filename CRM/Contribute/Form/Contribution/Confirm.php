@@ -55,31 +55,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set the parameters to be passed to contribution create function.
    *
    * @param array $params
-   * @param int $contactID
    * @param int $financialTypeID
    * @param bool $online
-   * @param int $contributionPageId
    * @param float $nonDeductibleAmount
-   * @param int $campaignId
    * @param bool $isMonetary
    * @param bool $pending
    * @param array $paymentProcessorOutcome
    * @param string $receiptDate
    * @param int $recurringContributionID
-   * @param bool $isTest
-   * @param int $addressID
-   * @param int $softCreditToID
-   * @param array $lineItems
    *
    * @return array
    */
   public static function getContributionParams(
-    $params, $contactID, $financialTypeID, $online, $contributionPageId, $nonDeductibleAmount, $campaignId, $isMonetary, $pending,
-    $paymentProcessorOutcome, $receiptDate, $recurringContributionID, $isTest, $addressID, $softCreditToID, $lineItems) {
+    $params, $financialTypeID, $online, $nonDeductibleAmount, $isMonetary, $pending,
+    $paymentProcessorOutcome, $receiptDate, $recurringContributionID) {
     $contributionParams = array(
-      'contact_id' => $contactID,
       'financial_type_id' => $financialTypeID,
-      'contribution_page_id' => $contributionPageId,
       'receive_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
       'non_deductible_amount' => $nonDeductibleAmount,
       'total_amount' => $params['amount'],
@@ -94,12 +85,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'cancel_reason' => CRM_Utils_Array::value('cancel_reason', $params, 0),
       'cancel_date' => isset($params['cancel_date']) ? CRM_Utils_Date::format($params['cancel_date']) : NULL,
       'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
-      'campaign_id' => $campaignId,
-      'is_test' => $isTest,
-      'address_id' => $addressID,
       //setting to make available to hook - although seems wrong to set on form for BAO hook availability
-      'soft_credit_to' => $softCreditToID,
-      'line_item' => $lineItems,
       'skipLineItem' => CRM_Utils_Array::value('skipLineItem', $params, 0),
     );
     if (!$online && isset($params['thankyou_date'])) {
@@ -107,6 +93,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     if (!$online || $isMonetary) {
       if (empty($params['is_pay_later'])) {
+        // @todo look up payment_instrument_id on payment processor table.
         $contributionParams['payment_instrument_id'] = 1;
       }
     }
@@ -820,13 +807,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param CRM_Core_Form $form
    * @param array $params
    * @param array $result
-   * @param int $contactID
+   * @param array $contributionParams
+   *   Parameters to be passed to contribution create action.
    * @param CRM_Financial_DAO_FinancialType $financialType
    * @param bool $pending
    * @param bool $online
-   *
-   * @param bool $isTest
-   * @param array $lineItems
    *
    * @param int $billingLocationID
    *   ID of billing location type.
@@ -838,16 +823,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     &$form,
     $params,
     $result,
-    $contactID,
+    $contributionParams,
     $financialType,
     $pending,
     $online,
-    $isTest,
-    $lineItems,
     $billingLocationID
   ) {
     $transaction = new CRM_Core_Transaction();
-    $contribSoftContactId = $addressID = NULL;
+    $contactID = $contributionParams['contact_id'];
+
     $isMonetary = !empty($form->_values['is_monetary']);
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
     // How do these vary from params? These are currently passed to
@@ -866,7 +850,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
 
-    $addressID = CRM_Contribute_BAO_Contribution::createAddress($params, $billingLocationID);
+    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $billingLocationID);
 
     //@todo - this is being set from the form to resolve CRM-10188 - an
     // eNotice caused by it not being set @ the front end
@@ -886,51 +870,39 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $receiptDate = $now;
     }
 
-    //get the contrib page id.
-    $contributionPageId = NULL;
-    if ($online) {
-      $contributionPageId = $form->_id;
-      $campaignId = CRM_Utils_Array::value('campaign_id', $params);
-      if (!array_key_exists('campaign_id', $params)) {
-        $campaignId = CRM_Utils_Array::value('campaign_id', $form->_values);
-      }
-    }
-    else {
-      //also for offline we do support - CRM-7290
-      $contributionPageId = CRM_Utils_Array::value('contribution_page_id', $params);
-      $campaignId = CRM_Utils_Array::value('campaign_id', $params);
-    }
-
     // Prepare soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
     if (!empty($params['pcp_made_through_id']) || !empty($params['soft_credit_to'])) {
       // if its due to pcp
       if (!empty($params['pcp_made_through_id'])) {
-        $contribSoftContactId = CRM_Core_DAO::getFieldValue(
+        $contributionParams['soft_credit_to'] = CRM_Core_DAO::getFieldValue(
           'CRM_PCP_DAO_PCP',
           $params['pcp_made_through_id'],
           'contact_id'
         );
+        // Pass these details onto with the contribution to make them
+        // available at hook_post_process, CRM-8908
+        // @todo - obsolete?
+        $params['soft_credit_to'] = $contributionParams['soft_credit_to'];
       }
       else {
-        $contribSoftContactId = CRM_Utils_Array::value('soft_credit_to', $params);
+        $contributionParams['soft_credit_to'] = CRM_Utils_Array::value('soft_credit_to', $params);
       }
-
-      // Pass these details onto with the contribution to make them
-      // available at hook_post_process, CRM-8908
-      $params['soft_credit_to'] = $contribSoftContactId;
     }
 
     if (isset($params['amount'])) {
-      $contribParams = self::getContributionParams(
-        $params, $contactID, $financialType->id, $online, $contributionPageId, $nonDeductibleAmount, $campaignId, $isMonetary, $pending, $result, $receiptDate,
-        $recurringContributionID, $isTest, $addressID, $contribSoftContactId, $lineItems
+      $contributionParams = array_merge(self::getContributionParams(
+        $params, $financialType->id, $online, $nonDeductibleAmount, $isMonetary, $pending,
+        $result, $receiptDate,
+        $recurringContributionID), $contributionParams
       );
-      $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
+      $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if ($invoicing) {
         $dataArray = array();
+        // @todo - interrogate the line items passed in on the params array.
+        // No reason to assume line items will be set on the form.
         foreach ($form->_lineItem as $lineItemKey => $lineItemValue) {
           foreach ($lineItemValue as $key => $value) {
             if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
@@ -1808,12 +1780,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
       $tempParams,
       $result,
-      $contactID,
+      array(
+        'contact_id' => $contactID,
+        'line_item' => $lineItems,
+        'is_test' => $isTest,
+        'campaign_id' => CRM_Utils_Array::value('campaign_id', $tempParams, CRM_Utils_Array::value('campaign_id',
+          $form->_values)),
+        'contribution_page_id' => $form->_id,
+      ),
       $financialType,
       $pending,
       TRUE,
-      $isTest,
-      $lineItems,
       $form->_bltID
     );
     return $membershipContribution;

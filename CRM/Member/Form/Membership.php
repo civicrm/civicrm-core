@@ -1493,15 +1493,21 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $financialType = new CRM_Financial_DAO_FinancialType();
         $financialType->id = $params['financial_type_id'];
         $financialType->find(TRUE);
+
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
           $paymentParams,
           $result,
-          $this->_contributorContactID,
+          array(
+            'contact_id' => $this->_contributorContactID,
+            'line_item' => $lineItems,
+            'is_test' => $isTest,
+            'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams),
+            'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $this->_params),
+          ),
           $financialType,
           TRUE,
           FALSE,
           $isTest,
-          $lineItems,
           $this->_bltID
         );
 

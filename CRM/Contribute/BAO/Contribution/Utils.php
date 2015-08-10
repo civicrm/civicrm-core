@@ -107,16 +107,21 @@ class CRM_Contribute_BAO_Contribution_Utils {
           unset($paymentParams['is_recur']);
         }
       }
+
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
         $form,
         $paymentParams,
         NULL,
-        $contactID,
+        array(
+          'contact_id' => $contactID,
+          'line_item' => $lineItems,
+          'is_test' => $isTest,
+          'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values)),
+          'contribution_page_id' => $form->_id,
+        ),
         $financialType,
         TRUE,
         TRUE,
-        $isTest,
-        $lineItems,
         $form->_bltID
       );
 
