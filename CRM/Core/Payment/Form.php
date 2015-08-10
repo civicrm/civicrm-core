@@ -299,26 +299,6 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
-   * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
-   *
-   * @param $form
-   */
-  protected static function addPaypalExpressCode(&$form) {
-    if (empty($form->isBackOffice)) {
-      if (in_array(CRM_Utils_Array::value('billing_mode', $form->_paymentProcessor), array(2, 3))) {
-        $form->_expressButtonName = $form->getButtonName('upload', 'express');
-        $form->assign('expressButtonName', $form->_expressButtonName);
-        $form->add('image',
-          $form->_expressButtonName,
-          $form->_paymentProcessor['url_button'],
-          array('class' => 'crm-form-submit')
-        );
-      }
-    }
-  }
-
-  /**
    * Validate the payment instrument values before passing it to the payment processor
    * We want this to be overrideable by the payment processor, and default to using
    * this object's validCreditCard for credit cards (implemented as the default in the Payment class).
