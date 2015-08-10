@@ -242,7 +242,25 @@ function civicrm_api3_activity_get($params) {
     }
   }
   else {
-    $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity');
+    $extraSql = array();
+    $options = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
+    $options = $options['values'];
+    $activityContactOptions = array(
+      'target_contact_id' => array_search('Activity Targets', $options),
+      'source_contact_id' => array_search('Activity Source', $options),
+      'assignee_contact_id' => array_search('Activity Assignees', $options),
+    );
+    foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
+      if (!empty($params[$activityContactName])) {
+        $extraSql['join'][] = array(
+          'activity_' . $activityContactName => '
+          LEFT JOIN civicrm_activity_contact ac ON a.id = ac.activity_id AND ac.record_type_id = ' . $activityContactValue,
+        );
+        // Note that if we later need to change the int to an array we would need sql escaping.
+        $extraSql['where'] = array('activity_' . $activityContactName => 'ac.contact_id = ' . (int) $params[$activityContactName]);
+      }
+    }
+    $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $extraSql);
   }
   $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   if ($options['is_count']) {
@@ -280,6 +298,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities) {
       $returns[$returnkey] = $v;
     }
   }
+
   $returns['source_contact_id'] = 1;
   foreach ($returns as $n => $v) {
     switch ($n) {
