@@ -443,6 +443,50 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
   }
 
+  /**
+   * Try to retrieve contacts searching on a datetime custom field with <=.
+   *
+   * Unit test for CRM-16999, which was an invalid issue. Never mind :-)
+   * 
+   * Searching on custom fields will not work until CRM-16036 is fixed, but
+   * this test just wants to see whether operators like <= are accepted by
+   * the API if a custom field is a DateTime.
+   */
+  public function testGetContactCustomFldDateTimeBefore() {
+    // Create a custom group with a datetime field 'test_datetime'.
+    $custom_group_result = $this->customGroupCreate(
+      array(
+        'extends' => 'Individual',
+        'title' => 'datetime_test_group',
+        'api.CustomField.create' => array(
+          'custom_group_id' => '$value.id',
+          'name' => 'test_datetime',
+          'label' => 'Demo Date',
+          'html_type' => 'Select Date',
+          'data_type' => 'Date',
+          'time_format' => 2,
+          'weight' => 4,
+          'is_required' => 1,
+          'is_searchable' => 1,
+          'is_search_range' => 1,
+          'is_active' => 1,
+        ),
+      )
+    );
+    $custom_group = CRM_Utils_Array::first($custom_group_result['values']);
+    $custom_field_id = $custom_group['api.CustomField.create']['id'];
+
+    // Just some date...
+    $dateTime = '2015-08-10';
+
+    // Search for contacts having test_datetime earlier than today.
+    $params = array("custom_$custom_field_id" => array('<=' => $dateTime));
+    $result = $this->callAPIAndDocument(
+        'Contact', 'get', $params, __FUNCTION__, __FILE__);
+
+    // I am happy if there is no error. :-)
+    $this->assertEquals(0, $result['is_error']);
+  }
 
   /**
    * Test creating a current employer through API.
