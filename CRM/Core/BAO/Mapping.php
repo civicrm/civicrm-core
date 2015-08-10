@@ -1024,8 +1024,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           $value = $params['value'][$key][$k];
           if ($fldName == 'group' || $fldName == 'tag') {
             $value = trim($value);
-            $value = str_replace('(', '', $value);
-            $value = str_replace(')', '', $value);
 
             $v = explode(',', $value);
             $value = array();
@@ -1043,8 +1041,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           // CRM-14983: verify if values are comma separated convert to array
-          if (!is_array($value) && (strpos($value, ',') !== FALSE || strstr($value, '(')) && substr($fldName, 0, 7) != 'custom_' && $params['operator'][$key][$k] == 'IN') {
-            $value = explode(',', trim($value, "(..)"));
+          if (!is_array($value) && strstr($params['operator'][$key][$k], 'IN')) {
+            $value = explode(',', $value);
             $value = array($params['operator'][$key][$k] => $value);
           }
 
