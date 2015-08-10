@@ -1614,6 +1614,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         // process -
         // @see http://wiki.civicrm.org/confluence/pages/viewpage.action?pageId=261062657#Payments&AccountsRoadmap-Movetowardsalwaysusinga2-steppaymentprocess
         $membershipParams['contribution_status_id'] = CRM_Utils_Array::value('payment_status_id', $result);
+        unset($membershipParams['lineItems']);
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
