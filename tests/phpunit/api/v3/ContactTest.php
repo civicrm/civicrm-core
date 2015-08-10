@@ -446,7 +446,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Try to retrieve contacts searching on a datetime custom field with <=.
    *
-   * Unit test for CRM-16999.
+   * Unit test for CRM-16999, which was an invalid issue. Never mind :-)
    * 
    * Searching on custom fields will not work until CRM-16036 is fixed, but
    * this test just wants to see whether operators like <= are accepted by
@@ -467,7 +467,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
           'time_format' => 2,
           'weight' => 4,
           'is_required' => 1,
-          'is_searchable' => 0,
+          'is_searchable' => 1,
+          'is_search_range' => 1,
           'is_active' => 1,
         ),
       )
@@ -475,7 +476,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $custom_group = CRM_Utils_Array::first($custom_group_result['values']);
     $custom_field_id = $custom_group['api.CustomField.create']['id'];
 
-    $dateTime = CRM_Utils_Date::currentDBDate();
+    // Just some date...
+    $dateTime = '2015-08-10';
 
     // Search for contacts having test_datetime earlier than today.
     $params = array("custom_$custom_field_id" => array('<=' => $dateTime));
