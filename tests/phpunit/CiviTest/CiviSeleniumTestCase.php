@@ -852,6 +852,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     elseif ($processorType == 'AuthNet') {
       // FIXME: we 'll need to make a new separate account for testing
       $processorSettings = array(
+        //dummy live username/password are passed to bypass processor validation on live credential
+        'user_name' => '3HcY62mY',
+        'password' => '69943NrwaQA92b8J',
         'test_user_name' => '5ULu56ex',
         'test_password' => '7ARxW575w736eF5p',
       );
@@ -875,6 +878,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
     elseif ($processorType == 'PayPal_Standard') {
       $processorSettings = array(
+        'user_name' => 'V18ki@9r5Bf.org',
         'test_user_name' => 'V18ki@9r5Bf.org',
       );
     }
