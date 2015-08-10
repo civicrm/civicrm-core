@@ -480,6 +480,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
   $entity = _civicrm_api_get_entity_name_from_dao($dao);
   $custom_fields = _civicrm_api3_custom_fields_for_entity($entity);
   $options = _civicrm_api3_get_options_from_params($params);
+
   // Unset $params['options'] if they are api parameters (not options as a fieldname).
   if (!empty($params['options']) && is_array($params['options'])&& array_intersect(array_keys($params['options']), array_keys($options))) {
     unset ($params['options']);
@@ -487,8 +488,14 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
 
   $entity_field_names = _civicrm_api3_field_names(_civicrm_api3_build_fields_array($dao));
   $custom_field_names = array();
+  $uniqueAliases = array();
   $getFieldsResult = civicrm_api3($entity, 'getfields', array('action' => 'get'));
   $getFieldsResult = $getFieldsResult['values'];
+  foreach ($getFieldsResult as $getFieldKey => $getFieldSpec) {
+    $uniqueAliases[$getFieldKey] = $getFieldSpec['name'];
+    $uniqueAliases[$getFieldSpec['name']] = $getFieldSpec['name'];
+  }
+
   // $select_fields maps column names to the field names of the result
   // values.
   $select_fields = array();
@@ -504,12 +511,13 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
 
   // populate $select_fields
   $return_all_fields = (empty($options['return']) || !is_array($options['return']));
+  $return = $return_all_fields ? array_fill_keys($entity_field_names, 1) : $options['return'];
 
   // default fields
-  foreach ($entity_field_names as $field_name) {
-    if ($return_all_fields || !empty($options['return'][$field_name])) {
+  foreach (array_keys($return) as $field_name) {
+    if (!empty($uniqueAliases[$field_name]) && substr($field_name, 0, 7) != 'custom_') {
       // 'a.' is an alias for the entity table.
-      $select_fields["a.$field_name"] = $field_name;
+      $select_fields["a.{$uniqueAliases[$field_name]}"] = $uniqueAliases[$field_name];
     }
   }
 
@@ -553,9 +561,51 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
   // populate $where_clauses
   foreach ($params as $key => $value) {
     $type = 'String';
+    $table_name = NULL;
+    $column_name = NULL;
+
+    if (substr($key, 0, 7) == 'filter.') {
+      // Legacy support for old filter syntax per the test contract.
+      // (Convert the style to the later one & then deal with them).
+      $filterArray = explode('.', $key);
+      $value = array($filterArray[1] => $value);
+      $key = 'filters';
+    }
+
+    // Legacy support for 'filter's construct.
+    if ($key == 'filters') {
+      foreach ($value as $filterKey => $filterValue) {
+        if (substr($filterKey, -4, 4) == 'high') {
+          $key = substr($filterKey, 0, -5);
+          $value = array('<=' => $filterValue);
+        }
+
+        if (substr($filterKey, -3, 3) == 'low') {
+          $key = substr($filterKey, 0, -4);
+          $value = array('>=' => $filterValue);
+        }
+
+        if ($filterKey == 'is_current' || $filterKey == 'isCurrent') {
+          // Is current is almost worth creating as a 'sql filter' in the DAO function since several entities have the
+          // concept.
+          $todayStart = date('Ymd000000', strtotime('now'));
+          $todayEnd = date('Ymd235959', strtotime('now'));
+          $query->where(array("(a.start_date <= '$todayStart' OR a.start_date IS NULL) AND (a.end_date >= '$todayEnd' OR
+          a.end_date IS NULL)
+          AND a.is_active = 1
+        "));
+        }
+      }
+    }
+
     if (array_key_exists($key, $getFieldsResult)) {
       $type = $getFieldsResult[$key]['type'];
       $key = $getFieldsResult[$key]['name'];
+    }
+    if ($key == _civicrm_api_get_entity_name_from_camel($entity) . '_id') {
+      // The test contract enforces support of (eg) mailing_group_id if the entity is MailingGroup.
+      $type = 'int';
+      $key = 'id';
     }
     if (in_array($key, $entity_field_names)) {
       $table_name = 'a';
@@ -571,7 +621,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
     }
     // I don't know why I had to specifically exclude 0 as a key - wouldn't the others have caught it?
     // We normally silently ignore null values passed in - if people want IS_NULL they can use acceptedSqlOperator syntax.
-    if ((!in_array($key, $entity_field_names) && !in_array($key, $custom_field_names)) || empty($key) || is_null($value)) {
+    if ((!$table_name) || empty($key) || is_null($value)) {
       // No valid filter field. This might be a chained call or something.
       // Just ignore this for the $where_clause.
       continue;
@@ -649,9 +699,18 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
       ));
     }
   };
-  if (!empty($extraMysql['where'])) {
-    foreach ($extraMysql['where'] as $extraWhere) {
-      $query->where($extraWhere);
+  if (!empty($extraMysql)) {
+    foreach ($extraMysql as $type => $extraClauses) {
+      foreach ($extraClauses as $clauseKey => $clause) {
+        if ($type == 'join') {
+          foreach ($clause as $joinName => $join) {
+            $query->$type($joinName, $join);
+          }
+        }
+        else {
+          $query->$type($clause);
+        }
+      }
     }
   }
 
@@ -662,7 +721,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
       $words = preg_split("/[\s]+/", $sort_option);
       if (count($words) > 0 && in_array($words[0], array_values($select_fields))) {
         $tmp = $words[0];
-        if (strtoupper($words[1]) == 'DESC') {
+        if (!empty($words[1]) && strtoupper($words[1]) == 'DESC') {
           $tmp .= " DESC";
         }
         $sort_fields[] = $tmp;
@@ -688,7 +747,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
     }
     $result_entities[$result_dao->id] = array();
     foreach ($select_fields as $column => $alias) {
-      if (property_exists($result_dao, $alias)) {
+      if (property_exists($result_dao, $alias) && $result_dao->$alias != NULL) {
         $result_entities[$result_dao->id][$alias] = $result_dao->$alias;
       }
       // Backward compatibility on fields names.
@@ -696,10 +755,6 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
         $result_entities[$result_dao->id][$getFieldsResult['values'][$column]['uniqueName']] = $result_dao->$alias;
       }
       foreach ($getFieldsResult as $returnName => $spec) {
-        $castToInt = FALSE;
-        if (!empty($spec['type']) && $spec['type'] == CRM_Utils_Type::T_INT) {
-          $castToInt = TRUE;
-        }
         if (empty($result_entities[$result_dao->id][$returnName]) && !empty($result_entities[$result_dao->id][$spec['name']])) {
           $result_entities[$result_dao->id][$returnName] = $result_entities[$result_dao->id][$spec['name']];
         }
@@ -934,6 +989,8 @@ function _civicrm_api3_get_query_object($params, $mode, $entity) {
 
 /**
  * Function transfers the filters being passed into the DAO onto the params object.
+ *
+ * @deprecated DAO based retrieval is being phased out.
  *
  * @param CRM_Core_DAO $dao
  * @param array $params
@@ -1245,6 +1302,8 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
 
 /**
  * Converts an DAO object to an array.
+ *
+ * @deprecated - DAO based retrieval is being phased out.
  *
  * @param CRM_Core_DAO $dao
  *   Object to convert.
