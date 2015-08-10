@@ -46,10 +46,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @param int $contributionTypeId
    *   Financial type id.
    * @param int|string $component component id
-   * @param array $fieldTypes
-   *   Presumably relates to custom field types - used when building data for sendMail.
    * @param $isTest
-   * @param $isPayLater
    *
    * @throws CRM_Core_Exception
    * @throws Exception
@@ -63,9 +60,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
     $contactID,
     $contributionTypeId,
     $component = 'contribution',
-    $fieldTypes = NULL,
-    $isTest,
-    $isPayLater
+    $isTest
   ) {
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
     $lineItems = $form->_lineItem;
@@ -108,17 +103,26 @@ class CRM_Contribute_BAO_Contribution_Utils {
         }
       }
 
+      $contributionParams = array(
+        'contact_id' => $contactID,
+        'line_item' => $lineItems,
+        'is_test' => $isTest,
+        'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values)),
+        'contribution_page_id' => $form->_id,
+        'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+      );
+      $isMonetary = !empty($form->_values['is_monetary']);
+      if ($isMonetary) {
+        if (empty($paymentParams['is_pay_later'])) {
+          // @todo look up payment_instrument_id on payment processor table.
+          $contributionParams['payment_instrument_id'] = 1;
+        }
+      }
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
         $form,
         $paymentParams,
         NULL,
-        array(
-          'contact_id' => $contactID,
-          'line_item' => $lineItems,
-          'is_test' => $isTest,
-          'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values)),
-          'contribution_page_id' => $form->_id,
-        ),
+        $contributionParams,
         $financialType,
         TRUE,
         TRUE,

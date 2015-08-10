@@ -1491,18 +1491,20 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
         $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
           $paymentParams,
-          $result,
+          NULL,
           array(
             'contact_id' => $this->_contributorContactID,
             'line_item' => $lineItem,
             'is_test' => $isTest,
             'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams),
             'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $this->_params),
+            'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+            'thankyou_date' => CRM_Utils_Array::value('thankyou_date', $paymentParams),
+            'payment_instrument_id' => $this->_paymentProcessor['payment_instrument_id'],
           ),
           $financialType,
           TRUE,
           FALSE,
-          $isTest,
           $this->_bltID
         );
 
