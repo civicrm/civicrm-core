@@ -815,7 +815,7 @@ LIMIT {$offset}, {$rowCount}
     $relationship_type_id = CRM_Utils_Type::escape(CRM_Utils_Array::value('relationship_type_id', $_GET), 'Integer',
       FALSE);
 
-    if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {
+    if ($context != 'user' && !CRM_Contact_BAO_Contact_Permission::allow($contactID)) {
       return CRM_Utils_System::permissionDenied();
     }
 

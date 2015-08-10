@@ -1949,16 +1949,16 @@ AND cc.sort_name LIKE '%$name%'";
 
     // check logged in user for permission
     $page = new CRM_Core_Page();
-    CRM_Contact_Page_View::checkUserPermission($page, $params['contact_id']);
-    $permissions = array($page->_permission);
-    if ($page->_permission == CRM_Core_Permission::EDIT) {
-      $permissions[] = CRM_Core_Permission::DELETE;
-    }
-    $mask = CRM_Core_Action::mask($permissions);
 
     if ($params['context'] != 'user') {
       $links = CRM_Contact_Page_View_Relationship::links();
       $permissionedContacts = FALSE;
+      CRM_Contact_Page_View::checkUserPermission($page, $params['contact_id']);
+      $permissions = array($page->_permission);
+      if ($page->_permission == CRM_Core_Permission::EDIT) {
+        $permissions[] = CRM_Core_Permission::DELETE;
+      }
+      $mask = CRM_Core_Action::mask($permissions);
     }
     else {
       $links = CRM_Contact_Page_View_UserDashBoard::links();
