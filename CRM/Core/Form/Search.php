@@ -122,7 +122,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
     if (!empty($rows)) {
       foreach ($rows as $row) {
-        $this->addElement('checkbox', $row['checkbox'], NULL, NULL, array('class' => 'select-row'));
+        if (CRM_Utils_Array::value('checkbox', $row)) {
+          $this->addElement('checkbox', $row['checkbox'], NULL, NULL, array('class' => 'select-row'));
+        }
       }
     }
   }
