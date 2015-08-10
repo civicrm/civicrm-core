@@ -453,6 +453,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *   the result of this processing
    */
   public function import($onDuplicate, &$values, $doGeocodeAddress = FALSE) {
+    // Ding! I touched a toxic function.
     $config = CRM_Core_Config::singleton();
     $this->_unparsedStreetAddressContacts = array();
     if (!$doGeocodeAddress) {
