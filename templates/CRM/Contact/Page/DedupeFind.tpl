@@ -85,23 +85,32 @@
     <input type='checkbox' id ='crm-dedupe-display-selection' name="display-selection">
     <label for="display-selection">{ts}Within Selections{/ts}&nbsp;</label>  
   </span>
-  <table id="dupePairs" class="form-layout-compressed" cellspacing="0" width="100%">
+
+  <table id="dupePairs"
+    class="form-layout-compressed crm-ajax-table"
+    cellspacing="0"
+    width="100%"
+    data-length-menu='[[10, 25, 50, 100, 1000, 2000, -1], [10, 25, 50, 100, 1000, 2000, "All"]]',
+    data-searching='true',
+    data-dom='flrtip',
+    data-order='[]',
+    data-column-defs='{literal}[{"targets": [0,1,3,13], "orderable":false}, {"targets": [7,8,9,10,11,12], "visible":false}]{/literal}'>
     <thead>
       <tr class="columnheader"> 
-        <th class="crm-dedupe-selection"><input type="checkbox" value="0" name="pnid_all" class="crm-dedupe-select-all"></th>
-        <th class="crm-empty">&nbsp;</th>
-        <th class="crm-contact">{ts}Contact{/ts} 1</th>
-        <th class="crm-empty">&nbsp;</th>
-        <th class="crm-contact-duplicate">{ts}Contact{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th class="crm-contact">{ts}Email{/ts} 1</th>
-        <th class="crm-contact-duplicate">{ts}Email{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th class="crm-contact">{ts}Street Address{/ts} 1</th>
-        <th class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th class="crm-contact">{ts}Postcode{/ts} 1</th>
-        <th class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th class="crm-contact-conflicts">{ts}Conflicts{/ts}</th>
-        <th class="crm-threshold">{ts}Threshold{/ts}</th>
-        <th class="crm-empty">&nbsp;</th>
+        <th data-data="is_selected_input" class="crm-dedupe-selection"><input type="checkbox" value="0" name="pnid_all" class="crm-dedupe-select-all"></th>
+        <th data-data="src_image"    class="crm-empty">&nbsp;</th>
+        <th data-data="src"          class="crm-contact">{ts}Contact{/ts} 1</th>
+        <th data-data="dst_image"    class="crm-empty">&nbsp;</th>
+        <th data-data="dst"          class="crm-contact-duplicate">{ts}Contact{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="src_email"    class="crm-contact">{ts}Email{/ts} 1</th>
+        <th data-data="dst_email"    class="crm-contact-duplicate">{ts}Email{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="src_street"   class="crm-contact">{ts}Street Address{/ts} 1</th>
+        <th data-data="dst_street"   class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="src_postcode" class="crm-contact">{ts}Postcode{/ts} 1</th>
+        <th data-data="dst_postcode" class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
+        <th data-data="conflicts"    class="crm-contact-conflicts">{ts}Conflicts{/ts}</th>
+        <th data-data="weight"       class="crm-threshold">{ts}Threshold{/ts}</th>
+        <th data-data="actions"      class="crm-empty">&nbsp;</th>
       </tr>
     </thead>
     <tbody>
@@ -190,168 +199,99 @@
 {include file='CRM/common/dedupe.tpl'}
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
-  var sourceUrl = {/literal}'{$sourceUrl}'{literal};
-  var context   = {/literal}'{$context}'{literal};
-  $('#dupePairs').DataTable({
-    //"scrollX": true, // doesn't work with hover popup for for icons
-    "lengthMenu": [[10, 25, 50, 100, 1000, 2000, -1], [10, 25, 50, 100, 1000, 2000, "All"]],
-    "searching" : true,
-    "dom": 'flrtip',
-    "processing": true,
-    "serverSide": true,
-    "ajax": sourceUrl,
-    "columns"  : [
-      {data: "is_selected_input"},
-      {data: "src_image"},
-      {data: "src"},
-      {data: "dst_image"},
-      {data: "dst"},
-      {data: "src_email"},
-      {data: "dst_email"},
-      {data: "src_street"},
-      {data: "dst_street"},
-      {data: "src_postcode"},
-      {data: "dst_postcode"},
-      {
-        data: "conflicts",
-        className: "crm-pair-conflict"
-      },
-      {data: "weight"},
-      {data: "actions"},
-    ],
-    "order": [], // removes default order by for column 1 (checkbox)
-    "columnDefs": [ 
-      {
-        "targets": [0, 1, 3, 13],
-        "orderable": false
-      },
-      {
-        "targets": [7, 8, 9, 10, 11, 12],
-        "visible": false
+  (function($) {
+    CRM.$('table#dupePairs').data({
+      "ajax": {
+        "url": {/literal}'{$sourceUrl}'{literal}
       }
-    ],
-    rowCallback: function (row, data) {
-      // Set the checked state of the checkbox in the table
-      $('input.crm-dedupe-select', row).prop('checked', data.is_selected == 1);
-      if (data.is_selected == 1) {
-        $(row).toggleClass('crm-row-selected');
-      }
-      // for action column at the last, set nowrap
-      $('td:last', row).attr('nowrap','nowrap');
-      // for conflcts column
-      $('td.crm-pair-conflict', row).attr('nowrap','nowrap');
-    }
-  });
-
-  // redraw datatable if searching within selected records
-  $('#crm-dedupe-display-selection').on('click', function(){
-    reloadUrl = sourceUrl;
-    if($(this).prop('checked')){
-      reloadUrl = sourceUrl+'&selected=1';
-    }
-    $('#dupePairs').DataTable().ajax.url(reloadUrl).draw();
-  });
-
-  $('#dupePairs_length_selection').appendTo('#dupePairs_length');
-  
-  // apply selected class on click of a row
-  $('#dupePairs tbody').on('click', 'tr', function(e) {
-    $(this).toggleClass('crm-row-selected');
-    $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));
-    var ele = $('input.crm-dedupe-select', this);
-    toggleDedupeSelect(ele, 0);
-  });
-
-  // when select-all checkbox is checked
-  $('#dupePairs thead tr .crm-dedupe-selection').on('click', function() {
-    var checked = $('.crm-dedupe-select-all').prop('checked');
-    if (checked) {
-      $("#dupePairs tbody tr input[type='checkbox']").prop('checked', true);
-      $("#dupePairs tbody tr").addClass('crm-row-selected');
-    }
-    else{
-      $("#dupePairs tbody tr input[type='checkbox']").prop('checked', false);
-      $("#dupePairs tbody tr").removeClass('crm-row-selected');
-    }
-    var ele = $('#dupePairs tbody tr');
-    toggleDedupeSelect(ele, 1);
-  });
-    
-  // inline search boxes placed in tfoot
-  $('#dupePairsColFilters thead th').each( function () {
-    var title = $('#dupePairs thead th').eq($(this).index()).text();
-    if (title.length > 1) {
-      $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
-    }
-  });
-
-  // apply dataTable
-  var table = $('#dupePairs').DataTable();
-
-  // apply the search
-  $('#searchOptions input').on( 'keyup change', function () {
-    table
-      .column($(this).attr('search-column'))
-      .search(this.value)
-      .draw();
-  });
-
-  // show / hide columns
-  $('input.toggle-vis').on('click', function (e) {
-    var column = table.column( $(this).attr('data-column-main') );
-    column.visible( ! column.visible() );
-
-    // nowrap to conflicts column is applied only during initial rendering
-    // for show / hide clicks we need to set it explicitly
-    $('#dupePairs tbody td.crm-pair-conflict').attr('nowrap', 'nowrap');
-
-    if ($(this).attr('data-column-dupe')) {
-      column = table.column( $(this).attr('data-column-dupe') );
-      column.visible( ! column.visible() );
-    }
-  });
-  
-  // keep the conflicts checkbox checked when context is "conflicts"
-  if(context == 'conflicts') {
-    $('#conflicts').attr('checked', true);  
-    var column = table.column( $('#conflicts').attr('data-column-main') );
-    column.visible( ! column.visible() );
-  }
-
-  // on click of flip link of a row
-  $('#dupePairs tbody').on('click', 'tr .crm-dedupe-flip', function(e) {
-    e.stopPropagation();
-    var $el   = $(this);
-    var $elTr = $(this).closest('tr');
-    var postUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
-    var request = $.post(postUrl, {pnid : $el.data('pnid')});
-    request.done(function(dt) {
-      var mapper = {2:4, 5:6, 7:8, 9:10}
-      var idx = table.row($elTr).index();
-      $.each(mapper, function(key, val) {
-        var v1  = table.cell(idx, key).data();
-        var v2  = table.cell(idx, val).data();
-        table.cell(idx, key).data(v2);
-        table.cell(idx, val).data(v1);
+    });
+    $(function($) {
+      // redraw datatable if searching within selected records
+      $('#crm-dedupe-display-selection').on('click', function(){
+        reloadUrl = sourceUrl;
+        if($(this).prop('checked')){
+          reloadUrl = sourceUrl+'&selected=1';
+        }
+        CRM.$('table#dupePairs').DataTable().ajax.url(reloadUrl).draw();
       });
-      // keep the checkbox checked if needed
-      $('input.crm-dedupe-select', $elTr).prop('checked', $elTr.hasClass('crm-row-selected'));
-    });
-  });
+    
+      $('#dupePairs_length_selection').appendTo('#dupePairs_length');
 
-  $(".crm-dedupe-flip-selections").on('click', function(e) {
-    var ids = [];
-    $('.crm-row-selected').each(function() {
-      var ele = CRM.$('input.crm-dedupe-select', this);
-      ids.push(CRM.$(ele).attr('name').substr(5));
-    });
-    if (ids.length > 0) {
-      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
-      CRM.$.post(dataUrl, {pnid: ids}, function (response) {
-        var mapper = {2:4, 5:6, 7:8, 9:10}
-        $('.crm-row-selected').each(function() {
-          var idx = table.row(this).index();
+      // apply selected class on click of a row
+      $('#dupePairs tbody').on('click', 'tr', function(e) {
+        $(this).toggleClass('crm-row-selected');
+        $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));
+        var ele = $('input.crm-dedupe-select', this);
+        toggleDedupeSelect(ele, 0);
+      });
+
+      // when select-all checkbox is checked
+      $('#dupePairs thead tr .crm-dedupe-selection').on('click', function() {
+        var checked = $('.crm-dedupe-select-all').prop('checked');
+        if (checked) {
+          $("#dupePairs tbody tr input[type='checkbox']").prop('checked', true);
+          $("#dupePairs tbody tr").addClass('crm-row-selected');
+        }
+        else{
+          $("#dupePairs tbody tr input[type='checkbox']").prop('checked', false);
+          $("#dupePairs tbody tr").removeClass('crm-row-selected');
+        }
+        var ele = $('#dupePairs tbody tr');
+        toggleDedupeSelect(ele, 1);
+      });
+
+      // inline search boxes placed in tfoot
+      $('#dupePairsColFilters thead th').each( function () {
+        var title = $('#dupePairs thead th').eq($(this).index()).text();
+        if (title.length > 1) {
+          $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+        }
+      });
+
+      // get dataTable
+      var table = CRM.$('table#dupePairs').DataTable();
+
+      // apply the search
+      $('#searchOptions input').on( 'keyup change', function () {
+        table
+          .column($(this).attr('search-column'))
+          .search(this.value)
+          .draw();
+      });
+
+      // show / hide columns
+      $('input.toggle-vis').on('click', function (e) {
+        var column = table.column( $(this).attr('data-column-main') );
+        column.visible( ! column.visible() );
+  
+        // nowrap to conflicts column is applied only during initial rendering
+        // for show / hide clicks we need to set it explicitly
+        $('#dupePairs tbody td.crm-pair-conflict').attr('nowrap', 'nowrap');
+  
+        if ($(this).attr('data-column-dupe')) {
+          column = table.column( $(this).attr('data-column-dupe') );
+          column.visible( ! column.visible() );
+        }
+      });
+      
+      // keep the conflicts checkbox checked when context is "conflicts"
+      var context = {/literal}'{$context}'{literal};
+      if(context == 'conflicts') {
+        $('#conflicts').attr('checked', true);  
+        var column = table.column( $('#conflicts').attr('data-column-main') );
+        column.visible( ! column.visible() );
+      }
+  
+      // on click of flip link of a row
+      $('#dupePairs tbody').on('click', 'tr .crm-dedupe-flip', function(e) {
+        e.stopPropagation();
+        var $el   = $(this);
+        var $elTr = $(this).closest('tr');
+        var postUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
+        var request = $.post(postUrl, {pnid : $el.data('pnid')});
+        request.done(function(dt) {
+          var mapper = {2:4, 5:6, 7:8, 9:10}
+          var idx = table.row($elTr).index();
           $.each(mapper, function(key, val) {
             var v1  = table.cell(idx, key).data();
             var v2  = table.cell(idx, val).data();
@@ -359,37 +299,61 @@ CRM.$(function($) {
             table.cell(idx, val).data(v1);
           });
           // keep the checkbox checked if needed
-          $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));
+          $('input.crm-dedupe-select', $elTr).prop('checked', $elTr.hasClass('crm-row-selected'));
         });
-      }, 'json');
-    }
-  });
-});
-
-function toggleDedupeSelect(element, isMultiple) {
-  if (!isMultiple) {
-    var is_selected = CRM.$(element).prop('checked') ? 1: 0;
-    var id = CRM.$(element).prop('name').substr(5);
-  }
-  else {
-    var id = [];
-    CRM.$(element).each(function() {
-      var sth = CRM.$('input.crm-dedupe-select', this);
-      id.push(CRM.$(sth).prop('name').substr(5));
-    });
-    var is_selected = CRM.$('.crm-dedupe-select-all').prop('checked') ? 1 : 0;
-  }
-
-  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
-  var rgid = {/literal}"{$rgid}"{literal};
-  var gid = {/literal}"{$gid}"{literal};
-
-  rgid = rgid.length > 0 ? rgid : 0;
-  gid  = gid.length > 0 ? gid : 0;
+      });
   
-  CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected}, function (data) {
-    // nothing to do for now
-  }, 'json');
-}
+      $(".crm-dedupe-flip-selections").on('click', function(e) {
+        var ids = [];
+        $('.crm-row-selected').each(function() {
+          var ele = CRM.$('input.crm-dedupe-select', this);
+          ids.push(CRM.$(ele).attr('name').substr(5));
+        });
+        if (ids.length > 0) {
+          var dataUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
+          CRM.$.post(dataUrl, {pnid: ids}, function (response) {
+            var mapper = {2:4, 5:6, 7:8, 9:10}
+            $('.crm-row-selected').each(function() {
+              var idx = table.row(this).index();
+              $.each(mapper, function(key, val) {
+                var v1  = table.cell(idx, key).data();
+                var v2  = table.cell(idx, val).data();
+                table.cell(idx, key).data(v2);
+                table.cell(idx, val).data(v1);
+              });
+              // keep the checkbox checked if needed
+              $('input.crm-dedupe-select', this).prop('checked', $(this).hasClass('crm-row-selected'));
+            });
+          }, 'json');
+        }
+      });
+    });
+  })(CRM.$);
+
+  function toggleDedupeSelect(element, isMultiple) {
+    if (!isMultiple) {
+      var is_selected = CRM.$(element).prop('checked') ? 1: 0;
+      var id = CRM.$(element).prop('name').substr(5);
+    }
+    else {
+      var id = [];
+      CRM.$(element).each(function() {
+        var sth = CRM.$('input.crm-dedupe-select', this);
+        id.push(CRM.$(sth).prop('name').substr(5));
+      });
+      var is_selected = CRM.$('.crm-dedupe-select-all').prop('checked') ? 1 : 0;
+    }
+  
+    var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
+    var rgid = {/literal}"{$rgid}"{literal};
+    var gid = {/literal}"{$gid}"{literal};
+  
+    rgid = rgid.length > 0 ? rgid : 0;
+    gid  = gid.length > 0 ? gid : 0;
+    
+    CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected}, function (data) {
+      // nothing to do for now
+    }, 'json');
+  }
 </script>
 {/literal}
