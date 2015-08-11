@@ -762,21 +762,26 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           }
         }
       }
+      // Return error if empty $self->_memTypeSelected
+      if (empty($errors) && empty($selectedMemberships)) {
+        $errors['_qf_default'] = ts('Select at least one membership option.');
+      }
+      if (!$self->_mode && empty($params['record_contribution'])) {
+        $errors['record_contribution'] = ts('Record Membership Payment is required when you use a price set.');
+      }
     }
-    elseif (empty($params['membership_type_id'][1])) {
-      $errors['membership_type_id'] = ts('Please select a membership type.');
-    }
-
-    if (!$priceSetId) {
+    else {
+      if (empty($params['membership_type_id'][1])) {
+        $errors['membership_type_id'] = ts('Please select a membership type.');
+      }
       $numterms = CRM_Utils_Array::value('num_terms', $params);
       if ($numterms && intval($numterms) != $numterms) {
         $errors['num_terms'] = ts('Please enter an integer for the number of terms.');
       }
-    }
 
-    // Return error if empty $self->_memTypeSelected
-    if ($priceSetId && empty($errors) && empty($selectedMemberships)) {
-      $errors['_qf_default'] = ts('Select at least one membership option.');
+      if ($self->_mode || isset($params['record_contribution']) && empty($params['financial_type_id'])) {
+        $errors['financial_type_id'] = ts('Please enter the financial Type.');
+      }
     }
 
     if (!empty($errors) && (count($selectedMemberships) > 1)) {
@@ -793,13 +798,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return $errors;
     }
 
-    if ($priceSetId && !$self->_mode && empty($params['record_contribution'])) {
-      $errors['record_contribution'] = ts('Record Membership Payment is required when you using price set.');
-    }
-
-    if (!$priceSetId && $self->_mode && empty($params['financial_type_id'])) {
-      $errors['financial_type_id'] = ts('Please enter the financial Type.');
-    }
 
     if (!empty($params['record_contribution']) && empty($params['payment_instrument_id'])) {
       $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
@@ -926,9 +924,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     //total amount condition arise when membership type having no
     //minimum fee
     if (isset($params['record_contribution'])) {
-      if (!$params['financial_type_id']) {
-        $errors['financial_type_id'] = ts('Please enter the financial Type.');
-      }
       if (CRM_Utils_System::isNull($params['total_amount'])) {
         $errors['total_amount'] = ts('Please enter the contribution.');
       }
@@ -1169,6 +1164,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $priceSetDetails[$priceSetID],
       $formValues
     );
+    if (empty($formValues['financial_type_id'])) {
+      $formValues['financial_type_id'] = $priceSetDetails[$priceSetID]['financial_type_id'];
+    }
 
     $config = CRM_Core_Config::singleton();
 
