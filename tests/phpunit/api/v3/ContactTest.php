@@ -443,6 +443,45 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
   }
 
+  /**
+   * Unit test for CRM-17012: Searching on datetime custom field with <=.
+   */
+  public function testGetContactCustomFldDateTimeBefore() {
+    // Create a custom group with a datetime field 'test_datetime'.
+    $custom_group_result = $this->customGroupCreate(
+      array(
+        'extends' => 'Individual',
+        'title' => 'datetime_test_group',
+        'api.CustomField.create' => array(
+          'custom_group_id' => '$value.id',
+          'name' => 'test_datetime',
+          'label' => 'Demo Date',
+          'html_type' => 'Select Date',
+          'data_type' => 'Date',
+          'time_format' => 2,
+          'weight' => 4,
+          'is_required' => 1,
+          'is_searchable' => 1,
+          'is_search_range' => 1,
+          'is_active' => 1,
+        ),
+      )
+    );
+    $custom_group = CRM_Utils_Array::first($custom_group_result['values']);
+    $custom_field_id = $custom_group['api.CustomField.create']['id'];
+
+    // Just some date...
+    $dateTime = '2015-08-10';
+
+    // Search for contacts having test_datetime earlier than today.
+    $params = array("custom_$custom_field_id" => array('<=' => $dateTime));
+    $result = $this->callAPIAndDocument(
+        'Contact', 'get', $params, __FUNCTION__, __FILE__);
+
+    // Since no contacts have the custom field set, the result should contain
+    // no values.
+    $this->assertEquals(0, $result['count']);
+  }
 
   /**
    * Test creating a current employer through API.
