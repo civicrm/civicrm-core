@@ -64,8 +64,7 @@
       // @param id MessageTemplate id  (per APIv3)
       // @return Promise MessageTemplate (per APIv3)
       get: function get(id) {
-        return crmApi('MessageTemplate', 'get', {
-          "sequential": 1,
+        return crmApi('MessageTemplate', 'getsingle', {
            "return": "id,msg_subject,msg_html,msg_title,msg_text",
            "id": id
         });
