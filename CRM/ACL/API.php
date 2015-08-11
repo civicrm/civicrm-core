@@ -123,6 +123,17 @@ class CRM_ACL_API {
       $contactID = $user ? $user : 0;
     }
 
+    //CRM-17014 hack - check if it's a REST request
+    if ($contactID == 0) {
+      $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+      if (!empty($api_key)) {
+        $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
+        if (!empty($valid_user)) {
+          $contactID = $valid_user;
+        }
+      }
+    }
+    
     // Check if contact has permissions on self
     if ($user && $contactID == $user) {
       if (CRM_Core_Permission::check('edit my contact') ||
