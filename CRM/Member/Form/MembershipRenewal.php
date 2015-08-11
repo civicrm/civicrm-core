@@ -718,8 +718,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $formValues['processPriceSet'] = TRUE;
       }
 
-      //CRM-16950
-      $formValues['tax_amount'] = $this->_params['tax_amount'];
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
         $formValues['contribution_contact_id'] = $this->_contributorContactID;
