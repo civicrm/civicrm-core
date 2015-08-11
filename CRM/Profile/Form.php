@@ -1325,7 +1325,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     //create CMS user (if CMS user option is selected in profile)
     if (!empty($params['cms_create_account']) &&
-      ( $this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT )
+      ($this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT)
     ) {
       $params['contactID'] = $this->_id;
       if (!CRM_Core_BAO_CMSUser::create($params, $this->_mail)) {
