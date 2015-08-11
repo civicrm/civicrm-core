@@ -260,7 +260,7 @@ class CRM_Contact_Task {
           CRM_Core_Permission::check('create mailings')
         ) {
           self::$_tasks[self::CREATE_MAILING] = array(
-            'title' => ts('Create a Mass Mailing'),
+            'title' => ts('Email - schedule/send via CiviMail'),
             'class' => array(
               'CRM_Mailing_Form_Group',
               'CRM_Mailing_Form_Settings',
