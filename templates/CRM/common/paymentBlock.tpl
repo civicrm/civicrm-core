@@ -28,6 +28,8 @@
 
   CRM.$(function($) {
     function buildPaymentBlock(type) {
+      var $form = $('#billing-payment-block').closest('form');
+
       {/literal}{if !$isBillingAddressRequiredForPayLater}{literal}
       if (type == 0) {
         $("#billing-payment-block").html('');
@@ -49,6 +51,9 @@
       var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="`$urlPathVar``$contributionPageID`processor_id="}" + type;
 
       {literal}
+      // Processors like pp-express will hide the form submit buttons, so re-show them when switching
+      $('.crm-submit-buttons', $form).show().find('input').prop('disabled', true);
+
       CRM.loadPage(dataUrl, {target: '#billing-payment-block'});
     }
   
@@ -56,6 +61,9 @@
     $('[name=payment_processor_id]').on('change.paymentBlock', function() {
         buildPaymentBlock($(this).val());
     });
+    $('#billing-payment-block').on('crmLoad', function() {
+      $('.crm-submit-buttons input').prop('disabled', false);
+    })
   });
 
 </script>
