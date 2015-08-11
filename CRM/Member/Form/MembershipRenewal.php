@@ -296,7 +296,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $taxAmount = NULL;
         $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
         if (CRM_Utils_Array::value($values['financial_type_id'], $taxRates)) {
-          $taxAmount = ($taxRate/100) * CRM_Utils_Array::value('minimum_fee', $values);
+          $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
           $totalAmount = $totalAmount + $taxAmount;
         }
 
