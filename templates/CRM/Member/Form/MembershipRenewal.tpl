@@ -165,9 +165,7 @@
                   <td>{$form.total_amount.html}<br/>
                     <span
                       class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span>
-                    {if $taxAmount}
-                      <div class="totaltaxAmount">{ts 1=$taxTerm 2=$taxAmount}Includes %1 amount of $%2.{/ts}</div>
-                    {/if}
+                      <div class="totaltaxAmount"></div>
                   </td>
                 </tr>
                 <tr class="crm-membershiprenew-form-block-receive_date">
@@ -200,9 +198,7 @@
           <td>{$form.total_amount.html}<br/>
             <span
               class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span>
-            {if $taxAmount}
-              <div class="totaltaxAmount">{ts 1=$taxTerm 2=$taxAmount}Includes %1 amount of %2.{/ts}</div>
-            {/if}
+              <div class="totaltaxAmount"></div>
           </td>
         </tr>
       {/if}
@@ -401,6 +397,8 @@
       else {
         cj("#total_amount").val(allMemberships[memType]['total_amount']);
       }
+
+      cj('.totaltaxAmount').html(allMemberships[memType]['tax_message']);
     }
 
     // show/hide different contact section
