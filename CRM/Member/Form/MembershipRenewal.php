@@ -261,6 +261,19 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $allMembershipInfo = $membershipType = array();
 
+    //CRM-16950
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    $this->assign('taxRates', json_encode($taxRates));
+    $config = CRM_Core_Config::singleton();
+    $this->assign('currency', $config->defaultCurrencySymbol);
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    if (isset($invoicing)) {
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      $this->assign('taxTerm', $taxTerm);
+    }
+    $taxRate = CRM_Utils_Array::value($allMemberships[$defaults['membership_type_id']]['financial_type_id'], $taxRates);
+
     // auto renew options if enabled for the membership
     $options = CRM_Core_SelectValues::memberAutoRenew();
 
@@ -286,12 +299,21 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           }
         }
 
+        //CRM-16950
+        $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
+        if ($taxRate) {
+          $taxAmount = ($taxRate/100) * CRM_Utils_Array::value('minimum_fee', $values);
+          $totalAmount = $totalAmount + $taxAmount;
+          $allMembershipInfo[$key]['tax_amount'] = $taxAmount;
+          $this->assign('taxAmount', $taxAmount);
+        }
+
         // build membership info array, which is used to set the payment information block when
         // membership type is selected.
         $allMembershipInfo[$key] = array(
           'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
-          'total_amount' => CRM_Utils_Money::format($values['minimum_fee'], NULL, '%a'),
-          'total_amount_numeric' => CRM_Utils_Array::value('minimum_fee', $values),
+          'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
+          'total_amount_numeric' => $totalAmount,
         );
 
         if (!empty($values['auto_renew'])) {
@@ -703,6 +725,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $formValues['processPriceSet'] = TRUE;
       }
 
+      //CRM-16950
+      $formValues['tax_amount'] = $this->_params['tax_amount'];
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
         $formValues['contribution_contact_id'] = $this->_contributorContactID;
