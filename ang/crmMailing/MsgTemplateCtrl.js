@@ -33,9 +33,9 @@
     // @return Promise
     $scope.loadTemplate = function loadTemplate(mailing, id) {
       return crmMsgTemplates.get(id).then(function(tpl) {
-        mailing.subject = tpl.values[0].msg_subject;
-        mailing.body_text = tpl.values[0].msg_text;
-        mailing.body_html = tpl.values[0].msg_html;
+        mailing.subject = tpl.msg_subject;
+        mailing.body_text = tpl.msg_text;
+        mailing.body_html = tpl.msg_html;
       });
     };
   });
