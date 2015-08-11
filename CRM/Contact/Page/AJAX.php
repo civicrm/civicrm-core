@@ -222,7 +222,7 @@ class CRM_Contact_Page_AJAX {
   public static function relationship() {
     $relType = CRM_Utils_Request::retrieve('rel_type', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
     $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
-    $relationshipID = CRM_Utils_Array::value('rel_id', $_REQUEST); // this used only to determine add or update mode
+    $relationshipID = CRM_Utils_Request::retrieve('rel_id', 'Positive', CRM_Core_DAO::$_nullObject); // this used only to determine add or update mode
     $caseID = CRM_Utils_Request::retrieve('case_id', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
 
     // check if there are multiple clients for this case, if so then we need create
@@ -308,11 +308,10 @@ class CRM_Contact_Page_AJAX {
     CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain');
     $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
     $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
-
+    $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive', CRM_Core_DAO::$_nullObject);
     CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID);
-    $contactId = CRM_Utils_Array::value('contactId', $_REQUEST);
     if ($contactId) {
-      echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $_REQUEST['groupID'], $contactId);
+      echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroupID, $contactId);
     }
 
     // reset the group contact cache for this group
@@ -325,17 +324,19 @@ class CRM_Contact_Page_AJAX {
    */
   static public function checkUserName() {
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), array('for', 'ts'));
+    $sig = CRM_Utils_Request::retrieve('sig', 'String', CRM_Core_DAO::$_nullObject);
+    $for = CRM_Utils_Request::retrieve('for', 'String', CRM_Core_DAO::$_nullObject);
     if (
       CRM_Utils_Time::getTimeRaw() > $_REQUEST['ts'] + self::CHECK_USERNAME_TTL
-      || $_REQUEST['for'] != 'civicrm/ajax/cmsuser'
-      || !$signer->validate($_REQUEST['sig'], $_REQUEST)
+      || $for != 'civicrm/ajax/cmsuser'
+      || !$signer->validate($sig, $_REQUEST)
     ) {
       $user = array('name' => 'error');
       CRM_Utils_JSON::output($user);
     }
 
     $config = CRM_Core_Config::singleton();
-    $username = trim($_REQUEST['cms_name']);
+    $username = trim(CRM_Utils_Array::value('cms_name', $_REQUEST));
 
     $params = array('name' => $username);
 
@@ -424,8 +425,8 @@ LIMIT {$offset}, {$rowCount}
           // send query to hook to be modified if needed
           CRM_Utils_Hook::contactListQuery($query,
             $name,
-            CRM_Utils_Array::value('context', $_GET),
-            CRM_Utils_Array::value('cid', $_GET)
+            CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject),
+            CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)
           );
 
           $dao = CRM_Core_DAO::executeQuery($query);
@@ -449,8 +450,8 @@ LIMIT {$offset}, {$rowCount}
           // send query to hook to be modified if needed
           CRM_Utils_Hook::contactListQuery($query,
             $name,
-            CRM_Utils_Array::value('context', $_GET),
-            CRM_Utils_Array::value('cid', $_GET)
+            CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject),
+            CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)
           );
 
           $dao = CRM_Core_DAO::executeQuery($query);
@@ -520,8 +521,8 @@ LIMIT {$offset}, {$rowCount}
       // send query to hook to be modified if needed
       CRM_Utils_Hook::contactListQuery($query,
         $name,
-        CRM_Utils_Array::value('context', $_GET),
-        CRM_Utils_Array::value('cid', $_GET)
+        CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject),
+        CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)
       );
 
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -542,7 +543,7 @@ LIMIT {$offset}, {$rowCount}
 
 
   public static function buildSubTypes() {
-    $parent = CRM_Utils_Array::value('parentId', $_REQUEST);
+    $parent = CRM_Utils_Request::retrieve('parentId', 'Positive', CRM_Core_DAO::$_nullObject);
 
     switch ($parent) {
       case 1:
@@ -564,7 +565,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   public static function buildDedupeRules() {
-    $parent = CRM_Utils_Array::value('parentId', $_REQUEST);
+    $parent = CRM_Utils_Request::retrieve('parentId', 'Positive', CRM_Core_DAO::$_nullObject);
 
     switch ($parent) {
       case 1:
@@ -791,7 +792,7 @@ LIMIT {$offset}, {$rowCount}
   }
 
   public static function getAddressDisplay() {
-    $contactId = CRM_Utils_Array::value('contact_id', $_REQUEST);
+    $contactId = CRM_Utils_Request::retrieve('contact_id', 'Positive', CRM_Core_DAO::$_nullObject);
     if (!$contactId) {
       $addressVal["error_message"] = "no contact id found";
     }
