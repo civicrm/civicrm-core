@@ -49,6 +49,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
 
     $this->assign('suppressForm', TRUE);
+    $this->controller->_generateQFKey = FALSE;
   }
 
   public function buildQuickForm() {
