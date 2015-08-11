@@ -386,8 +386,8 @@ SELECT label, value
         }
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
-          $value = $value[$op];
           $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
+          $value = $value[$op];
         }
         else {
           $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
