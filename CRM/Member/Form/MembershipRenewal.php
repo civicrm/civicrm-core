@@ -263,16 +263,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     //CRM-16950
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-    $this->assign('taxRates', json_encode($taxRates));
-    $config = CRM_Core_Config::singleton();
-    $this->assign('currency', $config->defaultCurrencySymbol);
-    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    if (isset($invoicing)) {
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-      $this->assign('taxTerm', $taxTerm);
-    }
     $taxRate = CRM_Utils_Array::value($allMemberships[$defaults['membership_type_id']]['financial_type_id'], $taxRates);
+
+    $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
 
     // auto renew options if enabled for the membership
     $options = CRM_Core_SelectValues::memberAutoRenew();
@@ -300,12 +293,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         }
 
         //CRM-16950
+        $taxAmount = NULL;
         $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
-        if ($taxRate) {
+        if (CRM_Utils_Array::value($values['financial_type_id'], $taxRates)) {
           $taxAmount = ($taxRate/100) * CRM_Utils_Array::value('minimum_fee', $values);
           $totalAmount = $totalAmount + $taxAmount;
-          $allMembershipInfo[$key]['tax_amount'] = $taxAmount;
-          $this->assign('taxAmount', $taxAmount);
         }
 
         // build membership info array, which is used to set the payment information block when
@@ -314,6 +306,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
           'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
           'total_amount_numeric' => $totalAmount,
+          'tax_message' => $taxAmount ? ts("Includes %1 amount of %2", array(1 => CRM_Utils_Array::value('tax_term', $invoiceSettings), 2 => CRM_Utils_Money::format($taxAmount))) : $taxAmount,
         );
 
         if (!empty($values['auto_renew'])) {
