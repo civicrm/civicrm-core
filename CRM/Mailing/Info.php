@@ -119,6 +119,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $civiMails = civicrm_api3('Mailing', 'get', array(
       'is_completed' => 1,
       'mailing_type' => array('IN' => array('standalone', 'winner')),
+      'domain_id' => CRM_Core_Config::domainID(),
       'return' => array('id', 'name', 'scheduled_date'),
       'sequential' => 1,
       'options' => array(
