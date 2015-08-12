@@ -2411,6 +2411,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     if (!empty($groups)) {
       $groupIDs = implode(',', array_keys($groups));
+      $domain_id = CRM_Core_Config::domainID();
 
       // get all the mailings that are in this subset of groups
       $query = "
@@ -2418,7 +2419,7 @@ SELECT    DISTINCT( m.id ) as id
   FROM    civicrm_mailing m
 LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
  WHERE ( ( g.entity_table like 'civicrm_group%' AND g.entity_id IN ( $groupIDs ) )
-    OR   ( g.entity_table IS NULL AND g.entity_id IS NULL ) )
+    OR   ( g.entity_table IS NULL AND g.entity_id IS NULL AND m.domain_id = $domain_id ) )
 ";
       $dao = CRM_Core_DAO::executeQuery($query);
 
