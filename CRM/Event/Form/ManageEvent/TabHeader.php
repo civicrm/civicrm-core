@@ -202,37 +202,12 @@ WHERE      e.id = %1
         $link = "civicrm/event/manage/{$key}";
         $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
 
-        $tabs[$key]['link'] = (isset($value['link']) ? self::url($value['link']) :
+        $tabs[$key]['link'] = (isset($value['link']) ? $value['link'] :
           CRM_Utils_System::url($link, $query));
       }
     }
 
     return $tabs;
-  }
-
-  /**
-   * Parses a link passed via hook_civicrm_tabset formats it so CiviCRM can use it.
-   *
-   * Wraps CRM_Utils_System::url. Allows for passing routes to Angular.
-   *
-   * @param string $url
-   * @return string
-   *   An HTML string containing a link to the given path.
-   */
-  public static function url($url) {
-    $urlParts = parse_url($url);
-    $path = (strpos($urlParts['path'], '/') === 0 ? substr($urlParts['path'], 1) : $urlParts['path']);
-
-    $params = parse_str(CRM_Utils_Array::value('query', $urlParts));
-
-    // PHP doesn't know about URL fragments (i.e, what comes after the #), so
-    // we translate this to a URL param
-    $params['route'] = CRM_Utils_Array::value('fragment', $urlParts);
-
-    // Force the page to load as a snippet. This is being rendered in a tab, after all.
-    $params['snippet'] = CRM_Core_Smarty::PRINT_SNIPPET;
-
-    return CRM_Utils_System::url($path, http_build_query($params));
   }
 
   /**
