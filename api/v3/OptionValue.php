@@ -90,7 +90,7 @@ function _civicrm_api3_option_value_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
   //continue to support component
   $params['component_id']['api.aliases'] = array('component');
-  $params['name']['api.aliases'] = array('label');
+  //  $params['name']['api.aliases'] = array('label');
   $params['option_group_id']['api.required'] = TRUE;
 }
 
