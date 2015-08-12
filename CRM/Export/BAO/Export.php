@@ -1330,7 +1330,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     // early exit for master_id, CRM-12100
     // in the DB it is an ID, but in the export, we retrive the display_name of the master record
-    if ($fieldName == 'master_id') {
+    // also for current_employer, CRM-16939
+    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
       $sqlColumns[$fieldName] = "$fieldName varchar(128)";
       return;
     }
