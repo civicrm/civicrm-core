@@ -114,15 +114,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Get selected membership type from the form values.
    *
-   * @param int $priceSetID
+   * @param array $priceSet
    * @param array $params
    *
    * @return array
    */
-  public static function getSelectedMemberships($priceSetID, $params) {
+  public static function getSelectedMemberships($priceSet, $params) {
     $memTypeSelected = array();
-    $priceFieldIDS = self::getPriceFieldIDs($params);
-    if ($priceSetID && is_array($priceFieldIDS)) {
+    $priceFieldIDS = self::getPriceFieldIDs($params, $priceSet);
+    if (!empty($priceSet) && is_array($priceFieldIDS)) {
       foreach ($priceFieldIDS as $priceFieldId) {
         if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
           $memTypeSelected[$id] = $id;
@@ -139,28 +139,26 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Extract price set fields and values from $params.
    *
    * @param array $params
+   * @param array $priceSet
    *
    * @return array
    */
-  public static function getPriceFieldIDs($params) {
-    $priceFieldIDS = $priceSet = $fieldIds = array();
-    if (isset(self::$priceSet) && is_array(self::$priceSet)) {
-      $priceSet = self::$_priceSet;
-      if (isset($priceSet['fields']) && is_array($priceSet['fields'])) {
-        $fieldIds = array_keys($priceSet['fields']);
-      }
-    }
-    foreach ($fieldIds as $fieldId) {
-      if (!empty($params['price_' . $fieldId])) {
-        if (is_array($params['price_' . $fieldId])) {
-          foreach ($params['price_' . $fieldId] as $priceFldVal => $isSet) {
-            if ($isSet) {
-              $priceFieldIDS[] = $priceFldVal;
+  public static function getPriceFieldIDs($params, $priceSet) {
+    $priceFieldIDS = $fieldIds = array();
+    if (isset($priceSet['fields']) && is_array($priceSet['fields'])) {
+      $fieldIds = array_keys($priceSet['fields']);
+      foreach ($fieldIds as $fieldId) {
+        if (!empty($params['price_' . $fieldId])) {
+          if (is_array($params['price_' . $fieldId])) {
+            foreach ($params['price_' . $fieldId] as $priceFldVal => $isSet) {
+              if ($isSet) {
+                $priceFieldIDS[] = $priceFldVal;
+              }
             }
           }
-        }
-        else {
-          $priceFieldIDS[] = $params['price_' . $fieldId];
+          else {
+            $priceFieldIDS[] = $params['price_' . $fieldId];
+          }
         }
       }
     }
@@ -746,13 +744,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $errors = array();
 
     $priceSetId = CRM_Utils_Array::value('price_set_id', $params);
+    $priceSetDetails = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId);
 
-    $selectedMemberships = self::getSelectedMemberships($priceSetId, $params);
-
+    $selectedMemberships = self::getSelectedMemberships($priceSetDetails[$priceSetId], $params);
     if ($priceSetId) {
       CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $params, $errors);
 
-      $priceFieldIDS = self::getPriceFieldIDs($params, $self);
+      $priceFieldIDS = self::getPriceFieldIDs($params, $priceSetDetails);
 
       if (!empty($priceFieldIDS)) {
         $ids = implode(',', $priceFieldIDS);
@@ -764,21 +762,26 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           }
         }
       }
+      // Return error if empty $self->_memTypeSelected
+      if (empty($errors) && empty($selectedMemberships)) {
+        $errors['_qf_default'] = ts('Select at least one membership option.');
+      }
+      if (!$self->_mode && empty($params['record_contribution'])) {
+        $errors['record_contribution'] = ts('Record Membership Payment is required when you use a price set.');
+      }
     }
-    elseif (empty($params['membership_type_id'][1])) {
-      $errors['membership_type_id'] = ts('Please select a membership type.');
-    }
-
-    if (!$priceSetId) {
+    else {
+      if (empty($params['membership_type_id'][1])) {
+        $errors['membership_type_id'] = ts('Please select a membership type.');
+      }
       $numterms = CRM_Utils_Array::value('num_terms', $params);
       if ($numterms && intval($numterms) != $numterms) {
         $errors['num_terms'] = ts('Please enter an integer for the number of terms.');
       }
-    }
 
-    // Return error if empty $self->_memTypeSelected
-    if ($priceSetId && empty($errors) && empty($selectedMemberships)) {
-      $errors['_qf_default'] = ts('Select at least one membership option.');
+      if ($self->_mode || isset($params['record_contribution']) && empty($params['financial_type_id'])) {
+        $errors['financial_type_id'] = ts('Please enter the financial Type.');
+      }
     }
 
     if (!empty($errors) && (count($selectedMemberships) > 1)) {
@@ -795,13 +798,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return $errors;
     }
 
-    if ($priceSetId && !$self->_mode && empty($params['record_contribution'])) {
-      $errors['record_contribution'] = ts('Record Membership Payment is required when you using price set.');
-    }
-
-    if (!$priceSetId && $self->_mode && empty($params['financial_type_id'])) {
-      $errors['financial_type_id'] = ts('Please enter the financial Type.');
-    }
 
     if (!empty($params['record_contribution']) && empty($params['payment_instrument_id'])) {
       $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
@@ -928,9 +924,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     //total amount condition arise when membership type having no
     //minimum fee
     if (isset($params['record_contribution'])) {
-      if (!$params['financial_type_id']) {
-        $errors['financial_type_id'] = ts('Please enter the financial Type.');
-      }
       if (CRM_Utils_System::isNull($params['total_amount'])) {
         $errors['total_amount'] = ts('Please enter the contribution.');
       }
@@ -1166,7 +1159,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // In form mode these are set in preProcess.
     //TODO: set memberships, fixme
     $this->setContextVariables($formValues);
-    $this->_memTypeSelected = self::getSelectedMemberships($priceSetID, $formValues);
+    $priceSetDetails = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
+    $this->_memTypeSelected = self::getSelectedMemberships(
+      $priceSetDetails[$priceSetID],
+      $formValues
+    );
+    if (empty($formValues['financial_type_id'])) {
+      $formValues['financial_type_id'] = $priceSetDetails[$priceSetID]['financial_type_id'];
+    }
 
     $config = CRM_Core_Config::singleton();
 
