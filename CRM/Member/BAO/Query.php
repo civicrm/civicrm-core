@@ -201,7 +201,8 @@ class CRM_Member_BAO_Query {
       case 'member_status_id':
       case 'member_membership_type_id':
         if (is_array($value)) {
-           $value = array('IN' => array_keys($value));
+          $op = 'IN';
+          $value = array_keys($value);
         }
       case 'membership_status':
       case 'membership_status_id':
