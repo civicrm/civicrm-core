@@ -29,7 +29,7 @@
  * 1. Add failure function in each api call
  * 2. Add Validation mentioned in wiki for create/update call
  * 3. Add code for Update call
- * 4. Change the code to use multiple line items for contribution, membership and participant 
+ * 4. Change the code to use multiple line items for contribution, membership and participant
  */
 /**
  * This api exposes CiviCRM Order records.
@@ -63,8 +63,7 @@ function civicrm_api3_order_create(&$params) {
           $entityParams['skipLineItem'] = TRUE;
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
           $params['contribution_mode'] = $entity;
-          $entityIds[] = $lineItems['line_item']['entity_id'] = 
-            $params[$entity . '_id'] = $entityResult['id'];
+          $entityIds[] = $lineItems['line_item']['entity_id'] = $params[$entity . '_id'] = $entityResult['id'];
         }
         else {
           // pledge payment
@@ -78,7 +77,7 @@ function civicrm_api3_order_create(&$params) {
       }
       $params['line_item'][$priceSetID][$lineItems['line_item']['price_field_id']] = $lineItems['line_item'];
     }
-  }  
+  }
   $contribution = civicrm_api3('Contribution', 'create', $params);
   // add payments
   if ($entity && CRM_Utils_Array::value('id', $contribution)) {
@@ -107,7 +106,7 @@ function civicrm_api3_order_create(&$params) {
  */
 function civicrm_api3_order_delete($params) {
   $result = civicrm_api3('Contribution', 'delete', $params);
-  return civicrm_api3_create_success($result['values'], $params, 'Order', 'delete'); 
+  return civicrm_api3_create_success($result['values'], $params, 'Order', 'delete');
 }
 
 /**
@@ -125,7 +124,7 @@ function civicrm_api3_order_cancel($params) {
   if (!$result['is_error']) {
     CRM_Contribute_BAO_Contribution::transitionComponents($params);
   }
-  return civicrm_api3_create_success($result['values'], $params, 'Order', 'cancel'); 
+  return civicrm_api3_create_success($result['values'], $params, 'Order', 'cancel');
 }
 
 /**
@@ -148,7 +147,7 @@ function civicrm_api3_order_get($params) {
       unset($contributions[$key]['api.line_item.get']);
     }
   }
-  return civicrm_api3_create_success($contributions, $params, 'Order', 'get');  
+  return civicrm_api3_create_success($contributions, $params, 'Order', 'get');
 }
 
 /**
