@@ -1423,9 +1423,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       // if the payment processor returns a contribution_status_id -> use it!
       if (isset($result['contribution_status_id'])) {
-        $params['contribution_status_id'] = $result['contribution_status_id'];
+        $result['payment_status_id'] = $result['contribution_status_id'];
       }
-      elseif (isset($result['payment_status_id'])) {
+      if (isset($result['payment_status_id'])) {
         // CRM-16737 $result['contribution_status_id'] is deprecated in favour
         // of payment_status_id as the payment processor only knows whether the payment is complete
         // not whether payment completes the contribution
@@ -1492,7 +1492,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         if (!empty($softParams) && empty($paymentParams['is_recur'])) {
           $membershipParams['soft_credit'] = $softParams;
         }
-        unset($membershipParams['lineItems']);
+        if (!empty($paymentParams['is_recur']) && CRM_Utils_Array::value('payment_status_id', $result) == 1) {
+          // CRM-16993 we have a situation where line items have already been created.
+          unset($membershipParams['lineItems']);
+        }
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);

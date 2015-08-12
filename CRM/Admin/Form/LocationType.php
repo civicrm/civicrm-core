@@ -76,8 +76,14 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_default', ts('Default?'));
-    if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
-      $this->freeze(array('name', 'description', 'is_active'));
+
+    if ($this->_action & CRM_Core_Action::UPDATE) {
+      if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
+        $this->freeze(array('name', 'description', 'is_active'));
+      }
+      if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_default')) {
+        $this->freeze(array('is_default'));
+      }
     }
   }
 

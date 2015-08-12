@@ -266,21 +266,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
       }
       if (is_object($payment)) {
         $result = $payment->doDirectPayment($paymentParams);
-        if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
-          try {
-            civicrm_api3('contribution', 'completetransaction', array(
-                'id' => $result['contribution']->id,
-                'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-                'is_transactional' => FALSE,
-              )
-            );
-          }
-          catch (CiviCRM_API3_Exception $e) {
-            if ($e->getErrorCode() != 'contribution_completed') {
-              throw new CRM_Core_Exception('Failed to update contribution in database');
-            }
-          }
-        }
       }
       else {
         CRM_Core_Error::fatal($paymentObjError);
