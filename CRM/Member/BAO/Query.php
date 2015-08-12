@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Member_BAO_Query {
 
@@ -46,8 +44,6 @@ class CRM_Member_BAO_Query {
    * If membership are involved, add the specific membership fields
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     // if membership mode add membership id
@@ -201,6 +197,12 @@ class CRM_Member_BAO_Query {
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
+      // CRM-17011 These 2 variants appear in some smart groups saved at some time prior to 4.6.6.
+      case 'member_status_id':
+      case 'member_membership_type_id':
+        if (is_array($value)) {
+           $value = array('IN' => array_keys($value));
+        }
       case 'membership_status':
       case 'membership_status_id':
       case 'membership_type':
