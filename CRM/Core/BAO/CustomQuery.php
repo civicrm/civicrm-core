@@ -349,35 +349,6 @@ SELECT label, value
 
         $isSerialized = CRM_Core_BAO_CustomField::isSerialized($field);
 
-        // Handle multi-select search for any data type
-        if (is_array($value) && !$field['is_search_range'] && $field['data_type'] != 'String') {
-          $wildcard = $isSerialized ? $wildcard : TRUE;
-          $options = CRM_Utils_Array::value('values', civicrm_api3('contact', 'getoptions', array(
-                'field' => $name,
-                'context' => 'search',
-              ), array()));
-          $qillValue = '';
-          $sqlOP = $wildcard ? ' OR ' : ' AND ';
-          $sqlValue = array();
-          foreach ($value as $num => &$v) {
-            $sep = count($value) > (1 + $num) ? ', ' : (' ' . ($wildcard ? ts('OR') : ts('AND')) . ' ');
-            $qillValue .= ($num ? $sep : '') . $options[$v];
-            $v = CRM_Core_DAO::escapeString($v);
-            if ($isSerialized) {
-              $sqlValue[] = "( $fieldName like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $v . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
-            }
-            else {
-              $v = "'$v'";
-            }
-          }
-          if (!$isSerialized) {
-            $sqlValue = array("$fieldName IN (" . implode(',', $value) . ")");
-          }
-          $this->_where[$grouping][] = ' ( ' . implode($sqlOP, $sqlValue) . ' ) ';
-          $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
-          continue;
-        }
-
         // fix $value here to escape sql injection attacks
         $qillValue = NULL;
         if (!is_array($value)) {
@@ -389,15 +360,16 @@ SELECT label, value
           $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
         }
         else {
+          $op = 'IN';
           $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
-          $value = array('IN' => $value);
         }
 
         $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
 
         switch ($field['data_type']) {
           case 'String':
-            $sql = "$fieldName";
+          case 'StateProvince':
+          case 'Country':
 
             if ($field['is_search_range'] && is_array($value)) {
               $this->searchRange($field['id'],
@@ -411,7 +383,12 @@ SELECT label, value
             else {
               // fix $value here to escape sql injection attacks
               if (!is_array($value)) {
-                $value = CRM_Utils_Type::escape($strtolower($value), 'String');
+                if ($field['data_type'] == 'String') {
+                  $value = CRM_Utils_Type::escape($strtolower($value), 'String');
+                }
+                else {
+                  $value = CRM_Utils_Type::escape($value, 'Integer');
+                }
               }
               elseif ($isSerialized) {
                 if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
@@ -436,7 +413,7 @@ SELECT label, value
               }
 
               //FIX for custom data query fired against no value(NULL/NOT NULL)
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($sql, $op, $value, $field['data_type']);
+              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
               $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
             }
             break;
@@ -453,57 +430,51 @@ SELECT label, value
             }
             else {
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-              $this->_qill[$grouping][] = $field['label'] . " $qillOp $value";
+              $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));;
             }
             break;
 
           case 'Boolean':
-            if (strtolower($value) == 'yes' || strtolower($value) == strtolower(ts('Yes'))) {
-              $value = 1;
+            if (!is_array($value)) {
+              if (strtolower($value) == 'yes' || strtolower($value) == strtolower(ts('Yes'))) {
+                $value = 1;
+              }
+              else {
+                $value = (int) $value;
+              }
+              $value = ($value == 1) ? 1 : 0;
+              $qillValue = $value ? 'Yes' : 'No';
             }
-            else {
-              $value = (int) $value;
-            }
-            $value = ($value == 1) ? 1 : 0;
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $value = $value ? ts('Yes') : ts('No');
-            $this->_qill[$grouping][] = $field['label'] . " $qillOp {$value}";
+            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
             break;
 
           case 'Link':
+          case 'Memo':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = $field['label'] . " $qillOp $value";
-            break;
-
-          case 'Float':
-            if ($field['is_search_range'] && is_array($value)) {
-              $this->searchRange($field['id'], $field['label'], $field['data_type'], $fieldName, $value, $grouping);
-            }
-            else {
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Float');
-              $this->_qill[$grouping][] = $field['label'] . " $qillOp {$value}";
-            }
+            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
             break;
 
           case 'Money':
-            if ($field['is_search_range'] && is_array($value)) {
+            if (is_array($value)) {
+              $value = CRM_Utils_Array::value($op, $value, $value);
               foreach ($value as $key => $val) {
                 $moneyFormat = CRM_Utils_Rule::cleanMoney($value[$key]);
                 $value[$key] = $moneyFormat;
               }
+            }
+            else {
+              $value = CRM_Utils_Rule::cleanMoney($value);
+            }
+
+          case 'Float':
+            if ($field['is_search_range']) {
               $this->searchRange($field['id'], $field['label'], $field['data_type'], $fieldName, $value, $grouping);
             }
             else {
-              $moneyFormat = CRM_Utils_Rule::cleanMoney($value);
-              $value = $moneyFormat;
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Float');
-              $this->_qill[$grouping][] = $field['label'] . " {$qillOp} {$value}";
+              $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
             }
-            break;
-
-          case 'Memo':
-            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = "$field[label] $qillOp $value";
             break;
 
           case 'Date':
@@ -548,12 +519,6 @@ SELECT label, value
                 $this->_qill[$grouping][] = $field['label'] . ' <= ' . CRM_Utils_Date::customFormat($toDate);
               }
             }
-            break;
-
-          case 'StateProvince':
-          case 'Country':
-            $this->_where[$grouping][] = "$fieldName {$op} " . CRM_Utils_Type::escape($value, 'Int');
-            $this->_qill[$grouping][] = $field['label'] . " {$qillOp} {$qillValue}";
             break;
 
           case 'File':
