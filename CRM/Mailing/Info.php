@@ -131,11 +131,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'contact_id' => $contactID,
     ));
 
-    // FIXME: Loading the contents of every template into the dom does not scale well
     $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + array(
       'sequential' => 1,
       'is_active' => 1,
-      'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
+      'return' => array("id", "msg_title"),
       'workflow_id' => array('IS NULL' => ""),
     ));
     $mailTokens = civicrm_api3('Mailing', 'gettokens', array(

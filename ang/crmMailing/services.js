@@ -60,18 +60,14 @@
     window.tpls = tpls;
     var lastModifiedTpl = null;
     return {
+      // Get a template
+      // @param id MessageTemplate id  (per APIv3)
       // @return Promise MessageTemplate (per APIv3)
       get: function get(id) {
-        id = '' + id; // parseInt(id);
-        var dfr = $q.defer();
-        var tpl = _.where(tpls, {id: id});
-        if (id && tpl && tpl[0]) {
-          dfr.resolve(tpl[0]);
-        }
-        else {
-          dfr.reject(id);
-        }
-        return dfr.promise;
+        return crmApi('MessageTemplate', 'getsingle', {
+           "return": "id,msg_subject,msg_html,msg_title,msg_text",
+           "id": id
+        });
       },
       // Save a template
       // @param tpl MessageTemplate (per APIv3) For new templates, omit "id"
