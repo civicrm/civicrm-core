@@ -197,14 +197,18 @@ class CRM_Member_BAO_Query {
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
+      // CRM-17011 These 2 variants appear in some smart groups saved at some time prior to 4.6.6.
+      case 'member_status_id':
+      case 'member_membership_type_id':
+        if (is_array($value)) {
+          $op = 'IN';
+          $value = array_keys($value);
+        }
       case 'membership_status':
       case 'membership_status_id':
       case 'membership_type':
       case 'membership_type_id':
       case 'member_id':
-        // CRM-17011 These 2 variants appear in some smart groups saved at some time prior to 4.6.6.
-      case 'member_status_id':
-      case 'member_membership_type_id':
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
           $qillName = 'Membership Status(s)';

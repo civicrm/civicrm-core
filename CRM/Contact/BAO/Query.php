@@ -5205,6 +5205,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
             }
           }
           else {
+            $op = 'IN';
             $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReportUsingOldFormat;
             if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => array_keys($value)), $dataType)) != FALSE) {
               return $queryString;
