@@ -2414,17 +2414,25 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // get all the groups that this user can access
     // if they dont have universal access
-    $groups = CRM_Core_PseudoConstant::group(NULL, FALSE);
+    $groupNames = civicrm_api3('group', 'get', array(
+      'is_active' => 1,
+      'check_permission' => TRUE,
+      'return' => array('title', 'id'),
+      'options' => array('limit' => 0),
+    ));
+    foreach ($groupNames['values'] as $group) {
+      $groups[$group['id']] = $group['title'];
+    }
     if (!empty($groups)) {
       $groupIDs = implode(',', array_keys($groups));
-
+      $domain_id = CRM_Core_Config::domainID();
       // get all the mailings that are in this subset of groups
       $query = "
 SELECT    DISTINCT( m.id ) as id
   FROM    civicrm_mailing m
 LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
  WHERE ( ( g.entity_table like 'civicrm_group%' AND g.entity_id IN ( $groupIDs ) )
-    OR   ( g.entity_table IS NULL AND g.entity_id IS NULL ) )
+    OR   ( g.entity_table IS NULL AND g.entity_id IS NULL AND m.domain_id = $domain_id) )
 ";
       $dao = CRM_Core_DAO::executeQuery($query);
 
