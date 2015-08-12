@@ -90,7 +90,6 @@
     class="form-layout-compressed crm-ajax-table"
     cellspacing="0"
     width="100%"
-    data-length-menu='[[10, 25, 50, 100, 1000, 2000, -1], [10, 25, 50, 100, 1000, 2000, "All"]]',
     data-searching='true',
     data-dom='flrtip',
     data-order='[]',
@@ -108,7 +107,7 @@
         <th data-data="dst_street"   class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
         <th data-data="src_postcode" class="crm-contact">{ts}Postcode{/ts} 1</th>
         <th data-data="dst_postcode" class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th data-data="conflicts"    class="crm-contact-conflicts">{ts}Conflicts{/ts}</th>
+        <th data-data="conflicts"    class="crm-contact-conflicts crm-pair-conflict">{ts}Conflicts{/ts}</th>
         <th data-data="weight"       class="crm-threshold">{ts}Threshold{/ts}</th>
         <th data-data="actions"      class="crm-empty">&nbsp;</th>
       </tr>
@@ -203,9 +202,23 @@
     CRM.$('table#dupePairs').data({
       "ajax": {
         "url": {/literal}'{$sourceUrl}'{literal}
+      },
+      rowCallback: function (row, data) {
+        // Set the checked state of the checkbox in the table
+        $('input.crm-dedupe-select', row).prop('checked', data.is_selected == 1);
+        if (data.is_selected == 1) {
+          $(row).toggleClass('crm-row-selected');
+        }
+        // for action column at the last, set nowrap
+        $('td:last', row).attr('nowrap','nowrap');
+        // for conflcts column
+        $('td.crm-pair-conflict', row).attr('nowrap','nowrap');
       }
     });
     $(function($) {
+      var sourceUrl = {/literal}'{$sourceUrl}'{literal};
+      var context   = {/literal}'{$context}'{literal};
+
       // redraw datatable if searching within selected records
       $('#crm-dedupe-display-selection').on('click', function(){
         reloadUrl = sourceUrl;
@@ -275,7 +288,6 @@
       });
       
       // keep the conflicts checkbox checked when context is "conflicts"
-      var context = {/literal}'{$context}'{literal};
       if(context == 'conflicts') {
         $('#conflicts').attr('checked', true);  
         var column = table.column( $('#conflicts').attr('data-column-main') );
