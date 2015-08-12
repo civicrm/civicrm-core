@@ -83,3 +83,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_status_pref` (
 
 ,          CONSTRAINT FK_civicrm_status_pref_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
+
+-- CRM-17005
+UPDATE civicrm_country SET name = 'PALESTINIAN TERRITORY' WHERE name = 'PALESTINIAN TERRITORY, OCCUPIED';
