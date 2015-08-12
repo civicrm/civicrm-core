@@ -69,7 +69,7 @@ function civicrm_api3_order_create(&$params) {
           // pledge payment
         }
       }
-      if (empty($priceSetID)) {    
+      if (empty($priceSetID)) {
         $priceSetID = civicrm_api3('PriceField', 'getvalue', array(
           'return' => 'price_set_id',
           'id' => $lineItems['line_item']['price_field_id'],
