@@ -132,9 +132,9 @@ class Modules extends \CRM_Core_Page {
   public function send($type, $data) {
     // Encourage browsers to cache for a long time - 1 year
     $ttl = 60 * 60 * 24 * 364;
-    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
-    header("Content-Type:	$type");
-    header("Cache-Control: max-age=$ttl, public");
+    \CRM_Utils_System::setHttpHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
+    \CRM_Utils_System::setHttpHeader("Content-Type",	$type);
+    \CRM_Utils_System::setHttpHeader("Cache-Control", "max-age=$ttl, public");
     echo $data;
   }
 
