@@ -264,11 +264,13 @@ class CRM_Contribute_BAO_Contribution_Utils {
           $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
         }
       }
-      if (is_object($payment)) {
-        $result = $payment->doDirectPayment($paymentParams);
-      }
-      else {
-        CRM_Core_Error::fatal($paymentObjError);
+      if ($form->_amount > 0.0) {
+        if (is_object($payment)) {
+          $result = $payment->doDirectPayment($paymentParams);
+        }
+        else {
+          CRM_Core_Error::fatal($paymentObjError);
+        }
       }
     }
 
