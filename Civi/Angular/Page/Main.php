@@ -109,9 +109,12 @@ class Main extends \CRM_Core_Page {
       }
     }
 
-    // Set the location hash so that Angular knows which page it is trying to load.
-    $route = \CRM_Utils_Request::retrieve('route', 'String');
-    $this->assign("route", $route);
+    // If trying to load an Angular page via AJAX, the route must be passed as a
+    // URL parameter, since PHP doesn't know about URL fragments (i.e, what
+    // comes after the #).
+    \CRM_Core_Resources::singleton()->addSetting(array(
+      'angularRoute' => \CRM_Utils_Request::retrieve('route', 'String'),
+    ));
   }
 
 }
