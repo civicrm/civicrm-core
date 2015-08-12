@@ -412,8 +412,6 @@
       payment_options.hide();
       payment_processor.hide();
       payment_information.hide();
-      // also unset selected payment methods
-      cj('input[name="payment_processor"]').removeProp('checked');
     }
     else {
       payment_options.show();

@@ -160,7 +160,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
 
-      if ($form->_contributeMode) {
+      if ($form->_contributeMode && $form->_amount > 0.0) {
         try {
           $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
           if ($form->_contributeMode == 'notify') {

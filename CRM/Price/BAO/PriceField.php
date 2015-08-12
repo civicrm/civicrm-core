@@ -401,6 +401,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             'price' => json_encode(array($elementName, $priceVal)),
             'data-amount' => $opt[$valueFieldName],
             'data-currency' => $currencyName,
+            'data-price-field-values' => json_encode($customOption),
           );
           if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
@@ -506,7 +507,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             '' => ts('- select -'),
           ) + $selectOption,
           $useRequired && $field->is_required,
-          array('price' => json_encode($priceVal), 'class' => 'crm-select2')
+          array('price' => json_encode($priceVal), 'class' => 'crm-select2', 'data-price-field-values' => json_encode($customOption))
         );
 
         // CRM-6902 - Add "max" option for a price set field
