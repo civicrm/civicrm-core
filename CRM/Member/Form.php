@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -71,6 +69,20 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @var array
    */
   protected $membershipTypeRenewalStatus = array();
+
+  /**
+   * Price set ID configured for the form.
+   *
+   * @var int
+   */
+  public $_priceSetId;
+
+  /**
+   * Price set details as an array.
+   *
+   * @var array
+   */
+  public $_priceSet;
 
   public function preProcess() {
     // Check for edit permission.
