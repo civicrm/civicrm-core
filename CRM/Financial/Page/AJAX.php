@@ -106,7 +106,8 @@ class CRM_Financial_Page_AJAX {
         '3' => array(1, 9), //revenue
         '4' => array(7), //cost of sales
       );
-      $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $_GET['_value'], 'financial_account_type_id');
+      $financialAccountId = CRM_Utils_Request::retrieve('_value', 'Positive', CRM_Core_DAO::$_nullObject);
+      $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountId, 'financial_account_type_id');
       $result = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
     }
 
@@ -151,8 +152,8 @@ class CRM_Financial_Page_AJAX {
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
     }
-
-    $elements = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Product', $_GET['_value'], 'financial_type_id');
+    $productId = CRM_Utils_Request::retrieve('_value', 'Positive', CRM_Core_DAO::$_nullObject);
+    $elements = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Product', $productId, 'financial_type_id');
     CRM_Utils_JSON::output($elements);
   }
 
@@ -169,7 +170,7 @@ class CRM_Financial_Page_AJAX {
       }
     }
 
-    $entityID  = CRM_Utils_Array::value('entityID', $_POST);
+    $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $methods = array(
       'assign' => 'addBatchEntity',
       'remove' => 'removeBatchEntity',
