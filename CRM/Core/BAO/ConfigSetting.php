@@ -356,10 +356,12 @@ class CRM_Core_BAO_ConfigSetting {
       if (!empty($enableComponents)) {
         $defaults['enableComponents'] = $enableComponents;
 
-        $components = CRM_Core_Component::getComponents();
+        // Lookup component IDs. Note: Do *not* instantiate components.
+        // Classloading may not be fully setup yet.
+        $components = CRM_Core_Component::getComponentIDs();
         $enabledComponentIDs = array();
         foreach ($defaults['enableComponents'] as $name) {
-          $enabledComponentIDs[] = $components[$name]->componentID;
+          $enabledComponentIDs[] = $components[$name];
         }
         $defaults['enableComponentIDs'] = $enabledComponentIDs;
       }

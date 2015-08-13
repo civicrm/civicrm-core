@@ -113,6 +113,23 @@ class CRM_Core_Component {
   }
 
   /**
+   * @return array
+   *   Array(string $name => int $id).
+   */
+  public static function &getComponentIDs() {
+    $componentIDs = array();
+
+    $cr = new CRM_Core_DAO_Component();
+    $cr->find(FALSE);
+    while ($cr->fetch()) {
+      $componentIDs[$cr->name] = $cr->id;
+    }
+
+    return $componentIDs;
+  }
+
+
+  /**
    * @param bool $force
    *
    * @return array|null
