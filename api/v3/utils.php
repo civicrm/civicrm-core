@@ -515,7 +515,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
 
   // default fields
   foreach (array_keys($return) as $field_name) {
-    if (!empty($uniqueAliases[$field_name]) && substr($field_name, 0, 7) != 'custom_') {
+    if (!empty($uniqueAliases[$field_name]) && (CRM_Core_BAO_CustomField::getKeyID($field_name) == FALSE)) {
       // 'a.' is an alias for the entity table.
       $select_fields["a.{$uniqueAliases[$field_name]}"] = $uniqueAliases[$field_name];
     }
