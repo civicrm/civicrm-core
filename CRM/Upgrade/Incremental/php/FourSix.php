@@ -251,7 +251,7 @@ class CRM_Upgrade_Incremental_php_FourSix {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('domainID', CRM_Core_Config::domainID());
 
-    $fileName = "CRM/Upgrade/Incremental/sql/$rev.mysql.tpl";
+    $fileName = dirname(__DIR__) . "/sql/$rev.mysql.tpl";
 
     $upgrade->source($smarty->fetch($fileName), TRUE);
 
