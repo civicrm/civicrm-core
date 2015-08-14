@@ -282,9 +282,6 @@ class CRM_Utils_Mail_Incoming {
       ));
     }
 
-    require_once 'ezc/Base/src/ezc_bootstrap.php';
-    require_once 'ezc/autoload/mail_autoload.php';
-
     // explode email to digestable format
     $set = new ezcMailFileSet(array($file));
     $parser = new ezcMailParser();
