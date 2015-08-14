@@ -144,9 +144,13 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $fromAddress = civicrm_api3('OptionValue', 'get', $params + array(
       'option_group_id' => "from_email_address",
     ));
+    $prevemUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'prevem_url');
     CRM_Core_Resources::singleton()
       ->addSetting(array(
         'crmMailing' => array(
+          'prevemUrl' => !empty($prevemUrl) ? CRM_Utils_URL::mask($prevemUrl, array('user','pass')) : NULL,
+          'prevemConsumer' => parse_url($prevemUrl, PHP_URL_USER),
+          'prevemSecret' => parse_url($prevemUrl, PHP_URL_PASS),
           'civiMails' => $civiMails['values'],
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
           'groupNames' => $groupNames['values'],
