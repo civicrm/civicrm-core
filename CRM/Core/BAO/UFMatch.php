@@ -101,8 +101,11 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     //check do we have logged in user.
     $isUserLoggedIn = CRM_Utils_System::isUserLoggedIn();
 
+    //CRM-16508 make sure we are not in registration or contribution workflow before reseting the session
+    $qfKey = CRM_Utils_Array::value('qfKey', $_REQUEST);
+
     // reset the session if we are a different user
-    if ($ufID && $ufID != $userSystemID) {
+    if ($ufID && $ufID != $userSystemID && empty($qfKey)) {
       $session->reset();
 
       //get logged in user ids, and set to session.
