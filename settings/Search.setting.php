@@ -94,4 +94,22 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
+  'includeOrderByClause' => array(
+    'group_name' => 'Search Preferences',
+    'group' => 'Search Preferences',
+    'name' => 'includeOrderByClause',
+    'prefetch' => 1,
+    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'config_only' => 1,
+    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.6',
+    'title' => 'Include Order By Clause',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'If disabled, the search results will not be ordered. This may improve response time on search results on large datasets',
+    'help_text' => NULL,
+  ),
 );
