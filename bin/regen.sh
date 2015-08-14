@@ -46,10 +46,12 @@ php GenerateData.php
 cd $CIVISOURCEDIR
 "$PHP5PATH"php bin/cli.php -e System -a flush --triggers 1 --session 1
 
-$MYSQLCMD -e "DROP TABLE zipcodes; UPDATE civicrm_domain SET config_backend = NULL; UPDATE civicrm_setting SET value = NULL WHERE name = 'userFrameworkResourceURL'  OR name = 'imageUploadURL';"
+$MYSQLCMD -e "DROP TABLE zipcodes; UPDATE civicrm_domain SET config_backend = NULL; DELETE FROM civicrm_extension; DELETE FROM civicrm_cache; UPDATE civicrm_setting SET value = NULL WHERE group_name IN ('Directory Preferences','URL Preferences');"
+TABLENAMES=$( echo "show tables like 'civicrm_%'" | $MYSQLCMD | grep ^civicrm_ | xargs )
 
 cd $CIVISOURCEDIR/sql
-$MYSQLDUMP -cent --skip-triggers $DBNAME > civicrm_generated.mysql
+
+$MYSQLDUMP -cent --skip-triggers $DBNAME $TABLENAMES > civicrm_generated.mysql
 #cat civicrm_sample_report.mysql >> civicrm_generated.mysql
 cat civicrm_sample_custom_data.mysql >> civicrm_generated.mysql
 #cat civicrm_devel_config.mysql >> civicrm_generated.mysql
