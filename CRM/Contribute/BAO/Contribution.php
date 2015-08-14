@@ -4120,7 +4120,7 @@ WHERE con.id = {$contributionId}
     );
 
     $contributionParams = array_merge(array(
-      'contribution_status_id' => 'Completed',      
+      'contribution_status_id' => 'Completed',
       'financial_type_id' => $contribution->financial_type_id,
     ), array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
