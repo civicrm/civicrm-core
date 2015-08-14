@@ -48,7 +48,8 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
   static $_tokens = array(
     'crmurl' => array(
       'configbackend' => 'civicrm/admin/configtask',
-    ));
+    ),
+  );
 
   /**
    * Get the final, usable URL string (after interpolating any variables)
@@ -132,12 +133,12 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
 
   /**
    * @param array $tokensList
-   * @param String $str
+   * @param string $str
    *
    */
   public function replaceLinkToken($tokensList, &$str) {
-    foreach($tokensList as $categories => $tokens) {
-      foreach($tokens as $token){
+    foreach ($tokensList as $categories => $tokens) {
+      foreach ($tokens as $token) {
         $value = '';
         if (!empty(self::$_tokens[$categories][$token])) {
           $value = self::$_tokens[$categories][$token];
