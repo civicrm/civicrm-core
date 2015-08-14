@@ -49,6 +49,9 @@ function civicrm_api3_contribution_create(&$params) {
   if (empty($params['id'])) {
     $op = 'add';
   }
+  else {
+    $op = 'edit';
+  }
   CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
   if (!in_array($params['financial_type_id'], array_keys($types))) {
     return civicrm_api3_create_error('You do not have permission to create this contribution');
