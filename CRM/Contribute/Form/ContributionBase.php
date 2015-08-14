@@ -710,7 +710,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $fields = array_diff_key($fields, $fieldsToIgnore);
           CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'), ts('Warning'), 'alert');
         }
-
+        drupal_set_message(json_encode(array_diff_assoc($fields, $this->_fields)));
         $fields = array_diff_assoc($fields, $this->_fields);
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);

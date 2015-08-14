@@ -2015,7 +2015,7 @@ FROM   civicrm_membership_type
       }
     }
     $dao->free();
-
+dpm(debug_backtrace());
     CRM_Utils_Hook::membershipTypeValues($form, $membershipTypeValues);
 
     if (is_numeric($membershipTypeID) &&
