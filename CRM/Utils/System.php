@@ -736,7 +736,7 @@ class CRM_Utils_System {
    *
    * @return array
    */
-  public static function parsePHPModules() {
+  private static function parsePHPModules() {
     ob_start();
     phpinfo(INFO_MODULES);
     $s = ob_get_contents();
