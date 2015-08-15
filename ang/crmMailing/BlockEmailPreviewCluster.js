@@ -12,96 +12,131 @@
         scope.crmMailingConst = CRM.crmMailing;
         scope.ts = CRM.ts(null);
         scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
-        scope.testContact = {email: CRM.crmMailing.defaultTestEmail};
-        scope.testGroup = {gid: null};
-        scope.yahooURL = 'javascript:';
-        scope.renderingDone = false;
+        scope.gmail = 0;
+        scope.yahoo = 0;
+        scope.iconClass = {
+          "gmail" : "fadedIcon",
+          "yahoo" : "fadedIcon"
+        }
+        scope.prevemURL = CRM.crmMailing.prevemUrl;
+        scope.consumerId = CRM.crmMailing.prevemConsumer;
+        
+        var clientIconURL = {
+          "gmail" : "http://www.socialtalent.co/wp-content/uploads/2015/07/Gmail-Logo.png",
+          "yahoo" : "https://lh6.ggpht.com/yzhSae3SIKlwv9lBzpCWaexNKgpLHXvwnxyEE7_oW3SdMv604v-YtUcQnGCyAUpX1lcm=w300"
+        }
 
-        scope.requestPreview = function requestPreview(renderers) {
+        scope.initialCheck = function initialCheck() {
+          var batchId = scope.consumerId + ':' + scope.mailing.id;
+          var checkURL = scope.prevemURL + '/api/PreviewBatches?filter=%7B%22where%22%3A%7B%22batchId%22%20%3A%20%22'+batchId+'%22%7D%7D'
+          var statusURL = scope.prevemURL + '/api/PreviewBatches/status?batchId='
+          $http.get(checkURL)
+            .success(function(data, status, headers, config){
+              /*called for result & error because 200 status*/    
+              if (data[0] != undefined){
+                //handle success here
+                scope.requested = true;
+                data[0].renderers.forEach(function(entry) {
+                  scope[entry + 'Show'] = true;
+                })
+                scope.Interval = setInterval( function(){
+                  scope.checkStatus(scope.mailing, statusURL);
+                }, 5000);
+              } else if (data.error) {
+                //handle error here
+                console.log(data.error)
+              }
+            })
+          .error(function(data, status, headers, config){
+              /*handle non 200 statuses*/
+              console.log(data);
+          });
+        }
+
+        scope.initialCheck();
+
+        scope.openPreviewImage = function openPreviewImage(mailing, clientName) {
+          if (scope[clientName] === 0) {
+            CRM.alert(ts('The screenshot for %1 is still being prepared. Try again in a minute.', {1: clientName}));
+          }
+          else {
+            window.open(scope[clientName]);
+          }
+        }
+
+        scope.getClientIcon = function getClientIcon(clientName) {
+          return clientIconURL[clientName];
+        }
+
+        scope.requestPreview = function requestPreview(mailing, renderers) {
           scope.$eval(attr.onRequest);
           scope.requested= true;
-          if (renderers.gmail) {
-            scope.gmailShow = true;
+          for (var clientName in renderers) {
+            if (renderers[clientName]) {
+              scope[clientName + 'Show'] = true;
+            }
+            else {
+              scope[clientName + 'Show'] =false
+            }
           }
-          else {
-            scope.gmailShow = false;
-          }
-          if (renderers.yahoo) {
-            scope.yahooShow = true;
-          }
-          else {
-            scope.yahooShow = false;
-          }
-          var statusURL = 'http://0.0.0.0:3000/api/PreviewBatches/status?batchId='
-          var batchId = 1234;
-          var Interval;
-          Interval = setInterval( function(){
-            checkStatus(statusURL);
+
+          var statusURL = scope.prevemURL + '/api/PreviewBatches/status?batchId='
+          var batchId = scope.consumerId + ':' + mailing.id;
+          scope.Interval = setInterval( function(){
+            scope.checkStatus(mailing, statusURL);
           }, 5000);
-          function checkStatus(statusURL) {
-            $http.get(statusURL+batchId)
-                .success(function(data, status, headers, config){
-                /*called for result & error because 200 status*/
-                //console.log(data)    
-                if (data.response){
-                    //handle success here
-                    //console.log(data.response.finished)
-                    if (data.response.finished == 1){
-                      clearInterval(Interval);
-                      //console.log("done")
-                      scope.yahooURL = data.response.yahoo;
-                      console.log(scope.yahooURL);
-                      scope.renderingDone = true;
-                    }
-                } else if (data.error) {
-                    //handle error here
-                    console.log(status)
+        };
+
+        scope.checkStatus = function checkStatus(mailing, statusURL) {
+          var batchId = scope.consumerId + ':' + mailing.id;
+          $http.get(statusURL+batchId)
+            .success(function(data, status, headers, config){
+              /*called for result & error because 200 status*/    
+              if (data.response){
+                //handle success here
+                for (var clientName in data.response) {
+                  if (data.response[clientName] != 0 && data.response[clientName] != 2 && data.response[clientName] != null) {
+                    scope[clientName] = data.response[clientName];
+                    scope.iconClass[clientName] = "clearIcon";
+                  }
                 }
-              })
+                if (data.response.finished == 1){
+                  clearInterval(scope.Interval);
+                }
+              } else if (data.error) {
+                //handle error here
+                console.log(status);
+                console.log(data.error);
+              }
+            })
+          .error(function(data, status, headers, config){
+              /*handle non 200 statuses*/
+              console.log(data);
+          });
+        }
+
+        scope.cancelBatch = function cancelBatch(mailing) {
+          scope.requested= false;
+          var deleteURL = scope.prevemURL + '/api/PreviewBatches/'
+          var batchId = scope.consumerId + ':' + mailing.id;
+          $http.delete(deleteURL+batchId)
+            .success(function(data, status, headers, config){
+              /*called for result & error because 200 status*/
+              console.log(status)    
+              if (data.result){
+                //handle success here
+                console.log(data.result)
+              } else if (data.error) {
+                //handle error here
+                console.log(status)
+              }
+            })
             .error(function(data, status, headers, config){
                 /*handle non 200 statuses*/
                 console.log(data);
-            });
-          }
-        };
-        scope.cancelBatch = function cancelBatch() {
-          scope.requested= false;
-          console.log("hello");
-          console.log(scope.yahooURL);
+            })
         };
 
-        scope.previewTestGroup = function(e) {
-          var $dialog = $(this);
-          $dialog.html('<div class="crm-loading-element"></div>').parent().find('button[data-op=yes]').prop('disabled', true);
-          $dialog.dialog('option', 'title', ts('Send to %1', {1: _.pluck(_.where(scope.crmMailingConst.groupNames, {id: scope.testGroup.gid}), 'title')[0]}));
-          CRM.api3('contact', 'get', {
-            group: scope.testGroup.gid,
-            options: {limit: 0},
-            return: 'display_name,email'
-          }).done(function(data) {
-            var count = 0,
-            // Fixme: should this be in a template?
-              markup = '<ol>';
-            _.each(data.values, function(row) {
-              // Fixme: contact api doesn't seem capable of filtering out contacts with no email, so we're doing it client-side
-              if (row.email) {
-                count++;
-                markup += '<li>' + row.display_name + ' - ' + row.email + '</li>';
-              }
-            });
-            markup += '</ol>';
-            markup = '<h4>' + ts('A test message will be sent to %1 people:', {1: count}) + '</h4>' + markup;
-            if (!count) {
-              markup = '<div class="messages status"><div class="icon ui-icon-alert"></div> ' +
-              (data.count ? ts('None of the contacts in this group have an email address.') : ts('Group is empty.')) +
-              '</div>';
-            }
-            $dialog
-              .html(markup)
-              .trigger('crmLoad')
-              .parent().find('button[data-op=yes]').prop('disabled', !count);
-          });
-        };
       }
     };
   });

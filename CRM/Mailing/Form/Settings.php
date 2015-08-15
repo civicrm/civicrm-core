@@ -120,12 +120,6 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
     $this->add('checkbox', 'open_tracking', ts('Track Opens?'));
     $defaults['open_tracking'] = TRUE;
 
-    $this->add('checkbox', 'gmail_preview', ts('Get a preview from Gmail?'));
-    $defaults['gmail_preview'] = TRUE;
-
-    $this->add('checkbox', 'yahoo_preview', ts('Get a preview from YahooMail?'));
-    $defaults['yahoo_preview'] = TRUE;
-
     $this->add('checkbox', 'auto_responder', ts('Auto-respond to Replies?'));
     $defaults['auto_responder'] = FALSE;
 
@@ -180,7 +174,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
     $params['created_id'] = $session->get('userID');
 
     $uploadParams = array('reply_id', 'unsubscribe_id', 'optout_id', 'resubscribe_id');
-    $uploadParamsBoolean = array('override_verp', 'forward_replies', 'url_tracking', 'open_tracking', 'auto_responder', 'gmail_preview', 'yahoo_preview');
+    $uploadParamsBoolean = array('override_verp', 'forward_replies', 'url_tracking', 'open_tracking', 'auto_responder');
 
     $qf_Settings_submit = $this->controller->exportValue($this->_name, '_qf_Settings_submit');
 

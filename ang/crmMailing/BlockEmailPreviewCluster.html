@@ -5,7 +5,7 @@ Required vars: mailing
 <!--
 Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
 -->
-<div class="crmMailing-email-preview-cluster">
+<div id="EmailPreviewCluster" class="crmMailing-email-preview-cluster">
 	<div class="crm-block" ng-form="subform" ng-show="!requested" crm-ui-id-scope>
       {{ts('Select Email Services to fetch a preview for:')}}
 	  <div class="crm-group">
@@ -16,17 +16,18 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
 	      <input crm-ui-id="subform.yahoo_preview" name="yahoo_preview" type="checkbox" ng-model="mailing.renderers.yahoo" ng-true-value="1" ng-false-value="0" />
 	    </div>
 	  </div>
-    <button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid || !(mailing.renderers.gmail|| mailing.renderers.yahoo)" ng-click="requestPreview(mailing.renderers)">{{ts('Request Preview')}}</button>
+    <button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid || !(mailing.renderers.gmail|| mailing.renderers.yahoo)" ng-click="requestPreview(mailing, mailing.renderers)">{{ts('Request Preview')}}</button>
 	<a crm-ui-help="hs({id: 'test', title: ts('Test Email')})"></a>
 	</div>
 	<div class="crm-block" ng-form="subform" ng-hide="!requested" crm-ui-id-scope>
 		<div align="center">
-			<a ng-href="{{yahooURL}}" ng-disabled="!renderingDone">
-			<img ng-show="gmailShow" src="http://www.socialtalent.co/wp-content/uploads/2015/07/Gmail-Logo.png" width="130" height="100">
-			<img hspace="50" ng-show="yahooShow" src="https://lh6.ggpht.com/yzhSae3SIKlwv9lBzpCWaexNKgpLHXvwnxyEE7_oW3SdMv604v-YtUcQnGCyAUpX1lcm=w300" width="130" height="100"></a>
+			<a ng-click="openPreviewImage(mailing, 'gmail')">
+				<img class ="{{iconClass.gmail}}" ng-show="gmailShow" src="{{getClientIcon('gmail')}}" width="130" height="100"></a>
+			<a ng-click="openPreviewImage(mailing, 'yahoo')">
+				<img class ="{{iconClass.yahoo}}" hspace="50" ng-show="yahooShow" src="{{getClientIcon('yahoo')}}" width="130" height="100"></a>
 		</div>
 		<div>
-	  	<button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid" crm-confirm="{resizable: true, width: '40%', height: '40%'}" on-yes="cancelBatch()">{{ts('Cancel')}}</button>
+	  	<button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid" crm-confirm="{resizable: true, width: '40%', height: '40%'}" on-yes="cancelBatch(mailing)">{{ts('Cancel')}}</button>
 	  	</div>
   	</div>
 	<div class="clear"></div>
