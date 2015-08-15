@@ -45,8 +45,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function _populateOptionAndCustomGroup() {
     $dataValues = array(
-      'integer' => array(1,2,3),
-      'number' => array(10.11,20.22,30.33),
+      'integer' => array(1, 2, 3),
+      'number' => array(10.11, 20.22, 30.33),
       'string' => array(substr(sha1(rand()), 0, 4), substr(sha1(rand()), 0, 3), substr(sha1(rand()), 0, 2)),
       'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
       'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
@@ -155,7 +155,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Contact', 'create', $params);
     $contactId = $result['id'];
 
-    $count = rand(1,2);
+    $count = rand(1, 2);
     $seperator = CRM_Core_DAO::VALUE_SEPARATOR;
     if ($isSerialized) {
       $selectedValue = $this->optionGroup[$type]['values'];
@@ -175,14 +175,14 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       $notselectedValue = $this->optionGroup[$type]['values'][$count];
     }
 
-    $params = array('entity_id' => $contactId, 'custom_' . $customId  => $selectedValue);
+    $params = array('entity_id' => $contactId, 'custom_' . $customId => $selectedValue);
     $this->callAPISuccess('CustomValue', 'create', $params);
 
     foreach ($sqlOps as $op) {
       $description = "Find Contact whose $customField[label] $op $notselectedValue";
       switch ($op) {
         case '!=':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => $notselectedValue)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)), __FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
 
@@ -195,23 +195,23 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man2@yahoo.com'));
           $contactId2 = $result['id'];
           $lesserSelectedValue = $type == 'date' ? date('Ymd', strtotime('- 1 day')) : $selectedValue - 1;
-          $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId2, 'custom_' . $customId  => $lesserSelectedValue));
+          $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId2, 'custom_' . $customId => $lesserSelectedValue));
 
           if ($op == '>') {
-            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => $lesserSelectedValue)), __FUNCTION__, __FILE__, $description);
+            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $lesserSelectedValue)), __FUNCTION__, __FILE__, $description);
             $this->assertEquals($contactId, $result['id']);
           }
           elseif ($op == '<') {
-            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => $selectedValue)), __FUNCTION__, __FILE__, $description);
+            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)), __FUNCTION__, __FILE__, $description);
             $this->assertEquals($contactId2, $result['id']);
           }
           else {
             $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man3@yahoo.com'));
             $contactId3 = $result['id'];
             $greaterSelectedValue = $type == 'date' ? date('Ymd', strtotime('+ 1 day')) : $selectedValue + 1;
-            $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId3, 'custom_' . $customId  => $greaterSelectedValue));
+            $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId3, 'custom_' . $customId => $greaterSelectedValue));
 
-            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => $selectedValue)), __FUNCTION__, __FILE__, $description);
+            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)), __FUNCTION__, __FILE__, $description);
 
             $this->assertEquals($contactId, $result['values'][$contactId]['id']);
             if ($op == '>=') {
@@ -227,27 +227,22 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           break;
 
         case 'IN':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => (array) $selectedValue)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => (array) $selectedValue)), __FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         case 'NOT IN':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => (array) $notselectedValue)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => (array) $notselectedValue)), __FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         case 'LIKE':
-          $result = $this->callAPIAndDocument('Contact', 'Get',
-            array('custom_' . $customId  =>
-              array($op => (is_array($selectedValue) ? "%" . $selectedValue[0] . "%" : $selectedValue)
-              )),
-           __FUNCTION__, __FILE__, $description
-          );
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => (is_array($selectedValue) ? "%" . $selectedValue[0] . "%" : $selectedValue),),), __FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         case 'NOT LIKE':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => $notselectedValue)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)), __FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
 
@@ -257,19 +252,18 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           break;
 
         case 'IS NOT NULL':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => 1)),__FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => 1)),__FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         default:
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => (is_array($selectedValue) ? implode($seperator, $selectedValue) : $selectedValue)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => (is_array($selectedValue) ? implode($seperator, $selectedValue) : $selectedValue)), __FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
       }
     }
 
     $this->callAPISuccess('Contact', 'delete', array('id' => $contactId));
-    //$this->callAPISuccess('CustomField', 'delete', array('id' => $customId));
   }
 
 }
