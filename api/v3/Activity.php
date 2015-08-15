@@ -254,7 +254,7 @@ function civicrm_api3_activity_get($params) {
       if (!empty($params[$activityContactName])) {
         $extraSql['join'][] = array(
           'activity_' . $activityContactName => '
-          LEFT JOIN civicrm_activity_contact ac ON a.id = ac.activity_id AND ac.record_type_id = ' . $activityContactValue,
+          LEFT JOIN civicrm_activity_contact ac ON a.id = ac.activity_id AND ac.record_type_id = ' . (int) $activityContactValue,
         );
         // Note that if we later need to change the int to an array we would need sql escaping.
         $extraSql['where'] = array('activity_' . $activityContactName => 'ac.contact_id = ' . (int) $params[$activityContactName]);
