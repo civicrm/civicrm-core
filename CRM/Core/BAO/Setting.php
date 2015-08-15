@@ -170,13 +170,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $contactID = NULL,
     $domainID = NULL
   ) {
-    if (self::isUpgradeFromPreFourOneAlpha1()) {
-      // civicrm_setting table is not going to be present. For now we'll just
-      // return a dummy object
-      $dao = new CRM_Core_DAO_Domain();
-      $dao->id = -1; // so ->find() doesn't fetch any data later on
-      return $dao;
-    }
     $dao = new CRM_Core_DAO_Setting();
 
     $dao->group_name = $group;
@@ -961,10 +954,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @param int $domainID
    */
   public static function fixAndStoreDirAndURL(&$params, $domainID = NULL) {
-    if (self::isUpgradeFromPreFourOneAlpha1()) {
-      return;
-    }
-
     if (empty($domainID)) {
       $domainID = CRM_Core_Config::domainID();
     }
@@ -1055,9 +1044,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       if ($isJoomla) {
         $params['userFrameworkResourceURL'] = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/') . str_replace('administrator', '', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'userFrameworkResourceURL', 'value', 'name'));
       }
-      if (self::isUpgradeFromPreFourOneAlpha1()) {
-        return;
-      }
     }
 
     if ($setInConfig) {
@@ -1137,21 +1123,6 @@ AND domain_id = %3
     else {
       return $default;
     }
-  }
-
-  /**
-   * Civicrm_setting didn't exist before 4.1.alpha1 and this function helps taking decisions during upgrade
-   *
-   * @return bool
-   */
-  public static function isUpgradeFromPreFourOneAlpha1() {
-    if (CRM_Core_Config::isUpgradeMode()) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-      if (version_compare($currentVer, '4.1.alpha1') < 0) {
-        return TRUE;
-      }
-    }
-    return FALSE;
   }
 
 }
