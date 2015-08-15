@@ -127,4 +127,19 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($data, array('six' => 6));
   }
 
+  public function testGetSetPathParts() {
+    $arr = array(
+      'one' => '1',
+      'two' => array(
+        'half' => 2,
+      ),
+    );
+    $this->assertEquals('1', CRM_Utils_Array::pathGet($arr, array('one')));
+    $this->assertEquals('2', CRM_Utils_Array::pathGet($arr, array('two', 'half')));
+    $this->assertEquals(NULL, CRM_Utils_Array::pathGet($arr, array('zoo', 'half')));
+    CRM_Utils_Array::pathSet($arr, array('zoo', 'half'), '3');
+    $this->assertEquals(3, CRM_Utils_Array::pathGet($arr, array('zoo', 'half')));
+    $this->assertEquals(3, $arr['zoo']['half']);
+  }
+
 }

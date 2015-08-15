@@ -80,12 +80,47 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('SELECT * FROM foo bar', $select->toSQL());
   }
 
+  public function testModeOutput() {
+    $select = CRM_Utils_SQL_Select::from('foo', array('mode' => 'out'))
+      ->where('foo = @value')
+      ->where(array(
+        'whiz > @base',
+        'frob != @base',
+      ))
+      ->param('@value', 'not"valid')
+      ->param(array(
+        '@base' => 'in"valid',
+      ));
+    $this->assertLike('SELECT * FROM foo WHERE (foo = "not\\"valid") AND (whiz > "in\\"valid") AND (frob != "in\\"valid")', $select->toSQL());
+
+    try {
+      CRM_Utils_SQL_Select::from('foo', array('mode' => 'out'))
+        ->where('foo = @value', array('@value' => 'not"valid'));
+      $this->fail('In output mode, we should reject requests to interpolate inputs.');
+    }
+    catch (Exception $e) {
+      $this->assertRegExp("/Cannot mix interpolation modes/", $e->getMessage());
+    }
+
+    $outputModeFragment = CRM_Utils_SQL_Select::fragment()
+      ->param('value', 'whatever');
+    $inputModeFragment = CRM_Utils_SQL_Select::fragment()
+      ->where('foo = @value', array('@value' => 'not"valid'));
+    try {
+      $outputModeFragment->merge($inputModeFragment);
+      $this->fail('In output-mode, we should reject requests to merge from input-mode.');
+    }
+    catch (Exception $e) {
+      $this->assertRegExp("/Cannot merge queries that use different interpolation modes/", $e->getMessage());
+    }
+  }
+
   public function testBig() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->select('foo.id')
       ->join('rel1', 'INNER JOIN rel1_table rel1 ON foo.id = rel1.foo_id')
       ->join('rel2', 'LEFT JOIN rel2_table rel2 ON foo.id = rel2.foo_id')
-      ->where('foo.type = @type', array('@type' => 'mytype'))
+      ->where('foo.type = @theType', array('@theType' => 'mytype'))
       ->groupBy("foo.id")
       ->having('sum(rel1.stat) > 10')
       ->orderBy('rel2.whiz')
@@ -103,6 +138,20 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Parameter-values could include control characters like
+   * '"@" or "!", but they should never be evaluated.
+   */
+  public function testNoIterativeInterpolation() {
+    $select = CRM_Utils_SQL_Select::from('foo')
+      ->where('a = @a and b = @b and c = @c', array(
+        'a' => '@b',
+        'b' => '@c',
+        'c' => '@a',
+      ));
+    $this->assertLike('SELECT * FROM foo WHERE (a = "@b" and b = "@c" and c = "@a")', $select->toSQL());
+  }
+
   public function testInterpolate() {
     $actual = CRM_Utils_SQL_Select::from('ignore')->interpolate(
       '@escaped !unescaped #validated',
@@ -113,6 +162,44 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       )
     );
     $this->assertLike('"foo\"bar" concat(foo,bar) 15.2', $actual);
+  }
+
+  public function testInterpolateWildcard() {
+    $actual = CRM_Utils_SQL_Select::from('ignore')->interpolate(
+      'escaped @escaped unescaped !unescaped validated #validated',
+      array(
+        'escaped' => 'foo"bar',
+        'unescaped' => 'concat(foo,bar)',
+        'validated' => 15.2,
+      )
+    );
+    $this->assertLike('escaped "foo\"bar" unescaped concat(foo,bar) validated 15.2', $actual);
+  }
+
+  public function testInterpolateUnknown() {
+    $actual = CRM_Utils_SQL_Select::from('ignore')->interpolate(
+      'escaped @escaped unescaped !unescaped validated #validated',
+      array(
+        'irrelevant' => 'foo',
+      )
+    );
+    $this->assertLike('escaped @escaped unescaped !unescaped validated #validated', $actual);
+  }
+
+  public function testInterpolateUnknownStrict() {
+    try {
+      CRM_Utils_SQL_Select::from('ignore')
+        ->strict()
+        ->interpolate('@johnMcClane',
+          array(
+            'irrelevant' => 'foo',
+          )
+        );
+      $this->fail('Unknown variables should throw errors in strict mode.');
+    }
+    catch (Exception $e) {
+      $this->assertRegExp('/Cannot build query. Variable "@johnMcClane" is unknown./', $e->getMessage());
+    }
   }
 
   public function testInterpolateArray() {
@@ -149,16 +236,27 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     }
   }
 
-  public function testInterpolateBadKey() {
-    try {
-      $result = CRM_Utils_SQL_Select::from('ignore')->interpolate('this is a {var}', array(
-        '{var}' => 'not a well-formed variable name',
-      ));
-      $this->fail('Expected exception; got: ' . var_export($result, TRUE));
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->assertTrue(TRUE, "Caught expected exception");
-    }
+  public function testMerge() {
+    $fragmentOutMode = CRM_Utils_SQL_Select::fragment()
+      ->select(array('a', 'b'))
+      ->where('a = #two')
+      ->param('two', 2);
+    $fragmentAutoMode = CRM_Utils_SQL_Select::fragment()
+      ->select('e')
+      ->where('whipit()');
+    $query = CRM_Utils_SQL_Select::from('foo')
+      ->select(array('c', 'd'))
+      ->where('c = @four')
+      ->param('four', 4)
+      ->merge($fragmentOutMode)
+      ->merge($fragmentAutoMode);
+    $this->assertLike('SELECT c, d, a, b, e FROM foo WHERE (c = "4") AND (a = 2) AND (whipit())', $query->toSQL());
+  }
+
+  public function testArrayGet() {
+    $select = CRM_Utils_SQL_Select::from("foo")
+      ->param('hello', 'world');
+    $this->assertEquals('world', $select['hello']);
   }
 
   /**
