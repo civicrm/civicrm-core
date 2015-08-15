@@ -49,14 +49,24 @@
       {/if}
 
       var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="`$urlPathVar``$contributionPageID`processor_id="}" + type;
-
       {literal}
+      if (typeof(CRM.vars) != "undefined") {
+        if (typeof(CRM.vars.coreForm) != "undefined") {
+          if (typeof(CRM.vars.coreForm.contact_id) != "undefined") {
+            dataUrl = dataUrl + "&cid=" + CRM.vars.coreForm.contact_id;
+          }
+
+          if (typeof(CRM.vars.coreForm.checksum) != "undefined" ) {
+            dataUrl = dataUrl + "&cs=" + CRM.vars.coreForm.checksum;
+          }
+        }
+      }
+
       // Processors like pp-express will hide the form submit buttons, so re-show them when switching
       $('.crm-submit-buttons', $form).show().find('input').prop('disabled', true);
-
       CRM.loadPage(dataUrl, {target: '#billing-payment-block'});
     }
-  
+
     $('.crm-group.payment_options-group').show();
     $('[name=payment_processor_id]').on('change.paymentBlock', function() {
         buildPaymentBlock($(this).val());

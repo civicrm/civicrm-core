@@ -1912,7 +1912,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return $tempID;
     }
-
+    if (is_numeric($userID)) {
+      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $userID));
+    }
     return is_numeric($userID) ? $userID : NULL;
   }
 
