@@ -615,16 +615,15 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       //create line items
       $lineItem = array();
-
-      $priceSetId = CRM_Member_BAO_Membership::createLineItems($this, $this->_params['membership_type_id']);
+      $this->_params = $this->setPriceSetParameters($this->_params);
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $this->_params, $lineItem[$priceSetId]
+        $this->_params, $lineItem[$this->_priceSetId]
       );
       //CRM-11529 for quick config backoffice transactions
       //when financial_type_id is passed in form, update the
       //line items with the financial type selected in form
       if ($submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $this->_params)) {
-        foreach ($lineItem[$priceSetId] as &$li) {
+        foreach ($lineItem[$this->_priceSetId] as &$li) {
           $li['financial_type_id'] = $submittedFinancialType;
         }
       }
