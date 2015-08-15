@@ -4,18 +4,19 @@
  * Dear God Why Do I Have To Write This (Dumb SQL Builder)
  *
  * Usage:
- * $select = new CRM_Utils_SQL_Select('civicrm_activity act');
- * $select
+ * @code
+ * $select = CRM_Utils_SQL_Select::from('civicrm_activity act')
  *     ->join('absence', 'inner join civicrm_activity absence on absence.id = act.source_record_id')
- *     ->where('activity_type_id = #type', array('#type' => 234))
- *     ->where('status_id IN (#statuses)', array('#statuses' => array(1,2,3))
- *     ->where('subject like @subj', array('@subj' => '%hello%'))
- *     ->where('!dynamicColumn = 1', array('!dynamicColumn' => 'coalesce(is_active,0)'))
+ *     ->where('activity_type_id = #type', array('type' => 234))
+ *     ->where('status_id IN (#statuses)', array('statuses' => array(1,2,3))
+ *     ->where('subject like @subj', array('subj' => '%hello%'))
+ *     ->where('!dynamicColumn = 1', array('dynamicColumn' => 'coalesce(is_active,0)'))
  *     ->where('!column = @value', array(
- *        '!column' => $customField->column_name,
- *        '@value' => $form['foo']
+ *        'column' => $customField->column_name,
+ *        'value' => $form['foo']
  *      ))
  * echo $select->toSQL();
+ * @endcode
  *
  * Design principles:
  *  - Portable
@@ -29,11 +30,63 @@
  *    - use "!varname" to insert raw (unescaped) values
  *    - use "#varname" to insert a numerical value (these are validated but not escaped)
  *    - to disable any preprocessing, simply omit the variable list
+ *    - control characters (@!#) are mandatory in expressions but optional in arg-keys
  *  - Variables may be individual values or arrays; arrays are imploded with commas
  *  - Conditionals are AND'd; if you need OR's, do it yourself
  *  - Use classes/functions with documentation (rather than undocumented array-trees)
+ *  - For any given string, interpolation is only performed once. After an interpolation,
+ *    a string may never again be subjected to interpolation.
+ *
+ * The "interpolate-once" principle can be enforced by either interpolating on input
+ * xor output. The notations for input and output interpolation are a bit different,
+ * and they may not be mixed.
+ *
+ * @code
+ * // Interpolate on input. Set params when using them.
+ * $select->where('activity_type_id = #type', array(
+ *   'type' => 234,
+ * ));
+ *
+ * // Interpolate on output. Set params independently.
+ * $select
+ *     ->where('activity_type_id = #type')
+ *     ->param('type', 234),
+ * @endcode
  */
-class CRM_Utils_SQL_Select {
+class CRM_Utils_SQL_Select implements ArrayAccess {
+
+  /**
+   * Interpolate values as soon as they are passed in (where(), join(), etc).
+   *
+   * Default.
+   *
+   * Pro: Every clause has its own unique namespace for parameters.
+   * Con: Probably slower.
+   * Advice: Use this when aggregating SQL fragments from agents who
+   *   maintained by different parties.
+   */
+  const INTERPOLATE_INPUT = 'in';
+
+  /**
+   * Interpolate values when rendering SQL output (toSQL()).
+   *
+   * Pro: Probably faster.
+   * Con: Must maintain an aggregated list of all parameters.
+   * Advice: Use this when you have control over the entire query.
+   */
+  const INTERPOLATE_OUTPUT = 'out';
+
+  /**
+   * Determine mode automatically. When the first attempt is made
+   * to use input-interpolation (eg `where(..., array(...))`) or
+   * output-interpolation (eg `param(...)`), the mode will be
+   * set. Subsequent calls will be validated using the same mode.
+   */
+  const INTERPOLATE_AUTO = 'auto';
+
+  private $mode = NULL;
+  private $insertInto = NULL;
+  private $insertIntoFields = array();
   private $selects = array();
   private $from;
   private $joins = array();
@@ -43,16 +96,31 @@ class CRM_Utils_SQL_Select {
   private $orderBys = array();
   private $limit = NULL;
   private $offset = NULL;
+  private $params = array();
+
+  // Public to work-around PHP 5.3 limit.
+  public $strict = NULL;
 
   /**
    * Create a new SELECT query.
    *
    * @param string $from
    *   Table-name and optional alias.
+   * @param array $options
    * @return CRM_Utils_SQL_Select
    */
-  public static function from($from) {
-    return new self($from);
+  public static function from($from, $options = array()) {
+    return new self($from, $options);
+  }
+
+  /**
+   * Create a partial SELECT query.
+   *
+   * @param array $options
+   * @return CRM_Utils_SQL_Select
+   */
+  public static function fragment($options = array()) {
+    return new self(NULL, $options);
   }
 
   /**
@@ -60,23 +128,86 @@ class CRM_Utils_SQL_Select {
    *
    * @param string $from
    *   Table-name and optional alias.
+   * @param array $options
    */
-  public function __construct($from) {
+  public function __construct($from, $options = array()) {
     $this->from = $from;
+    $this->mode = isset($options['mode']) ? $options['mode'] : self::INTERPOLATE_AUTO;
+  }
+
+  /**
+   * Make a new copy of this query.
+   *
+   * @return CRM_Utils_SQL_Select
+   */
+  public function copy() {
+    return clone $this;
+  }
+
+  /**
+   * @param CRM_Utils_SQL_Select $other
+   * @param array|NULL $parts
+   *   ex: 'joins', 'wheres'
+   * @return $this
+   */
+  public function merge($other, $parts = NULL) {
+    if ($other === NULL) {
+      return $this;
+    }
+
+    if ($this->mode === self::INTERPOLATE_AUTO) {
+      $this->mode = $other->mode;
+    }
+    elseif ($other->mode === self::INTERPOLATE_AUTO) {
+      // Noop.
+    }
+    elseif ($this->mode !== $other->mode) {
+      // Mixing modes will lead to someone getting an expected substitution.
+      throw new RuntimeException("Cannot merge queries that use different interpolation modes ({$this->mode} vs {$other->mode}).");
+    }
+
+    $arrayFields = array('insertIntoFields', 'selects', 'joins', 'wheres', 'groupBys', 'havings', 'orderBys', 'params');
+    foreach ($arrayFields as $f) {
+      if ($parts === NULL || in_array($f, $parts)) {
+        $this->{$f} = array_merge($this->{$f}, $other->{$f});
+      }
+    }
+
+    $flatFields = array('insertInto', 'from', 'limit', 'offset');
+    foreach ($flatFields as $f) {
+      if ($parts === NULL || in_array($f, $parts)) {
+        if ($other->{$f} !== NULL) {
+          $this->{$f} = $other->{$f};
+        }
+      }
+    }
+
+    return $this;
   }
 
   /**
    * Add a new JOIN clause.
    *
-   * @param string $name
+   * Note: To add multiple JOINs at once, use $name===NULL and
+   * pass an array of $exprs.
+   *
+   * @param string|NULL $name
    *   The effective alias of the joined table.
-   * @param string $expr
+   * @param string|array $exprs
    *   The complete join expression (eg "INNER JOIN mytable myalias ON mytable.id = maintable.foo_id").
    * @param array|null $args
    * @return CRM_Utils_SQL_Select
    */
-  public function join($name, $expr, $args = NULL) {
-    $this->joins[$name] = $this->interpolate($expr, $args);
+  public function join($name, $exprs, $args = NULL) {
+    if ($name !== NULL) {
+      $this->joins[$name] = $this->interpolate($exprs, $args);
+    }
+    else {
+      foreach ($exprs as $name => $expr) {
+        $this->joins[$name] = $this->interpolate($expr, $args);
+      }
+      return $this;
+    }
     return $this;
   }
 
@@ -156,6 +287,33 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
+   * Set one (or multiple) parameters to interpolate into the query.
+   *
+   * @param array|string $keys
+   *   Key name, or an array of key-value pairs.
+   * @param null|mixed $value
+   * @return $this
+   */
+  public function param($keys, $value = NULL) {
+    if ($this->mode === self::INTERPOLATE_AUTO) {
+      $this->mode = self::INTERPOLATE_OUTPUT;
+    }
+    elseif ($this->mode !== self::INTERPOLATE_OUTPUT) {
+      throw new RuntimeException("Select::param() only makes sense when interpolating on output.");
+    }
+
+    if (is_array($keys)) {
+      foreach ($keys as $k => $v) {
+        $this->params[$k] = $v;
+      }
+    }
+    else {
+      $this->params[$keys] = $value;
+    }
+    return $this;
+  }
+
+  /**
    * Set a limit on the number of records to return.
    *
    * @param int $limit
@@ -176,6 +334,81 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
+   * Insert the results of the SELECT query into another
+   * table.
+   *
+   * @param string $table
+   *   The name of the other table (which receives new data).
+   * @param array $fields
+   *   The fields to fill in the other table (in order).
+   * @return $this
+   * @see insertIntoField
+   */
+  public function insertInto($table, $fields = array()) {
+    $this->insertInto = $table;
+    $this->insertIntoField($fields);
+    return $this;
+  }
+
+  /**
+   * @param array $fields
+   *   The fields to fill in the other table (in order).
+   * @return $this
+   */
+  public function insertIntoField($fields) {
+    $fields = (array) $fields;
+    foreach ($fields as $field) {
+      $this->insertIntoFields[] = $field;
+    }
+    return $this;
+  }
+
+  /**
+   * @param array|NULL $parts
+   *   List of fields to check (e.g. 'selects', 'joins').
+   *   Defaults to all.
+   * @return bool
+   */
+  public function isEmpty($parts = NULL) {
+    $empty = TRUE;
+    $fields = array(
+      'insertInto',
+      'insertIntoFields',
+      'selects',
+      'from',
+      'joins',
+      'wheres',
+      'groupBys',
+      'havings',
+      'orderBys',
+      'limit',
+      'offset',
+    );
+    if ($parts !== NULL) {
+      $fields = array_intersect($fields, $parts);
+    }
+    foreach ($fields as $field) {
+      if (!empty($this->{$field})) {
+        $empty = FALSE;
+      }
+    }
+    return $empty;
+  }
+
+  /**
+   * Enable (or disable) strict mode.
+   *
+   * In strict mode, unknown variables will generate exceptions.
+   *
+   * @param bool $strict
+   * @return $this
+   */
+  public function strict($strict = TRUE) {
+    $this->strict = $strict;
+    return $this;
+  }
+
+  /**
    * Given a string like "field_name = @value", replace "@value" with an escaped SQL string
    *
    * @param $expr SQL expression
@@ -191,37 +424,59 @@ class CRM_Utils_SQL_Select {
    * @return string
    *   SQL expression
    */
-  public function interpolate($expr, $args) {
+  public function interpolate($expr, $args, $activeMode = self::INTERPOLATE_INPUT) {
     if ($args === NULL) {
       return $expr;
     }
     else {
-      foreach (array_keys($args) as $key) {
-        $values = is_array($args[$key]) ? $args[$key] : array($args[$key]);
-        if ($key{0} == '@') {
-          $parts = array_map(array($this, 'escapeString'), $values);
-          $args[$key] = implode(', ', $parts);
+      if ($this->mode === self::INTERPOLATE_AUTO) {
+        $this->mode = $activeMode;
+      }
+      elseif ($activeMode !== $this->mode) {
+        throw new RuntimeException("Cannot mix interpolation modes.");
+      }
+
+      $select = $this;
+      return preg_replace_callback('/([#!@])([a-zA-Z0-9_]+)/', function($m) use ($select, $args) {
+        if (isset($args[$m[2]])) {
+          $values = $args[$m[2]];
         }
-        elseif ($key{0} == '!') {
-          $args[$key] = implode(', ', $values);
+        elseif (isset($args[$m[1] . $m[2]])) {
+          // Backward compat. Keys in $args look like "#myNumber" or "@myString".
+          $values = $args[$m[1] . $m[2]];
         }
-        elseif ($key{0} == '#') {
-          foreach ($values as $valueKey => $value) {
-            if ($value === NULL) {
-              $values[$valueKey] = 'NULL';
-            }
-            elseif (!is_numeric($value)) {
-              //throw new API_Exception("Failed encoding non-numeric value" . var_export(array($key => $args[$key]), TRUE));
-              throw new CRM_Core_Exception("Failed encoding non-numeric value");
-            }
-          }
-          $args[$key] = implode(', ', $values);
+        elseif ($select->strict) {
+          throw new CRM_Core_Exception('Cannot build query. Variable "' . $m[1] . $m[2] . '" is unknown.');
         }
         else {
-          throw new CRM_Core_Exception("Bad SQL parameter key: $key");
+          // Unrecognized variables are ignored. Mitigate risk of accidents.
+          return $m[0];
         }
-      }
-      return strtr($expr, $args);
+        $values = is_array($values) ? $values : array($values);
+        switch ($m[1]) {
+          case '@':
+            $parts = array_map(array($select, 'escapeString'), $values);
+            return implode(', ', $parts);
+
+          case '!':
+            return implode(', ', $values);
+
+          case '#':
+            foreach ($values as $valueKey => $value) {
+              if ($value === NULL) {
+                $values[$valueKey] = 'NULL';
+              }
+              elseif (!is_numeric($value)) {
+                //throw new API_Exception("Failed encoding non-numeric value" . var_export(array($key => $args[$key]), TRUE));
+                throw new CRM_Core_Exception("Failed encoding non-numeric value");
+              }
+            }
+            return implode(', ', $values);
+
+          default:
+            throw new CRM_Core_Exception("Unrecognized prefix");
+        }
+      }, $expr);
     }
   }
 
@@ -230,7 +485,7 @@ class CRM_Utils_SQL_Select {
    * @return string
    *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
    */
-  protected function escapeString($value) {
+  public function escapeString($value) {
     return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
   }
 
@@ -239,13 +494,21 @@ class CRM_Utils_SQL_Select {
    *   SQL statement
    */
   public function toSQL() {
+    $sql = '';
+    if ($this->insertInto) {
+      $sql .= 'INSERT INTO ' . $this->insertInto . ' (';
+      $sql .= implode(', ', $this->insertIntoFields);
+      $sql .= ")\n";
+    }
     if ($this->selects) {
-      $sql = 'SELECT ' . implode(', ', $this->selects) . "\n";
+      $sql .= 'SELECT ' . implode(', ', $this->selects) . "\n";
     }
     else {
-      $sql = 'SELECT *' . "\n";
+      $sql .= 'SELECT *' . "\n";
     }
-    $sql .= 'FROM ' . $this->from . "\n";
+    if ($this->from !== NULL) {
+      $sql .= 'FROM ' . $this->from . "\n";
+    }
     foreach ($this->joins as $join) {
       $sql .= $join . "\n";
     }
@@ -267,7 +530,26 @@ class CRM_Utils_SQL_Select {
         $sql .= 'OFFSET ' . $this->offset . "\n";
       }
     }
+    if ($this->mode === self::INTERPOLATE_OUTPUT) {
+      $sql = $this->interpolate($sql, $this->params, self::INTERPOLATE_OUTPUT);
+    }
     return $sql;
+  }
+
+  public function offsetExists($offset) {
+    return isset($this->params[$offset]);
+  }
+
+  public function offsetGet($offset) {
+    return $this->params[$offset];
+  }
+
+  public function offsetSet($offset, $value) {
+    $this->param($offset, $value);
+  }
+
+  public function offsetUnset($offset) {
+    unset($this->params[$offset]);
   }
 
 }

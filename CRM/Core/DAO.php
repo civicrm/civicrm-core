@@ -978,6 +978,19 @@ FROM   civicrm_domain
   }
 
   /**
+   * Returns all results as array-encoded records.
+   *
+   * @return array
+   */
+  public function fetchAll() {
+    $result = array();
+    while ($this->fetch()) {
+      $result[] = $this->toArray();
+    }
+    return $result;
+  }
+
+  /**
    * Given a DAO name, a column name and a column value, find the record and GET the value of another column in that record
    *
    * @param string $daoName
