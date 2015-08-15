@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Mailing_Config extends CRM_Core_Component_Config {
+class CRM_Mailing_Config {
 
   const OUTBOUND_OPTION_SMTP = 0;
   const OUTBOUND_OPTION_SENDMAIL = 1;
