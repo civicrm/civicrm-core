@@ -2,7 +2,10 @@
   // example: <div crm-mailing-block-preview crm-mailing="myMailing" on-preview="openPreview(myMailing, preview.mode)" on-send="sendEmail(myMailing,preview.recipient)">
   // note: the directive defines a variable called "preview" with any inputs supplied by the user (e.g. the target recipient for an example mailing)
 
-  angular.module('crmMailing').directive('crmMailingBlockEmailPreviewCluster', function (crmUiHelp, $http) {
+  angular.module('crmMailing').directive('crmMailingBlockEmailPreviewCluster', function (crmUiHelp, $http, crmApi) {
+
+    // Somewhere in here, you might call crmApi('Prevem', 'login', {}).then(function(prevemCred){  ... use credentials... });
+
     return {
       templateUrl: '~/crmMailing/BlockEmailPreviewCluster.html',
       link: function(scope, elm, attr) {
