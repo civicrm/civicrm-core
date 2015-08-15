@@ -342,11 +342,6 @@ SELECT label, value
 
         $fieldName = "{$field['table_name']}.{$field['column_name']}";
 
-        // Autocomplete comes back as a string not an array
-        if ($field['data_type'] == 'String' && $field['html_type'] == 'Autocomplete-Select' && $op == '=') {
-          $value = explode(',', $value);
-        }
-
         $isSerialized = CRM_Core_BAO_CustomField::isSerialized($field);
 
         // fix $value here to escape sql injection attacks
@@ -357,10 +352,10 @@ SELECT label, value
         }
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
-          $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
+          $qillValue = strstr($op, 'NULL') ? NULL : CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
         }
         else {
-          $op = 'IN';
+          $op = strstr($op, 'IN') ? $op : 'IN';
           $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value, $id, $this->_options);
         }
 
@@ -395,11 +390,11 @@ SELECT label, value
                   $op = key($value);
                   $value = $value[$op];
                 }
-                $value = implode(',', $value);
+                $value = implode(',', (array) $value);
               }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
-              if ($isSerialized && !empty($value)) {
+              if ($isSerialized && !empty($value) && !strstr($op, 'NULL')) {
                 if (strstr($op, 'IN')) {
                   $value = str_replace(",", "[[:cntrl:]]*|[[:cntrl:]]*", $value);
                   $value = str_replace('(', '[[.left-parenthesis.]]', $value);
@@ -456,11 +451,10 @@ SELECT label, value
             break;
 
           case 'Money':
+            $value = CRM_Utils_Array::value($op, (array) $value, $value);
             if (is_array($value)) {
-              $value = CRM_Utils_Array::value($op, $value, $value);
               foreach ($value as $key => $val) {
-                $moneyFormat = CRM_Utils_Rule::cleanMoney($value[$key]);
-                $value[$key] = $moneyFormat;
+                $value[$key] = CRM_Utils_Rule::cleanMoney($value[$key]);
               }
             }
             else {
@@ -480,9 +474,10 @@ SELECT label, value
           case 'Date':
             $fromValue = CRM_Utils_Array::value('from', $value);
             $toValue = CRM_Utils_Array::value('to', $value);
+            $value = CRM_Utils_Array::value($op, $value, $value);
 
             if (!$fromValue && !$toValue) {
-              if (!CRM_Utils_Date::processDate($value) && !in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
+              if (!is_array($value) && !CRM_Utils_Date::processDate($value) && !in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
                 continue;
               }
 
@@ -491,9 +486,20 @@ SELECT label, value
                 $value = "01-01-{$value}";
               }
 
-              $date = CRM_Utils_Date::processDate($value);
+              if (is_array($value)) {
+                $date = $qillValue = array();
+                foreach ($value as $key => $val) {
+                  $date[$key] = CRM_Utils_Date::processDate($val);
+                  $qillValue[$key] = CRM_Utils_Date::customFormat($date[$key]);
+                }
+              }
+              else {
+                $date = CRM_Utils_Date::processDate($value);
+                $qillValue = CRM_Utils_Date::customFormat($date);
+              }
+
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $date, 'String');
-              $this->_qill[$grouping][] = $field['label'] . " {$qillOp} " . CRM_Utils_Date::customFormat($date);
+              $this->_qill[$grouping][] = $field['label'] . " {$qillOp} " . implode(', ', (array) $qillValue);
             }
             else {
               if (is_numeric($fromValue) && strlen($fromValue) == 4) {
