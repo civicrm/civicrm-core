@@ -156,6 +156,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Default payment instrument validation.
+   *
+   * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
+   * Not a static function, because I need to check for payment_type.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  public function validatePaymentInstrument($values, &$errors) {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Pro') {
+      CRM_Core_Payment_Form::validateCreditCard($values, $errors);
+    }
+  }
+
+  /**
    * Express checkout code. Check PayPal documentation for more information
    *
    * @param array $params
