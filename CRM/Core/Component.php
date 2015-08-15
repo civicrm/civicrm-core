@@ -237,22 +237,6 @@ class CRM_Core_Component {
   }
 
   /**
-   * @param $config
-   * @param bool $oldMode
-   *
-   * @return null
-   */
-  public static function addConfig(&$config, $oldMode = FALSE) {
-    $info = self::_info();
-
-    foreach ($info as $name => $comp) {
-      $cfg = $comp->getConfigObject();
-      $cfg->add($config, $oldMode);
-    }
-    return NULL;
-  }
-
-  /**
    * @param string $componentName
    *
    * @return mixed
