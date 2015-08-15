@@ -1773,28 +1773,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->_id = $membership->id;
     }
 
-    $statusMsg = '';
-    if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $statusMsg = $this->getStatusMessageForUpdate($membership, $endDate, $receiptSend);
-    }
-    elseif (($this->_action & CRM_Core_Action::ADD)) {
-      $statusMsg = $this->getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
-        $params, $calcDates, $mailSend);
-    }
-
-    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
-    //CRM-15187
-    // dusplay message when membership type is changed
-    if (($this->_action & CRM_Core_Action::UPDATE) && $this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
-      CRM_Core_Session::setStatus(
-        ts('The financial types associated with the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its financial type.'),
-        ts('Warning')
-      );
-      CRM_Core_Session::setStatus(
-        ts('The cost of the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its amount.'),
-        ts('Warning')
-      );
-    }
+    $isRecur = CRM_Utils_Array::value('is_recur', $params);
+    $this->setStatusMessage($membership, $endDate, $receiptSend, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend);
     return $createdMemberships;
   }
 
@@ -1856,14 +1836,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param bool $receiptSend
    * @param array $membershipTypes
    * @param array $createdMemberships
-   * @param array $params
+   * @param bool $isRecur
    * @param array $calcDates
    * @param bool $mailSent
    *
    * @return array|string
    */
   protected function getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
-                                               $params, $calcDates, $mailSent) {
+                                               $isRecur, $calcDates, $mailSent) {
     // FIX ME: fix status messages
 
     $statusMsg = array();
@@ -1877,7 +1857,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $memEndDate = ($membership->end_date) ? $membership->end_date : $endDate;
 
       //get the end date from calculated dates.
-      if (!$memEndDate && empty($params['is_recur'])) {
+      if (!$memEndDate && !$isRecur) {
         $memEndDate = CRM_Utils_Array::value('end_date', $calcDates[$memType]);
       }
 
@@ -1891,6 +1871,41 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $statusMsg .= ' ' . ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
     }
     return $statusMsg;
+  }
+
+  /**
+   * @param $membership
+   * @param $endDate
+   * @param $receiptSend
+   * @param $membershipTypes
+   * @param $createdMemberships
+   * @param $isRecur
+   * @param $calcDates
+   * @param $mailSend
+   */
+  protected function setStatusMessage($membership, $endDate, $receiptSend, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend) {
+    $statusMsg = '';
+    if (($this->_action & CRM_Core_Action::UPDATE)) {
+      $statusMsg = $this->getStatusMessageForUpdate($membership, $endDate, $receiptSend);
+    }
+    elseif (($this->_action & CRM_Core_Action::ADD)) {
+      $statusMsg = $this->getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
+        $isRecur, $calcDates, $mailSend);
+    }
+
+    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+    //CRM-15187
+    // display message when membership type is changed
+    if (($this->_action & CRM_Core_Action::UPDATE) && $this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
+      CRM_Core_Session::setStatus(
+        ts('The financial types associated with the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its financial type.'),
+        ts('Warning')
+      );
+      CRM_Core_Session::setStatus(
+        ts('The cost of the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its amount.'),
+        ts('Warning')
+      );
+    }
   }
 
 }
