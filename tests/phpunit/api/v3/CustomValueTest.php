@@ -237,7 +237,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           break;
 
         case 'LIKE':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => (is_array($selectedValue) ? "%" . $selectedValue[0] . "%" : $selectedValue),),), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => (is_array($selectedValue) ? "%" . $selectedValue[0] . "%" : $selectedValue))), __FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
 
@@ -247,12 +247,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           break;
 
         case 'IS NULL':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId  => array($op => 1)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => 1)), __FUNCTION__, __FILE__, $description);
           $this->assertEquals(FALSE, array_key_exists($contactId, $result['values']));
           break;
 
         case 'IS NOT NULL':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => 1)),__FUNCTION__, __FILE__, $description);
+          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => 1)), __FUNCTION__, __FILE__, $description);
           $this->assertEquals($contactId, $result['id']);
           break;
 
