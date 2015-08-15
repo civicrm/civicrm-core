@@ -259,29 +259,12 @@
         });
       },
 
-      composerPreviewBatch: function composerPreviewBatch(message, renderers) {
-        var prevemURL = 'http://0.0.0.0:3000/api/';
-        var postURL = prevemURL + 'PreviewBatches';
-        var consumerId = 1234;
-        var batchId = consumerId //+ new Date().getTime()/1000;     //unique everytime. Needs to be saved in order for the composer to be able to look the batch up.
-        var statusURL = prevemURL + 'PreviewBatches/status?batchId=' + batchId;
-
-        // function checkStatus(statusURL, batchId) {
-        //     http.get(statusURL+batchId, function(res) {
-        //       var body = '';
-        //       res.on('data', function(chunk) {
-        //           body += chunk;
-        //       });
-
-        //       res.on('end', function() {
-        //           var status = JSON.parse(body);
-        //         console.log(status.response);
-        //         if (status.response.finished == 1) {
-        //           clearInterval(Interval);
-        //         }
-        //       });
-        //   });
-        // }
+      composerPreviewBatch: function composerPreviewBatch(id, message, renderers) {
+        var prevemURL = CRM.crmMailing.prevemUrl;
+        var postURL = prevemURL + '/api/PreviewBatches';
+        var consumerId = CRM.crmMailing.prevemConsumer;
+        var batchId = consumerId + ':' + id;     //unique everytime. Needs to be saved in order for the composer to be able to look the batch up.
+        var statusURL = prevemURL + '/api/PreviewBatches/status?batchId=' + batchId;
         var Interval;
         var postData = {
           "batchId" : batchId,
@@ -291,19 +274,16 @@
         }
         $http.post(postURL, postData)
           .success(function(data, status, headers, config){
-              /*called for result & error because 200 status*/
-              console.log(status)    
-              if (data.result){
-                  //handle success here
-                  //console.log(status)
-                  Interval = setInterval( function(){
-                    checkStatus(statusURL, batchId);
-                  }, 5000);
-              } else if (data.error) {
-                  //handle error here
-                  console.log(status)
-              }
-            })
+            /*called for result & error because 200 status*/
+            console.log(status)    
+            if (data.result){
+              //handle success here
+              console.log(data.result)
+            } else if (data.error) {
+              //handle error here
+              console.log(status)
+            }
+          })
           .error(function(data, status, headers, config){
               /*handle non 200 statuses*/
               console.log(data);
@@ -481,10 +461,7 @@
             }
         };
         var p = crmMailingMgr
-          p.composerPreviewBatch(message, renderers)
-          // .then(function () {
-          //   console.log("done");
-          // });           
+          p.composerPreviewBatch(mailing.id, message, renderers)
       },
 
       // @param mode string one of 'html', 'text', or 'full'
