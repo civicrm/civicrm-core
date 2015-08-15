@@ -2397,7 +2397,7 @@ SELECT contact_id
     }
 
     // the string is longer than the length and we need a uniq string
-    // for the same tablename we need the same uniq string everytime
+    // for the same tablename we need the same uniq string every time
     // hence we use md5 on the string, which is not random
     // we'll append 8 characters to the end of the tableName
     $md5string = substr(md5($string), 0, 8);

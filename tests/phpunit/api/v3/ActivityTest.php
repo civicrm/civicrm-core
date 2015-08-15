@@ -607,7 +607,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'id' => $activity['id'],
     ));
     if ($activityget['count'] > 0) {
-      $this->assertNotEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0], 'In line ' . __LINE__);
+      $this->assertNotEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0]);
     }
   }
 
