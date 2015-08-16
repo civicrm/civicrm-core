@@ -4,7 +4,7 @@
 
   angular.module('crmMailing').directive('crmMailingBlockEmailPreviewCluster', function (crmUiHelp, $http, crmApi) {
 
-    // Somewhere in here, you might call crmApi('Prevem', 'login', {}).then(function(prevemCred){  ... use credentials... });
+    crmApi('Prevem', 'login').then(function(returnValues){ console.log('returnValues'); });
 
     return {
       templateUrl: '~/crmMailing/BlockEmailPreviewCluster.html',

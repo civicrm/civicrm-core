@@ -26,15 +26,44 @@
  */
 
 function civicrm_api3_prevem_login($params) {
-  $prevemUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'prevem_url');
+	$prevemUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'prevem_url');
 
-  // TODO Parse $prevemUrl. Send login request to get token.
-  // To send login request, see eg http://stackoverflow.com/questions/2445276/how-to-post-data-in-php-using-file-get-contents
+	$prevemURL = !empty($prevemUrl) ? CRM_Utils_URL::mask($prevemUrl, array('user','pass')) : NULL;
+	$prevemConsumer = parse_url($prevemUrl, PHP_URL_USER);
+	$prevemSecret = parse_url($prevemUrl, PHP_URL_PASS);
+	// TODO Parse $prevemUrl. Send login request to get token.
+	// To send login request, see eg http://stackoverflow.com/questions/2445276/how-to-post-data-in-php-using-file-get-contents
 
-  $returnValues = array(
-    'url' => 'http://example.com:1234',
-    'consumerId' => 'hello',
-    'token' => 'world',
-  );
-  return civicrm_api3_create_success($returnValues, $params, 'Prevem', 'login');
+	$postdata = http_build_query(
+	    array(
+	        'email' => $prevemConsumer . "@foo.com",
+	        'password' => $prevemSecret
+	    )
+	);
+
+	$opts = array('http' =>
+	    array(
+	        'method'  => 'POST',
+	        'header'  => 'Content-type: application/x-www-form-urlencoded',
+	        'content' => $postdata
+	    )
+	);
+
+	$context  = stream_context_create($opts);
+	$result = file_get_contents($prevemURL . '/api/Users/login', false, $context);
+	$accessToken = json_decode($result)->{'id'};
+
+	$returnValues = array(
+	'url' => $prevemURL,
+	'consumerId' => $prevemConsumer,
+	'token' => $accessToken,
+	);
+
+	if ($result === FALSE) {
+		// echo $returnValues . "hjhhjj";
+		return civicrm_api3_create_error($returnValues, $params, 'Prevem', 'login');
+	}
+	else {
+		return civicrm_api3_create_success($returnValues, $params, 'Prevem', 'login');
+	}
 }
