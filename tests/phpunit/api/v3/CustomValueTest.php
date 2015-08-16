@@ -68,8 +68,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         $this->optionGroup[$dataType]['id'] = $result['id'];
       }
       elseif ($dataType == 'contact') {
-        for ($i=0; $i < 3; $i++) {
-          $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com',));
+        for ($i = 0; $i < 3; $i++) {
+          $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com'));
           $this->optionGroup[$dataType]['values'][$i] = $result['id'];
         }
       }
@@ -145,8 +145,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           $count++;
           break;
 
-          //TODO: Test case of Country fields remain as it throws foreign key contraint ONLY in test environment
         default:
+          //TODO: Test case of Country fields remain as it throws foreign key contraint ONLY in test environment
           $count++;
           break;
       }
