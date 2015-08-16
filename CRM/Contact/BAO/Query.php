@@ -1601,7 +1601,9 @@ class CRM_Contact_BAO_Query {
       }
       $result = array($id, 'IN', $values, 0, 0);
     }
-    elseif ($id == 'contact_type') {
+    elseif ($id == 'contact_type' ||
+      (!empty($values) && is_array($values) && !in_array(key($values), CRM_Core_DAO::acceptedSQLOperators(), TRUE))
+    ) {
       $result = array($id, 'IN', $values, 0, $wildcard);
     }
     else {
@@ -5331,6 +5333,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
             }
           }
           else {
+            $op = 'IN';
             $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReportUsingOldFormat;
             if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => array_keys($value)), $dataType)) != FALSE) {
               return $queryString;

@@ -207,17 +207,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues["member_test"] = 0;
     }
 
-    $specialParams = array(
-      'membership_status_id',
-      'membership_type_id',
-    );
-    foreach ($specialParams as $element) {
-      $value = CRM_Utils_Array::value($element, $this->_formValues);
-      if (!empty($value) && is_array($value)) {
-        $this->_formValues[$element] = array('IN' => $value);
-      }
-    }
-
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
