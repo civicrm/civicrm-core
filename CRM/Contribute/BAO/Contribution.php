@@ -4180,7 +4180,6 @@ LIMIT 1;";
       if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
         $eventDetail = civicrm_api3('Event', 'getsingle', array('id' => $objects['event']->id));
         $contributionParams['source'] = ts('Online Event Registration') . ': ' . $eventDetail['title'];
-
         if ($eventDetail['is_email_confirm']) {
           // @todo this should be set by the function that sends the mail after sending.
           $contributionParams['receipt_date'] = $changeDate;
