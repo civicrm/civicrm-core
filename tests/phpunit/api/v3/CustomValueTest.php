@@ -51,11 +51,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
       'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
       'date' => NULL,
+      'contact' => NULL,
     );
 
     foreach ($dataValues as $dataType => $values) {
+      $this->optionGroup[$dataType] = array('values' => $values);
       if (!empty($values)) {
-        $this->optionGroup[$dataType] = array('values' => $values);
         $result = $this->callAPISuccess('OptionGroup', 'create',
           array(
             'name' => "{$dataType}_group",
@@ -65,6 +66,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           )
         );
         $this->optionGroup[$dataType]['id'] = $result['id'];
+      }
+      elseif ($dataType == 'contact') {
+        for ($i=0; $i < 3; $i++) {
+          $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com',));
+          $this->optionGroup[$dataType]['values'][$i] = $result['id'];
+        }
       }
       $this->ids[$dataType] = $this->entityCustomGroupWithSingleFieldCreate("$dataType Custom Group", 'Contacts');
     }
@@ -89,7 +96,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $count = 0;
 
     foreach ($customFieldDataType as $dataType => $label) {
-      $validSQLOperator = array('=', "!=", 'IN', 'NOT IN', 'IS NOT NULL', 'IS NULL');
       switch ($dataType) {
         case 'Date':
         case 'StateProvince';
@@ -100,7 +106,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         case 'Money':
 
           if (in_array($dataType, array('String', 'Link'))) {
-            $validSQLOperator += array('LIKE', "NOT LIKE");
+            $validSQLOperator = array('=', '!=', 'IN', 'NOT IN', 'LIKE', 'NOT LIKE', 'IS NOT NULL', 'IS NULL');
             $type = 'string';
           }
           else {
@@ -110,10 +116,16 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
             elseif ($dataType == 'StateProvince') {
               $type = 'state_province';
             }
-            else {
-              $type = $dataType == 'Int' ? 'integer' : ($dataType == 'Date' ? 'date' : 'number');
+            elseif ($dataType == 'ContactReference') {
+              $type = 'contact';
             }
-            $validSQLOperator += array('<=', '>=', '>', '<');
+            elseif ($dataType == 'Date') {
+              $type = 'date';
+            }
+            else {
+              $type = $dataType == 'Int' ? 'integer' : 'number';
+            }
+            $validSQLOperator = array('=', '!=', 'IN', 'NOT IN', '<=', '>=', '>', '<', 'IS NOT NULL', 'IS NULL');
           }
 
           foreach ($dataToHtmlTypes[$count] as $html) {
@@ -124,7 +136,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
               'html_type' => $html,
               'default_value' => NULL,
             );
-            if (!in_array($html, array('Text', 'TextArea', 'Link', 'Select Date'))) {
+            if (!in_array($html, array('Text', 'TextArea')) && !in_array($dataType, array('Link', 'Date', 'ContactReference'))) {
               $params += array('option_group_id' => $this->optionGroup[$type]['id']);
             }
             $customField = $this->customFieldCreate($params);
@@ -133,11 +145,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           $count++;
           break;
 
-        case 'ContactReference':
-          $validSQLOperator += array('<=', '>=', '>', '<');
-          $count++;
-          break;
-
+          //TODO: Test case of Country fields remain as it throws foreign key contraint ONLY in test environment
         default:
           $count++;
           break;
@@ -168,50 +176,71 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     }
     elseif ($type == 'date') {
       $selectedValue = date('Ymd');
-      $notselectedValue = date('Ymd', strtotime('yesterday'));
+      $notselectedValue = $lesserSelectedValue = date('Ymd', strtotime('yesterday'));
+      $greaterSelectedValue = date('Ymd', strtotime('+ 1 day'));
+    }
+    elseif ($type == 'contact') {
+      $selectedValue = $this->optionGroup[$type]['values'][1];
+      $notselectedValue = $this->optionGroup[$type]['values'][0];
     }
     else {
       $selectedValue = $this->optionGroup[$type]['values'][0];
       $notselectedValue = $this->optionGroup[$type]['values'][$count];
+      if (in_array(">", $sqlOps)) {
+        $greaterSelectedValue = $selectedValue + 1;
+        $lesserSelectedValue = $selectedValue - 1;
+      }
     }
 
     $params = array('entity_id' => $contactId, 'custom_' . $customId => $selectedValue);
     $this->callAPISuccess('CustomValue', 'create', $params);
 
     foreach ($sqlOps as $op) {
-      $description = "Find Contact whose $customField[label] $op $notselectedValue";
+      $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+      $description = "\nFind Contact where '$customField[label]' $qillOp ";
       switch ($op) {
-        case '!=':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)), __FUNCTION__, __FILE__, $description);
+        case '=':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => (is_array($selectedValue) ? implode(CRM_Core_DAO::VALUE_SEPARATOR, $selectedValue) : $selectedValue)));
           $this->assertEquals($contactId, $result['id']);
+          echo $description . implode("[separator]", (array) $selectedValue);
+          break;
+
+        case '!=':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)));
+          $this->assertEquals($contactId, $result['id']);
+          echo $description . $notselectedValue;
           break;
 
         case '>':
         case '<':
         case '>=':
         case '<=':
+          if ($isSerialized) {
+            continue;
+          }
           // To be precise in for these operator we can't just rely on one contact,
           // hence creating multiple contact with custom value less/more then $selectedValue respectively
           $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man2@yahoo.com'));
           $contactId2 = $result['id'];
-          $lesserSelectedValue = $type == 'date' ? date('Ymd', strtotime('- 1 day')) : $selectedValue - 1;
           $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId2, 'custom_' . $customId => $lesserSelectedValue));
 
           if ($op == '>') {
-            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $lesserSelectedValue)), __FUNCTION__, __FILE__, $description);
+            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $lesserSelectedValue)));
             $this->assertEquals($contactId, $result['id']);
+            echo $description . $lesserSelectedValue;
           }
           elseif ($op == '<') {
-            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)), __FUNCTION__, __FILE__, $description);
+            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)));
             $this->assertEquals($contactId2, $result['id']);
+            echo $description . $selectedValue;
           }
           else {
             $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man3@yahoo.com'));
             $contactId3 = $result['id'];
-            $greaterSelectedValue = $type == 'date' ? date('Ymd', strtotime('+ 1 day')) : $selectedValue + 1;
             $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId3, 'custom_' . $customId => $greaterSelectedValue));
 
-            $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)), __FUNCTION__, __FILE__, $description);
+            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)));
+            echo $description . $selectedValue;
 
             $this->assertEquals($contactId, $result['values'][$contactId]['id']);
             if ($op == '>=') {
@@ -227,38 +256,40 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           break;
 
         case 'IN':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => (array) $selectedValue)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => (array) $selectedValue)));
           $this->assertEquals($contactId, $result['id']);
+          echo $description . implode(",", (array) $selectedValue);
           break;
 
         case 'NOT IN':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => (array) $notselectedValue)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => (array) $notselectedValue)));
           $this->assertEquals($contactId, $result['id']);
+          echo $description . implode(",", (array) $notselectedValue);
           break;
 
         case 'LIKE':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => (is_array($selectedValue) ? "%" . $selectedValue[0] . "%" : $selectedValue))), __FUNCTION__, __FILE__, $description);
+          $selectedValue = is_array($selectedValue) ? $selectedValue[0] : $selectedValue;
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => "%$selectedValue%")));
           $this->assertEquals($contactId, $result['id']);
+          echo $description . "%$selectedValue%";
           break;
 
         case 'NOT LIKE':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)));
           $this->assertEquals($contactId, $result['id']);
+          echo $description . "'$notselectedValue'";
           break;
 
         case 'IS NULL':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => 1)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => 1)));
           $this->assertEquals(FALSE, array_key_exists($contactId, $result['values']));
+          echo $description;
           break;
 
         case 'IS NOT NULL':
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => array($op => 1)), __FUNCTION__, __FILE__, $description);
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => 1)));
           $this->assertEquals($contactId, $result['id']);
-          break;
-
-        default:
-          $result = $this->callAPIAndDocument('Contact', 'Get', array('custom_' . $customId => (is_array($selectedValue) ? implode($seperator, $selectedValue) : $selectedValue)), __FUNCTION__, __FILE__, $description);
-          $this->assertEquals($contactId, $result['id']);
+          echo $description;
           break;
       }
     }

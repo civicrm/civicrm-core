@@ -394,7 +394,7 @@ SELECT label, value
               }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
-              if ($isSerialized && !empty($value) && !strstr($op, 'NULL')) {
+              if ($isSerialized && !empty($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
                 if (strstr($op, 'IN')) {
                   $value = str_replace(",", "[[:cntrl:]]*|[[:cntrl:]]*", $value);
                   $value = str_replace('(', '[[.left-parenthesis.]]', $value);
