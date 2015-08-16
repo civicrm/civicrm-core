@@ -307,7 +307,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     //Assigning Activity type name
     if ($this->_activityTypeId) {
-      $activityTName = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'name');
+      $activityTName = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
       if ($activityTName[$this->_activityTypeId]) {
         $this->_activityTypeName = $activityTName[$this->_activityTypeId];
         $this->assign('activityTName', $activityTName[$this->_activityTypeId]);

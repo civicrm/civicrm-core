@@ -773,4 +773,11 @@ AND    u.status = 1
     return $timezone;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function setHttpHeader($name, $value) {
+    drupal_add_http_header($name, $value);
+  }
+
 }

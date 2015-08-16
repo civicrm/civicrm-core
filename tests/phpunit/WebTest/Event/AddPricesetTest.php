@@ -671,7 +671,7 @@ class WebTest_Event_AddPricesetTest extends CiviSeleniumTestCase {
         'From' => $displayName,
         'Financial Type' => 'Event Fee',
         'Contribution Status' => 'Completed',
-        'Paid By' => 'Check',
+        'Payment Method' => 'Check',
         'Check Number' => '1044',
         'Received Into' => 'Deposit Bank Account',
       )

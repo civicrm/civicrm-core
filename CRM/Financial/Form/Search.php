@@ -78,7 +78,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     $this->add(
       'select',
       'payment_instrument_id',
-      ts('Payment Instrument'),
+      ts('Payment Method'),
       array('' => ts('- any -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
       FALSE
     );

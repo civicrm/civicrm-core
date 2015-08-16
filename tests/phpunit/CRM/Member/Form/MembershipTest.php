@@ -497,6 +497,81 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ));
     $form->preProcess();
     $this->createLoggedInUser();
+    $params = $this->getBaseSubmitParams();
+    $form->_mode = 'test';
+
+    $form->submit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 1);
+
+    $contribution = $this->callAPISuccess('Contribution', 'get', array(
+      'contact_id' => $this->_individualId,
+      'is_test' => TRUE,
+    ));
+
+    // CRM-16992.
+    $this->callAPISuccessGetCount('LineItem', array(
+      'entity_id' => $membership['id'],
+      'entity_table' => 'civicrm_membership',
+      'contribution_id' => $contribution['id'],
+    ), 1);
+  }
+
+  /**
+   * Test the submit function of the membership form.
+   */
+  public function testSubmitRecurCompleteInstant() {
+    $form = $this->getForm();
+
+    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
+    $processor->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'kettles boil water'));
+    $this->callAPISuccess('MembershipType', 'create', array(
+      'id' => $this->membershipTypeAnnualFixedID,
+      'duration_unit' => 'month',
+      'duration_interval' => 1,
+      'auto_renew' => TRUE,
+    ));
+    $form->preProcess();
+    $this->createLoggedInUser();
+    $params = $this->getBaseSubmitParams();
+    $form->_mode = 'test';
+
+    $form->submit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 1);
+
+    $contribution = $this->callAPISuccess('Contribution', 'get', array(
+      'contact_id' => $this->_individualId,
+      'is_test' => TRUE,
+    ));
+
+    $this->callAPISuccessGetCount('LineItem', array(
+      'entity_id' => $membership['id'],
+      'entity_table' => 'civicrm_membership',
+      'contribution_id' => $contribution['id'],
+    ), 1);
+
+  }
+
+  /**
+   * Get a membership form object.
+   *
+   * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
+   *
+   * @return \CRM_Member_Form_Membership
+   */
+  protected function getForm() {
+    $form = new CRM_Member_Form_Membership();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Core_Controller();
+    $form->_bltID = 5;
+    return $form;
+  }
+
+  /**
+   * @return array
+   */
+  protected function getBaseSubmitParams() {
     $params = array(
       'cid' => $this->_individualId,
       'price_set_id' => 0,
@@ -533,38 +608,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
     );
-    $form->_mode = 'test';
-
-    $form->submit($params);
-    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
-    $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 1);
-
-    $contribution = $this->callAPISuccess('Contribution', 'get', array(
-      'contact_id' => $this->_individualId,
-      'is_test' => TRUE,
-    ));
-    // Not currently passing.
-    //  $this->callAPISuccessGetCount('LineItem', array(
-    //  'entity_id' => $membership['id'],
-    //  'entity_table' => 'civicrm_membership',
-    //  'contribution_id' => $contribution['id'],
-    //), 1);
-    //
-  }
-
-  /**
-   * Get a membership form object.
-   *
-   * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
-   *
-   * @return \CRM_Member_Form_Membership
-   */
-  protected function getForm() {
-    $form = new CRM_Member_Form_Membership();
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form->controller = new CRM_Core_Controller();
-    $form->_bltID = 5;
-    return $form;
+    return $params;
   }
 
 }

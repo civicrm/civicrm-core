@@ -64,8 +64,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_prefix = 'case_';
 
-  protected $_defaults;
-
   /**
    * Processing needed for buildForm and later.
    *
@@ -248,7 +246,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 

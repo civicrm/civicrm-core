@@ -100,7 +100,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
       'Financial Type' => 'Donation (test)',
       'Total Amount' => 'Installments: 12, Interval: 1 month(s)',
       'Contribution Status' => 'Pending : Incomplete Transaction',
-      'Paid By' => 'Credit Card',
+      'Payment Method' => 'Credit Card',
     );
 
     foreach ($verifyData as $label => $value) {

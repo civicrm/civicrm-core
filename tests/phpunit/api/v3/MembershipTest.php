@@ -596,13 +596,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * We are checking for no enotices + only id & end_date returned
+   * We are checking for no e-notices + only id & end_date returned
    */
   public function testMembershipGetWithReturn() {
     $this->contactMembershipCreate($this->_params);
     $result = $this->callAPISuccess('membership', 'get', array('return' => 'end_date'));
     foreach ($result['values'] as $membership) {
-      $this->assertEquals(array('id', 'end_date'), array_keys($membership));
+      $this->assertEquals(array('end_date', 'membership_end_date', 'id'), array_keys($membership));
     }
   }
   ///////////////// civicrm_membership_create methods
@@ -712,6 +712,40 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     ));
     $this->assertEquals("custom string", $check['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+  }
+
+  /**
+   * Search on custom field value.
+   */
+  public function testSearchWithCustomDataCRM16036() {
+    // Create a custom field on membership
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    // Create a new membership, but don't assign anything to the custom field.
+    $params = $this->_params;
+    $result = $this->callAPIAndDocument(
+      $this->_entity,
+      'create',
+      $params,
+      __FUNCTION__,
+      __FILE__,
+      NULL,
+      'SearchWithCustomData');
+
+    // search memberships with CRM-16036 as custom field value.
+    // Since we did not touch the custom field of any membership,
+    // this should not return any results.
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+      'custom_' . $ids['custom_field_id'] => "CRM-16036",
+    ));
+
+    // Cleanup.
+    $this->callAPISuccess($this->_entity, 'delete', array(
+      'id' => $result['id'],
+    ));
+
+    // Assert.
+    $this->assertEquals(0, $check['count']);
   }
 
   /**

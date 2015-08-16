@@ -1315,7 +1315,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
 
           // overwrite - need to delete block which belongs to main-contact.
-          if ($mainBlockId && ($operation == 2)) {
+          if (isset($mainBlockId) && $mainBlockId && ($operation == 2)) {
             $deleteDAO = new $daoName();
             $deleteDAO->id = $mainBlockId;
             $deleteDAO->find(TRUE);

@@ -383,7 +383,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       'componentName' => 'Event',
       'contribution_id' => $contributionId,
       'contribution_status_id' => $contributionStatusId,
-      'skipComponentSync' => 1,
+      'IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved' => 1,
     );
 
     //change related contribution status.
@@ -463,7 +463,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       'labelColumn' => 'name',
       'flip' => 1,
     ));
-    $input['skipComponentSync'] = CRM_Utils_Array::value('skipComponentSync', $params);
+    $input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] = CRM_Utils_Array::value('IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved', $params);
     if ($statusId == $contributionStatuses['Cancelled']) {
       $baseIPN->cancelled($objects, $transaction, $input);
       $transaction->commit();

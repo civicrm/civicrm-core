@@ -351,7 +351,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
                     civicrm_subscription_history.method as method';
     }
 
-    $where = " WHERE contact_a.id = %1 AND civicrm_group.is_active = 1 AND civicrm_group.saved_search_id IS NULL";
+    $where = " WHERE contact_a.id = %1 AND civicrm_group.is_active = 1";
 
     if ($excludeHidden) {
       $where .= " AND civicrm_group.is_hidden = 0 ";
@@ -380,6 +380,10 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     }
 
     $from = CRM_Contact_BAO_Query::fromClause($tables);
+
+    //CRM-16945: seems hackish but as per CRM-16483 of using group criteria for Search Builder it is mandatory
+    //to include group_contact_cache clause when group table is present, so following code remove duplicacy
+    $from = str_replace("OR civicrm_group.id = civicrm_group_contact_cache.group_id", 'AND civicrm_group.saved_search_id IS NULL', $from);
 
     $where .= " AND $permission ";
 
@@ -799,15 +803,10 @@ AND    contact_id IN ( $contactStr )
 
     $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
 
-    if (($fieldName == 'group' || $fieldName == 'group_id')) {
-      // Enforce group visibility permissions
-      if (!empty($props['check_permissions'])) {
-        $options = CRM_Core_PseudoConstant::group();
-      }
-      if ($context == 'search' || $context == 'create') {
-        // Sort group list by hierarchy
-        $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
-      }
+    // Sort group list by hierarchy
+    // TODO: This will only work when api.entity is "group_contact". What about others?
+    if (($fieldName == 'group' || $fieldName == 'group_id') && ($context == 'search' || $context == 'create')) {
+      $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
     }
 
     return $options;

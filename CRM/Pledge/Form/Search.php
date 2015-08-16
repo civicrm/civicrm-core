@@ -64,12 +64,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_prefix = "pledge_";
 
-  protected $_defaults;
-
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
 
@@ -218,7 +214,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
 
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 

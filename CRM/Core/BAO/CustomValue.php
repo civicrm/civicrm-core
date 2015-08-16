@@ -165,7 +165,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param array $formValues
    * @return null
    */
-  public static function fixFieldValueOfTypeMemo(&$formValues) {
+  public static function fixCustomFieldValue(&$formValues) {
     if (empty($formValues)) {
       return NULL;
     }
@@ -180,14 +180,24 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       $htmlType = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_CustomField',
         substr($key, 7), 'html_type'
       );
-      if (($htmlType == 'TextArea') &&
+      $dataType = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_CustomField',
+        substr($key, 7), 'data_type'
+      );
+
+      if (is_array($formValues[$key])) {
+        if (!in_array(key($formValues[$key]), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $formValues[$key] = array('IN' => $formValues[$key]);
+        }
+      }
+      elseif (($htmlType == 'TextArea' ||
+          ($htmlType == 'Text' && $dataType == 'String')
+        ) &&
         !((substr($formValues[$key], 0, 1) == '%') ||
           (substr($formValues[$key], -1, 1) == '%')
         )
       ) {
-        $formValues[$key] = '%' . $formValues[$key] . '%';
+        $formValues[$key] = array('LIKE' => '%' . $formValues[$key] . '%');
       }
-
     }
   }
 

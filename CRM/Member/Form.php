@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -71,6 +69,20 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @var array
    */
   protected $membershipTypeRenewalStatus = array();
+
+  /**
+   * Price set ID configured for the form.
+   *
+   * @var int
+   */
+  public $_priceSetId;
+
+  /**
+   * Price set details as an array.
+   *
+   * @var array
+   */
+  public $_priceSet;
 
   public function preProcess() {
     // Check for edit permission.
@@ -332,6 +344,82 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'is_recur' => TRUE,
     );
     return $returnParams;
+  }
+
+  /**
+   * Ensure price parameters are set.
+   *
+   * If they are not set it means a quick config option has been chosen so we
+   * fill them in here to make the two flows the same. They look like 'price_2' => 2 etc.
+   *
+   * @param array $formValues
+   */
+  protected function ensurePriceParamsAreSet(&$formValues) {
+    foreach ($formValues as $key => $value) {
+      if ((substr($key, 0, 6) == 'price_') && is_int(substr($key, 7))) {
+        return;
+      }
+    }
+    $priceFields = CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(
+      $formValues['membership_type_id'][0],
+      $formValues['membership_type_id'][1],
+      $formValues['total_amount'],
+      $this->_priceSetId
+    );
+    $formValues = array_merge($formValues, $priceFields['price_fields']);
+  }
+
+  /**
+   * Get the details for the selected price set.
+   *
+   * @param array $params
+   *   Parameters submitted to the form.
+   *
+   * @return array
+   */
+  protected static function getPriceSetDetails($params) {
+    $priceSetID = CRM_Utils_Array::value('price_set_id', $params);
+    if ($priceSetID) {
+      return CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
+    }
+    else {
+      $priceSet = CRM_Price_BAO_PriceSet::getDefaultPriceSet('membership');
+      $priceSet = reset($priceSet);
+      return CRM_Price_BAO_PriceSet::getSetDetail($priceSet['setID']);
+    }
+  }
+
+  /**
+   * Get the selected price set id.
+   *
+   * @param array $params
+   *   Parameters submitted to the form.
+   *
+   * @return int
+   */
+  protected static function getPriceSetID($params) {
+    $priceSetID = CRM_Utils_Array::value('price_set_id', $params);
+    if (!$priceSetID) {
+      $priceSetDetails = self::getPriceSetDetails($params);
+      return key($priceSetDetails);
+    }
+    return $priceSetID;
+  }
+
+  /**
+   * Store parameters relating to price sets.
+   *
+   * @param array $formValues
+   *
+   * @return array
+   */
+  protected function setPriceSetParameters($formValues) {
+    $this->_priceSetId = self::getPriceSetID($formValues);
+    $priceSetDetails = self::getPriceSetDetails($formValues);
+    $this->_priceSet = $priceSetDetails[$this->_priceSetId];
+    // process price set and get total amount and line items.
+    $this->ensurePriceParamsAreSet($formValues);
+    return $formValues;
   }
 
 }

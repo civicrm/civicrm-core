@@ -49,7 +49,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param array $contact
+   * @param CRM $contact
    *   Contact object.
    *
    * @return CRM_Contact_BAO_Contact
@@ -254,7 +254,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     }
 
     //now set the names.
-    $names = array('sortName' => 'sort_name', 'displayName' => 'display_name');
+    $names = array('displayName' => 'display_name', 'sortName' => 'sort_name');
     foreach ($names as $value => $name) {
       if (empty($$value)) {
         if ($email) {
@@ -262,6 +262,13 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
         elseif ($uniqId) {
           $$value = $uniqId;
+        }
+        elseif (!empty($params[$name])) {
+          $$value = $params[$name];
+        }
+        // If we have nothing else going on set sort_name to display_name.
+        elseif ($displayName) {
+          $$value = $displayName;
         }
       }
       //finally if we could not pass anything lets keep db.
@@ -408,11 +415,10 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * Check if there is data to create the object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return bool
    */
-  public static function dataExists(&$params) {
+  public static function dataExists($params) {
     if ($params['contact_type'] == 'Individual') {
       return TRUE;
     }

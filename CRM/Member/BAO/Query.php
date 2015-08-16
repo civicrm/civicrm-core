@@ -396,7 +396,7 @@ class CRM_Member_BAO_Query {
     );
 
     $form->addSelect('membership_type_id',
-      array('entity' => 'membership', 'multiple' => 'multiple', 'label' => ts('Memebership Type(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+      array('entity' => 'membership', 'multiple' => 'multiple', 'label' => ts('Membership Type(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
     $form->addElement('text', 'member_source', ts('Source'));

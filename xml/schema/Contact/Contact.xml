@@ -10,7 +10,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
-    <title>Internal Contact ID</title>
+    <title>Contact ID</title>
     <import>true</import>
     <headerPattern>/internal|contact?|id$/i</headerPattern>
     <required>true</required>
@@ -360,7 +360,7 @@
   </index>
   <field>
     <name>source</name>
-    <title>Source of Contact Data</title>
+    <title>Contact Source</title>
     <uniqueName>contact_source</uniqueName>
     <type>varchar</type>
     <length>255</length>
@@ -370,7 +370,7 @@
     </html>
 
     <import>true</import>
-    <headerPattern>/(S(ource\s)?o(f\s)?C(ontact\s)?Data)$/i</headerPattern>
+    <headerPattern>/(C(ontact\s)?Source)$/i</headerPattern>
     <comment>where contact come from, e.g. import, donate module insert...</comment>
     <add>1.1</add>
   </field>
@@ -672,7 +672,7 @@
   </field>
   <field>
     <name>is_deceased</name>
-    <title>Is Deceased</title>
+    <title>Deceased</title>
     <import>true</import>
     <export>true</export>
     <headerPattern>/i(s\s)?d(eceased)$/i</headerPattern>
@@ -798,7 +798,7 @@
   </field>
   <field>
     <name>employer_id</name>
-    <title>Current Employer ID</title>
+    <title>Current Employer</title>
     <uniqueName>current_employer_id</uniqueName>
     <type>int unsigned</type>
     <comment>OPTIONAL FK to civicrm_contact record.</comment>

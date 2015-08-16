@@ -182,13 +182,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_priceSet;
 
   /**
-   * Form defaults
-   * @todo can we define this a as protected? can we define higher up the chain
-   * @var array
-   */
-  public $_defaults;
-
-  /**
    * User display name
    *
    * @var string
@@ -548,10 +541,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_mode) {
       if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE) == TRUE) {
         if (!empty($this->_recurPaymentProcessors)) {
-          CRM_Contribute_Form_Contribution_Main::buildRecur($this);
-          $this->setDefaults(array('is_recur' => 0));
-          $this->assign('buildRecurBlock', TRUE);
-          $recurJs = array('onChange' => "buildRecurBlock( this.value ); return false;");
+          $buildRecurBlock = TRUE;
+          if ($this->_ppID) {
+            // ppID denotes a pledge payment.
+            foreach ($this->_paymentProcessors as $processor) {
+              if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('recurContributionsForPledges')) {
+                $buildRecurBlock = TRUE;
+                break;
+              }
+              $buildRecurBlock = FALSE;
+            }
+          }
+          if ($buildRecurBlock) {
+            CRM_Contribute_Form_Contribution_Main::buildRecur($this);
+            $this->setDefaults(array('is_recur' => 0));
+            $this->assign('buildRecurBlock', TRUE);
+            $recurJs = array('onChange' => "buildRecurBlock( this.value ); return false;");
+          }
         }
       }
     }
@@ -613,7 +619,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $paymentInstrument = FALSE;
     if (!$this->_mode) {
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
-        ts('Paid By'),
+        ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
         TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
       );
@@ -1191,16 +1197,28 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('is_deductible', TRUE);
       $this->set('is_deductible', TRUE);
     }
+    $contributionParams = array(
+      'contact_id' => $contactID,
+      'line_item' => $lineItem,
+      'is_test' => $isTest,
+      'campaign_id' => CRM_Utils_Array::value('campaign_id', $this->_params),
+      'contribution_page_id' => CRM_Utils_Array::value('contribution_page_id', $this->_params),
+      'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+      'thankyou_date' => CRM_Utils_Array::value('thankyou_date', $this->_params),
+    );
+
+    if (empty($paymentParams['is_pay_later'])) {
+      // @todo look up payment_instrument_id on payment processor table.
+      $contributionParams['payment_instrument_id'] = 1;
+    }
 
     $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($this,
       $this->_params,
       NULL,
-      $contactID,
+      $contributionParams,
       $financialType,
       TRUE,
       FALSE,
-      $isTest,
-      $lineItem,
       $this->_bltID
     );
 
@@ -1229,7 +1247,21 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
          * = error or success, unless it is a recurring contribution in which case it is pending.
          */
         if ($result['payment_status_id'] == array_search('Completed', $statuses)) {
-          civicrm_api3('contribution', 'completetransaction', array('id' => $contribution->id, 'trxn_id' => $result['trxn_id']));
+          try {
+            civicrm_api3('contribution', 'completetransaction', array(
+              'id' => $contribution->id,
+              'trxn_id' => $result['trxn_id'],
+              'payment_processor_id' => $this->_paymentProcessor['id'],
+              'is_transactional' => FALSE,
+            ));
+            // This has now been set to 1 in the DB - declare it here also
+            $contribution->contribution_status_id = 1;
+          }
+          catch (CiviCRM_API3_Exception $e) {
+            if ($e->getErrorCode() != 'contribution_completed') {
+              throw new CRM_Core_Exception('Failed to update contribution in database');
+            }
+          }
         }
         else {
           // Save the trxn_id.

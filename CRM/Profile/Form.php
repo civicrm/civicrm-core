@@ -135,8 +135,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   protected $_ctype = NULL;
 
-  protected $_defaults = NULL;
-
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode

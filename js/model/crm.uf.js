@@ -197,7 +197,8 @@
       },
       'label': {
         title: ts('Field Label'),
-        type: 'Text'
+        type: 'Text',
+        editorAttrs: {maxlength: 255}
       },
       'location_type_id': {
         title: ts('Location Type'),
@@ -487,6 +488,7 @@
         title: ts('Profile Name'),
         help: ts(''),
         type: 'Text',
+        editorAttrs: {maxlength: 64},
         validators: ['required']
       },
       'group_type': {
@@ -668,9 +670,8 @@
           return _.omit(ufFieldModel.toStrictJSON(), ['id', 'uf_group_id']);
         })
       );
-      copy.set('title', ts('%1 (Copy)', {
-        1: copy.get('title')
-      }));
+      var copyLabel = ' ' + ts('(Copy)');
+      copy.set('title', copy.get('title').slice(0, 64 - copyLabel.length) + copyLabel);
       return copy;
     },
     getModelClass: function(entity_name) {
@@ -698,11 +699,15 @@
      * @return {Boolean}
      */
     //CRM-15427
-    checkGroupType: function(validTypesExpr, allowAllSubtypes) {
+    checkGroupType: function(validTypesExpr, allowAllSubtypes, usedByFilter) {
       var allMatched = true;
       allowAllSubtypes = allowAllSubtypes || false;
+      usedByFilter = usedByFilter || null;
       if (_.isEmpty(this.get('group_type'))) {
         return true;
+      }
+      if (usedByFilter && _.isEmpty(this.get('module'))) {
+        return false;
       }
 
       var actualTypes = CRM.UF.parseTypeList(this.get('group_type'));
@@ -715,6 +720,10 @@
         }
       });
 
+      // CRM-16915 - filter with usedBy module if specified.
+      if (usedByFilter && this.get('module') != usedByFilter) {
+        allMatched = false;
+      }
       //CRM-15427 allow all subtypes
       if (!$.isEmptyObject(validTypes.subTypes) && !allowAllSubtypes) {
         // Every actual.subType is a valid.subType

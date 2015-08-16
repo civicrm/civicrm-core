@@ -75,17 +75,19 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     }
     $required = !empty($widget['required']);
 
+    if ($widget['type'] == 'RichTextEditor') {
+      $widget['type'] = 'wysiwyg';
+      $attributes['class'] .= ' collapsed';
+    }
+
     $languages = CRM_Core_I18n::languages(TRUE);
     foreach ($this->_locales as $locale) {
+      $attr = $attributes;
       $name = "{$field}_{$locale}";
       if ($locale == $tsLocale) {
-        $attributes['class'] .= ' default-lang';
+        $attr['class'] .= ' default-lang';
       }
-      if ($widget['type'] == 'RichTextEditor') {
-        $attributes['class'] .= ' collapsed';
-        $widget['type'] = 'wysiwyg';
-      }
-      $this->add($widget['type'], $name, $languages[$locale], $attributes, $required);
+      $this->add($widget['type'], $name, $languages[$locale], $attr, $required);
 
       $this->_defaults[$name] = $dao->$locale;
     }

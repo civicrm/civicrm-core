@@ -40,7 +40,6 @@
 class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   const RULES_COUNT = 5;
   protected $_contactType;
-  protected $_defaults = array();
   protected $_fields = array();
   protected $_rgid;
 

@@ -264,7 +264,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'receive_date' => array(
-            'title' => ts('Receive Date'),
+            'title' => ts('Date Received'),
             'default_weight' => '2',
             'default_order' => 'DESC',
           ),

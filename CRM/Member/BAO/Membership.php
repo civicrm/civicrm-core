@@ -2031,11 +2031,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $membershipOrg
    * @param int $membershipTypeID
    * @param float $total_amount
+   * @param int $priceSetId
    *
    * @return array
    */
-  public static function getQuickConfigMembershipLineItems($membershipOrg, $membershipTypeID, $total_amount) {
-    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
+  public static function setQuickConfigMembershipParameters($membershipOrg, $membershipTypeID, $total_amount, $priceSetId) {
     $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
 
     // The name of the price field corresponds to the membership_type organization contact.
@@ -2419,52 +2419,6 @@ WHERE      civicrm_membership.is_test = 0";
       ));
     }
     return $contribution;
-  }
-
-  /**
-   * Record line items for default membership.
-   * @deprecated
-   *
-   * Use getQuickConfigMembershipLineItems
-   *
-   * @param CRM_Core_Form $qf
-   * @param array $membershipType
-   *   Array with membership type and organization.
-   *
-   * @return int $priceSetId
-   */
-  public static function createLineItems(&$qf, $membershipType) {
-    $qf->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
-    $qf->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-
-    // The name of the price field corresponds to the membership_type organization contact.
-    $editedFieldParams = array(
-      'price_set_id' => $priceSetId,
-      'name' => $membershipType[0],
-    );
-    $editedResults = array();
-    CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
-
-    if (!empty($editedResults)) {
-      unset($qf->_priceSet['fields']);
-      $qf->_priceSet['fields'][$editedResults['id']] = $priceSets['fields'][$editedResults['id']];
-      unset($qf->_priceSet['fields'][$editedResults['id']]['options']);
-      $fid = $editedResults['id'];
-      $editedFieldParams = array(
-        'price_field_id' => $editedResults['id'],
-        'membership_type_id' => $membershipType[1],
-      );
-      $editedResults = array();
-      CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
-      $qf->_priceSet['fields'][$fid]['options'][$editedResults['id']] = $priceSets['fields'][$fid]['options'][$editedResults['id']];
-      if (!empty($qf->_params['total_amount'])) {
-        $qf->_priceSet['fields'][$fid]['options'][$editedResults['id']]['amount'] = $qf->_params['total_amount'];
-      }
-    }
-
-    $fieldID = key($qf->_priceSet['fields']);
-    $qf->_params['price_' . $fieldID] = CRM_Utils_Array::value('id', $editedResults);
-    return $priceSetId;
   }
 
   /**

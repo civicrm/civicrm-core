@@ -90,11 +90,6 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
-    if ($this->_id) {
-      $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-      CRM_Utils_System::setTitle(ts('Include Profiles') . " ($title)");
-    }
-
     $ufJoinParams = array(
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',

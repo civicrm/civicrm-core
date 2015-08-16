@@ -124,7 +124,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
    * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   protected function addPaypalExpressCode(&$form) {
     if (empty($form->isBackOffice)) {
@@ -153,6 +153,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   protected function supportsRecurContributionsForPledges() {
     return TRUE;
+  }
+
+  /**
+   * Default payment instrument validation.
+   *
+   * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
+   * Not a static function, because I need to check for payment_type.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  public function validatePaymentInstrument($values, &$errors) {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Pro') {
+      CRM_Core_Payment_Form::validateCreditCard($values, $errors);
+    }
   }
 
   /**
@@ -934,6 +949,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     return $result;
+  }
+
+  /**
+   * Get array of fields that should be displayed on the payment form.
+   *
+   * @return array
+   * @throws CiviCRM_API3_Exception
+   */
+  public function getPaymentFormFields() {
+    if ($this->_processorName == ts('PayPal Pro')) {
+      return $this->getCreditCardFormFields();
+    }
+    else {
+      return array();
+    }
   }
 
   /**

@@ -1165,19 +1165,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     switch ($html_type) {
       case 'Radio':
         if ($data_type == 'Boolean') {
-          // Do not assume that if not yes means no.
-          $display = '';
-          if ($value) {
-            $display = ts('Yes');
-          }
-          elseif ((string) $value === '0') {
-            $display = ts('No');
-          }
+          $option = array('No', 'Yes');
         }
-        elseif (is_array($value)) {
+        if (is_array($value)) {
           $display = NULL;
           foreach ($value as $data) {
             $display .= $display ? ', ' . $option[$data] : $option[$data];
+
           }
         }
         else {
@@ -1197,7 +1191,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Select':
-        $display = CRM_Utils_Array::value($value, $option);
+        if (is_array($value)) {
+          $display = NULL;
+          foreach ($value as $data) {
+            $display .= $display ? ', ' . $option[$data] : $option[$data];
+          }
+        }
+        else {
+          $display = CRM_Utils_Array::value($value, $option);
+        }
         break;
 
       case 'CheckBox':
@@ -1213,25 +1215,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           if ($html_type == 'CheckBox') {
             $newData = array();
             foreach ($checkedData as $v) {
-              $newData[$v] = 1;
+              $v = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $v);
+              $newData[] = $v;
             }
             $checkedData = $newData;
           }
         }
 
         $v = array();
-        $p = array();
         foreach ($checkedData as $key => $val) {
-          if ($html_type == 'CheckBox') {
-            if ($val) {
-              $p[] = $key;
-              $v[] = CRM_Utils_Array::value($key, $option);
-            }
-          }
-          else {
-            $p[] = $val;
-            $v[] = CRM_Utils_Array::value($val, $option);
-          }
+          $v[] = CRM_Utils_Array::value($val, $option);
         }
         if (!empty($v)) {
           $display = implode(', ', $v);

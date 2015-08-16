@@ -740,7 +740,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
       $allCases = FALSE;
     }
 
-    $condition = " AND civicrm_case.is_deleted = 0 ";
+    $condition = " AND civicrm_case.is_deleted = 0 AND civicrm_contact.is_deleted <> 1";
 
     if (!$allCases) {
       $condition .= " AND case_relationship.contact_id_b = {$userID} ";
@@ -917,6 +917,7 @@ AND civicrm_case.status_id != $closedId";
       $userID = 'null';
       $all = 1;
       $case_owner = 1;
+      $myGroupByClause = ' GROUP BY civicrm_case.id';
     }
     else {
       $all = 0;
@@ -925,17 +926,19 @@ AND civicrm_case.status_id != $closedId";
       $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
     }
 
+    // FIXME: This query could be a lot more efficient if it used COUNT() instead of returning all rows and then counting them with php
     $query = "
 SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
  case_type_id, case_relationship.contact_id_b
  FROM civicrm_case
+ INNER JOIN civicrm_case_contact cc on cc.case_id = civicrm_case.id
  LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
  LEFT JOIN civicrm_option_group option_group_case_status ON ( option_group_case_status.name = 'case_status' )
  LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
  AND option_group_case_status.id = case_status.option_group_id )
  LEFT JOIN civicrm_relationship case_relationship ON ( case_relationship.case_id  = civicrm_case.id
  AND case_relationship.contact_id_b = {$userID})
- WHERE is_deleted =0
+ WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
 {$myCaseWhereClause} {$myGroupByClause}";
 
     $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);

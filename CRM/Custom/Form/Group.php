@@ -60,13 +60,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   protected $_subtypes = array();
 
   /**
-   * Array of default params.
-   *
-   * @var array
-   */
-  protected $_defaults = array();
-
-  /**
    * Set variables up before form is built.
    *
    *

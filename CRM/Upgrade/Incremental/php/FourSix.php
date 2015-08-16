@@ -177,4 +177,21 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
     return TRUE;
   }
 
+  /**
+   * Queue Task Callback for CRM-16846
+   *
+   * Run a sql file without resetting locale to that version
+   */
+  public static function task_4_6_x_runOnlySql(CRM_Queue_TaskContext $ctx, $rev) {
+    $upgrade = new CRM_Upgrade_Form();
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('domainID', CRM_Core_Config::domainID());
+
+    $fileName = "CRM/Upgrade/Incremental/sql/$rev.mysql.tpl";
+
+    $upgrade->source($smarty->fetch($fileName), TRUE);
+
+    return TRUE;
+  }
+
 }

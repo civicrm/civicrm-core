@@ -620,6 +620,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'where_tables',
         ),
       ),
+      'StatusPreference' => array(
+        'break_return' => array(
+          'ignore_severity',
+        ),
+      ),
     );
     if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])) {
       return array();
@@ -1182,9 +1187,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
               $entity[$fieldName] = (string) $entity2['id'];
             }
             else {
-              $uniqueName = CRM_Utils_Array::value('uniqueName', $specs);
+              $uniqueName = CRM_Utils_Array::value('uniqueName', $specs, $fieldName);
               if (!empty($entity[$fieldName])) {
-                $resetFKTo = array($fieldName => $entity[$fieldName]);
+                $resetFKTo = array($fieldName => $entity[$fieldName], $uniqueName => $entity[$fieldName]);
               }
               $entity[$fieldName] = (string) empty($entity2[$field]) ? CRM_Utils_Array::value($uniqueName, $entity2) : $entity2[$field];
               //todo - there isn't always something set here - & our checking on unset values is limited
@@ -1222,7 +1227,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
                 'sequential' => 1,
               ));
             $optionValue = $optionValue['values'];
-            $options[$optionValue[0]['value']] = 'new option value';
+            $keyColumn = CRM_Utils_Array::value('keyColumn', $specs['pseudoconstant'], 'value');
+            $options[$optionValue[0][$keyColumn]] = 'new option value';
           }
         }
         $entity[$field] = array_rand($options);
@@ -1242,6 +1248,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
 
+      if (!empty($specs['uniqueName'])) {
+        $entity[$specs['uniqueName']] = $entity[$specs['name']];
+      }
+
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $checkParams = array(
         'id' => $entity['id'],
@@ -1254,6 +1264,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       );
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
+
       $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updated\n" . print_r(array(
             'update-params' => $updateParams,
             'update-result' => $update,

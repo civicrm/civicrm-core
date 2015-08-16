@@ -354,7 +354,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->add('text', 'num_terms', ts('Extend Membership by'), array('onchange' => "setPaymentBlock();"), TRUE);
       $this->addRule('num_terms', ts('Please enter a whole number for how many periods to renew.'), 'integer');
 
-      $this->add('select', 'payment_instrument_id', ts('Paid By'),
+      $this->add('select', 'payment_instrument_id', ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
         FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
       );
@@ -439,7 +439,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $errors['total_amount'] = ts('Please enter a Contribution Amount.');
       }
       if (empty($params['payment_instrument_id'])) {
-        $errors['payment_instrument_id'] = ts('Paid By is a required field.');
+        $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
       }
     }
     return empty($errors) ? TRUE : $errors;
@@ -615,16 +615,15 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       //create line items
       $lineItem = array();
-
-      $priceSetId = CRM_Member_BAO_Membership::createLineItems($this, $this->_params['membership_type_id']);
+      $this->_params = $this->setPriceSetParameters($this->_params);
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $this->_params, $lineItem[$priceSetId]
+        $this->_params, $lineItem[$this->_priceSetId]
       );
       //CRM-11529 for quick config backoffice transactions
       //when financial_type_id is passed in form, update the
       //line items with the financial type selected in form
       if ($submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $this->_params)) {
-        foreach ($lineItem[$priceSetId] as &$li) {
+        foreach ($lineItem[$this->_priceSetId] as &$li) {
           $li['financial_type_id'] = $submittedFinancialType;
         }
       }

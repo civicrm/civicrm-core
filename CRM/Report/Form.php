@@ -90,8 +90,6 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   protected $_options = array();
 
-  protected $_defaults = array();
-
   /**
    * By default most reports hide contact id.
    * Setting this to true makes it available
@@ -3144,7 +3142,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           //Load the image
           $chart = imagecreatefrompng($uploadUrl);
           //convert it into formatted png
-          header('Content-type: image/png');
+          CRM_Utils_System::setHttpHeader('Content-type', 'image/png');
           //overwrite with same image
           imagepng($chart, $uploadImg);
           //delete the object
@@ -3357,7 +3355,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
     $clause = "{$field['dbAlias']} IN (" . implode(', ', $value) . ")";
 
-    return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
+    $contactAlias = $this->_aliases['civicrm_contact'];
+    if (!empty($this->relationType) && $this->relationType == 'b_a') {
+      $contactAlias = $this->_aliases['civicrm_contact_b'];
+    }
+    return " {$contactAlias}.id {$sqlOp} (
                           SELECT DISTINCT {$this->_aliases['civicrm_group']}.contact_id
                           FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
                           WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added'

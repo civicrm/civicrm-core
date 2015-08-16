@@ -111,7 +111,7 @@ class civicrm_cli {
       $result = civicrm_api($this->_entity, $this->_action, $this->_params);
     }
 
-    if ($result['is_error'] != 0) {
+    if (!empty($result['is_error'])) {
       $this->_log($result['error_message']);
       return FALSE;
     }

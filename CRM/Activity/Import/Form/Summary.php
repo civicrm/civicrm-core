@@ -44,9 +44,8 @@ class CRM_Activity_Import_Form_Summary extends CRM_Import_Form_Summary {
    * @return void
    */
   public function preProcess() {
-
     // set the error message path to display
-    $errorFile = $this->assign('errorFile', $this->get('errorFile'));
+    $this->assign('errorFile', $this->get('errorFile'));
 
     $totalRowCount = $this->get('totalRowCount');
     $relatedCount = $this->get('relatedCount');

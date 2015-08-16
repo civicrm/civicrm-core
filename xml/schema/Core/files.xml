@@ -55,4 +55,5 @@
   <xi:include href="PrintLabel.xml"           parse="xml" />
   <xi:include href="WordReplacement.xml"      parse="xml" />
   <xi:include href="RecurringEntity.xml"      parse="xml" />
+  <xi:include href="StatusPreference.xml"     parse="xml" />
 </tables>

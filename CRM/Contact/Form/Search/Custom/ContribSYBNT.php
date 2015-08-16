@@ -167,18 +167,15 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
 
     $from = $this->from();
 
+    $select = $this->select();
     if ($justIDs) {
-      $select = $this->select();
       $select .= ', contact_a.id, display_name';
     }
     else {
-      $select = $this->select();
       $select = "
            DISTINCT contact_a.id as contact_id,
            contact_a.display_name as display_name,
-           $select
-";
-
+           $select ";
     }
     $this->buildACLClause('contact_a');
     $sql = "

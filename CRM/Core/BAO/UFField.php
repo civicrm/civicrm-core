@@ -1137,11 +1137,11 @@ SELECT  id
         ),
         'receive_date' => array(
           'name' => 'receive_date',
-          'title' => ts('Receive Date'),
+          'title' => ts('Date Received'),
         ),
         'payment_instrument' => array(
           'name' => 'payment_instrument',
-          'title' => ts('Payment Instrument'),
+          'title' => ts('Payment Method'),
         ),
         'contribution_status_id' => array(
           'name' => 'contribution_status_id',

@@ -517,7 +517,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'alter_display' => 'alterContributionType',
           ),
           'payment_instrument_id' => array(
-            'title' => ts('Payment Instrument'),
+            'title' => ts('Payment Method'),
             'alter_display' => 'alterPaymentType',
           ),
           'source' => array('title' => 'Contribution Source'),
@@ -553,7 +553,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'payment_instrument_id' => array(
-            'title' => ts('Payment Instrument'),
+            'title' => ts('Payment Method'),
           ),
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
@@ -561,7 +561,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
         ),
         'group_bys' => array(
           'financial_type_id' => array('title' => ts('Financial Type')),
-          'payment_instrument_id' => array('title' => ts('Payment Instrument')),
+          'payment_instrument_id' => array('title' => ts('Payment Method')),
           'contribution_id' => array(
             'title' => ts('Individual Contribution'),
             'name' => 'id',

@@ -1251,11 +1251,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $errorFileName = $parserName::errorFileName($type);
         $saveFileName = $parserName::saveFileName($type);
         if (!empty($errorFileName) && !empty($saveFileName)) {
-          header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-          header('Content-Description: File Transfer');
-          header('Content-Type: text/csv');
-          header('Content-Length: ' . filesize($errorFileName));
-          header('Content-Disposition: attachment; filename=' . $saveFileName);
+          CRM_Utils_System::setHttpHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
+          CRM_Utils_System::setHttpHeader('Content-Description', 'File Transfer');
+          CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv');
+          CRM_Utils_System::setHttpHeader('Content-Length', filesize($errorFileName));
+          CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=' . $saveFileName);
 
           readfile($errorFileName);
         }
@@ -1330,7 +1330,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     // early exit for master_id, CRM-12100
     // in the DB it is an ID, but in the export, we retrive the display_name of the master record
-    if ($fieldName == 'master_id') {
+    // also for current_employer, CRM-16939
+    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
       $sqlColumns[$fieldName] = "$fieldName varchar(128)";
       return;
     }
@@ -2038,8 +2039,8 @@ WHERE  {$whereClause}";
       $componentPaymentFields = array(
         'componentPaymentField_total_amount' => ts('Total Amount'),
         'componentPaymentField_contribution_status' => ts('Contribution Status'),
-        'componentPaymentField_received_date' => ts('Received Date'),
-        'componentPaymentField_payment_instrument' => ts('Payment Instrument'),
+        'componentPaymentField_received_date' => ts('Date Received'),
+        'componentPaymentField_payment_instrument' => ts('Payment Method'),
         'componentPaymentField_transaction_id' => ts('Transaction ID'),
       );
     }

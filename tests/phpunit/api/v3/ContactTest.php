@@ -229,6 +229,22 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test creating individual by display_name.
+   *
+   * Display name & sort name should be set.
+   */
+  public function testCreateDisplayNameIndividual() {
+    $params = array(
+      'display_name' => 'abc1',
+      'contact_type' => 'Individual',
+    );
+
+    $contact = $this->callAPISuccess('contact', 'create', $params);
+    $params['sort_name'] = 'abc1';
+    $this->getAndCheck($params, $contact['id'], 'contact');
+  }
+
+  /**
    * Test old keys still work.
    *
    * Verify that attempt to create individual contact with
@@ -1618,7 +1634,44 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Verify attempt to create individual with chained arrays.
+   *  Verify attempt to create individual with chained arrays and sequential
+   */
+  public function testGetIndividualWithChainedArraysAndSequential() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params['custom_' . $ids['custom_field_id']] = "custom string";
+
+    $moreids = $this->CustomGroupMultipleCreateWithFields();
+    $description = "/*this demonstrates the usage of chained api functions. In this case no notes or custom fields have been created ";
+    $subfile = "APIChainedArray";
+    $params = array(
+      'sequential' => 1,
+      'first_name' => 'abc3',
+      'last_name' => 'xyz3',
+      'contact_type' => 'Individual',
+      'email' => 'man3@yahoo.com',
+      'api.website.create' => array(
+        array(
+          'url' => "http://civicrm.org",
+        ),
+        array(
+          'url' => "https://civicrm.org",
+        ),
+      ),
+    );
+
+    $result = $this->callAPISuccess('Contact', 'create', $params);
+
+    // delete the contact and custom groups
+    $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
+    $this->customGroupDelete($ids['custom_group_id']);
+    $this->customGroupDelete($moreids['custom_group_id']);
+
+    $this->assertEquals($result['id'], $result['values'][0]['id']);
+    $this->assertArrayKeyExists('api.website.create', $result['values'][0]);
+  }
+
+  /**
+   *  Verify attempt to create individual with chained arrays
    */
   public function testGetIndividualWithChainedArrays() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -1683,6 +1736,47 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['id']);
     $this->assertEquals(0, $result['values'][$result['id']]['api.website.get']['is_error']);
     $this->assertEquals("http://civicrm.org", $result['values'][$result['id']]['api.website.get']['values'][0]['url']);
+  }
+
+  /**
+   *  Verify attempt to create individual with chained arrays and sequential.
+   *
+   *  See https://issues.civicrm.org/jira/browse/CRM-15815
+   */
+  public function testCreateIndividualWithChainedArrayAndSequential() {
+    $params = array(
+      'sequential' => 1,
+      'first_name' => 'abc5',
+      'last_name' => 'xyz5',
+      'contact_type' => 'Individual',
+      'email' => 'woman5@yahoo.com',
+      'api.phone.create' => array(
+        array('phone' => '03-231 07 95'),
+        array('phone' => '03-232 51 62'),
+      ),
+      'api.website.create' => array(
+        'url' => 'http://civicrm.org',
+      ),
+    );
+    $result = $this->callAPISuccess('Contact', 'create', $params);
+
+    // I could try to parse the result to see whether the two phone numbers
+    // and the website are there, but I am not sure about the correct format.
+    // So I will just fetch it again before checking.
+    // See also http://forum.civicrm.org/index.php/topic,35393.0.html
+    $params = array(
+      'sequential' => 1,
+      'id' => $result['id'],
+      'api.website.get' => array(),
+      'api.phone.get' => array(),
+    );
+    $result = $this->callAPISuccess('Contact', 'get', $params);
+
+    // delete the contact
+    $this->callAPISuccess('contact', 'delete', $result);
+
+    $this->assertEquals(2, $result['values'][0]['api.phone.get']['count']);
+    $this->assertEquals(1, $result['values'][0]['api.website.get']['count']);
   }
 
   public function testGetIndividualWithChainedArraysFormats() {

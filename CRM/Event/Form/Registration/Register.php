@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -44,11 +42,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * The fields involved in this page.
    */
   public $_fields;
-
-  /**
-   * The defaults involved in this page.
-   */
-  public $_defaults;
 
   /**
    * The status message that user view.
@@ -123,38 +116,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
-   * Adding discussion from CRM-11915 as code comments
-   * When multiple payment processors are configured for a event and user does any selection changes for them on online event registeration page :
-   * The 'Register' page gets loaded through ajax and following happens :
-   * the setDefaults function is called with the variable _ppType set with selected payment processor type,
-   * so in the 'if' condition checked whether the selected payment processor's billing mode is of 'billing form mode'. If its not, don't setDefaults for billing form and return instead.
-   * - For payment processors of billing mode 'Notify' - return from setDefaults before the code for billing profile population execution .
-   * (done this is because for payment processors with 'Notify' mode billing profile form doesn't get rendered on UI)
-   *
-   * @return void
+   * Set default values for the form.
    */
   public function setDefaultValues() {
     $this->_defaults = array();
     $contactID = $this->getContactID();
-    $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
-    $this->_defaults = array_merge($this->_defaults, $billingDefaults);
-
-    $config = CRM_Core_Config::singleton();
-    // set default country from config if no country set
-    // note the effect of this is to set the billing country to default to the site default
-    // country if the person has an address but no country (for anonymous country is set above)
-    // this could have implications if the billing profile is filled but hidden.
-    // this behaviour has been in place for a while but the use of js to hide things has increased
-    if (empty($this->_defaults["billing_country_id-{$this->_bltID}"])) {
-      $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
-    }
-
-    // set default state/province from config if no state/province set
-    if (empty($this->_defaults["billing_state_province_id-{$this->_bltID}"])) {
-      $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
-    }
+    CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
 
     if ($contactID) {
       $fields = array();

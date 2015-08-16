@@ -99,7 +99,7 @@ class CRM_ACL_API {
     $onlyDeleted = FALSE,
     $skipDeleteClause = FALSE
   ) {
-    // the default value which is valid for rhe final AND
+    // the default value which is valid for the final AND
     $deleteClause = ' ( 1 ) ';
     if (!$skipDeleteClause) {
       if (CRM_Core_Permission::check('access deleted contacts') and $onlyDeleted) {
@@ -113,21 +113,23 @@ class CRM_ACL_API {
 
     // first see if the contact has edit / view all contacts
     if (CRM_Core_Permission::check('edit all contacts') ||
-      ($type == self::VIEW &&
-        CRM_Core_Permission::check('view all contacts')
-      )
+      ($type == self::VIEW && CRM_Core_Permission::check('view all contacts'))
     ) {
-      return $skipDeleteClause ? ' ( 1 ) ' : $deleteClause;
+      return $deleteClause;
     }
 
+    $user = CRM_Core_Session::getLoggedInContactID();
     if ($contactID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = $user ? $user : 0;
     }
 
-    if (!$contactID) {
-      // anonymous user
-      $contactID = 0;
+    // Check if contact has permissions on self
+    if ($user && $contactID == $user) {
+      if (CRM_Core_Permission::check('edit my contact') ||
+        ($type == self::VIEW && CRM_Core_Permission::check('view my contact'))
+      ) {
+        return ' ( 1 ) ';
+      }
     }
 
     return implode(' AND ',
@@ -226,6 +228,9 @@ class CRM_ACL_API {
     else {
       $groups = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
       $cache[$key] = $groups;
+    }
+    if (empty($groups)) {
+      return FALSE;
     }
 
     return in_array($groupID, $groups) ? TRUE : FALSE;

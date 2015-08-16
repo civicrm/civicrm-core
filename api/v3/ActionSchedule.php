@@ -37,6 +37,7 @@
  * @param array $params
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_action_schedule_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ActionSchedule');

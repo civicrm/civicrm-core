@@ -83,11 +83,11 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
       header('HTTP/1.0 403 Forbidden');
       return;
     }
-    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', CRM_Utils_Time::getTimeRaw() + $ttl));
-    header("Content-Type: $mimeType");
-    header("Content-Disposition: inline; filename=\"" . basename($file) . "\"");
-    header("Cache-Control: max-age=$ttl, public");
-    header('Pragma: public');
+    CRM_Utils_System::setHttpHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', CRM_Utils_Time::getTimeRaw() + $ttl));
+    CRM_Utils_System::setHttpHeader("Content-Type", $mimeType);
+    CRM_Utils_System::setHttpHeader("Content-Disposition", "inline; filename=\"" . basename($file) . "\"");
+    CRM_Utils_System::setHttpHeader("Cache-Control", "max-age=$ttl, public");
+    CRM_Utils_System::setHttpHeader('Pragma', 'public');
     readfile($file);
   }
 

@@ -112,7 +112,7 @@ class CRM_Group_Page_AJAX {
       if (!empty($params['is_unit_test'])) {
         return array($groups, $iFilteredTotal);
       }
-      header('Content-Type: application/json');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
       echo CRM_Utils_JSON::encodeDataTableSelector($groups, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
       CRM_Utils_System::civiExit();
     }

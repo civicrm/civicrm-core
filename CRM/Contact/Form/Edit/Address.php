@@ -142,7 +142,13 @@ class CRM_Contact_Form_Edit_Address {
         $name = 'name';
       }
 
-      $form->addField("address[$blockId][$name]", array('entity' => 'address'));
+      $params = array('entity' => 'address');
+
+      if ($name == 'postal_code_suffix') {
+        $params['label'] = ts('Suffix');
+      }
+
+      $form->addField("address[$blockId][$name]", $params);
     }
 
     $entityId = NULL;

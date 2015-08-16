@@ -149,7 +149,7 @@
     {/if}
   {/if}
   <tr>
-    <td class="label">{ts}Paid By{/ts}</td>
+    <td class="label">{ts}Payment Method{/ts}</td>
     <td>{$payment_instrument}{if $payment_processor_name} ({$payment_processor_name}){/if}</td>
   </tr>
 

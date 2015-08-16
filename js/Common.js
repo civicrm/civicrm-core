@@ -362,6 +362,13 @@ CRM.strings = CRM.strings || {};
    * @param options object
    */
   $.fn.crmSelect2 = function(options) {
+    if (options === 'destroy') {
+      return $(this).each(function() {
+        $(this)
+          .removeClass('crm-ajax-select')
+          .select2('destroy');
+      });
+    }
     return $(this).each(function () {
       var
         $el = $(this),
@@ -396,6 +403,15 @@ CRM.strings = CRM.strings || {};
    * @param options object
    */
   $.fn.crmEntityRef = function(options) {
+    if (options === 'destroy') {
+      return $(this).each(function() {
+        var entity = $(this).data('api-entity') || '';
+        $(this)
+          .off('.crmEntity')
+          .removeClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref')
+          .crmSelect2('destroy');
+      });
+    }
     options = options || {};
     options.select = options.select || {};
     return $(this).each(function() {

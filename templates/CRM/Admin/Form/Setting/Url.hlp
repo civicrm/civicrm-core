@@ -37,7 +37,7 @@
 {/htxt}
 {htxt id='id-verify_ssl'}
 <p>{ts}This setting will verify the SSL certificates received when making secure HTTPS connections to payment processors.{/ts}</p>
-<p>{ts}For example, in order to process a payment through Authorize.net, CiviCRM must make a request to https://secure.authorize.net/gateway/transact.dll. Using https to connect to secure.authorize.net insures that the connection is encrypted, but it's possible that CiviCRM is actually connecting to an attacker and the attacker is connecting to secure.authorize.net.{/ts}</p>
+<p>{ts}For example, in order to process a payment through Authorize.net, CiviCRM must make a request to https://secure2.authorize.net/gateway/transact.dll. Using https to connect to secure2.authorize.net insures that the connection is encrypted, but it's possible that CiviCRM is actually connecting to an attacker and the attacker is connecting to secure2.authorize.net.{/ts}</p>
 <p>{ts}Verifying the SSL certificate helps confirm that CiviCRM is securely communicating directly to payment processors.{/ts}</p>
 {/htxt}
 

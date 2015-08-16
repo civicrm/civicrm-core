@@ -692,13 +692,13 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function setWord($fileName = NULL) {
     //Mark as a CSV file.
-    header('Content-Type: application/vnd.ms-word');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-word');
 
     //Force a download and name the file using the current timestamp.
     if (!$fileName) {
       $fileName = 'Contacts_' . $_SERVER['REQUEST_TIME'] . '.doc';
     }
-    header("Content-Disposition: attachment; filename=Contacts_$fileName");
+    CRM_Utils_System::setHttpHeader("Content-Disposition", "attachment; filename=Contacts_$fileName");
   }
 
   /**
@@ -706,14 +706,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function setExcel($fileName = NULL) {
     //Mark as an excel file.
-    header('Content-Type: application/vnd.ms-excel');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-excel');
 
     //Force a download and name the file using the current timestamp.
     if (!$fileName) {
       $fileName = 'Contacts_' . $_SERVER['REQUEST_TIME'] . '.xls';
     }
 
-    header("Content-Disposition: attachment; filename=Contacts_$fileName");
+    CRM_Utils_System::setHttpHeader("Content-Disposition", "attachment; filename=Contacts_$fileName");
   }
 
   /**
@@ -858,18 +858,25 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Instead of outputting a fatal error message, we'll just redirect to the entryURL if present
+   * Instead of outputting a fatal error message, we'll just redirect
+   * to the entryURL if present
    *
    * @return void
    */
   public function invalidKeyRedirect() {
-    if ($this->_entryURL) {
-      CRM_Core_Session::setStatus(ts('Your browser session has expired and we are unable to complete your form submission. We have returned you to the initial step so you can complete and resubmit the form. If you experience continued difficulties, please contact us for assistance.'));
-      return CRM_Utils_System::redirect($this->_entryURL);
+    if ($this->_entryURL && $url_parts = parse_url($this->_entryURL)) {
+      // CRM-16832: Ensure local redirects only.
+      if (!empty($url_parts['path'])) {
+        // Prepend a slash, but don't duplicate it.
+        $redirect_url = '/' . ltrim($url_parts['path'], '/');
+        if (!empty($url_parts['query'])) {
+          $redirect_url .= '?' . $url_parts['query'];
+        }
+        CRM_Core_Session::setStatus(ts('Your browser session has expired and we are unable to complete your form submission. We have returned you to the initial step so you can complete and resubmit the form. If you experience continued difficulties, please contact us for assistance.'));
+        return CRM_Utils_System::redirect($redirect_url);
+      }
     }
-    else {
-      self::invalidKeyCommon();
-    }
+    self::invalidKeyCommon();
   }
 
 }

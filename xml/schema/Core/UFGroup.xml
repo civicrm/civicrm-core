@@ -217,6 +217,12 @@
     <comment>Name of the UF group for directly addressing it in the codebase</comment>
     <add>3.0</add>
   </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
   <field>
     <name>created_id</name>
     <title>Profile Created By</title>

@@ -62,6 +62,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $_title = NULL;
 
   /**
+   * The default values for the form.
+   *
+   * @var array
+   */
+  public $_defaults = array();
+
+  /**
    * The options passed into this form
    * @var mixed
    */
@@ -445,16 +452,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->validateChainSelectFields();
 
-    $hookErrors = CRM_Utils_Hook::validate(
-      get_class($this),
-      $this->_submitValues,
-      $this->_submitFiles,
-      $this
-    );
-
-    if (!is_array($hookErrors)) {
-      $hookErrors = array();
-    }
+    $hookErrors = array();
 
     CRM_Utils_Hook::validateForm(
       get_class($this),
@@ -1204,7 +1202,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $options = $props['options'];
     }
     else {
-      $info = civicrm_api3($props['entity'], 'getoptions', $props + array('check_permissions' => 1));
+      $info = civicrm_api3($props['entity'], 'getoptions', $props);
       $options = $info['values'];
     }
     if (!array_key_exists('placeholder', $props)) {
@@ -1447,7 +1445,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $default
    *   //CRM-15427.
    */
-  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE) {
+  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE, $usedFor = NULL) {
     // Output widget
     // FIXME: Instead of adhoc serialization, use a single json_encode()
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
@@ -1459,6 +1457,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'data-entities' => json_encode($entities),
       //CRM-15427
       'data-default' => $default,
+      'data-usedfor' => json_encode($usedFor),
     ));
   }
 
@@ -1869,7 +1868,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return NULL|int
    */
-  public function getContactID() {
+  protected function setContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     if (isset($this->_params) && isset($this->_params['select_contact_id'])) {
       $tempID = $this->_params['select_contact_id'];
@@ -1910,6 +1909,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     return is_numeric($userID) ? $userID : NULL;
+  }
+
+  public function getContactID() {
+    return $this->setContactID();
   }
 
   /**

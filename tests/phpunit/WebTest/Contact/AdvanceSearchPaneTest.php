@@ -186,7 +186,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
             'Country' => array(
               'type' => 'select',
               'locator' => 'country',
-              'values' => array('United States'),
+              'values' => array('UNITED STATES'),
             ),
             'State' => array(
               'type' => 'multiselect2',

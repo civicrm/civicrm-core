@@ -364,13 +364,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $enableSSL = FALSE;
 
   /**
-   * Error template to use for fatal errors
-   *
-   * @var string
-   */
-  public $fatalErrorTemplate = 'CRM/common/fatal.tpl';
-
-  /**
    * Fatal error handler
    *
    * @var string

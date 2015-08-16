@@ -1176,7 +1176,7 @@ WHERE civicrm_event.is_active = 1
         // CRM-13890 : NOTE wait list condition need to be given so that
         // wait list message is shown properly in email i.e. WRT online event registration template
         if (empty($tplParams['participant_status']) && empty($values['params']['isOnWaitlist'])) {
-          $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id');
+          $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id', TRUE);
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
         }
         //CRM-15754 - if participant_status contains status ID
@@ -1923,10 +1923,7 @@ WHERE  ce.loc_block_id = $locBlockId";
     if ($startDate && $startDate >= $now) {
       $validDate = FALSE;
     }
-    if ($endDate && $endDate < $now) {
-      $validDate = FALSE;
-    }
-    if ($eventEnd && $eventEnd < $now) {
+    if ($endDate && $endDate < $now && $eventEnd && $eventEnd < $now) {
       $validDate = FALSE;
     }
 

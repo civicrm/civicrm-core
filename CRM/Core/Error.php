@@ -334,7 +334,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     if (php_sapi_name() == "cli") {
       print ("Sorry. A non-recoverable error has occurred.\n$message \n$code\n$email\n\n");
-      debug_print_backtrace();
+      // Fix for CRM-16899
+      echo static::formatBacktrace(debug_backtrace());
       die("\n");
       // FIXME: Why doesn't this call abend()?
       // Difference: abend() will cleanup transaction and (via civiExit) store session state
@@ -378,10 +379,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     $template = CRM_Core_Smarty::singleton();
-
     $template->assign($vars);
-
-    $config->userSystem->outputError($template->fetch($config->fatalErrorTemplate));
+    $config->userSystem->outputError($template->fetch('CRM/common/fatal.tpl'));
 
     self::abend(CRM_Core_Error::FATAL_ERROR);
   }
@@ -447,7 +446,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // print to screen
     $template = CRM_Core_Smarty::singleton();
     $template->assign($vars);
-    $content = $template->fetch($config->fatalErrorTemplate);
+    $content = $template->fetch('CRM/common/fatal.tpl');
     if ($config->backtrace) {
       $content = self::formatHtmlException($exception) . $content;
     }

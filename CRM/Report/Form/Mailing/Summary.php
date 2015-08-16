@@ -146,7 +146,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       'dao' => 'CRM_Mailing_DAO_Mailing',
       'fields' => array(
         'delivered_count' => array(
-          'name' => 'id',
+          'name' => 'event_queue_id',
           'title' => ts('Delivered'),
         ),
         'accepted_rate' => array(
@@ -164,7 +164,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       'dao' => 'CRM_Mailing_DAO_Mailing',
       'fields' => array(
         'bounce_count' => array(
-          'name' => 'id',
+          'name' => 'event_queue_id',
           'title' => ts('Bounce'),
         ),
         'bounce_rate' => array(
@@ -182,7 +182,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       'dao' => 'CRM_Mailing_DAO_Mailing',
       'fields' => array(
         'open_count' => array(
-          'name' => 'id',
+          'name' => 'event_queue_id',
           'title' => ts('Opened'),
         ),
         'open_rate' => array(
@@ -200,7 +200,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       'dao' => 'CRM_Mailing_DAO_Mailing',
       'fields' => array(
         'click_count' => array(
-          'name' => 'id',
+          'name' => 'event_queue_id',
           'title' => ts('Clicks'),
         ),
         'CTR' => array(

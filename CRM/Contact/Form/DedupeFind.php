@@ -40,14 +40,7 @@
 class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
-   * Defined defaults.
-   */
-  public $_defaults;
-
-  /**
    * Pre processing.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
