@@ -275,6 +275,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
   }
 
+  /**
+   * Set variables in a way that can be accessed from different places.
+   *
+   * This is part of refactoring for unit testability on the submit function.
+   *
+   * @param array $params
+   */
   protected function setContextVariables($params) {
     $variables = array(
       'action' => '_action',
