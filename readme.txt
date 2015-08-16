@@ -36,11 +36,11 @@ CiviCRM is localized in over 20 languages including: Chinese (Taiwan, China), Du
 == Changelog ==
 
 = 4.5 =
-Support for CiviCRM version 4.5.x
+Support for CiviCRM version 4.7.x
 
 = 4.4 =
-Support for CiviCRM version 4.4.x
+Support for CiviCRM version 4.7.x
 
 = 4.3 =
-Support for CiviCRM version 4.3.x
+Support for CiviCRM version 4.7.x
 
