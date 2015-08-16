@@ -39,6 +39,9 @@
             selectedMail: function($route, crmMailingMgr) {
               return crmMailingMgr.get($route.current.params.id);
             },
+            prevemCredentials: function(crmApi) {
+              return crmApi('Prevem','login', {});//.then(function(returnValues){ console.log('returnValues'); });
+            },
             attachments: function($route, CrmAttachments) {
               var attachments = new CrmAttachments(function () {
                 return {entity_table: 'civicrm_mailing', entity_id: $route.current.params.id};
