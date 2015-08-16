@@ -125,12 +125,12 @@ function civicrm_api3_event_get($params) {
     unset($params['return.max_results']);
   }
 
-  $extraSql = array();
+  $sql = CRM_Utils_SQL_Select::fragment();
   if (!empty($params['isCurrent'])) {
-    $extraSql['where'] = array('civicrm_event' => '(start_date >= CURDATE() || end_date >= CURDATE())');
+    $sql->where('(start_date >= CURDATE() || end_date >= CURDATE())');
   }
 
-  $events = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Event', $extraSql, TRUE);
+  $events = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Event', $sql, TRUE);
   $options = _civicrm_api3_get_options_from_params($params);
   if ($options['is_count']) {
     return civicrm_api3_create_success($events, $params, 'Event', 'get');
