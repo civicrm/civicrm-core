@@ -1429,9 +1429,21 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
   }
   if (!empty($customValues)) {
     foreach ($customValues as $key => $val) {
+      // CRM-15915 the setDefaults functions keys the fields by their values.
+      // This results in an array like array('A' => 'A') which results in different json
+      // than entities using the BAO query object.
+      // A case could be made to change it in CRM_Core_BAO_CustomGroup::setDefaults
+      // but it would affect some forms & require testing called from 9 other places - one of which appears
+      // to be just for fun.
+      // Note that the setDefaults also sets arrays like $val => 0 for checkboxes.
+      // This would probably still return odd json output but have restricted this to a narrow (tested)
+      // scope.
+      if (is_array($val) && array_keys($val) == array_values($val)) {
+        $val = array_values($val);
+      }
       // per standard - return custom_fieldID
       $id = CRM_Core_BAO_CustomField::getKeyID($key);
-      $returnArray['custom_' . $id] = $val;
+      $returnArray['custom_' . $id] = array_values($val);
 
       //not standard - but some api did this so guess we should keep - cheap as chips
       $returnArray[$key] = $val;
