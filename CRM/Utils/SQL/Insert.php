@@ -61,6 +61,14 @@ class CRM_Utils_SQL_Insert {
     $this->rows = array();
   }
 
+  public function columns($columns) {
+    if ($this->columns !== NULL) {
+      throw new CRM_Core_Exception("Column order already specified.");
+    }
+    $this->columns = $columns;
+    return $this;
+  }
+
   /**
    * @param array $rows
    * @return CRM_Utils_SQL_Insert
@@ -79,17 +87,17 @@ class CRM_Utils_SQL_Insert {
    */
   public function row($row) {
     $columns = array_keys($row);
-    sort($columns);
 
     if ($this->columns === NULL) {
+      sort($columns);
       $this->columns = $columns;
     }
-    elseif ($this->columns != $columns) {
+    elseif (array_diff($this->columns, $columns) !== array()) {
       throw new CRM_Core_Exception("Inconsistent column names");
     }
 
     $escapedRow = array();
-    foreach ($columns as $column) {
+    foreach ($this->columns as $column) {
       $escapedRow[$column] = $this->escapeString($row[$column]);
     }
     $this->rows[] = $escapedRow;

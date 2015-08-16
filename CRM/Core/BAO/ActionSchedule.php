@@ -3,9 +3,8 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
-  | Copyright (C) 2011 Marty Wright                                    |
-  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
-  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2015                                |
+   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
   | CiviCRM is free software; you can copy, modify, and distribute it  |
