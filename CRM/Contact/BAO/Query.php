@@ -1867,26 +1867,7 @@ class CRM_Contact_BAO_Query {
         }
         // check for both id and contact_id
         if ($this->_params[$id][0] == 'id' || $this->_params[$id][0] == 'contact_id') {
-          if (
-            $this->_params[$id][1] == 'IS NULL' ||
-            $this->_params[$id][1] == 'IS NOT NULL'
-          ) {
-            $this->_where[0][] = "contact_a.id {$this->_params[$id][1]}";
-          }
-          elseif (is_array($this->_params[$id][2])) {
-            $idList = implode("','", $this->_params[$id][2]);
-            //why on earth do they put ' in the middle & not on the outside? We have to assume it's
-            //to support 'something' so lets add them conditionally to support the api (which is a tested flow
-            // so if you are looking to alter this check api test results
-            if (strpos(trim($idList), "'") > 0) {
-              $idList = "'" . $idList . "'";
-            }
-
-            $this->_where[0][] = "contact_a.id IN ({$idList})";
-          }
-          else {
-            $this->_where[0][] = self::buildClause("contact_a.id", "{$this->_params[$id][1]}", "{$this->_params[$id][2]}");
-          }
+          $this->_where[0][] = self::buildClause("contact_a.id", $this->_params[$id][1], $this->_params[$id][2]);
         }
         else {
           $this->whereClauseSingle($this->_params[$id]);
