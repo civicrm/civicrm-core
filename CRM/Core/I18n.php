@@ -77,7 +77,7 @@ class CRM_Core_I18n {
         setlocale(LC_MESSAGES, $locale);
         setlocale(LC_CTYPE, $locale);
 
-        bindtextdomain('civicrm', $config->gettextResourceDir);
+        bindtextdomain('civicrm', CRM_Core_I18n::getResourceDir());
         bind_textdomain_codeset('civicrm', 'UTF-8');
         textdomain('civicrm');
 
@@ -93,11 +93,11 @@ class CRM_Core_I18n {
       require_once 'PHPgettext/streams.php';
       require_once 'PHPgettext/gettext.php';
 
-      $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
 
       if (!file_exists($mo_file)) {
         // fallback to pre-4.5 mode
-        $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
+        $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
       }
 
       $streamer = new FileReader($mo_file);
@@ -135,7 +135,7 @@ class CRM_Core_I18n {
       // check which ones are available; add them to $all if not there already
       $config = CRM_Core_Config::singleton();
       $codes = array();
-      if (is_dir($config->gettextResourceDir) && $dir = opendir($config->gettextResourceDir)) {
+      if (is_dir(CRM_Core_I18n::getResourceDir()) && $dir = opendir(CRM_Core_I18n::getResourceDir())) {
         while ($filename = readdir($dir)) {
           if (preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $filename)) {
             $codes[] = $filename;
@@ -197,6 +197,14 @@ class CRM_Core_I18n {
       }
     }
     return strtr($str, $tr);
+  }
+
+  public static function getResourceDir() {
+    static $dir = NULL;
+    if ($dir === NULL) {
+      $dir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR;
+    }
+    return $dir;
   }
 
   /**
