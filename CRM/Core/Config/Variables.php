@@ -299,14 +299,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $geocodeMethod = '';
 
   /**
-   *
-   *
-   * @var boolean
-   */
-  public $mapGeoCoding = 1;
-
-
-  /**
    * Whether database-level logging should be performed
    * @var boolean
    */
