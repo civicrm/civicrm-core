@@ -460,15 +460,15 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
     $actSQL = "SELECT
       COUNT(DISTINCT {$this->_aliases['civicrm_activity']}.activity_type_id ) as civicrm_activity_activity_type_id_count,
-      COUNT({$this->_aliases['civicrm_activity']}.activity_type_id ) as civicrm_activity_activity_type_count,
+      COUNT(DISTINCT {$this->_aliases['civicrm_activity']}.id ) as civicrm_activity_activity_id_count,
       SUM({$this->_aliases['civicrm_activity']}.duration ) as civicrm_activity_activity_duration
-      {$this->_from} {$this->_where}";
+      {$this->_from} {$this->_where} {$this->_groupBy}";
 
     $actDAO = CRM_Core_DAO::executeQuery($actSQL);
 
     while ($actDAO->fetch()) {
       $totalType += $actDAO->civicrm_activity_activity_type_id_count;
-      $totalActivity += $actDAO->civicrm_activity_activity_type_count;
+      $totalActivity += $actDAO->civicrm_activity_activity_id_count;
       $totalDuration += $actDAO->civicrm_activity_activity_duration;
     }
 
