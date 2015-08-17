@@ -52,7 +52,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'sort_name' => array(
             'title' => ts('Contact Name'),
-            'default' => TRUE,
             'no_repeat' => TRUE,
           ),
         ),
@@ -65,7 +64,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           'sort_name' => array(
             'name' => 'id',
             'title' => ts('Contact'),
-            'default' => TRUE,
           ),
         ),
         'order_bys' => array(
@@ -80,7 +78,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'fields' => array(
           'email' => array(
             'title' => 'Email',
-            'default' => TRUE,
           ),
         ),
         'order_bys' => array(
@@ -114,6 +111,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'duration' => array(
             'title' => 'Duration',
+            'default' => TRUE,
             'statistics' => array(
               'sum' => ts('Duration'),
             ),
@@ -132,6 +130,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
+            'default' => FALSE,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           ),
