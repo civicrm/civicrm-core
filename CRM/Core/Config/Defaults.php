@@ -59,10 +59,6 @@ class CRM_Core_Config_Defaults {
 
     // show tree widget
     $this->groupTree = defined('CIVICRM_GROUPTREE') ? TRUE : FALSE;
-
-    // add UI revamp pages
-    //$this->revampPages = array( 'CRM/Admin/Form/Setting/Url.tpl', 'CRM/Admin/Form/Preferences/Address.tpl' );
-    $this->revampPages = array();
   }
 
   /**
