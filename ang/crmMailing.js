@@ -49,7 +49,11 @@
               return crmMailingMgr.get($route.current.params.id);
             },
             prevemCredentials: function(crmApi) {
-              return crmApi('Prevem','login', {});//.then(function(returnValues){ console.log('returnValues'); });
+              return crmApi('Prevem','login', {})//.then(function(returnValues){ console.log('returnValues'); });
+                .catch(function(err){
+                  console.log('err', err);
+                  return {};
+                });
             },
             attachments: function($route, CrmAttachments) {
               var attachments = new CrmAttachments(function () {

@@ -4,8 +4,6 @@
 
   angular.module('crmMailing').directive('crmMailingBlockEmailPreviewCluster', function (crmUiHelp, $http, crmApi) {
 
-    crmApi('Prevem', 'login').then(function(returnValues){ console.log('returnValues'); });
-
     return {
       templateUrl: '~/crmMailing/BlockEmailPreviewCluster.html',
       link: function(scope, elm, attr) {
@@ -21,21 +19,32 @@
           "gmail" : "fadedIcon",
           "yahoo" : "fadedIcon"
         }
-        scope.prevemURL = CRM.crmMailing.prevemUrl;
-        scope.consumerId = CRM.crmMailing.prevemConsumer;
         
         var clientIconURL = {
           "gmail" : "http://www.socialtalent.co/wp-content/uploads/2015/07/Gmail-Logo.png",
           "yahoo" : "https://lh6.ggpht.com/yzhSae3SIKlwv9lBzpCWaexNKgpLHXvwnxyEE7_oW3SdMv604v-YtUcQnGCyAUpX1lcm=w300"
         }
+        
+      crmApi('Prevem', 'login', {})
+        .then(function(r){  
+          scope.accessToken = r.values.token;
+          scope.prevemURL = r.values.url;
+          scope.consumerId = r.values.consumerId;
+          scope.initialCheck();
+        })
+        .catch(function(err){
+          console.log('error', err);
+        });
+
+        scope.accessTokenUrlExtension = 'access_token=' + scope.accessToken;
 
         scope.initialCheck = function initialCheck() {
           var batchId = scope.consumerId + ':' + scope.mailing.id;
-          var checkURL = scope.prevemURL + '/api/PreviewBatches?filter=%7B%22where%22%3A%7B%22batchId%22%20%3A%20%22'+batchId+'%22%7D%7D'
+          var checkURL = scope.prevemURL + '/api/PreviewBatches?filter=%7B%22where%22%3A%7B%22batchId%22%20%3A%20%22'+batchId+'%22%7D%7D'+'&'+scope.accessTokenUrlExtension;
           var statusURL = scope.prevemURL + '/api/PreviewBatches/status?batchId='
           $http.get(checkURL)
             .success(function(data, status, headers, config){
-              /*called for result & error because 200 status*/    
+              /*called for result & error because 200 status*/   
               if (data[0] != undefined){
                 //handle success here
                 scope.requested = true;
@@ -53,10 +62,9 @@
           .error(function(data, status, headers, config){
               /*handle non 200 statuses*/
               console.log(data);
+              CRM.alert(ts('Failure at the Preview Manager. Check if you have created a user at the Preview Manager and are logged in successfully there.'));
           });
         }
-
-        scope.initialCheck();
 
         scope.openPreviewImage = function openPreviewImage(mailing, clientName) {
           if (scope[clientName] === 0) {
@@ -92,11 +100,12 @@
 
         scope.checkStatus = function checkStatus(mailing, statusURL) {
           var batchId = scope.consumerId + ':' + mailing.id;
-          $http.get(statusURL+batchId)
+          $http.get(statusURL+batchId+'&'+scope.accessTokenUrlExtension)
             .success(function(data, status, headers, config){
               /*called for result & error because 200 status*/    
               if (data.response){
                 //handle success here
+                console.log(data.response);
                 for (var clientName in data.response) {
                   if (data.response[clientName] != 0 && data.response[clientName] != 2 && data.response[clientName] != null) {
                     scope[clientName] = data.response[clientName];
@@ -114,7 +123,10 @@
             })
           .error(function(data, status, headers, config){
               /*handle non 200 statuses*/
-              console.log(data);
+              console.log(status);
+              clearInterval(scope.Interval);
+              scope.requested = false;
+              CRM.alert(ts('Failed to request a preview. Check if you have created a user at the Preview Manager and are logged in successfully there.'));
           });
         }
 
@@ -122,10 +134,10 @@
           scope.requested= false;
           var deleteURL = scope.prevemURL + '/api/PreviewBatches/'
           var batchId = scope.consumerId + ':' + mailing.id;
-          $http.delete(deleteURL+batchId)
+          $http.delete(deleteURL+batchId+'?'+scope.accessTokenUrlExtension)
             .success(function(data, status, headers, config){
               /*called for result & error because 200 status*/
-              console.log(status)    
+              console.log(data)    
               if (data.result){
                 //handle success here
                 console.log(data.result)

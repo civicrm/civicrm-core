@@ -29,6 +29,9 @@ function civicrm_api3_prevem_login($params) {
 	$prevemUrl = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'prevem_url');
 
 	$prevemURL = !empty($prevemUrl) ? CRM_Utils_URL::mask($prevemUrl, array('user','pass')) : NULL;
+	if (!$prevemURL) {
+		return civicrm_api3_create_error("prevemURL is not configured");		
+	}
 	$prevemConsumer = parse_url($prevemUrl, PHP_URL_USER);
 	$prevemSecret = parse_url($prevemUrl, PHP_URL_PASS);
 	// TODO Parse $prevemUrl. Send login request to get token.
@@ -50,20 +53,23 @@ function civicrm_api3_prevem_login($params) {
 	);
 
 	$context  = stream_context_create($opts);
-	$result = file_get_contents($prevemURL . '/api/Users/login', false, $context);
-	$accessToken = json_decode($result)->{'id'};
-
-	$returnValues = array(
-	'url' => $prevemURL,
-	'consumerId' => $prevemConsumer,
-	'token' => $accessToken,
-	);
-
+	$result = file_get_contents('http://localhost:3000/api/Users/login', false, $context);
+	//CRM_Core_Error::debug_var('$http_response_header', $http_response_header);
 	if ($result === FALSE) {
 		// echo $returnValues . "hjhhjj";
-		return civicrm_api3_create_error($returnValues, $params, 'Prevem', 'login');
+		return civicrm_api3_create_error("Failed to login");
 	}
 	else {
+		$accessToken = json_decode($result)->{'id'};
+		if (!$accessToken){
+			return civicrm_api3_create_error("Failed to parse access token");
+		}
+		$returnValues = array(
+			'url' => $prevemURL,
+			'consumerId' => $prevemConsumer,
+			'token' => $accessToken,
+			'password' => $prevemSecret
+		);
 		return civicrm_api3_create_success($returnValues, $params, 'Prevem', 'login');
 	}
 }
