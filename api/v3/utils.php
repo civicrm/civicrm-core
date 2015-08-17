@@ -470,11 +470,11 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  *   As passed into api get function.
  * @param bool $isFillUniqueFields
  *   Do we need to ensure unique fields continue to be populated for this api? (backward compatibility).
- * @param array $extraMysql
+ * @param CRM_Utils_SQL_Select|NULL $sqlFragment
  *
  * @return array
  */
-function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFields, $extraMysql) {
+function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFields, $sqlFragment) {
 
   $dao = new $dao_name();
   $entity = _civicrm_api_get_entity_name_from_dao($dao);
@@ -699,19 +699,8 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
       ));
     }
   };
-  if (!empty($extraMysql)) {
-    foreach ($extraMysql as $type => $extraClauses) {
-      foreach ($extraClauses as $clauseKey => $clause) {
-        if ($type == 'join') {
-          foreach ($clause as $joinName => $join) {
-            $query->$type($joinName, $join);
-          }
-        }
-        else {
-          $query->$type($clause);
-        }
-      }
-    }
+  if (!empty($sqlFragment)) {
+    $query->merge($sqlFragment);
   }
 
   // order by
@@ -1637,21 +1626,21 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
  * @param bool $returnAsSuccess
  *   Return in api success format.
  * @param string $entity
- * @param array $extraSql
- *   API specific queries eg for event isCurrent would be converted to
- *   $extraSql['where'] = array('civicrm_event' => array('(start_date >= CURDATE() || end_date >= CURDATE())'));
+ * @param CRM_Utils_SQL_Select|NULL $sql
+ *   Extra SQL bits to add to the query. For filtering current events, this might be:
+ *   CRM_Utils_SQL_Select::fragment()->where('(start_date >= CURDATE() || end_date >= CURDATE())');
  * @param bool $uniqueFields
  *   Should unique field names be returned (for backward compatibility)
  *
  * @return array
  */
-function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $entity = "", $extraSql = array(), $uniqueFields = FALSE) {
+function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
 
   if ($returnAsSuccess) {
-    return civicrm_api3_create_success(_civicrm_api3_get_using_utils_sql($bao_name, $params, $uniqueFields, $extraSql), $params, $entity, 'get');
+    return civicrm_api3_create_success(_civicrm_api3_get_using_utils_sql($bao_name, $params, $uniqueFields, $sql), $params, $entity, 'get');
   }
   else {
-    return _civicrm_api3_get_using_utils_sql($bao_name, $params, $uniqueFields, $extraSql);
+    return _civicrm_api3_get_using_utils_sql($bao_name, $params, $uniqueFields, $sql);
   }
 }
 
