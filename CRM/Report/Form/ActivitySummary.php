@@ -458,10 +458,14 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
     $totalType = $totalActivity = $totalDuration = 0;
 
+    $query = "SELECT SUM(activity_civireport.duration)
+    FROM civicrm_activity activity_civireport
+    {$this->_where} {$this->_groupBy}";
+
     $actSQL = "SELECT
       COUNT(DISTINCT {$this->_aliases['civicrm_activity']}.activity_type_id ) as civicrm_activity_activity_type_id_count,
       COUNT(DISTINCT {$this->_aliases['civicrm_activity']}.id ) as civicrm_activity_activity_id_count,
-      SUM({$this->_aliases['civicrm_activity']}.duration ) as civicrm_activity_activity_duration
+      ($query) as civicrm_activity_activity_duration
       {$this->_from} {$this->_where} {$this->_groupBy}";
 
     $actDAO = CRM_Core_DAO::executeQuery($actSQL);
