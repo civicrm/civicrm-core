@@ -267,8 +267,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    */
   private function _getDataSources() {
     // Open the data source dir and scan it for class files
-    $config = CRM_Core_Config::singleton();
-    $dataSourceDir = $config->importDataSourceDir;
+    global $civicrm_root;
+    $dataSourceDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'Import' . DIRECTORY_SEPARATOR . 'DataSource' . DIRECTORY_SEPARATOR;
     $dataSources = array();
     if (!is_dir($dataSourceDir)) {
       CRM_Core_Error::fatal("Import DataSource directory $dataSourceDir does not exist");

@@ -68,19 +68,6 @@ class CRM_Core_BAO_ConfigSetting {
   public static function add(&$params) {
     self::fixParams($params);
 
-    // also set a template url so js files can use this
-    // CRM-6194
-    $params['civiRelativeURL'] = CRM_Utils_System::url('CIVI_BASE_TEMPLATE');
-    $params['civiRelativeURL']
-      = str_replace(
-        'CIVI_BASE_TEMPLATE',
-        '',
-        $params['civiRelativeURL']
-      );
-
-    // also add the version number for use by template / js etc
-    $params['civiVersion'] = CRM_Utils_System::version();
-
     $domain = new CRM_Core_DAO_Domain();
     $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);

@@ -57,21 +57,12 @@ class CRM_Core_Config_Defaults {
 
     $this->sqlDir = $civicrm_root . DIRECTORY_SEPARATOR . 'sql' . DIRECTORY_SEPARATOR;
 
-    $this->importDataSourceDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'Import' . DIRECTORY_SEPARATOR . 'DataSource' . DIRECTORY_SEPARATOR;
-
-    $this->gettextResourceDir = $civicrm_root . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR;
-
     // show tree widget
     $this->groupTree = defined('CIVICRM_GROUPTREE') ? TRUE : FALSE;
 
     // add UI revamp pages
     //$this->revampPages = array( 'CRM/Admin/Form/Setting/Url.tpl', 'CRM/Admin/Form/Preferences/Address.tpl' );
     $this->revampPages = array();
-
-    $size = trim(ini_get('upload_max_filesize'));
-    if ($size) {
-      $this->maxImportFileSize = self::formatUnitSize($size);
-    }
   }
 
   /**

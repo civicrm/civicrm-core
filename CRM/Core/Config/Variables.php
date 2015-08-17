@@ -229,23 +229,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $monetaryThousandSeparator = ',';
 
   /**
-   * Default encoding of strings returned by gettext
-   * @var string
-   */
-  public $gettextCodeset = 'utf-8';
-
-  /**
-   * Default name for gettext domain.
-   * @var string
-   */
-  public $gettextDomain = 'civicrm';
-
-  /**
-   * Default location of gettext resource files.
-   */
-  public $gettextResourceDir = './l10n/';
-
-  /**
    * Default user framework. This basically makes Drupal 7 the default
    */
   public $userFramework = 'Drupal';
@@ -271,11 +254,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $userFrameworkFrontend = FALSE;
   public $userFrameworkLogging = FALSE;
 
-  /**
-   * The handle for import file size
-   * @var int
-   */
-  public $maxImportFileSize = 1048576;
   public $maxFileSize = 2;
 
   /**
@@ -390,20 +368,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    * @var integer
    */
   public $maxLocationBlocks = 2;
-
-  /**
-   * The font path where captcha fonts are stored
-   *
-   * @var string
-   */
-  public $captchaFontPath = '/usr/X11R6/lib/X11/fonts/';
-
-  /**
-   * The font to use for captcha
-   *
-   * @var string
-   */
-  public $captchaFont = 'HelveticaBold.ttf';
 
   /**
    * Some search settings
