@@ -269,6 +269,10 @@ AND    time_format <> ''
       //@todo array_diff this
       unset($params[$setting]);
     }
+    if (!empty($result['error_message'])) {
+      CRM_Core_Session::setStatus($result['error_message'], ts('Save Failed'), 'error');
+    }
+
     CRM_Core_BAO_ConfigSetting::create($params);
 
     CRM_Core_Config::clearDBCache();
