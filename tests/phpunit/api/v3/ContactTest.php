@@ -2149,6 +2149,34 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that getquick returns contacts with an exact first name match first.
+   */
+  public function testGetQuickExactFirst() {
+    $this->getQuickSearchSampleData();
+    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'b'));
+    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
+    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
+    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
+    $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
+  }
+
+  /**
+   * Set up some sample data for testing quicksearch.
+   */
+  public function getQuickSearchSampleData() {
+    $contacts = array(
+      array('first_name' => 'Bob', 'last_name' => 'Bob'),
+      array('first_name' => 'Bobby', 'last_name' => 'A Bobby'),
+    );
+    foreach ($contacts as $type => $contact) {
+      $contact['contact_type'] = 'Individual';
+      $this->callAPISuccess('Contact', 'create', $contact);
+    }
+  }
+
+  /**
    * Test get ref api - gets a list of references to an entity.
    */
   public function testGetReferenceCounts() {
