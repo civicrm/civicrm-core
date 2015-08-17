@@ -259,12 +259,13 @@
         });
       },
 
-      composerPreviewBatch: function composerPreviewBatch(id, message, renderers) {
-        var prevemURL = CRM.crmMailing.prevemUrl;
+      composerPreviewBatch: function composerPreviewBatch(prevemCredentials, id, message, renderers) {
+        var prevemURL = prevemCredentials.values.url;
         var postURL = prevemURL + '/api/PreviewBatches';
-        var consumerId = CRM.crmMailing.prevemConsumer;
+        var consumerId = prevemCredentials.values.consumerId;
+        var accessToken = prevemCredentials.values.token;
+        var accessTokenUrlExtension = 'access_token=' + accessToken;
         var batchId = consumerId + ':' + id;     //unique everytime. Needs to be saved in order for the composer to be able to look the batch up.
-        var statusURL = prevemURL + '/api/PreviewBatches/status?batchId=' + batchId;
         var Interval;
         var postData = {
           "batchId" : batchId,
@@ -272,7 +273,7 @@
           "message" : message,
           "renderers" : renderers
         }
-        $http.post(postURL, postData)
+        $http.post(postURL+'?'+accessTokenUrlExtension, postData)
           .success(function(data, status, headers, config){
             /*called for result & error because 200 status*/
             console.log(status)    
@@ -448,7 +449,7 @@
   angular.module('crmMailing').factory('crmMailingPreviewMgr', function (dialogService, crmMailingMgr, crmStatus) {
     return {
 
-      previewCluster: function previewCluster(mailing){
+      previewCluster: function previewCluster(mailing, prevemCredentials){
         var message = {
           subject: mailing.subject,
           html: mailing.body_html,
@@ -461,7 +462,7 @@
             }
         };
         var p = crmMailingMgr
-          p.composerPreviewBatch(mailing.id, message, renderers)
+          p.composerPreviewBatch(prevemCredentials, mailing.id, message, renderers)
       },
 
       // @param mode string one of 'html', 'text', or 'full'
