@@ -63,11 +63,6 @@ class CRM_Core_Config_Defaults {
     // add UI revamp pages
     //$this->revampPages = array( 'CRM/Admin/Form/Setting/Url.tpl', 'CRM/Admin/Form/Preferences/Address.tpl' );
     $this->revampPages = array();
-
-    $size = trim(ini_get('upload_max_filesize'));
-    if ($size) {
-      $this->maxImportFileSize = self::formatUnitSize($size);
-    }
   }
 
   /**
