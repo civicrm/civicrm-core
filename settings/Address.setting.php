@@ -82,6 +82,6 @@ return array(
     'is_contact' => 0,
     'weight' => 30,
     'description' => NULL,
-    'help_text' => NULL
+    'help_text' => NULL,
   ),
 );
