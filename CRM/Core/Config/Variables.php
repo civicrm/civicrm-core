@@ -254,11 +254,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $userFrameworkFrontend = FALSE;
   public $userFrameworkLogging = FALSE;
 
-  /**
-   * The handle for import file size
-   * @var int
-   */
-  public $maxImportFileSize = 1048576;
   public $maxFileSize = 2;
 
   /**
