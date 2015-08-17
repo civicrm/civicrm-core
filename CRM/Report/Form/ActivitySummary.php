@@ -610,6 +610,13 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         }
       }
 
+      if (array_key_exists('civicrm_activity_duration', $row)) {
+        if ($value = $row['civicrm_activity_duration']) {
+          $rows[$rowNum]['civicrm_activity_duration'] += $rows[$rowNum]['civicrm_activity_duration'];
+          $entryFound = TRUE;
+        }
+      }
+
       if (!$entryFound) {
         break;
       }
