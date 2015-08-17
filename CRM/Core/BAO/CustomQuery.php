@@ -401,14 +401,14 @@ SELECT label, value
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
               if ($isSerialized && !empty($value)) {
                 if (strstr($op, 'IN')) {
+                  $value = str_replace(",", "[[:cntrl:]]*|[[:cntrl:]]*", $value);
                   $value = str_replace('(', '[[.left-parenthesis.]]', $value);
                   $value = str_replace(')', '[[.right-parenthesis.]]', $value);
-                  $value = str_replace(",", "[[:cntrl:]]|[[:cntrl:]]", $value);
                 }
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
-                $value = "[[:cntrl:]]" . $value . "[[:cntrl:]]";
+                $value = "[[:cntrl:]]*" . $value . "[[:cntrl:]]*";
                 if (!$wildcard) {
-                  $value = str_replace("[[:cntrl:]]|", '', $value);
+                  $value = str_replace("[[:cntrl:]]*|", '', $value);
                 }
               }
 

@@ -1227,7 +1227,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           if ($html_type == 'CheckBox') {
             $newData = array();
             foreach ($checkedData as $v) {
-              $newData[$v] = 1;
+              $v = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $v);
+              $newData[] = $v;
             }
             $checkedData = $newData;
           }

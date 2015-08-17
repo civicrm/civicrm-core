@@ -1396,7 +1396,6 @@ ORDER BY civicrm_custom_group.weight,
               $defaults[$elementName] = CRM_Utils_Money::format($value, NULL, '%a');
             }
             else {
-              drupal_set_message(json_encode($value));
               $defaults[$elementName] = $value;
             }
         }

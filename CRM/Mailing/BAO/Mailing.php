@@ -2414,9 +2414,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // get all the groups that this user can access
     // if they dont have universal access
-    $groupNames = civicrm_api3('Group', 'get', array(
+    $groupNames = civicrm_api3('group', 'get', array(
       'is_active' => 1,
-      'check_permissions' => TRUE,
+      'check_permission' => TRUE,
       'return' => array('title', 'id'),
       'options' => array('limit' => 0),
     ));
@@ -2432,7 +2432,7 @@ SELECT    DISTINCT( m.id ) as id
   FROM    civicrm_mailing m
 LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
  WHERE ( ( g.entity_table like 'civicrm_group%' AND g.entity_id IN ( $groupIDs ) )
-    OR   ( g.entity_table IS NULL AND g.entity_id IS NULL AND m.domain_id = $domain_id ) )
+    OR   ( g.entity_table IS NULL AND g.entity_id IS NULL AND m.domain_id = $domain_id) )
 ";
       $dao = CRM_Core_DAO::executeQuery($query);
 

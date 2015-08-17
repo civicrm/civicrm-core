@@ -423,19 +423,16 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   if (!$contribution->id == $params['id']) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
-  try {
-    if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
-      throw new API_Exception('failed to load related objects');
-    }
-    elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
-      throw new API_Exception(ts('Contribution already completed'));
-    }
-    $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
-    $params = _ipn_process_transaction($params, $contribution, $input, $ids);
+
+  if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
+    throw new API_Exception('failed to load related objects');
   }
-  catch(Exception $e) {
-    throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
+  elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+    throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
+  $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+  $params = _ipn_process_transaction($params, $contribution, $input, $ids);
+
 }
 
 /**

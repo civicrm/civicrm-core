@@ -247,8 +247,8 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             if ($pid) {
               $processor = Civi\Payment\System::singleton()->getById($pid);
               if (!$processor->supports('MultipleConcurrentPayments')) {
-              $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
-            }
+                $errors['member_price_set_id'] = ts('The membership price set associated with this online contribution allows a user to select BOTH an auto-renew AND a non-auto-renew membership. This requires submitting multiple processor transactions, and is not supported for one or more of the payment processors enabled under the Amounts tab.');
+              }
             }
           }
         }
