@@ -170,7 +170,6 @@ $config = CRM_Core_Config::singleton(FALSE);
 $GLOBALS['civicrm_default_error_scope'] = NULL;
 
 // The translation files are in the parent directory (l10n)
-$config->gettextResourceDir = '..' . DIRECTORY_SEPARATOR . $config->gettextResourceDir;
 $i18n = CRM_Core_I18n::singleton();
 
 global $cmsPath;
