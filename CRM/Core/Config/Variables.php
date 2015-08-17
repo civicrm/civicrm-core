@@ -375,20 +375,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $maxLocationBlocks = 2;
 
   /**
-   * The font path where captcha fonts are stored
-   *
-   * @var string
-   */
-  public $captchaFontPath = '/usr/X11R6/lib/X11/fonts/';
-
-  /**
-   * The font to use for captcha
-   *
-   * @var string
-   */
-  public $captchaFont = 'HelveticaBold.ttf';
-
-  /**
    * Some search settings
    */
   public $includeWildCardInName = 1;
