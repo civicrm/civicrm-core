@@ -940,6 +940,9 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    */
   private static function checkDuplicateCustomFields(&$params, $relationshipId) {
     $existingValues = CRM_Core_BAO_CustomValueTable::getEntityValues($relationshipId, 'Relationship');
+    if (!array_key_exists('custom', $params)) {
+      return TRUE;
+    }
     // iterate through $params['custom'], and check if the custom
     // values are the same as the one of the existing relationship.
     foreach ($params['custom'] as $group) {
