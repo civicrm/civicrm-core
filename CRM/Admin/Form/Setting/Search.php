@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -46,12 +44,11 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Search Preferences'));
 
+    // @todo remove the following adds in favour of setting via the settings array (above).
     $this->addYesNo('includeWildCardInName', ts('Automatic Wildcard'));
     $this->addYesNo('includeEmailInName', ts('Include Email'));
     $this->addYesNo('includeNickNameInName', ts('Include Nickname'));
