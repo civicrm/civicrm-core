@@ -358,6 +358,7 @@ SELECT label, value
         elseif (count($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
           $qillValue = CRM_Core_BAO_CustomField::getDisplayValue($value[$op], $id, $this->_options);
+          $value = $value[$op];
         }
         else {
           $op = 'IN';
