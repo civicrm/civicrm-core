@@ -229,18 +229,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $monetaryThousandSeparator = ',';
 
   /**
-   * Default encoding of strings returned by gettext
-   * @var string
-   */
-  public $gettextCodeset = 'utf-8';
-
-  /**
-   * Default name for gettext domain.
-   * @var string
-   */
-  public $gettextDomain = 'civicrm';
-
-  /**
    * Default location of gettext resource files.
    */
   public $gettextResourceDir = './l10n/';
