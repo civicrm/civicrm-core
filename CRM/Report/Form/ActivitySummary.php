@@ -372,7 +372,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
 
     if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
+      $this->_where .= " AND ({$this->_aclWhere} OR civicrm_contact_source.is_deleted=0 OR civicrm_contact_assignee.is_deleted=0)";
     }
   }
 
