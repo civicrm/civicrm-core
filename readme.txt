@@ -3,7 +3,7 @@ Contributors: needle
 Tags: civicrm, crm
 Requires at least: 3.4
 Tested up to: 4.0
-Stable tag: 4.6
+Stable tag: 4.7
 License: AGPL3
 License URI: http://www.gnu.org/licenses/agpl-3.0.html
 
@@ -36,11 +36,11 @@ CiviCRM is localized in over 20 languages including: Chinese (Taiwan, China), Du
 == Changelog ==
 
 = 4.5 =
-Support for CiviCRM version 4.7.x
+Support for CiviCRM version 4.5.x
 
 = 4.4 =
-Support for CiviCRM version 4.7.x
+Support for CiviCRM version 4.4.x
 
 = 4.3 =
-Support for CiviCRM version 4.7.x
+Support for CiviCRM version 4.3.x
 
