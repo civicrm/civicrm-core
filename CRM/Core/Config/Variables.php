@@ -229,11 +229,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $monetaryThousandSeparator = ',';
 
   /**
-   * Default location of gettext resource files.
-   */
-  public $gettextResourceDir = './l10n/';
-
-  /**
    * Default user framework. This basically makes Drupal 7 the default
    */
   public $userFramework = 'Drupal';
