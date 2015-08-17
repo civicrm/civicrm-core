@@ -87,7 +87,7 @@
   </span>
 
   <table id="dupePairs"
-    class="form-layout-compressed crm-ajax-table"
+    class="crm-ajax-table"
     cellspacing="0"
     width="100%"
     data-searching='true',
@@ -107,7 +107,7 @@
         <th data-data="dst_street"   class="crm-contact-duplicate">{ts}Street Address{/ts} 2 ({ts}Duplicate{/ts})</th>
         <th data-data="src_postcode" class="crm-contact">{ts}Postcode{/ts} 1</th>
         <th data-data="dst_postcode" class="crm-contact-duplicate">{ts}Postcode{/ts} 2 ({ts}Duplicate{/ts})</th>
-        <th data-data="conflicts"    class="crm-contact-conflicts crm-pair-conflict">{ts}Conflicts{/ts}</th>
+        <th data-data="conflicts"    class="crm-contact-conflicts">{ts}Conflicts{/ts}</th>
         <th data-data="weight"       class="crm-threshold">{ts}Threshold{/ts}</th>
         <th data-data="actions"      class="crm-empty">&nbsp;</th>
       </tr>
@@ -212,7 +212,8 @@
         // for action column at the last, set nowrap
         $('td:last', row).attr('nowrap','nowrap');
         // for conflcts column
-        $('td.crm-pair-conflict', row).attr('nowrap','nowrap');
+        var col = CRM.$('table#dupePairs thead th.crm-contact-conflicts').index();
+        $('td:eq(' + col + ')', row).attr('nowrap','nowrap');
       }
     });
     $(function($) {
@@ -279,8 +280,11 @@
   
         // nowrap to conflicts column is applied only during initial rendering
         // for show / hide clicks we need to set it explicitly
-        $('#dupePairs tbody td.crm-pair-conflict').attr('nowrap', 'nowrap');
-  
+        var col = CRM.$('table#dupePairs thead th.crm-contact-conflicts').index() + 1;
+        if (col > 0) {
+          CRM.$('table#dupePairs tbody tr td:nth-child(' + col + ')').attr('nowrap','nowrap');
+        }
+
         if ($(this).attr('data-column-dupe')) {
           column = table.column( $(this).attr('data-column-dupe') );
           column.visible( ! column.visible() );
