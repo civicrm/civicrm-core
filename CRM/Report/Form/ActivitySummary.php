@@ -460,7 +460,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
     $query = "SELECT SUM(activity_civireport.duration)
     FROM civicrm_activity activity_civireport
-    {$this->_where} {$this->_groupBy}";
+    {$this->_where}";
 
     $actSQL = "SELECT
       COUNT(DISTINCT {$this->_aliases['civicrm_activity']}.activity_type_id ) as civicrm_activity_activity_type_id_count,
