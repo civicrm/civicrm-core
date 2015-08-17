@@ -47,6 +47,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'versionCheck' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionCheckIgnoreDate' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'empoweredBy' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'logging' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'maxFileSize' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'secondDegRelPermissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -73,16 +74,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)'));
 
-    // also check if we can enable triggers
-    $validTriggerPermission = CRM_Core_DAO::checkTriggerViewPermission(FALSE);
-
-    // FIXME: for now, disable logging for multilingual sites OR if triggers are not permittted
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $attribs = $domain->locales || !$validTriggerPermission ? array('disabled' => 'disabled') : array();
-
-    $this->assign('validTriggerPermission', $validTriggerPermission);
-    $this->addYesNo('logging', ts('Logging'), NULL, NULL, $attribs);
+    $this->assign('validTriggerPermission', CRM_Core_DAO::checkTriggerViewPermission(FALSE));
 
     $this->addElement(
       'text',
@@ -151,28 +143,6 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       }
     }
     return $errors;
-  }
-
-
-  public function postProcess() {
-    // store the submitted values in an array
-    $config = CRM_Core_Config::singleton();
-    $params = $this->controller->exportValues($this->_name);
-
-    // get current logging status
-    $values = $this->exportValues();
-
-    parent::postProcess();
-
-    if ($config->logging != $values['logging']) {
-      $logging = new CRM_Logging_Schema();
-      if ($values['logging']) {
-        $logging->enableLogging();
-      }
-      else {
-        $logging->disableLogging();
-      }
-    }
   }
 
 }
