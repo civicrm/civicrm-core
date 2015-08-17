@@ -242,7 +242,7 @@ function civicrm_api3_activity_get($params) {
     }
   }
   else {
-    $extraSql = array();
+    $sql = CRM_Utils_SQL_Select::fragment();
     $options = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
     $options = $options['values'];
     $activityContactOptions = array(
@@ -252,15 +252,20 @@ function civicrm_api3_activity_get($params) {
     );
     foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
       if (!empty($params[$activityContactName])) {
-        $extraSql['join'][] = array(
-          'activity_' . $activityContactName => '
-          LEFT JOIN civicrm_activity_contact ac ON a.id = ac.activity_id AND ac.record_type_id = ' . (int) $activityContactValue,
+        // If the intent is to have multiple joins -- one for each relation -- then you would
+        // need different table aliases. Consider replacing 'ac' and passing in a '!alias' param,
+        // with a different value for each relation.
+        $sql->join(
+          'activity_' . $activityContactName,
+          'LEFT JOIN civicrm_activity_contact ac ON a.id = ac.activity_id AND ac.record_type_id = #typeId',
+          array('typeId' => $activityContactValue)
         );
-        // Note that if we later need to change the int to an array we would need sql escaping.
-        $extraSql['where'] = array('activity_' . $activityContactName => 'ac.contact_id = ' . (int) $params[$activityContactName]);
+        $sql->where('ac.contact_id IN (#cid)', array(
+          'cid' => $params[$activityContactName],
+        ));
       }
     }
-    $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $extraSql);
+    $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
   }
   $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   if ($options['is_count']) {
