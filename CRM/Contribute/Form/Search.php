@@ -291,7 +291,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         }
       }
 
-      if (!$config->groupTree) {
+      if (!defined('CIVICRM_GROUPTREE')) {
         $group = CRM_Utils_Array::value('group', $this->_formValues);
         if ($group && !is_array($group)) {
           unset($this->_formValues['group']);
