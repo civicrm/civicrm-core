@@ -1300,9 +1300,9 @@ ORDER BY civicrm_custom_group.weight,
         if (empty($field['element_name'])) {
           continue;
         }
-        
+
         $elementName = $field['element_name'];
-        
+
         switch ($field['html_type']) {
           case 'Multi-Select':
           case 'AdvMulti-Select':
