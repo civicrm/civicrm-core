@@ -1,5 +1,7 @@
 {* file to handle db changes in 4.7.alpha1 during upgrade *}
 
+{include file='../CRM/Upgrade/4.7.alpha1.msg_template/civicrm_msg_template.tpl'}
+
 -- CRM-16354
 SELECT @option_group_id_wysiwyg := max(id) from civicrm_option_group where name = 'wysiwyg_editor';
 
