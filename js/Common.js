@@ -201,8 +201,9 @@ function showHideRow(index) {
 
 /* jshint ignore:end */
 
-CRM.utils = CRM.utils || {};
-CRM.strings = CRM.strings || {};
+if (!CRM.utils) CRM.utils = {};
+if (!CRM.strings) CRM.strings = {};
+if (!CRM.vars) CRM.vars = {};
 
 (function ($, _, undefined) {
   "use strict";
