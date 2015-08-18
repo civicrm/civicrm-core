@@ -56,9 +56,6 @@ class CRM_Core_Config_Defaults {
     );
 
     $this->sqlDir = $civicrm_root . DIRECTORY_SEPARATOR . 'sql' . DIRECTORY_SEPARATOR;
-
-    // show tree widget
-    $this->groupTree = defined('CIVICRM_GROUPTREE') ? TRUE : FALSE;
   }
 
   /**
