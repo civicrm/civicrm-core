@@ -184,9 +184,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       }
 
       // Get the mailer
-      // make it a persistent connection, CRM-9349
       if ($mode === NULL) {
-        $mailer = $config->getMailer(TRUE);
+        $mailer = \Civi\Core\Container::singleton()->get('pear_mail');
       }
       elseif ($mode == 'sms') {
         $mailer = CRM_SMS_Provider::singleton(array('mailing_id' => $job->mailing_id));
