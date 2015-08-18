@@ -48,6 +48,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   // Current logged-in user
   protected $loggedInAs = NULL;
 
+  private $settingCache;
+
   /**
    *  Constructor.
    *
@@ -101,6 +103,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if (property_exists($this->settings, 'rcPort') && $this->settings->rcPort) {
       $this->setPort($this->settings->rcPort);
     }
+    $this->settingCache = array();
   }
 
   /**
@@ -413,6 +416,20 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $_config_backend = unserialize($result);
     }
     return $_config_backend[$field];
+  }
+
+  /**
+   * @param string $field
+   * @return mixed
+   */
+  public function webtestGetSetting($field) {
+    if (!isset($this->settingCache[$field])) {
+      $result = $this->webtest_civicrm_api("Setting", "getsingle", array(
+        'return' => $field,
+      ));
+      $this->settingCache[$field] = $result[$field];
+    }
+    return $this->settingCache[$field];
   }
 
   /**
