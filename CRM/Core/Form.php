@@ -344,6 +344,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Add an element for inputting a month+day (partial date).
+   *
+   * @param string $name
+   * @param string $label
+   * @return HTML_QuickForm_Element
+   */
+  public function addMonthDay($name, $label) {
+    return $this->add('date', $name, $label,
+      CRM_Core_SelectValues::date(NULL, 'M d')
+    );
+  }
+
+  /**
    * called before buildForm. Any pre-processing that
    * needs to be done for buildForm should be done here
    *
