@@ -1315,15 +1315,6 @@ if (!CRM.vars) CRM.vars = {};
       messagesFromMarkup.call($('#crm-container'));
     }
 
-    // Hide CiviCRM menubar when editor is fullscreen
-    if (window.CKEDITOR) {
-      CKEDITOR.on('instanceCreated', function (e) {
-        e.editor.on('maximize', function (e) {
-          $('#civicrm-menu').toggle(e.data === 2);
-        });
-      });
-    }
-
     $('body')
       // bind the event for image popup
       .on('click', 'a.crm-image-popup', function(e) {
