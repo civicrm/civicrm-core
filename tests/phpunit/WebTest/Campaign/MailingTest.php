@@ -275,6 +275,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->clickAjaxLink("CiviMail", 'campaigns');
     $this->multiselect2("campaigns", array("$campaignTitle"));
     $this->click("_qf_Advanced_refresh");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check for contacts inserted while adding Campaing and Mailing
     foreach ($contactNames as $ctKey => $contact) {
