@@ -1460,9 +1460,9 @@ class CRM_Utils_Date {
         break;
 
       case 'week':
-        $weekFirst = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);;
+        $weekFirst = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
         $thisDay = $now['wday'];
-        if ($weekFirst > $thisDay){
+        if ($weekFirst > $thisDay) {
           $diffDay = $thisDay - $weekFirst + 7;
         }
         else {
