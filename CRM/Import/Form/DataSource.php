@@ -52,7 +52,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(static::PATH, $params));
 
     // check for post max size
-    CRM_Core_Config_Defaults::formatUnitSize(ini_get('post_max_size'), TRUE);
+    CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
   }
 
   /**
@@ -63,7 +63,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
 
-    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize . 'm', TRUE);
+    $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
 
     $this->assign('uploadSize', $uploadSize);
