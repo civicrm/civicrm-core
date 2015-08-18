@@ -406,7 +406,7 @@ WHERE  email = %2
     $b = CRM_Utils_Mail::setMimeParams($message);
     $h = $message->headers($headers);
 
-    $mailer = $config->getMailer();
+    $mailer = \Civi\Core\Container::singleton()->get('pear_mail');
 
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();

@@ -397,8 +397,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // FIXME: look at it closer in second stage
 
     // initialize the object once db is loaded
-    CRM_Core_Config::$_mail = NULL;
     $config = CRM_Core_Config::singleton();
+    Civi\Core\Container::singleton(TRUE);
 
     // when running unit tests, use mockup user framework
     $config->setUserFramework('UnitTests');
