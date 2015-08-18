@@ -945,8 +945,7 @@ if (!CRM.vars) CRM.vars = {};
   $.fn.crmtooltip = function () {
     $(document)
       .on('mouseover', 'a.crm-summary-link:not(.crm-processed)', function (e) {
-        $(this).addClass('crm-processed');
-        $(this).addClass('crm-tooltip-active');
+        $(this).addClass('crm-processed crm-tooltip-active');
         var topDistance = e.pageY - $(window).scrollTop();
         if (topDistance < 300 || topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
           $(this).addClass('crm-tooltip-down');
@@ -959,8 +958,7 @@ if (!CRM.vars) CRM.vars = {};
         }
       })
       .on('mouseout', 'a.crm-summary-link', function () {
-        $(this).removeClass('crm-processed');
-        $(this).removeClass('crm-tooltip-active crm-tooltip-down');
+        $(this).removeClass('crm-processed crm-tooltip-active crm-tooltip-down');
       })
       .on('click', 'a.crm-summary-link', false);
   };
