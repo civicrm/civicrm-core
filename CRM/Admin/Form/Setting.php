@@ -144,6 +144,12 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
             $props['html_type'] == 'select' ? CRM_Utils_Array::value('html_attributes', $props) : NULL
           );
         }
+        elseif ($add == 'addSelect') {
+          $options = civicrm_api3('Setting', 'getoptions', array(
+            'field' => $setting,
+          ));
+          $this->addElement('select', $setting, ts($props['title']), $options['values'], CRM_Utils_Array::value('html_attributes', $props));
+        }
         else {
           $this->$add($setting, ts($props['title']));
         }
@@ -159,6 +165,10 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       }
     }
+  }
+
+  public function getDefaultEntity() {
+    return 'Setting';
   }
 
   /**
