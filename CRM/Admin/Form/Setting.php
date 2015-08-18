@@ -234,18 +234,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       );
     }
 
-    // update time for date formats when global time is changed
-    if (!empty($params['timeInputFormat'])) {
-      $query = "
-UPDATE civicrm_preferences_date
-SET    time_format = %1
-WHERE  time_format IS NOT NULL
-AND    time_format <> ''
-";
-      $sqlParams = array(1 => array($params['timeInputFormat'], 'String'));
-      CRM_Core_DAO::executeQuery($query, $sqlParams);
-    }
-
     // verify ssl peer option
     if (isset($params['verifySSL'])) {
       CRM_Core_BAO_Setting::setItem($params['verifySSL'],
