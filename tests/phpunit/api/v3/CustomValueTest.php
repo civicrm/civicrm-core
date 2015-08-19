@@ -207,7 +207,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
         case '!=':
           $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)));
-          $this->assertEquals($contactId, $result['id']);
+          $this->assertEquals(TRUE, array_key_exists($contactId, $result['values']));
           echo $description . $notselectedValue;
           break;
 
