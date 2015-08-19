@@ -103,6 +103,18 @@ class Container {
     ))
       ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
 
+    $container->setDefinition('cache.settings', new Definition(
+      'CRM_Utils_Cache_SqlGroup',
+      array(
+        array('group' => 'Settings', 'prefetch' => 0),
+      )
+    ));
+
+    $container->setDefinition('settings_manager', new Definition(
+      'Civi\Core\SettingsManager',
+      array(new Reference('cache.settings'))
+    ));
+
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactoryClass('CRM_Utils_Mail')->setFactoryMethod('createMailer');
 
