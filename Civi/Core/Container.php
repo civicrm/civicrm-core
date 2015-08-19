@@ -103,6 +103,9 @@ class Container {
     ))
       ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
 
+    $container->setDefinition('pear_mail', new Definition('Mail'))
+      ->setFactoryClass('CRM_Utils_Mail')->setFactoryMethod('createMailer');
+
     // Expose legacy singletons as services in the container.
     $singletons = array(
       'resources' => 'CRM_Core_Resources',

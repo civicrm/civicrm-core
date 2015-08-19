@@ -172,7 +172,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $mailing_obj->find(TRUE);
 
     $config = CRM_Core_Config::singleton();
-    $mailer = $config->getMailer();
+    $mailer = \Civi\Core\Container::singleton()->get('pear_mail');
 
     $recipient = NULL;
     $attachments = NULL;

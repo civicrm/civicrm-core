@@ -192,6 +192,11 @@ class CRM_Core_PseudoConstant {
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
    *
+   * NOTE: If someone undertakes a refactoring of this, please consider the use-case of
+   * the Setting.getoptions API. There is no DAO/field, but it would be nice to use the
+   * same 'pseudoconstant' struct in *.settings.php. This means loosening the coupling
+   * between $field lookup and the $pseudoconstant evaluation.
+   *
    * @param string $daoName
    * @param string $fieldName
    * @param array $params

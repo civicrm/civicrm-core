@@ -41,6 +41,9 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
 
   public $_settings = array(
     'weekBegins' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'dateInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'timeInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'fiscalYearStart' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
   );
 
   /**
@@ -56,16 +59,6 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
     $this->addElement('text', 'dateformatPartial', ts('Month and Year'));
     $this->addElement('text', 'dateformatYear', ts('Year Only'));
     $this->addElement('text', 'dateformatTime', ts('Time Only'));
-    $this->add('select', 'dateInputFormat', ts('Complete Date'),
-      CRM_Core_SelectValues::getDatePluginInputFormats()
-    );
-    $this->add('select', 'timeInputFormat', ts('Time'),
-      CRM_Core_SelectValues::getTimeFormats()
-    );
-
-    $this->add('date', 'fiscalYearStart', ts('Fiscal Year Start'),
-      CRM_Core_SelectValues::date(NULL, 'M d')
-    );
 
     parent::buildQuickForm();
   }

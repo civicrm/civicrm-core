@@ -93,4 +93,30 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
     CRM_Core_Error::fatal();
   }
 
+  /**
+   * (Setting Callback - On Change)
+   * Respond to changes in the "timeInputFormat" setting.
+   *
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
+   */
+  public static function onChangeSetting($oldValue, $newValue, $metadata) {
+    if ($oldValue == $newValue) {
+      return;
+    }
+
+    $query = "
+UPDATE civicrm_preferences_date
+SET    time_format = %1
+WHERE  time_format IS NOT NULL
+AND    time_format <> ''
+";
+    $sqlParams = array(1 => array($newValue, 'String'));
+    CRM_Core_DAO::executeQuery($query, $sqlParams);
+  }
+
 }
