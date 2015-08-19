@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Utils_Cache_APCcache {
+class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX = '';
 

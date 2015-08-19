@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Utils_Cache_Memcache {
+class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   const DEFAULT_HOST = 'localhost';
   const DEFAULT_PORT = 11211;
   const DEFAULT_TIMEOUT = 3600;
