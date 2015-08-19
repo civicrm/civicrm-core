@@ -110,6 +110,7 @@ class Container {
     $singletons = array(
       'resources' => 'CRM_Core_Resources',
       'httpClient' => 'CRM_Utils_HttpClient',
+      'cache.default' => 'CRM_Utils_Cache',
       // Maybe? 'config' => 'CRM_Core_Config',
       // Maybe? 'smarty' => 'CRM_Core_Smarty',
     );
