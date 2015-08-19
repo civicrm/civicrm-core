@@ -186,7 +186,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         CRM_Core_Error::fatal(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
       }
     }
-    CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $this->_contactID));
 
     if ($this->_action & CRM_Core_Action::ADD) {
       if (!CRM_Member_BAO_Membership::statusAvailabilty($this->_contactID)) {
