@@ -697,7 +697,7 @@ CRM_Utils_System::authenticateScript(TRUE);
 //log the execution of script
 CRM_Core_Error::debug_log_message('ContributionProcessor.php');
 
-$lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.contribute.CiviContributeProcessor');
+$lock = Civi::service('lockManager')->acquire('worker.contribute.CiviContributeProcessor');
 
 if ($lock->isAcquired()) {
   // try to unset any time limits

@@ -136,7 +136,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.mailing.job.{$job->id}");
+      $lock = Civi::service('lockManager')->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -185,7 +185,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
       // Get the mailer
       if ($mode === NULL) {
-        $mailer = \Civi\Core\Container::singleton()->get('pear_mail');
+        $mailer = \Civi::service('pear_mail');
       }
       elseif ($mode == 'sms') {
         $mailer = CRM_SMS_Provider::singleton(array('mailing_id' => $job->mailing_id));
@@ -341,7 +341,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     // X Number of child jobs
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.mailing.job.{$job->id}");
+      $lock = Civi::service('lockManager')->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
