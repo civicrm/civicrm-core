@@ -668,7 +668,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $replyToEmail = $mailing->replyto_email;
       }
 
-      $message = &$mailing->compose(
+      $message = $mailing->compose(
         $this->id, $field['id'], $field['hash'],
         $field['contact_id'], $field['email'],
         $recipient, FALSE, $details[0][$contactID], $attachments,
