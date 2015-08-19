@@ -279,8 +279,6 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
       $params[$parameter] = $this->controller->exportValue($this->_name, $parameter);
     }
 
-    dpm($this->controller->exportValues(), 'values');
-
     // Previously, we checked if $mailing->is_template, and did *not*
     // schedule if it was set. Discussed with Lobo, removed that check
     // as it appeared to prevent mails being scheduled if they were
