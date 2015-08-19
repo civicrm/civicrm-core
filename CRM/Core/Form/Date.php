@@ -184,7 +184,7 @@ class CRM_Core_Form_Date {
       'starting.day' => ts('Tomorrow'),
       'starting.week' => ts('Next 7 days including today'),
       'starting.month' => ts('Next 30 days including today'),
-      'starting.quarter' => ts('Next 90 days including today'),
+      'starting.quarter' => ts('Next 90 days from today'),
       'starting.year' => ts('Next 12 months including today'),
       'less.year' => ts('To end of current calendar year'),
       'less.quarter' => ts('To end of current quarter'),
