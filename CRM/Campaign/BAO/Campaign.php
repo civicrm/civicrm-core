@@ -145,7 +145,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    *
    * @return \CRM_Campaign_DAO_Campaign|null
    */
-  public function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $campaign = new CRM_Campaign_DAO_Campaign();
 
     $campaign->copyValues($params);
