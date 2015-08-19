@@ -525,7 +525,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @deprecated
    */
   public static function getMailer() {
-    return Civi\Core\Container::singleton()->get('pear_mail');
+    return Civi::service('pear_mail');
   }
 
   /**

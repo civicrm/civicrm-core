@@ -260,7 +260,7 @@ class CRM_Utils_Mail {
 
     $to = array($params['toEmail']);
     $result = NULL;
-    $mailer = \Civi\Core\Container::singleton()->get('pear_mail');
+    $mailer = \Civi::service('pear_mail');
 
     // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
     // be included in both $to and $headers['Cc', 'Bcc']

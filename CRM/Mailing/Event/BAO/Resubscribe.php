@@ -287,7 +287,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     $b = CRM_Utils_Mail::setMimeParams($message);
     $h = $message->headers($headers);
 
-    $mailer = \Civi\Core\Container::singleton()->get('pear_mail');
+    $mailer = \Civi::service('pear_mail');
 
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();

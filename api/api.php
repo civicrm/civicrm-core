@@ -20,7 +20,7 @@
  * @return array|int
  */
 function civicrm_api($entity, $action, $params, $extra = NULL) {
-  return \Civi\Core\Container::singleton()->get('civi_api_kernel')->run($entity, $action, $params, $extra);
+  return \Civi::service('civi_api_kernel')->run($entity, $action, $params, $extra);
 }
 
 /**

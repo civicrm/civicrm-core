@@ -91,7 +91,7 @@ function civicrm_api3_cxn_register($params) {
 
   try {
     /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
-    $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+    $client = \Civi::service('cxn_reg_client');
     list($cxnId, $result) = $client->register($appMeta);
     CRM_Cxn_BAO_Cxn::updateAppMeta($appMeta);
   }
@@ -133,7 +133,7 @@ function civicrm_api3_cxn_unregister($params) {
   $appMeta = CRM_Cxn_BAO_Cxn::getAppMeta($cxnId);
 
   /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
-  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+  $client = \Civi::service('cxn_reg_client');
   list($cxnId, $result) = $client->unregister($appMeta, CRM_Utils_Array::value('force', $params, FALSE));
 
   return $result;
@@ -240,7 +240,7 @@ function civicrm_api3_cxn_getlink($params) {
   }
 
   /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
-  $client = \Civi\Core\Container::singleton()->get('cxn_reg_client');
+  $client = \Civi::service('cxn_reg_client');
   return $client->call($appMeta, 'Cxn', 'getlink', array(
     'page' => $params['page'],
   ));
