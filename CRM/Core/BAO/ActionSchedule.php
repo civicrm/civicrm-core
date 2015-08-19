@@ -1315,6 +1315,7 @@ HAVING reminder.id = MAX(reminder.id) AND reminder.reference_date <> {$dateField
         }
         $insertAdditionalSql = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
+SELECT * FROM (
 {$addSelect}
 FROM ({$contactTable})
 LEFT JOIN {$additionReminderClause}
@@ -1328,7 +1329,9 @@ AND c.id NOT IN (
      WHERE rem.action_schedule_id = {$actionSchedule->id}
       AND rem.entity_table = '{$mapping->entity}'
     )
+
 GROUP BY c.id
+) as reminders
 ";
         CRM_Core_DAO::executeQuery($insertAdditionalSql);
       }
