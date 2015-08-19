@@ -299,14 +299,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $geocodeMethod = '';
 
   /**
-   *
-   *
-   * @var boolean
-   */
-  public $mapGeoCoding = 1;
-
-
-  /**
    * Whether database-level logging should be performed
    * @var boolean
    */
@@ -363,13 +355,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $fieldSeparator = ',';
 
   /**
-   * Max location blocks in address
-   *
-   * @var integer
-   */
-  public $maxLocationBlocks = 2;
-
-  /**
    * Some search settings
    */
   public $includeWildCardInName = 1;
@@ -395,14 +380,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    */
   public $includeAlphabeticalPager = 1;
   public $includeOrderByClause = 1;
-  public $oldInputStyle = 1;
-
-  /**
-   * Should we disable key generation for forms
-   *
-   * @var boolean
-   */
-  public $formKeyDisable = FALSE;
 
   /**
    * determine whether the call is from cms or civicrm

@@ -291,7 +291,7 @@ SELECT     civicrm_email.id as email_id
       $this->id,
       $this->hash
     );
-    $mailer = $config->getMailer();
+    $mailer = \Civi\Core\Container::singleton()->get('pear_mail');
 
     if (is_object($mailer)) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();

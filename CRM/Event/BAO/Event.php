@@ -466,7 +466,7 @@ $event_summary_limit
               $params = array('entity_id' => $dao->id, 'entity_table' => 'civicrm_event');
               $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
               if (is_numeric(CRM_Utils_Array::value('geo_code_1', $values['location']['address'][1])) ||
-                ($config->mapGeoCoding &&
+                (
                   !empty($values['location']['address'][1]['city']) &&
                   !empty($values['location']['address'][1]['state_province_id'])
                 )
