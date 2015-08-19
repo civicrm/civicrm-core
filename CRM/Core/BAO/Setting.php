@@ -224,61 +224,21 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $contactID = NULL,
     $domainID = NULL
   ) {
-
-    $overrideGroup = array();
-    if (NULL !== ($override = self::getOverride($group, $name, NULL))) {
-      if (isset($name)) {
-        return $override;
+    /** @var \Civi\Core\SettingsManager $manager */
+    $manager = \Civi::service('settings_manager');
+    $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
+    if (TRUE) {
+      if ($name === NULL) {
+        CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name should be provided.\n");
       }
-      else {
-        $overrideGroup = $override;
+      if ($componentID !== NULL) {
+        CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name='$name'. Component should be omitted\n");
       }
-    }
-
-    if (empty($domainID)) {
-      $domainID = CRM_Core_Config::domainID();
-    }
-    $cacheKey = self::inCache($group, $name, $componentID, $contactID, TRUE, $domainID);
-
-    if ($group && !isset($name) && $cacheKey) {
-      // check value against the cache, and unset key if values are different
-      $valueDifference = CRM_Utils_Array::multiArrayDiff($overrideGroup, self::$_cache[$cacheKey]);
-      if (!empty($valueDifference)) {
-        $cacheKey = '';
+      if ($defaultValue !== NULL) {
+        CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name='$name'. Defaults should come from metadata\n");
       }
     }
-
-    if (!$cacheKey) {
-      $dao = self::dao($group, NULL, $componentID, $contactID, $domainID);
-      $dao->find();
-
-      $values = array();
-      while ($dao->fetch()) {
-        if (NULL !== ($override = self::getOverride($group, $dao->name, NULL))) {
-          $values[$dao->name] = $override;
-        }
-        elseif ($dao->value) {
-          $values[$dao->name] = unserialize($dao->value);
-        }
-        else {
-          $values[$dao->name] = NULL;
-        }
-      }
-      $dao->free();
-
-      if (!isset($name)) {
-        // merge db and override group values
-        // When no $name is present, the getItem() function should return an array
-        // consisting of the sum of all override settings + all settings present in
-        // the database for the given $group (with the overrides taking precedence,
-        // and applying even if the setting is not defined in the database).
-        //
-        $values = array_merge($values, $overrideGroup);
-      }
-
-      $cacheKey = self::setCache($values, $group, $componentID, $contactID, $domainID);
-    }
-    return $name ? CRM_Utils_Array::value($name, self::$_cache[$cacheKey], $defaultValue) : self::$_cache[$cacheKey];
+    return $name ? $settings->get($name) : $settings->all();
   }
 
   /**
@@ -373,14 +333,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $createdID = NULL,
     $domainID = NULL
   ) {
-    $fields = array();
-    $fieldsToSet = self::validateSettingsInput(array($name => $value), $fields);
-    //We haven't traditionally validated inputs to setItem, so this breaks things.
-    //foreach ($fieldsToSet as $settingField => &$settingValue) {
-    //  self::validateSetting($settingValue, $fields['values'][$settingField]);
-    //}
-
-    return self::_setItem($fields['values'][$name], $value, $group, $name, $componentID, $contactID, $createdID, $domainID);
+    /** @var \Civi\Core\SettingsManager $manager */
+    $manager = \Civi::service('settings_manager');
+    $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
+    $settings->set($name, $value);
   }
 
   /**
@@ -485,10 +441,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @return array
    */
   public static function setItems(&$params, $domains = NULL) {
-    $originalDomain = CRM_Core_Config::domainID();
-    if (empty($domains)) {
-      $domains[] = $originalDomain;
-    }
+    /** @var \Civi\Core\SettingsManager $manager */
+    $manager = \Civi::service('settings_manager');
+    $domains = empty($domains) ? array(CRM_Core_Config::domainID()) : $domains;
+
+    // FIXME: redundant validation
+    // FIXME: this whole thing should just be a loop to call $settings->add() on each domain.
+
     $reloadConfig = FALSE;
     $fields = $config_keys = array();
     $fieldsToSet = self::validateSettingsInput($params, $fields);
@@ -498,23 +457,16 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
 
     foreach ($domains as $domainID) {
+
       if ($domainID != CRM_Core_Config::domainID()) {
         $reloadConfig = TRUE;
         CRM_Core_BAO_Domain::setDomain($domainID);
       }
       $result[$domainID] = array();
+      $realSettingsToSet = array(); // need to separate config_backend stuff
       foreach ($fieldsToSet as $name => $value) {
         if (empty($fields['values'][$name]['config_only'])) {
-          CRM_Core_BAO_Setting::_setItem(
-            $fields['values'][$name],
-            $value,
-            $fields['values'][$name]['group_name'],
-            $name,
-            CRM_Utils_Array::value('component_id', $params),
-            CRM_Utils_Array::value('contact_id', $params),
-            CRM_Utils_Array::value('created_id', $params),
-            $domainID
-          );
+          $realSettingsToSet[$name] = $value;
         }
         if (!empty($fields['values'][$name]['prefetch'])) {
           if (!empty($fields['values'][$name]['config_key'])) {
@@ -524,6 +476,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
         }
         $result[$domainID][$name] = $value;
       }
+      $manager->getBagByDomain($domainID)->add($realSettingsToSet);
       if ($reloadConfig) {
         CRM_Core_Config::singleton($reloadConfig, $reloadConfig);
       }

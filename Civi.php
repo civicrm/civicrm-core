@@ -74,4 +74,15 @@ class Civi {
     self::$statics = array();
   }
 
+  /**
+   * Obtain the domain settings.
+   *
+   * @param int|null $domainID
+   *   For the default domain, leave $domainID as NULL.
+   * @return \Civi\Core\SettingsBag
+   */
+  public static function settings($domainID = NULL) {
+    return Civi\Core\Container::singleton()->get('settings_manager')->getBagByDomain($domainID);
+  }
+
 }
