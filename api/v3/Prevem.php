@@ -30,7 +30,7 @@ function civicrm_api3_prevem_login($params) {
 
 	$prevemURL = !empty($prevemUrl) ? CRM_Utils_URL::mask($prevemUrl, array('user','pass')) : NULL;
 	if (!$prevemURL) {
-		return civicrm_api3_create_error("prevemURL is not configured");		
+		return civicrm_api3_create_error("prevemURL is not configured. Go to Administer>CiviMail>CiviMail Component Settings to configure prevemURL");		
 	}
 	$prevemConsumer = parse_url($prevemUrl, PHP_URL_USER);
 	$prevemSecret = parse_url($prevemUrl, PHP_URL_PASS);
@@ -53,16 +53,16 @@ function civicrm_api3_prevem_login($params) {
 	);
 
 	$context  = stream_context_create($opts);
-	$result = file_get_contents('http://localhost:3000/api/Users/login', false, $context);
+	$result1 = file_get_contents($prevemURL.'/api/Users', false, $context);
+	$result = file_get_contents($prevemURL.'/api/Users/login', false, $context);
 	//CRM_Core_Error::debug_var('$http_response_header', $http_response_header);
 	if ($result === FALSE) {
-		// echo $returnValues . "hjhhjj";
-		return civicrm_api3_create_error("Failed to login");
+		return civicrm_api3_create_error("Failed to login. Check if Preview Manager is running on ".$prevemURL);
 	}
 	else {
 		$accessToken = json_decode($result)->{'id'};
 		if (!$accessToken){
-			return civicrm_api3_create_error("Failed to parse access token");
+			return civicrm_api3_create_error("Failed to parse access token. Check if Preview Manager is running on ".$prevemURL);
 		}
 		$returnValues = array(
 			'url' => $prevemURL,

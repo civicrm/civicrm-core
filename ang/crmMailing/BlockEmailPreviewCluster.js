@@ -24,7 +24,7 @@
           "gmail" : "http://www.socialtalent.co/wp-content/uploads/2015/07/Gmail-Logo.png",
           "yahoo" : "https://lh6.ggpht.com/yzhSae3SIKlwv9lBzpCWaexNKgpLHXvwnxyEE7_oW3SdMv604v-YtUcQnGCyAUpX1lcm=w300"
         }
-        
+
       crmApi('Prevem', 'login', {})
         .then(function(r){  
           scope.accessToken = r.values.token;
@@ -70,6 +70,15 @@
           if (scope[clientName] === 0) {
             CRM.alert(ts('The screenshot for %1 is still being prepared. Try again in a minute.', {1: clientName}));
           }
+          else if (scope[clientName] === 3) {
+            CRM.alert(ts('Connection to the Selenium Server was refused. The screenshot for %1 couln\'t be fetched because of an error at the %1 renderer\'s end. Please make sure the Selenium server is running on the renderer\'s machine. Cancel this request and make a new request to try again.', {1: clientName}));
+          }
+          else if (scope[clientName] === 4) {
+            CRM.alert(ts('Renderer couldn\'t locate an Element. The screenshot for %1 couln\'t be fetched because of an error at the %1 renderer\'s end. Cancel this request and make a new request to try again.', {1: clientName}));
+          }
+          else if (scope[clientName] === 5) {
+            CRM.alert(ts('Unknown Error at the Renderer\'s end. The screenshot for %1 couln\'t be fetched because of an unknown error at the %1 renderer\'s end. Cancel this request and make a new request to try again.', {1: clientName}));
+          }
           else {
             window.open(scope[clientName]);
           }
@@ -83,6 +92,8 @@
           scope.$eval(attr.onRequest);
           scope.requested= true;
           for (var clientName in renderers) {
+            scope[clientName] = 0;
+            scope.iconClass[clientName] = 'fadedIcon';
             if (renderers[clientName]) {
               scope[clientName + 'Show'] = true;
             }
@@ -112,7 +123,7 @@
                     scope.iconClass[clientName] = "clearIcon";
                   }
                 }
-                if (data.response.finished == 1){
+                if (data.response.finished === 1){
                   clearInterval(scope.Interval);
                 }
               } else if (data.error) {
@@ -134,6 +145,7 @@
           scope.requested= false;
           var deleteURL = scope.prevemURL + '/api/PreviewBatches/'
           var batchId = scope.consumerId + ':' + mailing.id;
+          clearInterval(scope.Interval);
           $http.delete(deleteURL+batchId+'?'+scope.accessTokenUrlExtension)
             .success(function(data, status, headers, config){
               /*called for result & error because 200 status*/
