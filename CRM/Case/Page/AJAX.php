@@ -42,7 +42,7 @@ class CRM_Case_Page_AJAX {
    */
   public static function unclosedCases() {
     $params = array(
-      'limit' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10),
+      'limit' => Civi::settings()->get('search_autocomplete_count'),
       'sort_name' => CRM_Utils_Type::escape(CRM_Utils_Array::value('term', $_GET, ''), 'String'),
     );
 

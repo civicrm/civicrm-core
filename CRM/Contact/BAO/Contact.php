@@ -782,7 +782,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       return FALSE;
     }
     // If trash is disabled in system settings then we always skip
-    if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'contact_undelete', NULL, 1)) {
+    if (!Civi::settings()->get('contact_undelete')) {
       $skipUndelete = TRUE;
     }
 
