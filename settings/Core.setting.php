@@ -520,12 +520,10 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
-  'checksumTimeout' => array(
+  'checksum_timeout' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
-    'name' => 'checksumTimeout',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'name' => 'checksum_timeout',
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_attributes' => array(

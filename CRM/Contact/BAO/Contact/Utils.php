@@ -201,11 +201,7 @@ WHERE  id IN ( $idString )
     }
 
     if (!$live) {
-      $days = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'checksum_timeout',
-        NULL,
-        7
-      );
+      $days = Civi::settings()->get('checksum_timeout');
       $live = 24 * $days;
     }
 
