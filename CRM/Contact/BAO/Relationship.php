@@ -1295,6 +1295,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               $mask -= CRM_Core_Action::ENABLE;
               $mask -= CRM_Core_Action::DISABLE;
             }
+            $mask = $mask & $permissionMask;
           }
 
           // Give access to manage case link by copying to MAX_ACTION index temporarily, depending on case permission of user.
