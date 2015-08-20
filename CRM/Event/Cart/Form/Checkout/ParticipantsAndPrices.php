@@ -200,15 +200,15 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         $participant->email = NULL;
         //LSE set contact first, last name, etc.,not just ID
         $contactdata = array();
-        foreach($this->_submitValues['field'] as $key => $value) {
+        foreach ($this->_submitValues['field'] as $key => $value) {
           $contactdata = $value;
         }
         if ($contactdata['first_name'] != NULL) {
           $participant->contact_id = self::find_or_create_contact($this->getContactID(),
           array(
-	    'email' => $contactdata['email-Primary'],
+            'email' => $contactdata['email-Primary'],
             'first_name' => $contactdata['first_name'],
-	    'last_name' => $contactdata['last_name'],
+            'last_name' => $contactdata['last_name'],
             'is_deleted' => FALSE));
           $participant->save();
           $this->cid = $participant->contact_id;
