@@ -178,4 +178,18 @@ return array(
     'description' => 'If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID',
     'help_text' => NULL,
   ),
+  'civimail_multiple_bulk_emails' => array(
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'civimail_multiple_bulk_emails',
+    'type' => 'Integer',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'add' => '4.5',
+    'title' => ' Multiple Bulk Emails',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'If enabled, CiviMail will deliver a copy of the email to each bulk email listed for the contact.',
+    'help_text' => NULL,
+  ),
 );

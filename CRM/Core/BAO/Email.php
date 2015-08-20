@@ -319,7 +319,7 @@ AND    reset_date IS NULL
    * @return object
    */
   public static function isMultipleBulkMail() {
-    return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'civimail_multiple_bulk_emails', NULL, FALSE);
+    return Civi::settings()->get('civimail_multiple_bulk_emails');
   }
 
   /**
