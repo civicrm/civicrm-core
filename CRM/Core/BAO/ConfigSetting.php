@@ -319,7 +319,7 @@ class CRM_Core_BAO_ConfigSetting {
       CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($defaults);
 
       // Pickup enabled-components from settings table if found.
-      $enableComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+      $enableComponents = Civi::settings()->get('enable_components');
       if (!empty($enableComponents)) {
         $defaults['enableComponents'] = $enableComponents;
 
@@ -649,8 +649,7 @@ WHERE  option_group_id = (
     }
 
     // get enabled-components from DB and add to the list
-    $enabledComponents
-      = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents = Civi::settings()->get('enable_components');
     $enabledComponents[] = $componentName;
 
     self::setEnabledComponents($enabledComponents);
@@ -675,8 +674,7 @@ WHERE  option_group_id = (
     }
 
     // get enabled-components from DB and add to the list
-    $enabledComponents
-      = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents = Civi::settings()->get('enable_components');
     $enabledComponents = array_diff($enabledComponents, array($componentName));
 
     self::setEnabledComponents($enabledComponents);
