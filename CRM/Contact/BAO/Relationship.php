@@ -1977,19 +1977,13 @@ AND cc.sort_name LIKE '%$name%'";
     $contactRelationships = array();
     $params['total'] = 0;
     if (!empty($relationships)) {
-      // get the total relationships
-      if ($params['context'] != 'user') {
-        $params['total'] = count($relationships);
-      }
-      else {
-        // FIX ME: we cannot directly determine total permissioned relationship, hence re-fire query
-        $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
-          $relationshipStatus,
-          0, 0, 0,
-          NULL, NULL, TRUE
-        );
-        $params['total'] = count($permissionedRelationships);
-      }
+      // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
+      $params['total'] = $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+        $relationshipStatus,
+        0, 1, 0,
+        NULL, NULL,
+        $permissionedContacts
+      );
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
