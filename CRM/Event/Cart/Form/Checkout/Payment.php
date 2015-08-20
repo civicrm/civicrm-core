@@ -1,8 +1,4 @@
 <?php
-
-/**
- * Class CRM_Event_Cart_Form_Checkout_Payment
- */
 class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $all_participants;
   public $financial_type_id;
@@ -17,14 +13,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $is_pay_later = FALSE;
   public $pay_later_receipt;
 
-  /**
-   * @param array $params
-   * @param $participant
-   * @param $event
-   *
-   * @return mixed
-   */
-  public function registerParticipant($params, &$participant, $event) {
+  function registerParticipant($params, &$participant, $event) {
     $transaction = new CRM_Core_Transaction();
 
     // handle register date CRM-4320

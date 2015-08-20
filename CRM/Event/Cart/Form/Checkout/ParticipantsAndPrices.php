@@ -206,9 +206,9 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         if ($contactdata['first_name'] != NULL) {
           $participant->contact_id = self::find_or_create_contact($this->getContactID(),
           array(
-	    'email' => $contactdata['email-Primary'],
+            'email' => $contactdata['email-Primary'],
             'first_name' => $contactdata['first_name'],
-	    'last_name' => $contactdata['last_name'],
+            'last_name' => $contactdata['last_name'],
             'is_deleted' => FALSE));
           $participant->save();
           $this->cid = $participant->contact_id;
