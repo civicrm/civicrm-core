@@ -200,7 +200,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         $participant->email = NULL;
         //LSE set contact first, last name, etc.,not just ID
         $contactdata = array();
-        foreach($this->_submitValues['field'] as $key => $value) {
+        foreach ($this->_submitValues['field'] as $key => $value) {
           $contactdata = $value;
         }
         if ($contactdata['first_name'] != NULL) {
