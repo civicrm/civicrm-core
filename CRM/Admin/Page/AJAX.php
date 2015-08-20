@@ -248,7 +248,7 @@ class CRM_Admin_Page_AJAX {
   public static function mergeTagList() {
     $name = CRM_Utils_Type::escape($_GET['term'], 'String');
     $fromId = CRM_Utils_Type::escape($_GET['fromId'], 'Integer');
-    $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
+    $limit = Civi::settings()->get('search_autocomplete_count');
 
     // build used-for clause to be used in main query
     $usedForTagA = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $fromId, 'used_for');

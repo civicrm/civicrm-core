@@ -74,7 +74,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       CRM_Core_Error::fatal(ts('You do not have permission to delete this contact.'));
     }
 
-    $this->assign('trash', CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'contact_undelete', NULL) and !$this->_skipUndelete);
+    $this->assign('trash', Civi::settings()->get('contact_undelete') and !$this->_skipUndelete);
     $this->assign('restore', $this->_restore);
 
     if ($this->_restore) {

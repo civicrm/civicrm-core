@@ -83,7 +83,7 @@ class CRM_Contact_Page_AJAX {
 
     $return = array_unique(array_merge(array('sort_name'), $list));
 
-    $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
+    $limit = Civi::settings()->get('search_autocomplete_count');
 
     $params = array('offset' => 0, 'rowCount' => $limit, 'version' => 3);
     foreach ($return as $fld) {
@@ -158,7 +158,7 @@ class CRM_Contact_Page_AJAX {
   public static function getPCPList() {
     $name = CRM_Utils_Array::value('term', $_GET);
     $name = CRM_Utils_Type::escape($name, 'String');
-    $limit = $max = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
+    $limit = $max = Civi::settings()->get('search_autocomplete_count');
 
     $where = ' AND pcp.page_id = cp.id AND pcp.contact_id = cc.id';
 
@@ -403,7 +403,7 @@ class CRM_Contact_Page_AJAX {
 
       if ($queryString) {
         $offset = CRM_Utils_Array::value('offset', $_GET, 0);
-        $rowCount = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
+        $rowCount = Civi::settings()->get('search_autocomplete_count');
 
         $offset = CRM_Utils_Type::escape($offset, 'Int');
 
