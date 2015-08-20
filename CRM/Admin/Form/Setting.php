@@ -230,14 +230,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       unset($params['enableComponents']);
     }
 
-    // save checksum timeout
-    if (!empty($params['checksumTimeout'])) {
-      CRM_Core_BAO_Setting::setItem($params['checksumTimeout'],
-        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'checksum_timeout'
-      );
-    }
-
     // verify ssl peer option
     if (isset($params['verifySSL'])) {
       CRM_Core_BAO_Setting::setItem($params['verifySSL'],

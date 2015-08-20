@@ -736,6 +736,7 @@ WHERE  option_group_id = (
       'autocompleteContactSearch',
       'autocompleteContactReference',
       'checksumTimeout',
+      'checksum_timeout',
     );
   }
 
