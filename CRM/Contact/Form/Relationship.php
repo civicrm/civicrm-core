@@ -117,6 +117,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $this->_contactId = $this->get('contactId');
 
+    // Check permissions
+    if (in_array($this->_action, array(CRM_Core_Action::ADD, CRM_Core_Action::UPDATE, CRM_Core_Action::DELETE))) {
+      if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to edit relationships for this contact.'));
+      }
+    }
+
     $this->_relationshipId = $this->get('id');
 
     $this->_rtype = CRM_Utils_Request::retrieve('rtype', 'String', $this);
