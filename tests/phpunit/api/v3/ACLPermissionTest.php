@@ -83,6 +83,22 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Function tests that an empty where hook returns no results with edit my contact.
+   *
+   * CRM-16512 caused contacts with Edit my contact to be able to view all records.
+   */
+  public function testContactGetNoResultsHookWithEditMyContact() {
+    $this->createLoggedInUser();
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view my contact');
+    $result = $this->callAPISuccess('contact', 'get', array(
+      'check_permissions' => 1,
+      'return' => 'display_name',
+    ));
+    $this->assertEquals(0, $result['count']);
+  }
+
+  /**
    * Function tests all results are returned.
    */
   public function testContactGetAllResultsHook() {
@@ -122,7 +138,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Confirm that without check permissions we still get 2 contacts returned
+   * Confirm that without check permissions we still get 2 contacts returned.
    */
   public function testContactGetHookLimitingHookDontCheck() {
     $result = $this->callAPISuccess('contact', 'get', array(
@@ -299,7 +315,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * Function tests that an empty where hook returns no results
-   * @param $entity
+   * @param string $entity
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEntityGetNoResultsHook($entity) {
