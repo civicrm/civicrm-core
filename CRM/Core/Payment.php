@@ -705,12 +705,7 @@ abstract class CRM_Core_Payment {
       }
     }
     else {
-      if ($this->_paymentProcessor['billing_mode'] == 1) {
-        $result = $this->doDirectPayment($params, $component);
-      }
-      else {
-        $result = $this->doExpressCheckout($params);
-      }
+      $result = $this->doDirectPayment($params, $component);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
           // See comment block.

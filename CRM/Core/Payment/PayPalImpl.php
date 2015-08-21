@@ -281,7 +281,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    */
   public function doExpressCheckout(&$params) {
-
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
     if (!empty($params['is_recur'])) {
       return $this->createRecurringPayments($params);
     }
@@ -304,7 +304,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
+      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
 
     /* Success */
@@ -318,7 +318,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     $params['payment_status'] = $result['paymentstatus'];
     $params['pending_reason'] = $result['pendingreason'];
-
+    if (!empty($params['is_recur'])) {
+      // See comment block.
+      $result['payment_status_id'] = array_search('Pending', $statuses);
+    }
+    else {
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+    }
     return $params;
   }
 
@@ -393,6 +399,39 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['signature'] = $this->_paymentProcessor['signature'];
     $args['subject'] = CRM_Utils_Array::value('subject', $this->_paymentProcessor);
     $args['method'] = $method;
+  }
+
+  /**
+   * Process payment - this function wraps around both doTransferPayment and doDirectPayment.
+   *
+   * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
+   * more agnostic.
+   *
+   * Payment processors should set payment_status_id. This function adds some historical defaults ie. the
+   * assumption that if a 'doDirectPayment' processors comes back it completed the transaction & in fact
+   * doTransferCheckout would not traditionally come back.
+   *
+   * doDirectPayment does not do an immediate payment for Authorize.net or Paypal so the default is assumed
+   * to be Pending.
+   *
+   * Once this function is fully rolled out then it will be preferred for processors to throw exceptions than to
+   * return Error objects
+   *
+   * @param array $params
+   *
+   * @param string $component
+   *
+   * @return array
+   *   Result array
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doPayment(&$params, $component = 'contribute') {
+    if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal_Express') {
+      return parent::doPayment($params, $component);
+    }
+    $this->_component = $component;
+    return $this->doExpressCheckout($params);
   }
 
   /**
