@@ -68,9 +68,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $processor->class_name = $ppTypeDAO->class_name;
     $processor->payment_type = $ppTypeDAO->payment_type;
     // CRM-16621
-    if (!CRM_Utils_System::isNull($processor->password)) {
-      $processor->password = CRM_Utils_Crypt::encrypt($processor->password);
-    }
+    CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($processor->password, 'encrypt');
     $processor->save();
     // CRM-11826, add entry in civicrm_entity_financial_account
     // if financial_account_id is not NULL
@@ -112,9 +110,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $paymentProcessor->copyValues($params);
     if ($paymentProcessor->find(TRUE)) {
       // CRM-16621
-      if (!CRM_Utils_System::isNull($paymentProcessor->password)) {
-        $paymentProcessor->password = CRM_Utils_Crypt::decrypt($paymentProcessor->password);
-      }
+      CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($paymentProcessor->password);
       CRM_Core_DAO::storeValues($paymentProcessor, $defaults);
       return $paymentProcessor;
     }
@@ -211,16 +207,12 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
         CRM_Core_Error::fatal(ts('Could not retrieve payment processor details'));
       }
       // CRM-16621
-      if (!CRM_Utils_System::isNull($testDAO->password)) {
-        $testDAO->password = CRM_Utils_Crypt::decrypt($testDAO->password);
-      }
+      CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($testDAO->password);
       return self::buildPayment($testDAO, $mode);
     }
     else {
       // CRM-16621
-      if (!CRM_Utils_System::isNull($dao->password)) {
-        $dao->password = CRM_Utils_Crypt::decrypt($dao->password);
-      }
+      CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($dao->password);
       return self::buildPayment($dao, $mode);
     }
   }
@@ -490,6 +482,20 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
     }
 
     return $result;
+  }
+
+  /**
+   * Encrypt/Decrypt payment processor password
+   * CRM-16621
+   *
+   * @param int $password
+   * @param string $action
+   *
+   */
+  public static function encryptDecryptPass(&$password, $action = 'decrypt') {
+    if (!CRM_Utils_System::isNull($password)) {
+      $password = CRM_Utils_Crypt::$action($password);
+    }
   }
 
 }
