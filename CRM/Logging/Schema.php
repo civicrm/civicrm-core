@@ -534,7 +534,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
    * Create a log table with schema mirroring the given table’s structure and seeding it with the given table’s contents.
    */
   private function createLogTableFor($table) {
-    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table",  CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
     $dao->fetch();
     $query = $dao->Create_Table;
 
