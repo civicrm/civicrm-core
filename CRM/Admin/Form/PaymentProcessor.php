@@ -391,7 +391,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         $dao->{$field['name']} = 'null';
       }
     }
-
+    // CRM-16621
+    if (!CRM_Utils_System::isNull($dao->password)) {
+      $dao->password = CRM_Utils_Crypt::encrypt($dao->password);
+    }
     // also copy meta fields from the info DAO
     $dao->is_recur = $this->_ppDAO->is_recur;
     $dao->billing_mode = $this->_ppDAO->billing_mode;

@@ -65,7 +65,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $processor->billing_mode = $ppTypeDAO->billing_mode;
     $processor->class_name = $ppTypeDAO->class_name;
     $processor->payment_type = $ppTypeDAO->payment_type;
-
+    // CRM-16621
+    if (!CRM_Utils_System::isNull($processor->password)) {
+      $processor->password = CRM_Utils_Crypt::encrypt($processor->password);
+    }
     $processor->save();
     // CRM-11826, add entry in civicrm_entity_financial_account
     // if financial_account_id is not NULL
