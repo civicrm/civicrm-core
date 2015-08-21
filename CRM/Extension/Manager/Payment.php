@@ -252,7 +252,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
           'name' => $dao->title,
           'payment_processor_type_id' => $dao->id,
           'user_name' => 'nothing',
-          'password' => 'nothing',
+          'password' => NULL,
           'signature' => '',
           'url_site' => $dao->url_site_default,
           'url_api' => $dao->url_api_default,
