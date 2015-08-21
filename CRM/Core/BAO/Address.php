@@ -64,7 +64,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     if (!$entity) {
       $contactId = $params['contact_id'];
       //get all the addresses for this contact
-      $addresses = self::allAddress($contactId, $updateBlankLocInfo);
+      $addresses = self::allAddress($contactId);
     }
     else {
       // get all address from location block
@@ -84,15 +84,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       $addressExists = self::dataExists($value);
       if (empty($value['id'])) {
-        if ($updateBlankLocInfo) {
-          if ((!empty($addresses) || !$addressExists) && array_key_exists($key, $addresses)) {
-            $value['id'] = $addresses[$key];
-          }
-        }
-        else {
-          if (!empty($addresses) && array_key_exists(CRM_Utils_Array::value('location_type_id', $value), $addresses)) {
-            $value['id'] = $addresses[CRM_Utils_Array::value('location_type_id', $value)];
-          }
+        if (!empty($addresses) && array_key_exists(CRM_Utils_Array::value('location_type_id', $value), $addresses)) {
+          $value['id'] = $addresses[CRM_Utils_Array::value('location_type_id', $value)];
         }
       }
 
