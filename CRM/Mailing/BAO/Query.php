@@ -123,6 +123,12 @@ class CRM_Mailing_BAO_Query {
         $query->_element['mailing_recipients_id'] = 1;
       }
     }
+
+    if (CRM_Utils_Array::value('mailing_campaign_id', $query->_returnProperties)) {
+      $query->_select['mailing_campaign_id'] = 'civicrm_mailing.campaign_id as mailing_campaign_id';
+      $query->_element['mailing_campaign_id'] = 1;
+      $query->_tables['civicrm_campaign'] = 1;
+    }
   }
 
   /**
@@ -207,6 +213,7 @@ class CRM_Mailing_BAO_Query {
     if ($mode & CRM_Contact_BAO_Query::MODE_MAILING) {
       $properties = array(
         'mailing_id' => 1,
+        'mailing_campaign_id' => 1,
         'mailing_name' => 1,
         'sort_name' => 1,
         'email' => 1,
@@ -375,6 +382,17 @@ class CRM_Mailing_BAO_Query {
           $query->_qill[$grouping][] = "Mailing Job Status IS \"$value\"";
         }
         return;
+
+      case 'mailing_campaign_id':
+        $campParams = array(
+          'op' => $op,
+          'campaign' => $value,
+          'grouping' => $grouping,
+          'tableName' => 'civicrm_mailing',
+        );
+        CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
+        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
+        return;
     }
   }
 
@@ -423,6 +441,8 @@ class CRM_Mailing_BAO_Query {
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));
     $form->add('checkbox', 'mailing_forward', ts('Forwards'));
+    // Campaign select field
+    CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'mailing_campaign_id');
 
     $form->assign('validCiviMailing', TRUE);
   }
