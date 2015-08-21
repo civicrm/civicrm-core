@@ -55,6 +55,13 @@ class Civi {
   }
 
   /**
+   * @return \Psr\Log\LoggerInterface
+   */
+  public static function log() {
+    return Civi\Core\Container::singleton()->get('psr_log');
+  }
+
+  /**
    * Fetch a service from the container.
    *
    * @param string $id

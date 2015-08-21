@@ -103,6 +103,8 @@ class Container {
     ))
       ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
 
+    $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
+
     $container->setDefinition('cache.settings', new Definition(
       'CRM_Utils_Cache_SqlGroup',
       array(
