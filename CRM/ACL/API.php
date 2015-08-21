@@ -128,7 +128,7 @@ class CRM_ACL_API {
       if (CRM_Core_Permission::check('edit my contact') ||
         ($type == self::VIEW && CRM_Core_Permission::check('view my contact'))
       ) {
-        return ' ( 1 ) ';
+        // return ' ( 1 ) ';
       }
     }
 
