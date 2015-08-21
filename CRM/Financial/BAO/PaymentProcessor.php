@@ -210,9 +210,17 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       if (!$testDAO->find(TRUE)) {
         CRM_Core_Error::fatal(ts('Could not retrieve payment processor details'));
       }
+      // CRM-16621
+      if (!CRM_Utils_System::isNull($testDAO->password)) {
+        $testDAO->password = CRM_Utils_Crypt::decrypt($testDAO->password);
+      }
       return self::buildPayment($testDAO, $mode);
     }
     else {
+      // CRM-16621
+      if (!CRM_Utils_System::isNull($dao->password)) {
+        $dao->password = CRM_Utils_Crypt::decrypt($dao->password);
+      }
       return self::buildPayment($dao, $mode);
     }
   }
