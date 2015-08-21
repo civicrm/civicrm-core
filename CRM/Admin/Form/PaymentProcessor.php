@@ -313,9 +313,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       return $defaults;
     }
     // CRM-16621
-    if (!CRM_Utils_System::isNull($dao->password)) {
-      $dao->password = CRM_Utils_Crypt::decrypt($dao->password);
-    }
+    CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($dao->password);
     CRM_Core_DAO::storeValues($dao, $defaults);
     // When user changes payment processor type, it is passed in via $this->_ppType so update defaults array.
     if ($this->_ppType) {
@@ -330,9 +328,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if ($testDAO->find(TRUE)) {
       $this->_testID = $testDAO->id;
       // CRM-16621
-      if (!CRM_Utils_System::isNull($testDAO->password)) {
-        $testDAO->password = CRM_Utils_Crypt::decrypt($testDAO->password);
-      }
+      CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($testDAO->password);
       foreach ($this->_fields as $field) {
         $testName = "test_{$field['name']}";
         $defaults[$testName] = $testDAO->{$field['name']};
@@ -398,9 +394,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       }
     }
     // CRM-16621
-    if (!CRM_Utils_System::isNull($dao->password)) {
-      $dao->password = CRM_Utils_Crypt::encrypt($dao->password);
-    }
+    CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($dao->password, 'encrypt');
     // also copy meta fields from the info DAO
     $dao->is_recur = $this->_ppDAO->is_recur;
     $dao->billing_mode = $this->_ppDAO->billing_mode;
