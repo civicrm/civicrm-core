@@ -3503,7 +3503,14 @@ WHERE  $smartGroupClause
     }
     else {
       $field = 'civicrm_address.postal_code';
-      $val = CRM_Utils_Type::escape($value, 'String');
+      // Per CRM-17060 we might be looking at an 'IN' syntax so don't case arrays to string.
+      if (!is_array($value)) {
+        $val = CRM_Utils_Type::escape($value, 'String');
+      }
+      else {
+        // Do we need to escape values here? I would expect buildClause does.
+        $val = $value;
+      }
     }
 
     $this->_tables['civicrm_address'] = $this->_whereTables['civicrm_address'] = 1;
@@ -5177,6 +5184,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
 
       case 'IN':
       case 'NOT IN':
+        // I feel like this would be escaped properly if passed through $queryString = CRM_Core_DAO::createSqlFilter.
         if (!empty($value) && is_array($value) && !array_key_exists($op, $value)) {
           $value = array($op => $value);
         }
