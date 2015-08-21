@@ -272,23 +272,23 @@
           "consumerId" : consumerId,
           "message" : message,
           "renderers" : renderers
-        };
+        }
         $http.post(postURL+'?'+accessTokenUrlExtension, postData)
           .success(function(data, status, headers, config){
             /*called for result & error because 200 status*/
-            console.log(status);
+            console.log(status)    
             if (data.result){
               //handle success here
-              console.log(data.result);
+              console.log(data.result)
             } else if (data.error) {
               //handle error here
-              console.log(status);
+              console.log(status)
             }
           })
           .error(function(data, status, headers, config){
               /*handle non 200 statuses*/
               console.log(data);
-          });
+          })
           return;
       },
 
@@ -455,14 +455,14 @@
           html: mailing.body_html,
           text: mailing.body_text
         };
-        var renderers = [];
+        var renderers = new Array();
         for(var index in mailing.renderers) { 
             if (mailing.renderers[index]) {
               renderers.push(index);
             }
-        }
-        var p = crmMailingMgr;
-          p.composerPreviewBatch(prevemCredentials, mailing.id, message, renderers);
+        };
+        var p = crmMailingMgr
+          p.composerPreviewBatch(prevemCredentials, mailing.id, message, renderers)
       },
 
       // @param mode string one of 'html', 'text', or 'full'

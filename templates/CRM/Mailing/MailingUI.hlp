@@ -124,22 +124,3 @@
     {ts}If a recipient replies to this mailing, forward the reply to the FROM Email address specified for the mailing.{/ts}
   </p>
 {/htxt}
-
-{htxt id="gmail_help"}
-  <p>
-    {ts}Request a preview for Gmail in your next Email Preview Cluster batch.{/ts}
-  </p>
-{/htxt}
-
-{htxt id="yahoo_help"}
-  <p>
-    {ts}Request a preview for YahooMail in your next Email Preview Cluster batch.{/ts}
-  </p>
-{/htxt}
-
-{htxt id="request_preview"}
-  <p>
-    {ts}Post a new Preview Batch on the Preview Manager.{/ts}
-    <p>This is the Email Preview Cluster Service which enables you to preview what your email would actually look like to receivers using various email clients.</p>
-  </p>
-{/htxt}
