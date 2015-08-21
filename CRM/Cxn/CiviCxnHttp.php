@@ -89,7 +89,7 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
     $result = parent::createStreamOpts($verb, $url, $blob, $headers);
 
     $caConfig = CA_Config_Stream::probe(array(
-      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE),
+      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'),
     ));
     if ($caConfig->isEnableSSL()) {
       $result['ssl'] = $caConfig->toStreamOptions();
