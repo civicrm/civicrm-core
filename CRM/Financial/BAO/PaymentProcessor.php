@@ -110,6 +110,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $paymentProcessor = new CRM_Financial_DAO_PaymentProcessor();
     $paymentProcessor->copyValues($params);
     if ($paymentProcessor->find(TRUE)) {
+      // CRM-16621
+      if (!CRM_Utils_System::isNull($paymentProcessor->password)) {
+        $paymentProcessor->password = CRM_Utils_Crypt::decrypt($paymentProcessor->password);
+      }
       CRM_Core_DAO::storeValues($paymentProcessor, $defaults);
       return $paymentProcessor;
     }
