@@ -43,7 +43,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
   protected $_add2groupSupported = FALSE;
 
-  public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
+  public $_drilldownReport = array('mailing/detail' => 'Link to Detail Report');
 
   protected $_charts = array(
     '' => 'Tabular',
@@ -62,6 +62,12 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $this->_columns['civicrm_mailing'] = array(
       'dao' => 'CRM_Mailing_DAO_Mailing',
       'fields' => array(
+        'id' => array(
+          'name' => 'id',
+          'title' => ts('Mailing ID'),
+          'required' => TRUE,
+          'no_display' => TRUE,
+        ),
         'name' => array(
           'title' => ts('Mailing Name'),
           'required' => TRUE,
@@ -602,6 +608,17 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
+      // CRM-16506
+      if (array_key_exists('civicrm_mailing_name', $row) &&
+        array_key_exists('civicrm_mailing_id', $row)
+      ) {
+        $rows[$rowNum]['civicrm_mailing_name_link'] = CRM_Report_Utils_Report::getNextUrl('mailing/detail',
+          'reset=1&force=1&mailing_id_op=eq&mailing_id_value=' . $row['civicrm_mailing_id'],
+          $this->_absoluteUrl, $this->_id, $this->_drilldownReport
+        );
+        $rows[$rowNum]['civicrm_mailing_name_hover'] = ts('View Mailing details for this mailing');
+        $entryFound = TRUE;
+      }
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
       if (!$entryFound) {
