@@ -1027,7 +1027,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *   Contact ID
    *
    * @return bool|\CRM_Contribute_DAO_Contribution
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function processCreditCard($submittedValues, $lineItem, $contactID) {
@@ -1112,7 +1112,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
     }
 
-    if (in_array('credit_card_exp_date', array_keys($this->_paymentFields))) {
+    if (in_array('credit_card_exp_date', array_keys($this->_params))) {
       $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
     }
