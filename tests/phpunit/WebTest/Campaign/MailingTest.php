@@ -266,8 +266,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->mailingCampaignAdvancedSearchTest($campaignTitle, $this->_contactNames);
   }
 
-
-  function mailingCampaignAdvancedSearchTest($campaignTitle, $contactNames) {
+  public function mailingCampaignAdvancedSearchTest($campaignTitle, $contactNames) {
     // Go directly to Advanced Search
     $this->openCiviPage('contact/search/advanced', 'reset=1');
 
@@ -280,4 +279,5 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('search-status');
     $this->assertElementContainsText('search-status', '2 Contacts');
   }
+
 }

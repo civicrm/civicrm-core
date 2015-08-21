@@ -603,6 +603,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
         $campaignIds[$campId] = $campId;
         $campaignTitles[$campId] = $allCampaigns[$campId];
       }
+      $op = 'IN';
     }
     else {
       $campaignIds = $campaign;
