@@ -2295,6 +2295,7 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
     ) {
       $apiRequest['params'][$field] = $apiRequest['params'][$values['name']];
       // note that it would make sense to unset the original field here but tests need to be in place first
+      unset($apiRequest['params'][$values['name']]);
     }
     if (!isset($apiRequest['params'][$field])
       && $uniqueName
