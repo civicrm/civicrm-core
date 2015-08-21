@@ -9,15 +9,15 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
 	<div class="crm-block" ng-form="subform" ng-show="!requested" crm-ui-id-scope>
       {{ts('Select Email Services to fetch a preview for:')}}
 	  <div class="crm-group">
-	    <div crm-ui-field="{name: 'subform.gmail_preview', title: ts('Gmail'), help: hs('gmail_help')}" crm-layout="checkbox">
+	    <div crm-ui-field="{name: 'subform.gmail_preview', title: ts('Gmail'), help: hs({id: 'gmail_help', title: ts('Request Preview for Gmail')})}" crm-layout="checkbox">
 	      <input crm-ui-id="subform.gmail_preview" name="gmail_preview" type="checkbox" ng-model="mailing.renderers.gmail" ng-true-value="1" ng-false-value="0" />
 	    </div>
-	    <div crm-ui-field="{name: 'subform.yahoo_preview', title: ts('YahooMail'), help: hs('yahoo_help')}" crm-layout="checkbox">
+	    <div crm-ui-field="{name: 'subform.yahoo_preview', title: ts('YahooMail'), help: hs({id: 'yahoo_help', title: ts('Request Preview for YahooMail')})}" crm-layout="checkbox">
 	      <input crm-ui-id="subform.yahoo_preview" name="yahoo_preview" type="checkbox" ng-model="mailing.renderers.yahoo" ng-true-value="1" ng-false-value="0" />
 	    </div>
 	  </div>
     <button crm-icon="mail-closed" ng-disabled="crmMailing.$invalid || !(mailing.renderers.gmail|| mailing.renderers.yahoo)" ng-click="requestPreview(mailing, mailing.renderers)">{{ts('Request Preview')}}</button>
-	<a crm-ui-help="hs({id: 'test', title: ts('Test Email')})"></a>
+	<a crm-ui-help="hs({id: 'request_preview', title: ts('Request Preview Batch')})"></a>
 	</div>
 	<div class="crm-block" ng-form="subform" ng-hide="!requested" crm-ui-id-scope>
 		<div align="center">
