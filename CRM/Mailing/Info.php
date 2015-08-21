@@ -161,6 +161,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'option_group_id' => "from_email_address",
       'domain_id' => CRM_Core_Config::domainID(),
     ));
+<<<<<<< 738f879d67a85f0abad6ea7336094196ee858b39
 
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
