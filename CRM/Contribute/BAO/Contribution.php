@@ -3138,7 +3138,7 @@ WHERE  contribution_id = %1 ";
       return;
     }
     if ($context == 'changedAmount' || $context == 'changeFinancialType') {
-      $itemAmount = $params['trxnParams']['total_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
+      $itemAmount = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $params['total_amount'] - $params['prevContribution']->total_amount;
     }
     if ($context == 'changedStatus') {
       //get all the statuses
