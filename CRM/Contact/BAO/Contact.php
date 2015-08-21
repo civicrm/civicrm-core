@@ -1864,6 +1864,14 @@ ORDER BY civicrm_email.is_primary DESC";
       $params['uf_group_id'] = $ufGroupId;
     }
 
+    // If a user has logged in, or accessed via a checksum
+    // Then deliberately 'blanking' a value in the profile should remove it from their record
+    $session = CRM_Core_Session::singleton();
+    $params['updateBlankLocInfo'] = TRUE;
+    if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
+      $params['updateBlankLocInfo'] = FALSE;
+    }
+
     if ($contactID) {
       $editHook = TRUE;
       CRM_Utils_Hook::pre('edit', 'Profile', $contactID, $params);
@@ -2097,6 +2105,11 @@ ORDER BY civicrm_email.is_primary DESC";
         }
 
         if ($contactID) {
+          //CRM-16877 -- include id in params to edit `block` fields
+          if ($blockName != 'address' && !empty($entityId[$loc]['id']) && isset($data[$blockName][$loc])) {
+            $entityId = CRM_Core_BAO_Block::getBlockIds($blockName, $contactID, NULL, TRUE);
+            $data[$blockName][$loc]['id'] = $entityId[$loc]['id'];
+          }
           //get the primary location type
           if ($locTypeId == $primaryLocationType) {
             $data[$blockName][$loc]['is_primary'] = 1;
