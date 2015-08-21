@@ -488,7 +488,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
    *
    * @return array
    */
-  public function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
 
     if (empty($fields['charts'])) {
