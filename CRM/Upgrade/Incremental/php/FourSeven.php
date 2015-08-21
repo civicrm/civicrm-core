@@ -44,6 +44,11 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.7.alpha1') {
+      // CRM-17004 Warn of Moneris removal
+      $monerisProcessors = civicrm_api3('PaymentProcessor', 'getcount', array('payment_processor_type_id' => "Moneris"));
+      if (!empty($monerisProcessors['result']) && !function_exists('moneris_civicrm_managed')) {
+        $preUpgradeMessage .= '<p>' . ts('The %1 payment processor is no longer bundled with CiviCRM. After upgrading you will need to install the extension to continue using it.', array(1 => 'Moneris')) . '</p>';
+      }
 
       // CRM-16478 Remove custom fatal error template path option
       $config = CRM_Core_Config::singleton();
@@ -104,6 +109,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Migrate Settings to %1', array(1 => $rev)), 'migrateSettings', $rev);
     $this->addTask(ts('Add Getting Started dashlet to %1: SQL', array(1 => $rev)), 'addGettingStartedDashlet', $rev);
+    $this->addTask(ts('Remove %1', array(1 => 'Moneris')), 'removePaymentProcessorType', 'Moneris');
   }
 
   /**
