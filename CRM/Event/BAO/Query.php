@@ -129,36 +129,36 @@ class CRM_Event_BAO_Query {
         $query->_whereTables['event_type'] = 1;
       }
 
-      //add status and status_id
-      if (!empty($query->_returnProperties['participant_status']) || !empty($query->_returnProperties['participant_status_id'])) {
-        $query->_select['participant_status'] = "participant_status.label as participant_status";
-        $query->_select['participant_status_id'] = "participant_status.id as participant_status_id";
+      //add status_id
+      if (!empty($query->_returnProperties['participant_status_id'])) {
+        $query->_select['participant_status_id'] = "civicrm_participant.status_id as participant_status_id";
         $query->_element['participant_status_id'] = 1;
-        $query->_element['participant_status'] = 1;
         $query->_tables['civicrm_participant'] = 1;
-        $query->_tables['participant_status'] = 1;
         $query->_whereTables['civicrm_participant'] = 1;
-        $query->_whereTables['participant_status'] = 1;
-        $query->_pseudoConstantsSelect['participant_status'] = array(
-          'pseudoField' => 'participant_status',
-          'idCol' => 'participant_status_id',
-        );
       }
 
-      //add participant_role and participant_role_id
-      if (!empty($query->_returnProperties['participant_role']) || !empty($query->_returnProperties['participant_role_id'])) {
-        $query->_select['participant_role'] = "participant_role.label as participant_role";
+      // get particupant_status label
+      if (!empty($query->_returnProperties['participant_status'])) {
+        $query->_select['participant_status'] = "participant_status.label as participant_status";
+        $query->_element['participant_status'] = 1;
+        $query->_tables['participant_status'] = 1;
+        $query->_whereTables['civicrm_participant'] = 1;
+      }
+
+      //add participant_role_id
+      if (!empty($query->_returnProperties['participant_role_id'])) {
         $query->_select['participant_role_id'] = "civicrm_participant.role_id as participant_role_id";
-        $query->_element['participant_role'] = 1;
         $query->_element['participant_role_id'] = 1;
         $query->_tables['civicrm_participant'] = 1;
+        $query->_whereTables['civicrm_participant'] = 1;
+      }
+
+      //add participant_role
+      if (!empty($query->_returnProperties['participant_role'])) {
+        $query->_select['participant_status'] = "participant_role.label as participant_role";
+        $query->_element['participant_role'] = 1;
         $query->_tables['participant_role'] = 1;
         $query->_whereTables['civicrm_participant'] = 1;
-        $query->_whereTables['participant_role'] = 1;
-        $query->_pseudoConstantsSelect['participant_role'] = array(
-          'pseudoField' => 'participant_role',
-          'idCol' => 'participant_role_id',
-        );
       }
 
       //add register date
@@ -340,6 +340,9 @@ class CRM_Event_BAO_Query {
         }
       case 'participant_status':
       case 'participant_role':
+        if (!strpos($name, '_id')) {
+          $name .= '_id';
+        }
       case 'participant_source':
       case 'participant_id':
       case 'participant_contact_id':
@@ -361,20 +364,26 @@ class CRM_Event_BAO_Query {
           if ($name == 'is_pay_later') {
             $qillName = $name;
           }
+
+          // Participant role need a special handling as role ids are being stored with value separator
           if ($name == 'role_id') {
             $qillName = 'participant_role';
-            $query->_where[$grouping][] = " civicrm_participant.$name REGEXP '[[:<:]]" . implode('[[:>:]]|[[:<:]]', (array) $value) . "[[:>:]]' ";
+            if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+              $op = key($value);
+              $value = $value[$op];
+            }
+            $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
+            $query->_where[$grouping][] = " civicrm_participant.$name $regexOp '[[:<:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:>:]]*' ";
           }
         }
 
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
+        $tableName = empty($tableName) ? 'civicrm_participant' : $tableName;
 
-        if (in_array($name, array('participant_status', 'participant_role'))) {
-          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$name.label", $op, $value, $dataType);
+        if ($name != 'role_id') {
+          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
         }
-        elseif ($name != 'role_id') {
-          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.$name", $op, $value, $dataType);
-        }
+
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
