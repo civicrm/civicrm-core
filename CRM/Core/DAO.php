@@ -1257,6 +1257,9 @@ FROM   civicrm_domain
     $tr = array();
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
+        if (!is_array($item)) {
+          continue;
+        }
         if (CRM_Utils_Type::validate($item[0], $item[1]) !== NULL) {
           $item[0] = self::escapeString($item[0]);
           if ($item[1] == 'String' ||
