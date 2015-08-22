@@ -1020,7 +1020,7 @@ class CRM_GCD {
       case 5:
         $email = "$last.$m$first";
         break;
-      
+
       case 6:
         $email = "$f$m$last";
         break;
@@ -1990,7 +1990,7 @@ function module_list() {
   return array();
 }
 
-echo("Starting data generation on " . date("F dS h:i:s A") . "\n");
+echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");
 $gcd = new CRM_GCD();
 $gcd->initID();
 $gcd->generate('Domain');
@@ -2018,4 +2018,4 @@ $gcd->generate('Participant');
 $gcd->generate('ParticipantPayment');
 $gcd->generate('LineItemParticipants');
 $gcd->generate('ParticipantFinancialItem');
-echo("Ending data generation on " . date("F dS h:i:s A") . "\n");
+echo ("Ending data generation on " . date("F dS h:i:s A") . "\n");
