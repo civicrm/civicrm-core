@@ -225,7 +225,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    * Default user framework. This basically makes Drupal 7 the default
    */
   public $userFramework = 'Drupal';
-  public $userFrameworkVersion = 'Unknown';
   public $userFrameworkUsersTableName = 'users';
   public $userFrameworkClass = 'CRM_Utils_System_Drupal';
   public $userHookClass = 'CRM_Utils_Hook_Drupal';

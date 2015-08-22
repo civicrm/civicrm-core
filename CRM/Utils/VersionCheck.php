@@ -288,7 +288,7 @@ class CRM_Utils_VersionCheck {
         'uf' => $config->userFramework,
         'lang' => $config->lcMessages,
         'co' => $config->defaultContactCountry,
-        'ufv' => $config->userFrameworkVersion,
+        'ufv' => $config->userSystem->getVersion(),
         'PHP' => phpversion(),
         'MySQL' => CRM_CORE_DAO::singleValueQuery('SELECT VERSION()'),
         'communityMessagesUrl' => Civi::settings()->get('communityMessagesUrl'),
