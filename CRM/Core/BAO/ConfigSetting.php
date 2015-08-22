@@ -322,15 +322,6 @@ class CRM_Core_BAO_ConfigSetting {
       $enableComponents = Civi::settings()->get('enable_components');
       if (!empty($enableComponents)) {
         $defaults['enableComponents'] = $enableComponents;
-
-        // Lookup component IDs. Note: Do *not* instantiate components.
-        // Classloading may not be fully setup yet.
-        $components = CRM_Core_Component::getComponentIDs();
-        $enabledComponentIDs = array();
-        foreach ($defaults['enableComponents'] as $name) {
-          $enabledComponentIDs[] = $components[$name];
-        }
-        $defaults['enableComponentIDs'] = $enabledComponentIDs;
       }
     }
   }
@@ -689,16 +680,9 @@ WHERE  option_group_id = (
    */
   public static function setEnabledComponents($enabledComponents) {
     $config = CRM_Core_Config::singleton();
-    $components = CRM_Core_Component::getComponents();
-
-    $enabledComponentIDs = array();
-    foreach ($enabledComponents as $name) {
-      $enabledComponentIDs[] = $components[$name]->componentID;
-    }
 
     // fix the config object
     $config->enableComponents = $enabledComponents;
-    $config->enableComponentIDs = $enabledComponentIDs;
 
     // also force reset of component array
     CRM_Core_Component::getEnabledComponents(TRUE);

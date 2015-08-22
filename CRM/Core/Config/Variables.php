@@ -324,7 +324,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
     'CiviMail',
     'CiviReport',
   );
-  public $enableComponentIDs = array(1, 6, 2, 3, 4, 8);
 
   /**
    * Should payments be accepted only via SSL?
