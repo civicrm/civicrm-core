@@ -853,7 +853,7 @@ function civicrm_api3_contact_getquick($params) {
       if (!in_array('email', $list)) {
         $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";
       }
-      $emailWhere =  " WHERE email LIKE '$strSearch'";
+      $emailWhere = " WHERE email LIKE '$strSearch'";
     }
   }
 
@@ -912,7 +912,7 @@ function civicrm_api3_contact_getquick($params) {
       )
     ";
   }
-  $query .=") t
+  $query .= ") t
     {$orderByOuter}
     LIMIT    0, {$limit}
   ";
