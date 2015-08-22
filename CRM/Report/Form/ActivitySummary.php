@@ -421,7 +421,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy);
     }
     else {
-      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id ";
+      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id ";
     }
   }
 
