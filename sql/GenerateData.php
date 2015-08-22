@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
@@ -132,7 +132,7 @@ class CRM_GCD {
     $this->numStrictIndividual = $this->numIndividual - ($this->numHousehold * self::NUM_INDIVIDUAL_PER_HOUSEHOLD);
 
     // Parse data file
-    foreach((array) simplexml_load_file(self::DATA_FILENAME) as $key => $val) {
+    foreach ((array) simplexml_load_file(self::DATA_FILENAME) as $key => $val) {
       $val = (array) $val;
       $this->sampleData[$key] = (array) $val['item'];
     }
@@ -358,7 +358,7 @@ class CRM_GCD {
    *   and today
    *
    * @param  int $startDate Start Date in Unix timestamp
-   * @param  int $endDate   End Date in Unix timestamp
+   * @param  int $endDate End Date in Unix timestamp
    * @access private
    *
    * @return string randomly generated date in the format "Ymd"
@@ -893,7 +893,7 @@ class CRM_GCD {
         $params['postal_code'],
         $params['geo_code_1'],
         $params['geo_code_2'],
-      ) = $this->getZipCodeInfo();
+        ) = $this->getZipCodeInfo();
 
       $this->_addDAO('Address', $params);
       $params['state'] = $this->states[$params['state_province_id']];
@@ -1364,16 +1364,16 @@ VALUES
         }
         $dateFactor = ($count * ($YearFactor) * ($YearFactor) * ($YearFactor));
         $startDate = date('Y-m-d', mktime(0, 0, 0,
-            date('m'),
-            (date('d') - ($dateFactor)),
-            (date('Y') - ($YearFactor))
-          ));
+          date('m'),
+          (date('d') - ($dateFactor)),
+          (date('Y') - ($YearFactor))
+        ));
         $partOfDate = explode('-', $startDate);
         $endDate = date('Y-m-d', mktime(0, 0, 0,
-            $partOfDate[1],
-            ($partOfDate[2] - 1),
-            ($partOfDate[0] + ($YearFactor))
-          ));
+          $partOfDate[1],
+          ($partOfDate[2] - 1),
+          ($partOfDate[0] + ($YearFactor))
+        ));
 
         $membership .= "( {$randomContacts[$count]}, {$membershipTypeId}, '{$startDate}', '{$startDate}', '{$endDate}', '{$source}', {$membershipStatusId})";
         $activity .= "( {$activitySourceId}, 7, '{$membershipTypeName}', '{$startDate} 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 )";
@@ -1857,7 +1857,7 @@ WHERE cefa.account_relationship = 1";
    */
   private function addFinancialItem($result, $financialAccountId = NULL) {
     $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
-    while($result->fetch()){
+    while ($result->fetch()) {
       $trxnParams = array(
         'trxn_date' => CRM_Utils_Date::processDate($result->receive_date),
         'total_amount' => $result->total_amount,
@@ -1882,8 +1882,8 @@ WHERE cefa.account_relationship = 1";
         'financial_account_id' => $result->financial_account_id
       );
       $trxnId['id'] = $trxn->id;
-      CRM_Financial_BAO_FinancialItem::create($financialItem, null, $trxnId);
-  }
+      CRM_Financial_BAO_FinancialItem::create($financialItem, NULL, $trxnId);
+    }
   }
 
   private function addLineItemParticipants() {
@@ -1931,7 +1931,7 @@ AND    a.source_record_id = c.id
 AND    a.details = 'Membership Payment'
 ";
     $this->_query($sql);
-}
+  }
 
   private function addParticipantPayment() {
     $maxContribution = CRM_Core_DAO::singleValueQuery("select max(id) from civicrm_contribution");
@@ -1982,7 +1982,7 @@ function module_list() {
   return array();
 }
 
-echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");
+echo("Starting data generation on " . date("F dS h:i:s A") . "\n");
 $gcd = new CRM_GCD();
 $gcd->initID();
 $gcd->generate('Domain');
@@ -2010,4 +2010,4 @@ $gcd->generate('Participant');
 $gcd->generate('ParticipantPayment');
 $gcd->generate('LineItemParticipants');
 $gcd->generate('ParticipantFinancialItem');
-echo ("Ending data generation on " . date("F dS h:i:s A") . "\n");
+echo("Ending data generation on " . date("F dS h:i:s A") . "\n");
