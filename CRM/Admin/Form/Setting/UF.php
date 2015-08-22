@@ -48,14 +48,17 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     $this->_uf = $config->userFramework;
 
     if ($this->_uf == 'WordPress') {
-      $this->_settings = array('wpBasePage' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME);
+      $this->_settings['wpBasePage'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
     }
 
     CRM_Utils_System::setTitle(
       ts('Settings - %1 Integration', array(1 => $this->_uf))
     );
 
-    $this->addElement('text', 'userFrameworkUsersTableName', ts('%1 Users Table Name', array(1 => $this->_uf)));
+    if ($config->userSystem->is_drupal) {
+      $this->_settings['userFrameworkUsersTableName'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
+    }
+
     // find out if drupal has its database prefixed
     global $databases;
     $drupal_prefix = '';

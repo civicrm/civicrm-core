@@ -310,7 +310,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $dbpassword = md5($password);
     $name = $dbDrupal->escapeSimple($strtolower($name));
-    $sql = 'SELECT u.* FROM ' . $config->userFrameworkUsersTableName . " u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
+    $userFrameworkUsersTableName = $this->getUsersTableName();
+    $sql = 'SELECT u.* FROM ' . $userFrameworkUsersTableName . " u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
     $query = $dbDrupal->query($sql);
 
     $user = NULL;
