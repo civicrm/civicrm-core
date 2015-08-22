@@ -877,8 +877,7 @@ function civicrm_api3_contact_getquick($params) {
       ";
   }
 
-  $orderByInner = "";
-  $orderByOuter = "ORDER BY exactFirst";
+  $orderByInner = $orderByOuter = "ORDER BY exactFirst";
   if ($config->includeOrderByClause) {
     $orderByInner = "ORDER BY sort_name";
     $orderByOuter .= ", sort_name";
@@ -895,7 +894,8 @@ function civicrm_api3_contact_getquick($params) {
             FROM   civicrm_contact cc {$from}
     {$aclFrom}
     {$additionalFrom} {$includeEmailFrom}
-    {$exactWhereClause}
+    {$whereClause}
+    {$orderByInner}
     LIMIT 0, {$limit} )
     ";
   if ($whereClause != $exactWhereClause) {
