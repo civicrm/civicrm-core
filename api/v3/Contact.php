@@ -623,6 +623,37 @@ function _civicrm_api3_greeting_format_params($params) {
 }
 
 /**
+ * Adjust Metadata for Get action.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_contact_getquick_spec(&$params) {
+  $params['name']['api.required'] = TRUE;
+  $params['name']['title'] = ts('String to search on');
+  $params['name']['type'] = CRM_Utils_Type::T_STRING;
+  $params['field']['type'] = CRM_Utils_Type::T_STRING;
+  $params['field']['title'] = ts('Field to search on');
+  $params['field']['options'] = array(
+    '',
+    'id',
+    'contact_id',
+    'external_identifier',
+    'first_name',
+    'last_name',
+    'job_title',
+    'postal_code',
+    'street_address',
+    'email',
+    'city',
+    'phone_numeric',
+  );
+  $params['table_name']['type'] = CRM_Utils_Type::T_STRING;
+  $params['table_name']['title'] = ts('Table alias to search on');
+  $params['table_name']['api.default'] = 'cc';
+}
+
+/**
  * Old Contact quick search api.
  *
  * @deprecated
@@ -633,9 +664,8 @@ function _civicrm_api3_greeting_format_params($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_contact_getquick($params) {
-  civicrm_api3_verify_mandatory($params, NULL, array('name'));
   $name = CRM_Utils_Type::escape(CRM_Utils_Array::value('name', $params), 'String');
-
+  $table_name = CRM_Utils_String::munge($params['table_name']);
   // get the autocomplete options from settings
   $acpref = explode(CRM_Core_DAO::VALUE_SEPARATOR,
     CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -664,6 +694,10 @@ function civicrm_api3_contact_getquick($params) {
     if (!in_array($searchField, $list)) {
       $list[] = $searchField;
     }
+  }
+  else {
+    // Set field name to first name for exact match checking.
+    $field_name = 'sort_name';
   }
 
   $select = $actualSelectElements = array('sort_name');
@@ -805,7 +839,6 @@ function civicrm_api3_contact_getquick($params) {
 
   //CRM-10687
   if (!empty($params['field_name']) && !empty($params['table_name'])) {
-    $table_name = CRM_Utils_String::munge($params['table_name']);
     $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
     $exactWhereClause = " WHERE ( $table_name.$field_name = '$name') {$where}";
     // Search by id should be exact
@@ -855,24 +888,31 @@ function civicrm_api3_contact_getquick($params) {
   $query = "
         SELECT DISTINCT(id), data, sort_name {$selectAliases}, exactFirst
         FROM   (
-            ( SELECT 0 as exactFirst, cc.id as id, CONCAT_WS( ' :: ', {$actualSelectElements} ) as data {$select}
+            ( SELECT IF($table_name.$field_name = '{$name}', 0, 1) as exactFirst, cc.id as id, CONCAT_WS( ' :: ',
+            {$actualSelectElements} )
+             as data
+            {$select}
             FROM   civicrm_contact cc {$from}
     {$aclFrom}
     {$additionalFrom} {$includeEmailFrom}
     {$exactWhereClause}
     LIMIT 0, {$limit} )
-    UNION
-    ( SELECT 1 as exactFirst, cc.id as id, CONCAT_WS( ' :: ', {$actualSelectElements} ) as data {$select}
+    ";
+  if ($whereClause != $exactWhereClause) {
+    $query .= "UNION
+    ( SELECT IF($table_name.$field_name = '{$name}', 0, 1) as exactFirst, cc.id as id, CONCAT_WS( ' :: ', {$actualSelectElements} ) as data {$select}
     FROM   civicrm_contact cc {$from}
     {$aclFrom}
     {$additionalFrom} {$includeEmailFrom}
     {$whereClause}
     {$orderByInner}
-    LIMIT 0, {$limit} )
-) t
-{$orderByOuter}
-LIMIT    0, {$limit}
-    ";
+    LIMIT 0, {$limit} )";
+   }
+  $query .=") t
+    {$orderByOuter}
+    LIMIT    0, {$limit}
+  ";
+
   // send query to hook to be modified if needed
   CRM_Utils_Hook::contactListQuery($query,
     $name,
