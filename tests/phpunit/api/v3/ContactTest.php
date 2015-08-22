@@ -2186,6 +2186,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     foreach ($expectedData as $index => $value) {
       $this->assertEquals($value, $result['values'][$index]['data']);
     }
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'h.',
+    ));
+    $expectedData = array(
+      'H Bobby, Bobby :: bob@h.com',
+    );
+    foreach ($expectedData as $index => $value) {
+      $this->assertEquals($value, $result['values'][$index]['data']);
+    }
+    $this->callAPISuccess('Setting', 'create', array('includeWildCardInName' => FALSE));
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'h.',
+    ));
+    $this->callAPISuccess('Setting', 'create', array('includeWildCardInName' => TRUE));
+    $this->assertEquals(0, $result['count']);
   }
 
   /**
