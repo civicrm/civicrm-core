@@ -45,13 +45,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $backtrace = 0;
 
   /**
-   * The directory where Smarty and plugins are installed.
-   * @var string
-   */
-  public $smartyDir = NULL;
-  public $pluginsDir = NULL;
-
-  /**
    * The root directory of our template tree.
    * @var string
    */

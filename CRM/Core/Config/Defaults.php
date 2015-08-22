@@ -45,17 +45,10 @@ class CRM_Core_Config_Defaults {
   public function setCoreVariables() {
     global $civicrm_root;
 
-    // set of base directories relying on $civicrm_root
-    $this->smartyDir = $civicrm_root . DIRECTORY_SEPARATOR . 'packages' . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR;
-
-    $this->pluginsDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'Core' . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
-
     $this->templateDir = array(
       $civicrm_root . DIRECTORY_SEPARATOR .
       'templates' . DIRECTORY_SEPARATOR,
     );
-
-    $this->sqlDir = $civicrm_root . DIRECTORY_SEPARATOR . 'sql' . DIRECTORY_SEPARATOR;
   }
 
   /**
