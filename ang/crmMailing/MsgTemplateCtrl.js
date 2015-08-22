@@ -4,7 +4,7 @@
   angular.module('crmMailing').controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService) {
     var ts = $scope.ts = CRM.ts(null);
     $scope.crmMsgTemplates = crmMsgTemplates;
-
+    $scope.checkPerm = CRM.checkPerm;
     // @return Promise MessageTemplate (per APIv3)
     $scope.saveTemplate = function saveTemplate(mailing) {
       var model = {
