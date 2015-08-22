@@ -2267,7 +2267,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $expected = array(
       'Bob, Bob',
       'A Bobby, Bobby',
-      'B Bobby, Bobby'
+      'B Bobby, Bobby',
     );
 
     foreach ($expected as $index => $value) {
@@ -2305,16 +2305,26 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contacts = array(
       array('first_name' => 'Bob', 'last_name' => 'Bob', 'external_identifier' => 'abc', 'email' => 'bob@bob.com'),
       array('first_name' => 'Bobby', 'last_name' => 'A Bobby', 'external_identifier' => 'abcd'),
-      array('first_name' => 'Bobby', 'last_name' => 'B Bobby', 'external_identifier' => 'bcd', 'api.address.create' => array(
-        'street_address' => 'Sesame Street',
-        'city' => 'Toronto',
-        'location_type_id' => 1,
-      ),),
-      array('first_name' => 'Bobby', 'last_name' => 'C Bobby', 'external_identifier' => 'bcde',  'api.address.create' => array(
-        'street_address' => 'Te huarahi',
-        'city' => 'Whanganui',
-        'location_type_id' => 1,
-      ),),
+      array(
+        'first_name' => 'Bobby',
+        'last_name' => 'B Bobby',
+        'external_identifier' => 'bcd',
+        'api.address.create' => array(
+          'street_address' => 'Sesame Street',
+          'city' => 'Toronto',
+          'location_type_id' => 1,
+        ),
+      ),
+      array(
+        'first_name' => 'Bobby',
+        'last_name' => 'C Bobby',
+        'external_identifier' => 'bcde',
+        'api.address.create' => array(
+          'street_address' => 'Te huarahi',
+          'city' => 'Whanganui',
+          'location_type_id' => 1,
+        ),
+      ),
       array('first_name' => 'Bobby', 'last_name' => 'D Bobby', 'external_identifier' => 'efg'),
       array('first_name' => 'Bobby', 'last_name' => 'E Bobby', 'external_identifier' => 'hij', 'email' => 'bob@bobby.com'),
       array('first_name' => 'Bobby', 'last_name' => 'F Bobby', 'external_identifier' => 'klm'),
