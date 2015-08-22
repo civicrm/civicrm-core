@@ -303,18 +303,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     else {
       $this->cleanURL = 0;
     }
-
-    if ($userFramework == 'Joomla') {
-      /** @var object|null $mainframe */
-      global $mainframe;
-      $dbprefix = $mainframe ? $mainframe->getCfg('dbprefix') : 'jos_';
-      $this->userFrameworkUsersTableName = $dbprefix . 'users';
-    }
-    elseif ($userFramework == 'WordPress') {
-      global $wpdb;
-      $dbprefix = $wpdb ? $wpdb->prefix : '';
-      $this->userFrameworkUsersTableName = $dbprefix . 'users';
-    }
   }
 
   /**
