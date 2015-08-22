@@ -304,8 +304,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       $this->cleanURL = 0;
     }
 
-    $this->userFrameworkVersion = $this->userSystem->getVersion();
-
     if ($userFramework == 'Joomla') {
       /** @var object|null $mainframe */
       global $mainframe;
