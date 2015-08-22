@@ -128,11 +128,14 @@ class CRM_Core_Smarty extends Smarty {
       }
     }
 
+    $smartyDir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'packages' . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR;
+    $pluginsDir = __DIR__ . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
+
     if ($customPluginsDir) {
-      $this->plugins_dir = array($customPluginsDir, $config->smartyDir . 'plugins', $config->pluginsDir);
+      $this->plugins_dir = array($customPluginsDir, $smartyDir . 'plugins', $pluginsDir);
     }
     else {
-      $this->plugins_dir = array($config->smartyDir . 'plugins', $config->pluginsDir);
+      $this->plugins_dir = array($smartyDir . 'plugins', $pluginsDir);
     }
 
     // add the session and the config here
