@@ -140,11 +140,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    */
   private static $_singleton = NULL;
 
-  /**
-   * @var CRM_Core_Component
-   */
-  public $componentRegistry = NULL;
-
   ///
   /// END HELPER CLASS PROPERTIES
   ///
@@ -386,11 +381,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
     // also initialize the logger
     self::$_log = Log::singleton('display');
-
-    // initialize component registry early to avoid "race"
-    // between CRM_Core_Config and CRM_Core_Component (they
-    // are co-dependant)
-    $this->componentRegistry = new CRM_Core_Component();
   }
 
   /**
