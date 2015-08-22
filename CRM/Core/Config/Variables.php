@@ -386,11 +386,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $inCiviCRM = FALSE;
 
   /**
-   * Component registry object (of CRM_Core_Component type)
-   */
-  public $componentRegistry = NULL;
-
-  /**
    * PDF receipt as attachment is disabled by default (CRM-8350)
    */
   public $doNotAttachPDFReceipt = FALSE;
