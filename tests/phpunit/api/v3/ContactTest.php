@@ -2150,13 +2150,78 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that getquick returns contacts with an exact first name match first.
+   *
+   * The search string 'b' & 'bob' both return ordered by sort_name if includeOrderByClause
+   * is true (default) but if it is false then matches are returned in ID order.
    */
   public function testGetQuickExactFirst() {
     $this->getQuickSearchSampleData();
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'b'));
     $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $this->assertEquals('B Bobby, Bobby', $result['values'][1]['sort_name']);
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $this->assertEquals('B Bobby, Bobby', $result['values'][1]['sort_name']);
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
+    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
+    $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
+    $this->assertEquals('A Bobby, Bobby', $result['values'][1]['sort_name']);
+  }
+
+  /**
+   * Test that getquick returns contacts with an exact first name match first.
+   */
+  public function testGetQuickExternalID() {
+    $this->getQuickSearchSampleData();
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'b',
+      'field_name' => 'external_identifier',
+      'table_name' => 'cc',
+    ));
+    $this->assertEquals(0, $result['count']);
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'abc',
+      'field_name' => 'external_identifier',
+      'table_name' => 'cc',
+    ));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
+  }
+
+  /**
+   * Test that getquick returns contacts with an exact first name match first.
+   */
+  public function testGetQuickID() {
+    $this->getQuickSearchSampleData();
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 2,
+      'field_name' => 'id',
+      'table_name' => 'cc',
+    ));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 2,
+      'field_name' => 'contact_id',
+      'table_name' => 'cc',
+    ));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals('A Bobby, Bobby', $result['values'][0]['sort_name']);
+  }
+
+  /**
+   * Test that getquick returns contacts with an exact first name match first.
+   */
+  public function testGetQuickFirstName() {
+    $this->getQuickSearchSampleData();
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'Bob',
+      'field_name' => 'first_name',
+      'table_name' => 'cc',
+    ));
+    $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
+    $this->assertEquals('K Bobby, Bob', $result['values'][1]['sort_name']);
+    $this->assertEquals('A Bobby, Bobby', $result['values'][2]['sort_name']);
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
@@ -2167,8 +2232,18 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function getQuickSearchSampleData() {
     $contacts = array(
-      array('first_name' => 'Bob', 'last_name' => 'Bob'),
-      array('first_name' => 'Bobby', 'last_name' => 'A Bobby'),
+      array('first_name' => 'Bob', 'last_name' => 'Bob', 'external_identifier' => 'abc'),
+      array('first_name' => 'Bobby', 'last_name' => 'A Bobby', 'external_identifier' => 'abcd'),
+      array('first_name' => 'Bobby', 'last_name' => 'B Bobby', 'external_identifier' => 'bcd'),
+      array('first_name' => 'Bobby', 'last_name' => 'C Bobby', 'external_identifier' => 'bcde'),
+      array('first_name' => 'Bobby', 'last_name' => 'D Bobby', 'external_identifier' => 'efg'),
+      array('first_name' => 'Bobby', 'last_name' => 'E Bobby', 'external_identifier' => 'hij'),
+      array('first_name' => 'Bobby', 'last_name' => 'F Bobby', 'external_identifier' => 'klm'),
+      array('first_name' => 'Bobby', 'last_name' => 'G Bobby', 'external_identifier' => 'nop'),
+      array('first_name' => 'Bobby', 'last_name' => 'H Bobby', 'external_identifier' => 'qrs'),
+      array('first_name' => 'Bobby', 'last_name' => 'I Bobby'),
+      array('first_name' => 'Bobby', 'last_name' => 'J Bobby'),
+      array('first_name' => 'Bob', 'last_name' => 'K Bobby', 'external_identifier' => 'bcdef'),
     );
     foreach ($contacts as $type => $contact) {
       $contact['contact_type'] = 'Individual';
