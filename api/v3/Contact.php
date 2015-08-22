@@ -847,16 +847,13 @@ function civicrm_api3_contact_getquick($params) {
     }
   }
   else {
+    $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
+    $exactWhereClause = " WHERE ( sort_name LIKE '$name' $exactIncludeNickName ) {$where} ";
     if ($config->includeEmailInName) {
       if (!in_array('email', $list)) {
         $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";
       }
-      $whereClause = " WHERE ( email LIKE '$strSearch' OR sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
-      $exactWhereClause = " WHERE ( email LIKE '$name' OR sort_name LIKE '$name' $exactIncludeNickName ) {$where} ";
-    }
-    else {
-      $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
-      $exactWhereClause = " WHERE ( sort_name LIKE '$name' $exactIncludeNickName ) {$where} ";
+      $emailWhere =  " WHERE email LIKE '$strSearch'";
     }
   }
 
@@ -893,21 +890,28 @@ function civicrm_api3_contact_getquick($params) {
             {$select}
             FROM   civicrm_contact cc {$from}
     {$aclFrom}
-    {$additionalFrom} {$includeEmailFrom}
+    {$additionalFrom}
     {$whereClause}
     {$orderByInner}
     LIMIT 0, {$limit} )
     ";
-  if ($whereClause != $exactWhereClause) {
-    $query .= "UNION
-    ( SELECT IF($table_name.$field_name = '{$name}', 0, 1) as exactFirst, cc.id as id, CONCAT_WS( ' :: ', {$actualSelectElements} ) as data {$select}
-    FROM   civicrm_contact cc {$from}
-    {$aclFrom}
-    {$additionalFrom} {$includeEmailFrom}
-    {$whereClause}
-    {$orderByInner}
-    LIMIT 0, {$limit} )";
-   }
+
+  if (!empty($emailWhere)) {
+    $query .= "
+      UNION (
+        SELECT IF($table_name.$field_name = '{$name}', 0, 1) as exactFirst, cc.id as id, CONCAT_WS( ' :: ',
+          {$actualSelectElements} )
+          as data
+          {$select}
+          FROM   civicrm_contact cc {$from}
+        {$aclFrom}
+        {$additionalFrom} {$includeEmailFrom}
+        {$emailWhere}
+        {$orderByInner}
+      LIMIT 0, {$limit}
+      )
+    ";
+  }
   $query .=") t
     {$orderByOuter}
     LIMIT    0, {$limit}
