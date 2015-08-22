@@ -79,6 +79,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_relationship',
       'civicrm_uf_match',
       'civicrm_phone',
+      'civicrm_address',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -2171,6 +2172,25 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test that getquick returns contacts with an exact first name match first.
    */
+  public function testGetQuickEmail() {
+    $this->getQuickSearchSampleData();
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'c',
+    ));
+    $expectedData = array(
+      'Bob, Bob :: bob@bob.com',
+      'C Bobby, Bobby',
+      'E Bobby, Bobby :: bob@bobby.com',
+      'H Bobby, Bobby :: bob@h.com',
+    );
+    foreach ($expectedData as $index => $value) {
+      $this->assertEquals($value, $result['values'][$index]['data']);
+    }
+  }
+
+  /**
+   * Test that getquick returns contacts with an exact first name match first.
+   */
   public function testGetQuickExternalID() {
     $this->getQuickSearchSampleData();
     $result = $this->callAPISuccess('contact', 'getquick', array(
@@ -2219,12 +2239,63 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'field_name' => 'first_name',
       'table_name' => 'cc',
     ));
-    $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
-    $this->assertEquals('K Bobby, Bob', $result['values'][1]['sort_name']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][2]['sort_name']);
+    $expected = array(
+      'Bob, Bob',
+      'K Bobby, Bob',
+      'A Bobby, Bobby',
+    );
+
+    foreach ($expected as $index => $value) {
+      $this->assertEquals($value, $result['values'][$index]['sort_name']);
+    }
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
+  }
+
+  /**
+   * Test that getquick returns contacts with an exact last name match first.
+   */
+  public function testGetQuickLastName() {
+    $this->getQuickSearchSampleData();
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'Bob',
+      'field_name' => 'last_name',
+      'table_name' => 'cc',
+    ));
+    $expected = array(
+      'Bob, Bob',
+      'A Bobby, Bobby',
+      'B Bobby, Bobby'
+    );
+
+    foreach ($expected as $index => $value) {
+      $this->assertEquals($value, $result['values'][$index]['sort_name']);
+    }
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
+    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
+    $this->assertEquals('Bob, Bob :: bob@bob.com', $result['values'][0]['data']);
+  }
+
+  /**
+   * Test that getquick returns contacts by city.
+   */
+  public function testGetQuickCity() {
+    $this->getQuickSearchSampleData();
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'o',
+      'field_name' => 'city',
+      'table_name' => 'sts',
+    ));
+    $this->assertEquals('B Bobby, Bobby :: Toronto', $result['values'][0]['data']);
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'n',
+      'field_name' => 'city',
+      'table_name' => 'sts',
+    ));
+    $this->assertEquals('B Bobby, Bobby :: Toronto', $result['values'][0]['data']);
+    $this->assertEquals('C Bobby, Bobby :: Whanganui', $result['values'][1]['data']);
   }
 
   /**
@@ -2232,15 +2303,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function getQuickSearchSampleData() {
     $contacts = array(
-      array('first_name' => 'Bob', 'last_name' => 'Bob', 'external_identifier' => 'abc'),
+      array('first_name' => 'Bob', 'last_name' => 'Bob', 'external_identifier' => 'abc', 'email' => 'bob@bob.com'),
       array('first_name' => 'Bobby', 'last_name' => 'A Bobby', 'external_identifier' => 'abcd'),
-      array('first_name' => 'Bobby', 'last_name' => 'B Bobby', 'external_identifier' => 'bcd'),
-      array('first_name' => 'Bobby', 'last_name' => 'C Bobby', 'external_identifier' => 'bcde'),
+      array('first_name' => 'Bobby', 'last_name' => 'B Bobby', 'external_identifier' => 'bcd', 'api.address.create' => array(
+        'street_address' => 'Sesame Street',
+        'city' => 'Toronto',
+        'location_type_id' => 1,
+      ),),
+      array('first_name' => 'Bobby', 'last_name' => 'C Bobby', 'external_identifier' => 'bcde',  'api.address.create' => array(
+        'street_address' => 'Te huarahi',
+        'city' => 'Whanganui',
+        'location_type_id' => 1,
+      ),),
       array('first_name' => 'Bobby', 'last_name' => 'D Bobby', 'external_identifier' => 'efg'),
-      array('first_name' => 'Bobby', 'last_name' => 'E Bobby', 'external_identifier' => 'hij'),
+      array('first_name' => 'Bobby', 'last_name' => 'E Bobby', 'external_identifier' => 'hij', 'email' => 'bob@bobby.com'),
       array('first_name' => 'Bobby', 'last_name' => 'F Bobby', 'external_identifier' => 'klm'),
       array('first_name' => 'Bobby', 'last_name' => 'G Bobby', 'external_identifier' => 'nop'),
-      array('first_name' => 'Bobby', 'last_name' => 'H Bobby', 'external_identifier' => 'qrs'),
+      array('first_name' => 'Bobby', 'last_name' => 'H Bobby', 'external_identifier' => 'qrs', 'email' => 'bob@h.com'),
       array('first_name' => 'Bobby', 'last_name' => 'I Bobby'),
       array('first_name' => 'Bobby', 'last_name' => 'J Bobby'),
       array('first_name' => 'Bob', 'last_name' => 'K Bobby', 'external_identifier' => 'bcdef'),
