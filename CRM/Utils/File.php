@@ -496,13 +496,14 @@ HTACCESS;
    * Create the base file path from which all our internal directories are
    * offset. This is derived from the template compile directory set
    */
-  public static function baseFilePath($templateCompileDir = NULL) {
+  public static function baseFilePath() {
     static $_path = NULL;
     if (!$_path) {
-      if ($templateCompileDir == NULL) {
-        $config = CRM_Core_Config::singleton();
-        $templateCompileDir = $config->templateCompileDir;
+      // Note: Don't rely on $config; that creates a dependency loop.
+      if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
+        throw new RuntimeException("Undefined constant: CIVICRM_TEMPLATE_COMPILEDIR");
       }
+      $templateCompileDir = CIVICRM_TEMPLATE_COMPILEDIR;
 
       $path = dirname($templateCompileDir);
 

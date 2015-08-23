@@ -42,15 +42,6 @@
  */
 class CRM_Core_Config_Defaults {
 
-  public function setCoreVariables() {
-    global $civicrm_root;
-
-    $this->templateDir = array(
-      $civicrm_root . DIRECTORY_SEPARATOR .
-      'templates' . DIRECTORY_SEPARATOR,
-    );
-  }
-
   /**
    * Set the default values.
    * in an empty db, also called when setting component using GUI
@@ -79,9 +70,7 @@ class CRM_Core_Config_Defaults {
     }
 
     $baseCMSURL = CRM_Utils_System::baseCMSURL();
-    if ($config->templateCompileDir) {
-      $path = CRM_Utils_File::baseFilePath($config->templateCompileDir);
-    }
+    $path = CRM_Utils_File::baseFilePath();
     if (!isset($defaults['enableSSL'])) {
       $defaults['enableSSL'] = 0;
     }
@@ -106,9 +95,7 @@ class CRM_Core_Config_Defaults {
           );
 
         if (strpos($civicrm_root,
-            DIRECTORY_SEPARATOR . 'sites' .
-            DIRECTORY_SEPARATOR . 'all' .
-            DIRECTORY_SEPARATOR . 'modules'
+            DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
           ) === FALSE
         ) {
           $startPos = strpos($civicrm_root,
@@ -150,14 +137,14 @@ class CRM_Core_Config_Defaults {
       }
     }
 
-    if (!isset($defaults['imageUploadDir']) && is_dir($config->templateCompileDir)) {
+    if (!isset($defaults['imageUploadDir']) && is_dir($path)) {
       $imgDir = $path . "persist/contribute/";
 
       CRM_Utils_File::createDir($imgDir);
       $defaults['imageUploadDir'] = $imgDir;
     }
 
-    if (!isset($defaults['uploadDir']) && is_dir($config->templateCompileDir)) {
+    if (!isset($defaults['uploadDir']) && is_dir($path)) {
       $uploadDir = $path . "upload/";
 
       CRM_Utils_File::createDir($uploadDir);
@@ -165,7 +152,7 @@ class CRM_Core_Config_Defaults {
       $defaults['uploadDir'] = $uploadDir;
     }
 
-    if (!isset($defaults['customFileUploadDir']) && is_dir($config->templateCompileDir)) {
+    if (!isset($defaults['customFileUploadDir']) && is_dir($path)) {
       $customDir = $path . "custom/";
 
       CRM_Utils_File::createDir($customDir);

@@ -97,7 +97,9 @@ class CRM_Core_Smarty extends Smarty {
     else {
       $this->template_dir = $config->templateDir;
     }
-    $this->compile_dir = $config->templateCompileDir;
+    $this->compile_dir = CRM_Utils_File::addTrailingSlash(CRM_Utils_File::addTrailingSlash($config->templateCompileDir) . $this->getLocale());
+    CRM_Utils_File::createDir($this->compile_dir);
+    CRM_Utils_File::restrictAccess($this->compile_dir);
 
     // check and ensure it is writable
     // else we sometime suppress errors quietly and this results
@@ -313,6 +315,20 @@ class CRM_Core_Smarty extends Smarty {
       $this->assign($key, $value);
     }
     return $this;
+  }
+
+  private function getLocale() {
+    global $tsLocale;
+    if (!empty($tsLocale)) {
+      return $tsLocale;
+    }
+
+    $config = CRM_Core_Config::singleton();
+    if (!empty($config->lcMessages)) {
+      return $config->lcMessages;
+    }
+
+    return 'en_US';
   }
 
 }
