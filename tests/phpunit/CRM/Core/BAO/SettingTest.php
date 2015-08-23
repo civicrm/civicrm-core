@@ -111,19 +111,6 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Ensure that overrides in $civicrm_setting apply when
-   * when using retrieveDirectoryAndURLPreferences().
-   */
-  public function testRetrieveDirectoryAndURLPreferences_Override() {
-    global $civicrm_setting;
-    $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
-
-    $params = array();
-    CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($params);
-    $this->assertEquals('/test/override', $params['imageUploadDir']);
-  }
-
-  /**
    * This test checks that CRM_Core_BAO_Setting::updateSettingsFromMetaData();
    * 1) Removes 'maxAttachments' from config (because 'prefetch' is not set in the metadata it should
    * be removed
@@ -176,7 +163,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
 
   /**
    * Ensure that overrides in $civicrm_setting apply when
-   * when using retrieveDirectoryAndURLPreferences().
+   * when using getItem().
    */
   public function testConvertConfigToSettingNoPrefetch() {
     $settings = array('maxAttachments' => 6);

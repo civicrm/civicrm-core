@@ -50,7 +50,7 @@ return array(
     'is_contact' => 0,
     'description' => 'Absolute URL of the location where the civicrm module or component has been installed.',
     'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Rule::url',
+    'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
   'imageUploadURL' => array(
     'group' => 'url',
@@ -66,7 +66,7 @@ return array(
     'is_contact' => 0,
     'description' => 'URL of the location for uploaded image files.',
     'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Rule::url',
+    'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
   'customCSSURL' => array(
     'group' => 'url',
@@ -82,7 +82,7 @@ return array(
     'is_contact' => 0,
     'description' => 'You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.',
     'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Rule::url',
+    'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
   'extensionsURL' => array(
     'group' => 'url',
@@ -98,6 +98,6 @@ return array(
     'is_contact' => 0,
     'description' => 'Base URL for extension resources (images, stylesheets, etc). This should match extensionsDir.',
     'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Rule::url',
+    'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
 );

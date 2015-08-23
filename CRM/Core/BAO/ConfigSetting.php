@@ -84,8 +84,6 @@ class CRM_Core_BAO_ConfigSetting {
       unset($params[$var]);
     }
 
-    CRM_Core_BAO_Setting::fixAndStoreDirAndURL($params);
-
     // also skip all Dir Params, we dont need to store those in the DB!
     foreach ($params as $name => $val) {
       if (substr($name, -3) == 'Dir') {
@@ -315,9 +313,6 @@ class CRM_Core_BAO_ConfigSetting {
 
     // dont add if its empty
     if (!empty($defaults)) {
-      // retrieve directory and url preferences also
-      CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($defaults);
-
       // Pickup enabled-components from settings table if found.
       $enableComponents = Civi::settings()->get('enable_components');
       if (!empty($enableComponents)) {

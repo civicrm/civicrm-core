@@ -244,7 +244,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testCreateInvalidURLSettings() {
     $params = array(
       'domain_id' => $this->_domainID2,
-      'userFrameworkResourceURL' => 'dfhkdhfd',
+      'userFrameworkResourceURL' => 'dfhkd*hfd',
     );
     $result = $this->callAPIFailure('setting', 'create', $params);
     $params = array(
