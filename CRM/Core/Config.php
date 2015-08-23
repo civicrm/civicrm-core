@@ -240,6 +240,10 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       $this->_initVariables();
     }
 
+    if (CRM_Utils_System::isSSL()) {
+      $this->userSystem->mapConfigToSSL();
+    }
+
     if (isset($this->customPHPPathDir) && $this->customPHPPathDir) {
       set_include_path($this->customPHPPathDir . PATH_SEPARATOR . get_include_path());
     }
@@ -275,69 +279,27 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       // Step 1. get system variables with their hardcoded defaults
       $variables = get_object_vars($this);
 
-      // Step 2. get default values (with settings file overrides if
-      // available - handled in CRM_Core_Config_Defaults)
-      CRM_Core_Config_Defaults::setValues($variables);
-
-      // retrieve directory and url preferences also
-      CRM_Core_BAO_Setting::retrieveDirectoryAndURLPreferences($variables);
-
       // serialise settings
       $settings = $variables;
       CRM_Core_BAO_ConfigSetting::add($settings);
     }
 
-    $urlArray = array('userFrameworkResourceURL', 'imageUploadURL');
-    $dirArray = array('uploadDir', 'customFileUploadDir');
-
     foreach ($variables as $key => $value) {
-      if (in_array($key, $urlArray)) {
-        $value = CRM_Utils_File::addTrailingSlash($value, '/');
-      }
-      elseif (in_array($key, $dirArray)) {
-        if ($value) {
-          $value = CRM_Utils_File::addTrailingSlash($value);
-        }
-        if (empty($value) || (CRM_Utils_File::createDir($value, FALSE) === FALSE)) {
-          // seems like we could not create the directories
-          // settings might have changed, lets suppress a message for now
-          // so we can make some more progress and let the user fix their settings
-          // for now we assign it to a know value
-          // CRM-4949
-          $value = $this->templateCompileDir;
-          $url = CRM_Utils_System::url('civicrm/admin/setting/path', 'reset=1');
-          CRM_Core_Session::setStatus(ts('%1 has an incorrect directory path. Please go to the <a href="%2">path setting page</a> and correct it.', array(
-            1 => $key,
-            2 => $url,
-          )), ts('Check Settings'), 'alert');
-        }
-      }
-
       $this->$key = $value;
     }
 
-    if ($this->userFrameworkResourceURL) {
-      if (CRM_Utils_System::isSSL()) {
-        $this->userFrameworkResourceURL = str_replace('http://', 'https://', $this->userFrameworkResourceURL);
-        $this->resourceBase = $this->userFrameworkResourceURL;
+    $this->customFileUploadDir = CRM_Core_Config_Defaults::getCustomFileUploadDir();
+    $this->customPHPPathDir = CRM_Core_Config_Defaults::getCustomPhpPathDir();
+    $this->customTemplateDir = CRM_Core_Config_Defaults::getCustomTemplateDir();
+    $this->extensionsDir = CRM_Core_Config_Defaults::getExtensionsDir();
+    $this->imageUploadDir = CRM_Core_Config_Defaults::getImageUploadDir();
+    $this->resourceBase = CRM_Core_Config_Defaults::getResourceBase();
+    $this->uploadDir = CRM_Core_Config_Defaults::getImageUploadDir();
 
-        if (!empty($this->extensionsURL)) {
-          $this->extensionsURL = str_replace('http://', 'https://', $this->extensionsURL);
-        }
-
-        $this->userSystem->mapConfigToSSL();
-      }
-
-      $rrb = parse_url($this->userFrameworkResourceURL);
-      $this->resourceBase = $this->userFrameworkResourceURL;
-      if (isset($_SERVER['HTTP_HOST']) && isset($rrb['host'])) {
-        $this->resourceBase = ($rrb['host'] == $_SERVER['HTTP_HOST']) ? $rrb['path'] : $this->userFrameworkResourceURL;
-      }
-    }
-
-    if (!$this->customFileUploadDir) {
-      $this->customFileUploadDir = $this->uploadDir;
-    }
+    $this->userFrameworkResourceURL = CRM_Core_Config_Defaults::getUserFrameworkResourceUrl();
+    $this->customCSSURL = CRM_Core_Config_Defaults::getCustomCssUrl();
+    $this->extensionsURL = CRM_Core_Config_Defaults::getExtensionsUrl();
+    $this->imageUploadURL = CRM_Core_Config_Defaults::getImageUploadUrl();
 
     $this->geocodeMethod = CRM_Utils_Geocode::getProviderClass();
   }
@@ -629,9 +591,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       $this->userFrameworkBaseURL = CRM_Utils_System::languageNegotiationURL($this->userFrameworkBaseURL);
 
       if (CRM_Utils_System::isSSL()) {
-        $this->userFrameworkBaseURL = str_replace('http://', 'https://',
-          $this->userFrameworkBaseURL
-        );
+        $this->userFrameworkBaseURL = str_replace('http://', 'https://', $this->userFrameworkBaseURL);
       }
     }
 
