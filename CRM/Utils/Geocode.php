@@ -35,12 +35,12 @@ class CRM_Utils_Geocode {
    *   Class name, or empty.
    */
   public static function getProviderClass() {
-    $config = CRM_Core_Config::singleton();
-    if ($config->geoProvider) {
-      return 'CRM_Utils_Geocode_' . $config->geoProvider;
+    $settings = Civi::settings();
+    if ($settings->get('geoProvider')) {
+      return 'CRM_Utils_Geocode_' . $settings->get('geoProvider');
     }
-    elseif ($config->mapProvider) {
-      return 'CRM_Utils_Geocode_' . $config->mapProvider;
+    elseif ($settings->get('mapProvider')) {
+      return 'CRM_Utils_Geocode_' . $settings->get('mapProvider');
     }
     else {
       return '';
