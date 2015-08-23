@@ -427,6 +427,9 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
   $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+  if (!empty($params['fee_amount'])) {
+    $input['fee_amount'] = $params['fee_amount'];
+  }
   $params = _ipn_process_transaction($params, $contribution, $input, $ids);
 
 }
@@ -460,11 +463,15 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
     'description' => '. If not provided this will default to domain mail or contribution page',
     'type' => CRM_Utils_Type::T_STRING,
   );
-
   $params['payment_processor_id'] = array(
     'title' => 'Payment processor ID',
-    'description' => '. Providing this is strongly recommended, as not possible to calculate it accurately always',
+    'description' => 'Providing this is strongly recommended, as not possible to calculate it accurately always',
     'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['fee_amount'] = array(
+    'title' => 'Fee charged on transaction',
+    'description' => 'If a fee has been charged then the amount',
+    'type' => CRM_Utils_Type::T_FLOAT,
   );
 }
 

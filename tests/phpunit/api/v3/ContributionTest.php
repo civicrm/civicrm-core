@@ -1368,6 +1368,28 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test completing a transaction via the API.
+   *
+   * Note that we are creating a logged in user because email goes out from
+   * that person
+   */
+  public function testCompleteTransactionFeeAmount() {
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+      'fee_amount' => '.56',
+      'trxn_id' => '7778888',
+    ));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id'], 'sequential' => 1));
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals('7778888', $contribution['trxn_id']);
+    $this->assertEquals('.56', $contribution['fee_amount']);
+    $this->assertEquals('99.44', $contribution['net_amount']);
+  }
+
+  /**
    * Test repeat contribution successfully creates line items.
    */
   public function testRepeatTransaction() {
