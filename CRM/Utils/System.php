@@ -500,21 +500,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Rewrite various system URLs to https.
-   */
-  public static function mapConfigToSSL() {
-    $config = CRM_Core_Config::singleton();
-    $config->userFrameworkResourceURL = str_replace('http://', 'https://', $config->userFrameworkResourceURL);
-    $config->resourceBase = $config->userFrameworkResourceURL;
-
-    if (!empty($config->extensionsURL)) {
-      $config->extensionsURL = str_replace('http://', 'https://', $config->extensionsURL);
-    }
-
-    return $config->userSystem->mapConfigToSSL();
-  }
-
-  /**
    * Get the base URL of the system.
    *
    * @return string

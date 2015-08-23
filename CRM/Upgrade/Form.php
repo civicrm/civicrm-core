@@ -123,7 +123,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     $this->locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
     $smarty = CRM_Core_Smarty::singleton();
-    $smarty->compile_dir = $this->_config->templateCompileDir;
+    //$smarty->compile_dir = $this->_config->templateCompileDir;
     $smarty->assign('multilingual', $this->multilingual);
     $smarty->assign('locales', $this->locales);
 
