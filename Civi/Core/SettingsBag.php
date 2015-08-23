@@ -80,6 +80,8 @@ class SettingsBag {
    */
   protected $values;
 
+  protected $filteredValues;
+
   /**
    * @param int $domainId
    *   The domain for which we want settings.
@@ -108,7 +110,7 @@ class SettingsBag {
     $dao = $this->createDao();
     $dao->find();
     while ($dao->fetch()) {
-      $this->values[$dao->name] = is_string($dao->value) ? unserialize($dao->value) : NULL;
+      $this->values[$dao->name] = ($dao->value !== NULL) ? unserialize($dao->value) : NULL;
     }
     $this->combined = NULL;
     return $this;
@@ -152,6 +154,42 @@ class SettingsBag {
   public function get($key) {
     $all = $this->all();
     return isset($all[$key]) ? $all[$key] : NULL;
+  }
+
+  /**
+   * Get the value of a setting, formatted as a path.
+   *
+   * @param string $key
+   * @return string|NULL
+   *   Absolute path.
+   */
+  public function getPath($key) {
+    if (!isset($this->filteredValues[$key])) {
+      $this->filteredValues[$key] = \CRM_Utils_File::absoluteDirectory($this->get($key));
+    }
+    return $this->filteredValues[$key];
+  }
+
+  /**
+   * Get the value of a setting, formatted as a URL.
+   *
+   * @param string $key
+   * @param bool $preferFormat
+   *   The preferred format ('absolute', 'relative').
+   *   The result data may not meet the preference -- if the setting
+   *   refers to an external domain, then the result will be
+   *   absolute (regardless of preference).
+   * @parma bool|NULL $ssl
+   *   NULL to autodetect. TRUE to force to SSL.
+   * @return string|NULL
+   *   URL.
+   */
+  public function getUrl($key, $preferFormat, $ssl = NULL) {
+    if (!isset($this->filteredValues[$key][$preferFormat][$ssl])) {
+      $value = $this->filterUrl($this->get($key), $preferFormat, $ssl);
+      $this->filteredValues[$key][$preferFormat][$ssl] = $value;
+    }
+    return $this->filteredValues[$key][$preferFormat][$ssl];
   }
 
   /**
@@ -201,7 +239,30 @@ class SettingsBag {
   public function set($key, $value) {
     $this->setDb($key, $value);
     $this->values[$key] = $value;
+    unset($this->filteredValues[$key]);
     $this->combined = NULL;
+    return $this;
+  }
+
+  /**
+   * @param string $key
+   * @param string $value
+   *   Absolute path.
+   * @return $this
+   */
+  public function setPath($key, $value) {
+    $this->set($key, \CRM_Utils_File::relativeDirectory($value));
+    return $this;
+  }
+
+  /**
+   * @param string $key
+   * @param string $value
+   *   Absolute URL.
+   * @return $this
+   */
+  public function setUrl($key, $value) {
+    $this->set($key, \CRM_Utils_System::relativeURL($value));
     return $this;
   }
 
@@ -265,6 +326,35 @@ class SettingsBag {
     //  $dao->value = $serializedValue;
     //  $dao->save();
     //}
+  }
+
+  /**
+   * Filter a URL, the same way that it would be if it were read from settings.
+   *
+   * @param $value
+   * @param $preferFormat
+   * @param $ssl
+   * @return mixed|string
+   */
+  public function filterUrl($value, $preferFormat, $ssl = NULL) {
+    if ($value) {
+      $value = \CRM_Utils_System::absoluteURL($value, TRUE);
+    }
+    if ($preferFormat === 'relative' && $value) {
+      $parsed = parse_url($value);
+      if (isset($_SERVER['HTTP_HOST']) && isset($parsed['host']) && $_SERVER['HTTP_HOST'] == $parsed['host']) {
+        $value = $parsed['path'];
+      }
+    }
+
+    if ($value) {
+      if ($ssl || ($ssl === NULL && \CRM_Utils_System::isSSL())) {
+        $value = str_replace('http://', 'https://', $value);
+        return $value;
+      }
+      return $value;
+    }
+    return $value;
   }
 
 }

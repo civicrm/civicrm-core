@@ -17,6 +17,10 @@ class SettingsManagerTest extends \CiviUnitTestCase {
       'd1' => 'alpha',
       'd2' => 'beta',
       'd3' => 'gamma',
+      'myrelpath' => 'foo',
+      'myabspath' => '/tmp/bar',
+      'myrelurl' => 'sites/foo',
+      'myabsurl' => 'http://example.com/bar',
     );
     $this->contactDefaults = array(
       'c1' => 'alpha',
@@ -115,6 +119,44 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
     $contactSettings = $manager->getBagByContact($domain->id, $contact->id);
     $this->assertEquals('from contact', $contactSettings->get('monkeywrench'));
+  }
+
+  public function testPaths() {
+    $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
+    $manager = $this->createManager();
+    $settings = $manager->getBagByDomain($domain->id);
+
+    $this->assertEquals('foo', $settings->get('myrelpath'));
+    $this->assertRegExp(':/.+/foo$:', $settings->getPath('myrelpath'));
+    $settings->setPath('myrelpath', 'foo/sub');
+    $this->assertEquals('foo/sub', $settings->get('myrelpath'));
+    $this->assertRegExp(':/.+/foo/sub$:', $settings->getPath('myrelpath'));
+
+    $this->assertEquals('/tmp/bar', $settings->get('myabspath'));
+    $this->assertEquals('/tmp/bar', $settings->getPath('myabspath'));
+    $settings->setPath('myabspath', '/tmp/bar/whiz');
+    $this->assertEquals('/tmp/bar/whiz', $settings->get('myabspath'));
+  }
+
+  public function testUrl() {
+    $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
+    $manager = $this->createManager();
+    $settings = $manager->getBagByDomain($domain->id);
+
+    $this->assertEquals('sites/foo', $settings->get('myrelurl'));
+    $this->assertRegExp(';^http.*sites/foo$;', $settings->getUrl('myrelurl', 'absolute'));
+    $this->assertRegExp(';^https:.*sites/foo$;', $settings->getUrl('myrelurl', 'absolute', TRUE));
+    //$this->assertEquals('/sites/foo', $settings->getUrl('myrelurl', 'relative'));
+    $settings->setUrl('myrelurl', 'sites/foo/sub');
+    $this->assertEquals('sites/foo/sub', $settings->get('myrelurl'));
+    $this->assertRegExp(';^http.*sites/foo/sub$;', $settings->getUrl('myrelurl', 'absolute'));
+    //$this->assertEquals('/sites/foo/sub', $settings->getUrl('myrelurl', 'relative'));
+
+    $this->assertEquals('http://example.com/bar', $settings->get('myabsurl'));
+    $this->assertEquals('http://example.com/bar', $settings->getUrl('myabsurl', 'absolute'));
+    $settings->setUrl('myabsurl', 'http://example.com/whiz');
+    $this->assertEquals('http://example.com/whiz', $settings->get('myabsurl'));
+    $this->assertEquals('http://example.com/whiz', $settings->getUrl('myabsurl', 'absolute'));
   }
 
   /**
