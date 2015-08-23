@@ -161,6 +161,22 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * @param $url
+   *
+   * @return bool
+   */
+  public static function urlish($url) {
+    if (empty($url)) {
+      return TRUE;
+    }
+    if (!preg_match('/^([a-z]+):/', $url)) {
+      // allow relative URL's (CRM-15598)
+      $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($url, '/');
+    }
+    return (bool) filter_var($url, FILTER_VALIDATE_URL);
+  }
+
+  /**
    * @param $string
    *
    * @return bool
@@ -705,6 +721,19 @@ class CRM_Utils_Rule {
    */
   public static function fileExists($path) {
     return file_exists($path);
+  }
+
+  /**
+   * Determine whether the value contains a valid reference to a directory.
+   *
+   * Paths stored in the setting system may be absolute -- or may be
+   * relative to the default data directory.
+   *
+   * @param string $path
+   * @return bool
+   */
+  public static function settingPath($path) {
+    return is_dir(\CRM_Utils_File::absoluteDirectory($path));
   }
 
   /**
