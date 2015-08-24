@@ -136,8 +136,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-      self::calculateMissingAmountParams($params);
     }
+    self::calculateMissingAmountParams($params, $contributionID);
 
     if (!empty($params['payment_instrument_id'])) {
       $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
@@ -259,9 +259,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @param array $params
    *   Params for a new contribution before they are saved.
+   * @param int|null $contributionID
+   *   Contribution ID if we are dealing with an update.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function calculateMissingAmountParams(&$params) {
-    if (!isset($params['fee_amount'])) {
+  public static function calculateMissingAmountParams(&$params, $contributionID) {
+    if (!$contributionID && !isset($params['fee_amount'])) {
       if (isset($params['total_amount']) && isset($params['net_amount'])) {
         $params['fee_amount'] = $params['total_amount'] - $params['net_amount'];
       }
@@ -270,7 +274,22 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
     if (!isset($params['net_amount'])) {
-      $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+      if (!$contributionID) {
+        $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+      }
+      else {
+        if (isset($params['fee_amount']) || isset($params['total_amount'])) {
+          // We have an existing contribution and fee_amount or total_amount has been passed in but not net_amount.
+          // net_amount may need adjusting.
+          $contribution = civicrm_api3('Contribution', 'getsingle', array(
+            'id' => $contributionID,
+            'return' => array('total_amount', 'net_amount'),
+          ));
+          $totalAmount = isset($params['total_amount']) ? $params['total_amount'] : CRM_Utils_Array::value('total_amount', $contribution);
+          $feeAmount = isset($params['fee_amount']) ? $params['fee_amount'] : CRM_Utils_Array::value('fee_amount', $contribution);
+          $params['net_amount'] = $totalAmount - $feeAmount;
+        }
+      }
     }
   }
 
