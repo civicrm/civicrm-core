@@ -187,11 +187,31 @@ class CRM_Core_Payment_Form {
   }
 
   /**
+   * Add the payment fields to the template.
+   *
+   * Generally this is the payment processor fields & the billing fields required
+   * for the payment processor. However, this has been complicated by adding
+   * pay later billing fields into this mix
+   *
+   * We now have the situation where the required fields cannot be set as required
+   * on the form level if they are required for the payment processor, as another
+   * processor might be selected and the validation will then be incorrect.
+   *
+   * However, if they are required for pay later we DO set them on the form level,
+   * presumably assuming they will be required whatever happens.
+   *
+   * As a side-note this seems to re-enforce the argument for making pay later
+   * operate as a payment processor rather than as a 'special thing on its own'.
+   *
    * @param CRM_Core_Form $form
+   *   Form that the payment fields are to be added to.
    * @param bool $useRequired
+   *   Effectively this means are the fields required for pay-later - see above.
    * @param array $paymentFields
+   *   Fields that are to be shown on the payment form.
    */
   protected static function addCommonFields(&$form, $useRequired, $paymentFields) {
+    $requiredPaymentFields = array();
     foreach ($paymentFields as $name => $field) {
       if (!empty($field['cc_field'])) {
         if ($field['htmlType'] == 'chainSelect') {
@@ -206,7 +226,13 @@ class CRM_Core_Payment_Form {
           );
         }
       }
+      // CRM-17071 We seem to be tying ourselves in knots around the addition
+      // of requiring billing fields for pay-later. Here we 'tell' the form the
+      // field is required if it is not otherwise marked as required and is
+      // required for the billing block.
+      $requiredPaymentFields[$field['name']] = !$useRequired ? $field['is_required'] : FALSE;
     }
+    $form->assign('requiredPaymentFields', $requiredPaymentFields);
   }
 
   /**
