@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Adds social networking buttons (Facebook like, Twitter tweet, Google +1, LinkedIn) to public pages (online contributions, event info) *}
-<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+
 <div class="crm-section crm-socialnetwork help">
     <h3 class="nobackground">{ts}Help spread the word{/ts}</h3>
     <div class="description">
@@ -42,6 +42,7 @@
                 <img title="Facebook Like Button" src="{$config->userFrameworkResourceURL|replace:'https://':'http://'}/i/fblike.png" alt="Facebook Button" />
             </a>
         {else}
+            <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
             {*use advanced buttons for pages*}
             <div class="label">
                 <iframe allowtransparency="true" frameborder="0" scrolling="no"

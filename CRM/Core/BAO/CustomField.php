@@ -1171,7 +1171,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = NULL;
           foreach ($value as $data) {
             $display .= $display ? ', ' . $option[$data] : $option[$data];
-
           }
         }
         else {
@@ -1184,6 +1183,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $value
         ) {
           $display = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'display_name');
+        }
+        elseif (is_array($value)) {
+          $display = NULL;
+          foreach ($value as $data) {
+            $display .= $display ? ', ' . $option[$data] : $option[$data];
+          }
         }
         else {
           $display = CRM_Utils_Array::value($value, $option);
@@ -1247,60 +1252,20 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Select State/Province':
-        if (empty($value)) {
-          $display = '';
-        }
-        else {
-          $display = CRM_Core_PseudoConstant::stateProvince($value);
-        }
-        break;
-
       case 'Multi-Select State/Province':
-        if (is_array($value)) {
-          $checkedData = $value;
-        }
-        else {
-          $checkedData = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-            substr($value, 1, -1)
-          );
-        }
-
-        $states = CRM_Core_PseudoConstant::stateProvince();
         $display = NULL;
-        foreach ($checkedData as $stateID) {
-          if ($display) {
-            $display .= ', ';
-          }
-          $display .= $states[$stateID];
+        $option = CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE);
+        foreach ((array) $value as $data) {
+          $display .= $display ? ', ' . $option[$data] : $option[$data];
         }
         break;
 
       case 'Select Country':
-        if (empty($value)) {
-          $display = '';
-        }
-        else {
-          $display = CRM_Core_PseudoConstant::country($value);
-        }
-        break;
-
       case 'Multi-Select Country':
-        if (is_array($value)) {
-          $checkedData = $value;
-        }
-        else {
-          $checkedData = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-            substr($value, 1, -1)
-          );
-        }
-
-        $countries = CRM_Core_PseudoConstant::country();
+        $countries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
         $display = NULL;
-        foreach ($checkedData as $countryID) {
-          if ($display) {
-            $display .= ', ';
-          }
-          $display .= $countries[$countryID];
+        foreach ((array) $value as $countryID) {
+          $display .= $display ? ', ' . $countries[$countryID] : $countries[$countryID];
         }
         break;
 
@@ -1324,16 +1289,17 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = '';
         }
         else {
-          $display = nl2br($value);
+          $display = is_array($value) ? nl2br(implode(', ', $value)) : nl2br($value);
         }
         break;
 
       case 'Link':
+      case 'Text':
         if (empty($value)) {
           $display = '';
         }
         else {
-          $display = $value;
+          $display = is_array($value) ? implode(', ', $value) : $value;
         }
     }
     return $display ? $display : $value;

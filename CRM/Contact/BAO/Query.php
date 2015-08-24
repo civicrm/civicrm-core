@@ -1873,26 +1873,7 @@ class CRM_Contact_BAO_Query {
         }
         // check for both id and contact_id
         if ($this->_params[$id][0] == 'id' || $this->_params[$id][0] == 'contact_id') {
-          if (
-            $this->_params[$id][1] == 'IS NULL' ||
-            $this->_params[$id][1] == 'IS NOT NULL'
-          ) {
-            $this->_where[0][] = "contact_a.id {$this->_params[$id][1]}";
-          }
-          elseif (is_array($this->_params[$id][2])) {
-            $idList = implode("','", $this->_params[$id][2]);
-            //why on earth do they put ' in the middle & not on the outside? We have to assume it's
-            //to support 'something' so lets add them conditionally to support the api (which is a tested flow
-            // so if you are looking to alter this check api test results
-            if (strpos(trim($idList), "'") > 0) {
-              $idList = "'" . $idList . "'";
-            }
-
-            $this->_where[0][] = "contact_a.id IN ({$idList})";
-          }
-          else {
-            $this->_where[0][] = self::buildClause("contact_a.id", "{$this->_params[$id][1]}", "{$this->_params[$id][2]}");
-          }
+          $this->_where[0][] = self::buildClause("contact_a.id", $this->_params[$id][1], $this->_params[$id][2]);
         }
         else {
           $this->whereClauseSingle($this->_params[$id]);
@@ -3511,7 +3492,14 @@ WHERE  $smartGroupClause
     }
     else {
       $field = 'civicrm_address.postal_code';
-      $val = CRM_Utils_Type::escape($value, 'String');
+      // Per CRM-17060 we might be looking at an 'IN' syntax so don't case arrays to string.
+      if (!is_array($value)) {
+        $val = CRM_Utils_Type::escape($value, 'String');
+      }
+      else {
+        // Do we need to escape values here? I would expect buildClause does.
+        $val = $value;
+      }
     }
 
     $this->_tables['civicrm_address'] = $this->_whereTables['civicrm_address'] = 1;
@@ -5305,6 +5293,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
 
       case 'IN':
       case 'NOT IN':
+        // I feel like this would be escaped properly if passed through $queryString = CRM_Core_DAO::createSqlFilter.
         if (!empty($value) && is_array($value) && !array_key_exists($op, $value)) {
           $value = array($op => $value);
         }

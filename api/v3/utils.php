@@ -900,17 +900,6 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
   }
 
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
-  foreach ($newParams as &$newParam) {
-    if ($newParam[1] == '='  && is_array($newParam[2])) {
-      // we may be looking at an attempt to use the 'IN' style syntax
-      // @todo at time of writing only 'IN' & 'NOT IN' are  supported for the array style syntax
-      $sqlFilter = CRM_Core_DAO::createSqlFilter($newParam[0], $params[$newParam[0]], 'String', NULL, TRUE);
-      if ($sqlFilter) {
-        $newParam[1] = key($newParam[2]);
-        $newParam[2] = $sqlFilter;
-      }
-    }
-  }
 
   $skipPermissions = !empty($params['check_permissions']) ? 0 : 1;
 
