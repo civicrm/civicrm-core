@@ -115,7 +115,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $params = array('id' => $this->_id);
       CRM_Pledge_BAO_Pledge::getValues($params, $this->_values);
 
-      $this->_isPending = (CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values))) ? FALSE : T;
+      $this->_isPending = (CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values))) ? FALSE : TRUE;
     }
 
     //get the pledge frequency units.
