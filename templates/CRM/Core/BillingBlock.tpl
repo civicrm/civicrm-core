@@ -34,8 +34,11 @@
       {/crmRegion}
       <div class="crm-section billing_mode-section {$paymentTypeName}_info-section">
         {foreach from=$paymentFields item=paymentField}
+          {assign var='name' value=$form.$paymentField.name}
           <div class="crm-section {$form.$paymentField.name}-section">
-            <div class="label">{$form.$paymentField.label}</div>
+            <div class="label">{$form.$paymentField.label}
+              {if $requiredPaymentFields.$name}<span class="crm-marker" title="{ts}This field is required.{/ts}">*</span>{/if}
+            </div>
             <div class="content">{$form.$paymentField.html}
               {if $paymentField == 'cvv2'}{* @todo move to form assignment*}
                 <span class="cvv2-icon" title="{ts}Usually the last 3-4 digits in the signature area on the back of the card.{/ts}"> </span>
@@ -58,8 +61,11 @@
       <legend>{ts}Billing Name and Address{/ts}</legend>
       <div class="crm-section billing_name_address-section">
         {foreach from=$billingDetailsFields item=billingField}
+          {assign var='name' value=$form.$billingField.name}
           <div class="crm-section {$form.$billingField.name}-section">
-            <div class="label">{$form.$billingField.label}</div>
+            <div class="label">{$form.$billingField.label}
+              {if $requiredPaymentFields.$name}<span class="crm-marker" title="{ts}This field is required.{/ts}">*</span>{/if}
+            </div>
             {if $form.$billingField.type == 'text'}
               <div class="content">{$form.$billingField.html}</div>
             {else}

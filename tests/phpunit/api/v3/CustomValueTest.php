@@ -32,21 +32,50 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_CustomValueTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  protected $individual;
-  protected $params;
   protected $ids;
+  protected $optionGroup;
 
   public $DBResetRequired = FALSE;
 
   public function setUp() {
     parent::setUp();
-    $this->individual = $this->individualCreate();
-    $this->params = array(
-      'entity_id' => $this->individual,
+
+    $this->_populateOptionAndCustomGroup();
+  }
+
+  public function _populateOptionAndCustomGroup() {
+    $dataValues = array(
+      'integer' => array(1, 2, 3),
+      'number' => array(10.11, 20.22, 30.33),
+      'string' => array(substr(sha1(rand()), 0, 4), substr(sha1(rand()), 0, 3), substr(sha1(rand()), 0, 2)),
+      'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
+      'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
+      'date' => NULL,
+      'contact' => NULL,
     );
-    $this->ids['single'] = $this->entityCustomGroupWithSingleFieldCreate('mySingleField', 'Contacts');
-    $this->ids['multi'] = $this->CustomGroupMultipleCreateWithFields();
-    $this->ids['multi2'] = $this->CustomGroupMultipleCreateWithFields(array('title' => 'group2'));
+
+    foreach ($dataValues as $dataType => $values) {
+      $this->optionGroup[$dataType] = array('values' => $values);
+      if (!empty($values)) {
+        $result = $this->callAPISuccess('OptionGroup', 'create',
+          array(
+            'name' => "{$dataType}_group",
+            'api.option_value.create' => array('label' => "$dataType 1", 'value' => $values[0]),
+            'api.option_value.create.1' => array('label' => "$dataType 2", 'value' => $values[1]),
+            'api.option_value.create.2' => array('label' => "$dataType 3", 'value' => $values[2]),
+          )
+        );
+        $this->optionGroup[$dataType]['id'] = $result['id'];
+      }
+      elseif ($dataType == 'contact') {
+        for ($i = 0; $i < 3; $i++) {
+          $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com'));
+          $this->optionGroup[$dataType]['values'][$i] = $result['id'];
+        }
+      }
+      $this->ids[$dataType] = $this->entityCustomGroupWithSingleFieldCreate("$dataType Custom Group", 'Contacts');
+    }
+
   }
 
   public function tearDown() {
@@ -62,116 +91,209 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   }
 
   public function testCreateCustomValue() {
-    $params = array(
-      'custom_' . $this->ids['single']['custom_field_id'] => 'customString',
-    ) + $this->params;
+    $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
+    $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
+    $count = 0;
 
-    $result = $this->callAPIAndDocument('custom_value', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count']);
-    $result = $this->callAPISuccess('custom_value', 'get', $params);
+    foreach ($customFieldDataType as $dataType => $label) {
+      switch ($dataType) {
+        case 'Date':
+        case 'StateProvince';
+        case 'String':
+        case 'Link':
+        case 'Int':
+        case 'Float':
+        case 'Money':
+          if (in_array($dataType, array('String', 'Link'))) {
+            $validSQLOperator = array('=', '!=', 'IN', 'NOT IN', 'LIKE', 'NOT LIKE', 'IS NOT NULL', 'IS NULL');
+            $type = 'string';
+          }
+          else {
+            if ($dataType == 'Country') {
+              $type == 'country';
+            }
+            elseif ($dataType == 'StateProvince') {
+              $type = 'state_province';
+            }
+            elseif ($dataType == 'ContactReference') {
+              $type = 'contact';
+            }
+            elseif ($dataType == 'Date') {
+              $type = 'date';
+            }
+            else {
+              $type = $dataType == 'Int' ? 'integer' : 'number';
+            }
+            $validSQLOperator = array('=', '!=', 'IN', 'NOT IN', '<=', '>=', '>', '<', 'IS NOT NULL', 'IS NULL');
+          }
+
+          foreach ($dataToHtmlTypes[$count] as $html) {
+            $params = array(
+              'custom_group_id' => $this->ids[$type]['custom_group_id'],
+              'label' => "$dataType - $html",
+              'data_type' => $dataType,
+              'html_type' => $html,
+              'default_value' => NULL,
+            );
+            if (!in_array($html, array('Text', 'TextArea')) && !in_array($dataType, array('Link', 'Date', 'ContactReference'))) {
+              $params += array('option_group_id' => $this->optionGroup[$type]['id']);
+            }
+            $customField = $this->customFieldCreate($params);
+            $this->_testCustomValue($customField['values'][$customField['id']], $validSQLOperator, $type);
+          }
+          $count++;
+          break;
+
+        default:
+          //TODO: Test case of Country fields remain as it throws foreign key contraint ONLY in test environment
+          $count++;
+          break;
+      }
+    }
   }
 
-  public function testGetMultipleCustomValues() {
-
-    $description = "This demonstrates the use of CustomValue get to fetch single and multi-valued custom data.";
-
+  public function _testCustomValue($customField, $sqlOps, $type) {
+    $isSerialized = CRM_Core_BAO_CustomField::isSerialized($customField);
+    $customId = $customField['id'];
     $params = array(
-      'first_name' => 'abc3',
-      'last_name' => 'xyz3',
       'contact_type' => 'Individual',
-      'email' => 'man3@yahoo.com',
-      'custom_' . $this->ids['single']['custom_field_id'] => "value 1",
-      'custom_' . $this->ids['multi']['custom_field_id'][0] => "value 2",
-      'custom_' . $this->ids['multi']['custom_field_id'][1] => "warm beer",
-      'custom_' . $this->ids['multi']['custom_field_id'][2] => "fl* w*",
-      'custom_' . $this->ids['multi2']['custom_field_id'][2] => "vegemite",
+      'email' => substr(sha1(rand()), 0, 7) . 'man1@yahoo.com',
     );
-
     $result = $this->callAPISuccess('Contact', 'create', $params);
-    $contact_id = $result['id'];
-    $firstCustomField = $this->ids['multi']['custom_field_id'][0];
-    $secondCustomField = $this->ids['multi2']['custom_field_id'][0];
-    $thirdCustomField = $this->ids['multi2']['custom_field_id'][1];
-    $createParams = array(
-      'contact_type' => 'Individual',
-      'id' => $contact_id,
-      'custom_' . $firstCustomField => "value 3",
-      'custom_' . $secondCustomField => "coffee",
-      'custom_' . $thirdCustomField => "value 4",
-    );
-    $result = $this->callAPISuccess('Contact', 'create', $createParams);
+    $contactId = $result['id'];
 
-    $params = array(
-      'id' => $result['id'],
-      'entity_id' => $result['id'],
-    );
+    $count = rand(1, 2);
+    $seperator = CRM_Core_DAO::VALUE_SEPARATOR;
+    if ($isSerialized) {
+      $selectedValue = $this->optionGroup[$type]['values'];
+      $notselectedValue = $selectedValue[$count];
+      unset($selectedValue[$count]);
+    }
+    elseif ($customField['html_type'] == 'Link') {
+      $selectedValue = "http://" . substr(sha1(rand()), 0, 7) . ".com";
+      $notselectedValue = "http://" . substr(sha1(rand()), 0, 7) . ".com";
+    }
+    elseif ($type == 'date') {
+      $selectedValue = date('Ymd');
+      $notselectedValue = $lesserSelectedValue = date('Ymd', strtotime('yesterday'));
+      $greaterSelectedValue = date('Ymd', strtotime('+ 1 day'));
+    }
+    elseif ($type == 'contact') {
+      $selectedValue = $this->optionGroup[$type]['values'][1];
+      $notselectedValue = $this->optionGroup[$type]['values'][0];
+    }
+    else {
+      $selectedValue = $this->optionGroup[$type]['values'][0];
+      $notselectedValue = $this->optionGroup[$type]['values'][$count];
+      if (in_array(">", $sqlOps)) {
+        $greaterSelectedValue = $selectedValue + 1;
+        $lesserSelectedValue = $selectedValue - 1;
+      }
+    }
 
-    $result = $this->callAPIAndDocument('CustomValue', 'Get', $params, __FUNCTION__, __FILE__, $description);
-    $params['format.field_names'] = 1;
-    $resultformatted = $this->callAPIAndDocument('CustomValue', 'Get', $params, __FUNCTION__, __FILE__, "utilises field names", 'FormatFieldName');
-    // delete the contact
-    $this->callAPISuccess('contact', 'delete', array('id' => $contact_id));
-    $this->assertEquals('coffee', $result['values'][$secondCustomField]['2']);
-    $this->assertEquals('coffee', $result['values'][$secondCustomField]['latest']);
-    $this->assertEquals($secondCustomField, $result['values'][$secondCustomField]['id']);
-    $this->assertEquals('defaultValue', $result['values'][$secondCustomField]['1']);
-    $this->assertEquals($contact_id, $result['values'][$secondCustomField]['entity_id']);
-    $this->assertEquals('value 1', $result['values'][$this->ids['single']['custom_field_id']]['0']);
-    $this->assertEquals('value 1', $result['values'][$this->ids['single']['custom_field_id']]['latest']);
-    $this->assertEquals('value 1', $resultformatted['values']['mySingleField']['latest']);
-    $this->assertEquals('', $result['values'][$thirdCustomField]['1']);
-    $this->assertEquals('value 4', $result['values'][$thirdCustomField]['2']);
-  }
+    $params = array('entity_id' => $contactId, 'custom_' . $customId => $selectedValue);
+    $this->callAPISuccess('CustomValue', 'create', $params);
 
-  public function testMultipleCustomValues() {
-    $params = array(
-      'first_name' => 'abc3',
-      'last_name' => 'xyz3',
-      'contact_type' => 'Individual',
-      'email' => 'man3@yahoo.com',
-      'custom_' . $this->ids['single']['custom_field_id'] => "value 1",
-      'custom_' . $this->ids['multi']['custom_field_id'][0] . '-1' => "multi value 1",
-      'custom_' . $this->ids['multi']['custom_field_id'][0] . '-2' => "multi value 2",
-      'custom_' . $this->ids['multi']['custom_field_id'][1] => "second multi value 1",
-    );
+    foreach ($sqlOps as $op) {
+      $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+      $description = "\nFind Contact where '$customField[label]' $qillOp ";
+      switch ($op) {
+        case '=':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => (is_array($selectedValue) ? implode(CRM_Core_DAO::VALUE_SEPARATOR, $selectedValue) : $selectedValue)));
+          $this->assertEquals($contactId, $result['id']);
+          echo $description . implode("[separator]", (array) $selectedValue);
+          break;
 
-    $result = $this->callAPISuccess('Contact', 'create', $params);
-    $contact_id = $result['id'];
-    $firstCustomField = $this->ids['multi']['custom_field_id'][1];
-    $secondCustomField = $this->ids['single']['custom_field_id'];
-    $thirdCustomField = $this->ids['multi']['custom_field_id'][0];
+        case '!=':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)));
+          $this->assertEquals(TRUE, array_key_exists($contactId, $result['values']));
+          echo $description . $notselectedValue;
+          break;
 
-    $createParams = array(
-      'contact_type' => 'Individual',
-      'id' => $contact_id,
-      'custom_' . $firstCustomField . '-1' => "second multi value 2",
-      'custom_' . $firstCustomField . '-2' => "second multi value 3",
-    );
-    $result = $this->callAPISuccess('Contact', 'create', $createParams);
+        case '>':
+        case '<':
+        case '>=':
+        case '<=':
+          if ($isSerialized) {
+            continue;
+          }
+          // To be precise in for these operator we can't just rely on one contact,
+          // hence creating multiple contact with custom value less/more then $selectedValue respectively
+          $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man2@yahoo.com'));
+          $contactId2 = $result['id'];
+          $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId2, 'custom_' . $customId => $lesserSelectedValue));
 
-    $params = array(
-      'id' => $result['id'],
-      'entity_id' => $result['id'],
-    );
+          if ($op == '>') {
+            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $lesserSelectedValue)));
+            $this->assertEquals($contactId, $result['id']);
+            echo $description . $lesserSelectedValue;
+          }
+          elseif ($op == '<') {
+            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)));
+            $this->assertEquals($contactId2, $result['id']);
+            echo $description . $selectedValue;
+          }
+          else {
+            $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man3@yahoo.com'));
+            $contactId3 = $result['id'];
+            $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId3, 'custom_' . $customId => $greaterSelectedValue));
 
-    $result = $this->callAPISuccess('CustomValue', 'Get', $params);
-    // delete the contact
-    $this->callAPISuccess('contact', 'delete', array('id' => $contact_id));
+            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)));
+            echo $description . $selectedValue;
 
-    $this->assertEquals($contact_id, $result['values'][$secondCustomField]['entity_id']);
-    $this->assertEquals('value 1', $result['values'][$secondCustomField]['latest']);
-    $this->assertEquals('value 1', $result['values'][$secondCustomField][0]);
+            $this->assertEquals($contactId, $result['values'][$contactId]['id']);
+            if ($op == '>=') {
+              $this->assertEquals($contactId3, $result['values'][$contactId3]['id']);
+            }
+            else {
+              $this->assertEquals($contactId2, $result['values'][$contactId2]['id']);
+            }
+            $this->callAPISuccess('contact', 'delete', array('id' => $contactId3));
+          }
 
-    $this->assertEquals($contact_id, $result['values'][$thirdCustomField]['entity_id']);
-    $this->assertEquals('multi value 1', $result['values'][$thirdCustomField][1]);
-    $this->assertEquals('multi value 2', $result['values'][$thirdCustomField][2]);
+          $this->callAPISuccess('contact', 'delete', array('id' => $contactId2));
+          break;
 
-    $this->assertEquals($contact_id, $result['values'][$firstCustomField]['entity_id']);
-    $this->assertEquals('second multi value 1', $result['values'][$firstCustomField][1]);
-    $this->assertEquals('', $result['values'][$firstCustomField][2]);
-    $this->assertEquals('second multi value 2', $result['values'][$firstCustomField][3]);
-    $this->assertEquals('second multi value 3', $result['values'][$firstCustomField][4]);
-    $this->assertEquals('second multi value 3', $result['values'][$firstCustomField]['latest']);
+        case 'IN':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => (array) $selectedValue)));
+          $this->assertEquals($contactId, $result['id']);
+          echo $description . implode(",", (array) $selectedValue);
+          break;
+
+        case 'NOT IN':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => (array) $notselectedValue)));
+          $this->assertEquals($contactId, $result['id']);
+          echo $description . implode(",", (array) $notselectedValue);
+          break;
+
+        case 'LIKE':
+          $selectedValue = is_array($selectedValue) ? $selectedValue[0] : $selectedValue;
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => "%$selectedValue%")));
+          $this->assertEquals($contactId, $result['id']);
+          echo $description . "%$selectedValue%";
+          break;
+
+        case 'NOT LIKE':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)));
+          $this->assertEquals($contactId, $result['id']);
+          echo $description . "'$notselectedValue'";
+          break;
+
+        case 'IS NULL':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => 1)));
+          $this->assertEquals(FALSE, array_key_exists($contactId, $result['values']));
+          echo $description;
+          break;
+
+        case 'IS NOT NULL':
+          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => 1)));
+          $this->assertEquals($contactId, $result['id']);
+          echo $description;
+          break;
+      }
+    }
+
+    $this->callAPISuccess('Contact', 'delete', array('id' => $contactId));
   }
 
   /**
