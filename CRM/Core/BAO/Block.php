@@ -254,9 +254,9 @@ class CRM_Core_BAO_Block {
       // lets try to add using the previous method to avoid any false creation of existing data.
       foreach ($blockIds as $blockId => $blockValue) {
         if (empty($value['id']) && $blockValue['locationTypeId'] == CRM_Utils_Array::value('location_type_id', $value)) {
-            //assigned id as first come first serve basis
-            $value['id'] = $blockValue['id'];
-            break;
+          //assigned id as first come first serve basis
+          $value['id'] = $blockValue['id'];
+          break;
         }
       }
       $dataExists = self::dataExists(self::$requiredBlockFields[$blockName], $value);
