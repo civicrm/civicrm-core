@@ -492,8 +492,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
 
     // create temp table to store main result
-    //$tempQuery = "CREATE TEMPORARY TABLE {$this->_tempTableName} ( " . implode(',', $dbColumns) . ')';
-    $tempQuery = "CREATE TABLE {$this->_tempTableName} (
+    $tempQuery = "CREATE TEMPORARY TABLE {$this->_tempTableName} (
       id int unsigned NOT NULL AUTO_INCREMENT, " . implode(', ', $dbColumns) . ' , PRIMARY KEY (id))';
     CRM_Core_DAO::executeQuery($tempQuery);
 
@@ -515,9 +514,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
 
     // create temp table to store duration
-    //$tempQuery = "CREATE TEMPORARY TABLE {$this->_tempTableName} ( " . implode(',', $dbColumns) . ')';
     $this->_tempDurationSumTableName = CRM_Core_DAO::createTempTableName('civicrm_activity');
-    $tempQuery = "CREATE TABLE {$this->_tempDurationSumTableName} (
+    $tempQuery = "CREATE TEMPORARY TABLE {$this->_tempDurationSumTableName} (
       id int unsigned NOT NULL AUTO_INCREMENT, civicrm_activity_duration_total VARCHAR(128), PRIMARY KEY (id))";
     CRM_Core_DAO::executeQuery($tempQuery);
 
