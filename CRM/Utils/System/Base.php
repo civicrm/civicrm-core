@@ -548,6 +548,10 @@ abstract class CRM_Utils_System_Base {
   public function getTimeZoneOffset() {
     $timezone = $this->getTimeZoneString();
     if ($timezone) {
+      if ($timezone == 'UTC') {
+        // CRM-17072 Let's short-circuit all the zero handling & return it here!
+        return '+00:00';
+      }
       $tzObj = new DateTimeZone($timezone);
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
