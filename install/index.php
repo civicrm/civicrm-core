@@ -1096,7 +1096,8 @@ class InstallRequirements {
       return;
     }
     else {
-      if (@mysql_query("CREATE DATABASE $database")) {
+      $query = sprintf("CREATE DATABASE %s", mysql_real_escape_string($database));
+      if (@mysql_query($query)) {
         $okay = ts("Able to create a new database.");
       }
       else {
@@ -1228,8 +1229,8 @@ class Installer extends InstallRequirements {
       // skip if database already present
       return;
     }
-
-    if (@mysql_query("CREATE DATABASE $database")) {
+    $query = sprintf("CREATE DATABASE %s", mysql_real_escape_string($database));
+    if (@mysql_query($query)) {
     }
     else {
       $errorTitle = ts("Oops! Could not create database %1", array(1 => $database));
