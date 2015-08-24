@@ -317,9 +317,12 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
         $relative = CRM_Utils_Array::value("contribution_processed_date_relative", $this->_params);
         $from = CRM_Utils_Array::value("contribution_processed_date_from", $this->_params);
         $to = CRM_Utils_Array::value("contribution_processed_date_to", $this->_params);
-        $this->_where .= " AND contribution_civireport.id IN (SELECT MAX(cc.id) FROM civicrm_contribution cc WHERE cc.contribution_status_id = 1 AND (" .
-        $this->dateClause("DATE(cc.receive_date)",
-            $relative, $from, $to, CRM_Utils_Type::T_DATE, NULL, NULL) . " ) GROUP BY cc.contribution_recur_id)";
+        $this->_where .= " AND contribution_civireport.id IN (SELECT MAX(cc.id)
+          FROM civicrm_contribution cc
+          LEFT JOIN civicrm_contribution_recur ccr ON cc.contribution_recur_id = ccr.id
+          WHERE ccr.contribution_status_id = 1 AND (" .
+          $this->dateClause("DATE(ccr.modified_date)",
+          $relative, $from, $to, CRM_Utils_Type::T_DATE, NULL, NULL) . " ) GROUP BY cc.contribution_recur_id)";
         $isBreak = TRUE;
       }
       if (!empty($isBreak)) {
