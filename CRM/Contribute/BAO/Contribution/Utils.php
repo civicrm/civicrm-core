@@ -125,7 +125,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $contributionParams,
         $financialType,
         TRUE,
-        TRUE,
         $form->_bltID
       );
 
