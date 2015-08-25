@@ -183,13 +183,6 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-    <path>civicrm/mailing/schedule</path>
-    <title>Schedule Mailing</title>
-    <page_callback>CRM_Mailing_Form_Schedule</page_callback>
-    <access_arguments>access CiviMail;schedule mailings</access_arguments>
-    <weight>700</weight>
-  </item>
-  <item>
     <path>civicrm/mailing/view</path>
     <title>View Mailing</title>
     <page_callback>CRM_Mailing_Page_View</page_callback>
