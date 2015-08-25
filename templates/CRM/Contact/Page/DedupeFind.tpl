@@ -218,6 +218,11 @@
       }
     });
     $(function($) {
+      $('.button').click(function() {
+        // no unsaved changes confirmation dialogs
+        $('[data-warn-changes=true]').attr('data-warn-changes', 'false');
+      });
+
       var sourceUrl = {/literal}'{$sourceUrl}'{literal};
       var context   = {/literal}'{$context}'{literal};
 
