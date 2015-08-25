@@ -1785,8 +1785,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isMonetary = !empty($form->_values['is_monetary']);
     if ($isMonetary) {
       if (empty($paymentParams['is_pay_later'])) {
-        // @todo look up payment_instrument_id on payment processor table.
-        $contributionParams['payment_instrument_id'] = 1;
+        $contributionParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
       }
     }
     $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
