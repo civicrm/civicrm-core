@@ -876,7 +876,7 @@ function civicrm_api3_contact_getquick($params) {
 
   $orderByInner = $orderByOuter = "ORDER BY exactFirst";
   if ($config->includeOrderByClause) {
-    $orderByInner = "ORDER BY sort_name";
+    $orderByInner = "ORDER BY exactFirst, sort_name";
     $orderByOuter .= ", sort_name";
   }
 
