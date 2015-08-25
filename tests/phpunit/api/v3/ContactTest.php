@@ -441,7 +441,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertNotNull($customFldDate, 'in line ' . __LINE__);
     $this->assertEquals($dateTime, $customFldDate);
     $this->assertEquals(000000, $customFldTime);
-    $result = $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument('Contact', 'create', $params, __FUNCTION__, __FILE__);
   }
 
 
@@ -1641,9 +1641,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
-    $moreids = $this->CustomGroupMultipleCreateWithFields();
-    $description = "/*this demonstrates the usage of chained api functions. In this case no notes or custom fields have been created ";
-    $subfile = "APIChainedArray";
+    $moreIDs = $this->CustomGroupMultipleCreateWithFields();
     $params = array(
       'sequential' => 1,
       'first_name' => 'abc3',
@@ -1665,7 +1663,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // delete the contact and custom groups
     $this->callAPISuccess('contact', 'delete', array('id' => $result['id']));
     $this->customGroupDelete($ids['custom_group_id']);
-    $this->customGroupDelete($moreids['custom_group_id']);
+    $this->customGroupDelete($moreIDs['custom_group_id']);
 
     $this->assertEquals($result['id'], $result['values'][0]['id']);
     $this->assertArrayKeyExists('api.website.create', $result['values'][0]);
@@ -1996,10 +1994,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->createContactFromXML();
     $description = "This demonstrates use of the 'getCount' action.
       This param causes the count of the only function to be returned as an integer.";
-    $subfile = "GetCountContact";
     $params = array('id' => 17);
     $result = $this->callAPIAndDocument('Contact', 'GetCount', $params, __FUNCTION__, __FILE__, $description,
-      $subfile, 'getcount');
+      'GetCountContact');
     $this->assertEquals('1', $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
