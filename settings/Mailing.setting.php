@@ -314,6 +314,7 @@ return array(
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
+  ),
   'prevem_url' => array(
     'group_name' => 'Mailing Preferences',
     'group' => 'mailing',
