@@ -408,6 +408,14 @@ class InstallRequirements {
         );
       }
       $onlyRequire = ($dbName == 'Drupal') ? TRUE : FALSE;
+      $this->requireValidDBName(
+        $databaseConfig['database'],
+        array(     
+          ts("MySQL %1 Configuration", array(1 => $dbName)),
+          ts("Is the provided database name valid?"),
+          ts("The database name provided is not valid. Please use only 0-9, a-z, A-Z and _ as characters in the name."),
+        )
+      );
       $this->requireDatabaseOrCreatePermissions(
         $databaseConfig['server'],
         $databaseConfig['username'],
@@ -1271,6 +1279,25 @@ class InstallRequirements {
    */
   public function hasWarnings() {
     return count($this->warnings);
+  }
+
+  /**
+   * function to check valid db name
+   *
+   * @param $database
+   * @param $testDetails
+   */
+  public function requireValidDBName($database, $testDetails) {
+    $matches = array();
+    preg_match(
+      "/^[0-9]*[a-zA-Z_]+[a-zA-Z0-9_]*$/",
+      $database,
+      $matches
+    );
+    if (empty($matches)) {
+      $this->error($testDetails);
+      return;
+    }
   }
 
 }
