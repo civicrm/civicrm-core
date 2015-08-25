@@ -594,6 +594,11 @@ class CRM_Core_Permission {
       $permissions['administer Multiple Organizations'] = array($prefix . ts('administer Multiple Organizations'));
     }
 
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
     if (!$all) {
       $components = CRM_Core_Component::getEnabledComponents();
     }
@@ -664,7 +669,7 @@ class CRM_Core_Permission {
    *
    * @return array
    */
-  public static function getCorePermissions($descriptions = FALSE) {
+  public static function getCorePermissions() {
     $prefix = ts('CiviCRM') . ': ';
     $permissions = array(
       'add contacts' => array(
@@ -839,12 +844,6 @@ class CRM_Core_Permission {
         ts('Allow users to view/ download their own invoices'),
       ),
     );
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
 
     return $permissions;
   }
