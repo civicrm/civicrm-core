@@ -92,6 +92,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Setting',
       'Payment',
       'Logging',
+      'Prevem',
     );
     $this->toBeImplemented['create'] = array(
       'Cxn',
@@ -110,6 +111,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Order',
       'SavedSearch', //work fine in local
       'Logging',
+      'Prevem',
     );
     $this->toBeImplemented['delete'] = array(
       'Cxn',
@@ -124,6 +126,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'System',
       'Payment',
       'Order',
+      'Prevem',
     );
     $this->onlyIDNonZeroCount['get'] = array(
       'ActivityType',
