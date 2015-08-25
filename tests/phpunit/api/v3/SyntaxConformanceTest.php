@@ -92,6 +92,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ReportTemplate',
       'System',
       'Setting',
+      'Prevem',
     );
     $this->toBeImplemented['create'] = array(
       'Cxn',
@@ -107,6 +108,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ReportTemplate',
       'System',
       'User',
+      'Prevem',
     );
     $this->toBeImplemented['delete'] = array(
       'Cxn',
@@ -120,6 +122,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Extension',
       'LocationType',
       'System',
+      'Prevem',
     );
     $this->onlyIDNonZeroCount['get'] = array(
       'ActivityType',
