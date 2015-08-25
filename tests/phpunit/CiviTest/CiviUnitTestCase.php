@@ -1494,7 +1494,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create Payment Processor.
    *
    * @return CRM_Financial_DAO_PaymentProcessor
-   *   instance of Payment Processsor
+   *   instance of Payment Processor
    */
   public function processorCreate() {
     $processorParams = array(
@@ -1509,8 +1509,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
     );
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($processorParams);
-    return $paymentProcessor;
+    return CRM_Financial_BAO_PaymentProcessor::create($processorParams);
+  }
+
+  /**
+   * Create Payment Processor.
+   *
+   * @param array $processorParams
+   *
+   * @return \CRM_Core_Payment_Dummy instance of Dummy Payment Processor
+   * instance of Dummy Payment Processor
+   */
+  public function dummyProcessorCreate($processorParams = array()) {
+    $paymentProcessor = $this->processorCreate($processorParams);
+    return Civi\Payment\System::singleton()->getById($paymentProcessor->id);
   }
 
   /**
