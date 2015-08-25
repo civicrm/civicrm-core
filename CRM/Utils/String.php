@@ -104,6 +104,16 @@ class CRM_Utils_String {
    * @return string
    */
   public static function convertStringToCamel($string) {
+    $map = array(
+      'acl' => 'Acl',
+      'ACL' => 'Acl',
+      'im' => 'Im',
+      'IM' => 'Im',
+    );
+    if (isset($map[$string])) {
+      return $map[$string];
+    }
+
     $fragments = explode('_', $string);
     foreach ($fragments as & $fragment) {
       $fragment = ucfirst($fragment);
