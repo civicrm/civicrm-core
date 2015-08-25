@@ -2243,9 +2243,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that getquick returns contacts with an exact first name match first.
+   *
+   * Depending on the setting the sort name sort might click in next or not - test!
    */
   public function testGetQuickFirstName() {
     $this->getQuickSearchSampleData();
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
       'field_name' => 'first_name',
@@ -2263,6 +2266,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
+    $this->assertEquals('A Bobby, Bobby', $result['values'][1]['sort_name']);
   }
 
   /**
