@@ -2171,6 +2171,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testGetQuickEmail() {
     $this->getQuickSearchSampleData();
+    $userID = $this->createLoggedInUser();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'c',
     ));
@@ -2180,6 +2181,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'E Bobby, Bobby :: bob@bobby.com',
       'H Bobby, Bobby :: bob@h.com',
     );
+    $this->assertEquals(5, $result['count']);
     foreach ($expectedData as $index => $value) {
       $this->assertEquals($value, $result['values'][$index]['data']);
     }
@@ -2198,6 +2200,35 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ));
     $this->callAPISuccess('Setting', 'create', array('includeWildCardInName' => TRUE));
     $this->assertEquals(0, $result['count']);
+  }
+
+  /**
+   * Test that getquick returns contacts with an exact first name match first.
+   */
+  public function testGetQuickEmailACL() {
+    $this->getQuickSearchSampleData();
+    $userID = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'c',
+    ));
+    $this->assertEquals(0, $result['count']);
+
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereNoBobH'));
+    CRM_Contact_BAO_Contact_Permission::cache($userID, CRM_Core_Permission::VIEW, TRUE);
+    $result = $this->callAPISuccess('contact', 'getquick', array(
+      'name' => 'c',
+    ));
+    // Without the acl it would be 5 like the previous email getquick test.
+    $this->assertEquals(4, $result['count']);
+    $expectedData = array(
+      'Bob, Bob :: bob@bob.com',
+      'C Bobby, Bobby',
+      'E Bobby, Bobby :: bob@bobby.com',
+    );
+    foreach ($expectedData as $index => $value) {
+      $this->assertEquals($value, $result['values'][$index]['data']);
+    }
   }
 
   /**
@@ -2275,6 +2306,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testGetQuickFirstNameACLs() {
     $this->getQuickSearchSampleData();
     $userID = $this->createLoggedInUser();
+    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
     $result = $this->callAPISuccess('contact', 'getquick', array(
       'name' => 'Bob',
@@ -2293,10 +2325,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('K Bobby, Bob', $result['values'][1]['sort_name']);
     // Without the ACL 9 would be bob@h.com.
     $this->assertEquals('I Bobby, Bobby', $result['values'][9]['sort_name']);
-    $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
-    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
-    $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
-    $this->assertEquals('A Bobby, Bobby', $result['values'][1]['sort_name']);
   }
 
   /**
@@ -2310,7 +2338,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param string $where
    */
   public function aclWhereNoBobH($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " email <> 'bob@h.com' OR email IS NULL";
+    $where = " (email <> 'bob@h.com' OR email IS NULL) ";
     $whereTables['civicrm_email'] = "LEFT JOIN civicrm_email e ON contact_a.id = e.contact_id";
   }
 

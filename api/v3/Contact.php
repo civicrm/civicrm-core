@@ -906,7 +906,7 @@ function civicrm_api3_contact_getquick($params) {
           FROM   civicrm_contact cc {$from}
         {$aclFrom}
         {$additionalFrom} {$includeEmailFrom}
-        {$emailWhere} AND cc.is_deleted = 0
+        {$emailWhere} AND cc.is_deleted = 0 " . ($aclWhere ? " AND $aclWhere " : '') . "
         {$orderByInner}
       LIMIT 0, {$limit}
       )
