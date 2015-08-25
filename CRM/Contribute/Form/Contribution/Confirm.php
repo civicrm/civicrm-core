@@ -810,8 +810,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   - thankyou_date (not all forms will set this)
    *
    * @param CRM_Financial_DAO_FinancialType $financialType
-   * @param bool $pending
-   *   The intention is this should always be TRUE and we are refactoring towards any completion happening elsewhere.
    * @param bool $online
    *   Is the form a front end form? If so set a bunch of unpredictable things that should be passed in from the form.
    *
@@ -827,7 +825,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $result,
     $contributionParams,
     $financialType,
-    $pending,
     $online,
     $billingLocationID
   ) {
@@ -892,7 +889,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (isset($params['amount'])) {
       $contributionParams = array_merge(self::getContributionParams(
-        $params, $financialType->id, $nonDeductibleAmount, $pending,
+        $params, $financialType->id, $nonDeductibleAmount, TRUE,
         $result, $receiptDate,
         $recurringContributionID), $contributionParams
       );
@@ -1797,7 +1794,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $result,
       $contributionParams,
       $financialType,
-      $pending,
       TRUE,
       $form->_bltID
     );

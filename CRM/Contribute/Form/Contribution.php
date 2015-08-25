@@ -1222,7 +1222,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       NULL,
       $contributionParams,
       $financialType,
-      TRUE,
       FALSE,
       $this->_bltID
     );
