@@ -1258,6 +1258,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'trxn_id' => $result['trxn_id'],
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
+              'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
             ));
             // This has now been set to 1 in the DB - declare it here also
             $contribution->contribution_status_id = 1;
