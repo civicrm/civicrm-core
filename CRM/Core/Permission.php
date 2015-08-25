@@ -664,8 +664,7 @@ class CRM_Core_Permission {
   }
 
   /**
-   * @param bool $descriptions
-   *   whether to return descriptions
+   * Get core permissions.
    *
    * @return array
    */
