@@ -1659,24 +1659,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
       $paymentActionResult = $payment->doPayment($form->_params, 'contribute');
-
-      if (CRM_Utils_Array::value('payment_status_id', $paymentActionResult) == 1) {
-        // Refer to CRM-16737. Payment processors 'should' return payment_status_id
-        // to denote the outcome of the transaction.
-        try {
-          civicrm_api3('contribution', 'completetransaction', array(
-            'id' => $paymentResult['contribution']->id,
-            'trxn_id' => CRM_Utils_Array::value('trxn_id', $paymentActionResult, $paymentResult['contribution']->trxn_id),
-            'is_transactional' => FALSE,
-            'payment_processor_id' => $form->_paymentProcessor['id'],
-          ));
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          if ($e->getErrorCode() != 'contribution_completed') {
-            throw new CRM_Core_Exception('Failed to update contribution in database');
-          }
-        }
-      }
+      $this->completeTransaction($paymentActionResult, $paymentResult['contribution']->id);
       // Do not send an email if Recurring transaction is done via Direct Mode
       // Email will we sent when the IPN is received.
       return;
@@ -1729,19 +1712,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $tempParams['amount'] = $minimumFee;
     $tempParams['invoiceID'] = md5(uniqid(rand(), TRUE));
 
-    $result = NULL;
-    if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
-      // At the moment our tests are calling this form in a way that leaves 'object' empty. For
-      // now we compensate here.
-      if (empty($form->_paymentProcessor['object'])) {
-        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-      }
-      else {
-        $payment = $form->_paymentProcessor['object'];
-      }
-      $result = $payment->doPayment($tempParams, 'contribute');
-    }
-
     //assign receive date when separate membership payment
     //and contribution amount not selected.
     if ($form->_amount == 0) {
@@ -1752,21 +1722,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->assign('receive_date', $receiveDate);
     }
 
-    $form->set('membership_trx_id', $result['trxn_id']);
     $form->set('membership_amount', $minimumFee);
-
-    $form->assign('membership_trx_id', $result['trxn_id']);
     $form->assign('membership_amount', $minimumFee);
 
     // we don't need to create the user twice, so lets disable cms_create_account
     // irrespective of the value, CRM-2888
     $tempParams['cms_create_account'] = 0;
-
-    //CRM-16165, scenarios are
-    // 1) If contribution is_pay_later and if contribution amount is > 0.0 we set pending = TRUE, vice-versa FALSE
-    // 2) If not pay later but auto-renewal membership is chosen then pending = TRUE as it later triggers
-    //   pending recurring contribution, vice-versa FALSE
-    $pending = $form->_params['is_pay_later'] ? (($minimumFee > 0.0) ? TRUE : FALSE) : (!empty($form->_params['auto_renew']) ? TRUE : FALSE);
 
     //set this variable as we are not creating pledge for
     //separate membership payment contribution.
@@ -1790,12 +1751,28 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $membershipContribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution($form,
       $tempParams,
-      $result,
+      $tempParams,
       $contributionParams,
       $financialType,
       TRUE,
       $form->_bltID
     );
+
+    if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
+      // At the moment our tests are calling this form in a way that leaves 'object' empty. For
+      // now we compensate here.
+      if (empty($form->_paymentProcessor['object'])) {
+        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+      }
+      else {
+        $payment = $form->_paymentProcessor['object'];
+      }
+      $result = $payment->doPayment($tempParams, 'contribute');
+      $form->set('membership_trx_id', $result['trxn_id']);
+      $form->assign('membership_trx_id', $result['trxn_id']);
+      $this->completeTransaction($result, $membershipContribution->id);
+    }
+
     return $membershipContribution;
   }
 
@@ -2271,28 +2248,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         ($this->_mode == 'test') ? 1 : 0
       );
 
-      if (!empty($result['is_payment_failure'])) {
-        return $result;
+      if (empty($result['is_payment_failure'])) {
+        // @todo move premium processing to complete transaction if it truly is an 'after' action.
+        $this->postProcessPremium($premiumParams, $result['contribution']);
       }
-      // @todo move premium processing to complete transaction if it truly is an 'after' action.
-      $this->postProcessPremium($premiumParams, $result['contribution']);
-      if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
-        try {
-          civicrm_api3('contribution', 'completetransaction', array(
-              'id' => $result['contribution']->id,
-              'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-              'payment_processor_id' => $this->_paymentProcessor['id'],
-              'is_transactional' => FALSE,
-              'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-            )
-          );
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          if ($e->getErrorCode() != 'contribution_completed') {
-            throw new CRM_Core_Exception('Failed to update contribution in database');
-          }
-        }
-
+      if (!empty($result['contribution'])) {
+        // Not quite sure why it would be empty at this stage but tests show it can be ... at least in tests.
+        $this->completeTransaction($result, $result['contribution']->id);
       }
       return $result;
     }
@@ -2396,6 +2358,38 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $membershipParams['cms_contactID'],
           'email-' . $this->_bltID
         );
+      }
+    }
+  }
+
+  /**
+   * Complete transaction if payment has been processed.
+   *
+   * Check the result for a success outcome & if paid then complete the transaction.
+   *
+   * Completing will trigger update of related entities and emails.
+   *
+   * @param array $result
+   * @param int $contributionID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function completeTransaction($result, $contributionID) {
+    if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
+      try {
+        civicrm_api3('contribution', 'completetransaction', array(
+            'id' => $contributionID,
+            'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+            'payment_processor_id' => $this->_paymentProcessor['id'],
+            'is_transactional' => FALSE,
+            'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+          )
+        );
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        if ($e->getErrorCode() != 'contribution_completed') {
+          throw new CRM_Core_Exception('Failed to update contribution in database');
+        }
       }
     }
   }

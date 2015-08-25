@@ -278,6 +278,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow() {
     $this->setUpMembershipContributionPage(TRUE);
+    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
+    $processor->setDoDirectPaymentResult(array('fee_amount' => .72));
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
@@ -303,6 +305,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+    foreach ($contributions['values'] as $contribution) {
+      $this->assertEquals(.72, $contribution['fee_amount']);
+      $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
+    }
   }
 
   /**

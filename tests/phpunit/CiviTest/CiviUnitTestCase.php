@@ -1517,8 +1517,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param array $processorParams
    *
-   * @return \CRM_Core_Payment_Dummy instance of Dummy Payment Processor
-   * instance of Dummy Payment Processor
+   * @return \CRM_Core_Payment_Dummy
+   *    Instance of Dummy Payment Processor
    */
   public function dummyProcessorCreate($processorParams = array()) {
     $paymentProcessor = $this->processorCreate($processorParams);
