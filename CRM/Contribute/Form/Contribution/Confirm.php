@@ -2288,6 +2288,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
+              'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
             )
           );
         }
