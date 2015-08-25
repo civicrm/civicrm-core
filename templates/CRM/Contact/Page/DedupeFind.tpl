@@ -307,7 +307,7 @@
         var postUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
         var request = $.post(postUrl, {pnid : $el.data('pnid')});
         request.done(function(dt) {
-          var mapper = {2:4, 5:6, 7:8, 9:10}
+          var mapper = {1:3, 2:4, 5:6, 7:8, 9:10}
           var idx = table.row($elTr).index();
           $.each(mapper, function(key, val) {
             var v1  = table.cell(idx, key).data();
@@ -329,7 +329,7 @@
         if (ids.length > 0) {
           var dataUrl = {/literal}"{crmURL p='civicrm/ajax/flipDupePairs' h=0 q='snippet=4'}"{literal};
           CRM.$.post(dataUrl, {pnid: ids}, function (response) {
-            var mapper = {2:4, 5:6, 7:8, 9:10}
+            var mapper = {1:3, 2:4, 5:6, 7:8, 9:10}
             $('.crm-row-selected').each(function() {
               var idx = table.row(this).index();
               $.each(mapper, function(key, val) {
