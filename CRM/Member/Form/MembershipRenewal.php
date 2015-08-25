@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -462,9 +460,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
   /**
    * Process the renewal form.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // get the submitted form values.
@@ -510,7 +505,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->convertDateFieldsToMySQL($this->_params);
     $this->assign('receive_date', $this->_params['receive_date']);
-    $this->processBillingAddress($now);
+    $this->processBillingAddress();
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
     $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
       CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
@@ -744,65 +739,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'toEmail' => $this->_contributorEmail,
           'isTest' => $this->_mode == 'test',
         )
-      );
-    }
-  }
-
-  /**
-   * Wrapper function for unit tests.
-   *
-   * @param array $formValues
-   */
-  public function testSubmit($formValues) {
-    $this->_memType = $formValues['membership_type_id'][1];
-    $this->_params = $formValues;
-    $this->submit($formValues);
-  }
-
-  protected function assignBillingName() {
-    $name = '';
-    if (!empty($this->_params['billing_first_name'])) {
-      $name = $this->_params['billing_first_name'];
-    }
-
-    if (!empty($this->_params['billing_middle_name'])) {
-      $name .= " {$this->_params['billing_middle_name']}";
-    }
-
-    if (!empty($this->_params['billing_last_name'])) {
-      $name .= " {$this->_params['billing_last_name']}";
-    }
-    $this->assign('billingName', $name);
-  }
-
-  /**
-   * Add the billing address to the contact who paid.
-   */
-  protected function processBillingAddress() {
-    $fields = array();
-
-    // set email for primary location.
-    $fields['email-Primary'] = 1;
-    $this->_params['email-5'] = $this->_params['email-Primary'] = $this->_contributorEmail;
-
-    // also add location name to the array
-    $this->_params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
-
-    $this->_params["address_name-{$this->_bltID}"] = trim($this->_params["address_name-{$this->_bltID}"]);
-
-    $fields["address_name-{$this->_bltID}"] = 1;
-    $fields["email-{$this->_bltID}"] = 1;
-
-    list($hasBillingField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
-
-    $addressParams['preserveDBName'] = TRUE;
-    if ($hasBillingField) {
-      $addressParams = array_merge($this->_params, $addressParams);
-      //here we are setting up the billing contact - if different from the member they are already created
-      // but they will get billing details assigned
-      CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
-        $this->_contributorContactID, NULL, NULL,
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
       );
     }
   }

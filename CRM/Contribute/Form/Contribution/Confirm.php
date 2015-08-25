@@ -832,13 +832,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contactID = $contributionParams['contact_id'];
 
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
-    // How do these vary from params? These are currently passed to
-    // - custom data function....
-    $formParams = $form->_params;
-    $isSeparateMembershipPayment = empty($formParams['separate_membership_payment']) ? FALSE : TRUE;
-    $pledgeID = empty($formParams['pledge_id']) ? NULL : $formParams['pledge_id'];
+    $isSeparateMembershipPayment = empty($params['separate_membership_payment']) ? FALSE : TRUE;
+    $pledgeID = empty($params['pledge_id']) ? NULL : $params['pledge_id'];
     if (!$isSeparateMembershipPayment && !empty($form->_values['pledge_block_id']) &&
-      (!empty($formParams['is_pledge']) || $pledgeID)) {
+      (!empty($params['is_pledge']) || $pledgeID)) {
       $isPledge = TRUE;
     }
     else {
@@ -927,7 +924,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     //CRM-13981, processing honor contact into soft-credit contribution
-    CRM_Contact_Form_ProfileContact::postProcess($form);
+    CRM_Contact_Form_ProfileContact::postProcess($form, $params);
 
     // process soft credit / pcp pages
     CRM_Contribute_Form_Contribution_Confirm::processPcpSoft($params, $contribution);
@@ -937,7 +934,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if ($pledgeID) {
         //when user doing pledge payments.
         //update the schedule when payment(s) are made
-        foreach ($form->_params['pledge_amount'] as $paymentId => $dontCare) {
+        foreach ($params['pledge_amount'] as $paymentId => $dontCare) {
           $scheduledAmount = CRM_Core_DAO::getFieldValue(
             'CRM_Pledge_DAO_PledgePayment',
             $paymentId,
@@ -1010,7 +1007,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     if ($online && $contribution) {
-      CRM_Core_BAO_CustomValueTable::postProcess($form->_params,
+      CRM_Core_BAO_CustomValueTable::postProcess($params,
         'civicrm_contribution',
         $contribution->id,
         'Contribution'

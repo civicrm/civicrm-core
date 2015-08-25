@@ -108,9 +108,9 @@ class CRM_Contact_Form_ProfileContact {
 
   /**
    * @param $form
+   * @param array $params Parameters from the form.
    */
-  public static function postProcess($form) {
-    $params = $form->_params;
+  public static function postProcess($form, $params) {
     if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
       $honorId = NULL;
 
