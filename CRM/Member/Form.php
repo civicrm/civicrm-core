@@ -84,6 +84,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   public $_priceSet;
 
+  /**
+   * Values submitted to the form, processed along the way.
+   *
+   * @var array
+   */
+  protected $_params = array();
+
   public function preProcess() {
     // Check for edit permission.
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
@@ -427,6 +434,83 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     // process price set and get total amount and line items.
     $this->ensurePriceParamsAreSet($formValues);
     return $formValues;
+  }
+
+  /**
+   * Add the billing address to the contact who paid.
+   */
+  protected function processBillingAddress() {
+    $fields = array();
+
+    // set email for primary location.
+    $fields['email-Primary'] = 1;
+    $this->_params['email-5'] = $this->_params['email-Primary'] = $this->_contributorEmail;
+    // now set the values for the billing location.
+    foreach (array_keys($this->_fields) as $name) {
+      $fields[$name] = 1;
+    }
+
+    // also add location name to the array
+    $this->_params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
+    $this->_params["address_name-{$this->_bltID}"] = trim($this->_params["address_name-{$this->_bltID}"]);
+
+    $fields["address_name-{$this->_bltID}"] = 1;
+
+    //ensure we don't over-write the payer's email with the member's email
+    if ($this->_contributorContactID == $this->_contactID) {
+      $fields["email-{$this->_bltID}"] = 1;
+    }
+
+    list($hasBillingField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+    $nameFields = array('first_name', 'middle_name', 'last_name');
+
+    foreach ($nameFields as $name) {
+      $fields[$name] = 1;
+      if (array_key_exists("billing_$name", $this->_params)) {
+        $this->_params[$name] = $this->_params["billing_{$name}"];
+        $this->_params['preserveDBName'] = TRUE;
+      }
+    }
+
+    if ($hasBillingField) {
+      $addressParams = array_merge($this->_params, $addressParams);
+      //here we are setting up the billing contact - if different from the member they are already created
+      // but they will get billing details assigned
+      CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
+        $this->_contributorContactID, NULL, NULL,
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
+      );
+    }
+  }
+
+  /**
+   * Assign billing name to the template.
+   */
+  protected function assignBillingName() {
+    $name = '';
+    if (!empty($this->_params['billing_first_name'])) {
+      $name = $this->_params['billing_first_name'];
+    }
+
+    if (!empty($this->_params['billing_middle_name'])) {
+      $name .= " {$this->_params['billing_middle_name']}";
+    }
+
+    if (!empty($this->_params['billing_last_name'])) {
+      $name .= " {$this->_params['billing_last_name']}";
+    }
+    $this->assign('billingName', $name);
+  }
+
+  /**
+   * Wrapper function for unit tests.
+   *
+   * @param array $formValues
+   */
+  public function testSubmit($formValues) {
+    $this->_memType = $formValues['membership_type_id'][1];
+    $this->_params = $formValues;
+    $this->submit();
   }
 
 }
