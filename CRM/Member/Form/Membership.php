@@ -779,7 +779,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $errors['num_terms'] = ts('Please enter an integer for the number of terms.');
       }
 
-      if ($self->_mode || isset($params['record_contribution']) && empty($params['financial_type_id'])) {
+      if (($self->_mode || isset($params['record_contribution'])) && empty($params['financial_type_id'])) {
         $errors['financial_type_id'] = ts('Please enter the financial Type.');
       }
     }
