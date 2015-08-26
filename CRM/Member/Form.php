@@ -257,15 +257,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'return' => $mapping,
     ));
 
+    $returnParams = array('is_recur' => TRUE);
     foreach ($mapping as $recurringFieldName => $membershipTypeFieldName) {
       $contributionRecurParams[$recurringFieldName] = $membershipType[$membershipTypeFieldName];
+      $returnParams[$recurringFieldName] = $membershipType[$membershipTypeFieldName];
     }
 
     $contributionRecur = civicrm_api3('ContributionRecur', 'create', $contributionRecurParams);
-    $returnParams = array(
-      'contributionRecurID' => $contributionRecur['id'],
-      'is_recur' => TRUE,
-    );
+    $returnParams['contributionRecurID'] = $contributionRecur['id'];
     return $returnParams;
   }
 
