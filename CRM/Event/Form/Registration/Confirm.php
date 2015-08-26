@@ -582,6 +582,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (is_array($this->_paymentProcessor)) {
           $payment = $this->_paymentProcessor['object'];
         }
+        if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
+          $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
+          $value = array_merge($value, $preApprovalParams);
+        }
         $result = NULL;
 
         if (!empty($value['is_pay_later']) ||
