@@ -637,7 +637,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           $li['financial_type_id'] = $submittedFinancialType;
         }
       }
-      $this->_params['total_amount'] = CRM_Utils_Array::value('amount', $this->_params);
+
       if (!empty($lineItem)) {
         $this->_params['lineItems'] = $lineItem;
         $this->_params['processPriceSet'] = TRUE;
