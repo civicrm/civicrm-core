@@ -151,14 +151,22 @@ class CRM_Event_BAO_Query {
         $query->_element['participant_role_id'] = 1;
         $query->_tables['civicrm_participant'] = 1;
         $query->_whereTables['civicrm_participant'] = 1;
+        $query->_pseudoConstantsSelect['participant_role_id'] = array(
+          'pseudoField' => 'participant_role_id',
+          'idCol' => 'participant_role_id',
+        );
       }
 
       //add participant_role
       if (!empty($query->_returnProperties['participant_role'])) {
-        $query->_select['participant_status'] = "participant_role.label as participant_role";
+        $query->_select['participant_status'] = "civicrm_participant.role_id as participant_role";
         $query->_element['participant_role'] = 1;
         $query->_tables['participant_role'] = 1;
         $query->_whereTables['civicrm_participant'] = 1;
+        $query->_pseudoConstantsSelect['participant_role'] = array(
+          'pseudoField' => 'participant_role',
+          'idCol' => 'participant_role',
+        );
       }
 
       //add register date
@@ -372,15 +380,17 @@ class CRM_Event_BAO_Query {
               $op = key($value);
               $value = $value[$op];
             }
-            $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
-            $query->_where[$grouping][] = " civicrm_participant.$name $regexOp '[[:<:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:>:]]*' ";
+            if (!strstr($op, 'NULL') || !strstr($op, 'EMPTY')) {
+              $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
+              $query->_where[$grouping][] = " civicrm_participant.$name $regexOp '^" . implode('[[:cntrl:]]', (array) $value) . "$' ";
+            }
           }
         }
 
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
         $tableName = empty($tableName) ? 'civicrm_participant' : $tableName;
 
-        if ($name != 'role_id') {
+        if ($name != 'role_id' || empty($regexOp)) {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
         }
 
@@ -470,7 +480,7 @@ class CRM_Event_BAO_Query {
 
       case 'participant_role':
         $from = " $side JOIN civicrm_option_group option_group_participant_role ON (option_group_participant_role.name = 'participant_role')";
-        $from .= " $side JOIN civicrm_option_value participant_role ON (civicrm_participant.role_id = participant_role.value
+        $from .= " $side JOIN civicrm_option_value participant_role ON ((civicrm_participant.role_id = participant_role.value OR SUBSTRING_INDEX(role_id,'', 1) = participant_role.value)
                                AND option_group_participant_role.id = participant_role.option_group_id ) ";
         break;
 
@@ -515,6 +525,8 @@ class CRM_Event_BAO_Query {
         'event_type' => 1,
         'participant_id' => 1,
         'participant_status' => 1,
+        'participant_status_id' => 1,
+        'participant_role' => 1,
         'participant_role_id' => 1,
         'participant_note' => 1,
         'participant_register_date' => 1,
