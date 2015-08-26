@@ -412,6 +412,8 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    */
   public $wpBasePage = NULL;
 
+  public $verpSeparator = '.', $mailThrottleTime = 0, $mailerJobsMax = 0, $mailerJobSize = 0, $mailerBatchLimit = 0;
+
   /**
    * Provide addressSequence.
    *

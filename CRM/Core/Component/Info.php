@@ -44,12 +44,6 @@ abstract class CRM_Core_Component_Info {
 
   /**
    * Name of the class (minus component namespace path)
-   * of the component configuration class'es name.
-   */
-  const COMPONENT_CONFIG_CLASS = 'Config';
-
-  /**
-   * Name of the class (minus component namespace path)
    * of the component BAO Query class'es name.
    */
   const COMPONENT_BAO_QUERY_CLASS = 'BAO_Query';
@@ -119,7 +113,19 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Utils_Hook::angularModules
    */
   public function getAngularModules() {
-    return array();
+    $result = array();
+    $result['crmSetting'] = array(
+      'ext' => 'civicrm',
+      'js' => array(
+        'ang/crmSetting.js',
+        'ang/crmSetting/*.js',
+        'ang/crmSetting/*/*.js',
+      ),
+      'css' => array('ang/crmSetting.css'),
+      'partials' => array('ang/crmSetting'),
+    );
+
+    return $result;
   }
 
   /**
@@ -238,16 +244,6 @@ abstract class CRM_Core_Component_Info {
       return TRUE;
     }
     return FALSE;
-  }
-
-  /**
-   * Provides component's configuration object.
-   *
-   * @return mixed
-   *   component's configuration object
-   */
-  public function getConfigObject() {
-    return $this->_instantiate(self::COMPONENT_CONFIG_CLASS);
   }
 
   /**

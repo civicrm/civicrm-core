@@ -92,6 +92,14 @@ class Manager {
       //  'js' => array('ang/crmExample.js'),
       //  'partials' => array('ang/crmExample'),
       //);
+      $angularModules['crmField'] = array(
+        'ext' => 'civicrm',
+        'js' => array(
+          'ang/crmField.js',
+          'ang/crmField/*.js',
+        ),
+        'partials' => array('ang/crmField'),
+      );
       $angularModules['crmResource'] = array(
         'ext' => 'civicrm',
         // 'js' => array('js/angular-crmResource/byModule.js'), // One HTTP request per module.
