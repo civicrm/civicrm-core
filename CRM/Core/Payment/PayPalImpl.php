@@ -25,6 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  *
  * @package CRM
@@ -88,7 +90,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @return bool
    */
   protected function supportsPreApproval() {
-    if ($this->_processorName == ts('PayPal Express')) {
+    if ($this->_processorName == ts('PayPal Express') || $this->_processorName == ts('PayPal Pro')) {
       return TRUE;
     }
     return FALSE;
@@ -226,7 +228,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @return array
    */
   public function getPreApprovalDetails($storedDetails) {
-    return $this->getExpressCheckoutDetails($storedDetails['token']);
+    return empty($storedDetails['token']) ? array() : $this->getExpressCheckoutDetails($storedDetails['token']);
   }
 
   /**
@@ -427,7 +429,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
-    if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal_Express') {
+    if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal_Express'
+    && (!empty($params['credit_card_number']) && empty($params['token']))
+    ) {
       return parent::doPayment($params, $component);
     }
     $this->_component = $component;
@@ -741,6 +745,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   - redirect_url (if set the browser will be redirected to this.
    */
   public function doPreApproval(&$params) {
+    if (!isset($params['button']) || !stristr($params['button'], 'express')) {
+      return array();
+    }
     $this->_component = $params['component'];
     $token = $this->setExpressCheckOut($params);
     return array(
