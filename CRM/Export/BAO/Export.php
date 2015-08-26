@@ -330,10 +330,6 @@ class CRM_Export_BAO_Export {
         }
       }
       $returnProperties[self::defaultReturnProperty($exportMode)] = 1;
-      if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT && !empty($returnProperties['participant_role'])) {
-        unset($returnProperties['participant_role']);
-        $returnProperties['participant_role_id'] = 1;
-      }
     }
     else {
       $primary = TRUE;
@@ -872,15 +868,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             }
             elseif ($field == 'provider_id' || $field == 'im_provider') {
               $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
-            }
-            elseif ($field == 'participant_role_id') {
-              $participantRoles = CRM_Event_PseudoConstant::participantRole();
-              $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-              $viewRoles = array();
-              foreach (explode($sep, $iterationDAO->$field) as $k => $v) {
-                $viewRoles[] = $participantRoles[$v];
-              }
-              $fieldValue = implode(',', $viewRoles);
             }
             elseif ($field == 'master_id') {
               $masterAddressId = NULL;
