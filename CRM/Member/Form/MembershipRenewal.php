@@ -232,19 +232,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('member_is_test', CRM_Utils_Array::value('member_is_test', $defaults));
 
     if ($this->_mode) {
-      // set default country from config if no country set
-      $config = CRM_Core_Config::singleton();
-      if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
-        $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
-      }
-
-      if (empty($defaults["billing_state_province_id-{$this->_bltID}"])) {
-        $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
-      }
-
-      $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
-      $defaults = array_merge($defaults, $billingDefaults);
-
+      $defaults = $this->getBillingDefaults($defaults);
     }
     return $defaults;
   }
@@ -741,6 +729,26 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         )
       );
     }
+  }
+
+  /**
+   * @param $defaults
+   *
+   * @return array
+   */
+  protected function getBillingDefaults($defaults) {
+    // set default country from config if no country set
+    $config = CRM_Core_Config::singleton();
+    if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
+      $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
+    }
+
+    if (empty($defaults["billing_state_province_id-{$this->_bltID}"])) {
+      $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
+    }
+
+    $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactID);
+    return array_merge($defaults, $billingDefaults);
   }
 
 }
