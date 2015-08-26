@@ -1256,14 +1256,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       }
       else {
         if ($membershipTypes === TRUE) {
-          $membershipTypes = array(array('id' => 2));
+          $membershipTypes = array(array('id' => 2, 'name' => 'Student', 'default' => 1));
         }
 
         // FIXME: handle Introductory Message - New Memberships/Renewals
         foreach ($membershipTypes as $mType) {
           $this->click("membership_type_{$mType['id']}");
           if (array_key_exists('default', $mType)) {
-            // FIXME:
+            $this->click("xpath=//label[text() = '$mType[name]']/parent::td/parent::tr/td[2]/input");
           }
           if (array_key_exists('auto_renew', $mType)) {
             $this->select("auto_renew_{$mType['id']}", "label=Give option");
@@ -1272,15 +1272,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         if ($membershipsRequired) {
           $this->click('is_required');
         }
-        $this->waitForElementPresent('CIVICRM_QFID_2_4');
-        $this->click('CIVICRM_QFID_2_4');
         if ($isSeparatePayment) {
           $this->click('is_separate_payment');
         }
       }
       $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
       $text = "'MembershipBlock' information has been saved.";
-      $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+      $this->isTextPresent($text);
     }
 
     // go to step 4 (thank-you and receipting)
@@ -2269,16 +2267,18 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * @param bool $multiple
    * @param bool $xpath
    */
-  public function select2($fieldName, $label, $multiple = FALSE, $xpath = FALSE) {
+  public function select2($fieldName, $labels, $multiple = FALSE, $xpath = FALSE) {
     // In the case of chainSelect, wait for options to load
     $this->waitForElementNotPresent('css=select.loading');
     if ($multiple) {
-      $this->clickAt("//*[@id='$fieldName']/../div/ul/li");
-      $this->keyDown("//*[@id='$fieldName']/../div/ul/li//input", " ");
-      $this->type("//*[@id='$fieldName']/../div/ul/li//input", $label);
-      $this->typeKeys("//*[@id='$fieldName']/../div/ul/li//input", $label);
-      $this->waitForElementPresent("//*[@class='select2-result-label']");
-      $this->clickAt("//*[contains(@class,'select2-result-selectable')]/div[contains(@class, 'select2-result-label')]");
+      foreach((array)$labels as $label) {
+        $this->clickAt("//*[@id='$fieldName']/../div/ul/li");
+        $this->keyDown("//*[@id='$fieldName']/../div/ul/li//input", " ");
+        $this->type("//*[@id='$fieldName']/../div/ul/li//input", $label);
+        $this->typeKeys("//*[@id='$fieldName']/../div/ul/li//input", $label);
+        $this->waitForElementPresent("//*[@class='select2-result-label']");
+        $this->clickAt("//*[contains(@class,'select2-result-selectable')]/div[contains(@class, 'select2-result-label')]");
+      }
     }
     else {
       if ($xpath) {
@@ -2289,8 +2289,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       }
       $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
       $this->keyDown("//*[@id='select2-drop']/div/input", " ");
-      $this->type("//*[@id='select2-drop']/div/input", $label);
-      $this->typeKeys("//*[@id='select2-drop']/div/input", $label);
+      $this->type("//*[@id='select2-drop']/div/input", $labels);
+      $this->typeKeys("//*[@id='select2-drop']/div/input", $labels);
       $this->waitForElementPresent("//*[@class='select2-result-label']");
       $this->clickAt("//*[contains(@class,'select2-result-selectable')]/div[contains(@class, 'select2-result-label')]");
     }
