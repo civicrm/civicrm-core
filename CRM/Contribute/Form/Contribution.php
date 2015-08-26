@@ -1056,13 +1056,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $submittedValues['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
     }
 
-    $params = $this->_params = $submittedValues;
+    $params = $submittedValues;
+    $this->_params = array_merge($this->_params, $submittedValues);
 
     // Mapping requiring documentation.
     $this->_params['payment_processor'] = $submittedValues['payment_processor_id'];
 
     $now = date('YmdHis');
-    $fields = array();
 
     // we need to retrieve email address
     if ($this->_context == 'standalone' && !empty($submittedValues['is_email_receipt'])) {
@@ -1072,56 +1072,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('displayName', $this->userDisplayName);
     }
 
-    // Set email for primary location.
-    $fields['email-Primary'] = 1;
-    $params['email-Primary'] = $this->userEmail;
-
-    // now set the values for the billing location.
-    foreach (array_keys($this->_fields) as $name) {
-      $fields[$name] = 1;
-    }
-
-    // also add location name to the array
-    $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
-
-    $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
-    $fields["address_name-{$this->_bltID}"] = 1;
-
-    $nameFields = array('first_name', 'middle_name', 'last_name');
-    foreach ($nameFields as $name) {
-      $fields[$name] = 1;
-      if (array_key_exists("billing_$name", $params)) {
-        $params[$name] = $params["billing_{$name}"];
-        $params['preserveDBName'] = TRUE;
-      }
-    }
-
+    $this->_contributorEmail = $this->userEmail;
+    $this->_contributorContactID = $contactID;
+    $this->processBillingAddress();
     if (!empty($params['source'])) {
       unset($params['source']);
     }
-    CRM_Contact_BAO_Contact::createProfileContact($params, $fields,
-      $contactID,
-      NULL, NULL,
-      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $contactID,
-        'contact_type'
-      )
-    );
 
-    // add all the additional payment params we need
-    if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-      $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-    }
-    if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
-      $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
-    }
-
-    if (in_array('credit_card_exp_date', array_keys($this->_params))) {
-      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-    }
-
-    $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->_params['total_amount'];
     $this->_params['amount_level'] = 0;
     $this->_params['description'] = ts("Contribution submitted by a staff person using contributor's credit card");
@@ -1416,6 +1373,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function submit($submittedValues, $action, $pledgePaymentID) {
     $softParams = $softIDs = array();
     $pId = $contribution = $isRelatedId = FALSE;
+    $this->_params = $submittedValues;
+    $this->beginPostProcess();
 
     if (!empty($submittedValues['price_set_id']) && $action & CRM_Core_Action::UPDATE) {
       $line = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'contribution');
