@@ -1531,6 +1531,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         if (!empty($softParams) && empty($paymentParams['is_recur'])) {
           $membershipParams['soft_credit'] = $softParams;
         }
+        if (isset($result['fee_amount'])) {
+          $membershipParams['fee_amount'] = $result['fee_amount'];
+        }
         // This is required to trigger the recording of the membership contribution in the
         // CRM_Member_BAO_Membership::Create function.
         // @todo stop setting this & 'teach' the create function to respond to something
