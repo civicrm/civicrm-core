@@ -148,7 +148,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("_qf_Relationship_upload");
     $this->waitForAjaxContent();
 
-    $title =  'Membership Type' . substr(sha1(rand()), 0, 7);
+    $title = 'Membership Type' . substr(sha1(rand()), 0, 7);
     //Create membership type
     $this->openCiviPage("admin/member/membershipType", "reset=1&action=browse");
     $this->click("link=Add Membership Type");
@@ -469,7 +469,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
   /**
    * @param int $pageId
-   * @param int $cid
+   * @param int $orgName
    * @param $pageTitle
    */
   public function _testAnomoyousOrganization($pageId, $orgName, $pageTitle) {
@@ -525,12 +525,13 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     // TODO: webtestVerifyTabularData function is causing timeout error, reason why most of the Webtests are failing
     // where its been called to assert tabular data
-    /*
+
+    /**
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1");
     $this->type("sort_name", $orgName['name']);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    //$this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     // verify contrb created
     $expected = array(
