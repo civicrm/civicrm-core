@@ -951,7 +951,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // get the submitted form values.
     $this->_params = $this->controller->exportValues($this->_name);
 
-    $this->submit($this->_params);
+    $this->submit();
 
     $this->setUserContext();
   }
@@ -1003,21 +1003,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $form->assign('customValues', $customValues);
 
     if ($form->_mode) {
-      $name = '';
-      if (!empty($form->_params['billing_first_name'])) {
-        $name = $form->_params['billing_first_name'];
-      }
-
-      if (!empty($form->_params['billing_middle_name'])) {
-        $name .= " {$form->_params['billing_middle_name']}";
-      }
-
-      if (!empty($form->_params['billing_last_name'])) {
-        $name .= " {$form->_params['billing_last_name']}";
-      }
-
-      $form->assign('billingName', $name);
-
       // assign the address formatted up for display
       $addressParts = array(
         "street_address-{$form->_bltID}",
@@ -1130,24 +1115,23 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    *
    * This is also accessed by unit tests.
    *
-   * @param array $formValues
-   *
    * @return array
    */
-  public function submit($formValues) {
+  public function submit() {
     $isTest = ($this->_mode == 'test') ? 1 : 0;
-
+    $this->storeContactFields($this->_params);
+    $formValues = $this->_params;
     $joinDate = $startDate = $endDate = NULL;
     $membershipTypes = $membership = $calcDate = array();
     $membershipType = NULL;
 
     $mailSend = FALSE;
     $formValues = $this->setPriceSetParameters($formValues);
-
     $params = $softParams = $ids = array();
 
     $allMemberStatus = CRM_Member_PseudoConstant::membershipStatus();
     $allContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $this->processBillingAddress();
 
     if ($this->_id) {
       $ids['membership'] = $params['id'] = $this->_id;
@@ -1233,8 +1217,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
-
-    $this->storeContactFields($formValues);
 
     $params['contact_id'] = $this->_contactID;
 
@@ -1389,47 +1371,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       //get the payment processor id as per mode.
       $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->_paymentProcessor['id'];
-
-      $now = date('YmdHis');
-      $fields = array();
-
-      // set email for primary location.
-      $fields['email-Primary'] = 1;
-      $formValues['email-5'] = $formValues['email-Primary'] = $this->_memberEmail;
-      $params['register_date'] = $now;
-
-      // now set the values for the billing location.
-      foreach ($this->_fields as $name => $dontCare) {
-        $fields[$name] = 1;
-      }
-
-      // also add location name to the array
-      $formValues["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $formValues) . ' ' . CRM_Utils_Array::value('billing_middle_name', $formValues) . ' ' . CRM_Utils_Array::value('billing_last_name', $formValues);
-
-      $formValues["address_name-{$this->_bltID}"] = trim($formValues["address_name-{$this->_bltID}"]);
-
-      $fields["address_name-{$this->_bltID}"] = 1;
-      //ensure we don't over-write the payer's email with the member's email
-      if ($this->_contributorContactID == $this->_contactID) {
-        $fields["email-{$this->_bltID}"] = 1;
-      }
-
-      $nameFields = array('first_name', 'middle_name', 'last_name');
-
-      foreach ($nameFields as $name) {
-        $fields[$name] = 1;
-        if (array_key_exists("billing_$name", $formValues)) {
-          $formValues[$name] = $formValues["billing_{$name}"];
-          $formValues['preserveDBName'] = TRUE;
-        }
-      }
-      if ($this->_contributorContactID == $this->_contactID) {
-        //see CRM-12869 for discussion of why we don't do this for separate payee payments
-        CRM_Contact_BAO_Contact::createProfileContact($formValues, $fields,
-          $this->_contributorContactID, NULL, NULL,
-          CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
-        );
-      }
+      $params['register_date'] = date('YmdHis');
 
       // add all the additional payment params we need
       $formValues["state_province-{$this->_bltID}"] = $formValues["billing_state_province-{$this->_bltID}"]
@@ -1549,6 +1491,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           }
         }
       }
+      $now = date('YmdHis');
       $params['receive_date'] = $now;
       $params['invoice_id'] = $formValues['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
@@ -1587,6 +1530,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         //CRM-15366
         if (!empty($softParams) && empty($paymentParams['is_recur'])) {
           $membershipParams['soft_credit'] = $softParams;
+        }
+        if (isset($result['fee_amount'])) {
+          $membershipParams['fee_amount'] = $result['fee_amount'];
         }
         // This is required to trigger the recording of the membership contribution in the
         // CRM_Member_BAO_Membership::Create function.
@@ -1763,6 +1709,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // although at some point we should switch in the templates.
       $formValues['receipt_text_signup'] = $formValues['receipt_text'];
       // send email receipt
+      $this->assignBillingName();
       $mailSend = self::emailReceipt($this, $formValues, $membership);
     }
 
