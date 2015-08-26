@@ -290,7 +290,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Set title
     if ($this->_mode) {
-      CRM_Financial_Form_Payment::addCreditCardJs();
       $this->setPageTitle($this->_ppID ? ts('Credit Card Pledge Payment') : ts('Credit Card Contribution'));
     }
     else {
