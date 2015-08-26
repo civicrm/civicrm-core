@@ -2354,6 +2354,7 @@ WHERE      civicrm_membership.is_test = 0";
     $contributionSoftParams = CRM_Utils_Array::value('soft_credit', $params);
     $recordContribution = array(
       'contact_id',
+      'fee_amount',
       'total_amount',
       'receive_date',
       'financial_type_id',

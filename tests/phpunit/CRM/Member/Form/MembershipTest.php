@@ -584,7 +584,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form = $this->getForm();
 
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
-    $processor->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'kettles boil water'));
+    $processor->setDoDirectPaymentResult(array(
+      'payment_status_id' => 1,
+      'trxn_id' => 'kettles boil water',
+      'fee_amount' => .14,
+    ));
     $this->callAPISuccess('MembershipType', 'create', array(
       'id' => $this->membershipTypeAnnualFixedID,
       'duration_unit' => 'month',
@@ -600,10 +604,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
     $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 1);
 
-    $contribution = $this->callAPISuccess('Contribution', 'get', array(
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', array(
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
+
+    $this->assertEquals(.14, $contribution['fee_amount']);
+    $this->assertEquals('kettles boil water', $contribution['trxn_id']);
 
     $this->callAPISuccessGetCount('LineItem', array(
       'entity_id' => $membership['id'],

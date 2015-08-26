@@ -420,6 +420,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'record_contribution' => TRUE,
       'trxn_id' => 777,
       'contribution_status_id' => 1,
+      'fee_amount' => .5,
     );
     $form->_contactID = $this->_individualId;
 
@@ -433,6 +434,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ));
 
     $this->assertEquals($contribution['trxn_id'], 777);
+    $this->assertEquals(.5, $contribution['fee_amount']);
     $this->callAPISuccessGetCount('LineItem', array(
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',
