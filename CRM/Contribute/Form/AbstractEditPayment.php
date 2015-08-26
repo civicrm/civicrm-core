@@ -440,6 +440,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
           $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
         }
       }
+      CRM_Financial_Form_Payment::addCreditCardJs();
     }
     $this->assign('recurringPaymentProcessorIds',
       empty($this->_recurPaymentProcessors) ? '' : implode(',', array_keys($this->_recurPaymentProcessors))
