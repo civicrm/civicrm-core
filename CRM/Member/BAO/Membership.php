@@ -457,11 +457,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $relationships = array();
     if (isset($membershipType['relationship_type_id'])) {
       $relationships = CRM_Contact_BAO_Relationship::getRelationship($contactId,
-        CRM_Contact_BAO_Relationship::CURRENT
+        CRM_Contact_BAO_Relationship::CURRENT, NULL, NULL, NULL, NULL, NULL, FALSE, $action
       );
       if ($action & CRM_Core_Action::UPDATE) {
         $pastRelationships = CRM_Contact_BAO_Relationship::getRelationship($contactId,
-          CRM_Contact_BAO_Relationship::PAST
+          CRM_Contact_BAO_Relationship::PAST, NULL, NULL, NULL, NULL, NULL, FALSE, $action
         );
         $relationships = array_merge($relationships, $pastRelationships);
       }
