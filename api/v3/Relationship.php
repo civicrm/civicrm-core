@@ -116,6 +116,7 @@ function civicrm_api3_relationship_get($params) {
       NULL,
       NULL,
       FALSE,
+      NULL,
       $params
     );
   }
