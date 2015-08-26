@@ -5458,10 +5458,11 @@ AND   displayRelType.is_active = 1
    *
    * @param CRM_Core_DAO $dao
    * @param bool $return
+   * @param bool $usedForAPI
    *
    * @return array|NULL
    */
-  public function convertToPseudoNames(&$dao, $return = FALSE) {
+  public function convertToPseudoNames(&$dao, $return = FALSE, $usedForAPI = FALSE) {
     if (empty($this->_pseudoConstantsSelect)) {
       return NULL;
     }
@@ -5503,7 +5504,7 @@ AND   displayRelType.is_active = 1
               $viewValues[$k] = $pseudoOptions[$v];
             }
           }
-          $dao->$key = implode(', ', $viewValues);
+          $dao->$key = ($usedForAPI && count($viewValues) > 1) ? $viewValues : implode(', ', $viewValues);
         }
         else {
           $labels = CRM_Core_OptionGroup::values($value['pseudoField']);
