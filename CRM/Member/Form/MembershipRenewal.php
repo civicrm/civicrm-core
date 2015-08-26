@@ -489,7 +489,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   protected function submit() {
     $this->storeContactFields($this->_params);
-
+    $this->beginPostProcess();
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->convertDateFieldsToMySQL($this->_params);
     $this->assign('receive_date', $this->_params['receive_date']);
@@ -524,17 +524,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     if ($this->_mode) {
       $this->_params['register_date'] = $now;
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id']);
-
-      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-      $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
-      $this->assign('credit_card_number',
-        CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
-      );
-      $this->assign('credit_card_type', $this->_params['credit_card_type']);
       $this->_params['description'] = ts("Contribution submitted by a staff person using member's credit card for renewal");
-      $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
       $this->_params['amount'] = $this->_params['total_amount'];
 
       // at this point we've created a contact and stored its address etc

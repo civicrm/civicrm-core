@@ -642,11 +642,18 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * access this function.
    */
   protected function beginPostProcess() {
-    if (in_array('credit_card_exp_date', array_keys($this->_params))) {
-      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+    if ($this->_mode) {
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id']);
+      if (in_array('credit_card_exp_date', array_keys($this->_params))) {
+        $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
+        $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+      }
+      $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
+      $this->assign('credit_card_number',
+        CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
+      );
+      $this->assign('credit_card_type', $this->_params['credit_card_type']);
     }
-
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
   }
 
