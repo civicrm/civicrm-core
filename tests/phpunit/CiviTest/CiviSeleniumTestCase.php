@@ -2271,7 +2271,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // In the case of chainSelect, wait for options to load
     $this->waitForElementNotPresent('css=select.loading');
     if ($multiple) {
-      foreach((array)$labels as $label) {
+      foreach ((array) $labels as $label) {
         $this->clickAt("//*[@id='$fieldName']/../div/ul/li");
         $this->keyDown("//*[@id='$fieldName']/../div/ul/li//input", " ");
         $this->type("//*[@id='$fieldName']/../div/ul/li//input", $label);
