@@ -80,7 +80,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     // the back-end's canonical set of parameters.  But if a processor
     // does this, it needs to invoke this hook after it has done translation,
     // but before it actually starts talking to its proprietary back-end.
-
+    if (!empty($params['is_recur'])) {
+      $throwAnENoticeIfNotSetAsTheseAreRequired = $params['frequency_interval'] . $params['frequency_unit'];
+    }
     // no translation in Dummy processor
     $cookedParams = $params;
     CRM_Utils_Hook::alterPaymentProcessorParams($this,
