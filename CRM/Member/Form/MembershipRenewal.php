@@ -506,7 +506,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if (empty($this->_params['financial_type_id'])) {
       $this->_params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
     }
-
+    $contributionRecurID = NULL;
     $this->assign('membershipID', $this->_id);
     $this->assign('contactID', $this->_contactID);
     $this->assign('module', 'Membership');
@@ -543,6 +543,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       if (!empty($this->_params['auto_renew'])) {
         $contributionRecurParams = $this->processRecurringContribution($paymentParams);
+        $contributionRecurID = $contributionRecurParams['contributionRecurID'];
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
       }
 
