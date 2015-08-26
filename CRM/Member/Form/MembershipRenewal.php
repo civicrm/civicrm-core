@@ -615,9 +615,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
       if (!empty($paymentParams['auto_renew'])) {
         $contributionRecurParams = $this->processRecurringContribution($paymentParams);
+        $this->_params['contributionRecurID'] = $contributionRecurParams['contributionRecurID'];
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
       }
-      $result = &$payment->doDirectPayment($paymentParams);
+      $result = $payment->doDirectPayment($paymentParams);
 
       if (is_a($result, 'CRM_Core_Error')) {
         CRM_Core_Error::displaySessionError($result);
