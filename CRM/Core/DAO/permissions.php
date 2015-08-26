@@ -177,6 +177,15 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
+  // Campaign permissions
+  $permissions['campaign'] = array(
+    'get' => array('access CiviCRM'),
+    'create' => array(array('administer CiviCampaign', 'manage campaign')),
+    'update' => array(array('administer CiviCampaign', 'manage campaign')),
+    'delete' => array(array('administer CiviCampaign', 'manage campaign')),
+  );
+  $permissions['survey'] = $permissions['campaign'];
+
   // Financial permissions
   $permissions['contribution'] = array(
     'get' => array(
