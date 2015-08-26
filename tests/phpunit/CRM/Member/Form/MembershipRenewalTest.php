@@ -308,7 +308,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
-    $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 1);
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array('contact_id' => $this->_individualId));
+    $this->assertEquals($contributionRecur['id'], $membership['contribution_recur_id']);
 
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array(
       'contact_id' => $this->_individualId,
@@ -327,6 +328,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ), 1);
 
   }
+
   /**
    * Test the submit function of the membership form.
    */
