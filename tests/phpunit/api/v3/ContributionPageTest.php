@@ -164,7 +164,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_mode' => 1,
     ));
     $dummyPP = Civi\Payment\System::singleton()->getById($paymentProcessor2ID);
-    $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
+    $dummyPP->setDoDirectPaymentResult(array(
+      'payment_status_id' => 1,
+      'trxn_id' => 'create_first_success',
+      'fee_amount' => .85,
+    ));
     $this->callAPISuccess('ContributionPage', 'create', array(
       'id' => $this->_ids['contribution_page'],
       'payment_processor' => array($paymentProcessor2ID, $this->_ids['payment_processor']),
@@ -183,11 +187,16 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $this->callAPISuccess('contribution', 'getsingle', array(
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
     ));
+    $this->assertEquals('create_first_success', $contribution['trxn_id']);
+    $this->assertEquals(10, $contribution['total_amount']);
+    $this->assertEquals(.85, $contribution['fee_amount']);
+    $this->assertEquals(9.15, $contribution['net_amount']);
   }
+
   /**
    * Test submit with a membership block in place.
    */
@@ -269,6 +278,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow() {
     $this->setUpMembershipContributionPage(TRUE);
+    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
+    $processor->setDoDirectPaymentResult(array('fee_amount' => .72));
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
@@ -294,6 +305,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+    foreach ($contributions['values'] as $contribution) {
+      $this->assertEquals(.72, $contribution['fee_amount']);
+      $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
+    }
   }
 
   /**

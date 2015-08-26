@@ -1485,7 +1485,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             'payment_instrument_id' => $this->_paymentProcessor['payment_instrument_id'],
           ),
           $financialType,
-          TRUE,
           FALSE,
           $this->_bltID
         );
