@@ -633,4 +633,79 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
   }
 
+  /**
+   * Begin post processing.
+   *
+   * This function aims to start to bring together common postProcessing functions.
+   *
+   * Eventually these are also shared with the front end forms & may need to be moved to where they can also
+   * access this function.
+   */
+  protected function beginPostProcess() {
+    if (in_array('credit_card_exp_date', array_keys($this->_params))) {
+      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
+      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+    }
+
+    $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
+  }
+
+
+  /**
+   * Add the billing address to the contact who paid.
+   *
+   * Note that this function works based on the presence or otherwise of billing fields & can be called regardless of
+   * whether they are 'expected' (due to assumptions about the payment processor type or the setting to collect billing
+   * for pay later.
+   */
+  protected function processBillingAddress() {
+    $fields = array();
+
+    $fields['email-Primary'] = 1;
+    $this->_params['email-5'] = $this->_params['email-Primary'] = $this->_contributorEmail;
+    // now set the values for the billing location.
+    foreach (array_keys($this->_fields) as $name) {
+      $fields[$name] = 1;
+    }
+
+    // also add location name to the array
+    $this->_params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
+    $this->_params["address_name-{$this->_bltID}"] = trim($this->_params["address_name-{$this->_bltID}"]);
+
+    $fields["address_name-{$this->_bltID}"] = 1;
+
+    //ensure we don't over-write the payer's email with the member's email
+    if ($this->_contributorContactID == $this->_contactID) {
+      $fields["email-{$this->_bltID}"] = 1;
+    }
+
+    list($hasBillingField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+    $nameFields = array('first_name', 'middle_name', 'last_name');
+
+    foreach ($nameFields as $name) {
+      $fields[$name] = 1;
+      if (array_key_exists("billing_$name", $this->_params)) {
+        $this->_params[$name] = $this->_params["billing_{$name}"];
+        $this->_params['preserveDBName'] = TRUE;
+      }
+    }
+
+    if ($hasBillingField) {
+      $addressParams = array_merge($this->_params, $addressParams);
+      //here we are setting up the billing contact - if different from the member they are already created
+      // but they will get billing details assigned
+      CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
+        $this->_contributorContactID, NULL, NULL,
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
+      );
+    }
+    // Add additional parameters that the payment processors are used to receiving.
+    if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
+      $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
+    }
+    if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
+      $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
+    }
+  }
+
 }
