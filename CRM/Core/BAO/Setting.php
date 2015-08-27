@@ -176,7 +176,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
     $dao = new CRM_Core_DAO_Setting();
 
-    $dao->group_name = $group;
+    if (!empty($group)) {
+      $dao->group_name = $group;
+    }
     $dao->name = $name;
     $dao->component_id = $componentID;
     if (empty($domainID)) {
@@ -370,6 +372,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
     $dao = self::dao($group, $name, $componentID, $contactID, $domainID);
     $dao->find(TRUE);
+    $dao->group_name = $group;
 
     if (isset($metadata['on_change'])) {
       foreach ($metadata['on_change'] as $callback) {
