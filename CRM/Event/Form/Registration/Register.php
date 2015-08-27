@@ -912,7 +912,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Check if profiles are complete when event registration occurs(CRM-9587)
+   * Check if profiles are complete when event registration occurs(CRM-9587).
+   *
+   * @param array $fields
+   * @param array $errors
+   * @param int $eventId
    */
   public static function checkProfileComplete($fields, &$errors, $eventId) {
     $email = '';
@@ -1066,6 +1070,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       if (is_array($this->_paymentProcessor)) {
         $payment = $this->_paymentProcessor['object'];
+        $payment->setBaseReturnUrl('civicrm/event/register');
       }
       // default mode is direct
       $this->set('contributeMode', 'direct');
@@ -1091,6 +1096,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['invoiceID'] = $invoiceID;
       }
       $this->_params = $this->get('params');
+      // Set the button so we know what
+      $params['button'] = $this->controller->getButtonName();
       if (!empty($this->_params) && is_array($this->_params)) {
         $this->_params[0] = $params;
       }
@@ -1099,77 +1106,66 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $this->_params[] = $params;
       }
       $this->set('params', $this->_params);
-
       if ($this->_paymentProcessor &&
-        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
+        $this->_paymentProcessor['object']->supports('preApproval')
+        && !$this->_allowWaitlist &&
+        !$this->_requireApproval
       ) {
-        //get the button name
-        $buttonName = $this->controller->getButtonName();
-        if (in_array($buttonName,
-            array(
-              $this->_expressButtonName,
-              $this->_expressButtonName . '_x',
-              $this->_expressButtonName . '_y',
-            )
-          ) && empty($params['is_pay_later']) &&
-          !$this->_allowWaitlist &&
-          !$this->_requireApproval
-        ) {
-          $this->set('contributeMode', 'express');
 
-          // Send Event Name & Id in Params
-          $params['eventName'] = $this->_values['event']['title'];
-          $params['eventId'] = $this->_values['event']['id'];
+        $this->handlePreApproval($params);
 
-          $params['cancelURL'] = CRM_Utils_System::url('civicrm/event/register',
-            "_qf_Register_display=1&qfKey={$this->controller->_key}",
-            TRUE, NULL, FALSE
-          );
-          if (CRM_Utils_Array::value('additional_participants', $params, FALSE)) {
-            $urlArgs = "_qf_Participant_1_display=1&rfp=1&qfKey={$this->controller->_key}";
-          }
-          else {
-            $urlArgs = "_qf_Confirm_display=1&rfp=1&qfKey={$this->controller->_key}";
-          }
-          $params['returnURL'] = CRM_Utils_System::url('civicrm/event/register',
-            $urlArgs,
-            TRUE, NULL, FALSE
-          );
-          $params['invoiceID'] = $invoiceID;
+        $this->set('contributeMode', 'express');
 
-          $params['component'] = 'event';
-          $token = $payment->doPreApproval($params);
-          if (is_a($token, 'CRM_Core_Error')) {
-            CRM_Core_Error::displaySessionError($token);
-            CRM_Utils_System::redirect($params['cancelURL']);
-          }
+        // Send Event Name & Id in Params
+        $params['eventName'] = $this->_values['event']['title'];
+        $params['eventId'] = $this->_values['event']['id'];
 
-          $this->set('token', $token);
-
-          $paymentURL = $this->_paymentProcessor['url_site'] . "/cgi-bin/webscr?cmd=_express-checkout&token=$token";
-
-          CRM_Utils_System::redirect($paymentURL);
+        $params['cancelURL'] = CRM_Utils_System::url('civicrm/event/register',
+          "_qf_Register_display=1&qfKey={$this->controller->_key}",
+          TRUE, NULL, FALSE
+        );
+        if (CRM_Utils_Array::value('additional_participants', $params, FALSE)) {
+          $urlArgs = "_qf_Participant_1_display=1&rfp=1&qfKey={$this->controller->_key}";
         }
+        else {
+          $urlArgs = "_qf_Confirm_display=1&rfp=1&qfKey={$this->controller->_key}";
+        }
+        $params['returnURL'] = CRM_Utils_System::url('civicrm/event/register',
+          $urlArgs,
+          TRUE, NULL, FALSE
+        );
+        $params['invoiceID'] = $invoiceID;
+
+        $params['component'] = 'event';
+        $token = $payment->doPreApproval($params);
+        if (is_a($token, 'CRM_Core_Error')) {
+          CRM_Core_Error::displaySessionError($token);
+          CRM_Utils_System::redirect($params['cancelURL']);
+        }
+
+        $this->set('token', $token);
+
+        $paymentURL = $this->_paymentProcessor['url_site'] . "/cgi-bin/webscr?cmd=_express-checkout&token=$token";
+        CRM_Utils_System::redirect($paymentURL);
       }
       elseif ($this->_paymentProcessor &&
         $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
       ) {
         $this->set('contributeMode', 'notify');
       }
-    }
-    else {
-      $session = CRM_Core_Session::singleton();
-      $params['description'] = ts('Online Event Registration') . ' ' . $this->_values['event']['title'];
+      else {
+        $params['description'] = ts('Online Event Registration') . ' ' . $this->_values['event']['title'];
 
-      $this->_params = array();
-      $this->_params[] = $params;
-      $this->set('params', $this->_params);
+        $this->_params = array();
+        $this->_params[] = $params;
+        $this->set('params', $this->_params);
 
-      if (
-        empty($params['additional_participants'])
-        && !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
-      ) {
-        self::processRegistration($this->_params);
+        if (
+          empty($params['additional_participants'])
+          && !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
+        ) {
+          self::processRegistration($this->_params);
+        }
       }
     }
 
@@ -1186,8 +1182,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param array $params
    *   Form values.
    * @param int $contactID
-   *
-   * @return void
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -1313,7 +1307,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $primaryContactId, $isTest, TRUE
       );
 
-      //lets carry all paticipant params w/ values.
+      //lets carry all participant params w/ values.
       foreach ($additionalIDs as $participantID => $contactId) {
         $participantNum = NULL;
         if ($participantID == $registerByID) {
@@ -1366,7 +1360,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @param array $fields
    *   The input form values(anonymous user).
-   * @param array $self
+   * @param CRM_Event_Form_Registration_Register $self
    *   Event data.
    * @param bool $isAdditional
    *   Treat isAdditional participants a bit differently.

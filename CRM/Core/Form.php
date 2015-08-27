@@ -741,6 +741,39 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Handle pre approval for processors.
+   *
+   * This fits with the flow where a pre-approval is done and then confirmed in the next stage when confirm is hit.
+   *
+   * This function is shared between contribution & event forms & this is their common class.
+   *
+   * However, this should be seen as an in-progress refactor, the end goal being to also align the
+   * backoffice forms that action payments.
+   *
+   * @param array $params
+   */
+  protected function handlePreApproval(&$params) {
+    try {
+      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+      $params['component'] = 'contribute';
+      $result = $payment->doPreApproval($params);
+      if (empty($result)) {
+        // This could happen, for example, when paypal looks at the button value & decides it is not paypal express.
+        return;
+      }
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      CRM_Core_Error::displaySessionError($e->getMessage());
+      CRM_Utils_System::redirect($params['cancelURL']);
+    }
+
+    $this->set('pre_approval_parameters', $result['pre_approval_parameters']);
+    if (!empty($result['redirect_url'])) {
+      CRM_Utils_System::redirect($result['redirect_url']);
+    }
+  }
+
+  /**
    * Setter function for options.
    *
    * @param mixed $options

@@ -1294,7 +1294,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->set('invoiceID', $invoiceID);
     $params['invoiceID'] = $invoiceID;
     $params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
-
+    $params['button'] = $this->controller->getButtonName();
     // required only if is_monetary and valid positive amount
     if ($this->_values['is_monetary'] &&
       is_array($this->_paymentProcessor) &&
@@ -1344,31 +1344,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         break;
     }
 
-  }
-
-  /**
-   * Handle pre approval for processors.
-   *
-   * This fits with the flow where a pre-approval is done and then confirmed in the next stage when confirm is hit.
-   *
-   * This applies to processors that
-   * @param array $params
-   */
-  protected function handlePreApproval(&$params) {
-    try {
-      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-      $params['component'] = 'contribute';
-      $result = $payment->doPreApproval($params);
-    }
-    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      CRM_Core_Error::displaySessionError($e->getMessage());
-      CRM_Utils_System::redirect($params['cancelURL']);
-    }
-
-    $this->set('pre_approval_parameters', $result['pre_approval_parameters']);
-    if (!empty($result['redirect_url'])) {
-      CRM_Utils_System::redirect($result['redirect_url']);
-    }
   }
 
   /**
