@@ -1108,6 +1108,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   public function submit() {
     $isTest = ($this->_mode == 'test') ? 1 : 0;
     $this->storeContactFields($this->_params);
+    $this->beginPostProcess();
     $formValues = $this->_params;
     $joinDate = $startDate = $endDate = NULL;
     $membershipTypes = $membership = $calcDate = array();
@@ -1353,23 +1354,23 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $formValues);
       }
 
+      // @todo - test removing this line. The beginPostProcess Function should have done it for us.
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($formValues['payment_processor_id'],
         $this->_mode
       );
 
-      //get the payment processor id as per mode.
+      //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
       $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->_paymentProcessor['id'];
       $params['register_date'] = date('YmdHis');
 
       // add all the additional payment params we need
+      // @todo the country & state values should be set by the call to $this->assignBillingAddress.
       $formValues["state_province-{$this->_bltID}"] = $formValues["billing_state_province-{$this->_bltID}"]
         = CRM_Core_PseudoConstant::stateProvinceAbbreviation($formValues["billing_state_province_id-{$this->_bltID}"]);
       $formValues["country-{$this->_bltID}"] = $formValues["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($formValues["billing_country_id-{$this->_bltID}"]);
 
-      $formValues['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($formValues);
-      $formValues['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($formValues);
-      $formValues['ip_address'] = CRM_Utils_System::ipAddress();
       $formValues['amount'] = $params['total_amount'];
+      // @todo this is a candidate for beginPostProcessFunction.
       $formValues['currencyID'] = $config->defaultCurrency;
       $formValues['description'] = ts("Contribution submitted by a staff person using member's credit card for signup");
       $formValues['invoiceID'] = md5(uniqid(rand(), TRUE));
@@ -1392,6 +1393,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $paymentParams['email'] = $this->_contributorEmail;
       }
 
+      // This is a candidate for shared beginPostProcess function.
       CRM_Core_Payment_Form::mapParams($this->_bltID, $formValues, $paymentParams, TRUE);
       // CRM-7137 -for recurring membership,
       // we do need contribution and recurring records.
