@@ -771,6 +771,10 @@ class CRM_Core_Permission {
         $prefix . ts('merge duplicate contacts'),
         ts('Delete Contacts must also be granted in order for this to work.'),
       ),
+      'force merge duplicate contacts' => array(
+        $prefix . ts('force merge duplicate contacts'),
+        ts('Delete Contacts must also be granted in order for this to work.'),
+      ),
       'view debug output' => array(
         $prefix . ts('view debug output'),
         ts('View results of debug and backtrace'),

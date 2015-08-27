@@ -217,9 +217,16 @@ class CRM_Core_BAO_CustomValueTable {
             default:
               break;
           }
-          $set[$field['column_name']] = "%{$count}";
-          $params[$count] = array($value, $type);
-          $count++;
+          if (strtolower($value) === "null") {
+            // when unsetting a value to null, we don't need to validate the type
+            // https://projectllr.atlassian.net/browse/VGQBMP-20
+            $set[$field['column_name']] = $value;
+          }
+          else {
+            $set[$field['column_name']] = "%{$count}";
+            $params[$count] = array($value, $type);
+            $count++;
+          }
         }
 
         if (!empty($set)) {
