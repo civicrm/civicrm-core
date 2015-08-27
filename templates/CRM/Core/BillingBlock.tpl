@@ -53,6 +53,7 @@
         {/foreach}
       </div>
     </fieldset>
+  {/if}
   {if $billingDetailsFields|@count}
     {if $profileAddressFields}
       <input type="checkbox" id="billingcheckbox" value="0">
@@ -78,7 +79,6 @@
       </div>
     </fieldset>
   {/if}
-{/if}
 </div>
 {if $profileAddressFields}
   <script type="text/javascript">
