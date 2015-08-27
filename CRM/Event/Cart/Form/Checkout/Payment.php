@@ -13,7 +13,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $is_pay_later = FALSE;
   public $pay_later_receipt;
 
-  function registerParticipant($params, &$participant, $event) {
+  public function registerParticipant($params, &$participant, $event) {
     $transaction = new CRM_Core_Transaction();
 
     // handle register date CRM-4320
@@ -744,7 +744,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
           if ($diff2->days > 0) {
             $active2 = TRUE;
           }
-	} else {
+        } else {
           $active2 = TRUE;
         }
         if ($discvalue['is_active'] == TRUE && ($discvalue['count_max'] == 0 || ($discvalue['count_max'] > $discvalue['count_use'])) && $active1 == TRUE && $active2 == TRUE) {

@@ -305,8 +305,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       );
     $this->add('text', 'selfcancelxfer_time', ts('Self cancel/transfer time limit (hours)'));
     $this->addRule('selfcancelxfer_time', ts('Please enter the number of hours (as an integer).'), 'integer');
-
-
     self::buildRegistrationBlock($this);
     self::buildConfirmationBlock($this);
     self::buildMailBlock($this);
