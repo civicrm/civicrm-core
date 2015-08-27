@@ -451,7 +451,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Test searching on custom fields with less than or equal.
-   * 
+   *
    * See CRM-17101.
    */
   public function testEventGetCustomFieldLte() {
