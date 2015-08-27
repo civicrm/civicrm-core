@@ -355,21 +355,13 @@ class CRM_Pledge_BAO_Query {
         $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
         return;
 
-      case 'pledge_campaign_id':
-        $campParams = array(
-          'op' => $op,
-          'campaign' => $value,
-          'grouping' => $grouping,
-          'tableName' => 'civicrm_pledge',
-        );
-        CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
-        return;
-
       case 'pledge_contact_id':
+      case 'pledge_campaign_id':
         $name = str_replace('pledge_', '', $name);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_pledge.$name", $op, $value, 'Integer');
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Pledge_DAO_Pledge', $name, $value, $op);
-        $query->_qill[$grouping][] = ts('Contact ID %1 %2', array(1 => $op, 2 => $value));
+        $label = ($name == 'campaign_id') ? 'Campaign' : 'Contact ID';
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $label, 2 => $op, 3 => $value));
         $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
         return;
     }
