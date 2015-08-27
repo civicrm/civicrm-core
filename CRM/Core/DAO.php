@@ -2329,6 +2329,20 @@ SELECT contact_id
             }
             return $escapedCriteria;
 
+          // contains
+          case 'CONTAINS':
+            $filters = array();
+            foreach (CRM_Utils_Array::explodePadded($criteria) as $criterium) {
+              $filters[] = (sprintf(
+                      '(%s LIKE "%%%s%%")', $fieldName, CRM_Core_DAO::VALUE_SEPARATOR . CRM_Core_DAO::escapeString($criterium) . CRM_Core_DAO::VALUE_SEPARATOR));
+            }
+            if (!$returnSanitisedArray) {
+              return (implode(' AND ', $filters));
+            }
+            else {
+              return NULL; // I am just guessing here ;-)
+            }
+
           // binary operators
 
           default:
@@ -2365,6 +2379,7 @@ SELECT contact_id
       'NOT BETWEEN',
       'IS NOT NULL',
       'IS NULL',
+      'CONTAINS',
     );
   }
 
