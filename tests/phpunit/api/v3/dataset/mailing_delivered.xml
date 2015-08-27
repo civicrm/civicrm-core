@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: mailing_delivered.xml 30511 2013-04-30 11:36:36Z shot $  -->
+<dataset>
+  <table name="civicrm_mailing">
+  <column>id</column>
+  <column>domain_id</column>
+  <column>header_id</column>
+  <column>footer_id</column>
+  <column>reply_id</column>
+  <column>unsubscribe_id</column>
+  <column>resubscribe_id</column>
+  <column>optout_id</column>
+  <column>name</column>
+  <column>from_name</column>
+  <column>from_email</column>
+  <column>replyto_email</column>
+  <column>subject</column>
+  <column>body_text</column>
+  <column>body_html</column>
+  <column>url_tracking</column>
+  <column>forward_replies</column>
+  <column>auto_responder</column>
+  <column>open_tracking</column>
+  <column>is_completed</column>
+  <column>msg_template_id</column>
+  <column>override_verp</column>
+  <column>created_id</column>
+  <column>created_date</column>
+  <column>scheduled_id</column>
+  <column>scheduled_date</column>
+  <column>approver_id</column>
+  <column>approval_date</column>
+  <column>approval_status_id</column>
+  <column>approval_note</column>
+  <column>is_archived</column>
+  <column>visibility</column>
+  <column>campaign_id</column>
+  <column>dedupe_email</column>
+  <column>sms_provider_id</column>
+  <row>
+    <value>1</value> <!--  id  -->
+    <value>1</value> <!--  domain_id -->
+    <value>1</value> <!--  header_id -->
+    <value>2</value> <!--  footer_id -->
+    <null /> <!--  reply_id  -->
+    <null /> <!--  unsubscribe_id  -->
+    <null /> <!--  resubscribe_id  -->
+    <null /> <!--  optout_id  -->
+    <value>Test Mailing</value> <!--  name  -->
+    <null /> <!--  from_name  -->
+    <null /> <!--  from_email  -->
+    <value>somereply@testing.org</value> <!--  replyto_email  -->
+    <value>Some Subject</value> <!--  subject            -->
+    <value>Just a body... nothing to see here.</value> <!--  body_text          -->
+    <value><html>Just some html...</html></value> <!--  body_html          -->
+    <null /> <!--  url_tracking       -->
+    <null /> <!--  forward_replies    -->
+    <null /> <!--  auto_responder     -->
+    <value>0</value> <!--  open_tracking      -->
+    <value>1</value> <!--  is_completed       -->
+    <null /> <!--  msg_template_id    -->
+    <null /> <!--  override_verp      -->
+    <value>3</value> <!--  created_id         -->
+    <null /> <!--  created_date       -->
+    <null /> <!--  scheduled_id       -->
+    <null /> <!--  scheduled_date     -->
+    <null /> <!--  approver_id        -->
+    <null /> <!--  approval_date      -->
+    <null /> <!--  approval_status_id -->
+    <null /> <!--  approval_note      -->
+    <value>0</value> <!--  is_archived        -->
+    <value>User and User Admin Only</value> <!--  visibility         -->
+    <null /> <!--  campaign_id        -->
+    <value>0</value> <!--  dedupe_email       -->
+    <null /> <!--  sms_provider_id    -->
+  </row>
+  </table>
+  <table name="civicrm_mailing_job">
+  <column>id</column>
+  <column>mailing_id</column>
+  <column>scheduled_date</column>
+  <column>start_date</column>
+  <column>end_date</column>
+  <column>status</column>
+  <column>is_test</column>
+  <column>job_type</column>
+  <column>parent_id</column>
+  <column>job_offset</column>
+  <column>job_limit</column>
+  <row>
+    <value>1</value>
+    <value>1</value>
+    <null />
+    <null />
+    <null />
+    <value>complete</value>
+    <value>0</value>
+    <null />
+    <null />
+    <value>0</value>
+    <value>0</value>
+  </row>
+  </table>
+  <table name="civicrm_mailing_event_queue">
+  <column>id</column>
+  <column>job_id</column>
+  <column>email_id</column>
+  <column>contact_id</column>
+  <column>hash</column>
+  <column>phone_id</column>
+  <row>
+  <value>1</value>
+  <value>1</value>
+  <value>1</value>
+  <value>23</value>
+  <value>80569af03942f016</value>
+  <null />
+  </row>
+  </table>
+  <table name="civicrm_mailing_event_delivered">
+  <column>id</column>
+  <column>event_queue_id</column>
+  <column>time_stamp</column>
+  <row>
+    <value>1</value>
+    <value>1</value>
+    <value>2013-04-30 18:11:26</value>
+  </row>
+  </table>
+</dataset>

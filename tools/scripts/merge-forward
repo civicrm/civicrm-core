@@ -1,0 +1,55 @@
+#!/bin/bash
+set -e
+
+RELPATH="$1"
+REMOTE="$2"
+MAINTBRANCH="$3"
+DEVBRANCH="$4"
+TMPBRANCH=$MAINTBRANCH-$DEVBRANCH-$(date "+%Y-%m-%d-%H-%M-%S")
+
+if [ -z "$RELPATH" -o  -z "$REMOTE" -o  -z "$MAINTBRANCH" -o  -z "$DEVBRANCH" ] ; then
+  PROG=$(basename $0)
+  echo "Merge any changes from the maintenance-branch into the development-branch."
+  echo "If there are no conflicts, then push the changes."
+  echo ""
+  echo "Usage: $PROG <relpath> <remote> <maintenance-branch> <development-branch>"
+  echo ""
+  echo "Example: $PROG drupal upstream 7.x-4.3 7.x-master"
+  exit 1
+fi
+
+pushd "$RELPATH" >> /dev/null
+  ## OS X: mktemp requires "-t prefix" argument
+  ## GNU: mktemp accepts optional -t pattern" argument
+  ## The string "merge-forward-XXXXXX" works as a prefix or pattern
+  TMPFILE=$(mktemp -t merge-forward-XXXXXX)
+
+  set -x
+  git fetch $REMOTE
+  git checkout -b $TMPBRANCH $REMOTE/$DEVBRANCH
+  git merge $REMOTE/$MAINTBRANCH | tee $TMPFILE
+  set +x
+
+  if grep -q CONFLICT "$TMPFILE" ; then
+    echo ""
+    echo "==> Conflicted merge. Please resolve conflicts and then push with:"
+    echo ""
+    echo "git push $REMOTE $TMPBRANCH:$DEVBRANCH"
+  elif grep -q "Already up-to-date." "$TMPFILE" ; then
+    echo ""
+    echo "==> No update needed"
+    echo ""
+  else
+    echo ""
+    echo "==> Clean merge; proceeding with push"
+    echo ""
+    set -x
+    git push $REMOTE $TMPBRANCH:$DEVBRANCH
+    git fetch $REMOTE
+    git checkout $REMOTE/$DEVBRANCH
+    git branch -d $TMPBRANCH
+    set +x
+  fi
+
+  /bin/rm -f "$TMPFILE"
+popd  >> /dev/null

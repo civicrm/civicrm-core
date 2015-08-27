@@ -1,0 +1,64 @@
+#!/usr/bin/env /bin/bash
+
+source `dirname $0`/demo.conf
+
+pushd .
+
+# run regen.sh
+echo "Running $CIVI_DEMO_DIR/bin/regen.sh.."
+cd $CIVI_DEMO_DIR/bin
+./regen.sh
+
+echo "cd $CIVI_DEMO_DIR/sql"
+cd $CIVI_DEMO_DIR/sql
+
+if [ $DRUPAL_DEMO_CRM_DBNAME ]; then
+  # drupal pristine
+  echo "Reloading civicrm-drupal-demo db from generated.mysql .."
+  mysqladmin -f drop $DRUPAL_DEMO_CRM_DBNAME
+  mysqladmin create $DRUPAL_DEMO_CRM_DBNAME
+  mysql $DRUPAL_DEMO_CRM_DBNAME < civicrm.mysql
+  mysql $DRUPAL_DEMO_CRM_DBNAME < civicrm_generated.mysql
+  echo "Taking civicrm-drupal-demo dump.."
+  mysqldump $DRUPAL_DEMO_CRM_DBNAME > $TMP_DUMP_FILE
+  if [ -f $DRUPAL_DEMO_CRM_PRISTINE ]; then
+    echo "Creating civicrm-drupal-demo pristine.."
+    cp $TMP_DUMP_FILE $DRUPAL_DEMO_CRM_PRISTINE
+  fi
+fi
+
+if [ ! -f $TMP_DUMP_FILE ]; then
+  exit 1
+fi
+
+if [ $WORDPRESS_DEMO_CRM_DBNAME ]; then
+  # wordpress pristine
+  if [ -f $WORDPRESS_DEMO_CRM_PRISTINE ]; then
+    echo "Creating civicrm-wordpress-demo pristine.."
+    cp $TMP_DUMP_FILE $WORDPRESS_DEMO_CRM_PRISTINE
+  fi
+  mysqladmin -f drop $WORDPRESS_DEMO_CRM_DBNAME
+  echo "Reloading civicrm-wordpress-demo from pristine.."
+  mysqladmin create $WORDPRESS_DEMO_CRM_DBNAME
+  mysql $WORDPRESS_DEMO_CRM_DBNAME < $TMP_DUMP_FILE
+fi
+
+if [ $JOOMLA_DEMO_DBNAME ]; then
+  # joomla pristine
+  if [ -f $JOOMLA_DEMO_PRISTINE ]; then
+    echo "Taking civicrm-joomla-demo pristine backup.."
+    cp $JOOMLA_DEMO_PRISTINE $JOOMLA_DEMO_PRISTINE.bak
+  fi
+  echo "Dropping civicrm_* tables from civicrm-joomla-demo db.."
+  mysql $JOOMLA_DEMO_DBNAME < civicrm_drop.mysql
+  echo "Reloading civicrm-joomla-demo with fresh civicrm_* tables.."
+  mysql $JOOMLA_DEMO_DBNAME < $TMP_DUMP_FILE
+  echo "Taking civicrm-joomla-demo db dump.."
+  mysqldump $JOOMLA_DEMO_DBNAME > $TMP_DUMP_FILE
+  if [ -f $JOOMLA_DEMO_PRISTINE ]; then
+    echo "Creating civicrm-joomla-demo pristine from dump.."
+    cp $TMP_DUMP_FILE $JOOMLA_DEMO_PRISTINE
+  fi
+fi
+
+popd

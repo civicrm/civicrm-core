@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Bridge</base>
+  <class>Role</class>
+  <name>civicrm_bridge_role</name>
+  <comment>An FK table that links between civicrm group and drupal roles</comment>
+  <add>2.0</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique table ID</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>drupal_role_id</name>
+    <type>int unsigned</type>
+    <comment>Foreign key to the drupal role.</comment>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_drupal_role_id</name>
+    <fieldName>index_drupal_role_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>group_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm group.</comment>
+    <add>2.0</add>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <add>2.0</add>
+  </foreignKey>
+</table>

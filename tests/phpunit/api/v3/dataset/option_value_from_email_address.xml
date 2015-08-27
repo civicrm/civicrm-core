@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_value_email_greeting.xml 23244 2009-08-11 16:06:41Z mover $  -->
+<dataset>
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>component_id</column>
+    <column>visibility_id</column>
+    <row>
+      <value>234</value>                    <!--  id  -->
+      <value>52</value>                     <!--  option_group_id  -->
+      <value><![CDATA["Test Label - Domain" <test@email.label.net>]]></value>   <!--  label  -->
+      <value>1</value>                      <!--  value  -->
+      <value><![CDATA["Test Name For Domain" <test@email.name.net>]]></value>   <!--  name  -->
+      <null />                              <!--  grouping  -->
+      <value>0</value>                      <!--  filter  -->
+      <value>1</value>                      <!--  is_default  -->
+      <value>1</value>                      <!--  weight  -->
+      <value>Default domain email address and from name.</value>    <!--  description  -->
+      <value>0</value>                      <!--  is_optgroup  -->
+      <value>0</value>                      <!--  is_reserved  -->
+      <value>1</value>                      <!--  is_active  -->
+      <null />                              <!--  component_id  -->
+      <null />                              <!--  visibility_id  -->
+    </row>
+  </table>
+</dataset>

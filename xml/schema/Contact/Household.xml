@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>Household</class>
+  <name>civicrm_household</name>
+  <comment>Define household specific properties</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Household ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Contact ID</comment>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+  </foreignKey>
+  <field>
+    <name>household_name</name>
+    <type>varchar</type>
+    <length>128</length>
+    <import>true</import>
+    <headerPattern>/^household|(h(ousehold\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <comment>Household Name.</comment>
+    <fulltext/>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_household_name</name>
+    <fieldName>household_name</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>primary_contact_id</name>
+    <type>int unsigned</type>
+    <comment>Optional FK to Primary Contact for this household.</comment>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>primary_contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+  </foreignKey>
+  <index>
+    <name>UI_contact</name>
+    <fieldName>contact_id</fieldName>
+    <unique>true</unique>
+    <add>1.6</add>
+  </index>
+</table>

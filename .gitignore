@@ -11,7 +11,7 @@ packages/doc
 packages/temp
 packages/test
 packages/git-footnote
-packages/_ORIGINAL_
+packages/_ORIGINAL
 packages/SeleniumRC
 packages/PHPUnit
 packages/PhpDocumentor
@@ -28,4 +28,4 @@ distmaker
 .svn
 bin/setup.sh
 bin/setup.php4.sh
-bin/setup.bat
+bin/setup.bat 

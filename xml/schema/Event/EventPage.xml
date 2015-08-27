@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Event</base>
+  <class>EventPage</class>
+  <name>civicrm_event_page</name>
+  <add>1.7</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Event Page ID</comment>
+    <add>1.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_id</name>
+    <title>Event</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Event which this page belongs to.</comment>
+    <add>1.7</add>
+  </field>
+  <foreignKey>
+    <name>event_id</name>
+    <table>civicrm_event</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>intro_text</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <title>Introductory Message</title>
+    <localizable>true</localizable>
+    <comment>Introductory message for Event Registration page. Text and html allowed. Displayed at the top of Event
+      Registration form.
+    </comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>footer_text</name>
+    <title>Footer Message</title>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Footer message for Event Registration page. Text and html allowed. Displayed at the bottom of Event
+      Registration form.
+    </comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_title</name>
+    <type>varchar</type>
+    <title>Confirmation Title</title>
+    <length>255</length>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Title for Confirmation page.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_text</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <title>Confirm Text</title>
+    <localizable>true</localizable>
+    <comment>Introductory message for Event Registration page. Text and html allowed. Displayed at the top of Event
+      Registration form.
+    </comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_footer_text</name>
+    <type>text</type>
+    <title>Footer Text</title>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Footer message for Event Registration page. Text and html allowed. Displayed at the bottom of Event
+      Registration form.
+    </comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>is_email_confirm</name>
+    <type>boolean</type>
+    <title>Is confirm email</title>
+    <default>0</default>
+    <comment>If true, confirmation is automatically emailed to contact on successful registration.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_email_text</name>
+    <type>text</type>
+    <title>Confirmation Email Text</title>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>text to include above standard event info on confirmation email. emails are text-only, so do not allow html
+      for now
+    </comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_from_name</name>
+    <type>varchar</type>
+    <title>Confirm From Name</title>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>FROM email name used for confirmation emails.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_from_email</name>
+    <type>varchar</type>
+    <title>Confirm From Email</title>
+    <length>255</length>
+    <comment>FROM email address used for confirmation emails.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>cc_confirm</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>comma-separated list of email addresses to cc each time a confirmation is sent</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>bcc_confirm</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>comma-separated list of email addresses to bcc each time a confirmation is sent</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>default_fee_id</name>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_option_value.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>default_discount_id</name>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_option_value.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>thankyou_title</name>
+    <type>varchar</type>
+    <title>ThankYou Title</title>
+    <length>255</length>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Title for ThankYou page.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>thankyou_text</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <title>ThankYou Text</title>
+    <localizable>true</localizable>
+    <comment>ThankYou Text.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>thankyou_footer_text</name>
+    <type>text</type>
+    <title>Footer Text</title>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Footer message.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>is_pay_later</name>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - allows the user to send payment directly to the org later</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>pay_later_text</name>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>The text displayed to the user in the main form</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>pay_later_receipt</name>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>The receipt sent to the user instead of the normal receipt text</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>is_multiple_registrations</name>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - allows the user to register multiple participants for event</comment>
+    <add>2.1</add>
+  </field>
+</table>

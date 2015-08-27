@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_value_case_activity.xml 36085 2011-09-09 13:15:49Z daved $  -->
+<dataset>
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>component_id</column>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Open Case</value>
+      <value>13</value>
+      <value>Open Case</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>13</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Follow up</value>
+      <value>14</value>
+      <value>Follow up</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>14</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Change Case Type</value>
+      <value>15</value>
+      <value>Change Case Type</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>15</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Change Case Status</value>
+      <value>16</value>
+      <value>Change Case Status</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>16</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Change Case Start Date</value>
+      <value>18</value>
+      <value>Change Case Start Date</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>18</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Assign Case Role</value>
+      <value>20</value>
+      <value>Assign Case Role</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>20</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Remove case Role</value>
+      <value>21</value>
+      <value>Remove case Role</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>21</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Merge Case</value>
+      <value>23</value>
+      <value>Merge Case</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>23</value>
+      <null />
+      <value>0</value>
+      <value>1</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Reassigned Case</value>
+      <value>24</value>
+      <value>Reassigned Case</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>24</value>
+      <null />
+      <value>0</value>
+      <value>1</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Link Cases</value>
+      <value>25</value>
+      <value>Link Cases</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>25</value>
+      <null />
+      <value>0</value>
+      <value>1</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Change Case Tags</value>
+      <value>26</value>
+      <value>Change Case Tags</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>26</value>
+      <null />
+      <value>0</value>
+      <value>1</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Add Client To Case</value>
+      <value>27</value>
+      <value>Add Client To Case</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>27</value>
+      <null />
+      <value>0</value>
+      <value>1</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Medical evaluation</value>
+      <value>33</value>
+      <value>Medical evaluation</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>34</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Mental health evaluation</value>
+      <value>35</value>
+      <value>Mental health evaluation</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>36</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Secure temporary housing</value>
+      <value>36</value>
+      <value>Secure temporary housing</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>37</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Income and benefits stabilization</value>
+      <value>38</value>
+      <value>Income and benefits stabilization</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>39</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>Long-term housing plan</value>
+      <value>40</value>
+      <value>Long-term housing plan</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>41</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+    <row>
+      <null />
+      <value>2</value>
+      <value>ADC referral</value>
+      <value>42</value>
+      <value>ADC referral</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>43</value>
+      <null />
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <value>7</value>
+    </row>
+  </table>
+</dataset>

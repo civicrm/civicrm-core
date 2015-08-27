@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Report_Form_Activity extends CRM_Report_Form {
   protected $_selectAliasesTotal = array();
@@ -245,9 +243,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       // Hack to get $this->_alias populated for the table.
       'civicrm_activity_contact' => array(
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(
-        ),
-    )) + $this->addressFields(TRUE);
+        'fields' => array(),
+      ),
+    ) + $this->addressFields(TRUE);
 
     if ($campaignEnabled) {
       // Add display column and filter for Survey Results, Campaign and Engagement Index if CiviCampaign is enabled
@@ -309,6 +307,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   /**
+   * Build select clause.
+   *
    * @param null $recordType
    */
   public function select($recordType = NULL) {
@@ -398,7 +398,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   /**
-   * @param $recordType
+   * Build from clause.
+   *
+   * @param string $recordType
    */
   public function from($recordType) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
@@ -468,7 +470,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   /**
-   * @param null $recordType
+   * Build where clause
+   *
+   * @param string $recordType
    */
   public function where($recordType = NULL) {
     $this->_where = " WHERE {$this->_aliases['civicrm_activity']}.is_test = 0 AND
@@ -552,11 +556,16 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     }
   }
 
+  /**
+   * Override group by function.
+   */
   public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_activity']}.id";
   }
 
   /**
+   * Build ACL clause.
+   *
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact_a') {

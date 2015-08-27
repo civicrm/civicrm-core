@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/demo-queue</path>
+    <page_callback>CRM_Demoqueue_Page_DemoQueue</page_callback>
+    <title>DemoQueue</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/demo-queue/done</path>
+    <page_callback>CRM_Demoqueue_Page_DemoQueueDone</page_callback>
+    <title>DemoQueueDone</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
