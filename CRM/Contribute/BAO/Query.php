@@ -360,6 +360,7 @@ class CRM_Contribute_BAO_Query {
       case 'contribution_contact_id':
       case (strpos($name, '_amount') !== FALSE):
       case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
+      case 'contribution_campaign_id':
         $qillName = $name;
         $pseudoExtraParam = NULL;
         // @todo including names using a switch statement & then using an 'if' to filter them out is ... odd!
@@ -372,11 +373,12 @@ class CRM_Contribute_BAO_Query {
               'contribution_check_number',
               'contribution_payment_instrument_id',
               'contribution_contact_id',
+              'contribution_campaign_id',
             )
           )
         ) {
           $name = str_replace('contribution_', '', $name);
-          if (!in_array($name, array('source', 'id', 'contact_id'))) {
+          if (!in_array($name, array('source', 'id', 'contact_id', 'campaign_id'))) {
             $qillName = str_replace('contribution_', '', $qillName);
           }
         }
@@ -515,16 +517,6 @@ class CRM_Contribute_BAO_Query {
           $query->_qill[$grouping][] = ts("NOT Personal Campaign Page Honor Roll");
         }
         $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
-        return;
-
-      case 'contribution_campaign_id':
-        $campParams = array(
-          'op' => $op,
-          'campaign' => $value,
-          'grouping' => $grouping,
-          'tableName' => 'civicrm_contribution',
-        );
-        CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         return;
 
       case 'contribution_batch_id':
