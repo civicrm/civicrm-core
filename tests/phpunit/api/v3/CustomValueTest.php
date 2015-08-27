@@ -39,20 +39,20 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-
-    $this->_populateOptionAndCustomGroup();
   }
 
-  public function _populateOptionAndCustomGroup() {
+  public function _populateOptionAndCustomGroup($type = NULL) {
     $dataValues = array(
       'integer' => array(1, 2, 3),
       'number' => array(10.11, 20.22, 30.33),
       'string' => array(substr(sha1(rand()), 0, 4), substr(sha1(rand()), 0, 3), substr(sha1(rand()), 0, 2)),
-      'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
+      //'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
       'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
       'date' => NULL,
       'contact' => NULL,
     );
+
+    $dataValues = !empty($type) ? array($type => $dataValues[$type]) : $dataValues;
 
     foreach ($dataValues as $dataType => $values) {
       $this->optionGroup[$dataType] = array('values' => $values);
@@ -88,9 +88,20 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
+
+    // cleanup created option group for each custom-set before running next test
+    if (!empty($this->optionGroup)) {
+      foreach ($this->optionGroup as $type => $value) {
+        if (!empty($value['id'])) {
+          $this->callAPISuccess('OptionGroup', 'delete', array('id' => $value['id']));
+        }
+      }
+    }
   }
 
   public function testCreateCustomValue() {
+    $this->_populateOptionAndCustomGroup();
+
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
     $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
     $count = 0;
@@ -109,10 +120,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
             $type = 'string';
           }
           else {
-            if ($dataType == 'Country') {
-              $type == 'country';
-            }
-            elseif ($dataType == 'StateProvince') {
+            if ($dataType == 'StateProvince') {
               $type = 'state_province';
             }
             elseif ($dataType == 'ContactReference') {
@@ -304,25 +312,23 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testAlterOptionValue() {
+    $this->_populateOptionAndCustomGroup('string');
+
     $selectField = $this->customFieldCreate(array(
-      'custom_group_id' => $this->ids['single']['custom_group_id'],
+      'custom_group_id' => $this->ids['string']['custom_group_id'],
       'label' => 'Custom Select',
       'html_type' => 'Select',
-      'option_values' => array(
-        'one' => 'Option1',
-        'two' => 'Option2',
-        'notone' => 'OptionNotOne',
-      ),
+      'option_group_id' => $this->optionGroup['string']['id'],
     ));
     $selectField = civicrm_api3('customField', 'getsingle', array('id' => $selectField['id']));
     $radioField = $this->customFieldCreate(array(
-      'custom_group_id' => $this->ids['single']['custom_group_id'],
+      'custom_group_id' => $this->ids['string']['custom_group_id'],
       'label' => 'Custom Radio',
       'html_type' => 'Radio',
       'option_group_id' => $selectField['option_group_id'],
     ));
     $multiSelectField = $this->customFieldCreate(array(
-      'custom_group_id' => $this->ids['single']['custom_group_id'],
+      'custom_group_id' => $this->ids['string']['custom_group_id'],
       'label' => 'Custom Multi-Select',
       'html_type' => 'Multi-Select',
       'option_group_id' => $selectField['option_group_id'],
@@ -330,18 +336,18 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $selectName = 'custom_' . $selectField['id'];
     $radioName = 'custom_' . $radioField['id'];
     $multiSelectName = 'custom_' . $multiSelectField['id'];
-    $controlFieldName = 'custom_' . $this->ids['single']['custom_field_id'];
+    $controlFieldName = 'custom_' . $this->ids['string']['custom_field_id'];
 
     $params = array(
       'first_name' => 'abc4',
       'last_name' => 'xyz4',
       'contact_type' => 'Individual',
       'email' => 'man4@yahoo.com',
-      $selectName => 'one',
-      $multiSelectName => array('one', 'two', 'notone'),
-      $radioName => 'notone',
+      $selectName => $this->optionGroup['string']['values'][0],
+      $multiSelectName => $this->optionGroup['string']['values'],
+      $radioName => $this->optionGroup['string']['values'][1],
       // The control group in a science experiment should be unaffected
-      $controlFieldName => 'one',
+      $controlFieldName => $this->optionGroup['string']['values'][2],
     );
 
     $contact = $this->callAPISuccess('Contact', 'create', $params);
@@ -350,13 +356,13 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'id' => $contact['id'],
       'return' => array($selectName, $multiSelectName),
     ));
-    $this->assertEquals('one', $result[$selectName]);
-    $this->assertEquals(array('one', 'two', 'notone'), $result[$multiSelectName]);
+    $this->assertEquals($params[$selectName], $result[$selectName]);
+    $this->assertEquals($params[$multiSelectName], $result[$multiSelectName]);
 
     $this->callAPISuccess('OptionValue', 'create', array(
       'value' => 'one-modified',
       'option_group_id' => $selectField['option_group_id'],
-      'name' => 'Option1',
+      'name' => 'string 1',
       'options' => array(
         'match-mandatory' => array('option_group_id', 'name'),
       ),
@@ -368,11 +374,11 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     ));
     // Ensure the relevant fields have been updated
     $this->assertEquals('one-modified', $result[$selectName]);
-    $this->assertEquals(array('one-modified', 'two', 'notone'), $result[$multiSelectName]);
+    $this->assertEquals(array('one-modified', $params[$radioName], $params[$controlFieldName]), $result[$multiSelectName]);
     // This field should not have changed because we didn't alter this option
-    $this->assertEquals('notone', $result[$radioName]);
+    $this->assertEquals($params[$radioName], $result[$radioName]);
     // This should not have changed because this field doesn't use the affected option group
-    $this->assertEquals('one', $result[$controlFieldName]);
+    $this->assertEquals($params[$controlFieldName], $result[$controlFieldName]);
   }
 
 }
