@@ -410,7 +410,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
   }
-  
+
   /**
    * Try to retrieve a relationship searching on multi-select custom field.
    */
@@ -468,7 +468,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
         'contact_id_a' => '$value.id',
         'contact_id_b' => $organization_create_result['id'],
         'relationship_type_id' => 5, // works for
-        'custom_' . $custom_field_result['id'] => array('A','B'),
+        'custom_' . $custom_field_result['id'] => array('A', 'B'),
       ),
       'sequential' => 1,
     ));
@@ -498,8 +498,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'id' => $custom_group_result['id'],
     ));
 
-    $this->AssertEquals($relationship_id, $relationship_get_result['id']);    
-}
+    $this->AssertEquals($relationship_id, $relationship_get_result['id']);
+  }
 
   /**
    * @return mixed

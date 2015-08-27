@@ -2342,9 +2342,9 @@ SELECT contact_id
             else {
               return NULL; // I am just guessing here ;-)
             }
+            break;
 
           // binary operators
-
           default:
             if (!$returnSanitisedArray) {
               return (sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
