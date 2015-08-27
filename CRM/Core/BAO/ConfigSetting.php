@@ -310,15 +310,6 @@ class CRM_Core_BAO_ConfigSetting {
         mb_internal_encoding('UTF-8');
       }
     }
-
-    // dont add if its empty
-    if (!empty($defaults)) {
-      // Pickup enabled-components from settings table if found.
-      $enableComponents = Civi::settings()->get('enable_components');
-      if (!empty($enableComponents)) {
-        $defaults['enableComponents'] = $enableComponents;
-      }
-    }
   }
 
   /**
