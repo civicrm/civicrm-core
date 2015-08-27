@@ -351,7 +351,7 @@ class CRM_Pledge_BAO_Query {
 
       case 'pledge_campaign_id':
         if (CRM_Utils_Array::value($op, $value)) {
-          $value = $value[$op]; 
+          $value = $value[$op];
         }
         $campParams = array(
           'op' => $op,

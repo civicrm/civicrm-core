@@ -504,7 +504,7 @@ class CRM_Contribute_BAO_Query {
 
       case 'contribution_campaign_id':
         if (CRM_Utils_Array::value($op, $value)) {
-          $value = $value[$op]; 
+          $value = $value[$op];
         }
         $campParams = array(
           'op' => $op,
