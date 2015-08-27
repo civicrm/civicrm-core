@@ -450,6 +450,37 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test searching on custom fields with less than or equal.
+   * 
+   * See CRM-17101.
+   */
+  public function testEventGetCustomFieldLte() {
+    // create custom group with custom field on event
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    // Create an event, with a custom value.
+    $params = $this->_params;
+    $params['title'] = "My test event.";
+    $params['start_date'] = "2015-03-14";
+    // Just assume that an event type 1 exists.
+    $params['event_type_id'] = 1;
+    $params['custom_' . $ids['custom_field_id']] = "AAAA";
+
+    $save_result = $this->callApiSuccess($this->_entity, 'create', $params);
+
+    // Retrieve the activity, search for custom field < 'BBBB'
+    $get_result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'custom_' . $ids['custom_field_id'] => array('<=' => 'BBBB'),
+    ));
+
+    // Expect that we find the saved event.
+    $this->assertArrayKeyExists($save_result['id'], $get_result['values']);
+
+    $this->callAPISuccess($this->_entity, 'Delete', array('id' => $save_result['id']));
+  }
+
+  /**
    * Test searching on custom fields with netsted call with id param.
    *
    * Search for an event on a custom field, and perform a chained call
