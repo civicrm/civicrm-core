@@ -1853,7 +1853,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         }
         CRM_Member_BAO_MembershipLog::add($logParams);
 
-        if (!empty($contributionRecurID)) {
+        if ($contributionRecurID) {
           CRM_Core_DAO::setFieldValue('CRM_Member_DAO_Membership', $membership->id,
             'contribution_recur_id', $contributionRecurID
           );
@@ -1983,12 +1983,14 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       if (!empty($membershipSource)) {
         $memParams['source'] = $membershipSource;
       }
-      $memParams['contribution_recur_id'] = $contributionRecurID;
-
       $memParams['is_test'] = $is_test;
       $memParams['is_pay_later'] = $isPayLater;
     }
-
+    // Putting this in an IF is precautionary as it seems likely that it would be ignored if empty, but
+    // perhaps shouldn't be?
+    if ($contributionRecurID) {
+      $memParams['contribution_recur_id'] = $contributionRecurID;
+    }
     //CRM-4555
     //if we decided status here and want to skip status
     //calculation in create( ); then need to pass 'skipStatusCal'.
