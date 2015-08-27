@@ -83,6 +83,25 @@ abstract class CRM_Core_Payment {
   protected $_paymentProcessor;
 
   /**
+   * Base url of the calling form.
+   *
+   * This is used for processors that need to return the browser back to the CiviCRM site.
+   *
+   * @var string
+   */
+  protected $baseReturnUrl;
+
+  /**
+   * Set Base return URL.
+   *
+   * @param string $url
+   *   Url of site to return browser to.
+   */
+  public function setBaseReturnUrl($url) {
+    $this->baseReturnUrl = $url;
+  }
+
+  /**
    * Opportunity for the payment processor to override the entire form build.
    *
    * @param CRM_Core_Form $form
@@ -539,9 +558,14 @@ abstract class CRM_Core_Payment {
   /**
    * Get base url dependent on component.
    *
-   * @return string|void
+   * (or preferably set it using the setter function).
+   *
+   * @return string
    */
   protected function getBaseReturnUrl() {
+    if ($this->baseReturnUrl) {
+      return $this->baseReturnUrl;
+    }
     if ($this->_component == 'event') {
       $baseURL = 'civicrm/event/register';
     }
