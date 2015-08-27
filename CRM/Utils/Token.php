@@ -1452,7 +1452,7 @@ class CRM_Utils_Token {
           $greetingDetails,
           TRUE,
           $greetingTokens,
-          FALSE,
+          TRUE,
           $escapeSmarty
         );
       }
@@ -1460,10 +1460,10 @@ class CRM_Utils_Token {
       // check if there are still any unevaluated tokens
       $remainingTokens = self::getTokens($tokenString);
 
-      // contact related $greetingTokens not empty, there are customized or hook tokens to replace
-      if (!empty($remainingTokens['contact'])) {
+      // $greetingTokens not empty, there are customized or hook tokens to replace
+      if (!empty($remainingTokens)) {
         // Fill the return properties array
-        $greetingTokens = $remainingTokens['contact'];
+        $greetingTokens = $remainingTokens;
         reset($greetingTokens);
         $greetingsReturnProperties = array();
         while (list($key) = each($greetingTokens)) {
