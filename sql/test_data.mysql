@@ -1,0 +1,11 @@
+
+ INSERT INTO `civicrm_contact_type`
+  ( `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
+ VALUES
+  ( 'Student'     , 'Student'     , NULL, 1, 1, 0),
+  ( 'Parent'      , 'Parent'      , NULL, 1, 1, 0),
+  ( 'Staff'       , 'Staff'       , NULL, 1, 1, 0),
+  ( 'Team'        , 'Team'        , NULL, 3, 1, 0),
+  ( 'Sponsor'     , 'Sponsor'     , NULL, 3, 1, 0);
+
+  

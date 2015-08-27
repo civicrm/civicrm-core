@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id:  -->
+<dataset>
+  <table name="civicrm_group">
+    <column>id</column>
+    <column>name</column>
+    <column>title</column>
+    <column>description</column>
+    <column>source</column>
+    <column>saved_search_id</column>
+    <column>is_active</column>
+    <column>visibility</column>
+    <column>where_clause</column>
+    <column>select_tables</column>
+    <column>where_tables</column>
+    <column>group_type</column>
+    <column>cache_date</column>
+    <column>parents</column>
+    <column>children</column>
+    <column>is_hidden</column>
+    <row>
+      <value>2</value>  <!--  id  -->
+      <value>Newsletter Subscribers</value>  <!--  name  -->
+      <value>Newsletter Subscribers</value>  <!--  title  -->
+      <value>Contacts in this group receive the newsletter.</value>  <!--  description  -->
+      <null />  <!--  source  -->
+      <null />  <!--  saved_search_id  -->
+      <value>1</value>  <!--  is_active  -->
+      <value>User and User Admin Only</value>  <!--  visibility  -->
+      <null />  <!--  where_clause  -->
+      <null />  <!--  select_tables  -->
+      <null />  <!--  where_tables  -->
+      <value>1</value>  <!--  group_type  -->
+      <null />  <!--  cache_date  -->
+      <null />  <!--  parents  -->
+      <null />  <!--  children  -->
+      <value>0</value>  <!--  is_hidden  -->
+    </row>
+    <row>
+      <value>3</value>  <!--  id  -->
+      <value>Another Newsletter Subscribers</value>  <!--  name  -->
+      <value>Another Newsletter Subscribers</value>  <!--  title  -->
+      <value>Contacts in this group receive another newsletter.</value>  <!--  description  -->
+      <null />  <!--  source  -->
+      <null />  <!--  saved_search_id  -->
+      <value>1</value>  <!--  is_active  -->
+      <value>User and User Admin Only</value>  <!--  visibility  -->
+      <null />  <!--  where_clause  -->
+      <null />  <!--  select_tables  -->
+      <null />  <!--  where_tables  -->
+      <value>1</value>  <!--  group_type  -->
+      <null />  <!--  cache_date  -->
+      <null />  <!--  parents  -->
+      <null />  <!--  children  -->
+      <value>0</value>  <!--  is_hidden  -->
+    </row>
+    <row>
+      <value>4</value>  <!--  id  -->
+      <value>Super Special Newsletter Subscribers</value>  <!--  name  -->
+      <value>Super Special Newsletter Subscribers</value>  <!--  title  -->
+      <value>Contacts in this group receive super special newsletter.</value>  <!--  description  -->
+      <null />  <!--  source  -->
+      <null />  <!--  saved_search_id  -->
+      <value>1</value>  <!--  is_active  -->
+      <value>User and User Admin Only</value>  <!--  visibility  -->
+      <null />  <!--  where_clause  -->
+      <null />  <!--  select_tables  -->
+      <null />  <!--  where_tables  -->
+      <value>1</value>  <!--  group_type  -->
+      <null />  <!--  cache_date  -->
+      <null />  <!--  parents  -->
+      <null />  <!--  children  -->
+      <value>0</value>  <!--  is_hidden  -->
+    </row>
+  </table>
+</dataset>

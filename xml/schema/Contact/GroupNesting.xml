@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>GroupNesting</class>
+  <name>civicrm_group_nesting</name>
+  <comment>Provide parent-child relationships for groups</comment>
+  <add>2.0</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Group Nesting ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Relationship ID</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>child_group_id</name>
+    <title>Child Group</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID of the child group</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>child_group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>2.0</add>
+  </foreignKey>
+  <field>
+    <name>parent_group_id</name>
+    <title>Parent Group</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID of the parent group</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>parent_group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>2.0</add>
+  </foreignKey>
+</table>

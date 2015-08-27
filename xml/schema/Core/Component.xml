@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Component</class>
+  <name>civicrm_component</name>
+  <add>2.0</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Component ID</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Component name</title>
+    <type>varchar</type>
+    <required>true</required>
+    <length>64</length>
+    <comment>Name of the component.</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>namespace</name>
+    <title>Namespace reserved for component.</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Path to components main directory in a form of a class
+      namespace.
+    </comment>
+    <add>2.0</add>
+  </field>
+</table>

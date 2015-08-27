@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financial</base>
+  <class>FinancialAccount</class>
+  <name>civicrm_financial_account</name>
+  <add>3.2</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Financial Account ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID</comment>
+    <add>3.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Financial Account Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <comment>Financial Account Name.</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>contact_id</name>
+    <uniqueName>financial_account_contact_id</uniqueName>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID that is responsible for the funds in this account</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>account_type_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>3.2</add>
+    <drop>4.3</drop>
+  </field>
+  <field>
+    <name>financial_account_type_id</name>
+    <type>int unsigned</type>
+    <title>Financial Account Type</title>
+    <required>true</required>
+    <default>3</default>
+    <add>4.3</add>
+    <comment>pseudo FK into civicrm_option_value.</comment>
+    <pseudoconstant>
+      <optionGroupName>financial_account_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>accounting_code</name>
+    <title>Accounting Code</title>
+    <type>varchar</type>
+    <length>64</length>
+    <export>true</export>
+    <comment>Optional value for mapping monies owed and received to accounting system codes.</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>account_type_code</name>
+    <title>Account Type Code</title>
+    <type>varchar</type>
+    <length>64</length>
+    <export>true</export>
+    <comment>Optional value for mapping account types to accounting system account categories (QuickBooks Account Type Codes for example).</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <title>Financial Account Description</title>
+    <length>255</length>
+    <comment>Financial Type Description.</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>parent_id</name>
+    <type>int unsigned</type>
+    <title>Financial Account Parent</title>
+    <comment>Parent ID in account hierarchy</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>parent_id</name>
+    <table>civicrm_financial_account</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>is_header_account</name>
+    <type>boolean</type>
+    <title>Header Financial Account?</title>
+    <default>0</default>
+    <comment>Is this a header account which does not allow transactions to be posted against it directly, but only to its sub-accounts?</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>is_deductible</name>
+    <type>boolean</type>
+    <title>Deductible Financial Account?</title>
+    <default>1</default>
+    <comment>Is this account tax-deductible?</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>is_tax</name>
+    <type>boolean</type>
+    <title>Tax Financial Account?</title>
+    <default>0</default>
+    <comment>Is this account for taxes?</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>tax_rate</name>
+    <type>decimal</type>
+    <title>Financial Account Tax Rate</title>
+    <length>10,8</length>
+    <comment>The percentage of the total_amount that is due for this tax.</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <type>boolean</type>
+    <title>Reserved Financial Account?</title>
+    <comment>Is this a predefined system object?</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <title>Financial Account is Active</title>
+    <comment>Is this property active?</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>is_default</name>
+    <type>boolean</type>
+    <title>Default Financial Account</title>
+    <comment>Is this account the default one (or default tax one) for its financial_account_type?</comment>
+    <add>4.3</add>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.3</add>
+  </index>
+</table>

@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: dataset.xml 23301 2009-08-17 13:02:24Z walt $  -->
+<dataset>
+    <!--  Source Contact for Activity: 1 -->
+    <civicrm_contact
+        id="1"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 1"
+        sort_name="Test Contact 1"
+        first_name="Test"
+        last_name="Contact 1"
+    />
+    <!--  Source Contact for Activity: 2 -->
+    <civicrm_contact
+        id="2"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 2"
+        sort_name="Test Contact 2"
+        first_name="Test"
+        last_name="Contact 2"
+    />
+    <!-- Source Contact for Activity: 3 -->
+    <civicrm_contact
+        id="3"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 3"
+        sort_name="Test Contact 3"
+        first_name="Test"
+        last_name="Contact 3"
+    />
+    <!--  Source Contact for Activity: 4 -->
+    <civicrm_contact
+        id="4"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 4"
+        sort_name="Test Contact 4"
+        first_name="Test"
+        last_name="Contact 4"
+    />
+    <!--  Source Contact for Activity: 5 -->
+    <civicrm_contact
+        id="5"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 5"
+        sort_name="Test Contact 5"
+        first_name="Test"
+        last_name="Contact 5"
+    />
+    <!--  Source Contact for Activity: 6 -->
+    <civicrm_contact
+        id="6"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 6"
+        sort_name="Test Contact 6"
+        first_name="Test"
+        last_name="Contact 6"
+    />
+    <!--  Source Contact for Activity: 7 -->
+    <civicrm_contact
+        id="7"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 7"
+        sort_name="Test Contact 7"
+        first_name="Test"
+        last_name="Contact 7"
+    />
+    <!--  Source Contact for Activity: 8 -->
+    <civicrm_contact
+        id="8"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 8"
+        sort_name="Test Contact 8"
+        first_name="Test"
+        last_name="Contact 8"
+    />
+    <!--  Source Contact for Activity: 9  -->
+    <civicrm_contact
+        id="9"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 9"
+        sort_name="Test Contact 9"
+        first_name="Test"
+        last_name="Contact 9"
+    />
+    <!--  Source Contact for Activity: 10  -->
+    <civicrm_contact
+        id="10"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 10"
+        sort_name="Test Contact 10"
+        first_name="Test"
+        last_name="Contact 10"
+    />
+    <!--  Source Contact for Activity: 11 -->
+    <civicrm_contact
+        id="11"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 11"
+        sort_name="Test Contact 11"
+        first_name="Test"
+        last_name="Contact 11"
+    />
+    <!--  Source Contact for Activity: 12  -->
+    <civicrm_contact
+        id="12"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 12"
+        sort_name="Test Contact 12"
+        first_name="Test"
+        last_name="Contact 12"
+    />
+    <!--  Source Contact for Activity: 13  -->
+    <civicrm_contact
+        id="13"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 13"
+        sort_name="Test Contact 13"
+        first_name="Test"
+        last_name="Contact 13"
+    />
+    <!--  Source Contact for Activity: 14  -->
+    <civicrm_contact
+        id="14"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 14"
+        sort_name="Test Contact 14"
+        first_name="Test"
+        last_name="Contact 14"
+    />
+    <!--  Source Contact for Activity: 15  -->
+    <civicrm_contact
+        id="15"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 15"
+        sort_name="Test Contact 15"
+        first_name="Test"
+        last_name="Contact 15"
+    />
+    <!--  Source Contact for Activity: 16  -->
+    <civicrm_contact
+        id="16"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 16"
+        sort_name="Test Contact 16"
+        first_name="Test"
+        last_name="Contact 16"
+    />
+    <!--  No Activities -->
+    <civicrm_contact
+        id="17"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 17"
+        sort_name="Test Contact 17"
+        first_name="Test"
+        last_name="Contact 17"
+    />
+    <!--  Source Contact: 1, Assignee Contact: 2,3 Target Contact: 4,5  -->
+    <civicrm_activity
+        id="1"
+        subject="subject 1"
+        activity_type_id="2"
+        status_id="1"
+    />
+    <!-- Source Contact: 2, Assignee Contact: 4,5 Target: 6,7  -->
+    <civicrm_activity
+        id="2"
+        subject="subject 2"
+        activity_type_id="2"
+        status_id="1"
+    />
+    <!--  Source Contact: 3, Assignee Contact: 6,7  Target Contact: 8,9 -->
+    <civicrm_activity
+        id="3"
+        subject="subject 3"
+        activity_type_id="2"
+        status_id="1"
+    />
+    <!--  Source Contact: 4, Assignee Contact: 8, 9  Target Contact: 10,11 -->
+    <civicrm_activity
+        id="4"
+        subject="subject 4"
+        activity_type_id="2"
+        status_id="1"
+    />
+    <!--  Source Contact: 5, Assignee Contact: 10, 11 Target Contact: 12, 13 -->
+    <civicrm_activity
+        id="5"
+        subject="subject 5"
+        activity_type_id="2"
+        status_id="1"
+    />
+    <!-- Source Contact: 6, Assignee Contact: 12, 13 Target Contact: 14, 15  -->
+    <civicrm_activity
+        id="6"
+        subject="subject 6"
+        activity_type_id="2"
+        status_id="1"
+    />
+    <!-- Source Contact: 7, Assignee Contact: 14, 15 Target Contact: 16, 1 -->
+    <civicrm_activity
+        id="7"
+        subject="subject 7"
+        activity_type_id="2"
+        status_id="1"
+    />
+    <!-- Source Contact: 8, Assignee Contact: 16, 1 Target Contact: 2, 3  -->
+    <civicrm_activity
+        id="8"
+        subject="subject 8"
+        activity_type_id="2"
+        status_id="1"
+    />
+    <!-- Source Contact: 9, Assignee Contact: 2, 3 Target Contact: 4, 5  -->
+    <civicrm_activity
+        id="9"
+        subject="subject 9"
+        activity_type_id="1"
+        status_id="2"
+    />
+    <!-- Source Contact: 10, Assignee Contact: 4, 5 Target Contact: 6,7  -->
+    <civicrm_activity
+        id="10"
+        subject="subject 10"
+        activity_type_id="1"
+        status_id="2"
+    />
+    <!-- Source Contact: 11, Assignee Contact: 6, 7  Target Contact: 8, 9 -->
+    <civicrm_activity
+        id="11"
+        subject="subject 11"
+        activity_type_id="1"
+        status_id="2"
+    />
+    <!-- Source Contact: 12, Assignee Contact: 8, 9 Target Contact: 10, 11  -->
+    <civicrm_activity
+        id="12"
+        subject="subject 12"
+        activity_type_id="1"
+        status_id="2"
+    />
+    <!-- Source Contact: 13, Assignee Contact: 10, 11 Target Contact: none  -->
+    <civicrm_activity
+        id="13"
+        subject="subject 13"
+        activity_type_id="1"
+        status_id="2"
+    />
+    <!-- Source Contact: 14, Assignee Contact: none Target Contact: 12, 13    -->
+    <civicrm_activity
+        id="14"
+        subject="subject 14"
+        activity_type_id="1"
+        status_id="2"
+    />
+    <!-- Source Contact: 15, Assignee Contact: 13 Target Contact: 14  -->
+    <civicrm_activity
+        id="15"
+        subject="subject 15"
+        activity_type_id="1"
+        status_id="2"
+    />
+    <!-- Source Contact: 16, Assignee Contact: none Target Contact: none  -->
+    <civicrm_activity
+        id="16"
+        subject="subject 16"
+        activity_type_id="1"
+        status_id="2"
+    />
+    <!-- Source Contacts -->
+    <civicrm_activity_contact
+        activity_id="1"
+        contact_id="1"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="2"
+        contact_id="2"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="3"
+        contact_id="3"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="4"
+        contact_id="4"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="5"
+        contact_id="5"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="6"
+        contact_id="6"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="7"
+        contact_id="7"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="8"
+        contact_id="8"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="9"
+        contact_id="9"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="10"
+        contact_id="10"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="11"
+        contact_id="11"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="12"
+        contact_id="12"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="13"
+        contact_id="13"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="14"
+        contact_id="14"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="15"
+        contact_id="15"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="16"
+        contact_id="16"
+        record_type_id="2"
+    />
+    <civicrm_activity_contact
+        activity_id="1"
+        contact_id="3"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="2"
+        contact_id="4"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="2"
+        contact_id="5"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="3"
+        contact_id="6"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="3"
+        contact_id="7"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="4"
+        contact_id="8"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="4"
+        contact_id="9"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="5"
+        contact_id="10"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="5"
+        contact_id="11"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="6"
+        contact_id="12"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="6"
+        contact_id="13"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="7"
+        contact_id="14"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="7"
+        contact_id="15"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="8"
+        contact_id="16"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="8"
+        contact_id="1"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="9"
+        contact_id="2"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="9"
+        contact_id="3"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="10"
+        contact_id="4"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="10"
+        contact_id="5"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="11"
+        contact_id="6"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="11"
+        contact_id="7"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="12"
+        contact_id="8"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="12"
+        contact_id="9"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="13"
+        contact_id="10"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="13"
+        contact_id="11"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="15"
+        contact_id="13"
+        record_type_id="1"
+    />
+    <civicrm_activity_contact
+        activity_id="1"
+        contact_id="4"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="1"
+        contact_id="5"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="2"
+        contact_id="6"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="2"
+        contact_id="7"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="3"
+        contact_id="9"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="4"
+        contact_id="10"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="4"
+        contact_id="11"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="5"
+        contact_id="12"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="5"
+        contact_id="13"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="6"
+        contact_id="14"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="6"
+        contact_id="15"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="7"
+        contact_id="16"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="7"
+        contact_id="1"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="8"
+        contact_id="2"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="8"
+        contact_id="3"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="9"
+        contact_id="4"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="9"
+        contact_id="5"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="10"
+        contact_id="6"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="10"
+        contact_id="7"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="11"
+        contact_id="8"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="11"
+        contact_id="9"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="12"
+        contact_id="10"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="12"
+        contact_id="11"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="14"
+        contact_id="12"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="14"
+        contact_id="13"
+        record_type_id="3"
+    />
+    <civicrm_activity_contact
+        activity_id="15"
+        contact_id="14"
+        record_type_id="3"
+    />
+</dataset>

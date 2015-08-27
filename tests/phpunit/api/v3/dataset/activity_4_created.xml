@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: activity_4_created.xml 30511 2010-11-03 11:36:36Z shot $  -->
+<dataset>
+  <table name="civicrm_activity">
+    <column>id</column>
+    <column>source_contact_id</column>
+    <column>source_record_id</column>
+    <column>activity_type_id</column>
+    <column>subject</column>
+    <column>activity_date_time</column>
+    <column>duration</column>
+    <column>location</column>
+    <column>phone_id</column>
+    <column>phone_number</column>
+    <column>details</column>
+    <column>status_id</column>
+    <column>priority_id</column>
+    <column>parent_id</column>
+    <column>is_test</column>
+    <column>medium_id</column>
+    <column>is_auto</column>
+    <column>relationship_id</column>
+    <column>is_current_revision</column>
+    <column>original_id</column>
+    <column>result</column>
+    <column>is_deleted</column>
+    <column>campaign_id</column>
+    <column>engagement_level</column>
+    <row>
+      <value>4</value>                      <!--  id  -->
+      <value>17</value>                      <!--  source_contact_id  -->
+      <null />                              <!--  source_record_id  -->
+      <value>5</value>                      <!--  activity_type_id  -->
+      <value>Make-it-Happen Meeting</value>  <!--  subject  -->
+      <value>2009-10-11T12:34:56</value>                              <!--  activity_date_time  -->
+      <value>120</value>  <!--  duration  -->
+      <value>21, Park Avenue</value>  <!--  location  -->
+      <null />  <!--  phone_id  -->
+      <null />  <!--  phone_number  -->
+      <value>Lets update Meeting</value>  <!--  details  -->
+      <value>1</value>  <!--  status_id  -->
+      <null />  <!--  priority_id  -->
+      <null />  <!--  parent_id  -->
+      <null />  <!--  is_test  -->
+      <null />  <!--  medium_id  -->
+      <null />  <!--  is_auto  -->
+      <null />  <!--  relationship_id  -->
+      <null />   <!--  is_current_revision  -->
+      <null />   <!--  original_id  -->
+      <null />   <!--  result  -->
+      <null />   <!--  is_deleted  -->
+      <null />   <!--  campaign_id  -->
+      <null />   <!--  engagement_level  -->
+    </row>
+  </table>
+</dataset>

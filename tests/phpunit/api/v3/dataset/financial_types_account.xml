@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id:  -->
+<dataset>
+  <table name="civicrm_entity_financial_account">
+    <column>id</column>
+    <column>entity_table</column>
+    <column>entity_id</column>
+    <column>account_relationship</column>
+    <column>financial_account_id</column>
+    <row>
+      <value>10</value>  <!--  id  -->
+      <value>civicrm_financial_type</value>  <!-- entity_table   -->
+      <value>10</value>  <!--  entity_id  -->
+      <value>1</value>  <!-- account_relationship   -->
+      <value>1</value>  <!-- financial_account_id   -->
+    </row>
+    <row>
+      <value>11</value>  <!--  id  -->
+      <value>civicrm_financial_type</value>  <!-- entity_table   -->
+      <value>11</value>  <!--  entity_id  -->
+      <value>1</value>  <!-- account_relationship   -->
+      <value>1</value>  <!-- financial_account_id   -->
+    </row>
+  </table>
+</dataset>

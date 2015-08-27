@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_group_activity_type.xml 23668 2009-09-17 11:16:05Z shot $  -->
+<dataset>
+  <civicrm_option_group
+    id="11"
+    name="contribution_status"
+    description="Contribution Status"
+    is_reserved="0"
+    is_active="1"
+   />
+</dataset>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Member</base>
+  <class>MembershipPayment</class>
+  <name>civicrm_membership_payment</name>
+  <comment>Membership Payment</comment>
+  <add>1.5</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Membership Payment ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.5</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>membership_id</name>
+    <title>Membership</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Membership table</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>membership_id</name>
+    <table>civicrm_membership</table>
+    <key>id</key>
+    <add>1.5</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contribution_id</name>
+    <title>Contribution</title>
+    <type>int unsigned</type>
+    <comment>FK to contribution table.</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>UI_contribution_membership</name>
+    <unique>true</unique>
+    <fieldName>contribution_id</fieldName>
+    <fieldName>membership_id</fieldName>
+    <add>2.0</add>
+  </index>
+</table>

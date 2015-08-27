@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<dataset>
+  <civicrm_contact
+    id = '69'
+  />
+  <civicrm_im
+    contact_id       = '69'
+    is_primary       = '0'
+    location_type_id = '1'
+    name             = 'alan3.smith3'
+    provider_id      = '1'
+  />
+  <civicrm_im
+    contact_id       = '69'
+    is_primary       = '0'
+    location_type_id = '2'
+    name             = 'alan2.smith2'
+    provider_id      = '2'
+  />
+  <civicrm_im
+    contact_id       = '69'
+    is_primary       = '1'
+    location_type_id = '3'
+    name             = 'alan1.smith1'
+    provider_id      = '3'
+  />
+</dataset>

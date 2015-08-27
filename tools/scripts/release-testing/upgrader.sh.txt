@@ -1,0 +1,376 @@
+#!/bin/bash
+
+: <<COMMENTBLOCK
+
+Release testing script is located in *tools* repository, in scripts/release-testing directory.
+
+h2. Utility script
+
+Script is located in scripts/release-testing/upgrader.sh It's written in bash and offers following functions:
+
+* *upgrader.sh cleanup-files* - removes CiviCRM installation files
+* *upgrader.sh cleanup-dbs* - makes sure that CiviCRM database is empty and Drupal database is in pristine state
+* *upgrader.sh install /path/to/tarball* - installs CiviCRM files from provided tarball and runs install webtest
+* *upgrader.sh upgrade /path/to/tarball* - puts CiviCRM files from provided tarball in place of currently existing install and runs upgrade webtest
+* *upgrader.sh dumpschema-cividb /path/to/dumpfile.mysql* - dumps CiviCRM schema into given file
+* *upgrader.sh run-checks* - verifies if all the params are set correctly
+* *upgrader.sh run-tests* - TBD
+
+Before you can use the script, you need to set following variables inside:
+* CIVIDBNAME - name of CiviCRM database
+* CIVIDBUSER - username to access CiviCRM database
+* CIVIDBPASS - password to access CiviCRM database
+* DRUPALDBNAME - name of Drupal database
+* DRUPALDBUSER - username to access Drupal database
+* DRUPALDBPASS - password to access Drupal database
+* DRUPALPRISTINEDBFILE - path to mysql dump of pristine Drupal database
+* DRUPALDIR - a path to Drupal root directory
+* MODULESDIR - a path to Drupal modules directory
+* CIVICRMDIR - a path where CiviCRM is expected to be
+* DRUPALURL - URL of Drupal installation used for upgrade testing
+* CIVICRMURL - URL of CiviCRM installation used for upgrade testing
+* PHPUNITSCRIPTDIR - path from which WebTests (using PHPunit) will be run
+* PHPUNITCOMMAND - name of the script used to run WebTests
+
+
+h2. Example release testing scenarios
+
+h3. Simple release tests
+
+Simple release test is located in scripts/release-testing/simpleupgradetest.sh
+
+{code}
+./upgrader.sh run-checks
+./upgrader.sh cleanup-dbs
+./upgrader.sh cleanup-files
+./upgrader.sh install 3.3.0-tarball
+./upgrader.sh upgrade 3.4.1-tarball
+{code}
+
+Step by step description:
+* good idea to run-checks at the beginning to make sure all the stuff is set up correctly
+* first two lines: cleans up databases for upgrade testing installation and removes CiviCRM files (in case they weren't cleaned up from previous runs) for upgrade testing installation
+* installs start version (3.3.0 in above case) -
+* upgrades 3.3.0 to 3.4.1
+
+
+h3. Upgraded database schema verification
+
+Upgraded database schema verification test is located in scripts/release-testing/simpleupgradetest.sh
+
+{code}
+./upgrader.sh run-checks
+./upgrader.sh cleanup-dbs
+./upgrader.sh cleanup-files
+
+./upgrader.sh install 3.4.1-tarball
+./upgrader.sh dumpschema-cividb 3.4.1-clean.mysql
+
+./upgrader.sh cleanup-dbs
+./upgrader.sh cleanup-files
+
+./upgrader.sh install 3.3.0-tarball
+./upgrader.sh upgrade 3.4.1-tarball
+./upgrader.sh dumpschema-cividb 3.4.1-upgraded.mysql
+
+diff 3.4.1-clean.mysql 3.4.1-upgraded.mysql
+{code}
+
+Step by step description:
+* good idea to run-checks at the beginning to make sure all the stuff is set up correctly
+* first two lines: cleans up databases for upgrade testing installation and removes CiviCRM files (in case they weren't cleaned up from previous runs) for upgrade testing installation
+* installs start version (3.4.1 in above case)
+* dumps database schema for clean 3.4.1 install
+* cleans up again
+* installs 3.3.0
+* upgrades 3.3.0 to 3.4.1
+* dumps database schema for upgraded 3.4.1 install
+* produces a diff between dumps to verify if core upgrade code takes all the necessary schema changes into consideration
+
+h2. Assembling other release testing scenario
+
+TBD
+
+COMMENTBLOCK
+
+############
+#
+# START: Configuration
+#
+############
+
+CIVIDBNAME=
+CIVIDBUSER=
+CIVIDBPASS=
+
+DRUPALDBNAME=
+DRUPALDBUSER=
+DRUPALDBPASS=
+DRUPALPRISTINEDBFILE=
+
+DRUPALDIR=
+MODULESDIR=$DRUPALDIR"/sites/all/modules"
+SETTINGSDIR=$DRUPALDIR"/sites/all"
+CIVICRMDIR=$MODULESDIR"/civicrm"
+DRUPALURL="http://url.url"
+CIVICRMURL=$DRUPALURL"/civicrm/dashboard"
+
+
+PHPUNITSCRIPTDIR=""
+PHPUNITCOMMAND="scripts/phpunit"
+
+############
+#
+# END: Configuration
+#
+# DO NOT EDIT BELOW THIS LINE
+#
+# START: Command line params verification
+#
+############
+
+PU_INSTALLTEST="WebTest_Release_InstallScript"
+PU_UPGRADETEST="WebTest_Release_UpgradeScript"
+PU_SUITE="WebTest_AllTests"
+
+echo
+
+USAGE="Usage: upgrader.sh ACTION [/path/to/file]"
+SELF=$(cd $(dirname $0); pwd -P)/$(basename $0)
+ACTION=$1
+FILENAME=$2
+
+if [ -z $ACTION ] ; then
+    echo $USAGE
+    exit 1
+fi
+
+if [ $ACTION == "install" ] && [ -z $FILENAME ] ; then
+    echo $USAGE
+    echo "(Tarball parameter required for install)"
+    exit 1
+fi
+
+if [ $ACTION == "upgrade" ] && [ -z $FILENAME ] ; then
+    echo $USAGE
+    echo "(Tarball parameter required for upgrade)"
+    exit 1
+fi
+
+if [ $ACTION == "dumpschema-cividb" ] && [ -z $FILENAME ] ; then
+    echo $USAGE
+    echo "(Filename parameter required for dumpschema-cividb)"
+    exit 1
+fi
+
+############
+#
+# END: Command line params verification
+#
+# START: Utility functions
+#
+############
+
+function upgecho {
+    echo "*** Upgrader (action: $ACTION): $1 "
+}
+
+function errecho {
+    upgecho "## ERROR: $1 "
+}
+
+function run-checks {
+
+    SILENT=$1
+    CHECKS=0
+
+    if [ $SILENT -eq 1 ] ; then
+        upgecho "Starting checks..."
+    fi
+
+    if [ $ACTION == "install" ] && [ ! -r $FILENAME ] ; then
+        errecho "Tarball: \""$FILENAME"\" doesn't exist or is not readable."
+        CHECKS=1
+    fi
+
+    if [ $ACTION == "upgrade" ] && [ ! -r $FILENAME ] ; then
+        errecho "Tarball: \""$FILENAME"\" doesn't exist or is not readable."
+        CHECKS=1
+    fi
+
+    if [ ! -r $DRUPALPRISTINEDBFILE ] ; then
+        errecho "Drupal pristine database file: \""$DRUPALPRISTINEDBFILE"\" doesn't exist or is not readable."
+        CHECKS=1
+    fi
+
+    if [ ! -w $DRUPALDIR ] ; then
+        errecho "Drupal directory (value: $DRUPALDIR) does not exist or not writable."
+        CHECKS=1
+    fi
+
+    if [ ! -w $MODULESDIR ] ; then
+        errecho "Drupal modules directory (value: $MODULESDIR) does not exist or not writable."
+        CHECKS=1
+    fi
+
+
+    if [ -d $CIVICRMDIR ] ; then
+        upgecho "CiviCRM directory (value: $CIVICRMDIR) already exists, but maybe it's not a problem."
+    fi
+
+    if [ $CHECKS -eq 1 ] ; then
+        errecho "Quitting due to errors: see messages above."
+        exit 1
+    fi
+
+
+
+    if [ $SILENT -eq 1 ] ; then
+
+        upgecho "Action:                       $ACTION"
+        upgecho "Tarball:                      $FILENAME"
+    	upgecho "Script path:                  $SELF"
+    	upgecho "Drupal location:              $DRUPALDIR"
+    	upgecho "CiviCRM will be installed to: $CIVICRMDIR"
+    	upgecho "CiviCRM Database credentials: u: $CIVIDBUSER, p: $CIVIDBPASS, n: $CIVIDBNAME"
+    	upgecho "Drupal Database credentials:  u: $DRUPALDBUSER, p: $DRUPALDBPASS, n: $DRUPALDBNAME"
+
+        upgecho "Done with checks, everything seems fine."
+
+    fi
+
+}
+
+############
+#
+# END: Utility functions
+#
+# START: Webtest related functions
+#
+############
+
+function run-upgrade-scenario {
+    upgecho "Running upgrade scenario tests."
+    echo "*** Take it away, Sebastian! "
+    echo
+    cd $PHPUNITSCRIPTDIR
+    $PHPUNITCOMMAND $PU_UPGRADETEST
+    echo
+}
+
+function run-install-scenario {
+    upgecho "Running install scenario tests."
+    echo "*** Take it away, Sebastian! "
+    echo
+    cd $PHPUNITSCRIPTDIR
+    $PHPUNITCOMMAND $PU_INSTALLTEST
+    echo
+}
+
+function run-tests {
+    upgecho "Running post upgrade tests."
+    echo "*** Take it away, Sebastian! "
+    echo
+    cd $PHPUNITSCRIPTDIR
+    $PHPUNITCOMMAND $PU_SUITE
+    echo
+}
+
+############
+#
+# END: Webtest related functions
+#
+# START: Core functionality
+#
+############
+
+function remove-files {
+    upgecho "Cleaning up files. ($CIVICRMDIR is gone!)"
+    rm -rf $CIVICRMDIR
+}
+
+function remove-settings {
+    upgecho "Removing civicrm.settings.php. ($SETTINGSDIR/civicrm.settings.php is gone!)"
+    rm -rf $SETTINGSDIR"/civicrm.settings.php"
+}
+
+function cleanup-cividb {
+    upgecho "Cleaning up CiviCRM db (dropped and created)."
+    mysqladmin -f -u $CIVIDBUSER -p$CIVIDBPASS drop $CIVIDBNAME >> /dev/null 2>&1
+    mysqladmin -f -u $CIVIDBUSER -p$CIVIDBPASS create $CIVIDBNAME >> /dev/null 2>&1
+}
+
+function cleanup-drupdb {
+    upgecho "Cleaning up Drupal db (pristine copy loaded)."
+    mysqladmin -f -u $DRUPALDBUSER -p$DRUPALDBPASS drop $DRUPALDBNAME >> /dev/null 2>&1
+    mysqladmin -f -u $DRUPALDBUSER -p$DRUPALDBPASS create $DRUPALDBNAME >> /dev/null 2>&1
+    mysql -u $DRUPALDBUSER -p$DRUPALDBPASS $DRUPALDBNAME < $DRUPALPRISTINEDBFILE
+}
+
+function dump-schema {
+    mysqldump --no-data -u $CIVIDBUSER -p$CIVIDBPASS $CIVIDBNAME > $1
+}
+
+function install-files {
+    upgecho "Installing files from $FILENAME."
+    cd $MODULESDIR
+    tar xzvf $1 >> /dev/null 2>&1
+}
+
+############
+#
+# END: Core functionality
+#
+# START: Action hub
+#
+############
+
+case $ACTION in
+
+    run-checks)
+        run-checks 1
+    ;;
+
+    cleanup-files)
+        run-checks 0
+        remove-files
+        remove-settings
+    ;;
+
+    cleanup-dbs)
+        run-checks 0
+        cleanup-drupdb
+        cleanup-cividb
+    ;;
+
+    install)
+        run-checks 0
+        install-files $FILENAME
+        run-install-scenario
+    ;;
+
+    upgrade)
+        run-checks 0
+        remove-files
+        install-files $FILENAME
+        run-upgrade-scenario
+    ;;
+
+    dumpschema-cividb)
+        run-checks 0
+        dump-schema $FILENAME
+    ;;
+
+    tests)
+        run-checks 0
+        run-tests
+    ;;
+esac
+
+############
+#
+# END: Action hub
+#
+############
+
+echo

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: location_type_data.xml 30511 2010-11-03 11:36:36Z shot $  -->
+<dataset>
+  <table name="civicrm_location_type">
+    <column>id</column>
+    <column>name</column>
+    <column>vcard_name</column>
+    <column>description</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>is_default</column>
+    <row>
+      <value>1</value>                         <!--  id  -->
+      <value>Home</value>                      <!--  name  -->
+      <value>HOME</value>                      <!--  vcard_name  -->
+      <value>Place of residence</value>        <!--  description  -->
+      <value>0</value>                         <!--  is_reserved  -->
+      <value>1</value>                         <!--  is_active  -->
+      <value>1</value>                         <!--  is_default  -->
+    </row>
+    <row>
+      <value>2</value>                         <!--  id  -->
+      <value>Work</value>                      <!--  name  -->
+      <value>WORK</value>                      <!--  vcard_name  -->
+      <value>Work location</value>             <!--  description  -->
+      <value>0</value>                         <!--  is_reserved  -->
+      <value>1</value>                         <!--  is_active  -->
+      <null />                                 <!--  is_default  -->
+    </row>
+    <row>
+      <value>3</value>                         <!--  id  -->
+      <value>Main</value>                      <!--  name  -->
+      <null />                                 <!--  vcard_name  -->
+      <value>Main office location</value>      <!--  description  -->
+      <value>0</value>                         <!--  is_reserved  -->
+      <value>1</value>                         <!--  is_active  -->
+      <null />                                 <!--  is_default  -->
+    </row>
+    <row>
+      <value>4</value>                         <!--  id  -->
+      <value>Other</value>                     <!--  name  -->
+      <null />                                 <!--  vcard_name  -->
+      <value>Other location</value>            <!--  description  -->
+      <value>0</value>                         <!--  is_reserved  -->
+      <value>0</value>                         <!--  is_active  -->
+      <null />                                 <!--  is_default  -->
+    </row>
+    <row>
+      <value>5</value>                         <!--  id  -->
+      <value>Billing</value>                   <!--  name  -->
+      <null />                                 <!--  vcard_name  -->
+      <value>Billing Address location</value>  <!--  description  -->
+      <value>1</value>                         <!--  is_reserved  -->
+      <value>1</value>                         <!--  is_active  -->
+      <null />                                 <!--  is_default  -->
+    </row>
+  </table>
+</dataset>

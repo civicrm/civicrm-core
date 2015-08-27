@@ -295,7 +295,12 @@ LIMIT $limit";
     CRM_Utils_JSON::output($result);
   }
 
-  public function mappingList() {
+  /**
+   * Get a list of mappings.
+   *
+   * This appears to be only used by scheduled reminders.
+   */
+  static public function mappingList() {
     if (empty($_GET['mappingID'])) {
       CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
     }

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: contact_org.xml 30511 2010-11-03 11:36:36Z shot $  -->
+<dataset>
+  <table name="civicrm_contact">
+    <column>id</column>
+    <column>contact_type</column>
+    <column>contact_sub_type</column>
+    <column>do_not_email</column>
+    <column>do_not_phone</column>
+    <column>do_not_mail</column>
+    <column>do_not_sms</column>
+    <column>do_not_trade</column>
+    <column>is_opt_out</column>
+    <column>legal_identifier</column>
+    <column>external_identifier</column>
+    <column>sort_name</column>
+    <column>display_name</column>
+    <column>nick_name</column>
+    <column>legal_name</column>
+    <column>image_URL</column>
+    <column>preferred_communication_method</column>
+    <column>preferred_language</column>
+    <column>preferred_mail_format</column>
+    <column>hash</column>
+    <column>api_key</column>
+    <column>source</column>
+    <column>first_name</column>
+    <column>middle_name</column>
+    <column>last_name</column>
+    <column>prefix_id</column>
+    <column>suffix_id</column>
+    <column>email_greeting_id</column>
+    <column>email_greeting_custom</column>
+    <column>email_greeting_display</column>
+    <column>postal_greeting_id</column>
+    <column>postal_greeting_custom</column>
+    <column>postal_greeting_display</column>
+    <column>addressee_id</column>
+    <column>addressee_custom</column>
+    <column>addressee_display</column>
+    <column>job_title</column>
+    <column>gender_id</column>
+    <column>birth_date</column>
+    <column>is_deceased</column>
+    <column>deceased_date</column>
+    <column>household_name</column>
+    <column>primary_contact_id</column>
+    <column>organization_name</column>
+    <column>sic_code</column>
+    <column>user_unique_id</column>
+    <column>employer_id</column>
+  <column>is_deleted</column>
+    <row>
+      <value>24</value>  <!--  id  -->
+      <value>Organization</value>  <!--  contact_type  -->
+      <null />           <!--  contact_sub_type  -->
+      <null />           <!--  do_not_email  -->
+      <null />           <!--  do_not_phone  -->
+      <null />           <!--  do_not_mail  -->
+      <null />           <!--  do_not_sms  -->
+      <null />           <!--  do_not_trade  -->
+      <value>0</value>   <!--  is_opt_out  -->
+      <null />           <!--  legal_identifier  -->
+      <null />           <!--  external_identifier  -->
+      <null />                     <!--  sort_name  -->
+      <null />  <!--  display_name  -->
+      <null /><!--  nick_name  -->
+      <null /><!--  legal_name  -->
+      <null /><!--  image_URL  -->
+      <null /><!--  preferred_communication_method  -->
+      <null />en_US<!--  preferred_language  -->
+      <null /><!--  preferred_mail_format  -->
+      <null /><!--  hash  -->
+      <null /><!--  api_key  -->
+      <null /><!--  source  -->
+      <null /><!--  first_name  -->
+      <null /><!--  middle_name  -->
+      <null />  <!--  last_name  -->
+      <null /><!--  prefix_id  -->
+      <null /><!--  suffix_id  -->
+      <null /><!--  email_greeting_id  -->
+      <null /><!--  email_greeting_custom  -->
+      <null /><!--  email_greeting_display  -->
+      <null /><!--  postal_greeting_id  -->
+      <null /><!--  postal_greeting_custom  -->
+      <null /><!--  postal_greeting_display  -->
+      <null /><!--  addressee_id  -->
+      <null /><!--  addressee_custom  -->
+      <null /><!--  addressee_display  -->
+      <null /><!--  job_title  -->
+      <null /><!--  gender_id  -->
+      <null /><!--  birth_date  -->
+      <null /><!--  is_deceased  -->
+      <null /><!--  deceased_date  -->
+      <null /><!--  household_name  -->
+      <null /><!--  primary_contact_id  -->
+      <null /><!--  organization_name  -->
+      <null /><!--  sic_code  -->
+      <null /><!--  user_unique_id  -->
+      <null /><!--  employer_id  -->
+    <value>0</value>
+    </row>
+  </table>
+</dataset>

@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: dataset.xml 44314 2012-12-19 11:12:49Z kurund $  -->
+<dataset>
+    <!--  Groups: none  Tags: none  -->
+    <civicrm_contact
+        id="9"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 9"
+        sort_name="Test Contact 9"
+        first_name="Test"
+        last_name="Contact 9"
+    />
+    <!--  Groups: none  Tags: 9  -->
+    <civicrm_contact
+        id="10"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 10"
+        sort_name="Test Contact 10"
+        first_name="Test"
+        last_name="Contact 10"
+    />
+    <!--  Groups: none  Tags: 7  -->
+    <civicrm_contact
+        id="11"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 11"
+        sort_name="Test Contact 11"
+        first_name="Test"
+        last_name="Contact 11"
+    />
+    <!--  Groups: none  Tags: 7, 9  -->
+    <civicrm_contact
+        id="12"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 12"
+        sort_name="Test Contact 12"
+        first_name="Test"
+        last_name="Contact 12"
+    />
+    <!--  Groups: 5  Tags: none  -->
+    <civicrm_contact
+        id="13"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 13"
+        sort_name="Test Contact 13"
+        first_name="Test"
+        last_name="Contact 13"
+    />
+    <!--  Groups: 5  Tags: 9  -->
+    <civicrm_contact
+        id="14"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 14"
+        sort_name="Test Contact 14"
+        first_name="Test"
+        last_name="Contact 14"
+    />
+    <!--  Groups: 5  Tags: 7  -->
+    <civicrm_contact
+        id="15"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 15"
+        sort_name="Test Contact 15"
+        first_name="Test"
+        last_name="Contact 15"
+    />
+    <!--  Groups: 5  Tags: 7, 9  -->
+    <civicrm_contact
+        id="16"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 16"
+        sort_name="Test Contact 16"
+        first_name="Test"
+        last_name="Contact 16"
+    />
+    <!--  Groups: 3  Tags: none  -->
+    <civicrm_contact
+        id="17"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 17"
+        sort_name="Test Contact 17"
+        first_name="Test"
+        last_name="Contact 17"
+    />
+    <!--  Groups: 3  Tags: 9  -->
+    <civicrm_contact
+        id="18"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 18"
+        sort_name="Test Contact 18"
+        first_name="Test"
+        last_name="Contact 18"
+    />
+    <!--  Groups: 3  Tags: 7  -->
+    <civicrm_contact
+        id="19"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 19"
+        sort_name="Test Contact 19"
+        first_name="Test"
+        last_name="Contact 19"
+    />
+    <!--  Groups: 3  Tags: 7, 9  -->
+    <civicrm_contact
+        id="20"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 20"
+        sort_name="Test Contact 20"
+        first_name="Test"
+        last_name="Contact 20"
+    />
+    <!--  Groups: 3, 5  Tags: none  -->
+    <civicrm_contact
+        id="21"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 21"
+        sort_name="Test Contact 21"
+        first_name="Test"
+        last_name="Contact 21"
+    />
+    <!--  Groups: 3, 5  Tags: 9  -->
+    <civicrm_contact
+        id="22"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 22"
+        sort_name="Test Contact 22"
+        first_name="Test"
+        last_name="Contact 22"
+    />
+    <!--  Groups: 3, 5  Tags: 7  -->
+    <civicrm_contact
+        id="23"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 23"
+        sort_name="Test Contact 23"
+        first_name="Test"
+        last_name="Contact 23"
+    />
+    <!--  Groups: 3, 5  Tags: 7, 9  -->
+    <civicrm_contact
+        id="24"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 24"
+        sort_name="Test Contact 24"
+        first_name="Test"
+        last_name="Contact 24"
+    />
+    <!--  Groups: none  Tags: 7  -->
+    <civicrm_contact
+        id="26"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 26"
+        sort_name="Test Contact 26"
+        first_name="Test"
+        last_name="Contact 26"
+    />
+    <!--  Groups: 3  Tags: none  -->
+    <civicrm_contact
+        id="27"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 27"
+        sort_name="Test Contact 27"
+        first_name="Test"
+        last_name="Contact 27"
+    />
+    <!--  Groups: 3  Tags: 7  -->
+    <civicrm_contact
+        id="28"
+        contact_type="Individual"
+        is_opt_out="0"
+        display_name="Test Contact 28"
+        sort_name="Test Contact 28"
+        first_name="Test"
+        last_name="Contact 28"
+    />
+    <civicrm_tag
+        id="7"
+        name="Test Tag 7"
+        description="Test Tag 7"
+        is_selectable="1"
+    />
+    <civicrm_tag
+        id="9"
+        name="Test Tag 9"
+        description="Test Tag 79"
+        is_selectable="1"
+    />
+    <civicrm_entity_tag
+        entity_id="10"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="12"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="14"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="16"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="18"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="20"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="22"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="24"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="11"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="12"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="15"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="16"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="19"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="20"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="23"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="24"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="26"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="28"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_saved_search
+        id="1"
+        form_values='a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:1:{i:0;s:1:"3";}s:13:"excludeGroups";a:0:{}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}'
+    />
+    <civicrm_saved_search
+        id="2"
+        form_values='a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:0:{}s:13:"excludeGroups";a:1:{i:0;s:1:"3";}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}'
+    />
+    <civicrm_group
+        id="3"
+        name="Test Group 3"
+        title="Test Group 3"
+        description="Test Group 3"
+        is_active="1"
+        visibility="User and User Admin Only"
+        is_hidden="0"
+    />
+    <civicrm_group
+        id="4"
+        name="Test Smart Group 4"
+        title="Test Smart Group 4"
+        description="Test Smart Group 4"
+        saved_search_id="1"
+        is_active="1"
+        visibility="User and User Admin Only"
+        is_hidden="0"
+    />
+    <civicrm_group
+        id="5"
+        name="Test Group 5"
+        title="Test Group 5"
+        description="Test Group 5"
+        is_active="1"
+        visibility="User and User Admin Only"
+        is_hidden="0"
+    />
+    <civicrm_group
+        id="6"
+        name="Test Smart Group 6"
+        title="Test Smart Group 6"
+        description="Test Smart Group 6"
+        saved_search_id="2"
+        is_active="1"
+        visibility="User and User Admin Only"
+        is_hidden="0"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="13"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="14"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="15"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="16"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="21"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="22"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="23"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="24"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="17"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="18"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="19"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="20"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="21"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="22"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="23"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="24"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="27"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="28"
+        status="Added"
+    />
+    <civicrm_option_group
+       id="24"
+       name="custom_search"
+       description="Custom Search"
+       is_reserved="0"
+       is_active="1"
+    />
+    <civicrm_option_value
+       id="153"
+       option_group_id="24"
+       label="CRM_Contact_Form_Search_Custom_Group"
+       value="4"
+       name="CRM_Contact_Form_Search_Custom_Group"
+       filter="0"
+       weight="4"
+       description="Include / Exclude Contacts in a Group / Tag"
+       is_optgroup="0"
+       is_reserved="0"
+       is_active="1"
+    />
+</dataset>

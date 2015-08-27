@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<extension key="org.civicrm.demoqueue" type="module">
+  <downloadUrl>http://FIXME/org.civicrm.demoqueue.zip</downloadUrl>
+  <file>demoqueue</file>
+  <name>Demo Queue</name>
+  <description>Helper which tests the queue runner</description>
+  <license>FIXME</license>
+  <maintainer>
+    <author>FIXME</author>
+    <email>FIXME@example.com</email>
+  </maintainer>
+  <releaseDate>2012-03-26</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.1</ver>
+  </compatibility>
+  <comments>This is a new, undeveloped module</comments>
+  <civix>
+    <namespace>CRM/Demoqueue</namespace>
+  </civix>
+</extension>

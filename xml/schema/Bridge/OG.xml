@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Bridge</base>
+  <class>OG</class>
+  <name>civicrm_bridge_og</name>
+  <comment>An FK table that links between drupal organic group, civicrm group and civicrm acl roles</comment>
+  <add>2.0</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique table ID</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>drupal_og_id</name>
+    <type>int unsigned</type>
+    <comment>Foreign key to the organic group.</comment>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_drupal_og_id</name>
+    <fieldName>index_drupal_og_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>group_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm group.</comment>
+    <add>2.0</add>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <add>2.0</add>
+  </foreignKey>
+  <field>
+    <name>acl_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm acl.</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>acl_id</name>
+    <table>civicrm_acl</table>
+    <key>id</key>
+    <add>2.0</add>
+  </foreignKey>
+  <field>
+    <name>admin_group_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to admin civicrm group.</comment>
+    <add>2.0</add>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>admin_group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <add>2.0</add>
+  </foreignKey>
+  <field>
+    <name>admin_acl_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm acl.</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>admin_acl_id</name>
+    <table>civicrm_acl</table>
+    <key>id</key>
+    <add>2.0</add>
+  </foreignKey>
+</table>

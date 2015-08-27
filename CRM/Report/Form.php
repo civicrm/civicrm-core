@@ -1420,9 +1420,11 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
-   * A form rule function to ensure that fields selected in group_by
-   * (if any) should only be the ones present in display/select fields criteria;
-   * note: works if and only if any custom field selected in group_by.
+   * A form rule function for custom data.
+   *
+   * The rule ensures that fields selected in group_by if any) should only be the ones
+   * present in display/select fields criteria;
+   * note: works if and only if custom field selected in group_by.
    *
    * @param array $fields
    * @param array $ignoreFields
@@ -1821,7 +1823,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * Get SQL where clause for a date field.
    *
    * @param string $fieldName
-   * @param $relative
+   * @param string $relative
    * @param string $from
    * @param string $to
    * @param string $type
@@ -2007,9 +2009,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $value
-   * @param $customField
-   * @param $fieldValueMap
+   * Format custom values.
+   *
+   * @param mixed $value
+   * @param array $customField
+   * @param array $fieldValueMap
    *
    * @return float|string|void
    */
@@ -2127,7 +2131,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $rows
+   * Remove duplicate rows.
+   *
+   * @param array $rows
    */
   public function removeDuplicates(&$rows) {
     if (empty($this->_noRepeats)) {
@@ -2150,8 +2156,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $row
-   * @param $fields
+   * Fix subtotal display.
+   *
+   * @param array $row
+   * @param array $fields
    * @param bool $subtotal
    */
   public function fixSubTotalDisplay(&$row, $fields, $subtotal = TRUE) {
@@ -2171,7 +2179,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $rows
+   * Calculate grant total.
+   *
+   * @param array $rows
    *
    * @return bool
    */
@@ -2200,7 +2210,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $rows
+   * Format display output.
+   *
+   * @param array $rows
    * @param bool $pager
    */
   public function formatDisplay(&$rows, $pager = TRUE) {
@@ -2250,7 +2262,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $rows
+   * Build chart.
+   *
+   * @param array $rows
    */
   public function buildChart(&$rows) {
     // override this method for building charts.
@@ -2261,7 +2275,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   // towards generalizing the select() method below.
 
   /**
-   * Generate the SELECT clause and set class variable $_select
+   * Generate the SELECT clause and set class variable $_select.
    */
   public function select() {
     $select = $this->_selectAliases = array();
@@ -2284,9 +2298,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           ) {
 
             // 1. In many cases we want select clause to be built in slightly different way
-            //    for a particular field of a particular type.
+            // for a particular field of a particular type.
             // 2. This method when used should receive params by reference and modify $this->_columnHeaders
-            //    as needed.
+            // as needed.
             $selectClause = $this->selectClause($tableName, 'fields', $fieldName, $field);
             if ($selectClause) {
               $select[] = $selectClause;
@@ -2358,9 +2372,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             $this->_phoneField = TRUE;
           }
           // 1. In many cases we want select clause to be built in slightly different way
-          //    for a particular field of a particular type.
+          // for a particular field of a particular type.
           // 2. This method when used should receive params by reference and modify $this->_columnHeaders
-          //    as needed.
+          // as needed.
           $selectClause = $this->selectClause($tableName, 'group_bys', $fieldName, $field);
           if ($selectClause) {
             $select[] = $selectClause;
@@ -2424,10 +2438,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Build select clause for a single field.
+   *
    * @param string $tableName
-   * @param $tableKey
+   * @param string $tableKey
    * @param string $fieldName
-   * @param $field
+   * @param string $field
    *
    * @return bool
    */
@@ -2435,6 +2451,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return FALSE;
   }
 
+  /**
+   * Build where clause.
+   */
   public function where() {
     $this->storeWhereHavingClauseArray();
 
@@ -2457,8 +2476,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Store Where clauses into an array - breaking out this step makes
-   * over-riding more flexible as the clauses can be used in constructing a
+   * Store Where clauses into an array.
+   *
+   * Breaking out this step makes over-riding more flexible as the clauses can be used in constructing a
    * temp table that may not be part of the final where clause or added
    * in other functions
    */
@@ -2519,6 +2539,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   }
 
+  /**
+   * Set output mode.
+   */
   public function processReportMode() {
     $buttonName = $this->controller->getButtonName();
 
@@ -2585,7 +2608,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * Post Processing function for Form (postProcessCommon should be used to set other variables from input as the api accesses that function)
+   * Post Processing function for Form.
+   *
+   * postProcessCommon should be used to set other variables from input as the api accesses that function.
    */
   public function beginPostProcess() {
     $this->setParams($this->controller->exportValues($this->_name));
@@ -2619,13 +2644,13 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * BeginPostProcess function run in both report mode and non-report mode (api)
+   * BeginPostProcess function run in both report mode and non-report mode (api).
    */
-  public function beginPostProcessCommon() {
-
-  }
+  public function beginPostProcessCommon() {}
 
   /**
+   * Build the report query.
+   *
    * @param bool $applyLimit
    *
    * @return string
@@ -2653,6 +2678,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     return $sql;
   }
 
+  /**
+   * Build group by clause.
+   */
   public function groupBy() {
     $groupBys = array();
     if (!empty($this->_params['group_bys']) &&
@@ -2675,6 +2703,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * Build order by clause.
+   */
   public function orderBy() {
     $this->_orderBy = "";
     $this->_sections = array();
@@ -2686,6 +2717,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Extract order by fields and store as an array.
+   *
    * In some cases other functions want to know which fields are selected for ordering by
    * Separating this into a separate function allows it to be called separately from constructing
    * the order by clause
@@ -2743,6 +2776,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Determine unselected columns.
+   *
    * @return array
    */
   public function unselectedSectionColumns() {
@@ -2769,8 +2804,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $sql
-   * @param $rows
+   * Build output rows.
+   *
+   * @param string $sql
+   * @param array $rows
    */
   public function buildRows($sql, &$rows) {
     $dao = CRM_Core_DAO::executeQuery($sql);
@@ -2803,9 +2840,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Calculate section totals.
+   *
    * When "order by" fields are marked as sections, this assigns to the template
    * an array of total counts for each section. This data is used by the Smarty
-   * plugin {sectionTotal}
+   * plugin {sectionTotal}.
    */
   public function sectionTotals() {
 
@@ -2866,12 +2905,17 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
+  /**
+   * Modify column headers.
+   */
   public function modifyColumnHeaders() {
     // use this method to modify $this->_columnHeaders
   }
 
   /**
-   * @param $rows
+   * Assign rows to the template.
+   *
+   * @param array $rows
    */
   public function doTemplateAssignment(&$rows) {
     $this->assign_by_ref('columnHeaders', $this->_columnHeaders);
@@ -2880,8 +2924,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * override this method to build your own statistics
-   * @param $rows
+   * Build report statistics.
+   *
+   * Override this method to build your own statistics.
+   *
+   * @param array $rows
    *
    * @return array
    */
@@ -2904,8 +2951,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $statistics
-   * @param $count
+   * Add count statistics.
+   *
+   * @param array $statistics
+   * @param int $count
    */
   public function countStat(&$statistics, $count) {
     $statistics['counts']['rowCount'] = array(
@@ -2922,7 +2971,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $statistics
+   * Add group by statistics.
+   *
+   * @param array $statistics
    */
   public function groupByStat(&$statistics) {
     if (!empty($this->_params['group_bys']) &&
@@ -2946,7 +2997,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $statistics
+   * Filter statistics.
+   *
+   * @param array $statistics
    */
   public function filterStat(&$statistics) {
     foreach ($this->_columns as $tableName => $table) {
@@ -3206,6 +3259,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * Compile the report content.
+   *
    * Although this function is super-short it is useful to keep separate so it can be over-ridden by report classes.
    *
    * @return string
@@ -3218,6 +3272,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
 
+  /**
+   * Post process function.
+   */
   public function postProcess() {
     // get ready with post process params
     $this->beginPostProcess();
@@ -3241,7 +3298,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Set limit.
+   *
    * @param int $rowCount
+   *
    * @return array
    */
   public function limit($rowCount = self::ROW_COUNT_LIMIT) {
@@ -3290,6 +3350,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Set pager.
+   *
    * @param int $rowCount
    */
   public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
@@ -3318,9 +3380,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $field
-   * @param $value
-   * @param $op
+   * Build where clause for groups.
+   *
+   * @param string $field
+   * @param mixed $value
+   * @param string $op
    *
    * @return string
    */
@@ -3365,9 +3429,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
-   * @param $field
-   * @param $value
-   * @param $op
+   * Build where clause for tags.
+   *
+   * @param string $field
+   * @param mixed $value
+   * @param string $op
    *
    * @return string
    */
@@ -3416,6 +3482,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
   /**
    * Generate Membership Type SQL Clause.
+   *
    * @param mixed $value
    * @param string $op
    *
@@ -3442,6 +3509,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Build acl clauses.
+   *
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact_a') {
@@ -3449,6 +3518,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   /**
+   * Add custom data to the columns.
+   *
    * @param bool $addFields
    * @param array $permCustomGroupIds
    */
@@ -3641,6 +3712,9 @@ ORDER BY cg.weight, cf.weight";
     }
   }
 
+  /**
+   * Build custom data from clause.
+   */
   public function customDataFrom() {
     if (empty($this->_customGroupExtends)) {
       return;
@@ -3679,7 +3753,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * @param $prop
+   * Check if the field is selected.
+   *
+   * @param string $prop
    *
    * @return bool
    */
@@ -3801,7 +3877,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Does table name have columns in SELECT clause?
+   * Check if table name has columns in SELECT clause.
    *
    * @param string $tableName
    *   Name of table (index of $this->_columns array).
@@ -3814,7 +3890,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
   /**
    * Fetch array of DAO tables having columns included in SELECT or ORDER BY clause.
-   * (building the array if it's unset)
+   *
+   * If the array is unset it will be built.
    *
    * @return array
    *   selectedTables
@@ -3868,6 +3945,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Add address fields.
+   *
    * @deprecated - use getAddressColumns which is a more accurate description
    * and also accepts an array of options rather than a long list
    *
@@ -4029,11 +4108,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * Do AlterDisplay processing on Address Fields.
    *
-   * @param $row
-   * @param $rows
-   * @param $rowNum
-   * @param $baseUrl
-   * @param $urltxt
+   * @param array $row
+   * @param array $rows
+   * @param int $rowNum
+   * @param string $baseUrl
+   * @param string $urltxt
    *
    * @return bool
    */
@@ -4204,6 +4283,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Add contact to group.
+   *
    * @param int $groupID
    */
   public function add2group($groupID) {
@@ -4234,7 +4315,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * function used for showing charts on print screen.
+   * Show charts on print screen.
    */
   public static function uploadChartImage() {
     // upload strictly for '.png' images

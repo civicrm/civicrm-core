@@ -1,0 +1,35 @@
+<?php
+
+class ReleaseTestSettings {
+
+  var $publicSandbox  = false;
+  var $browser = '*firefox';
+  var $sandboxURL = 'http://url.url';
+  var $sandboxPATH = '';
+  var $installPATH = '/sites/trunk.drupal/modules/civicrm/install/';
+  var $upgradePATH = '/civicrm/upgrade?reset=1';
+  var $username = '';
+  var $password = '';
+  var $adminUsername = '';
+  var $adminPassword = '';
+        var $UFemail = 'noreply@civicrm.org';
+
+        var $civiDBServer = 'localhost';
+        var $civiDBUser = '';
+        var $civiDBPass = '';
+        var $civiDBName = '';
+
+        var $drupalDBServer = 'localhost';
+        var $drupalDBUser = '';
+        var $drupalDBPass = '';
+        var $drupalDBName = '';
+
+
+  function __construct() {
+    $this->fullSandboxPath = $this->sandboxURL . $this->sandboxPATH;
+    $this->installURL = $this->fullSandboxPath . $this->installPATH;
+    $this->upgradeURL = $this->fullSandboxPath . $this->upgradePATH;
+  }
+
+}
+?>

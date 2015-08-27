@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: option_value_case.xml 36085 2011-09-09 13:15:49Z daved $  -->
+<dataset>
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>component_id</column>
+    <column>visibility_id</column>
+    <row>
+      <null />                  <!--  id  -->
+      <value>27</value>         <!--  option_group_id  -->
+      <value>Resolved</value>   <!--  label  -->
+      <value>2</value>          <!--  value  -->
+      <value>Closed</value>     <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>0</value>          <!--  filter  -->
+      <value>1</value>          <!--  is_default  -->
+      <value>2</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>1</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+    <row>
+      <null />                  <!--  id  -->
+      <value>27</value>         <!--  option_group_id  -->
+      <value>Ongoing</value>    <!--  label  -->
+      <value>1</value>          <!--  value  -->
+      <value>Open</value>       <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>0</value>          <!--  filter  -->
+      <value>1</value>          <!--  is_default  -->
+      <value>1</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>1</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+    <row>
+      <null />                  <!--  id  -->
+      <value>27</value>         <!--  option_group_id  -->
+      <value>Urgent</value>     <!--  label  -->
+      <value>3</value>          <!--  value  -->
+      <value>Urgent</value>     <!--  name  -->
+      <null />                  <!--  grouping  -->
+      <value>0</value>          <!--  filter  -->
+      <null />                  <!--  is_default  -->
+      <value>3</value>          <!--  weight  -->
+      <null />                  <!--  description  -->
+      <value>0</value>          <!--  is_optgroup  -->
+      <value>1</value>          <!--  is_reserved  -->
+      <value>1</value>          <!--  is_active  -->
+      <null />                  <!--  component_id  -->
+      <null />                  <!--  visibility_id  -->
+    </row>
+  </table>
+
+  <table name="civicrm_option_value">
+    <column>id</column>
+    <column>option_group_id</column>
+    <column>label</column>
+    <column>value</column>
+    <column>name</column>
+    <column>grouping</column>
+    <column>filter</column>
+    <column>is_default</column>
+    <column>weight</column>
+    <column>description</column>
+    <column>is_optgroup</column>
+    <column>is_reserved</column>
+    <column>is_active</column>
+    <column>component_id</column>
+    <row>
+      <null />
+      <value>26</value>
+      <value>Adult Day Care Referral</value>
+      <value>2</value>
+      <value>adult_day_care_referral</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>2</value>
+      <value>Arranging adult day care for senior individuals</value>
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <null />
+    </row>
+    <row>
+      <null />
+      <value>26</value>
+      <value>Housing Support</value>
+      <value>1</value>
+      <value>housing_support</value>
+      <null />
+      <value>0</value>
+      <null />
+      <value>1</value>
+      <value>Help homeless individuals obtain temporary and long-term housing</value>
+      <value>0</value>
+      <value>0</value>
+      <value>1</value>
+      <null />
+    </row>
+  </table>
+</dataset>

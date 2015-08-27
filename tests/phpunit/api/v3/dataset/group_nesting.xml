@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id:  -->
+<dataset>
+  <table name="civicrm_group_nesting">
+    <column>id</column>
+    <column>parent_group_id</column>
+    <column>child_group_id</column>
+    <row>
+      <value>1</value>  <!--  id  -->
+      <value>1</value>  <!--  parent_group_id  -->
+      <value>2</value>  <!--  child_group_id  -->
+    </row>
+    <row>
+      <value>2</value>  <!--  id  -->
+      <value>1</value>  <!--  parent_group_id  -->
+      <value>3</value>  <!--  child_group_id  -->
+    </row>
+    <row>
+      <value>3</value>  <!--  id  -->
+      <value>1</value>  <!--  parent_group_id  -->
+      <value>4</value>  <!--  child_group_id  -->
+    </row>
+    <row>
+      <value>4</value>  <!--  id  -->
+      <value>2</value>  <!--  parent_group_id  -->
+      <value>4</value>  <!--  child_group_id  -->
+    </row>
+  </table>
+</dataset>
