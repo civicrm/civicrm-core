@@ -2809,7 +2809,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @param string $sql
    * @param array $rows
    */
-   public function buildRows($sql, &$rows) { 
+  public function buildRows($sql, &$rows) {
     $dao = CRM_Core_DAO::executeQuery($sql);
     if (!is_array($rows)) {
       $rows = array();
@@ -2905,12 +2905,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Modify column headers.
    */
->>>>>>> 7d2a14447d9049e82a6e676071bce7c6070c98de
   public function modifyColumnHeaders() {
     // use this method to modify $this->_columnHeaders
   }
