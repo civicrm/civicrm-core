@@ -380,9 +380,10 @@ class CRM_Event_BAO_Query {
               $op = key($value);
               $value = $value[$op];
             }
-            if (!strstr($op, 'NULL') || !strstr($op, 'EMPTY')) {
+            if (!strstr($op, 'NULL') && !strstr($op, 'EMPTY') && !strstr($op, 'LIKE')) {
               $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
-              $query->_where[$grouping][] = " civicrm_participant.$name $regexOp '^" . implode('[[:cntrl:]]', (array) $value) . "$' ";
+              $regexp = (strstr($op, '=')) ? "^{$value}$" : "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:cntrl:]]*";
+              $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.$name", $regexOp, $regexp, 'String');
             }
           }
         }
