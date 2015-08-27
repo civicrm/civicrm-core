@@ -101,6 +101,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       $this->_defaults['enableSSL'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL');
       $this->_defaults['verifySSL'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
+      $this->_defaults['enableComponents'] = Civi::settings()->get('enable_components');
     }
 
     return $this->_defaults;

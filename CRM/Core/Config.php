@@ -288,6 +288,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       $this->$key = $value;
     }
 
+    $this->enableComponents = Civi::settings()->get('enable_components');
+
     $this->customFileUploadDir = CRM_Core_Config_Defaults::getCustomFileUploadDir();
     $this->customPHPPathDir = CRM_Core_Config_Defaults::getCustomPhpPathDir();
     $this->customTemplateDir = CRM_Core_Config_Defaults::getCustomTemplateDir();
