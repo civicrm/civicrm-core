@@ -413,6 +413,9 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'participant_campaign_id':
+        if (CRM_Utils_Array::value($op, $value)) {
+          $value = $value[$op];
+        }
         $campParams = array(
           'op' => $op,
           'campaign' => $value,
