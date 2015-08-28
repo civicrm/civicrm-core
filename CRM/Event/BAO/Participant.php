@@ -1961,13 +1961,18 @@ GROUP BY li.entity_table, li.entity_id, price_field_value_id
         WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId})";
       CRM_Core_DAO::executeQuery($updateLineItem);
     }
+    $amountLevel = array();
+    $totalParticipant = $participantCount = 0;
     if (!empty($updateLines)) {
       foreach ($updateLines as $valueId => $vals) {
+        $taxAmount = "NULL";
         if (isset($vals['tax_amount'])) {
           $taxAmount = $vals['tax_amount'];
         }
-        else {
-          $taxAmount = "NULL";
+        $amountLevel[] = $vals['label'] . ' - ' . (float) $vals['qty'];
+        if (isset($vals['participant_count'])) {
+          $participantCount = $vals['participant_count'];
+          $totalParticipant += $vals['participant_count'];
         }
         $updateLineItem = "
 UPDATE civicrm_line_item li
@@ -1975,6 +1980,7 @@ SET li.qty = {$vals['qty']},
     li.line_total = {$vals['line_total']},
     li.tax_amount = {$taxAmount},
     li.unit_price = {$vals['unit_price']},
+    li.participant_count = {$participantCount},
     li.label = %1
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
       (price_field_value_id = {$valueId})
@@ -2012,7 +2018,15 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     else {
       $taxAmount = "NULL";
     }
-    $trxn = self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount);
+    $displayParticipantCount = '';
+    if ($totalParticipant > 0) {
+      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
+    }
+    $updateAmountLevel = NULL;
+    if (!empty($amountLevel)) {
+      $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
+    $trxn = self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount, $updateAmountLevel);
     $trxnId = array();
     if ($trxn) {
       $trxnId['id'] = $trxn->id;
@@ -2068,7 +2082,7 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
    * @param $paidAmount
    * @param int $contributionId
    */
-  public static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL) {
+  public static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
     $pendingAmount = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $pendingAmount = CRM_Utils_Array::value('total_amount', $pendingAmount, 0);
     $balanceAmt = $updatedAmount - $paidAmount;
@@ -2105,6 +2119,9 @@ WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantId} AND
       $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
       $updatedContributionDAO->fee_amount = 0;
       $updatedContributionDAO->tax_amount = $taxAmount;
+      if (!empty($updateAmountLevel)) {
+        $updatedContributionDAO->amount_level = $updateAmountLevel;
+      }
       $updatedContributionDAO->save();
       // adjusted amount financial_trxn creation
       $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
