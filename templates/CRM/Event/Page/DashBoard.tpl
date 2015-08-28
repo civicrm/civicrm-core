@@ -119,8 +119,14 @@
                     {foreach from=$eventSummary.tab key=k item=v}
                       {assign var="fld" value=$v.field}
                       {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
-                      <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
-                             href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
+                      {* Schedule Reminders requires a different query string. *}
+                      {if $v.url EQ 'civicrm/event/manage/reminder'}
+                        <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
+                            href="{crmURL p="`$v.url`" q="reset=1&action=browse&setTab=1&id=`$id`"}">{$v.title}</a></li>
+                      {else}
+                        <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
+                            href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
+                      {/if}
                     {/foreach}
                   </ul>
                 </span>
