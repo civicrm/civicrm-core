@@ -209,6 +209,8 @@ class CRM_Member_BAO_Query {
       case 'membership_type':
       case 'membership_type_id':
       case 'member_id':
+      case 'member_campaign_id':
+
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
           $qillName = 'Membership Status(s)';
@@ -216,6 +218,10 @@ class CRM_Member_BAO_Query {
         elseif ($name == 'member_id') {
           $name = 'id';
           $qillName = 'Membership ID';
+        }
+        elseif ($name == 'member_campaign_id') {
+          $name = 'campaign_id';
+          $qillName = 'Campaign';
         }
         else {
           $name = 'membership_type_id';
@@ -289,16 +295,6 @@ class CRM_Member_BAO_Query {
           $query->_qill[$grouping][] = ts("Related Members Only");
         }
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
-        return;
-
-      case 'member_campaign_id':
-        $campParams = array(
-          'op' => $op,
-          'campaign' => $value,
-          'grouping' => $grouping,
-          'tableName' => 'civicrm_membership',
-        );
-        CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         return;
     }
   }
