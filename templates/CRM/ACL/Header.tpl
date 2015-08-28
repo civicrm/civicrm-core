@@ -23,50 +23,39 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/ACL/Header.tpl" step=3}
+{capture assign=docLink}{docURL page='user/current/initial-set-up/permissions-and-access-control/' text='Access Control Documentation'}{/capture}
 
-{if $action eq 1 or $action eq 2 or $action eq 8}
-<div class="crm-block crm-form-block">
-   {include file="CRM/ACL/Form/ACLBasic.tpl"}
+<div class="help">
+  <p>{ts 1=$docLink}ACLs allow you to control access to CiviCRM data. An ACL consists of an <strong>Operation</strong> (e.g. 'View' or 'Edit'), a <strong>set of data</strong> that the operation can be performed on (e.g. a group of contacts), and a <strong>Role</strong> that has permission to do this operation. Refer to the %1 for more info.{/ts}</p>
 </div>
-{/if}
 
-<div class="crm-block crm-content-block">
-{if $rows}
-<div id="ltype">
-<p></p>
-    <div class="form-item">
-        {strip}
-        <table>
-        <tr class="columnheader">
-            <th>{ts}Role{/ts}</th>
-            <th>{ts}ACL Type(s){/ts}</th>
-            <th></th>
-        </tr>
-        {foreach from=$rows item=row}
-        <tr class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-          <td>{$row.entity}</td>
-          <td>{$row.object_table}</td>
-          <td>{$row.action}</td>
-        </tr>
-        {/foreach}
-        </table>
-        {/strip}
+{php}
+  $currentStep = $this->get_template_vars('step');
+  $wizard = array(
+    'style' => array(),
+    'currentStepNumber' => $currentStep,
+    'steps' => array(
+      array(
+        'title' => ts('Manage Roles'),
+        'link' => CRM_Utils_System::url('civicrm/admin/options/acl_role', 'reset=1'),
+      ),
+      array(
+        'title' => ts('Assign Users'),
+        'link' => CRM_Utils_System::url('civicrm/acl/entityrole', 'reset=1'),
+      ),
+      array(
+        'title' => ts('Manage ACLs'),
+        'link' => CRM_Utils_System::url('civicrm/acl', 'reset=1'),
+      ),
+    ),
+  );
+  foreach ($wizard['steps'] as $num => &$step) {
+    $step['step'] = $step['valid'] = $step['stepNumber'] = $num + 1;
+    if ($step['stepNumber'] == $currentStep) {
+      $step['link'] = NULL;
+    }
+  }
+  $this->assign('wizard', $wizard);
+{/php}
 
-        {if $action ne 1 and $action ne 2}
-      <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newACL"><div class="icon ui-icon-circle-plus"></div>{ts}Add ACL{/ts}</a>
-        </div>
-        {/if}
-    </div>
-</div>
-{elseif $action ne 1 and $action ne 2 and $action ne 8}
-    <div class="messages status no-popup">
-    <dl>
-        <dt><img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/></dt>
-        {capture assign=crmURL}{crmURL q="action=add&reset=1"}{/capture}
-        <dd>{ts 1=$crmURL}There are no ACLs entered. You can <a href='%1'>add one</a>.{/ts}</dd>
-        </dl>
-    </div>
-{/if}
-</div>
+{include file="CRM/common/WizardHeader.tpl"}
