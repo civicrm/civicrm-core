@@ -641,7 +641,7 @@ function _civicrm_api3_get_using_utils_sql($dao_name, $params, $isFillUniqueFiel
         );
       }
       else {
-        $query->where(CRM_Core_DAO::createSQLFilter('a.' . $column_name, $value, $type));
+        $query->where(CRM_Core_DAO::createSQLFilter("{$table_name}.{$column_name}", $value, $type));
       }
     }
   }
