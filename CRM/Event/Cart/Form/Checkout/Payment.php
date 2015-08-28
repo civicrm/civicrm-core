@@ -249,7 +249,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         if (array_search($event_in_cart->event_id, $discounted_event_ids) != NULL) {
           $this->apply_discount($discountcode, $price_set_amount, $cost);
         }
-      } 
+      }
       $cost = $event_price_values['amount'];
       $amount_level = $event_price_values['amount_level'];
       $price_details[$price_set_id] = $price_set_amount;
@@ -703,7 +703,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $defaults["billing_last_name"] = $contact->last_name;
 
       $billing_address = CRM_Event_Cart_BAO_MerParticipant::billing_address_from_contact($contact);
-
       if ($billing_address != NULL) {
         $defaults["billing_street_address-{$this->_bltID}"] = $billing_address['street_address'];
         $defaults["billing_city-{$this->_bltID}"] = $billing_address['city'];
@@ -712,12 +711,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         $defaults["billing_country_id-{$this->_bltID}"] = $billing_address['country_id'];
       }
     }
-
     $defaults["source"] = $this->description;
-
     return $defaults;
   }
-  
   /**
    * @param $discountcode
    * @param array $price_set_amount
@@ -739,13 +735,14 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         if ($diff1->days > 0) {
           $active1 = TRUE;
         }
+        if ($discvalue['expire_on'] == NULL) {
+          $active2 = TRUE;
+        }
         if ($discvalue['expire_on'] != NULL) {
           $diff2 = date_diff(date_create($today), date_create($discvalue['expire_on']));
           if ($diff2->days > 0) {
             $active2 = TRUE;
           }
-        } else {
-          $active2 = TRUE;
         }
         if ($discvalue['is_active'] == TRUE && ($discvalue['count_max'] == 0 || ($discvalue['count_max'] > $discvalue['count_use'])) && $active1 == TRUE && $active2 == TRUE) {
           foreach ($price_set_amount as $key => $price) {

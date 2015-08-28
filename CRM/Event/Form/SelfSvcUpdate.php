@@ -44,14 +44,14 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    * @var string
    *
-   */  
+   */
   protected $_participant_id;
   /**
    * contact id
    *
    * @var string
    *
-   */  
+   */
   protected $_contact_id;
   /**
    * name of the particpant
@@ -128,7 +128,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     }
     $event = array();
     $daoName = 'title';
-    $this->_event_title = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event',$this->_event_id, $daoName);
+    $this->_event_title = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event', $this->_event_id, $daoName);
     $daoName = 'start_date';
     $this->_event_start_date = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event', $this->_event_id, $daoName);
     list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contact_id);
@@ -173,7 +173,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       }
     }
     $this->assign('details', $details);
-    $this->selfsvcupdateUrl = CRM_Utils_System::url('civicrm/event/selfsvcupdate',"reset=1&id={$this->_participant_id}&id=0");
+    $this->selfsvcupdateUrl = CRM_Utils_System::url('civicrm/event/selfsvcupdate', "reset=1&id={$this->_participant_id}&id=0");
     $this->selfsvcupdateText = ts('Update');
     $this->selfsvcupdateButtonText = ts('Update');
     // Based on those ids retrieve event and verify it is eligible
@@ -182,9 +182,9 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    $this->add('text', 'email', ts('Email'), ts($this->_contact_email), TRUE );
+    $this->add('text', 'email', ts('Email'), ts($this->_contact_email), TRUE);
     $this->add('text', 'participant', ts('Participant name'), ts($this->_contact_name), TRUE);
-    $this->add('select', 'action','Action', array('-select-', 'Transfer', 'Cancel'));
+    $this->add('select', 'action', 'Action', array('-select-', 'Transfer', 'Cancel'));
     $this->addButtons(array(
       array(
         'type' => 'submit',
@@ -205,7 +205,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_defaults['details'] = $this->_details;
     return $this->_defaults;
   }
-  
+
   public function postProcess() {
     //if selection is cancel, cancel this participant' registration, process refund
     //if transfer, process form to allow selection of transferree
@@ -220,17 +220,15 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $this->cancelParticipant($params);
     }
   }
-  
+ 
   public function transferParticipant($params) {
     $transferUrl = 'civicrm/event/form/selfsvctransfer';
     $url = CRM_Utils_System::url('civicrm/event/selfsvctransfer', 'reset=1&action=add&pid=' . $this->_participant_id);
-    //CRM_Core_Session::setStatus(ts("Select name & email to transfer your registration to.",
-      //array(1 => $set->title)), ts('Update'), 'success');
     $this->controller->setDestination($url);
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext($url);
   }
-  
+
   public function cancelParticipant($params) {
     //set participant record status to Cancelled, refund payment if possible
     // send email to participant and admin, and log Activity
@@ -242,8 +240,16 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     CRM_Event_BAO_Participant::create($value);
     $domainValues = array();
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $tokens = array('domain' => array('name', 'phone', 'address', 'email'),
-      'contact' => CRM_Core_SelectValues::contactTokens(), );
+    $tokens = array(
+      'domain' =>
+      array(
+        'name',
+        'phone',
+        'address',
+        'email'
+      ),
+      'contact' => CRM_Core_SelectValues::contactTokens(),
+    );
     foreach ($tokens['domain'] as $token) {
       $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
     }
@@ -295,4 +301,5 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', array(1 => $this->_contact_email));
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
+
 }
