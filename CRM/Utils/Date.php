@@ -1490,12 +1490,20 @@ class CRM_Utils_Date {
         break;
 
       case 'week':
+        $weekFirst = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
+        $thisDay = $now['wday'];
+        if ($weekFirst > $thisDay) {
+          $diffDay = $thisDay - $weekFirst + 7;
+        }
+        else {
+          $diffDay = $thisDay - $weekFirst;
+        }
         switch ($relativeTerm) {
           case 'this':
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']), $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
             $to = self::intervalAdd('day', 6, $from);
             break;
 
@@ -1503,7 +1511,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) - 7, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) - 7, $from);
             $to = self::intervalAdd('day', 6, $from);
             break;
 
@@ -1511,7 +1519,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) - 14, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) - 14, $from);
             $to = self::intervalAdd('day', 6, $from);
             break;
 
@@ -1519,7 +1527,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) - 14, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) - 14, $from);
             $to = self::intervalAdd('day', 13, $from);
             break;
 
@@ -1527,7 +1535,7 @@ class CRM_Utils_Date {
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
-            $to = self::intervalAdd('day', -1 * ($now['wday']) - 1, $to);
+            $to = self::intervalAdd('day', -1 * ($diffDay) - 1, $to);
             unset($from);
             break;
 
@@ -1535,7 +1543,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']), $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
             unset($to);
             break;
 
@@ -1543,7 +1551,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) - 1, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) - 1, $from);
             unset($to);
             break;
 
@@ -1561,7 +1569,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']), $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
@@ -1574,7 +1582,7 @@ class CRM_Utils_Date {
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
             //CRM-14550 QA Fix
-            $to = self::intervalAdd('day', -1 * ($now['wday']) + 6, $to);
+            $to = self::intervalAdd('day', -1 * ($diffDay) + 6, $to);
             unset($from);
             break;
 
@@ -1582,7 +1590,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) + 7, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) + 7, $from);
             $to = self::intervalAdd('day', 6, $from);
             break;
 
