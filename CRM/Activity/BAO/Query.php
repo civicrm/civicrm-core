@@ -301,6 +301,9 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'activity_campaign_id':
+        if (CRM_Utils_Array::value($op, $value)) {
+          $value = $value[$op];
+        }
         $campParams = array(
           'op' => $op,
           'campaign' => $value,

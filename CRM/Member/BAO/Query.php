@@ -292,6 +292,9 @@ class CRM_Member_BAO_Query {
         return;
 
       case 'member_campaign_id':
+        if (CRM_Utils_Array::value($op, $value)) {
+          $value = $value[$op];
+        }
         $campParams = array(
           'op' => $op,
           'campaign' => $value,
