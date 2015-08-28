@@ -69,13 +69,6 @@ class CRM_Core_BAO_ConfigSetting {
       self::formatParams($params, $values);
     }
 
-    // CRM-6151
-    if (isset($params['localeCustomStrings']) &&
-      is_array($params['localeCustomStrings'])
-    ) {
-      $domain->locale_custom_strings = serialize($params['localeCustomStrings']);
-    }
-
     // unset any of the variables we read from file that should not be stored in the database
     // the username and certpath are stored flat with _test and _live
     // check CRM-1470
@@ -189,11 +182,8 @@ class CRM_Core_BAO_ConfigSetting {
     if (CRM_Core_Config::isUpgradeMode()) {
       $domain->selectAdd('config_backend');
     }
-    elseif (CRM_Utils_Array::value($urlVar, $_GET) == 'admin/modules/list/confirm') {
-      $domain->selectAdd('config_backend', 'locales');
-    }
     else {
-      $domain->selectAdd('config_backend, locales, locale_custom_strings');
+      $domain->selectAdd('config_backend, locales');
     }
 
     $domain->id = CRM_Core_Config::domainID();
@@ -210,14 +200,6 @@ class CRM_Core_BAO_ConfigSetting {
         if (array_key_exists($skip, $defaults)) {
           unset($defaults[$skip]);
         }
-      }
-
-      // check if there are any locale strings
-      if ($domain->locale_custom_strings) {
-        $defaults['localeCustomStrings'] = unserialize($domain->locale_custom_strings);
-      }
-      else {
-        $defaults['localeCustomStrings'] = NULL;
       }
 
       // are we in a multi-language setup?
