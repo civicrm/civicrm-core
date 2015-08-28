@@ -346,6 +346,8 @@ class CRM_Event_BAO_Query {
       case 'participant_is_pay_later':
       case 'participant_fee_amount':
       case 'participant_fee_level':
+      case 'participant_campaign_id':
+
         $qillName = $name;
         if (in_array($name, array(
               'participant_status_id',
@@ -356,6 +358,7 @@ class CRM_Event_BAO_Query {
               'participant_fee_amount',
               'participant_fee_level',
               'participant_is_pay_later',
+              'participant_campaign_id',
             ))) {
           $name = str_replace('participant_', '', $name);
           if ($name == 'is_pay_later') {
@@ -410,16 +413,6 @@ class CRM_Event_BAO_Query {
         }
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
-        return;
-
-      case 'participant_campaign_id':
-        $campParams = array(
-          'op' => $op,
-          'campaign' => $value,
-          'grouping' => $grouping,
-          'tableName' => 'civicrm_participant',
-        );
-        CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         return;
     }
   }
