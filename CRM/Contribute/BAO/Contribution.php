@@ -2536,6 +2536,52 @@ WHERE  contribution_id = %1 ";
       $values['event'] = array();
 
       CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
+      // add custom fields for event
+      $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Event', $this->_relatedObjects['event'], $this->_relatedObjects['event']->id);
+
+      $eventCustomGroup = array();
+      foreach ($eventGroupTree as $key => $group) {
+        if ($key === 'info') {
+          continue;
+        }
+
+        foreach ($group['fields'] as $k => $customField) {
+          $groupLabel = $group['title'];
+          if (!empty($customField['customValue'])) {
+            foreach ($customField['customValue'] as $customFieldValues) {
+              $eventCustomGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
+            }
+          }
+        }
+      }
+      $values['event']['customGroup'] = $eventCustomGroup;
+
+      //get participant details
+      $participantParams = array(
+        'id' => $this->_relatedObjects['participant']->id,
+      );
+
+      $values['participant'] = array();
+
+      CRM_Event_BAO_Participant::getValues($participantParams, $values['participant'], $participantIds);
+      // add custom fields for event
+      $participantGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', $this->_relatedObjects['participant'], $this->_relatedObjects['participant']->id);
+      $participantCustomGroup = array();
+      foreach ($participantGroupTree as $key => $group) {
+        if ($key === 'info') {
+          continue;
+        }
+
+        foreach ($group['fields'] as $k => $customField) {
+          $groupLabel = $group['title'];
+          if (!empty($customField['customValue'])) {
+            foreach ($customField['customValue'] as $customFieldValues) {
+              $participantCustomGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
+            }
+          }
+        }
+      }
+      $values['participant']['customGroup'] = $participantCustomGroup;
 
       //get location details
       $locationParams = array(
@@ -2570,6 +2616,25 @@ WHERE  contribution_id = %1 ";
         }
       }
     }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', $this, $this->id);
+
+    $customGroup = array();
+    foreach ($groupTree as $key => $group) {
+      if ($key === 'info') {
+        continue;
+      }
+
+      foreach ($group['fields'] as $k => $customField) {
+        $groupLabel = $group['title'];
+        if (!empty($customField['customValue'])) {
+          foreach ($customField['customValue'] as $customFieldValues) {
+            $customGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
+          }
+        }
+      }
+    }
+    $values['customGroup'] = $customGroup;
 
     return $values;
   }
@@ -2685,6 +2750,9 @@ WHERE  contribution_id = %1 ";
     $template->assign('is_recur', (bool) $recur);
     $template->assign('currency', $this->currency);
     $template->assign('address', CRM_Utils_Address::format($input));
+    if (!empty($values['customGroup'])) {
+      $template->assign('customGroup', $values['customGroup']);
+    }
     if ($this->_component == 'event') {
       $template->assign('title', $values['event']['title']);
       $participantRoles = CRM_Event_PseudoConstant::participantRole();
@@ -2694,6 +2762,7 @@ WHERE  contribution_id = %1 ";
       }
       $values['event']['participant_role'] = implode(', ', $viewRoles);
       $template->assign('event', $values['event']);
+      $template->assign('participant', $values['participant']);
       $template->assign('location', $values['location']);
       $template->assign('customPre', $values['custom_pre_id']);
       $template->assign('customPost', $values['custom_post_id']);
