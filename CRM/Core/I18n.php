@@ -337,10 +337,15 @@ class CRM_Core_I18n {
 
     // do all wildcard translations first
     $config = CRM_Core_Config::singleton();
-    $stringTable = CRM_Utils_Array::value(
-      $config->lcMessages,
-      $config->localeCustomStrings
-    );
+    if (!isset(Civi::$statics[__CLASS__][$config->lcMessages])) {
+      if ($config->dsn && !CRM_Core_Config::isUpgradeMode()) {
+        Civi::$statics[__CLASS__][$config->lcMessages] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($config->lcMessages);
+      }
+      else {
+        Civi::$statics[__CLASS__][$config->lcMessages] = array();
+      }
+    }
+    $stringTable = Civi::$statics[__CLASS__][$config->lcMessages];
 
     $exactMatch = FALSE;
     if (isset($stringTable['enabled']['exactMatch'])) {
