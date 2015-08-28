@@ -52,6 +52,8 @@ class CRM_Export_BAO_Export {
    * return string Querymode
    */
   public static function getQueryMode($exportMode) {
+    $queryMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
+
     switch ($exportMode) {
       case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
         $queryMode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
@@ -212,7 +214,6 @@ class CRM_Export_BAO_Export {
       'name',
       FALSE
     );
-    $queryMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
 
     $queryMode = self::getQueryMode($exportMode);
 
@@ -329,7 +330,7 @@ class CRM_Export_BAO_Export {
         }
       }
       $returnProperties[self::defaultReturnProperty($exportMode)] = 1;
-      if ($exportmode == CRM_Export_Form_Select::EVENT_EXPORT && !empty($returnProperties['participant_role'])) {
+      if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT && !empty($returnProperties['participant_role'])) {
         unset($returnProperties['participant_role']);
         $returnProperties['participant_role_id'] = 1;
       }
