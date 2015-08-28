@@ -126,7 +126,7 @@ class CRM_Export_BAO_Export {
    *
    * return string component
    */
-   public static function exportComponent($exportMode) {
+  public static function exportComponent($exportMode) {
     switch ($exportMode) {
       case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
         $component = 'civicrm_contribution';
