@@ -1263,7 +1263,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
-            $from = self::intervalAdd('month', -3, $to);
+            $from = self::intervalAdd('day', -90, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
 
@@ -1306,6 +1306,16 @@ class CRM_Utils_Date {
             $to['M'] = 3 * $quarter;
             $to['Y'] = $from['Y'] = $now['year'] - $subtractYear;
             $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
+            break;
+
+          case 'starting':
+            $from['d'] = $now['mday'];
+            $from['M'] = $now['mon'];
+            $from['Y'] = $now['year'];
+            $from['H'] = 00;
+            $from['i'] = $to['s'] = 00;
+            $to = self::intervalAdd('day', 90, $from);
+            $to = self::intervalAdd('second', -1, $to);
             break;
         }
         break;
@@ -1405,6 +1415,16 @@ class CRM_Utils_Date {
             unset($to);
             break;
 
+          case 'ending_2':
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $from = self::intervalAdd('day', -60, $to);
+            $from = self::intervalAdd('second', 1, $from);
+            break;
+
           case 'ending':
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
@@ -1453,7 +1473,17 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
-            $to = self::intervalAdd('month', 1, $from);
+            $to = self::intervalAdd('day', 30, $from);
+            $to = self::intervalAdd('second', -1, $to);
+            break;
+
+          case 'starting_2':
+            $from['d'] = $now['mday'];
+            $from['M'] = $now['mon'];
+            $from['Y'] = $now['year'];
+            $from['H'] = 00;
+            $from['i'] = $to['s'] = 00;
+            $to = self::intervalAdd('day', 60, $from);
             $to = self::intervalAdd('second', -1, $to);
             break;
         }
