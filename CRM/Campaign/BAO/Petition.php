@@ -279,7 +279,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       return TRUE;
     }
     else {
-      // TODO: raise an error?
+      CRM_Core_Error::fatal(ts('Petition Id and/or Activity Id is not of the type Positive.'));
       return FALSE;
     }
   }
