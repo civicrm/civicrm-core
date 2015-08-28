@@ -159,7 +159,7 @@ class CRM_Event_BAO_Query {
 
       //add participant_role
       if (!empty($query->_returnProperties['participant_role'])) {
-        $query->_select['participant_status'] = "civicrm_participant.role_id as participant_role";
+        $query->_select['participant_role'] = "civicrm_participant.role_id as participant_role";
         $query->_element['participant_role'] = 1;
         $query->_tables['participant_role'] = 1;
         $query->_whereTables['civicrm_participant'] = 1;
@@ -342,15 +342,10 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'participant_status_id':
-      case 'participant_role_id':
         if ($value && is_array($value) && strpos($op, 'IN') === FALSE) {
           $op = 'IN';
         }
       case 'participant_status':
-      case 'participant_role':
-        if (!strpos($name, '_id')) {
-          $name .= '_id';
-        }
       case 'participant_source':
       case 'participant_id':
       case 'participant_contact_id':
@@ -360,7 +355,6 @@ class CRM_Event_BAO_Query {
         $qillName = $name;
         if (in_array($name, array(
               'participant_status_id',
-              'participant_role_id',
               'participant_source',
               'participant_id',
               'participant_contact_id',
@@ -372,26 +366,36 @@ class CRM_Event_BAO_Query {
           if ($name == 'is_pay_later') {
             $qillName = $name;
           }
-
-          // Participant role need a special handling as role ids are being stored with value separator
-          if ($name == 'role_id') {
-            $qillName = 'participant_role';
-            if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-              $op = key($value);
-              $value = $value[$op];
-            }
-            if (!strstr($op, 'NULL') && !strstr($op, 'EMPTY') && !strstr($op, 'LIKE')) {
-              $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
-              $regexp = (strstr($op, '=')) ? "^{$value}$" : "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:cntrl:]]*";
-              $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.$name", $regexOp, $regexp, 'String');
-            }
-          }
+        }
+        elseif ($name == 'participant_status') {
+          $name = 'status_id';
         }
 
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
         $tableName = empty($tableName) ? 'civicrm_participant' : $tableName;
 
-        if ($name != 'role_id' || empty($regexOp)) {
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
+
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Participant', $name, $value, $op);
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
+        $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
+        return;
+
+      case 'participant_role':
+      case 'participant_role_id':
+          $qillName = $name;
+          $name = 'role_id';
+
+        if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $op = key($value);
+          $value = $value[$op];
+        }
+        if (!strstr($op, 'NULL') && !strstr($op, 'EMPTY') && !strstr($op, 'LIKE')) {
+          $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
+          $regexp = (strstr($op, '=')) ? "^{$value}$" : "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', (array) $value) . "[[:cntrl:]]*";
+          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.$name", $regexOp, $regexp, 'String');
+        }
+        else {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("$tableName.$name", $op, $value, $dataType);
         }
 
