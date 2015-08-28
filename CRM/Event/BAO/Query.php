@@ -383,8 +383,8 @@ class CRM_Event_BAO_Query {
 
       case 'participant_role':
       case 'participant_role_id':
-          $qillName = $name;
-          $name = 'role_id';
+        $qillName = $name;
+        $name = 'role_id';
 
         if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
           $op = key($value);
