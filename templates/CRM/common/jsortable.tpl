@@ -154,6 +154,7 @@
           "bAutoWidth": false,
           "aoColumns": columns,
           "bSort": true,
+          "sDom": 'ti',
           "oLanguage":{
             "sEmptyTable": noRecordFoundMsg,
             "sZeroRecords": noRecordFoundMsg
