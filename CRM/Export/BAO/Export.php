@@ -92,7 +92,7 @@ class CRM_Export_BAO_Export {
    *
    * return string $property
    */
-  public static function defultReturnProperty($exportMode) {
+  public static function defaultReturnProperty($exportMode) {
     // hack to add default returnproperty based on export mode
     if ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT) {
       $property = 'contribution_id';
@@ -328,7 +328,7 @@ class CRM_Export_BAO_Export {
           }
         }
       }
-      $returnProperties[self::defultReturnProperty($exportMode)] = 1;
+      $returnProperties[self::defaultReturnProperty($exportMode)] = 1;
       if ($exportmode == CRM_Export_Form_Select::EVENT_EXPORT && !empty($returnProperties['participant_role'])) {
         unset($returnProperties['participant_role']);
         $returnProperties['participant_role_id'] = 1;
