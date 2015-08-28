@@ -95,7 +95,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
         ts('Progress Bar Color'),
         'text',
         FALSE,
-        '#FFFFFF',
+        '#2786C2',
       ),
       'color_main_text' => array(
         ts('Additional Text Color'),
@@ -122,7 +122,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
         '#96C0E7',
       ),
       'color_about_link' => array(
-        ts('Button Link Color'),
+        ts('Button Text Color'),
         'text',
         FALSE,
         '#556C82',
