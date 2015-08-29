@@ -608,7 +608,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
     $trashClause = $excludeTrashed ? "contact_a.is_deleted != 1" : "( 1 )";
 
-    if (empty($where) {
+    if (empty($where)) {
       $where = "WHERE $trashClause";
     }
     else {
