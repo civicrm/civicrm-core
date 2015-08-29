@@ -93,11 +93,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     foreach ($mappings as $mapping) {
       /** @var \Civi\ActionSchedule\Mapping $mapping */
       $entityValueLabels[$mapping->getId()] = $mapping->getValueLabels();
-      // Not sure why: everything *except* contact-dates have a $valueLabel.
-      if ($mapping->getId() !== CRM_Contact_ActionMapping::CONTACT_MAPPING_ID) {
-        $valueLabel = array('- ' . strtolower($mapping->getValueHeader()) . ' -');
-        $entityValueLabels[$mapping->getId()] = $valueLabel + $entityValueLabels[$mapping->getId()];
-      }
+      $valueLabel = array('- ' . strtolower($mapping->getValueHeader()) . ' -');
+      $entityValueLabels[$mapping->getId()] = $valueLabel + $entityValueLabels[$mapping->getId()];
     }
 
     $entityStatusLabels = array();
