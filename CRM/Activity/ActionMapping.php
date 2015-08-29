@@ -60,7 +60,6 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_status' => 'activity_status',
       'entity_status_label' => ts('Activity Status'),
       'entity_date_start' => 'activity_date_time',
-      'entity_recipient' => 'activity_contacts',
     )));
   }
 
