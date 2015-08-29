@@ -77,28 +77,33 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
-   * Retrieve list of selections/drop downs for Scheduled Reminder form
-   *
-   * @param bool $id
-   *   Mapping id.
+   * For each entity, get a list of entity-value labels.
    *
    * @return array
-   *   associated array of all the drop downs in the form
+   *   Ex: $entityValueLabels[$mappingId][$valueId] = $valueLabel.
+   * @throws CRM_Core_Exception
    */
-  public static function getSelection($id = NULL) {
-    $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
-    $selectedMapping = $mappings[$id ? $id : 1];
-
+  public static function getAllEntityValueLabels() {
     $entityValueLabels = array();
-    foreach ($mappings as $mapping) {
+    foreach (CRM_Core_BAO_ActionSchedule::getMappings() as $mapping) {
       /** @var \Civi\ActionSchedule\Mapping $mapping */
       $entityValueLabels[$mapping->getId()] = $mapping->getValueLabels();
       $valueLabel = array('- ' . strtolower($mapping->getValueHeader()) . ' -');
       $entityValueLabels[$mapping->getId()] = $valueLabel + $entityValueLabels[$mapping->getId()];
     }
+    return $entityValueLabels;
+  }
 
+  /**
+   * For each entity, get a list of entity-status labels.
+   *
+   * @return array
+   *   Ex: $entityValueLabels[$mappingId][$valueId][$statusId] = $statusLabel.
+   */
+  public static function getAllEntityStatusLabels() {
+    $entityValueLabels = self::getAllEntityValueLabels();
     $entityStatusLabels = array();
-    foreach ($mappings as $mapping) {
+    foreach (CRM_Core_BAO_ActionSchedule::getMappings() as $mapping) {
       /** @var \Civi\ActionSchedule\Mapping $mapping */
       $statusLabel = array('- ' . strtolower($mapping->getStatusHeader()) . ' -');
       $entityStatusLabels[$mapping->getId()] = $entityValueLabels[$mapping->getId()];
@@ -106,43 +111,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
         $vval = $statusLabel + $mapping->getStatusLabels($kkey);
       }
     }
-
-    $entityRecipientLabels = $selectedMapping->getRecipientTypes() + self::getAdditionalRecipients();
-
-    return array(
-      'sel1' => CRM_Utils_Array::collectMethod('getLabel', $mappings),
-      'sel2' => $entityValueLabels,
-      'sel3' => $entityStatusLabels,
-      'sel4' => $selectedMapping->getDateFields(),
-      'sel5' => $entityRecipientLabels,
-      'entityMapping' => CRM_Utils_Array::collectMethod('getEntity', $mappings),
-      'recipientMapping' => array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels)),
-    );
-  }
-
-  /**
-   * @param int $mappingId
-   * @param int $isLimit
-   *
-   * @return array
-   */
-  public static function getSelection1($mappingId = NULL, $isLimit = NULL) {
-    $mappings = CRM_Core_BAO_ActionSchedule::getMappings(array(
-      'id' => $mappingId,
-    ));
-    $dateFieldLabels = $entityRecipientLabels = array();
-
-    foreach ($mappings as $mapping) {
-      /** @var \Civi\ActionSchedule\Mapping $mapping */
-      $dateFieldLabels = $mapping->getDateFields();
-      $entityRecipientLabels = $mapping->getRecipientTypes(!$isLimit) + self::getAdditionalRecipients();
-    }
-
-    return array(
-      'sel4' => $dateFieldLabels,
-      'sel5' => $entityRecipientLabels,
-      'recipientMapping' => array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels)),
-    );
+    return $entityStatusLabels;
   }
 
   /**
@@ -718,7 +687,7 @@ FROM civicrm_action_schedule cas
    * @return array
    *   array(mixed $value => string $label).
    */
-  protected static function getAdditionalRecipients() {
+  public static function getAdditionalRecipients() {
     return array(
       'manual' => ts('Choose Recipient(s)'),
       'group' => ts('Select Group'),

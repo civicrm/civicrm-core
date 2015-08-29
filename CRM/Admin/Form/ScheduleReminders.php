@@ -115,15 +115,17 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       TRUE
     );
 
-    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection($mappingID);
-    $this->assign('entityMapping', json_encode($selectionOptions['entityMapping']));
-    $this->assign('recipientMapping', json_encode($selectionOptions['recipientMapping']));
+    $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
+    $selectedMapping = $mappings[$mappingID ? $mappingID : 1];
+    $entityRecipientLabels = $selectedMapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients();
+    $this->assign('entityMapping', json_encode(
+      CRM_Utils_Array::collectMethod('getEntity', $mappings)
+    ));
+    $this->assign('recipientMapping', json_encode(
+      array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels))
+    ));
 
     if (empty($this->_context)) {
-      if (empty($selectionOptions['sel1'])) {
-        CRM_Core_Error::fatal('Could not find mapping for scheduled reminders.');
-      }
-
       $sel = &$this->add(
         'hierselect',
         'entity',
@@ -133,7 +135,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
           'style' => 'vertical-align: top;',
         )
       );
-      $sel->setOptions(array($selectionOptions['sel1'], $selectionOptions['sel2'], $selectionOptions['sel3']));
+      $sel->setOptions(array(
+        CRM_Utils_Array::collectMethod('getLabel', $mappings),
+        CRM_Core_BAO_ActionSchedule::getAllEntityValueLabels(),
+        CRM_Core_BAO_ActionSchedule::getAllEntityStatusLabels(),
+      ));
 
       if (is_a($sel->_elements[1], 'HTML_QuickForm_select')) {
         // make second selector a multi-select -
@@ -148,7 +154,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
     else {
-      $options = $selectionOptions['sel3'][$this->_mappingID][0];
+      // Dig deeper - this code is sublimely stupid.
+      $allEntityStatusLabels = CRM_Core_BAO_ActionSchedule::getAllEntityStatusLabels();
+      $options = $allEntityStatusLabels[$this->_mappingID][0];
       $attributes = array('multiple' => 'multiple', 'class' => 'crm-select2 huge', 'placeholder' => $options[0]);
       unset($options[0]);
       $this->add('select', 'entity', ts('Recipient(s)'), $options, TRUE, $attributes);
@@ -196,7 +204,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //reminder_action
     $this->add('select', 'start_action_condition', ts('Action Condition'), $condition);
 
-    $this->add('select', 'start_action_date', ts('Date Field'), $selectionOptions['sel4'], TRUE);
+    $this->add('select', 'start_action_date', ts('Date Field'), $selectedMapping->getDateFields(), TRUE);
 
     $this->addElement('checkbox', 'record_activity', $recordActivity);
 
@@ -209,7 +217,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'end_frequency_unit', ts('until'), $freqUnitsDisplay);
     $this->add('select', 'end_frequency_interval', ts('until'), $numericOptions);
     $this->add('select', 'end_action', ts('Repetition Condition'), $condition, TRUE);
-    $this->add('select', 'end_date', ts('Date Field'), $selectionOptions['sel4'], TRUE);
+    $this->add('select', 'end_date', ts('Date Field'), $selectedMapping->getDateFields(), TRUE);
 
     $this->add('text', 'from_name', ts('From Name'));
     $this->add('text', 'from_email', ts('From Email'));
@@ -229,7 +237,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions, FALSE, array('onChange' => "showHideByValue('limit_to','','recipient', 'select','select',true);"));
 
-    $this->add('select', 'recipient', $recipientLabels['other'], $selectionOptions['sel5'],
+    $this->add('select', 'recipient', $recipientLabels['other'], $entityRecipientLabels,
       FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
 
