@@ -486,15 +486,11 @@ class CRM_Utils_Token {
         break;
 
       case 'editUrl':
+      case 'scheduleUrl':
+        // Note: editUrl and scheduleUrl used to be different, but now there's
+        // one screen which can adapt based on permissions (in workflow mode).
         $value = CRM_Utils_System::url('civicrm/mailing/send',
           "reset=1&mid={$mailing->id}&continue=true",
-          TRUE, NULL, FALSE, TRUE
-        );
-        break;
-
-      case 'scheduleUrl':
-        $value = CRM_Utils_System::url('civicrm/mailing/schedule',
-          "reset=1&mid={$mailing->id}",
           TRUE, NULL, FALSE, TRUE
         );
         break;
