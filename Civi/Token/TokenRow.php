@@ -50,14 +50,14 @@ class TokenRow {
   public $format;
 
   /**
-   * @var array|ArrayAccess
+   * @var array|\ArrayAccess
    *   List of token values.
    *   Ex: array('contact' => array('display_name' => 'Alice')).
    */
   public $tokens;
 
   /**
-   * @var array|ArrayAccess
+   * @var array|\ArrayAccess
    *   List of context values.
    *   Ex: array('controller' => 'CRM_Foo_Bar').
    */

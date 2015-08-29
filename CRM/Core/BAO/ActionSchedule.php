@@ -568,7 +568,7 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param TokenRow $tokenRow
+   * @param \Civi\Token\TokenRow $tokenRow
    * @param CRM_Core_DAO_ActionSchedule $schedule
    * @param int $toContactID
    * @throws CRM_Core_Exception
@@ -632,7 +632,7 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param TokenRow $tokenRow
+   * @param \Civi\Token\TokenRow $tokenRow
    * @param CRM_Core_DAO_ActionSchedule $schedule
    * @param int $toContactID
    * @return array
