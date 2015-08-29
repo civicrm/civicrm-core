@@ -330,6 +330,19 @@ abstract class Mapping implements MappingInterface {
   }
 
   /**
+   * Determine whether a schedule based on this mapping is sufficiently
+   * complete.
+   *
+   * @param \CRM_Core_DAO_ActionSchedule $schedule
+   * @return array
+   *   Array (string $code => string $message).
+   *   List of error messages.
+   */
+  public function validateSchedule($schedule) {
+    return array();
+  }
+
+  /**
    * Generate a query to locate contacts who match the given
    * schedule.
    *

@@ -68,6 +68,15 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
+   * @param string|int $id
+   * @return \Civi\ActionSchedule\Mapping|NULL
+   */
+  public static function getMapping($id) {
+    $mappings = self::getMappings();
+    return isset($mappings[$id]) ? $mappings[$id] : NULL;
+  }
+
+  /**
    * Retrieve list of selections/drop downs for Scheduled Reminder form
    *
    * @param bool $id

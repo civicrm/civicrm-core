@@ -286,6 +286,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *
    * @param array $fields
    *   The input form values.
+   * @param CRM_Admin_Form_ScheduleReminders $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -336,6 +337,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     );
     if ($fields['limit_to'] != '' && array_key_exists($fields['recipient'], $recipientKind) && empty($fields[$recipientKind[$fields['recipient']]['target_id']])) {
       $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', array(1 => $recipientKind[$fields['recipient']]['name']));
+    }
+
+    $actionSchedule = $self->parseActionSchedule($fields);
+    if ($actionSchedule->mapping_id) {
+      $mapping = CRM_Core_BAO_ActionSchedule::getMapping($actionSchedule->mapping_id);
+      CRM_Utils_Array::extend($errors, $mapping->validateSchedule($actionSchedule));
     }
 
     if (!empty($errors)) {
@@ -414,6 +421,39 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       return;
     }
     $values = $this->controller->exportValues($this->getName());
+    $bao = $this->parseActionSchedule($values)->save();
+
+    // we need to set this on the form so that hooks can identify the created entity
+    $this->set('id', $bao->id);
+    $bao->free();
+
+    $status = ts("Your new Reminder titled %1 has been saved.",
+      array(1 => "<strong>{$values['title']}</strong>")
+    );
+
+    if ($this->_action) {
+      if ($this->_action & CRM_Core_Action::UPDATE) {
+        $status = ts("Your Reminder titled %1 has been updated.",
+          array(1 => "<strong>{$values['title']}</strong>")
+        );
+      }
+
+      if ($this->_context == 'event' && $this->_compId) {
+        $url = CRM_Utils_System::url('civicrm/event/manage/reminder', "reset=1&action=browse&id={$this->_compId}&component={$this->_context}&setTab=1");
+        $session = CRM_Core_Session::singleton();
+        $session->pushUserContext($url);
+      }
+    }
+    CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
+  }
+
+  /**
+   * @param array $values
+   *   The submitted form values.
+   * @return CRM_Core_DAO_ActionSchedule
+   */
+  public function parseActionSchedule($values) {
+    $params = array();
 
     $keys = array(
       'title',
@@ -472,7 +512,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['group_id'] = $values['group_id'];
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
-    elseif (!CRM_Utils_System::isNull($values['recipient_listing']) && !CRM_Utils_System::isNull($values['limit_to'])) {
+    elseif (isset($values['recipient_listing']) && isset($values['limit_to']) && !CRM_Utils_System::isNull($values['recipient_listing']) && !CRM_Utils_System::isNull($values['limit_to'])) {
       $params['recipient'] = CRM_Utils_Array::value('recipient', $values);
       $params['recipient_listing'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Utils_Array::value('recipient_listing', $values)
@@ -491,15 +531,14 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     else {
       $params['mapping_id'] = $values['entity'][0];
-      $entity_value = $values['entity'][1];
-      $entity_status = $values['entity'][2];
       if ($params['mapping_id'] == 1) {
         $params['limit_to'] = 1;
       }
 
-      foreach (array('entity_value', 'entity_status') as $key) {
-        $params[$key] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $$key);
-      }
+      $entity_value = CRM_Utils_Array::value(1, $values['entity'], array());
+      $entity_status = CRM_Utils_Array::value(2, $values['entity'], array());
+      $params['entity_value'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $entity_value);
+      $params['entity_status'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $entity_status);
     }
 
     $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);
@@ -514,7 +553,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     // multilingual options
-    $params['filter_contact_language'] = CRM_Utils_Array::value('filter_contact_language', $values, NULL);
+    $params['filter_contact_language'] = CRM_Utils_Array::value('filter_contact_language', $values, array());
     $params['filter_contact_language'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['filter_contact_language']);
     $params['communication_language'] = CRM_Utils_Array::value('communication_language', $values, NULL);
 
@@ -613,29 +652,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
 
-    $bao = CRM_Core_BAO_ActionSchedule::add($params);
-    // we need to set this on the form so that hooks can identify the created entity
-    $this->set('id', $bao->id);
-    $bao->free();
-
-    $status = ts("Your new Reminder titled %1 has been saved.",
-      array(1 => "<strong>{$values['title']}</strong>")
-    );
-
-    if ($this->_action) {
-      if ($this->_action & CRM_Core_Action::UPDATE) {
-        $status = ts("Your Reminder titled %1 has been updated.",
-          array(1 => "<strong>{$values['title']}</strong>")
-        );
-      }
-
-      if ($this->_context == 'event' && $this->_compId) {
-        $url = CRM_Utils_System::url('civicrm/event/manage/reminder', "reset=1&action=browse&id={$this->_compId}&component={$this->_context}&setTab=1");
-        $session = CRM_Core_Session::singleton();
-        $session->pushUserContext($url);
-      }
-    }
-    CRM_Core_Session::setStatus($status, ts('Saved'), 'success');
+    $actionSchedule = new CRM_Core_DAO_ActionSchedule();
+    $actionSchedule->copyValues($params);
+    return $actionSchedule;
   }
 
   /**
