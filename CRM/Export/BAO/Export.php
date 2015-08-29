@@ -44,6 +44,116 @@ class CRM_Export_BAO_Export {
   const EXPORT_ROW_COUNT = 10000;
 
   /**
+   * Get Querymode based on ExportMode
+   *
+   * @param int $exportMode
+   *   Export mode.
+   *
+   * return string Querymode
+   */
+  public static function getQueryMode($exportMode) {
+    $queryMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
+
+    switch ($exportMode) {
+      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
+        $queryMode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
+        break;
+
+      case CRM_Export_Form_Select::EVENT_EXPORT:
+        $queryMode = CRM_Contact_BAO_Query::MODE_EVENT;
+        break;
+
+      case CRM_Export_Form_Select::MEMBER_EXPORT:
+        $queryMode = CRM_Contact_BAO_Query::MODE_MEMBER;
+        break;
+
+      case CRM_Export_Form_Select::PLEDGE_EXPORT:
+        $queryMode = CRM_Contact_BAO_Query::MODE_PLEDGE;
+        break;
+
+      case CRM_Export_Form_Select::CASE_EXPORT:
+        $queryMode = CRM_Contact_BAO_Query::MODE_CASE;
+        break;
+
+      case CRM_Export_Form_Select::GRANT_EXPORT:
+        $queryMode = CRM_Contact_BAO_Query::MODE_GRANT;
+        break;
+
+      case CRM_Export_Form_Select::ACTIVITY_EXPORT:
+        $queryMode = CRM_Contact_BAO_Query::MODE_ACTIVITY;
+        break;
+    }
+    return $queryMode;
+  }
+
+  /**
+   * Get default return property for export based on mode
+   *
+   * @param int $exportMode
+   *   Export mode.
+   *
+   * return string $property
+   */
+  public static function defaultReturnProperty($exportMode) {
+    // hack to add default returnproperty based on export mode
+    if ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT) {
+      $property = 'contribution_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
+      $property = 'participant_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::MEMBER_EXPORT) {
+      $property = 'membership_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::PLEDGE_EXPORT) {
+      $property = 'pledge_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
+      $property = 'case_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::GRANT_EXPORT) {
+      $property = 'grant_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
+      $property = 'activity_id';
+    }
+    return $property;
+  }
+
+  /**
+   * Get Export component
+   *
+   * @param int $exportMode
+   *   Export mode.
+   *
+   * return string component
+   */
+  public static function exportComponent($exportMode) {
+    switch ($exportMode) {
+      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
+        $component = 'civicrm_contribution';
+        break;
+
+      case CRM_Export_Form_Select::EVENT_EXPORT:
+        $component = 'civicrm_participant';
+        break;
+
+      case CRM_Export_Form_Select::MEMBER_EXPORT:
+        $component = 'civicrm_membership';
+        break;
+
+      case CRM_Export_Form_Select::PLEDGE_EXPORT:
+        $component = 'civicrm_pledge';
+        break;
+
+      case CRM_Export_Form_Select::GRANT_EXPORT:
+        $component = 'civicrm_grant';
+        break;
+    }
+    return $component;
+  }
+
+  /**
    * Get the list the export fields.
    *
    * @param int $selectAll
@@ -104,37 +214,9 @@ class CRM_Export_BAO_Export {
       'name',
       FALSE
     );
-    $queryMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
 
-    switch ($exportMode) {
-      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
-        break;
+    $queryMode = self::getQueryMode($exportMode);
 
-      case CRM_Export_Form_Select::EVENT_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_EVENT;
-        break;
-
-      case CRM_Export_Form_Select::MEMBER_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_MEMBER;
-        break;
-
-      case CRM_Export_Form_Select::PLEDGE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_PLEDGE;
-        break;
-
-      case CRM_Export_Form_Select::CASE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_CASE;
-        break;
-
-      case CRM_Export_Form_Select::GRANT_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_GRANT;
-        break;
-
-      case CRM_Export_Form_Select::ACTIVITY_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_ACTIVITY;
-        break;
-    }
     if ($fields) {
       //construct return properties
       $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
@@ -247,32 +329,10 @@ class CRM_Export_BAO_Export {
           }
         }
       }
-
-      // hack to add default returnproperty based on export mode
-      if ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT) {
-        $returnProperties['contribution_id'] = 1;
-      }
-      elseif ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
-        $returnProperties['participant_id'] = 1;
-        if (!empty($returnProperties['participant_role'])) {
-          unset($returnProperties['participant_role']);
-          $returnProperties['participant_role_id'] = 1;
-        }
-      }
-      elseif ($exportMode == CRM_Export_Form_Select::MEMBER_EXPORT) {
-        $returnProperties['membership_id'] = 1;
-      }
-      elseif ($exportMode == CRM_Export_Form_Select::PLEDGE_EXPORT) {
-        $returnProperties['pledge_id'] = 1;
-      }
-      elseif ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
-        $returnProperties['case_id'] = 1;
-      }
-      elseif ($exportMode == CRM_Export_Form_Select::GRANT_EXPORT) {
-        $returnProperties['grant_id'] = 1;
-      }
-      elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
-        $returnProperties['activity_id'] = 1;
+      $returnProperties[self::defaultReturnProperty($exportMode)] = 1;
+      if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT && !empty($returnProperties['participant_role'])) {
+        unset($returnProperties['participant_role']);
+        $returnProperties['participant_role_id'] = 1;
       }
     }
     else {
@@ -473,27 +533,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
         }
         else {
-          switch ($exportMode) {
-            case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-              $component = 'civicrm_contribution';
-              break;
-
-            case CRM_Export_Form_Select::EVENT_EXPORT:
-              $component = 'civicrm_participant';
-              break;
-
-            case CRM_Export_Form_Select::MEMBER_EXPORT:
-              $component = 'civicrm_membership';
-              break;
-
-            case CRM_Export_Form_Select::PLEDGE_EXPORT:
-              $component = 'civicrm_pledge';
-              break;
-
-            case CRM_Export_Form_Select::GRANT_EXPORT:
-              $component = 'civicrm_grant';
-              break;
-          }
+          $component = self::exportComponent($exportMode);
 
           if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
             $relIDs = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($ids);
@@ -566,11 +606,13 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $excludeTrashed = FALSE;
       }
     }
-    if (empty($where) && $excludeTrashed) {
-      $where = "WHERE contact_a.is_deleted != 1";
+    $trashClause = $excludeTrashed ? "contact_a.is_deleted != 1" : "( 1 )";
+
+    if (empty($where)) {
+      $where = "WHERE $trashClause";
     }
-    elseif ($excludeTrashed) {
-      $where .= " AND contact_a.is_deleted != 1";
+    else {
+      $where .= " AND $trashClause";
     }
 
     $queryString = "$select $from $where $having";
