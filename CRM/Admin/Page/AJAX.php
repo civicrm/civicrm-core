@@ -303,21 +303,16 @@ LIMIT $limit";
       CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
     }
 
-    $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection1($_GET['mappingID'], $_GET['isLimit']);
+    $mapping = CRM_Core_BAO_ActionSchedule::getMapping($_GET['mappingID']);
+    $dateFieldLabels = $mapping ? $mapping->getDateFields() : array();
+    $entityRecipientLabels = $mapping ? ($mapping->getRecipientTypes(!$_GET['isLimit']) + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients()) : array();
+    $recipientMapping = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
 
     $output = array(
-      'sel4' => array(),
-      'sel5' => array(),
-      'recipientMapping' => $selectionOptions['recipientMapping'],
+      'sel4' => CRM_Utils_Array::toKeyValueRows($dateFieldLabels),
+      'sel5' => CRM_Utils_Array::toKeyValueRows($entityRecipientLabels),
+      'recipientMapping' => $recipientMapping,
     );
-    foreach (array(4, 5) as $sel) {
-      foreach ($selectionOptions["sel$sel"] as $id => $name) {
-        $output["sel$sel"][] = array(
-          'value' => $name,
-          'key' => $id,
-        );
-      }
-    }
 
     CRM_Utils_JSON::output($output);
   }
