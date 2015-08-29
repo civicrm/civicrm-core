@@ -606,11 +606,13 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $excludeTrashed = FALSE;
       }
     }
-    if (empty($where) && $excludeTrashed) {
-      $where = "WHERE contact_a.is_deleted != 1";
+    $trashClause = $excludeTrashed ? "contact_a.is_deleted != 1" : "( 1 )";
+
+    if (empty($where) {
+      $where = "WHERE $trashClause";
     }
-    elseif ($excludeTrashed) {
-      $where .= " AND contact_a.is_deleted != 1";
+    else {
+      $where .= " AND $trashClause";
     }
 
     $queryString = "$select $from $where $having";
