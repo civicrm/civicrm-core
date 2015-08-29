@@ -117,14 +117,11 @@ interface MappingInterface {
    * More generally, all the "Recipients"/"Limit To"/"Also Include" stuff
    * needs a rethink.
    *
-   * @param bool|NULL $noThanksJustKidding
-   *   This is ridiculous and should not exist.
-   *   If true, don't do our main job.
    * @return array
    *   array(mixed $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes($noThanksJustKidding = FALSE);
+  public function getRecipientTypes();
 
   /**
    * Determine whether a schedule based on this mapping is sufficiently
