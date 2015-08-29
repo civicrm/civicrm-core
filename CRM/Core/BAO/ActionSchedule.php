@@ -78,31 +78,22 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    */
   public static function getSelection($id = NULL) {
     $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
+    $selectedMapping = $mappings[$id ? $id : 1];
 
-    $entityValueLabels = $entityStatusLabels = $dateFieldLabels = array();
-    $entityRecipientLabels = $entityRecipientNames = array();
-
-    if (!$id) {
-      $id = 1;
-    }
-
+    $entityValueLabels = array();
     foreach ($mappings as $mapping) {
       /** @var \Civi\ActionSchedule\Mapping $mapping */
-
-      $mappingId = $mapping->getId();
-      $entityValueLabels[$mappingId] = $mapping->getValueLabels();
+      $entityValueLabels[$mapping->getId()] = $mapping->getValueLabels();
       // Not sure why: everything *except* contact-dates have a $valueLabel.
       if ($mapping->getId() !== CRM_Contact_ActionMapping::CONTACT_MAPPING_ID) {
         $valueLabel = array('- ' . strtolower($mapping->getValueHeader()) . ' -');
         $entityValueLabels[$mapping->getId()] = $valueLabel + $entityValueLabels[$mapping->getId()];
       }
+    }
 
-      if ($mapping->getId() == $id) {
-        $dateFieldLabels = $mapping->getDateFields();
-        $entityRecipientLabels = $mapping->getRecipientTypes() + self::getAdditionalRecipients();
-        $entityRecipientNames = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
-      }
-
+    $entityStatusLabels = array();
+    foreach ($mappings as $mapping) {
+      /** @var \Civi\ActionSchedule\Mapping $mapping */
       $statusLabel = array('- ' . strtolower($mapping->getStatusHeader()) . ' -');
       $entityStatusLabels[$mapping->getId()] = $entityValueLabels[$mapping->getId()];
       foreach ($entityStatusLabels[$mapping->getId()] as $kkey => & $vval) {
@@ -110,21 +101,16 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
       }
     }
 
-    $entityLabels = array_map(function ($v) {
-      return $v->getLabel();
-    }, $mappings);
-    $entityNames = array_map(function ($v) {
-      return $v->getEntity();
-    }, $mappings);
+    $entityRecipientLabels = $selectedMapping->getRecipientTypes() + self::getAdditionalRecipients();
 
     return array(
-      'sel1' => $entityLabels,
+      'sel1' => CRM_Utils_Array::collectMethod('getLabel', $mappings),
       'sel2' => $entityValueLabels,
       'sel3' => $entityStatusLabels,
-      'sel4' => $dateFieldLabels,
+      'sel4' => $selectedMapping->getDateFields(),
       'sel5' => $entityRecipientLabels,
-      'entityMapping' => $entityNames,
-      'recipientMapping' => $entityRecipientNames,
+      'entityMapping' => CRM_Utils_Array::collectMethod('getEntity', $mappings),
+      'recipientMapping' => array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels)),
     );
   }
 
