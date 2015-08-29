@@ -116,12 +116,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     );
 
     $selectionOptions = CRM_Core_BAO_ActionSchedule::getSelection($mappingID);
-    extract($selectionOptions);
-    $this->assign('entityMapping', json_encode($entityMapping));
-    $this->assign('recipientMapping', json_encode($recipientMapping));
+    $this->assign('entityMapping', json_encode($selectionOptions['entityMapping']));
+    $this->assign('recipientMapping', json_encode($selectionOptions['recipientMapping']));
 
     if (empty($this->_context)) {
-      if (empty($sel1)) {
+      if (empty($selectionOptions['sel1'])) {
         CRM_Core_Error::fatal('Could not find mapping for scheduled reminders.');
       }
 
@@ -134,7 +133,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
           'style' => 'vertical-align: top;',
         )
       );
-      $sel->setOptions(array($sel1, $sel2, $sel3));
+      $sel->setOptions(array($selectionOptions['sel1'], $selectionOptions['sel2'], $selectionOptions['sel3']));
 
       if (is_a($sel->_elements[1], 'HTML_QuickForm_select')) {
         // make second selector a multi-select -
@@ -149,7 +148,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
     }
     else {
-      $options = $sel3[$this->_mappingID][0];
+      $options = $selectionOptions['sel3'][$this->_mappingID][0];
       $attributes = array('multiple' => 'multiple', 'class' => 'crm-select2 huge', 'placeholder' => $options[0]);
       unset($options[0]);
       $this->add('select', 'entity', ts('Recipient(s)'), $options, TRUE, $attributes);
@@ -197,7 +196,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //reminder_action
     $this->add('select', 'start_action_condition', ts('Action Condition'), $condition);
 
-    $this->add('select', 'start_action_date', ts('Date Field'), $sel4, TRUE);
+    $this->add('select', 'start_action_date', ts('Date Field'), $selectionOptions['sel4'], TRUE);
 
     $this->addElement('checkbox', 'record_activity', $recordActivity);
 
@@ -210,7 +209,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'end_frequency_unit', ts('until'), $freqUnitsDisplay);
     $this->add('select', 'end_frequency_interval', ts('until'), $numericOptions);
     $this->add('select', 'end_action', ts('Repetition Condition'), $condition, TRUE);
-    $this->add('select', 'end_date', ts('Date Field'), $sel4, TRUE);
+    $this->add('select', 'end_date', ts('Date Field'), $selectionOptions['sel4'], TRUE);
 
     $this->add('text', 'from_name', ts('From Name'));
     $this->add('text', 'from_email', ts('From Email'));
@@ -230,7 +229,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions, FALSE, array('onChange' => "showHideByValue('limit_to','','recipient', 'select','select',true);"));
 
-    $this->add('select', 'recipient', $recipientLabels['other'], $sel5,
+    $this->add('select', 'recipient', $recipientLabels['other'], $selectionOptions['sel5'],
       FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
 
