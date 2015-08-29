@@ -63,7 +63,6 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_status_label' => ts('Participant Status'),
       'entity_date_start' => 'event_start_date',
       'entity_date_end' => 'event_end_date',
-      'entity_recipient' => 'event_contacts',
     )));
     $registrations->register(CRM_Event_ActionMapping::create(array(
       'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
@@ -75,7 +74,6 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_status_label' => ts('Participant Status'),
       'entity_date_start' => 'event_start_date',
       'entity_date_end' => 'event_end_date',
-      'entity_recipient' => 'event_contacts',
     )));
     $registrations->register(CRM_Event_ActionMapping::create(array(
       'id' => CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID,
@@ -87,7 +85,6 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_status_label' => ts('Participant Status'),
       'entity_date_start' => 'event_start_date',
       'entity_date_end' => 'event_end_date',
-      'entity_recipient' => 'event_contacts',
     )));
   }
 

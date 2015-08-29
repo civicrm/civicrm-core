@@ -73,7 +73,6 @@ abstract class Mapping implements MappingInterface {
     'entity_status_label',
     'entity_date_start',
     'entity_date_end',
-    'entity_recipient',
   );
 
   public static function create($params) {
@@ -149,13 +148,6 @@ abstract class Mapping implements MappingInterface {
    *   Ex: 'event_end_date'.
    */
   private $entity_date_end;
-
-  /**
-   * Contact selector -- The field/relationship/option-group name.
-   * @var string|NULL
-   *   Ex: 'activity_contacts', 'event_contacts'.
-   */
-  protected $entity_recipient;
 
   /**
    * @return mixed
@@ -280,12 +272,12 @@ abstract class Mapping implements MappingInterface {
    */
   public function getRecipientTypes($noThanksJustKidding = FALSE) {
     $entityRecipientLabels = array();
-    switch ($this->entity_recipient) {
-      case 'activity_contacts':
+    switch ($this->entity) {
+      case 'civicrm_activity':
         $entityRecipientLabels = \CRM_Core_OptionGroup::values('activity_contacts');
         break;
 
-      case 'event_contacts':
+      case 'civicrm_participant':
         if (!$noThanksJustKidding) {
           $entityRecipientLabels = \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
         }
