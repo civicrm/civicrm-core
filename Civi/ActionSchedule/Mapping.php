@@ -241,12 +241,16 @@ abstract class Mapping implements MappingInterface {
   }
 
   /**
-   * Unsure. Not sure how it differs from getRecipientTypes... but it does...
+   * Get a list of recipients which match the given type.
+   *
+   * Note: A single schedule may target *multiple* recipients.
    *
    * @param string $recipientType
+   *   Ex: 'participant_role'.
    * @return array
    *   Array(mixed $name => string $label).
    *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   * @see getRecipientTypes
    */
   public function getRecipientListing($recipientType) {
     if (!$recipientType) {
@@ -261,16 +265,15 @@ abstract class Mapping implements MappingInterface {
   }
 
   /**
-   * Unsure. Not sure how it differs from getRecipientListing... but it does...
+   * Get a list of recipient types.
    *
-   * @param bool|NULL $noThanksJustKidding
-   *   This is ridiculous and should not exist.
-   *   If true, don't do our main job.
+   * Note: A single schedule may target at most *one* recipient type.
+   *
    * @return array
    *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes($noThanksJustKidding = FALSE) {
+  public function getRecipientTypes() {
     $entityRecipientLabels = array();
     switch ($this->entity) {
       case 'civicrm_activity':
@@ -278,9 +281,7 @@ abstract class Mapping implements MappingInterface {
         break;
 
       case 'civicrm_participant':
-        if (!$noThanksJustKidding) {
-          $entityRecipientLabels = \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
-        }
+        $entityRecipientLabels = \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
         break;
 
       default:
