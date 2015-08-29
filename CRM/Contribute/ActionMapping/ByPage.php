@@ -150,14 +150,11 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
   /**
    * FIXME: Unsure. Not sure how it differs from getRecipientListing... but it does...
    *
-   * @param bool|NULL $noThanksJustKidding
-   *   This is ridiculous and should not exist.
-   *   If true, don't do our main job.
    * @return array
    *   array(mixed $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientTypes($noThanksJustKidding = FALSE) {
+  public function getRecipientTypes() {
     return array();
   }
 
