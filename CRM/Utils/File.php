@@ -463,6 +463,33 @@ HTACCESS;
       }
     }
   }
+  /**
+   * Restrict access to civicrm.settings.php (by planting there a restrictive .htaccess file)
+   *
+   * @param string $dir
+   *   The directory to be secured.
+   * @param bool $overwrite
+   */
+  public static function restrictAccessSettings($dir, $overwrite = FALSE) {
+    // note: empty value for $dir can play havoc, since that might result in putting '.htaccess' to root dir
+    // of site, causing site to stop functioning.
+    // FIXME: we should do more checks here -
+    if (!empty($dir) && is_dir($dir)) {
+      $htaccess = <<<HTACCESS
+<Files "civicrm.settings.php">
+  Order allow,deny
+  Deny from all
+</Files>
+
+HTACCESS;
+      $file = $dir . '.htaccess';
+      if ($overwrite || !file_exists($file)) {
+        if (file_put_contents($file, $htaccess) === FALSE) {
+          CRM_Core_Error::movedSiteError($file);
+        }
+      }
+    }
+  }
 
   /**
    * Restrict remote users from browsing the given directory.
