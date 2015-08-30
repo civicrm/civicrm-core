@@ -241,9 +241,24 @@ abstract class Mapping implements MappingInterface {
   }
 
   /**
+   * Get a list of recipient types.
+   *
+   * Note: A single schedule may filter on *zero* or *one* recipient types.
+   * When an admin chooses a value, it's stored in $schedule->recipient.
+   *
+   * @return array
+   *   array(string $value => string $label).
+   *   Ex: array('assignee' => 'Activity Assignee').
+   */
+  public function getRecipientTypes() {
+    return array();
+  }
+
+  /**
    * Get a list of recipients which match the given type.
    *
-   * Note: A single schedule may target *multiple* recipients.
+   * Note: A single schedule may filter on *multiple* recipients.
+   * When an admin chooses value(s), it's stored in $schedule->recipient_listing.
    *
    * @param string $recipientType
    *   Ex: 'participant_role'.
@@ -253,42 +268,8 @@ abstract class Mapping implements MappingInterface {
    * @see getRecipientTypes
    */
   public function getRecipientListing($recipientType) {
-    if (!$recipientType) {
-      return array();
-    }
-
-    $options = array();
-    if ($this->entity === 'civicrm_participant' && $recipientType === 'participant_role') {
-      $options = \CRM_Event_PseudoConstant::participantRole();
-    }
-    return $options;
+    return array();
   }
-
-  /**
-   * Get a list of recipient types.
-   *
-   * Note: A single schedule may target at most *one* recipient type.
-   *
-   * @return array
-   *   array(string $value => string $label).
-   *   Ex: array('assignee' => 'Activity Assignee').
-   */
-  public function getRecipientTypes() {
-    $entityRecipientLabels = array();
-    switch ($this->entity) {
-      case 'civicrm_activity':
-        $entityRecipientLabels = \CRM_Core_OptionGroup::values('activity_contacts');
-        break;
-
-      case 'civicrm_participant':
-        $entityRecipientLabels = \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
-        break;
-
-      default:
-    }
-    return $entityRecipientLabels;
-  }
-
 
   protected static function getValueLabelMap($name) {
     static $valueLabelMap = NULL;

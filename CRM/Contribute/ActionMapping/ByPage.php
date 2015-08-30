@@ -136,25 +136,33 @@ class CRM_Contribute_ActionMapping_ByPage implements \Civi\ActionSchedule\Mappin
   }
 
   /**
-   * FIXME: Unsure. Not sure how it differs from getRecipientTypes... but it does...
+   * Get a list of recipient types.
    *
-   * @param string $recipientType
+   * Note: A single schedule may filter on *zero* or *one* recipient types.
+   * When an admin chooses a value, it's stored in $schedule->recipient.
+   *
    * @return array
-   *   Array(mixed $name => string $label).
-   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   *   array(string $value => string $label).
+   *   Ex: array('assignee' => 'Activity Assignee').
    */
-  public function getRecipientListing($recipientType) {
+  public function getRecipientTypes() {
     return array();
   }
 
   /**
-   * FIXME: Unsure. Not sure how it differs from getRecipientListing... but it does...
+   * Get a list of recipients which match the given type.
    *
+   * Note: A single schedule may filter on *multiple* recipients.
+   * When an admin chooses value(s), it's stored in $schedule->recipient_listing.
+   *
+   * @param string $recipientType
+   *   Ex: 'participant_role'.
    * @return array
-   *   array(mixed $value => string $label).
-   *   Ex: array('assignee' => 'Activity Assignee').
+   *   Array(mixed $name => string $label).
+   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   * @see getRecipientTypes
    */
-  public function getRecipientTypes() {
+  public function getRecipientListing($recipientType) {
     return array();
   }
 
