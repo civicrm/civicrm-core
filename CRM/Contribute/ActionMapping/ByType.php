@@ -229,6 +229,7 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
     if ($schedule->recipient_listing && $schedule->limit_to) {
       switch ($schedule->recipient) {
         case 'soft_credit_type':
+          $query['casContactIdField'] = 'soft.contact_id';
           $query->join('soft', 'INNER JOIN civicrm_contribution_soft soft ON soft.contribution_id = e.id')
             ->where("soft.soft_credit_type_id IN (#recipList)")
             ->param('recipList', \CRM_Utils_Array::explodePadded($schedule->recipient_listing));
