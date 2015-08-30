@@ -136,26 +136,42 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
   }
 
   /**
-   * FIXME: Unsure. Not sure how it differs from getRecipientTypes... but it does...
+   * Get a list of recipient types.
    *
-   * @param string $recipientType
-   * @return array
-   *   Array(mixed $name => string $label).
-   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
-   */
-  public function getRecipientListing($recipientType) {
-    return array();
-  }
-
-  /**
-   * FIXME: Unsure. Not sure how it differs from getRecipientListing... but it does...
+   * Note: A single schedule may filter on *zero* or *one* recipient types.
+   * When an admin chooses a value, it's stored in $schedule->recipient.
    *
    * @return array
-   *   array(mixed $value => string $label).
+   *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
   public function getRecipientTypes() {
-    return array();
+    return array(
+      'soft_credit_type' => ts('Soft Credit Role'),
+    );
+  }
+
+  /**
+   * Get a list of recipients which match the given type.
+   *
+   * Note: A single schedule may filter on *multiple* recipients.
+   * When an admin chooses value(s), it's stored in $schedule->recipient_listing.
+   *
+   * @param string $recipientType
+   *   Ex: 'participant_role'.
+   * @return array
+   *   Array(mixed $name => string $label).
+   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   * @see getRecipientTypes
+   */
+  public function getRecipientListing($recipientType) {
+    switch ($recipientType) {
+      case 'soft_credit_type':
+        return \CRM_Core_OptionGroup::values('soft_credit_type', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+
+      default:
+        return array();
+    }
   }
 
   /**
@@ -208,6 +224,16 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
     if (!empty($selectedStatuses)) {
       $query->where("e.contribution_status_id IN (#selectedStatuses)")
         ->param('selectedStatuses', $selectedStatuses);
+    }
+
+    if ($schedule->recipient_listing && $schedule->limit_to) {
+      switch ($schedule->recipient) {
+        case 'soft_credit_type':
+          $query->join('soft', 'INNER JOIN civicrm_contribution_soft soft ON soft.contribution_id = e.id')
+            ->where("soft.soft_credit_type_id IN (#recipList)")
+            ->param('recipList', \CRM_Utils_Array::explodePadded($schedule->recipient_listing));
+          break;
+      }
     }
 
     return $query;

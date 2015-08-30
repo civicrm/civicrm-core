@@ -90,38 +90,31 @@ interface MappingInterface {
   public function getDateFields();
 
   /**
-   * Just return an empty array.
+   * Get a list of recipient types.
    *
-   * There's only one context where this returns actual data -- when using
-   * something like 'Limit To: Participant Role: Attendee or Speaker'.
-   * Unfortunately, that use-case has several other hacky, hard-coded bits
-   * which make it work. New entities can't take advantage of this because
-   * they don't have similar hacky bits. More generally, all the "Recipients"/
-   * "Limit To"/"Also Include" stuff needs a rethink.
-   *
-   * @deprecated
-   * @param string $recipientType
-   * @return array
-   *   Array(mixed $name => string $label).
-   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
-   */
-  public function getRecipientListing($recipientType);
-
-  /**
-   * Just return an empty array.
-   *
-   * There are two contexts where this returns actual data -- when using
-   * Activities with the "Recipient" option, or whe using Events with the
-   * "Limit To:" option.  However, the mechanisms around these do not
-   * work the same and rely on on hacky, hard-coded bits in the UI.
-   * More generally, all the "Recipients"/"Limit To"/"Also Include" stuff
-   * needs a rethink.
+   * Note: A single schedule may filter on *zero* or *one* recipient types.
+   * When an admin chooses a value, it's stored in $schedule->recipient.
    *
    * @return array
-   *   array(mixed $value => string $label).
+   *   array(string $value => string $label).
    *   Ex: array('assignee' => 'Activity Assignee').
    */
   public function getRecipientTypes();
+
+  /**
+   * Get a list of recipients which match the given type.
+   *
+   * Note: A single schedule may filter on *multiple* recipients.
+   * When an admin chooses value(s), it's stored in $schedule->recipient_listing.
+   *
+   * @param string $recipientType
+   *   Ex: 'participant_role'.
+   * @return array
+   *   Array(mixed $name => string $label).
+   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   * @see getRecipientTypes
+   */
+  public function getRecipientListing($recipientType);
 
   /**
    * Determine whether a schedule based on this mapping is sufficiently

@@ -89,6 +89,43 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
   }
 
   /**
+   * Get a list of recipient types.
+   *
+   * Note: A single schedule may filter on *zero* or *one* recipient types.
+   * When an admin chooses a value, it's stored in $schedule->recipient.
+   *
+   * @return array
+   *   array(string $value => string $label).
+   *   Ex: array('assignee' => 'Activity Assignee').
+   */
+  public function getRecipientTypes() {
+    return \CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+  }
+
+  /**
+   * Get a list of recipients which match the given type.
+   *
+   * Note: A single schedule may filter on *multiple* recipients.
+   * When an admin chooses value(s), it's stored in $schedule->recipient_listing.
+   *
+   * @param string $recipientType
+   *   Ex: 'participant_role'.
+   * @return array
+   *   Array(mixed $name => string $label).
+   *   Ex: array(1 => 'Attendee', 2 => 'Volunteer').
+   * @see getRecipientTypes
+   */
+  public function getRecipientListing($recipientType) {
+    switch ($recipientType) {
+      case 'participant_role':
+        return \CRM_Event_PseudoConstant::participantRole();
+
+      default:
+        return array();
+    }
+  }
+
+  /**
    * Generate a query to locate recipients who match the given
    * schedule.
    *
