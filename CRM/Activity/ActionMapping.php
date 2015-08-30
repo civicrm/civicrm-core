@@ -64,6 +64,20 @@ class CRM_Activity_ActionMapping extends \Civi\ActionSchedule\Mapping {
   }
 
   /**
+   * Get a list of recipient types.
+   *
+   * Note: A single schedule may filter on *zero* or *one* recipient types.
+   * When an admin chooses a value, it's stored in $schedule->recipient.
+   *
+   * @return array
+   *   array(string $value => string $label).
+   *   Ex: array('assignee' => 'Activity Assignee').
+   */
+  public function getRecipientTypes() {
+    return \CRM_Core_OptionGroup::values('activity_contacts');
+  }
+
+  /**
    * Generate a query to locate recipients who match the given
    * schedule.
    *
