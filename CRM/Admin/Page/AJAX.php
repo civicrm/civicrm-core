@@ -329,6 +329,28 @@ LIMIT $limit";
     CRM_Utils_JSON::output($output);
   }
 
+  /**
+   * (Scheduled Reminders) Get the list of possible recipient filters.
+   *
+   * Ex: GET /civicrm/ajax/recipientListing?mappingID=contribpage&recipientType=
+   */
+  public static function recipientListing() {
+    $mappingID = filter_input(INPUT_GET, 'mappingID', FILTER_VALIDATE_REGEXP, array(
+      'options' => array(
+        'regexp' => '/^[a-zA-Z0-9_\-]+$/',
+      ),
+    ));
+    $recipientType = filter_input(INPUT_GET, 'recipientType', FILTER_VALIDATE_REGEXP, array(
+      'options' => array(
+        'regexp' => '/^[a-zA-Z0-9_\-]+$/',
+      ),
+    ));
+
+    CRM_Utils_JSON::output(array(
+      'recipients' => CRM_Utils_Array::toKeyValueRows(CRM_Core_BAO_ActionSchedule::getRecipientListing($mappingID, $recipientType)),
+    ));
+  }
+
   public static function mergeTags() {
     $tagAId = CRM_Utils_Type::escape($_POST['fromId'], 'Integer');
     $tagBId = CRM_Utils_Type::escape($_POST['toId'], 'Integer');

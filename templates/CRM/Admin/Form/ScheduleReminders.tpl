@@ -194,17 +194,19 @@
       $('#mode', $form).change(loadMsgBox);
 
       function populateRecipient() {
+        var mappingID = $('#entity_0', $form).val();
         var recipient = $("#recipient", $form).val();
-        if ((recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') && $('#limit_to').val() != '') {
-          CRM.api3('participant', 'getoptions', {field: recipientMapping[recipient] == 'participant_role' ? 'role_id' : 'status_id', sequential: 1})
-            .done(function(result) {
-              CRM.utils.setOptions($('#recipient_listing', $form), result.values);
-            });
-          $("#recipientList", $form).show();
+        $("#recipientList", $form).hide();
+        if ($('#limit_to').val() != '' ) {
+          $.getJSON(CRM.url('civicrm/ajax/recipientListing'), {mappingID: mappingID, recipientType: recipient},
+            function (result) {
+              if (!CRM._.isEmpty(result.recipients)) {
+                CRM.utils.setOptions($('#recipient_listing', $form), result.recipients);
+                $("#recipientList", $form).show();
+              }
+            }
+          );
         }
-        else {
-          $("#recipientList", $form).hide();
-	}
 
         showHideLimitTo();
       }
