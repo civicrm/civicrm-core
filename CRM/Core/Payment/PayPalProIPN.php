@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -163,7 +161,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $ids
    * @param array $objects
    * @param bool $first
-   * @return void|bool
+   * @return bool
    */
   public function recur(&$input, &$ids, &$objects, $first) {
     if (!isset($input['txnType'])) {
@@ -232,7 +230,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
           && !empty($recur->processor_id)
         ) {
           echo "already handled";
-          return;
+          return FALSE;
         }
         $recur->create_date = $now;
         $recur->contribution_status_id = 2;
@@ -254,7 +252,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         if ($this->retrieve('profile_status', 'String') == 'Expired') {
           if (!empty($recur->end_date)) {
             echo "already handled";
-            return;
+            return FALSE;
           }
           $recur->contribution_status_id = 1;
           $recur->end_date = $now;
@@ -289,7 +287,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     if ($txnType != 'recurring_payment') {
-      return;
+      return TRUE;
     }
 
     if (!$first) {
@@ -391,14 +389,14 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * (with the input parameters) & call this & all will be done
    *
    * @todo the references to POST throughout this class need to be removed
-   * @return void|bool
+   * @return bool
    */
   public function main() {
     CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
     CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
     if ($this->_isPaymentExpress) {
       $this->handlePaymentExpress();
-      return NULL;
+      return FALSE;
     }
     $objects = $ids = $input = array();
     $this->_component = $input['component'] = self::getValue('m');
