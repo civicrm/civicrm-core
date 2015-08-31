@@ -537,6 +537,141 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get billing fields required for this processor.
+   *
+   * We apply the existing default of returning fields only for payment processor type 1. Processors can override to
+   * alter.
+   *
+   * @param int $billingLocationID
+   *
+   * @return array
+   */
+  public function getBillingAddressFields($billingLocationID) {
+    if ($this->_paymentProcessor['billing_mode'] != 1 && $this->_paymentProcessor['billing_mode'] != 3) {
+      return array();
+    }
+    return array(
+      'first_name' => 'billing_first_name',
+      'middle_name' => 'billing_middle_name',
+      'last_name' => 'billing_last_name',
+      'street_address' => "billing_street_address-{$billingLocationID}",
+      'city' => "billing_city-{$billingLocationID}",
+      'country' => "billing_country_id-{$billingLocationID}",
+      'state_province' => "billing_state_province_id-{$billingLocationID}",
+      'postal_code' => "billing_postal_code-{$billingLocationID}",
+    );
+  }
+
+  /**
+   * Get form metadata for billing address fields.
+   *
+   * @param int $billingLocationID
+   *
+   * @return array
+   *    Array of metadata for address fields.
+   */
+  public function getBillingAddressFieldsMetadata($billingLocationID) {
+    $metadata = array();
+    $metadata['billing_first_name'] = array(
+      'htmlType' => 'text',
+      'name' => 'billing_first_name',
+      'title' => ts('Billing First Name'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata['billing_middle_name'] = array(
+      'htmlType' => 'text',
+      'name' => 'billing_middle_name',
+      'title' => ts('Billing Middle Name'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => FALSE,
+    );
+
+    $metadata['billing_last_name'] = array(
+      'htmlType' => 'text',
+      'name' => 'billing_last_name',
+      'title' => ts('Billing Last Name'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_street_address-{$billingLocationID}"] = array(
+      'htmlType' => 'text',
+      'name' => "billing_street_address-{$billingLocationID}",
+      'title' => ts('Street Address'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_city-{$billingLocationID}"] = array(
+      'htmlType' => 'text',
+      'name' => "billing_city-{$billingLocationID}",
+      'title' => ts('City'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_state_province_id-{$billingLocationID}"] = array(
+      'htmlType' => 'chainSelect',
+      'title' => ts('State/Province'),
+      'name' => "billing_state_province_id-{$billingLocationID}",
+      'cc_field' => TRUE,
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_postal_code-{$billingLocationID}"] = array(
+      'htmlType' => 'text',
+      'name' => "billing_postal_code-{$billingLocationID}",
+      'title' => ts('Postal Code'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_country_id-{$billingLocationID}"] = array(
+      'htmlType' => 'select',
+      'name' => "billing_country_id-{$billingLocationID}",
+      'title' => ts('Country'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        '' => ts('- select -'),
+      ) + CRM_Core_PseudoConstant::country(),
+      'is_required' => TRUE,
+    );
+    return $metadata;
+  }
+
+  /**
    * Get base url dependent on component.
    *
    * @return string|void
