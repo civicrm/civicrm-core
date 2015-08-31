@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class delegates to the chosen DataSource to grab the data to be
- *  imported.
+ * This class delegates to the chosen DataSource to grab the data to be imported.
  */
 class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
@@ -49,8 +46,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
 
@@ -128,8 +123,6 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -295,10 +288,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   }
 
   /**
-   * Call the DataSource's postProcess method to take over
-   * and then setup some common data structures for the next step
-   *
-   * @return void
+   * Call the DataSource's postProcess method.
    */
   public function postProcess() {
     $this->controller->resetPage('MapField');

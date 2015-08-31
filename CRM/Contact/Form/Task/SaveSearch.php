@@ -29,12 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to save a search
+ * This class provides the functionality to save a search.
+ *
  * Saved Searches are used for saving frequently used queries
  */
 class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
@@ -48,8 +47,6 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_id = NULL;
@@ -75,12 +72,11 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form object - it consists of
+   * Build the form object.
+   *
+   * It consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // get the qill
@@ -147,9 +143,6 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // saved search form values
