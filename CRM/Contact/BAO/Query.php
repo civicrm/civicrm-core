@@ -5532,7 +5532,7 @@ AND   displayRelType.is_active = 1
         continue;
       }
 
-      if (property_exists($dao, $value['idCol'])) {
+      if (is_object($dao) && property_exists($dao, $value['idCol'])) {
         $val = $dao->$value['idCol'];
 
         if (CRM_Utils_System::isNull($val)) {
