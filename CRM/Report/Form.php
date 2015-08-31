@@ -4340,6 +4340,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'first_name' => array(
         'title' => ts('First Name'),
       ),
+      'nick_name' => array(
+        'title' => ts('Nick Name'),
+      ),
       'middle_name' => array(
         'title' => ts('Middle Name'),
       ),
@@ -4351,6 +4354,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ),
       'postal_greeting_display' => array('title' => ts('Postal Greeting')),
       'email_greeting_display' => array('title' => ts('Email Greeting')),
+      'addressee_display' => array('title' => ts('Email Greeting')),
       'contact_type' => array(
         'title' => ts('Contact Type'),
       ),
