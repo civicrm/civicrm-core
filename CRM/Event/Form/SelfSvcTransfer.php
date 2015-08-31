@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.7                                          |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -239,7 +239,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, FALSE,);
       //create new contact for this name/email pair
       //if new contact, no need to check for contact already registered
-    $contact_id = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $contact_id);
+      $contact_id = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $contact_id);
     }
     return $contact_id;
   }
@@ -357,7 +357,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
           'name',
           'phone',
           'address',
-          'email'
+          'email',
         ),
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
@@ -373,7 +373,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //get the location info
     $locParams = array(
       'entity_id' => $participant->event_id,
-      'entity_table' => 'civicrm_event'
+      'entity_table' => 'civicrm_event',
     );
     $eventDetails[$participant->event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
     //need to set a flag for 'transfer' in sendTransactionParticipantEmail or Confirm email won't be sent
@@ -391,7 +391,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'name',
         'phone',
         'address',
-        'email'
+        'email',
       ),
       'contact' => CRM_Core_SelectValues::contactTokens(),
     );

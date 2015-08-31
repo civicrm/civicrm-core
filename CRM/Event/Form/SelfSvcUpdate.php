@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                          |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -220,7 +220,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $this->cancelParticipant($params);
     }
   }
- 
+
   public function transferParticipant($params) {
     $transferUrl = 'civicrm/event/form/selfsvctransfer';
     $url = CRM_Utils_System::url('civicrm/event/selfsvctransfer', 'reset=1&action=add&pid=' . $this->_participant_id);
@@ -246,7 +246,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
         'name',
         'phone',
         'address',
-        'email'
+        'email',
       ),
       'contact' => CRM_Core_SelectValues::contactTokens(),
     );
