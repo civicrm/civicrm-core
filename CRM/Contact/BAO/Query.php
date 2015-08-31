@@ -3572,45 +3572,9 @@ WHERE  $smartGroupClause
       $this->_tables['civicrm_address'] = 1;
       $this->_whereTables['civicrm_address'] = 1;
 
-      $countries = CRM_Core_PseudoConstant::country();
-      if (is_numeric($value)) {
-        $countryClause = self::buildClause(
-          'civicrm_address.country_id',
-          $op,
-          $value,
-          'Positive'
-        );
-        $countryName = $countries[(int ) $value];
-      }
-
-      else {
-        $intValues = self::parseSearchBuilderString($value);
-        if ($intValues && ($op == 'IN' || $op == 'NOT IN')) {
-          $countryClause = self::buildClause(
-            'civicrm_address.country_id',
-            $op,
-            $intValues,
-            'Positive'
-          );
-          $countryNames = array();
-          foreach ($intValues as $v) {
-            $countryNames[] = $countries[$v];
-          }
-          $countryName = implode(',', $countryNames);
-        }
-        else {
-          $countries = CRM_Core_PseudoConstant::country();
-          $intVal = CRM_Utils_Array::key($value, $countries);
-          $countryClause = self::buildClause(
-            'civicrm_address.country_id',
-            $op,
-            $intVal,
-            'Integer'
-          );
-          $countryName = $value;
-        }
-      }
-      $countryQill = ts('Country') . " {$op} '$countryName'";
+      $countryClause = self::buildClause('civicrm_address.country_id', $op, $value, 'Positive');
+      list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, 'country_id', $value, $op);
+      $countryQill = ts("%1 %2 %3", array(1 => 'Country', 2 => $qillop, 3 => $qillVal));
 
       if (!$fromStateProvince) {
         $this->_where[$grouping][] = $countryClause;
@@ -5666,6 +5630,9 @@ AND   displayRelType.is_active = 1
     }
     elseif ($daoName == 'CRM_Contact_DAO_Group' && $fieldName == 'id') {
       $pseduoOptions = CRM_Core_PseudoConstant::group();
+    }
+    elseif ($fieldName == 'country_id') {
+      $pseduoOptions = CRM_Core_PseudoConstant::country();
     }
     elseif ($daoName) {
       $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
