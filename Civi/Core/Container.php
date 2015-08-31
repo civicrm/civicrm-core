@@ -9,10 +9,14 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\Setup;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 // TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
@@ -37,20 +41,85 @@ class Container {
   public static function singleton($reset = FALSE) {
     if ($reset || self::$singleton === NULL) {
       $c = new self();
-      self::$singleton = $c->createContainer();
+      self::$singleton = $c->loadContainer();
     }
     return self::$singleton;
   }
 
   /**
+   * Find a cached container definition or construct a new one.
+   *
+   * There are many weird contexts in which Civi initializes (eg different
+   * variations of multitenancy and different permutations of CMS/CRM bootstrap),
+   * and hook_container may fire a bit differently in each context. To mitigate
+   * risk of leaks between environments, we compute a unique envID
+   * (md5(DB_NAME, HTTP_HOST, SCRIPT_FILENAME, etc)) and use separate caches for
+   * each (eg "templates_c/CachedCiviContainer.$ENVID.php").
+   *
+   * Constants:
+   *   - CIVICRM_CONTAINER_CACHE -- 'always' [default], 'never', 'auto'
+   *   - CIVICRM_DSN
+   *   - CIVICRM_DOMAIN_ID
+   *   - CIVICRM_TEMPLATE_COMPILEDIR
+   *
+   * @return ContainerInterface
+   */
+  public function loadContainer() {
+    // Note: The container's raison d'etre is to manage construction of other
+    // services. Consequently, we assume a minimal service available -- the classloader
+    // has been setup, and civicrm.settings.php is loaded, but nothing else works.
+
+    $cacheMode = defined('CIVICRM_CONTAINER_CACHE') ? CIVICRM_CONTAINER_CACHE : 'always';
+
+    // In pre-installation environments, don't bother with caching.
+    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') || !defined('CIVICRM_DSN') || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
+      return $this->createContainer();
+    }
+
+    $envId = md5(implode(\CRM_Core_DAO::VALUE_SEPARATOR, array(
+      defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1, // e.g. one database, multi URL
+      parse_url(CIVICRM_DSN, PHP_URL_PATH), // e.g. one codebase, multi database
+      \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''), // e.g. CMS vs extern vs installer
+      \CRM_Utils_Array::value('HTTP_HOST', $_SERVER, ''), // e.g. name-based vhosts
+      \CRM_Utils_Array::value('SERVER_PORT', $_SERVER, ''), // e.g. port-based vhosts
+      // Depending on deployment arch, these signals *could* be redundant, but who cares?
+    )));
+    $file = CIVICRM_TEMPLATE_COMPILEDIR . "/CachedCiviContainer.{$envId}.php";
+    $containerConfigCache = new ConfigCache($file, $cacheMode === 'auto');
+
+    if (!$containerConfigCache->isFresh()) {
+      $containerBuilder = $this->createContainer();
+      $containerBuilder->compile();
+      $dumper = new PhpDumper($containerBuilder);
+      $containerConfigCache->write(
+        $dumper->dump(array('class' => 'CachedCiviContainer')),
+        $containerBuilder->getResources()
+      );
+    }
+
+    require_once $file;
+    $c = new \CachedCiviContainer();
+    $c->set('service_container', $c);
+    return $c;
+  }
+
+  /**
+   * Construct a new container.
+   *
    * @var ContainerBuilder
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
    */
   public function createContainer() {
     $civicrm_base_path = dirname(dirname(__DIR__));
     $container = new ContainerBuilder();
+    $container->addCompilerPass(new RegisterListenersPass('dispatcher'));
+    $container->addObjectResource($this);
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
-    $container->set(self::SELF, $this);
+    //$container->set(self::SELF, $this);
+    $container->setDefinition(self::SELF, new Definition(
+      'Civi\Core\Container',
+      array()
+    ));
 
     // TODO Move configuration to an external file; define caching structure
     //    if (empty($configDirectories)) {
@@ -69,36 +138,36 @@ class Container {
     //    }
 
     $container->setDefinition('lockManager', new Definition(
-      '\Civi\Core\Lock\LockManager',
+      'Civi\Core\Lock\LockManager',
       array()
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createLockManager');
 
     $container->setDefinition('angular', new Definition(
-      '\Civi\Angular\Manager',
+      'Civi\Angular\Manager',
       array()
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
 
     $container->setDefinition('dispatcher', new Definition(
-      '\Symfony\Component\EventDispatcher\EventDispatcher',
-      array()
+      'Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher',
+      array(new Reference('service_container'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
 
     $container->setDefinition('magic_function_provider', new Definition(
-      '\Civi\API\Provider\MagicFunctionProvider',
+      'Civi\API\Provider\MagicFunctionProvider',
       array()
     ));
 
     $container->setDefinition('civi_api_kernel', new Definition(
-      '\Civi\API\Kernel',
+      'Civi\API\Kernel',
       array(new Reference('dispatcher'), new Reference('magic_function_provider'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
     $container->setDefinition('cxn_reg_client', new Definition(
-      '\Civi\Cxn\Rpc\RegistrationClient',
+      'Civi\Cxn\Rpc\RegistrationClient',
       array()
     ))
       ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
@@ -107,6 +176,7 @@ class Container {
     $singletons = array(
       'resources' => 'CRM_Core_Resources',
       'httpClient' => 'CRM_Utils_HttpClient',
+      'i18n' => 'CRM_Core_I18n',
       // Maybe? 'config' => 'CRM_Core_Config',
       // Maybe? 'smarty' => 'CRM_Core_Smarty',
     );
@@ -116,6 +186,20 @@ class Container {
       ))
         ->setFactoryClass($class)->setFactoryMethod('singleton');
     }
+
+    $container->setDefinition('civi_token_compat', new Definition(
+      'Civi\Token\TokenCompatSubscriber',
+      array()
+    ))->addTag('kernel.event_subscriber');
+
+    foreach (array('Activity', 'Contribute', 'Event', 'Member') as $comp) {
+      $container->setDefinition("crm_" . strtolower($comp) . "_tokens", new Definition(
+        "CRM_{$comp}_Tokens",
+        array()
+      ))->addTag('kernel.event_subscriber');
+    }
+
+    \CRM_Utils_Hook::container($container);
 
     return $container;
   }
@@ -128,10 +212,11 @@ class Container {
   }
 
   /**
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @param ContainerInterface $container
+   * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
-  public function createEventDispatcher() {
-    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+  public function createEventDispatcher($container) {
+    $dispatcher = new ContainerAwareEventDispatcher($container);
     $dispatcher->addListener('hook_civicrm_post::Activity', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
@@ -143,6 +228,13 @@ class Container {
       'CRM_Core_LegacyErrorHandler',
       'handleException',
     ));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Activity_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contact_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByPage', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByType', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Event_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Member_ActionMapping', 'onRegisterActionMappings'));
+
     return $dispatcher;
   }
 

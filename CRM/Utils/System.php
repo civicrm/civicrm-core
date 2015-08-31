@@ -1349,7 +1349,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get the locale set in the hosting CMS.
+   * Get the locale of the hosting CMS.
    *
    * @return string
    *   The used locale or null for none.
@@ -1357,6 +1357,23 @@ class CRM_Utils_System {
   public static function getUFLocale() {
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->getUFLocale();
+  }
+
+  /**
+   * Set the locale of the hosting CMS.
+   *
+   * For example, a mailing will want to change the CMS language so that
+   * URLs are in the correct language (such as the Drupal language prefix).
+   *
+   * @param string $civicrm_language
+   *   An array of parameters (see CRM_Utils_System::docURL2 method for names)
+   *
+   * @return bool
+   *   Returns whether the locale was successfully changed.
+   */
+  public static function setUFLocale($civicrm_language) {
+    $config = CRM_Core_Config::singleton();
+    return $config->userSystem->setUFLocale($civicrm_language);
   }
 
   /**
@@ -1818,7 +1835,7 @@ class CRM_Utils_System {
    * @return bool
    */
   public static function isInUpgradeMode() {
-    $args = explode('/', $_GET['q']);
+    $args = explode('/', CRM_Utils_Array::value('q', $_GET));
     $upgradeInProcess = CRM_Core_Session::singleton()->get('isUpgradePending');
     if ((isset($args[1]) && $args[1] == 'upgrade') || $upgradeInProcess) {
       return TRUE;

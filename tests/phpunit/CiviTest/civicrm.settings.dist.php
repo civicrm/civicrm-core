@@ -1,6 +1,7 @@
 <?php
 
 define('CIVICRM_TEST', 1);
+define('CIVICRM_CONTAINER_CACHE', 'auto');
 
 // This file is loaded on all systems running tests. To override settings on
 // your local system, please create "civicrm.settings.local.php" and put

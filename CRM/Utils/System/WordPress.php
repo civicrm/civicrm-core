@@ -326,6 +326,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    // TODO (probably not possible with WPML?)
+    return TRUE;
+  }
+
+  /**
    * Load wordpress bootstrap.
    *
    * @param string $name

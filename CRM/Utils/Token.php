@@ -218,7 +218,7 @@ class CRM_Utils_Token {
    * @return string
    *   the escaped string
    */
-  private static function tokenEscapeSmarty($string) {
+  public static function tokenEscapeSmarty($string) {
     // need to use negative look-behind, as both str_replace() and preg_replace() are sequential
     return preg_replace(array('/{/', '/(?<!{ldelim)}/'), array('{ldelim}', '{rdelim}'), $string);
   }

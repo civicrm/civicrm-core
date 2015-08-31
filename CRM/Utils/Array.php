@@ -614,6 +614,35 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Iterates over a list of objects and executes some method on each.
+   *
+   * Comparison:
+   *   - This is like array_map(), except it executes the objects' method
+   *     instead of a free-form callable.
+   *   - This is like Array::collect(), except it uses a method
+   *     instead of a property.
+   *
+   * @param string $method
+   *   The method to execute.
+   * @param array|Traversable $objects
+   *   A list of objects.
+   * @param array $args
+   *   An optional list of arguments to pass to the method.
+   *
+   * @return array
+   *   Keys are the original keys of $objects; values are the method results.
+   */
+  public static function collectMethod($method, $objects, $args = array()) {
+    $result = array();
+    if (is_array($objects)) {
+      foreach ($objects as $key => $object) {
+        $result[$key] = call_user_func_array(array($object, $method), $args);
+      }
+    }
+    return $result;
+  }
+
+  /**
    * Trims delimiters from a string and then splits it using explode().
    *
    * This method works mostly like PHP's built-in explode(), except that
@@ -962,6 +991,31 @@ class CRM_Utils_Array {
       $r = &$r[$part];
     }
     $r[$last] = $value;
+  }
+
+  /**
+   * Convert a simple dictionary into separate key+value records.
+   *
+   * @param array $array
+   *   Ex: array('foo' => 'bar').
+   * @param string $keyField
+   *   Ex: 'key'.
+   * @param string $valueField
+   *   Ex: 'value'.
+   * @return array
+   *   Ex: array(
+   *     0 => array('key' => 'foo', 'value' => 'bar')
+   *   ).
+   */
+  public static function toKeyValueRows($array, $keyField = 'key', $valueField = 'value') {
+    $result = array();
+    foreach ($array as $key => $value) {
+      $result[] = array(
+        $keyField => $key,
+        $valueField => $value,
+      );
+    }
+    return $result;
   }
 
 }
