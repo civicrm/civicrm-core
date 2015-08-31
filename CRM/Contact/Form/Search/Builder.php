@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class if for search builder processing
+ * This class is for search builder processing.
  */
 class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
@@ -54,8 +52,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Builder');
@@ -124,9 +120,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Search_Builder', 'formRule'), $this);
@@ -135,9 +128,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   /**
    * Global validation rules for the form.
    *
-   * @param $values
-   * @param $files
-   * @param $self
+   * @param array $values
+   * @param array $files
+   * @param CRM_Core_Form $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -334,8 +327,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
    * Process the uploaded file.
-   *
-   * @return void
    */
   public function postProcess() {
     $this->set('isAdvanced', '2');

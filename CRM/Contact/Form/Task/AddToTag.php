@@ -29,14 +29,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to delete a group of
- * contacts. This class provides functionality for the actual
- * addition of contacts to groups.
+ * This class provides the functionality to delete a group of contacts.
+ *
+ * This class provides functionality for the actual addition of contacts to groups.
+ *
+ * Wow is that copy & paste gone wrong or what? What does this class do? Anyone, anyone.
  */
 class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
 
@@ -56,9 +56,6 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // add select for tag
@@ -94,9 +91,6 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     //get the submitted values in an array

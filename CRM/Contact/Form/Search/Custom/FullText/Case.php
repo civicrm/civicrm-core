@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 

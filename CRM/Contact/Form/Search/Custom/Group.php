@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -44,7 +42,9 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   protected $_aclWhere = NULL;
 
   /**
-   * @param $formValues
+   * Class constructor.
+   *
+   * @param array $formValues
    */
   public function __construct(&$formValues) {
     $this->_formValues = $formValues;
@@ -611,6 +611,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
+   * Define columns.
+   *
    * @return array
    */
   public function &columns() {
@@ -618,6 +620,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
+   * Get summary.
+   *
    * @return NULL
    */
   public function summary() {
@@ -625,6 +629,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
+   * Get template file.
+   *
    * @return string
    */
   public function templateFile() {
@@ -632,7 +638,9 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
-   * @param $title
+   * Set title on search.
+   *
+   * @param string $title
    */
   public function setTitle($title) {
     if ($title) {
@@ -644,6 +652,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
+   * Build ACL clause.
+   *
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact') {

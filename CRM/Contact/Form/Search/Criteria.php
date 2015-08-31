@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Criteria {
   /**
@@ -522,13 +520,9 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
   /**
-   * Generate the custom Data Fields based
-   * on the is_searchable
+   * Generate the custom Data Fields based for those with is_searchable = 1.
    *
-   *
-   * @param $form
-   *
-   * @return void
+   * @param CRM_Contact_Form_Search $form
    */
   public static function custom(&$form) {
     $form->add('hidden', 'hidden_custom', 1);
@@ -545,7 +539,6 @@ class CRM_Contact_Form_Search_Criteria {
       $_groupTitle[$key] = $group['name'];
       CRM_Core_ShowHideBlocks::links($form, $group['name'], '', '');
 
-      $groupId = $group['id'];
       foreach ($group['fields'] as $field) {
         $fieldId = $field['id'];
         $elementName = 'custom_' . $fieldId;
@@ -557,8 +550,6 @@ class CRM_Contact_Form_Search_Criteria {
         );
       }
     }
-
-    //TODO: validate for only one state if prox_distance isset
   }
 
   /**

@@ -29,11 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
- * form helper class for a phone object
+ * Form helper class for a phone object.
  */
 class CRM_Contact_Form_Edit_Phone {
 
