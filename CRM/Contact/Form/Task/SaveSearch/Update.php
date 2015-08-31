@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to update a saved search
- *
+ * This class provides the functionality to update a saved search.
  */
 class CRM_Contact_Form_Task_SaveSearch_Update extends CRM_Contact_Form_Task_SaveSearch {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -59,10 +54,6 @@ class CRM_Contact_Form_Task_SaveSearch_Update extends CRM_Contact_Form_Task_Save
 
   /**
    * Set default values for the form.
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
 
