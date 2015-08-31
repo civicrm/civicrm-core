@@ -29,12 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_SearchCustom {
 
   /**
+   * Get details.
+   *
    * @param int $csID
    * @param int $ssID
    * @param int $gID
