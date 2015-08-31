@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Generate ical invites for activities
- *
+ * Generate ical invites for activities.
  */
 class CRM_Activity_BAO_ICalendar {
 

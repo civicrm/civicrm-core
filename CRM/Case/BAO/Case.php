@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -385,8 +383,6 @@ WHERE civicrm_case.id = %1";
    *   Case id.
    * @param bool $enable
    *   Action.
-   *
-   * @return void
    */
   public static function enableDisableCaseRelationships($caseId, $enable) {
     $contactIds = self::retrieveContactIdsByCaseId($caseId);
@@ -409,8 +405,6 @@ WHERE civicrm_case.id = %1";
    *
    * @param int $activityId
    *   Id of the activity.
-   *
-   * @return void
    */
   public static function deleteCaseActivity($activityId) {
     $case = new CRM_Case_DAO_CaseActivity();
@@ -1447,7 +1441,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param null $attachments
    * @param int $caseId
    *
-   * @return void
+   * @return null|array
    */
   public static function sendActivityCopy($clientId, $activityId, $contacts, $attachments = NULL, $caseId) {
     if (!$activityId) {
@@ -1929,10 +1923,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $relContactId
    *   Case role assignee contactId.
    * @param int $contactId
-   *
-   * @return void
-   *   on success creates activity and case activity
-   *
    */
   public static function createCaseRoleActivity($caseId, $relationshipId, $relContactId = NULL, $contactId = NULL) {
     if (!$caseId || !$relationshipId || empty($relationshipId)) {
@@ -2788,8 +2778,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Params to be sent to template for sending email.
    * @param array $activityParams
    *   Info of the activity.
-   *
-   * @return void
    */
   public static function buildPermissionLinks(&$tplParams, $activityParams) {
     $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityParams['source_record_id'],
@@ -3353,8 +3341,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Case id.
    * @param int $contactId
    *   Contact id / new client id.
-   *
-   * @return void
    */
   public static function addCaseRelationships($caseId, $contactId) {
     // get the case role / relationships for the case

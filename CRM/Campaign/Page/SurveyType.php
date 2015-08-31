@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying list of Gender
+ * Page for displaying list of Gender.
  */
 class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
 
@@ -70,8 +68,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
 
   /**
    * Obtains the group name from url and sets the title.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_gName = 'activity_type';
@@ -136,8 +132,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -146,9 +140,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
 
   /**
    * Browse all options.
-   *
-   *
-   * @return void
    */
   public function browse() {
     $campaingCompId = CRM_Core_Component::getComponentID('CiviCampaign');

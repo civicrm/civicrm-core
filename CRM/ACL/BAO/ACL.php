@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -44,6 +42,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   static $_fieldKeys = NULL;
 
   /**
+   * Get ACL entity table.
+   *
    * @return array|null
    */
   public static function entityTable() {

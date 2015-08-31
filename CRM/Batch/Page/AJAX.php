@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains functions that are called using AJAX
+ * This class contains functions that are called using AJAX.
  */
 class CRM_Batch_Page_AJAX {
 
