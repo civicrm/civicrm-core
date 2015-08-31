@@ -346,8 +346,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    * Process the form submission.
    *
    * @param array $params
-   *
-   * @return array|null
    */
   public function postProcess($params = NULL) {
     $transaction = new CRM_Core_Transaction();

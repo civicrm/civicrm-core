@@ -28,7 +28,6 @@
 /**
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 class CRM_Contact_BAO_DashboardContact extends CRM_Contact_DAO_DashboardContact {
 }

@@ -240,7 +240,7 @@ class CRM_Case_BAO_Query {
    * Where clause for a single field.
    *
    * @param array $values
-   * @param CRM_Case_BAO_Query s$query
+   * @param CRM_Case_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;

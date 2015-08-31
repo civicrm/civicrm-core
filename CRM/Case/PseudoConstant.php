@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class holds all the Pseudo constants that are specific for CiviCase.
- *
  */
 class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
 

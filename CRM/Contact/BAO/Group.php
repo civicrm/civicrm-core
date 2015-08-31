@@ -29,13 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -65,11 +63,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Delete the group and all the object that connect to
-   * this group. Incredibly destructive
+   * Delete the group and all the object that connect to this group.
    *
-   * @param int $id
-   *   Group id.
+   * Incredibly destructive.
+   *
+   * @param int $id Group id.
    */
   public static function discard($id) {
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);

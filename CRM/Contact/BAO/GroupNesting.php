@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright U.S. PIRG 2007
- * $Id$
- *
  */
 class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implements Iterator {
 
@@ -287,9 +285,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *   Id of the group to add the child to.
    * @param int $childID
    *   Id of the new child group.
-   *
-   *
-   * @return void
    */
   public static function add($parentID, $childID) {
     // TODO: Add checks here to make sure invalid nests can't be created
@@ -307,8 +302,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *   The id of the group to remove the child from.
    * @param $childID
    *   The id of the child group being removed.
-   *
-   * @return void
    */
   public static function remove($parentID, $childID) {
     $dao = new CRM_Contact_DAO_GroupNesting();
@@ -323,8 +316,6 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting implemen
    *
    * @param int $childID
    *   The id of the child group being removed.
-   *
-   * @return void
    */
   public static function removeAllParentForChild($childID) {
     $dao = new CRM_Contact_DAO_GroupNesting();
