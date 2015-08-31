@@ -3967,9 +3967,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => array(
-          'name' => array(
+          'address_name' => array(
             'title' => ts('Address Name'),
             'default' => CRM_Utils_Array::value('name', $defaults, FALSE),
+            'name' => 'name',
           ),
           'street_address' => array(
             'title' => ts('Street Address'),
@@ -4172,6 +4173,41 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Do AlterDisplay processing on Address Fields.
+   *
+   * @param array $row
+   * @param array $rows
+   * @param int $rowNum
+   *
+   * @return bool
+   */
+  public function alterDisplayContactFields(&$row, &$rows, &$rowNum) {
+    $entryFound = FALSE;
+    if (array_key_exists('civicrm_contact_prefix_id', $row)) {
+      $prefixes = CRM_Contact_BAO_Contact::buildOptions('prefix_id');
+      if ($value = $row['civicrm_contact_prefix_id']) {
+        $rows[$rowNum]['civicrm_contact_prefix_id'] = $prefixes[$rows[$rowNum]['civicrm_contact_prefix_id']];
+      }
+      $entryFound = TRUE;
+    }
+    if (array_key_exists('civicrm_contact_suffix_id', $row)) {
+      $suffixes = CRM_Contact_BAO_Contact::buildOptions('suffix_id');
+      if ($value = $row['civicrm_contact_suffix_id']) {
+        $rows[$rowNum]['civicrm_contact_suffix_id'] = $suffixes[$rows[$rowNum]['civicrm_contact_suffix_id']];
+      }
+      $entryFound = TRUE;
+    }
+    if (array_key_exists('civicrm_contact_gender_id', $row)) {
+      $genders = CRM_Contact_BAO_Contact::buildOptions('gender_id');
+      if ($value = $row['civicrm_contact_gender_id']) {
+        $rows[$rowNum]['civicrm_contact_gender_id'] = $genders[$rows[$rowNum]['civicrm_contact_gender_id']];
+      }
+      $entryFound = TRUE;
+    }
+    return $entryFound;
+  }
+
+  /**
    * Adjusts dates passed in to YEAR() for fiscal year.
    *
    * @param string $fieldName
@@ -4279,6 +4315,64 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $options['order_by'],
       $options['filters'],
       $options['defaults']
+    );
+  }
+
+  /**
+   * Get a standard set of contact fields.
+   *
+   * @return array
+   */
+  public function getBasicContactFields() {
+    return array(
+      'sort_name' => array(
+        'title' => ts('Contact Name'),
+        'required' => TRUE,
+        'default' => TRUE,
+      ),
+      'id' => array(
+        'no_display' => TRUE,
+        'required' => TRUE,
+      ),
+      'prefix_id' => array(
+        'title' => ts('Contact Prefix'),
+      ),
+      'first_name' => array(
+        'title' => ts('First Name'),
+      ),
+      'middle_name' => array(
+        'title' => ts('Middle Name'),
+      ),
+      'last_name' => array(
+        'title' => ts('Last Name'),
+      ),
+      'suffix_id' => array(
+        'title' => ts('Contact Suffix'),
+      ),
+      'postal_greeting_display' => array('title' => ts('Postal Greeting')),
+      'email_greeting_display' => array('title' => ts('Email Greeting')),
+      'contact_type' => array(
+        'title' => ts('Contact Type'),
+      ),
+      'contact_sub_type' => array(
+        'title' => ts('Contact Subtype'),
+      ),
+      'gender_id' => array(
+        'title' => ts('Gender'),
+      ),
+      'birth_date' => array(
+        'title' => ts('Birth Date'),
+      ),
+      'age' => array(
+        'title' => ts('Age'),
+        'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
+      ),
+      'job_title' => array(
+        'title' => ts('Contact Job title'),
+      ),
+      'organization_name' => array(
+        'title' => ts('Organization Name'),
+      ),
     );
   }
 
