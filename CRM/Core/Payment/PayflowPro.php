@@ -10,7 +10,7 @@
   */
 
 /**
- * Class CRM_Core_Payment_PayflowPro
+ * Class CRM_Core_Payment_PayflowPro.
  */
 class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   // (not used, implicit in the API, might need to convert?)
@@ -30,11 +30,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *
    * @param string $mode
    *   The mode of operation: live or test.
-   *
-   * @return void
-   */
-  /**
-   * @param $mode
    * @param $paymentProcessor
    */
   public function __construct($mode, &$paymentProcessor) {

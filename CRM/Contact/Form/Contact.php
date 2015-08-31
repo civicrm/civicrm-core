@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -143,8 +141,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -404,15 +400,12 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
-    $params = array();
 
     if ($this->_action & CRM_Core_Action::ADD) {
       if (array_key_exists('TagsAndGroups', $this->_editOptions)) {
@@ -572,7 +565,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return void
    * @see valid_date
    */
   public function addRules() {
@@ -738,8 +730,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //load form for child blocks
@@ -866,9 +856,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Form submission of new/edit contact is processed.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // check if dedupe button, if so return.

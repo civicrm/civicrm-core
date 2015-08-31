@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class is used to build address block
+ * This class is used to build address block.
  */
 class CRM_Contact_Form_Edit_Address {
 
@@ -48,9 +46,6 @@ class CRM_Contact_Form_Edit_Address {
    *   False, if we want to skip the address sharing features.
    * @param bool $inlineEdit
    *   True when edit used in inline edit.
-   *
-   * @return void
-   *
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharing = TRUE, $inlineEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
@@ -241,13 +236,12 @@ class CRM_Contact_Form_Edit_Address {
   /**
    * Check for correct state / country mapping.
    *
-   * @param $fields
-   * @param $files
-   * @param $self
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $self
    *
    * @return array|bool
    *   if no errors
-   *
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
@@ -303,7 +297,6 @@ class CRM_Contact_Form_Edit_Address {
    *   Defaults associated array.
    * @param CRM_Core_Form $form
    *   Form object.
-   *
    */
   public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = array();
@@ -407,10 +400,11 @@ class CRM_Contact_Form_Edit_Address {
     }
   }
 
-
   /**
+   * Store required custom data info.
+   *
    * @param CRM_Core_Form $form
-   * @param $groupTree
+   * @param array $groupTree
    */
   public static function storeRequiredCustomDataInfo(&$form, $groupTree) {
     if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
