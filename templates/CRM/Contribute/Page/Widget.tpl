@@ -102,11 +102,9 @@
         background-color: {/literal}{$form.color_main_bg.value}{literal};
     } /* title */
     .crm-contribute-widget .crm-amount-raised { color:#000; }
-    .crm-contribute-widget .crm-amount-bar  /* progress bar */
-        background-color:{/literal}{$form.color_bar.value}{literal};
-        border-color:#CECECE;
+    .crm-contribute-widget .crm-amount-fill {
+      background-color:{/literal}{$form.color_bar.value}{literal};
     }
-    .crm-contribute-widget .crm-amount-fill { background-color:#2786C2; }
     .crm-contribute-widget a.crm-contribute-button { /* button color */
         background-color:{/literal}{$form.color_button.value}{literal};
     }

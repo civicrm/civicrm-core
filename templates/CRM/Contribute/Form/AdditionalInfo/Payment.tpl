@@ -23,11 +23,9 @@
     }
 
     function buildRecurBlock( processorId ) {
-
       if ( !processorId ) processorId = cj( "#payment_processor_id" ).val( );
       var recurPaymentProIds = {/literal}'{$recurringPaymentProcessorIds}'{literal};
-      var funName = 'hide';
-      if ( recurPaymentProIds.indexOf( processorId ) != -1 ) funName = 'show';
+      var funName = ( cj.inArray(processorId, recurPaymentProIds.split(',')) > -1 ) ? 'show' : 'hide';
 
       var priceSet = cj("#price_set_id");
       if ( priceSet && priceSet.val( ) ) {
