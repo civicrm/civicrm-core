@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -85,8 +83,6 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
   /**
    * Browse all event templates.
-   *
-   * @return void
    */
   public function browse() {
     //get all event templates.

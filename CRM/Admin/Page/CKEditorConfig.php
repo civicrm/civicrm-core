@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for configuring CKEditor options
+ * Page for configuring CKEditor options.
  *
  * Note that while this is implemented as a CRM_Core_Page, it is actually a form.
  * Because the form needs to be submitted and refreshed via javascrit, it seemed like
@@ -55,6 +53,8 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   );
 
   /**
+   * Run page.
+   *
    * @return string
    */
   public function run() {
@@ -121,6 +121,8 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
+   * Get CKEditor plugins.
+   *
    * @return array
    */
   private function getCKPlugins() {
@@ -155,6 +157,8 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
+   * Get CK Editor skins.
+   *
    * @return array
    */
   private function getCKSkins() {
@@ -223,7 +227,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
-   * Delete self::CONFIG_FILENAME
+   * Delete config file.
    */
   public static function deleteConfigFile() {
     $file = self::getConfigFile();

@@ -29,15 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying list of site configuration tasks with links to each setting form
+ * Page for displaying list of site configuration tasks with links to each setting form.
  */
 class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
   /**
+   * Run page.
+   *
    * @return string
    */
   public function run() {

@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Error Handling and Debugging
- *
+ * This class generates form components for Error Handling and Debugging.
  */
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
@@ -47,8 +44,6 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts(' Settings - Debugging and Error Handling '));

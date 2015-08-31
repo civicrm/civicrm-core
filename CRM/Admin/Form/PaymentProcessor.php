@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: PaymentProcessor.php 9702 2007-05-29 23:57:16Z lobo $
- *
  */
 
 /**
- * This class generates form components for Payment Processor
- *
+ * This class generates form components for Payment Processor.
  */
 class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_id = NULL;
@@ -165,8 +162,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * Build the form object.
    *
    * @param bool $check
-   *
-   * @return void
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -338,9 +333,6 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return Void
    */
   public function postProcess() {
     CRM_Utils_System::flushCache('CRM_Financial_DAO_PaymentProcessor');
@@ -367,11 +359,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Save a payment processor.
    *
-   * @param $values
+   * @param array $values
    * @param int $domainID
-   * @param $test
-   *
-   * @return void
+   * @param bool $test
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
     $dao = new CRM_Financial_DAO_PaymentProcessor();

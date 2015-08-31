@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Campaign_BAO_Query {
   //since normal activity clause clause get collides.
@@ -65,9 +63,7 @@ class CRM_Campaign_BAO_Query {
   /**
    * If survey, campaign are involved, add the specific fields.
    *
-   * @param $query
-   *
-   * @return void
+   * @param CRM_Contact_BAO_Contact $query
    */
   public static function select(&$query) {
     self::$_applySurveyClause = FALSE;
@@ -337,9 +333,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
    * Add all the elements shared between,
    * normal voter search and voter listing (GOTV form)
    *
-   *
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function buildSearchForm(&$form) {
 
