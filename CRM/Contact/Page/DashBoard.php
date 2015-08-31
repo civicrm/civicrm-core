@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * CiviCRM Dashboard
- *
+ * CiviCRM Dashboard.
  */
 class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
 
   /**
    * Run dashboard.
-   *
-   * @return void
    */
   public function run() {
     // Add dashboard js and css
