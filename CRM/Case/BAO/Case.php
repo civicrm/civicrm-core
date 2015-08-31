@@ -33,7 +33,6 @@
 
 /**
  * This class contains the functions for Case Management.
- *
  */
 class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
@@ -1441,11 +1440,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param null $attachments
    * @param int $caseId
    *
-   * @return null|array
+   * @return bool |array
    */
   public static function sendActivityCopy($clientId, $activityId, $contacts, $attachments = NULL, $caseId) {
     if (!$activityId) {
-      return;
+      return FALSE;
     }
 
     $tplParams = $activityInfo = array();

@@ -29,11 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
   /**
+   * Run page.
+   *
    * @return string
    */
   public function run() {

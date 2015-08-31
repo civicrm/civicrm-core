@@ -37,9 +37,8 @@
 class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   /**
-   * Survet id`
-   *
    * @var int
+   *   Survey id.
    */
   protected $_surveyId;
 
@@ -232,7 +231,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-    */
+   */
   public function postProcess() {
     //add reservation.
     $countVoters = 0;

@@ -29,12 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   /**
-   * @param $caseType
+   * Run.
+   *
+   * @param string $caseType
    * @param array $params
    *
    * @return bool
