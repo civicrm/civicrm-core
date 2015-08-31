@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class gets the name of the file to upload
+ * This class gets the name of the file to upload.
  */
 class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
@@ -44,8 +42,6 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -69,8 +65,6 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
   /**
    * Process the uploaded file.
-   *
-   * @return void
    */
   public function postProcess() {
     $this->storeFormValues(array(
