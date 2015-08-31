@@ -83,6 +83,36 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Function tests that an empty where hook returns exactly 1 result with "view my contact".
+   *
+   * CRM-16512 caused contacts with Edit my contact to be able to view all records.
+   */
+  public function testContactGetOneResultHookWithViewMyContact() {
+    $this->createLoggedInUser();
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view my contact');
+    $result = $this->callAPISuccess('contact', 'get', array(
+      'check_permissions' => 1,
+      'return' => 'display_name',
+    ));
+    $this->assertEquals(1, $result['count']);
+  }
+
+  /**
+   * Function tests that a user with "edit my contact" can edit themselves.
+   */
+  public function testContactEditHookWithEditMyContact() {
+    $this->markTestIncomplete('api acls only work with contact get so far');
+    $cid = $this->createLoggedInUser();
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit my contact');
+    $this->callAPISuccess('contact', 'create', array(
+      'check_permissions' => 1,
+      'id' => $cid,
+    ));
+  }
+
+  /**
    * Function tests all results are returned.
    */
   public function testContactGetAllResultsHook() {
@@ -122,7 +152,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Confirm that without check permissions we still get 2 contacts returned
+   * Confirm that without check permissions we still get 2 contacts returned.
    */
   public function testContactGetHookLimitingHookDontCheck() {
     $result = $this->callAPISuccess('contact', 'get', array(
@@ -299,7 +329,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities
    * Function tests that an empty where hook returns no results
-   * @param $entity
+   * @param string $entity
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testEntityGetNoResultsHook($entity) {

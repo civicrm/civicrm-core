@@ -365,7 +365,14 @@
           entity: entity,
           select: {
             multiple: multiSelect,
-            minimumInputLength: _.includes(OPEN_IMMEDIATELY, entity) ? 0 : 1
+            minimumInputLength: _.includes(OPEN_IMMEDIATELY, entity) ? 0 : 1,
+            // If user types a numeric id, allow it as a choice
+            createSearchChoice: function(input) {
+              var match = /[1-9][0-9]*/.exec(input);
+              if (match && match[0] === input) {
+                return {id: input, label: input};
+              }
+            }
           }
         });
       }
