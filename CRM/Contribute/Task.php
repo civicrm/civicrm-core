@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * class to represent the actions that can be performed on a group of contacts
- * used by the search forms
+ * Class to represent the actions that can be performed on a group of contacts.
  *
+ * Used by the search forms.
  */
 class CRM_Contribute_Task {
   const DELETE_CONTRIBUTIONS = 1, PRINT_CONTRIBUTIONS = 2, EXPORT_CONTRIBUTIONS = 3, BATCH_CONTRIBUTIONS = 4, EMAIL_CONTACTS = 5, UPDATE_STATUS = 6, PDF_RECEIPT = 7;

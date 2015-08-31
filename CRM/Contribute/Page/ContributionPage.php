@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -372,10 +370,7 @@ AND         cp.page_type = 'contribute'
   }
 
   /**
-   * make a copy of a contribution page, including
-   * all the fields in the page
-   *
-   * @return void
+   * Make a copy of a contribution page, including all the fields in the page.
    */
   public function copy() {
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive',

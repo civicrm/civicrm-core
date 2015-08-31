@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This page displays custom data during inline edit
- *
+ * This page displays custom data during inline edit.
  */
 class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
 
@@ -43,8 +40,6 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
    * Run the page.
    *
    * This method is called after the page is created.
-   *
-   * @return void
    */
   public function run() {
     // get the emails for this contact

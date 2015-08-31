@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *  this file contains functions for synchronizing cms users with CiviCRM contacts
+ * This file contains functions for synchronizing cms users with CiviCRM contacts.
  */
 
 require_once 'DB.php';
@@ -52,12 +50,8 @@ class CRM_Core_BAO_CMSUser {
    *   This behavior is misplaced in the BAO layer, but we'll preserve it to avoid
    *   contract changes in the middle of the support cycle. In the next major
    *   release, we should remove & document it.
-   *
-   * @return void
-   *
    */
   public static function synchronize($is_interactive = TRUE) {
-    //start of schronization code
     $config = CRM_Core_Config::singleton();
 
     // Build an array of rows from UF users table.

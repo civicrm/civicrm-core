@@ -29,14 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
 
   /**
-   * called when action is browse.
-   *
+   * Called when action is browse.
    */
   public function browse() {
 

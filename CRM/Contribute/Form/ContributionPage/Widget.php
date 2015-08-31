@@ -141,13 +141,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
-   */
-  /**
+   * Set default values for the form.
    */
   public function setDefaultValues() {
     $defaults = array();
