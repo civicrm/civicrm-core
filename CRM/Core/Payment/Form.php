@@ -26,6 +26,7 @@
  */
 
 /**
+ * Class for constructing the payment processor block.
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
@@ -54,40 +55,66 @@ class CRM_Core_Payment_Form {
    */
   static public function setPaymentFieldsByProcessor(&$form, $processor, $forceBillingFieldsForPayLater = FALSE, $isBackOffice = FALSE) {
     $form->billingFieldSets = array();
-    if ($processor != NULL) {
-      // ie it is pay later
-      $paymentFields = self::getPaymentFields($processor);
-      $paymentTypeName = self::getPaymentTypeName($processor);
-      $paymentTypeLabel = self::getPaymentTypeLabel($processor);
-      //@todo if we switch to iterating through $form->billingFieldSets we won't need to assign these directly
-      $form->assign('paymentTypeName', $paymentTypeName);
-      $form->assign('paymentTypeLabel', $paymentTypeLabel);
-
-      $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
-      $form->assign('paymentFields', $paymentFields);
-    }
-
-    // @todo - replace this section with one similar to above per discussion - probably use a manual processor shell class to stand in for that capability
-    //return without adding billing fields if billing_mode = 4 (@todo - more the ability to set that to the payment processor)
-    // or payment processor is NULL (pay later)
-    if (($processor == NULL && !$forceBillingFieldsForPayLater) || CRM_Utils_Array::value('billing_mode', $processor) == 4) {
+    if (empty($processor)) {
+      self::hackyHandlePayLaterInPaymentProcessorFunction($form, $forceBillingFieldsForPayLater);
       return;
     }
-    //@todo setPaymentFields defines the billing fields - this should be moved to the processor class & renamed getBillingFields
-    // potentially pay later would also be a payment processor
-    //also set the billingFieldSet to hold all the details required to render the fieldset so we can iterate through the fieldset - making
-    // it easier to re-order in hooks etc. The billingFieldSets param is used to determine whether to show the billing pane
-    CRM_Core_Payment_Form::setBillingDetailsFields($form);
+
+    $paymentTypeName = self::getPaymentTypeName($processor);
+    $paymentTypeLabel = self::getPaymentTypeLabel($processor);
+    $form->assign('paymentTypeName', $paymentTypeName);
+    $form->assign('paymentTypeLabel', $paymentTypeLabel);
+    $form->_paymentFields = $form->billingFieldSets[$paymentTypeName]['fields'] = self::getPaymentFieldMetadata($processor);
+    $form->_paymentFields = array_merge($form->_paymentFields, self::getBillingAddressMetadata($processor, $form->_bltID));
+    $form->assign('paymentFields', self::getPaymentFields($processor));
+    self::setBillingAddressFields($form, $processor);
+    // @todo - this may be obsolete - although potentially it could be used to re-order things in the form.
     $form->billingFieldSets['billing_name_address-group']['fields'] = array();
   }
 
   /**
    * Add general billing fields.
-   * @todo set these like processor fields & let payment processors alter them
    *
    * @param CRM_Core_Form $form
+   * @param CRM_Core_Payment $processor
    *
    * @return void
+   */
+  static protected function setBillingAddressFields(&$form, $processor) {
+    $billingID = $form->_bltID;
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('billingDetailsFields', self::getBillingAddressFields($processor, $billingID));
+  }
+
+  /**
+   * Add pay later billing fields
+   *
+   * @deprecated
+   *
+   * This is here to preserve the old flow for pay-later requiring billing as I am unsure how to replicate it or what to
+   * expect from it/ whether it even works.
+   *
+   * Including the pay-later flow in this form is pretty hacky unless we adopt the proposed process of adding
+   * an offline / pay later processor (CRM_Core_Payment_Offline). In which case it would either be implemented
+   * (preferably) like other processors or (possibly) as a pseudo-processor with the Civi\Payment\System->getById
+   * turning that class if $id === 0 or getByProcessor returning it when $processor === array(); If we go down the path
+   * we probably also want to add the default pay-later text into the signature field of the pay later processor and
+   * implement a function similar to the dummy class where the payment processor outcome class can be set.
+   *
+   * Then doPayment could be called regardless of whether the flow is paylater or not - it wouldn't do much although
+   * people might leverage it's hook - but it would simplify the main postProcess flow as it would look like
+   *
+   * if ($paymentStatus === Completed) {
+   *   $processor->setPaymentResult = array('payment_status_id', 1);
+   * }
+   * $processor->doDirectPayment();
+   * etc
+   *
+   * And the postProcess code would not need to distinguish between pay later/ offline & online payments.
+   *
+   * Alternatively enforcing certain fields for pay later in some cases would be a candidate for an extension.
+   *
+   * @param CRM_Core_Form $form
    */
   static protected function setBillingDetailsFields(&$form) {
     $bltID = $form->_bltID;
@@ -229,9 +256,12 @@ class CRM_Core_Payment_Form {
   }
 
   /**
+   * Get the payment fields that apply to this processor.
+   *
    * @param array $paymentProcessor
-   * @todo it will be necessary to set details that affect it - mostly likely take Country as a param. Should we add generic
-   * setParams on processor class or just setCountry which we know we need?
+   *
+   * @todo sometimes things like the country alter the required fields (e.g direct debit fields). We should possibly
+   * set these before calling getPaymentFormFields (as we identify them).
    *
    * @return array
    */
@@ -247,7 +277,37 @@ class CRM_Core_Payment_Form {
    */
   public static function getPaymentFieldMetadata($paymentProcessor) {
     $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
-    return $paymentProcessorObject->getPaymentFormFieldsMetadata();
+    return array_intersect_key($paymentProcessorObject->getPaymentFormFieldsMetadata(), array_flip(self::getPaymentFields($paymentProcessor)));
+  }
+
+  /**
+   * Get the billing fields that apply to this processor.
+   *
+   * @param array $paymentProcessor
+   * @param int $billingLocationID
+   *   ID of billing location type.
+   *
+   * @todo sometimes things like the country alter the required fields (e.g postal code). We should possibly
+   * set these before calling getPaymentFormFields (as we identify them).
+   *
+   * @return array
+   */
+  public static function getBillingAddressFields($paymentProcessor, $billingLocationID) {
+    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
+    return $paymentProcessorObject->getBillingAddressFields($billingLocationID);
+  }
+
+  /**
+   * @param array $paymentProcessor
+   *
+   * @param int $billingLocationID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function getBillingAddressMetadata($paymentProcessor, $billingLocationID) {
+    $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
+    return $paymentProcessorObject->getBillingAddressFieldsMetadata($billingLocationID);
   }
 
   /**
@@ -469,6 +529,24 @@ class CRM_Core_Payment_Form {
    */
   public static function getCreditCardExpirationYear($src) {
     return CRM_Utils_Array::value('Y', $src['credit_card_exp_date']);
+  }
+
+  /**
+   * Set billing fields for pay later.
+   *
+   * This is considered hacky because pay later has basically been cludged onto the payment processor form.
+   *
+   * See notes on the deprecated function as to how this could be restructured. Alternatively this pay later
+   * handling could be moved out of the payment processor form all together.
+   *
+   * @param CRM_Core_Form $form
+   * @param int $forceBillingFieldsForPayLater
+   */
+  protected static function hackyHandlePayLaterInPaymentProcessorFunction(&$form, $forceBillingFieldsForPayLater) {
+    if ($forceBillingFieldsForPayLater) {
+      CRM_Core_Payment_Form::setBillingDetailsFields($form);
+      $form->billingFieldSets['billing_name_address-group']['fields'] = array();
+    }
   }
 
 }
