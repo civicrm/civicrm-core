@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Option Group
- *
+ * This class generates form components for Option Group.
  */
 class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   protected $_gid;
@@ -63,8 +60,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
@@ -112,8 +107,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -143,9 +136,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
 

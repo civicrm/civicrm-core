@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: Display.php 45499 2013-02-08 12:31:05Z kurund $
- *
  */
 
 /**
@@ -126,8 +124,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $wysiwyg_options = CRM_Core_OptionGroup::values('wysiwyg_editor', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
@@ -160,9 +156,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::VIEW) {

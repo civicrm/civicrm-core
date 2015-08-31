@@ -29,14 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
-require_once 'api/api.php';
 
 /**
- * class to parse activity csv files
+ * Class to parse activity csv files.
  */
 class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
@@ -56,7 +53,8 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
   /**
    * Class constructor.
-   * @param $mapperKeys
+   *
+   * @param array $mapperKeys
    * @param null $mapperLocType
    * @param null $mapperPhoneType
    */
@@ -66,9 +64,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   }
 
   /**
-   * The initializer code, called before the processing
-   *
-   * @return void
+   * The initializer code, called before the processing.
    */
   public function init() {
     $activityContact = CRM_Activity_BAO_ActivityContact::import();
@@ -398,9 +394,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   }
 
   /**
-   * The initializer code, called before the processing
-   *
-   * @return void
+   * The initializer code, called before the processing.
    */
   public function fini() {
   }

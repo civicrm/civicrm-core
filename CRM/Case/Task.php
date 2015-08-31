@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * class to represent the actions that can be performed on a group of contacts
- * used by the search forms
+ * Class to represent the actions that can be performed on a group of contacts.
  *
+ * Used by the search forms
  */
 class CRM_Case_Task {
   const DELETE_CASES = 1, PRINT_CASES = 2, EXPORT_CASES = 3, RESTORE_CASES = 4;

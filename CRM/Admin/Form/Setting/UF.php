@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Site Url
- *
+ * This class generates form components for Site Url.
  */
 class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
@@ -45,8 +42,6 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();

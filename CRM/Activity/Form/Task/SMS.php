@@ -26,8 +26,7 @@
  */
 
 /**
- * This class provides the functionality to sms a group of
- * contacts.
+ * This class provides the functionality to sms a group of contacts.
  */
 class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
 
@@ -48,8 +47,6 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -59,9 +56,6 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //enable form element
@@ -71,9 +65,6 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     CRM_Contact_Form_Task_SMSCommon::postProcess($this);

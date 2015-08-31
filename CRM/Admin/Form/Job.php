@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 
 /**
- *
+ * Class for configuring jobs.
  */
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
   protected $_id = NULL;
@@ -65,8 +63,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * Build the form object.
    *
    * @param bool $check
-   *
-   * @return void
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -172,9 +168,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
 

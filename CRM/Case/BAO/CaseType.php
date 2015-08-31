@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains the functions for Case Type management
- *
+ * This class contains the functions for Case Type management.
  */
 class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 

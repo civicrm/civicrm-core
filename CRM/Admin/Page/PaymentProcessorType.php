@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying list of payment processors
+ * Page for displaying list of payment processors.
  */
 class CRM_Admin_Page_PaymentProcessorType extends CRM_Core_Page_Basic {
 

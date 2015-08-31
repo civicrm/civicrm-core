@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality for batch entry for contributions/memberships
+ * This class provides the functionality for batch entry for contributions/memberships.
  */
 class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
@@ -86,8 +84,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_batchId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -114,9 +110,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if (!$this->_profileId) {
@@ -356,9 +349,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -397,9 +387,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -436,8 +423,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @param array $params
    *   Associated array of submitted values.
    *
-   *
-   * @return void
+   * @return bool
    */
   private function processContribution(&$params) {
     $dates = array(
@@ -859,9 +845,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @param array $value
    *   Associated array of submitted values.
-   *
-   *
-   * @return void
    */
   private function updateContactInfo(&$value) {
     $value['preserveDBName'] = $this->_preserveDefault;
@@ -875,9 +858,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Function exists purely for unit testing purposes. If you feel tempted to use this in live code
-   * then it probably means there is some functionality that needs to be moved
-   * out of the form layer
+   * Function exists purely for unit testing purposes.
+   *
+   * If you feel tempted to use this in live code then it probably means there is some functionality
+   * that needs to be moved out of the form layer
    *
    * @param array $params
    *
@@ -888,9 +872,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * Function exists purely for unit testing purposes. If you feel tempted to use this in live code
-   * then it probably means there is some functionality that needs to be moved
-   * out of the form layer
+   * Function exists purely for unit testing purposes.
+   *
+   * If you feel tempted to use this in live code then it probably means there is some functionality
+   * that needs to be moved out of the form layer.
    *
    * @param array $params
    *

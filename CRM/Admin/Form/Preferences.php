@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Base class for settings forms
- *
+ * Base class for settings forms.
  */
 class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   protected $_system = FALSE;
@@ -140,8 +137,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -235,9 +230,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
@@ -252,9 +244,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcessCommon() {
     foreach ($this->_varNames as $groupName => $groupValues) {
