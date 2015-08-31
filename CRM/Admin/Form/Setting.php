@@ -29,11 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
- * This class generates form components generic to CiviCRM settings
+ * This class generates form components generic to CiviCRM settings.
  */
 class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
@@ -167,6 +166,11 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Get default entity.
+   *
+   * @return string
+   */
   public function getDefaultEntity() {
     return 'Setting';
   }

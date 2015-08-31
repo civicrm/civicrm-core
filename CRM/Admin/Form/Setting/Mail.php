@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for CiviMail
+ * This class generates form components for CiviMail.
  */
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
@@ -44,8 +42,6 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - CiviMail'));

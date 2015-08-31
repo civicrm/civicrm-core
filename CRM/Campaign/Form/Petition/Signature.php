@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing a petition signature
- *
+ * This class generates form components for processing a petition signature.
  */
 class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   const EMAIL_THANK = 1, EMAIL_CONFIRM = 2, MODE_CREATE = 4;
@@ -232,9 +229,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $this->_defaults = array();
@@ -320,8 +314,8 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * @param $files
    * @param $errors
    *
-   * @return void
    * @see valid_date
+   * @return array|bool
    */
   public static function formRule($fields, $files, $errors) {
     $errors = array();
@@ -331,9 +325,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
   /**
    * Form submission of petition signature.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $tag_name = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME,
@@ -577,8 +568,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * @param int $id
    * @param string $name
    * @param bool $viewOnly
-   *
-   * @return void
    */
   public function buildCustom($id, $name, $viewOnly = FALSE) {
     if ($id) {

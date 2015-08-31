@@ -30,13 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for PDF Page Format Settings
- *
+ * This class generates form components for PDF Page Format Settings.
  */
 class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
 
@@ -47,8 +44,6 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -110,9 +105,6 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

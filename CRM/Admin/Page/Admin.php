@@ -29,15 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying Administer CiviCRM Control Panel
+ * Page for displaying Administer CiviCRM Control Panel.
  */
 class CRM_Admin_Page_Admin extends CRM_Core_Page {
   /**
+   * Run page.
+   *
    * @return string
    */
   public function run() {

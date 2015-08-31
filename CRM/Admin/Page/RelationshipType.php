@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying list of relationship types
+ * Page for displaying list of relationship types.
  */
 class CRM_Admin_Page_RelationshipType extends CRM_Core_Page_Basic {
 

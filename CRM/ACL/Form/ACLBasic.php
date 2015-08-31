@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
-
 class CRM_ACL_Form_ACLBasic extends CRM_Admin_Form {
 
   /**

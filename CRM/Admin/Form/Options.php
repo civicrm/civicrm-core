@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Options
- *
+ * This class generates form components for Options.
  */
 class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
@@ -55,8 +52,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
   /**
    * Pre-process
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -115,8 +110,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
   /**
    * Set default values for the form.
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
@@ -146,8 +139,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -390,9 +381,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

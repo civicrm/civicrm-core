@@ -27,12 +27,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Class CRM_Badge_Format_Badge
+ * Class CRM_Badge_Format_Badge.
  *
  * parent class for building name badges
  */
@@ -49,8 +47,6 @@ class CRM_Badge_BAO_Badge {
    *   Associated array with participant info.
    * @param array $layoutInfo
    *   Associated array which contains meta data about format/layout.
-   *
-   * @return void
    */
   public function createLabels(&$participants, &$layoutInfo) {
     $this->pdf = new CRM_Utils_PDF_Label($layoutInfo['format'], 'mm');
@@ -365,8 +361,6 @@ class CRM_Badge_BAO_Badge {
    * @param string $y
    * @param null $w
    * @param null $h
-   *
-   * @return void
    */
   public function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
     if (!$x) {
@@ -409,8 +403,6 @@ class CRM_Badge_BAO_Badge {
    * @param array $params
    *   Associated array of submitted values.
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildBadges(&$params, &$form) {
     // get name badge layout info

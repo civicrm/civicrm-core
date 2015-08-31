@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
 
@@ -41,6 +39,9 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
     return 'ParticipantStatusType';
   }
 
+  /**
+   * Build form.
+   */
   public function buildQuickForm() {
     parent::buildQuickForm();
 
@@ -71,6 +72,8 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
   }
 
   /**
+   * Set default values.
+   *
    * @return array
    */
   public function setDefaultValues() {
