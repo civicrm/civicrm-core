@@ -20,18 +20,18 @@
  * Response handler code.
  *
  * This will be invoked every time a notification or request is sent by the Google Server.
-  *
-  * To allow this code to receive responses, the url for this file
-  * must be set on the seller page under Settings->Integration as the
-  * "API Callback URL'
-  * Order processing commands can be sent automatically by placing these
-  * commands appropriately
-  *
-  * To use this code for merchant-calculated feedback, this url must be
-  * set also as the merchant-calculations-url when the cart is posted
-  * Depending on your calculations for shipping, taxes, coupons and gift
-  * certificates update parts of the code as required.
-  */
+ *
+ * To allow this code to receive responses, the url for this file
+ * must be set on the seller page under Settings->Integration as the
+ * "API Callback URL'
+ * Order processing commands can be sent automatically by placing these
+ * commands appropriately
+ *
+ * To use this code for merchant-calculated feedback, this url must be
+ * set also as the merchant-calculations-url when the cart is posted
+ * Depending on your calculations for shipping, taxes, coupons and gift
+ * certificates update parts of the code as required.
+ */
 
 define('GOOGLE_DEBUG_PP', 0);
 
