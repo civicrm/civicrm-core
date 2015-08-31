@@ -4377,6 +4377,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'organization_name' => array(
         'title' => ts('Organization Name'),
       ),
+      'external_identifier' => array(
+        'title' => ts('Contact identifier from external system'),
+      ),
     );
   }
 
