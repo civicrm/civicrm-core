@@ -29,17 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *  Access Control EntityRole
+ *  Access Control EntityRole.
  */
 class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   static $_entityTable = NULL;
 
   /**
+   * Get entity table.
+   *
    * @return array|null
    */
   public static function entityTable() {
