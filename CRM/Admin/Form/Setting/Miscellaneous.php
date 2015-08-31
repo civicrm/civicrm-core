@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Miscellaneous
- *
+ * This class generates form components for Miscellaneous.
  */
 class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
@@ -68,8 +65,6 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)'));

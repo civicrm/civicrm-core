@@ -29,13 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_Contact_Utils {
 
   /**
-   * Given a contact type, get the contact image
+   * Given a contact type, get the contact image.
    *
    * @param string $contactType
    *   Contact type.
@@ -811,8 +809,6 @@ Group By  componentId";
    *
    * @param array $address
    *   This is associated array which contains submitted form values.
-   *
-   * @return void
    */
   public static function processSharedAddress(&$address) {
     if (!is_array($address)) {
@@ -908,8 +904,6 @@ Group By  componentId";
    *
    * @param $contactID
    *   The contactID that was edited / deleted.
-   *
-   * @return void
    */
   public static function clearContactCaches($contactID = NULL) {
     // clear acl cache if any.
@@ -1122,11 +1116,9 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $templateString
    *   The greeting template string with contact tokens + Smarty syntax.
    *
-   * @param $contactDetails
+   * @param array $contactDetails
    * @param int $contactID
    * @param string $className
-   *
-   * @return void
    */
   public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
     CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);

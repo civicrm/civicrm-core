@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *  Access Control Cache
+ *  Access Control Cache.
  */
 class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
 

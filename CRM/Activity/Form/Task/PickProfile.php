@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality for batch profile update for Activity
+ * This class provides the functionality for batch profile update for Activity.
  */
 class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
@@ -57,8 +55,6 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     /*
@@ -89,9 +85,6 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $types = array('Activity');
@@ -137,9 +130,6 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Activity_Form_Task_PickProfile', 'formRule'));
@@ -160,9 +150,6 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

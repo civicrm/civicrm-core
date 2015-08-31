@@ -29,17 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Activity_Import_Field {
 
-  /**#@+
-   * @var string
-   */
-
   /**
-   * Name of the field
+   * @var string
+   *   Name of the field
    */
   public $_name;
 

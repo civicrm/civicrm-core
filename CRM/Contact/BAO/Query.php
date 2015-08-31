@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -463,8 +461,6 @@ class CRM_Contact_BAO_Query {
 
   /**
    * Function which actually does all the work for the constructor.
-   *
-   * @return void
    */
   public function initialize() {
     $this->_select = array();
@@ -504,12 +500,14 @@ class CRM_Contact_BAO_Query {
     $this->openedSearchPanes(TRUE);
   }
 
+  /**
+   * Fix and handle contact deletion nicely.
+   *
+   * this code is primarily for search builder use case where different clauses can specify if they want deleted.
+   *
+   * CRM-11971
+   */
   public function buildParamsLookup() {
-    // first fix and handle contact deletion nicely
-    // this code is primarily for search builder use case
-    // where different clauses can specify if they want deleted
-    // contacts or not
-    // CRM-11971
     $trashParamExists = FALSE;
     $paramByGroup = array();
     foreach ($this->_params as $k => $param) {
@@ -568,10 +566,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Some composite fields do not appear in the fields array
-   * hack to make them part of the query
-   *
-   * @return void
+   * Some composite fields do not appear in the fields array hack to make them part of the query.
    */
   public function addSpecialFields() {
     static $special = array('contact_type', 'contact_sub_type', 'sort_name', 'display_name');
@@ -589,8 +584,6 @@ class CRM_Contact_BAO_Query {
    * clauses. Note that since the where clause introduces new
    * tables, the initial attempt also retrieves all variables used
    * in the params list
-   *
-   * @return void
    */
   public function selectClause() {
 

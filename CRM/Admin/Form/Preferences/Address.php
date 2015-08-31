@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Address Section
+ * This class generates form components for Address Section.
  */
 class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
   public function preProcess() {
@@ -136,8 +134,6 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -180,9 +176,6 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::VIEW) {

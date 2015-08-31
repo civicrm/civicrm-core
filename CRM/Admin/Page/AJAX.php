@@ -29,17 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains all the function that are called using AJAX
+ * This class contains all the function that are called using AJAX.
  */
 class CRM_Admin_Page_AJAX {
 
   /**
-   * CRM-12337 Output navigation menu as executable javascript
+   * CRM-12337 Output navigation menu as executable javascript.
+   *
    * @see smarty_function_crmNavigationMenu
    */
   public static function getNavigationMenu() {
@@ -62,15 +61,14 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Process drag/move action for menu tree
+   * Process drag/move action for menu tree.
    */
   public static function menuTree() {
     CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
   /**
-   * Build status message while.
-   * enabling/ disabling various objects
+   * Build status message while enabling/ disabling various objects.
    */
   public static function getStatusMsg() {
     require_once 'api/v3/utils.php';

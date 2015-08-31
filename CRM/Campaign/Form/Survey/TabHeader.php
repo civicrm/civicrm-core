@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -39,6 +37,8 @@
 class CRM_Campaign_Form_Survey_TabHeader {
 
   /**
+   * Build tab header.
+   *
    * @param CRM_Core_Form $form
    *
    * @return array

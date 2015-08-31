@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for adding a petition
- *
+ * This class generates form components for adding a petition.
  */
 class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 

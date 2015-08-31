@@ -29,20 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Component
+ * This class generates form components for Component.
  */
 class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   protected $_components;
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Enable Components'));
