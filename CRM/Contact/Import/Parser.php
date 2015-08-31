@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
@@ -455,8 +453,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @param array $elements
    *   IM service provider type ids.
-   *
-   * @return void
    */
   public function setActiveFieldImProviders($elements) {
     for ($i = 0; $i < count($elements); $i++) {
@@ -523,8 +519,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @param array $elements
    *   IM service provider type ids of related contact.
-   *
-   * @return void
    */
   public function setActiveFieldRelatedContactImProvider($elements) {
     for ($i = 0; $i < count($elements); $i++) {
@@ -667,8 +661,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param CRM_Core_Session $store
    *
    * @param int $mode
-   *
-   * @return void
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('rowCount', $this->_rowCount);
@@ -731,9 +723,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param string $fileName
    * @param array $header
    * @param array $data
-   *
-   * @return void
-   */
+    */
   public static function exportCSV($fileName, $header, $data) {
 
     if (file_exists($fileName) && !is_writable($fileName)) {
@@ -778,8 +768,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @param int $id
    * @param array $params
-   *
-   * @return void
    */
   public function updateImportRecord($id, &$params) {
     $statusFieldName = $this->_statusFieldName;
