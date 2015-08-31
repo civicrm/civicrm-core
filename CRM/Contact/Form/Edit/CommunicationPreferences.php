@@ -29,17 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for an Communication Preferences object
+ * Form helper class for an Communication Preferences object.
  */
 class CRM_Contact_Form_Edit_CommunicationPreferences {
 
   /**
-   * Greetings
+   * Greetings.
+   *
    * @var array
    */
   static $greetings = array();
@@ -49,8 +48,6 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     // since the pcm - preferred communication method is logically
@@ -124,7 +121,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param CRM_Contact_Form_Edit_CommunicationPreferences $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -145,14 +142,10 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
-   *
+   * Set default values for the form.
    *
    * @param CRM_Core_Form $form
-   * @param $defaults
-   *
-   * @return void
+   * @param array $defaults
    */
   public static function setDefaultValues(&$form, &$defaults) {
 
@@ -191,11 +184,9 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   }
 
   /**
-   *  set array of greeting fields.
+   *  Set array of greeting fields.
    *
-   * @param $contactType
-   *
-   * @return void
+   * @param string $contactType
    */
   public static function getGreetingFields($contactType) {
     if (empty(self::$greetings[$contactType])) {
