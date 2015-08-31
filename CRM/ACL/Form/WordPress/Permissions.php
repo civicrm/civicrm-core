@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -40,8 +38,6 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -107,8 +103,6 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

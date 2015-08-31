@@ -29,14 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 class CRM_Activity_BAO_Query {
 
   /**
    * Build select for Case.
    *
-   * @param $query
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function select(&$query) {
     if (!empty($query->_returnProperties['activity_id'])) {
@@ -156,12 +155,9 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * Given a list of conditions in query generate the required.
-   * where clause
+   * Given a list of conditions in query generate the required where clause.
    *
    * @param $query
-   *
-   * @return void
    */
   public static function where(&$query) {
     foreach (array_keys($query->_params) as $id) {
@@ -178,9 +174,8 @@ class CRM_Activity_BAO_Query {
   /**
    * Where clause for a single field.
    *
-   * @param $values
-   * @param $query
-   * @return void
+   * @param array $values
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping) = $values;
@@ -409,9 +404,7 @@ class CRM_Activity_BAO_Query {
   /**
    * Add all the elements shared between case activity search and advanced search.
    *
-   *
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function buildSearchForm(&$form) {
     $activityOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
