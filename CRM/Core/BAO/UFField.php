@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains function for UFField
- *
+ * This class contains function for UFField.
  */
 class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
@@ -271,8 +268,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Custom field id.
    * @param bool $is_active
    *   Set the is_active field.
-   *
-   * @return void
    */
   public static function setUFField($customFieldId, $is_active) {
     //find the profile id given custom field
@@ -294,8 +289,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   From which we need to copy.
    * @param bool $new_id
    *   In which to copy.
-   *
-   * @return void
    */
   public static function copy($old_id, $new_id) {
     $ufField = new CRM_Core_DAO_UFField();
@@ -314,9 +307,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param int $customFieldId
    *   ID of the custom field to be deleted.
-   *
-   * @return void
-   *
    */
   public static function delUFField($customFieldId) {
     //find the profile id given custom field id
@@ -337,8 +327,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Custom group id.
    * @param bool $is_active
    *   Value we want to set the is_active field.
-   *
-   * @return void
    */
   public static function setUFFieldStatus($customGroupId, $is_active) {
     //find the profile id given custom group id
@@ -752,8 +740,6 @@ SELECT  id
    * Reset In selector and is searchable values for given $profileID.
    *
    * @param int $profileID
-   *
-   * @return void
    */
   public function resetInSelectorANDSearchable($profileID) {
     if (!$profileID) {

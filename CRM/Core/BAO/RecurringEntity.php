@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'packages/When/When.php';
 
 /**
- * Class CRM_Core_BAO_RecurringEntity
+ * Class CRM_Core_BAO_RecurringEntity.
  */
 class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
@@ -203,10 +201,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function updates the mode column in the civicrm_recurring_entity table.
    *
    * @param int $mode
-   *   Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entities, 3 - All the entity .
-   *
-   *
-   * @return void
+   *   Mode of the entity to cascade changes across parent/child relations eg 1 - only this entity, 2 - this and the following entities, 3 - All the entity.
    */
   public function mode($mode) {
     if ($this->entity_id && $this->entity_table) {
@@ -601,14 +596,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
   }
 
   /**
-   * This function acts as a listener to dao->update whenever there is an update,
-   * and propagates any changes to all related entities present in recurring entity table
+   * This function acts as a listener to dao->update whenever there is an update.
+   *
+   * It propagates any changes to all related entities present in recurring entity table
    *
    * @param object $event
-   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated .
-   *
-   *
-   * @return void
+   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated.
    */
   static public function triggerUpdate($event) {
     // if DB version is earlier than 4.6 skip any processing
@@ -623,20 +616,20 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     static $processedEntities = array();
     $obj =& $event->object;
     if (empty($obj->id) || empty($obj->__table)) {
-      return FALSE;
+      return;
     }
     $key = "{$obj->__table}_{$obj->id}";
 
     if (array_key_exists($key, $processedEntities)) {
       // already processed
-      return NULL;
+      return;
     }
 
     // get related entities
     $repeatingEntities = self::getEntitiesFor($obj->id, $obj->__table, FALSE, NULL);
     if (empty($repeatingEntities)) {
       // return if its not a recurring entity parent
-      return NULL;
+      return;
     }
     // mark being processed
     $processedEntities[$key] = 1;
@@ -677,15 +670,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * and creates entries for linked entities in recurring entity table
    *
    * @param object $event
-   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted .
-   *
-   *
-   * @return void
+   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted.
    */
   static public function triggerInsert($event) {
     $obj =& $event->object;
     if (!array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
-      return FALSE;
+      return;
     }
 
     // if DB version is earlier than 4.6 skip any processing
@@ -699,18 +689,18 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     static $processedEntities = array();
     if (empty($obj->id) || empty($obj->__table)) {
-      return FALSE;
+      return;
     }
     $key = "{$obj->__table}_{$obj->id}";
 
     if (array_key_exists($key, $processedEntities)) {
       // already being processed. Exit recursive calls.
-      return NULL;
+      return;
     }
 
     if (self::getStatus() == self::RUNNING) {
       // if recursion->generate() is doing some work, lets not intercept
-      return NULL;
+      return;
     }
 
     // mark being processed
@@ -743,7 +733,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
             foreach ($pRepeatingEntities as $key => $val) {
               if (array_key_exists($key, $processedEntities)) {
                 // this graph is already being processed
-                return NULL;
+                return;
               }
               $processedEntities[$key] = 1;
             }
@@ -787,10 +777,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * This function acts as a listener to dao->delete, and deletes an entry from recurring_entity table
    *
    * @param object $event
-   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted .
-   *
-   *
-   * @return void
+   *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted.
    */
   static public function triggerDelete($event) {
     $obj =& $event->object;
@@ -806,13 +793,13 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
     static $processedEntities = array();
     if (empty($obj->id) || empty($obj->__table) || !$event->result) {
-      return FALSE;
+      return;
     }
     $key = "{$obj->__table}_{$obj->id}";
 
     if (array_key_exists($key, $processedEntities)) {
       // already processed
-      return NULL;
+      return;
     }
 
     // mark being processed

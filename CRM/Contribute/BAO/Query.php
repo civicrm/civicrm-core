@@ -261,7 +261,6 @@ class CRM_Contribute_BAO_Query {
           continue;
         }
 
-        $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }

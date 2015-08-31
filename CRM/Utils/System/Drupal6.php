@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Drupal specific stuff goes here
+ * Drupal specific stuff goes here.
  */
 class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
@@ -49,7 +47,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param bool $maintenance
    *   For maintenance mode.
    *
-   * @return void
+   * @return null|string
    *   prints content on stdout
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
@@ -137,8 +135,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *   Array of errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   * @return void
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
@@ -253,8 +249,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $head
    *   The new string to be appended.
-   *
-   * @return void
    */
   public function addHTMLHead($head) {
     drupal_set_html_head($head);
@@ -652,8 +646,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param string $oldPerm
    * @param array $newPerms
    *   Array, strings.
-   *
-   * @return void
    */
   public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);

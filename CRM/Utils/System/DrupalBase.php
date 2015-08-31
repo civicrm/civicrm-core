@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Drupal specific stuff goes here
+ * Drupal specific stuff goes here.
  */
 abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
@@ -307,14 +305,11 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * Find any users/roles/security-principals with the given permission
-   * and replace it with one or more permissions.
+   * Find any users/roles/security-principals with the given permission and replace it with one or more permissions.
    *
    * @param string $oldPerm
    * @param array $newPerms
    *   Array, strings.
-   *
-   * @return void
    */
   public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);

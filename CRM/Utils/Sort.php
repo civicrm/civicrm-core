@@ -29,15 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  *
- * Base class to provide generic sort functionality. Note that some ideas
- * have been borrowed from the drupal tablesort.inc code. Also note that
- * since the Pager and Sort class are similar, do match the function names
+ * Base class to provide generic sort functionality.
+ *
+ * Note that some ideas have been borrowed from the drupal tablesort.inc code.
+ *
+ * Also note that since the Pager and Sort class are similar, do match the function names
  * if introducing additional functionality
  *
  * @package CRM
@@ -188,8 +188,6 @@ class CRM_Utils_Sort {
    *
    * @param string $defaultSortOrder
    *   The sort order to use by default.
-   *
-   * @return void
    */
   public function initSortID($defaultSortOrder) {
     $url = CRM_Utils_Array::value(self::SORT_ID, $_GET, $defaultSortOrder);
@@ -225,8 +223,6 @@ class CRM_Utils_Sort {
    *
    * @param string $defaultSortOrder
    *   The sort order to use by default.
-   *
-   * @return void
    */
   public function initialize($defaultSortOrder) {
     $this->initSortID($defaultSortOrder);
