@@ -66,8 +66,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
@@ -138,9 +136,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -222,9 +217,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -232,8 +224,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Process the PDf and email with activity and attachment.
-   * on click of Print Invoices
+   * Process the PDf and email with activity and attachment on click of Print Invoices.
    *
    * @param array $contribIDs
    *   Contribution Id.

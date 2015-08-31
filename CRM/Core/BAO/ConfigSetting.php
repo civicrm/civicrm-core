@@ -30,13 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * file contains functions used in civicrm configuration
- *
+ * File contains functions used in civicrm configuration.
  */
 class CRM_Core_BAO_ConfigSetting {
 
@@ -46,8 +43,6 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @param array $params
    *   Associated array of civicrm variables.
-   *
-   * @return void
    */
   public static function create($params) {
     self::add($params);
@@ -62,8 +57,6 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @param array $params
    *   Associated array of civicrm variables.
-   *
-   * @return void
    */
   public static function add(&$params) {
     self::fixParams($params);
@@ -130,8 +123,6 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @param array $params
    *   Associated array of civicrm variables.
-   *
-   * @return void
    */
   public static function fixParams(&$params) {
     // in our old civicrm.settings.php we were using ISO code for country and
@@ -164,8 +155,6 @@ class CRM_Core_BAO_ConfigSetting {
    *   Associated array of civicrm variables(submitted).
    * @param array $values
    *   Associated array of civicrm variables stored in db.
-   *
-   * @return void
    */
   public static function formatParams(&$params, &$values) {
     if (empty($params) ||

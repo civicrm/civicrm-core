@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -113,8 +111,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *   Array of errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   * @return void
    */
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
@@ -699,8 +695,6 @@ AND    u.status = 1
    * @param string $oldPerm
    * @param array $newPerms
    *   Array, strings.
-   *
-   * @return void
    */
   public function replacePermission($oldPerm, $newPerms) {
     $roles = user_roles(FALSE, $oldPerm);

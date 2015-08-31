@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -128,9 +126,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *   Errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   *
-   * @return void
    */
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     // If we are given a name, let's check to see if it already exists.

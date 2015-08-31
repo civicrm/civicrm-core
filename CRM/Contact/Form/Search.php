@@ -29,12 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
- */
-
-/**
- * Files required
  */
 
 /**
@@ -349,8 +343,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the common elements between the search/advanced form.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -494,8 +486,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     // set the various class variables
@@ -755,8 +745,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Common post processing.
-   *
-   * @return void
    */
   public function postProcess() {
     /*

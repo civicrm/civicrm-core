@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for case activity
- *
+ * This class generates form components for case activity.
  */
 class CRM_Case_Form_Case extends CRM_Core_Form {
 
@@ -88,8 +85,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function preProcess() {
 
@@ -196,11 +191,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
+   * Set default values for the form.
    */
   public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
@@ -289,8 +280,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   /**
    * Add local and global form rules.
    *
-   *
-   * @return void
+   * @return bool
    */
   public function addRules() {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
@@ -319,9 +309,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $transaction = new CRM_Core_Transaction();

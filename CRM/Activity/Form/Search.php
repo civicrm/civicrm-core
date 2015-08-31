@@ -29,16 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * This file is for activity search
+ * This file is for activity search.
  */
 class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
@@ -77,8 +71,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
@@ -158,9 +150,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();

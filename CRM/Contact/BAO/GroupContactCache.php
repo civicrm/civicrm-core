@@ -29,16 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
   static $_alreadyLoaded = array();
 
   /**
-   * Check to see if we have cache entries for this group
-   * if not, regenerate, else return
+   * Check to see if we have cache entries for this group.
+   *
+   * If not, regenerate, else return.
    *
    * @param $groupIDs
    *   Of group that we are checking against.
@@ -284,8 +283,6 @@ WHERE  id IN ( $groupIDs )
    *   the groupID to delete cache entries, NULL for all groups.
    * @param bool $onceOnly
    *   run the function exactly once for all groups.
-   *
-   * @return void
    */
   public static function remove($groupID = NULL, $onceOnly = TRUE) {
     static $invoked = FALSE;

@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
@@ -42,8 +40,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Create option value - note that the create function calls 'add' but
-   * has more business logic
+   * Create option value.
+   *
+   * Note that the create function calls 'add' but has more business logic.
    *
    * @param array $params
    *   Input parameters.
@@ -423,8 +422,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param int $opGroupId
    * @param array $opWeights
    *   Options value , weight pair.
-   *
-   * @return void
    */
   public static function updateOptionWeights($opGroupId, $opWeights) {
     if (!is_array($opWeights) || empty($opWeights)) {

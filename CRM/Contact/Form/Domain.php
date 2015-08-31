@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class is to build the form for adding Group
+ * This class is to build the form for adding Group.
  */
 class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
@@ -154,8 +152,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addField('name', array('label' => ts('Organization Name')), TRUE);
@@ -188,9 +184,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Domain', 'formRule'));
@@ -233,8 +226,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   /**
    * Process the form when submitted.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

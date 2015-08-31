@@ -29,23 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * advanced search, extends basic search
+ * Advanced search, extends basic search.
  */
 class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Advanced');
@@ -58,9 +50,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->set('context', 'advanced');
@@ -87,7 +76,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     );
 
     //check if there are any custom data searchable fields
-    $groupDetails = array();
     $extends = array_merge(array('Contact', 'Individual', 'Household', 'Organization'),
       CRM_Contact_BAO_ContactType::subTypes()
     );
@@ -223,17 +211,13 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * The post processing of the form gets done here.
    *
    * Key things done during post processing are
-   *      - check for reset or next request. if present, skip post procesing.
+   *      - check for reset or next request. if present, skip post processing.
    *      - now check if user requested running a saved search, if so, then
    *        the form values associated with the saved search are used for searching.
-   *      - if user has done a submit with new values the regular post submissing is
+   *      - if user has done a submit with new values the regular post submitting is
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     $this->set('isAdvanced', '1');
@@ -331,11 +315,10 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Normalize the form values to make it look similar to the advanced form values
-   * this prevents a ton of work downstream and allows us to use the same code for
-   * multiple purposes (queries, save/edit etc)
+   * Normalize the form values to make it look similar to the advanced form values.
    *
-   * @return void
+   * This prevents a ton of work downstream and allows us to use the same code for
+   * multiple purposes (queries, save/edit etc)
    */
   public function normalizeFormValues() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);

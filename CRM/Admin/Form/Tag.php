@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Tag
- *
+ * This class generates form components for Tag.
  */
 class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   protected $_isTagSet;
@@ -49,8 +46,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
@@ -137,9 +132,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $ids = array();

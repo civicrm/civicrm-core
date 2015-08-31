@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *
+ * Batch BAO class.
  */
 class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
@@ -575,9 +573,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *   Associated array of batch ids.
    * @param string $exportFormat
    *   Export format.
-   *
-   * @return void
-   *
    */
   public static function exportFinancialBatch($batchIds, $exportFormat) {
     if (empty($batchIds)) {

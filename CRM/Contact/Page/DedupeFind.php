@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   protected $_cid = NULL;
@@ -50,17 +48,12 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
 
   /**
    * Get action Links.
-   *
-   * @return void
-   *   (reference) of action links
    */
   public function &links() {
   }
 
   /**
    * Browse all rule groups.
-   *
-   * @return void
    */
   public function run() {
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
@@ -338,8 +331,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
 
   /**
    * Browse all rule groups.
-   *
-   * @return void
    */
   public function browse() {
     $this->assign('main_contacts', $this->_mainContacts);

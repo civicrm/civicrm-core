@@ -29,28 +29,23 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Auxiliary class to provide support to the Contact Form class. Does this by implementing
- * a small set of static methods
+ * Auxiliary class to provide support to the Contact Form class.
  *
+ * Does this by implementing a small set of static methods.
  */
 class CRM_Contact_Form_Edit_Household {
 
   /**
-   * This function provides the HTML form elements that are specific.
-   * to the Household Contact Type
+   * This function provides the HTML form elements that are specific to the Household Contact Type.
    *
    * @param CRM_Core_Form $form
    *   Form object.
    * @param int $inlineEditMode
    *   ( 1 for contact summary.
    * top bar form and 2 for display name edit )
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
     $form->applyFilter('__ALL__', 'trim');

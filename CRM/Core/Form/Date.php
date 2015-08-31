@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_Form_Date {
 
@@ -40,11 +38,10 @@ class CRM_Core_Form_Date {
   const DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
 
   /**
-   * build the date-format form
+   * Build the date-format form.
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
-   *
    */
   public static function buildAllowedDateFormats(&$form) {
 
@@ -70,8 +67,7 @@ class CRM_Core_Form_Date {
 
 
   /**
-   * retrieve the date range - relative or absolute
-   * and assign it to the form
+   * Retrieve the date range - relative or absolute and assign it to the form.
    *
    * @param CRM_Core_Form $form
    *   The form the dates should be added to.
@@ -85,7 +81,6 @@ class CRM_Core_Form_Date {
    *   Additional value pairs to add.
    * @param string $dateFormat
    * @param bool|string $displayTime
-   *
    */
   public static function buildDateRange(
     &$form, $fieldName, $count = 1,
@@ -108,8 +103,9 @@ class CRM_Core_Form_Date {
   }
 
   /**
-   * build the date range array that will provide the form option values.
-   * It can be - relative or absolute
+   * Build the date range array that will provide the form option values.
+   *
+   * It can be - relative or absolute.
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
@@ -123,6 +119,7 @@ class CRM_Core_Form_Date {
    *   Additional Operator Selections to add.
    * @param string $dateFormat
    * @param bool $displayTime
+   *
    * @return array
    *   Values for Selector
    */
@@ -214,7 +211,7 @@ class CRM_Core_Form_Date {
   }
 
   /**
-   * build the date range - relative or absolute
+   * Build the date range - relative or absolute.
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
@@ -223,7 +220,7 @@ class CRM_Core_Form_Date {
    *   Array of option values to add.
    * @param string $from
    *   Label.
-   * @param string|\stringe $to
+   * @param string $to
    * @param string $fromLabel
    * @param bool $required
    * @param string $dateFormat

@@ -37,11 +37,9 @@
 class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
     return parent::setDefaultValues();
@@ -49,8 +47,6 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->registerRule('emailList', 'callback', 'emailList', 'CRM_Utils_Rule');
@@ -106,8 +102,6 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     // get the submitted form values.

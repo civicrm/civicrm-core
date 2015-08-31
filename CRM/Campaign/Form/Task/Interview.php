@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -70,8 +68,6 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_votingTab = $this->get('votingTab');
@@ -281,9 +277,6 @@ WHERE {$clause}
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->assign('surveyTypeId', $this->_surveyTypeId);
@@ -387,9 +380,6 @@ WHERE {$clause}
 
   /**
    * Set default values for the form.
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     //load default data for only contact fields.
@@ -442,9 +432,6 @@ WHERE {$clause}
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $buttonName = $this->controller->getButtonName();

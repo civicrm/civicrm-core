@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_ProfileContact {
 
@@ -40,8 +38,6 @@ class CRM_Contact_Form_ProfileContact {
    * Set variables up before form is built.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function preProcess(&$form) {
     $session = CRM_Core_Session::singleton();

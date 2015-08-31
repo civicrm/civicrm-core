@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying Campaigns
+ * Page for displaying Campaigns.
  */
 class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
 

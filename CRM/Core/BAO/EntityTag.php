@@ -30,15 +30,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
   /**
-   *
-   * Given a contact id, it returns an array of tag id's the
-   * contact belongs to.
+   * Given a contact id, it returns an array of tag id's the contact belongs to.
    *
    * @param int $entityID
    *   Id of the entity usually the contactID.
@@ -47,7 +43,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @return array
    *   reference $tag array of category id's the contact belongs to.
-   *
    */
   public static function &getTag($entityID, $entityTable = 'civicrm_contact') {
     $tags = array();
@@ -220,10 +215,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
-   * @param $entityTable
+   * @param string $entityTable
    * @param int $entityID
-   *
-   * @return void
    */
   public static function create(&$params, $entityTable, $entityID) {
     // get categories for the entity id

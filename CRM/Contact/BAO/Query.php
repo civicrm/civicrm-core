@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -463,8 +461,6 @@ class CRM_Contact_BAO_Query {
 
   /**
    * Function which actually does all the work for the constructor.
-   *
-   * @return void
    */
   public function initialize() {
     $this->_select = array();
@@ -504,12 +500,14 @@ class CRM_Contact_BAO_Query {
     $this->openedSearchPanes(TRUE);
   }
 
+  /**
+   * Fix and handle contact deletion nicely.
+   *
+   * this code is primarily for search builder use case where different clauses can specify if they want deleted.
+   *
+   * CRM-11971
+   */
   public function buildParamsLookup() {
-    // first fix and handle contact deletion nicely
-    // this code is primarily for search builder use case
-    // where different clauses can specify if they want deleted
-    // contacts or not
-    // CRM-11971
     $trashParamExists = FALSE;
     $paramByGroup = array();
     foreach ($this->_params as $k => $param) {
@@ -568,10 +566,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Some composite fields do not appear in the fields array
-   * hack to make them part of the query
-   *
-   * @return void
+   * Some composite fields do not appear in the fields array hack to make them part of the query.
    */
   public function addSpecialFields() {
     static $special = array('contact_type', 'contact_sub_type', 'sort_name', 'display_name');
@@ -589,8 +584,6 @@ class CRM_Contact_BAO_Query {
    * clauses. Note that since the where clause introduces new
    * tables, the initial attempt also retrieves all variables used
    * in the params list
-   *
-   * @return void
    */
   public function selectClause() {
 
@@ -923,10 +916,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * If the return Properties are set in a hierarchy, traverse the hierarchy to get
-   * the return values
-   *
-   * @return void
+   * If the return Properties are set in a hierarchy, traverse the hierarchy to get the return values.
    */
   public function addHierarchicalElements() {
     if (empty($this->_returnProperties['location'])) {
@@ -1257,10 +1247,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * If the return Properties are set in a hierarchy, traverse the hierarchy to get
-   * the return values
-   *
-   * @return void
+   * If the return Properties are set in a hierarchy, traverse the hierarchy to get the return values.
    */
   public function addMultipleElements() {
     if (empty($this->_returnProperties['website'])) {
@@ -1407,12 +1394,14 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * @param string $name
-   * @param $grouping
+   * Get where values from the parameters.
    *
-   * @return null
+   * @param string $name
+   * @param mixed $grouping
+   *
+   * @return mixed
    */
-  public function &getWhereValues($name, $grouping) {
+  public function getWhereValues($name, $grouping) {
     $result = NULL;
     foreach ($this->_params as $values) {
       if ($values[0] == $name && $values[3] == $grouping) {
@@ -1424,9 +1413,11 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * @param $relative
-   * @param $from
-   * @param $to
+   * Fix date values.
+   *
+   * @param bool $relative
+   * @param string $from
+   * @param string $to
    */
   public static function fixDateValues($relative, &$from, &$to) {
     if ($relative) {
@@ -1435,7 +1426,9 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * @param $formValues
+   * Convert form values to array for this object.
+   *
+   * @param array $formValues
    * @param int $wildcard
    * @param bool $useEquals
    *
@@ -1506,8 +1499,10 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
+   * Fix values from query from/to something no-one cared enough to document.
+   *
    * @param int $id
-   * @param $values
+   * @param array $values
    * @param int $wildcard
    * @param bool $useEquals
    *
@@ -1515,7 +1510,7 @@ class CRM_Contact_BAO_Query {
    *
    * @return array|null
    */
-  public static function &fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL) {
+  public static function fixWhereValues($id, &$values, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL) {
     // skip a few search variables
     static $skipWhere = NULL;
     static $likeNames = NULL;
@@ -1614,7 +1609,9 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * @param $values
+   * Get the where clause for a single field.
+   *
+   * @param array $values
    */
   public function whereClauseSingle(&$values) {
     // do not process custom fields or prefixed contact ids or component params
@@ -1856,8 +1853,7 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Given a list of conditions in params generate the required.
-   * where clause
+   * Given a list of conditions in params generate the required where clause.
    *
    * @return string
    */
@@ -1886,7 +1882,7 @@ class CRM_Contact_BAO_Query {
     }
 
     if ($this->_customQuery) {
-      // Added following if condition to avoid the wrong value diplay for 'myaccount' / any UF info.
+      // Added following if condition to avoid the wrong value display for 'my account' / any UF info.
       // Hope it wont affect the other part of civicrm.. if it does please remove it.
       if (!empty($this->_customQuery->_where)) {
         $this->_where = CRM_Utils_Array::crmArrayMerge($this->_where, $this->_customQuery->_where);
@@ -1923,7 +1919,9 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * @param $values
+   * Generate where clause for any parameters not already handled.
+   *
+   * @param array $values
    *
    * @throws Exception
    */
@@ -2651,9 +2649,7 @@ class CRM_Contact_BAO_Query {
   /**
    * WHERE / QILL clause for deleted_contacts
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function deletedContacts($values) {
     list($_, $_, $value, $grouping, $_) = $values;
@@ -2667,8 +2663,6 @@ class CRM_Contact_BAO_Query {
    * Where / qill clause for contact_type
    *
    * @param $values
-   *
-   * @return void
    */
   public function contactType(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -2734,8 +2728,6 @@ class CRM_Contact_BAO_Query {
    * Where / qill clause for contact_sub_type
    *
    * @param $values
-   *
-   * @return void
    */
   public function contactSubType(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -2781,8 +2773,6 @@ class CRM_Contact_BAO_Query {
    * Where / qill clause for groups
    *
    * @param $values
-   *
-   * @return void
    */
   public function group(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -2944,8 +2934,6 @@ WHERE  $smartGroupClause
    * Where / qill clause for cms users
    *
    * @param $values
-   *
-   * @return void
    */
   public function ufUser(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -2966,9 +2954,7 @@ WHERE  $smartGroupClause
   /**
    * All tag search specific.
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function tagSearch(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3030,9 +3016,7 @@ WHERE  $smartGroupClause
   /**
    * Where / qill clause for tag
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function tag(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3112,9 +3096,7 @@ WHERE  $smartGroupClause
   /**
    * Where/qill clause for notes
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function notes(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3188,9 +3170,7 @@ WHERE  $smartGroupClause
   /**
    * Where / qill clause for sort_name
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function sortName(&$values) {
     list($fieldName, $op, $value, $grouping, $wildcard) = $values;
@@ -3287,9 +3267,7 @@ WHERE  $smartGroupClause
   /**
    * Where / qill clause for email
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function email(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3329,9 +3307,7 @@ WHERE  $smartGroupClause
   /**
    * Where / qill clause for phone number
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function phone_numeric(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3351,9 +3327,7 @@ WHERE  $smartGroupClause
   /**
    * Where / qill clause for phone type/location
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function phone_option_group($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3366,11 +3340,9 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for street_address
+   * Where / qill clause for street_address.
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function street_address(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3400,11 +3372,9 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for street_unit
+   * Where / qill clause for street_unit.
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function street_number(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3434,11 +3404,9 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for sorting by character
+   * Where / qill clause for sorting by character.
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function sortByCharacter(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3450,9 +3418,7 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for including contact ids
-   *
-   * @return void
+   * Where / qill clause for including contact ids.
    */
   public function includeContactIDs() {
     if (!$this->_includeContactIds || empty($this->_params)) {
@@ -3471,11 +3437,9 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for postal code
+   * Where / qill clause for postal code.
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function postalCode(&$values) {
     // skip if the fields dont have anything to do with postal_code
@@ -3519,12 +3483,12 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for location type
+   * Where / qill clause for location type.
    *
-   * @param $values
+   * @param array $values
    * @param null $status
    *
-   * @return void
+   * @return string
    */
   public function locationType(&$values, $status = NULL) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3638,12 +3602,12 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for county (if present)
+   * Where / qill clause for county (if present).
    *
-   * @param $values
+   * @param array $values
    * @param null $status
    *
-   * @return void
+   * @return string
    */
   public function county(&$values, $status = NULL) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3707,12 +3671,12 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for state/province AND country (if present)
+   * Where / qill clause for state/province AND country (if present).
    *
-   * @param $values
+   * @param array $values
    * @param null $status
    *
-   * @return void
+   * @return string
    */
   public function stateProvince(&$values, $status = NULL) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3801,11 +3765,9 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for change log
+   * Where / qill clause for change log.
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function changeLog(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3985,11 +3947,9 @@ WHERE  $smartGroupClause
   }
 
   /**
-   * Where / qill clause for relationship
+   * Where / qill clause for relationship.
    *
-   * @param $values
-   *
-   * @return void
+   * @param array $values
    */
   public function relationship(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -4949,11 +4909,13 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
   }
 
   /**
-   * @param $values
+   * Build query for a date field.
+   *
+   * @param array $values
    * @param string $tableName
    * @param string $fieldName
    * @param string $dbFieldName
-   * @param $fieldTitle
+   * @param string $fieldTitle
    * @param bool $appendTimeStamp
    */
   public function dateQueryBuilder(
@@ -5499,7 +5461,7 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * Builds the necessary structures for all fields that are similar to option value lookups.
+   * Builds the necessary structures for all fields that are similar to option value look-ups.
    *
    * @param string $name
    *   the name of the field.
@@ -5518,9 +5480,6 @@ AND   displayRelType.is_active = 1
    * @param string $dataType
    *   The data type for this element.
    * @param bool $useIDsOnly
-   *
-   * @return void
-   *   adds the where clause and qill to the query object
    */
   public function optionValueQuery(
     $name,

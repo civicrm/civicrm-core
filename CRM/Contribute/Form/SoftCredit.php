@@ -40,8 +40,6 @@ class CRM_Contribute_Form_SoftCredit {
    * Set variables up before form is built.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function preProcess(&$form) {
     $contriDAO = new CRM_Contribute_DAO_Contribution();
@@ -63,13 +61,12 @@ class CRM_Contribute_Form_SoftCredit {
     }
   }
 
-
   /**
    * Function used to build form element for soft credit block.
    *
    * @param CRM_Core_Form $form
    *
-   * @return void
+   * @return \CRM_Core_Form
    */
   public static function buildQuickForm(&$form) {
     if (!empty($form->_honor_block_is_active)) {

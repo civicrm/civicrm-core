@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to delete a group of
- * contacts. This class provides functionality for the actual
- * deletion.
+ * This class provides the functionality to delete a group of contacts.
+ *
+ * This class provides functionality for the actual deletion.
  */
 class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
@@ -55,8 +53,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
 
@@ -148,9 +144,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $label = $this->_restore ? ts('Restore Contact(s)') : ts('Delete Contact(s)');
@@ -202,9 +195,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $session = CRM_Core_Session::singleton();

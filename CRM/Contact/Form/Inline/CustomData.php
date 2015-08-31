@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for custom data section
+ * Form helper class for custom data section.
  */
 class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
@@ -69,8 +67,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements for custom data.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -88,8 +84,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     // Process / save custom data

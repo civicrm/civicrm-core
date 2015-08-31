@@ -55,8 +55,6 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     // initialize the task and row fields
@@ -84,9 +82,6 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -108,9 +103,6 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Contribute_Form_Task_PickProfile', 'formRule'));
@@ -131,9 +123,6 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

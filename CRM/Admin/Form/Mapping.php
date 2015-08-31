@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Mapping
- *
+ * This class generates form components for Mapping.
  */
 class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -92,9 +87,6 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

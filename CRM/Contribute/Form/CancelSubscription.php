@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides support for canceling recurring subscriptions
- *
+ * This class provides support for canceling recurring subscriptions.
  */
 class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   protected $_paymentProcessorObj = NULL;
@@ -54,8 +51,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
@@ -132,8 +127,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // Determine if we can cancel recurring contribution via API with this processor
@@ -196,9 +189,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $status = $message = NULL;

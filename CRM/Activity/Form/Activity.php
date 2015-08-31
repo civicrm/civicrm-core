@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Activity
- *
+ * This class generates form components for Activity.
  */
 class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
@@ -221,8 +218,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function preProcess() {
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
@@ -513,11 +508,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * For edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
 

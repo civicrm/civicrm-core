@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_BAO_CustomQuery {
   const PREFIX = 'custom_value_';
@@ -254,9 +252,6 @@ SELECT label, value
 
   /**
    * Generate the select clause and the associated tables.
-   * for the from clause
-   *
-   * @return void
    */
   public function select() {
     if (empty($this->_fields)) {
@@ -318,15 +313,12 @@ SELECT label, value
   }
 
   /**
-   * Generate the where clause and also the english language.
-   * equivalent
-   *
-   * @return void
+   * Generate the where clause and also the english language equivalent.
    */
   public function where() {
     foreach ($this->_ids as $id => $values) {
 
-      // Fixed for Isuue CRM 607
+      // Fixed for Issue CRM 607
       if (CRM_Utils_Array::value($id, $this->_fields) === NULL ||
         !$values
       ) {

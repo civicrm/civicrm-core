@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This is class to handle address related functions
+ * This is class to handle address related functions.
  */
 class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
@@ -200,8 +198,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return void
    */
   public static function fixAddress(&$params) {
     if (!empty($params['billing_street_address'])) {
@@ -559,11 +555,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   }
 
   /**
-   * Add the formatted address to $this-> display
+   * Add the formatted address to $this-> display.
    *
    * @param bool $microformat
-   *
-   * @return void
+   *   Unexplained parameter that I've always wondered about.
    */
   public function addDisplay($microformat = FALSE) {
     $fields = array(
@@ -1005,8 +1000,6 @@ SELECT is_primary,
    *   Address id.
    * @param array $params
    *   Associated array of address params.
-   *
-   * @return void
    */
   public static function processSharedAddress($addressId, $params) {
     $query = 'SELECT id FROM civicrm_address WHERE master_id = %1';
@@ -1110,8 +1103,6 @@ SELECT is_primary,
    *   Master address id.
    * @param array $params
    *   Associated array of submitted values.
-   *
-   * @return void
    */
   public static function processSharedAddressRelationship($masterAddressId, $params) {
     // get the contact type of contact being edited / created

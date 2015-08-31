@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for DedupeRules
- *
+ * This class generates form components for DedupeRules.
  */
 class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
@@ -48,8 +45,6 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -79,9 +74,6 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $values = $this->exportValues();

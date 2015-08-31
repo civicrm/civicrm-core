@@ -29,7 +29,7 @@
 require_once "PEAR.php";
 
 /**
- * Class CRM_Core_Session
+ * Class CRM_Core_Session.
  */
 class CRM_Core_Session {
 
@@ -106,9 +106,6 @@ class CRM_Core_Session {
    *
    * @param bool $isRead
    *   Is this a read operation, in this case, the session will not be touched.
-   *
-   *
-   * @return void
    */
   public function initialize($isRead = FALSE) {
     // lets initialize the _session variable just before we need it
@@ -144,16 +141,13 @@ class CRM_Core_Session {
     ) {
       $this->_session[$this->_key] = array();
     }
-    return NULL;
+    return;
   }
 
   /**
    * Resets the session store.
    *
-   *
    * @param int $all
-   *
-   * @return void
    */
   public function reset($all = 1) {
     if ($all != 1) {
@@ -167,7 +161,7 @@ class CRM_Core_Session {
       $this->_session = array();
     }
 
-    return NULL;
+    return;
   }
 
   /**
@@ -177,9 +171,6 @@ class CRM_Core_Session {
    *   Local scope name.
    * @param bool $isRead
    *   Is this a read operation, in this case, the session will not be touched.
-   *
-   *
-   * @return void
    */
   public function createScope($prefix, $isRead = FALSE) {
     $this->initialize($isRead);
@@ -198,8 +189,6 @@ class CRM_Core_Session {
    *
    * @param string $prefix
    *   Local scope name.
-   *
-   * @return void
    */
   public function resetScope($prefix) {
     $this->initialize();
@@ -228,8 +217,6 @@ class CRM_Core_Session {
    *   Value of the variable.
    * @param string $prefix
    *   A string to prefix the keys in the session with.
-   *
-   * @return void
    */
   public function set($name, $value = NULL, $prefix = NULL) {
     // create session scope
@@ -296,8 +283,6 @@ class CRM_Core_Session {
    *   Associative array to store name/value pairs.
    * @param string $prefix
    *   Will be stripped from the key before putting it in the return.
-   *
-   * @return void
    */
   public function getVars(&$vars, $prefix = '') {
     // create session scope
@@ -347,8 +332,6 @@ class CRM_Core_Session {
    *   The url to return to when done.
    * @param bool $check
    *   Should we do a dupe checking with the top element.
-   *
-   * @return void
    */
   public function pushUserContext($userContext, $check = TRUE) {
     if (empty($userContext)) {
@@ -384,8 +367,6 @@ class CRM_Core_Session {
    *
    * @param string $userContext
    *   The url to return to when done.
-   *
-   * @return void
    */
   public function replaceUserContext($userContext) {
     if (empty($userContext)) {
@@ -486,9 +467,6 @@ class CRM_Core_Session {
    *                 set to 0 for no expiration
    *                 defaults to 10 seconds for most messages, 5 if it has a title but no body,
    *                 or 0 for errors or messages containing links
-   *
-   *
-   * @return void
    */
   public static function setStatus($text, $title = '', $type = 'alert', $options = array()) {
     // make sure session is initialized, CRM-8120

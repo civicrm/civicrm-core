@@ -29,13 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_Contact_Optimizer {
   /**
-   * @param $newValues
-   * @param $oldValues
+   * Edit function.
+   *
+   * @param array $newValues
+   * @param array $oldValues
    */
   public static function edit(&$newValues, &$oldValues) {
     // still need to do more work on this

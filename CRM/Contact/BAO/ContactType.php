@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
 
@@ -894,7 +892,7 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    * @param array $subtypes
    *   List of subtypes related to which entry is to be removed.
    *
-   * @return void
+   * @return bool
    */
   public static function deleteCustomRowsOfSubtype($gID, $subtypes = array()) {
     if (!$gID or empty($subtypes)) {
@@ -932,7 +930,7 @@ WHERE ($subtypeClause)";
    * @param int $entityID
    *   Entity id.
    *
-   * @return void
+   * @return null|string
    */
   public static function deleteCustomRowsForEntityID($customTable, $entityID) {
     $customTable = CRM_Utils_Type::escape($customTable, 'String');

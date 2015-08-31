@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Activity Filter
- *
+ * This class generates form components for Activity Filter.
  */
 class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
   public function buildQuickForm() {

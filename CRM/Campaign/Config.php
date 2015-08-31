@@ -32,8 +32,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Campaign_Config extends CRM_Core_Component_Config {
 }

@@ -29,19 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for contact name section
+ * Form helper class for contact name section.
  */
 class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -78,8 +74,6 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
