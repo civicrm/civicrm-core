@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Parent class for inline contact forms
+ * Parent class for inline contact forms.
  */
 abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
 
@@ -94,8 +92,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
 
   /**
    * Common form elements.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Contact_Form_Inline_Lock::buildQuickForm($this, $this->_contactId);
@@ -116,8 +112,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
 
   /**
    * Override default cancel action.
-   *
-   * @return void
    */
   public function cancelAction() {
     $response = array('status' => 'cancel');
@@ -140,8 +134,6 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
 
   /**
    * Add entry to log table.
-   *
-   * @return void
    */
   protected function log() {
     CRM_Core_BAO_Log::register($this->_contactId,
@@ -152,9 +144,8 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
 
   /**
    * Common function for all inline contact edit forms.
-   * Prepares ajaxResponse
    *
-   * @return void
+   * Prepares ajaxResponse
    */
   protected function response() {
     $this->ajaxResponse = array_merge(
