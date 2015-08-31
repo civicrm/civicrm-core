@@ -66,17 +66,17 @@ class CRM_Contribute_Task {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Contributions'),
+          'title' => ts('Delete contributions'),
           'class' => 'CRM_Contribute_Form_Task_Delete',
           'result' => FALSE,
         ),
         2 => array(
-          'title' => ts('Print Selected Rows'),
+          'title' => ts('Print selected rows'),
           'class' => 'CRM_Contribute_Form_Task_Print',
           'result' => FALSE,
         ),
         3 => array(
-          'title' => ts('Export Contributions'),
+          'title' => ts('Export contributions'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
@@ -84,7 +84,7 @@ class CRM_Contribute_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Batch Update Contributions Via Profile'),
+          'title' => ts('Batch update contributions via profile'),
           'class' => array(
             'CRM_Contribute_Form_Task_PickProfile',
             'CRM_Contribute_Form_Task_Batch',
@@ -92,27 +92,27 @@ class CRM_Contribute_Task {
           'result' => TRUE,
         ),
         5 => array(
-          'title' => ts('Send Email to Contacts'),
+          'title' => ts('Email - send now'),
           'class' => 'CRM_Contribute_Form_Task_Email',
           'result' => TRUE,
         ),
         6 => array(
-          'title' => ts('Update Pending Contribution Status'),
+          'title' => ts('Update pending contribution status'),
           'class' => 'CRM_Contribute_Form_Task_Status',
           'result' => TRUE,
         ),
         7 => array(
-          'title' => ts('Print or Email Contribution Receipts'),
+          'title' => ts('Receipts - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDF',
           'result' => FALSE,
         ),
         8 => array(
-          'title' => ts('Thank-you Letters for Contributions'),
+          'title' => ts('Thank-you letters - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
         ),
         9 => array(
-          'title' => ts('Print or Email Contribution Invoices'),
+          'title' => ts('Invoices - print or email'),
           'class' => 'CRM_Contribute_Form_Task_Invoice',
           'result' => FALSE,
         ),
@@ -127,7 +127,7 @@ class CRM_Contribute_Task {
         unset(self::$_tasks[4], self::$_tasks[6]);
       }
 
-      // remove action "Print or Email Contribution Invoices"
+      // remove action "Invoices - print or email"
       $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       if (!$invoicing) {
