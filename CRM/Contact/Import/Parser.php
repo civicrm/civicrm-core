@@ -34,17 +34,15 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
   protected $_tableName;
 
-  /**#@+
-   * @var integer
-   */
-
   /**
    * Total number of lines in file
+   *
+   * @var integer
    */
   protected $_rowCount;
 
   /**
-   * Running total number of un matched Conact
+   * Running total number of un-matched Contacts.
    */
   protected $_unMatchCount;
 
@@ -83,8 +81,10 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   public $_dedupeRuleGroupID = NULL;
 
   /**
+   * Run import.
+   *
    * @param string $tableName
-   * @param $mapper
+   * @param array $mapper
    * @param int $mode
    * @param int $contactType
    * @param string $primaryKeyName
@@ -497,7 +497,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * @param $elements
+   * Set active field for related contact's phone type.
+   *
+   * @param array $elements
    */
   public function setActiveFieldRelatedContactPhoneType($elements) {
     for ($i = 0; $i < count($elements); $i++) {
@@ -723,7 +725,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param string $fileName
    * @param array $header
    * @param array $data
-    */
+   */
   public static function exportCSV($fileName, $header, $data) {
 
     if (file_exists($fileName) && !is_writable($fileName)) {
@@ -764,7 +766,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Update the record with PK $id in the import database table
+   * Update the record with PK $id in the import database table.
    *
    * @param int $id
    * @param array $params
