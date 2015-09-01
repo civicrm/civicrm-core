@@ -1,4 +1,4 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+Dear {contact.display_name},
 {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
 {$event.confirm_email_text}
 {/if}

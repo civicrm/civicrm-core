@@ -22,7 +22,7 @@
   <tr>
    <td>
 
-    <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
+    <p>Dear {contact.display_name},</p>
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
     {/if}
