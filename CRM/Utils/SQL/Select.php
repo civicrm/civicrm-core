@@ -236,7 +236,8 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   public function where($exprs, $args = NULL) {
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
-      $this->wheres[$expr] = $this->interpolate($expr, $args);
+      $evaluatedExpr = $this->interpolate($expr, $args);
+      $this->wheres[$evaluatedExpr] = $evaluatedExpr;
     }
     return $this;
   }
