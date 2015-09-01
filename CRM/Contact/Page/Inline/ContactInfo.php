@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page to disply contact information on topi of summary
- *
+ * Page to display contact information on top of summary.
  */
 class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
 
@@ -43,8 +40,6 @@ class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
    * Run the page.
    *
    * This method is called after the page is created.
-   *
-   * @return void
    */
   public function run() {
     // get the emails for this contact

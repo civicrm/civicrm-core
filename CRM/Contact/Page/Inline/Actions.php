@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Dummy page for actions button
- *
+ * Dummy page for actions button.
  */
 class CRM_Contact_Page_Inline_Actions extends CRM_Core_Page {
 
@@ -43,8 +40,6 @@ class CRM_Contact_Page_Inline_Actions extends CRM_Core_Page {
    * Run the page.
    *
    * This method is called after the page is created.
-   *
-   * @return void
    */
   public function run() {
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);

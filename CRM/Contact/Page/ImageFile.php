@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
   /**
@@ -40,6 +38,11 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
    */
   private $ttl = 43200;
 
+  /**
+   * Run page.
+   *
+   * @throws \Exception
+   */
   public function run() {
     if (!preg_match('/^[^\/]+\.(jpg|jpeg|png|gif)$/i', $_GET['photo'])) {
       CRM_Core_Error::fatal('Malformed photo name');
@@ -51,6 +54,7 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
       1 => array("%" . $_GET['photo'], 'String'),
     );
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $cid = NULL;
     while ($dao->fetch()) {
       $cid = $dao->id;
     }
@@ -69,6 +73,8 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
   }
 
   /**
+   * Download image.
+   *
    * @param string $file
    *   Local file path.
    * @param string $mimeType
@@ -79,7 +85,8 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
     if (!file_exists($file)) {
       header("HTTP/1.0 404 Not Found");
       return;
-    } elseif (!is_readable($file)) {
+    }
+    elseif (!is_readable($file)) {
       header('HTTP/1.0 403 Forbidden');
       return;
     }
