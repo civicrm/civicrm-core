@@ -309,9 +309,9 @@ class CRM_Event_BAO_Query {
             $value,
             "Boolean"
           );
-          if ($value) {
-            $query->_qill[$grouping][] = ts("Participant is a Test");
-          }
+
+          $isTest = $value ? 'a Test' : 'not a Test';
+          $query->_qill[$grouping][] = ts("Participant is %1", array(1 => $isTest));
           $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         }
         return;
