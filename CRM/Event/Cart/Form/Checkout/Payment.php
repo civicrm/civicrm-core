@@ -1,8 +1,4 @@
 <?php
-
-/**
- * Class CRM_Event_Cart_Form_Checkout_Payment
- */
 class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $all_participants;
   public $financial_type_id;
@@ -17,13 +13,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $is_pay_later = FALSE;
   public $pay_later_receipt;
 
-  /**
-   * @param array $params
-   * @param $participant
-   * @param $event
-   *
-   * @return mixed
-   */
   public function registerParticipant($params, &$participant, $event) {
     $transaction = new CRM_Core_Transaction();
 
@@ -253,6 +242,14 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $price_set = $price_sets[$price_set_id];
       $price_set_amount = array();
       CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
+      $discountcode = $this->_price_values['discountcode'];
+      if ($discountcode != NULL) {
+        $discounted_event_ids = array();
+        $discounted_event_ids = _cividiscount_get_discounted_event_ids();
+        if (array_search($event_in_cart->event_id, $discounted_event_ids) != NULL) {
+          $this->apply_discount($discountcode, $price_set_amount, $cost);
+        }
+      }
       $cost = $event_price_values['amount'];
       $amount_level = $event_price_values['amount_level'];
       $price_details[$price_set_id] = $price_set_amount;
@@ -642,7 +639,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
     $mer_participant->contribution_id = $contribution->id;
     $params['contributionID'] = $contribution->id;
-
+    $params['receive_date'] = $contribution->receive_date;
     return $contribution;
   }
 
@@ -699,7 +696,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $defaults["billing_last_name"] = $contact->last_name;
 
       $billing_address = CRM_Event_Cart_BAO_MerParticipant::billing_address_from_contact($contact);
-
       if ($billing_address != NULL) {
         $defaults["billing_street_address-{$this->_bltID}"] = $billing_address['street_address'];
         $defaults["billing_city-{$this->_bltID}"] = $billing_address['city'];
@@ -708,10 +704,54 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         $defaults["billing_country_id-{$this->_bltID}"] = $billing_address['country_id'];
       }
     }
-
     $defaults["source"] = $this->description;
-
     return $defaults;
+  }
+  /**
+   * @param $discountcode
+   * @param array $price_set_amount
+   * @param &$cost
+   *
+   * @return void
+   */
+  public function apply_discount($discountcode, &$price_set_amount, &$cost) {
+    $discounts = array();
+    $discounted = array();
+    $discounted_priceset_ids = array();
+    $discounted_priceset_ids = _cividiscount_get_discounted_priceset_ids();
+    $discounts = _cividiscount_get_discounts();
+    foreach ($discounts as $key => $discvalue) {
+      if ($key == $discountcode) {
+        //check priceset and is_active
+        $today = date('Y-m-d');
+        $diff1 = date_diff(date_create($today), date_create($discvalue['active_on']));
+        if ($diff1->days > 0) {
+          $active1 = TRUE;
+        }
+        if ($discvalue['expire_on'] == NULL) {
+          $active2 = TRUE;
+        }
+        if ($discvalue['expire_on'] != NULL) {
+          $diff2 = date_diff(date_create($today), date_create($discvalue['expire_on']));
+          if ($diff2->days > 0) {
+            $active2 = TRUE;
+          }
+        }
+        if ($discvalue['is_active'] == TRUE && ($discvalue['count_max'] == 0 || ($discvalue['count_max'] > $discvalue['count_use'])) && $active1 == TRUE && $active2 == TRUE) {
+          foreach ($price_set_amount as $key => $price) {
+            if (array_search($price['price_field_value_id'], $discounted_priceset_ids) != NULL) {
+              $discounted = _cividiscount_calc_discount($price['line_total'], $price['label'], $discvalue, $autodiscount, "USD");
+              $price_set_amount[$key]['line_total'] = $discounted[0];
+              $cost += $discounted[0];
+              $price_set_amount[$key]['label'] = $discounted[1];
+            }
+          }
+        }
+      }
+    }
+    if (!empty($discountcode) && empty($discounted)) {
+      $form->set('discountCodeErrorMsg', ts('The discount code you entered is invalid.'));
+    }
   }
 
 }
