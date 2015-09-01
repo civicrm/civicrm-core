@@ -1391,9 +1391,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     }
   }
 
-  function createModifiedDateTime($origDateTime, $modifyRule) {
+  public function createModifiedDateTime($origDateTime, $modifyRule) {
     $newDateTime = clone($origDateTime);
     $newDateTime->modify($modifyRule);
     return $newDateTime;
   }
+
 }
