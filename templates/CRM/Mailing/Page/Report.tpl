@@ -35,8 +35,11 @@
         <td>{$report.event_totals.delivered} ({$report.event_totals.delivered_rate|string_format:"%0.2f"}%)</td>
         <td>{$report.event_totals.actionlinks.delivered}</td></tr>
   {if $report.mailing.open_tracking}
-    <tr><td class="label"><a href="{$report.event_totals.links.opened}">{ts}Tracked Opens{/ts}</a></td>
+    <tr><td class="label"><a href="{$report.event_totals.links.opened}&distinct=1">{ts}Unique Opens{/ts}</a></td>
         <td>{$report.event_totals.opened}</td>
+        <td>{$report.event_totals.actionlinks.opened}</td></tr>
+    <tr><td class="label"><a href="{$report.event_totals.links.opened}">{ts}Total Opens{/ts}</a></td>
+        <td>{$report.event_totals.total_opened}</td>
         <td>{$report.event_totals.actionlinks.opened}</td></tr>
   {/if}
   {if $report.mailing.url_tracking}
