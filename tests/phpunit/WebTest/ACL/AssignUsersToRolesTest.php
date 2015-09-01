@@ -140,7 +140,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("task");
     $this->click('radio_ts', 'ts_all');
     $this->click('task');
-    $this->select('task', 'label=New Smart Group');
+    $this->select('task', 'label=Smart group - create');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $smartGroupTitle = "SmartGroup" . substr(sha1(rand()), 0, 4);
     $this->type("title", $smartGroupTitle);

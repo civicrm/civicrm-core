@@ -164,7 +164,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
       $urlParams = "_qf_PickOption_display=true&qfKey={$params['qfKey']}";
       $urlRedirect = CRM_Utils_System::url('civicrm/activity/search', $urlParams);
       CRM_Core_Error::statusBounce(
-        ts('It appears you have no contacts with emails from the selected recipients.'),
+        ts('It appears you have no contacts with email addresses from the selected recipients.'),
         $urlRedirect
       );
     }

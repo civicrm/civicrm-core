@@ -64,17 +64,17 @@ class CRM_Case_Task {
     if (!self::$_tasks) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Cases'),
+          'title' => ts('Delete cases'),
           'class' => 'CRM_Case_Form_Task_Delete',
           'result' => FALSE,
         ),
         2 => array(
-          'title' => ts('Print Selected Rows'),
+          'title' => ts('Print selected rows'),
           'class' => 'CRM_Case_Form_Task_Print',
           'result' => FALSE,
         ),
         3 => array(
-          'title' => ts('Export Cases'),
+          'title' => ts('Export cases'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
@@ -82,7 +82,7 @@ class CRM_Case_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Restore Cases'),
+          'title' => ts('Restore cases'),
           'class' => 'CRM_Case_Form_Task_Restore',
           'result' => FALSE,
         ),
