@@ -2033,6 +2033,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'unsubscribe',
       'optout',
       'opened',
+      'total_opened',
       'bounce',
       'spool',
     );
@@ -2055,6 +2056,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       // CRM-1258
       $row['opened'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($mailing_id, $mailing->id, TRUE);
       $report['event_totals']['opened'] += $row['opened'];
+      $row['total_opened'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($mailing_id, $mailing->id);
+      $report['event_totals']['total_opened'] += $row['total_opened'];
 
       // compute unsub total separately to discount duplicates
       // CRM-1783

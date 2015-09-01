@@ -455,7 +455,7 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
         'unsubscribe' => ts('Unsubscribe Requests'),
         'optout' => ts('Opt-out Requests'),
         'click' => $this->_is_distinct ? ts('Unique Click-throughs') : ts('Click-throughs'),
-        'opened' => $this->_is_distinct ? ts('Unique Tracked Opens') : ts('Tracked Opens'),
+        'opened' => $this->_is_distinct ? ts('Unique Tracked Opens') : ts('Total Tracked Opens'),
       );
     }
     return $events[$this->_event_type];
