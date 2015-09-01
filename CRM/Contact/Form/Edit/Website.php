@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for an Website object
+ * Form helper class for an Website object.
  */
 class CRM_Contact_Form_Edit_Website {
 
@@ -45,8 +43,6 @@ class CRM_Contact_Form_Edit_Website {
    *   Reference to the form object.
    * @param int $blockCount
    *   Block number to build.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form, $blockCount = NULL) {
     if (!$blockCount) {

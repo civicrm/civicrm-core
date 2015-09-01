@@ -29,24 +29,20 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
   protected $_tableName;
 
-  /**#@+
-   * @var integer
-   */
-
   /**
    * Total number of lines in file
+   *
+   * @var integer
    */
   protected $_rowCount;
 
   /**
-   * Running total number of un matched Conact
+   * Running total number of un-matched Contacts.
    */
   protected $_unMatchCount;
 
@@ -85,8 +81,10 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   public $_dedupeRuleGroupID = NULL;
 
   /**
+   * Run import.
+   *
    * @param string $tableName
-   * @param $mapper
+   * @param array $mapper
    * @param int $mode
    * @param int $contactType
    * @param string $primaryKeyName
@@ -455,8 +453,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @param array $elements
    *   IM service provider type ids.
-   *
-   * @return void
    */
   public function setActiveFieldImProviders($elements) {
     for ($i = 0; $i < count($elements); $i++) {
@@ -501,7 +497,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * @param $elements
+   * Set active field for related contact's phone type.
+   *
+   * @param array $elements
    */
   public function setActiveFieldRelatedContactPhoneType($elements) {
     for ($i = 0; $i < count($elements); $i++) {
@@ -523,8 +521,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @param array $elements
    *   IM service provider type ids of related contact.
-   *
-   * @return void
    */
   public function setActiveFieldRelatedContactImProvider($elements) {
     for ($i = 0; $i < count($elements); $i++) {
@@ -667,8 +663,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param CRM_Core_Session $store
    *
    * @param int $mode
-   *
-   * @return void
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('rowCount', $this->_rowCount);
@@ -731,8 +725,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param string $fileName
    * @param array $header
    * @param array $data
-   *
-   * @return void
    */
   public static function exportCSV($fileName, $header, $data) {
 
@@ -774,12 +766,10 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Update the record with PK $id in the import database table
+   * Update the record with PK $id in the import database table.
    *
    * @param int $id
    * @param array $params
-   *
-   * @return void
    */
   public function updateImportRecord($id, &$params) {
     $statusFieldName = $this->_statusFieldName;

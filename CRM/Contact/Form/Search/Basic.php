@@ -29,17 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * Base Search / View form for *all* listing of multiple
- * contacts
+ * Base Search / View form for *all* listing of multiple contacts.
  */
 class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
@@ -52,9 +45,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // text for sort_name or email criteria
@@ -139,9 +129,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Search_Basic', 'formRule'));
@@ -149,8 +136,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Basic');
@@ -167,8 +152,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
   /**
    * This method is called for processing a submitted search form.
-   *
-   * @return void
    */
   public function postProcess() {
     $this->set('isAdvanced', '0');
@@ -216,11 +199,10 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Normalize the form values to make it look similar to the advanced form values
-   * this prevents a ton of work downstream and allows us to use the same code for
-   * multiple purposes (queries, save/edit etc)
+   * Normalize the form values to make it look similar to the advanced form values.
    *
-   * @return void
+   * This prevents a ton of work downstream and allows us to use the same code for
+   * multiple purposes (queries, save/edit etc)
    */
   public function normalizeFormValues() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);

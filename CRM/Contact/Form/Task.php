@@ -29,11 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
- * This class generates form components for search-result tasks
+ * This class generates form components for search-result tasks.
  */
 class CRM_Contact_Form_Task extends CRM_Core_Form {
 
