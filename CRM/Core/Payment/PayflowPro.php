@@ -25,7 +25,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    */
   static private $_singleton = NULL;
 
-  /*
+  /**
    * Constructor
    *
    * @param string $mode

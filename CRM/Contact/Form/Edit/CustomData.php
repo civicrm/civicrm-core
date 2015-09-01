@@ -32,7 +32,7 @@
  */
 
 /**
- *Form helper class for an Demographics object.
+ * Form helper class for an Demographics object.
  */
 class CRM_Contact_Form_Edit_CustomData {
 
