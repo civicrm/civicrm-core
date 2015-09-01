@@ -55,5 +55,6 @@ $output = '
     var ' . $jsonvar . ' = ' . json_encode($data) . ';
 ';
 
+header("Content-Type: text/javascript");
 echo $output;
 CRM_Utils_System::civiExit();
