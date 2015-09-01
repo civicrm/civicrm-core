@@ -207,7 +207,7 @@ class CRM_Financial_Page_AJAX {
           case 'remove':
             $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $recordID, 'payment_instrument_id');
             $batchPID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $entityID, 'payment_instrument_id');
-            $paymentInstrument = CRM_Core_OptionGroup::getLabel('payment_instrument', $batchPID);
+            $paymentInstrument = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchPID);
             if ($op == 'remove' || ($recordPID == $batchPID && $op == 'assign') || !isset($batchPID)) {
               $params = array(
                 'entity_id' => $recordID,
