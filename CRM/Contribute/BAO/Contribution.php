@@ -2480,6 +2480,13 @@ WHERE  contribution_id = %1 ";
       $addressDetails = array_values($addressDetails);
       $values['address'] = $addressDetails[0]['display'];
     }
+    // Else we assign the billing address of the contribution contact.
+    else {
+      $addressParams = array('contact_id' => $this->contact_id, 'is_billing' => 1);
+      $addressDetails = CRM_Core_BAO_Address::getValues($addressParams);
+      $addressDetails = array_values($addressDetails);
+      $values['address'] = $addressDetails[0]['display'];
+    }
     if ($this->_component == 'contribute') {
       if (isset($this->contribution_page_id)) {
         CRM_Contribute_BAO_ContributionPage::setValues(
