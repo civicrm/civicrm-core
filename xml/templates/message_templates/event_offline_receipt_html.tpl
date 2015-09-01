@@ -21,6 +21,7 @@
 
   <tr>
    <td>
+    <p>Dear {contact.display_name}</p>
 
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
