@@ -236,7 +236,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
         'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
         'last_name' => CRM_Utils_Array::value('last_name', $fields, NULL),
-        'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, FALSE,);
+        'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, FALSE));
       //create new contact for this name/email pair
       //if new contact, no need to check for contact already registered
       $contact_id = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $contact_id);
