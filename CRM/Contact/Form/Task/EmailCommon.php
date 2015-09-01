@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -132,10 +130,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   /**
    * Build the form object.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     $toArray = $ccArray = $bccArray = array();
@@ -395,10 +390,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   /**
    * Process the form after the input has been submitted and validated.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function postProcess(&$form) {
     if (count($form->_contactIds) > self::MAX_EMAILS_KILL_SWITCH) {

@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class previews the uploaded file and returns summary
- * statistics
+ * This class previews the uploaded file and returns summary statistics.
  */
 class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     //get the data from the session
@@ -137,8 +132,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addElement('text', 'newGroupName', ts('Name for new group'));
@@ -250,10 +243,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
+   * Process the mapped fields and map it into the uploaded file.
    */
   public function postProcess() {
 
@@ -343,10 +333,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
+   * Process the mapped fields and map it into the uploaded file.
    */
   public function postProcessOld() {
 

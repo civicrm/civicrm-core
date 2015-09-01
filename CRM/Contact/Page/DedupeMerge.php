@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
  */
 class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
 
@@ -38,9 +36,6 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
 
   /**
    * Browse batch merges.
-   *
-   * @return void
-   * @access public
    */
   public function run() {
     $runner = self::getRunner();
