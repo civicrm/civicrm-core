@@ -1322,6 +1322,7 @@ LEFT JOIN {$additionReminderClause}
 WHERE c.is_deleted = 0 AND c.is_deceased = 0
 {$addWhereClause}
 
+AND reminder.id IS NULL
 AND c.id NOT IN (
      SELECT rem.contact_id
      FROM civicrm_action_log rem INNER JOIN {$mapping->entity} e ON rem.entity_id = e.id
