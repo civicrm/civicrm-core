@@ -643,7 +643,10 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    */
   protected function beginPostProcess() {
     if ($this->_mode) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id']);
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment(
+        $this->_params['payment_processor_id'],
+        ($this->_mode == 'test')
+      );
       if (in_array('credit_card_exp_date', array_keys($this->_params))) {
         $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
         $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
