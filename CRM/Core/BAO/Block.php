@@ -29,11 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  *
- * add static functions to include some common functionality
- * used across location sub object BAO classes
- *
+ * Add static functions to include some common functionality used across location sub object BAO classes.
  */
 class CRM_Core_BAO_Block {
 
@@ -398,8 +395,6 @@ class CRM_Core_BAO_Block {
    *   Block name.
    * @param int $params
    *   Associates array.
-   *
-   * @return void
    */
   public static function blockDelete($blockName, $params) {
     $name = ucfirst($blockName);

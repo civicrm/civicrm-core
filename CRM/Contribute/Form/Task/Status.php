@@ -32,8 +32,7 @@
  */
 
 /**
- * This class provides the functionality to email a group of
- * contacts.
+ * This class provides the functionality to email a group of contacts.
  */
 class CRM_Contribute_Form_Task_Status extends CRM_Contribute_Form_Task {
 
@@ -49,8 +48,6 @@ class CRM_Contribute_Form_Task_Status extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
@@ -87,9 +84,6 @@ AND    {$this->_componentClause}";
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $status = CRM_Contribute_PseudoConstant::contributionStatus();
@@ -212,9 +206,6 @@ AND    co.id IN ( $contribIDs )";
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
