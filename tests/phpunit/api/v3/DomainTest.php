@@ -105,7 +105,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $this->assertType('array', $result);
 
     $domain = $result['values'][0];
-    $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email'], 'In line ' . __LINE__);
+    $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email']);
     $this->assertEquals("FIXME", $domain['from_name']);
     // checking other important parts of domain information
     // test will fail if backward incompatible changes happen
@@ -127,7 +127,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
         continue;
       }
 
-      $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email'], 'In line ' . __LINE__);
+      $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email']);
       $this->assertEquals("FIXME", $domain['from_name']);
 
       // checking other important parts of domain information
