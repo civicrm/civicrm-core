@@ -676,8 +676,8 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       'sort_name',
       'financial_type_id',
       'contribution_page_id',
-      'contribution_payment_instrument_id',
-      'contribution_transaction_id',
+      'payment_instrument_id',
+      'contribution_trxn_id',
       'contribution_source',
       'contribution_currency_type',
       'contribution_pay_later',
@@ -737,6 +737,7 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       $where = implode(' AND ', $query->_where[0]) .
         " AND civicrm_entity_batch.batch_id IS NULL
          AND civicrm_entity_financial_trxn.entity_table = 'civicrm_contribution'";
+      $where = str_replace('civicrm_contribution.payment_instrument_id', 'civicrm_financial_trxn.payment_instrument_id', $where);
       $searchValue = TRUE;
     }
     else {

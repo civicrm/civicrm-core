@@ -373,7 +373,8 @@ class CRM_Financial_Page_AJAX {
         elseif ($columnKey == 'payment_method' && $financialItem->$columnKey) {
           $row[$financialItem->id][$columnKey] = CRM_Core_OptionGroup::getLabel('payment_instrument', $financialItem->$columnKey);
           if ($row[$financialItem->id][$columnKey] == 'Check') {
-            $row[$financialItem->id][$columnKey] = $row[$financialItem->id][$columnKey] . ' (' . $financialItem->check_number . ')';
+            $checkNumber = $financialItem->check_number ? ' (' . $financialItem->check_number . ')' : '';
+            $row[$financialItem->id][$columnKey] = $row[$financialItem->id][$columnKey] . $checkNumber;
           }
         }
         elseif ($columnKey == 'amount' && $financialItem->$columnKey) {
