@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -44,8 +42,6 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -70,8 +66,6 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
   /**
    * Process the uploaded file.
-   *
-   * @return void
    */
   public function postProcess() {
     $this->storeFormValues(array(

@@ -29,19 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class summarizes the import results
+ * This class summarizes the import results.
  */
 class CRM_Contribute_Import_Form_Summary extends CRM_Import_Form_Summary {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     // set the error message path to display
