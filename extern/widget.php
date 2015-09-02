@@ -55,5 +55,6 @@ $output = '
     var ' . $jsonvar . ' = ' . json_encode($data) . ';
 ';
 
+CRM_Core_Page_AJAX::setJsHeaders(60);
 echo $output;
 CRM_Utils_System::civiExit();
