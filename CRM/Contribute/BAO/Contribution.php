@@ -1053,7 +1053,7 @@ GROUP BY p.id
       $contributionDAO->id = $honorDAO->contribution_id;
 
       if ($contributionDAO->find(TRUE)) {
-        $params[$contributionDAO->id]['honor_type'] = CRM_Core_OptionGroup::getLabel('soft_credit_type', $honorDAO->soft_credit_type_id, 'value');
+        $params[$contributionDAO->id]['honor_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $honorDAO->soft_credit_type_id);
         $params[$contributionDAO->id]['honorId'] = $contributionDAO->contact_id;
         $params[$contributionDAO->id]['display_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contributionDAO->contact_id, 'display_name');
         $params[$contributionDAO->id]['type'] = $type[$contributionDAO->financial_type_id];

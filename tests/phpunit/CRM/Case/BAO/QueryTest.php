@@ -65,4 +65,5 @@ class CRM_Case_BAO_QueryTest extends CiviUnitTestCase {
     $queryObj->_qill[1]
     );
   }
+
 }
