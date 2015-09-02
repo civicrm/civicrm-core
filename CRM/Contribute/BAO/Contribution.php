@@ -2481,6 +2481,11 @@ WHERE  contribution_id = %1 ";
       $values['address'] = $addressDetails[0]['display'];
     }
     if ($this->_component == 'contribute') {
+      //get soft contributions
+      $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);
+      if (!empty($softContributions)) {
+        $values['softContributions'] = $softContributions['soft_credit'];
+      }
       if (isset($this->contribution_page_id)) {
         CRM_Contribute_BAO_ContributionPage::setValues(
           $this->contribution_page_id,
@@ -2752,6 +2757,9 @@ WHERE  contribution_id = %1 ";
     $template->assign('address', CRM_Utils_Address::format($input));
     if (!empty($values['customGroup'])) {
       $template->assign('customGroup', $values['customGroup']);
+    }
+    if (!empty($values['softContributions'])) {
+      $template->assign('softContributions', $values['softContributions']);
     }
     if ($this->_component == 'event') {
       $template->assign('title', $values['event']['title']);
