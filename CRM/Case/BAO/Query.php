@@ -237,6 +237,16 @@ class CRM_Case_BAO_Query {
   /**
    * Where clause for a single field.
    *
+   * CRM-17120 adds a test that checks the Qill on some of these parameters.
+   * However, I couldn't find a way, other than via test, to access the
+   * case_activity options in the code below and invalid sql was returned.
+   * Perhaps the options are just legacy?
+   *
+   * Also, CRM-17120 locks in the Qill - but it probably is not quite right as I
+   * see 'Activity Type = Scheduled' (rather than activity status).
+   *
+   * See CRM_Case_BAO_QueryTest for more.
+   *
    * @param array $values
    * @param CRM_Contact_BAO_Query $query
    */
@@ -348,7 +358,7 @@ class CRM_Case_BAO_Query {
 
       case 'case_recent_activity_type':
         $names = $value;
-        if ($activityType = CRM_Core_OptionGroup::getLabel('activity_type', $value, 'value')) {
+        if (($activityType = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $value)) != FALSE) {
           $names = $activityType;
         }
 
@@ -361,8 +371,10 @@ class CRM_Case_BAO_Query {
         return;
 
       case 'case_activity_status_id':
+        echo $value;
+
         $names = $value;
-        if ($activityStatus = CRM_Core_OptionGroup::getLabel('activity_status', $value, 'value')) {
+        if (($activityStatus = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'status_id', $value)) != FALSE) {
           $names = $activityStatus;
         }
 
@@ -384,7 +396,7 @@ class CRM_Case_BAO_Query {
 
       case 'case_activity_medium_id':
         $names = $value;
-        if ($activityMedium = CRM_Core_OptionGroup::getLabel('encounter_medium', $value, 'value')) {
+        if (($activityMedium = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'medium_id', $value)) != FALSE) {
           $names = $activityMedium;
         }
 
