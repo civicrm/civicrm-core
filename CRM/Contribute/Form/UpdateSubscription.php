@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -39,7 +37,6 @@
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
@@ -126,11 +123,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
 
@@ -144,8 +139,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
   /**
    * Actually build the components of the form.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // CRM-16398: If current recurring contribution got > 1 lineitems then make amount field readonly
@@ -185,10 +178,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * called after the user submits the form.
-   *
-   *
-   * @return void
+   * Called after the user submits the form.
    */
   public function postProcess() {
     // store the submitted values in an array

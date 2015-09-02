@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class handle creation of location block elements
+ * This class handle creation of location block elements.
  */
 class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
@@ -193,8 +191,6 @@ WHERE e.id = %1";
    *
    * @param int $locBlockId
    *   Id of the Location Block.
-   *
-   * @return void
    */
   public static function deleteLocBlock($locBlockId) {
     if (!$locBlockId) {
@@ -289,8 +285,6 @@ WHERE e.id = %1";
    *   Contact id.
    * @param int $locationTypeId
    *   Id of the location to delete.
-   *
-   * @return void
    */
   public static function deleteLocationBlocks($contactId, $locationTypeId) {
     // ensure that contactId has a value

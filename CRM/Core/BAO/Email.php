@@ -29,18 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains functions for email handling
+ * This class contains functions for email handling.
  */
 class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
 
   /**
-   * Create email address - note that the create function calls 'add' but
-   * has more business logic
+   * Create email address.
+   *
+   * Note that the create function calls 'add' but  has more business logic.
    *
    * @param array $params
    *   Input parameters.
@@ -235,8 +234,6 @@ ORDER BY e.is_primary DESC, email_id ASC ";
    *
    * @param object $email
    *   Email object.
-   *
-   * @return void
    */
   public static function holdEmail(&$email) {
     //check for update mode
