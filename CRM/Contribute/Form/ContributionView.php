@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Payment-Instrument
- *
+ * This class generates form components for Payment-Instrument.
  */
 class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $id = $this->get('id');
@@ -204,8 +199,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 

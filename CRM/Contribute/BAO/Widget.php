@@ -29,11 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
- * Class to retrieve information about a contribution page
+ * Class to retrieve information about a contribution page.
  */
 class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
 

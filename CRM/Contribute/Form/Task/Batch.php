@@ -55,8 +55,6 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     // initialize the task and row fields
@@ -80,9 +78,6 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
@@ -183,9 +178,6 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
 
   /**
    * Set default values for the form.
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -203,9 +195,6 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

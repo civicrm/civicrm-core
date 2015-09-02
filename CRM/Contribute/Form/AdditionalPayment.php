@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -40,7 +38,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public $_contributeMode = 'direct';
 
   /**
-   * Related component whose financial payment is being processed
+   * Related component whose financial payment is being processed.
    *
    * @var string
    */
