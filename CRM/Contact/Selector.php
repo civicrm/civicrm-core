@@ -29,15 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class is used to retrieve and display a range of
- * contacts that match the given criteria (specifically for
- * results of advanced search options.
+ * Class is to retrieve and display a range of contacts that match the given criteria.
  *
+ * It is specifically for results of advanced search options.
  */
 class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
@@ -1072,8 +1069,6 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    * @param CRM_Utils_Sort $sort
    * @param string $cacheKey
    *   Cache key.
-   *
-   * @return void
    */
   public function rebuildPreNextCache($start, $end, $sort, $cacheKey) {
     // generate full SQL

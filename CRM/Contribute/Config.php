@@ -33,8 +33,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contribute_Config extends CRM_Core_Component_Config {
 }

@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components generic to Contribution admin
- *
+ * This class generates form components generic to Contribution admin.
  */
 class CRM_Contribute_Form extends CRM_Admin_Form {
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
-   *
+   * Set default values for the form.
    *
    * @return array
    */
