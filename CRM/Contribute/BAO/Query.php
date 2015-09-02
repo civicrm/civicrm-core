@@ -895,10 +895,9 @@ class CRM_Contribute_BAO_Query {
       array('entity' => 'contribution', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
-
-    $form->add('select', 
-      'contribution_pcp_made_through_id', 
-      ts('Personal Campaign Page'), 
+    $form->add('select',
+      'contribution_pcp_made_through_id',
+      ts('Personal Campaign Page'),
       CRM_Contribute_PseudoConstant::pcPage(), FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')));
 
     $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
