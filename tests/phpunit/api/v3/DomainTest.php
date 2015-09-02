@@ -132,10 +132,16 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('id', $domain);
     $this->assertArrayHasKey('name', $domain);
     $this->assertArrayHasKey('domain_email', $domain);
-    $this->assertArrayHasKey('domain_phone', $domain);
+    $this->assertEquals(array(
+      'phone_type' => 'Phone',
+      'phone' => '456-456',
+    ), $domain['domain_phone']);
     $this->assertArrayHasKey('domain_address', $domain);
   }
 
+  /**
+   * Test get function with current domain.
+   */
   public function testGetCurrentDomain() {
     $params = array('current_domain' => 1);
     $result = $this->callAPISuccess('domain', 'get', $params);
