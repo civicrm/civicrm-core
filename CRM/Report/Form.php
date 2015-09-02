@@ -4113,11 +4113,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $rows
    * @param int $rowNum
    * @param string $baseUrl
-   * @param string $urltxt
+   * @param string $linkText
    *
    * @return bool
    */
-  public function alterDisplayAddressFields(&$row, &$rows, &$rowNum, $baseUrl, $urltxt) {
+  public function alterDisplayAddressFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText) {
     $criteriaQueryParams = CRM_Report_Utils_Report::getPreviewCriteriaQueryParams($this->_defaults, $this->_params);
     $entryFound = FALSE;
     // handle country
@@ -4131,7 +4131,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         );
         $rows[$rowNum]['civicrm_address_country_id_link'] = $url;
         $rows[$rowNum]['civicrm_address_country_id_hover'] = ts("%1 for this country.",
-          array(1 => $urltxt)
+          array(1 => $linkText)
         );
       }
 
@@ -4147,7 +4147,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         );
         $rows[$rowNum]['civicrm_address_county_id_link'] = $url;
         $rows[$rowNum]['civicrm_address_county_id_hover'] = ts("%1 for this county.",
-          array(1 => $urltxt)
+          array(1 => $linkText)
         );
       }
       $entryFound = TRUE;
@@ -4163,7 +4163,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         );
         $rows[$rowNum]['civicrm_address_state_province_id_link'] = $url;
         $rows[$rowNum]['civicrm_address_state_province_id_hover'] = ts("%1 for this state.",
-          array(1 => $urltxt)
+          array(1 => $linkText)
         );
       }
       $entryFound = TRUE;
@@ -4178,10 +4178,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $row
    * @param array $rows
    * @param int $rowNum
+   * @param string $baseUrl
+   * @param string $linkText
    *
    * @return bool
    */
-  public function alterDisplayContactFields(&$row, &$rows, &$rowNum) {
+  public function alterDisplayContactFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText) {
     $entryFound = FALSE;
     if (array_key_exists('civicrm_contact_prefix_id', $row)) {
       $prefixes = CRM_Contact_BAO_Contact::buildOptions('prefix_id');
@@ -4199,8 +4201,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
     if (array_key_exists('civicrm_contact_gender_id', $row)) {
       $genders = CRM_Contact_BAO_Contact::buildOptions('gender_id');
-      if ($value = $row['civicrm_contact_gender_id']) {
+      if (($value = $row['civicrm_contact_gender_id']) != FALSE) {
         $rows[$rowNum]['civicrm_contact_gender_id'] = $genders[$rows[$rowNum]['civicrm_contact_gender_id']];
+        $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, 'gender_id', 'civicrm_contact', 'Gender');
       }
       $entryFound = TRUE;
     }
@@ -4461,6 +4464,34 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'entity' => CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table)),
       'multiple' => TRUE,
       'placeholder' => ts('- select -'),
+    );
+  }
+
+  /**
+   * Add link fields to the row.
+   *
+   * Function adds the _link & _hover fields to the row.
+   *
+   * @param array $row
+   * @param string $baseUrl
+   * @param string $linkText
+   * @param string $value
+   * @param string $fieldName
+   * @param string $tablePrefix
+   * @param string $fieldLabel
+   *
+   * @return mixed
+   */
+  protected function addLinkToRow(&$row, $baseUrl, $linkText, $value, $fieldName, $tablePrefix, $fieldLabel) {
+    $criteriaQueryParams = CRM_Report_Utils_Report::getPreviewCriteriaQueryParams($this->_defaults, $this->_params);
+    $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
+      "reset=1&force=1&{$criteriaQueryParams}&" .
+      $fieldName . "_op=in&{$fieldName}_value={$value}",
+      $this->_absoluteUrl, $this->_id
+    );
+    $row["{$tablePrefix}_{$fieldName}_link"] = $url;
+    $row["{$tablePrefix}_{$fieldName}_hover"] = ts("%1 for this %2.",
+      array(1 => $linkText, 2 => $fieldLabel)
     );
   }
 

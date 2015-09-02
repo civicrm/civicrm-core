@@ -658,7 +658,6 @@ ORDER BY  cv.label
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
-    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
 
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
@@ -784,9 +783,7 @@ ORDER BY  cv.label
       // handle financial type
       $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contribution_financial_type_id', $rowNum, $financialTypes);
 
-      // handle gender id
-      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contact_gender_id', $rowNum, $genders);
-      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'member/detail') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'event/participantListing', 'View Event Income Details') ? TRUE : $entryFound;
 
       // display birthday in the configured custom format
       if (array_key_exists('civicrm_contact_birth_date', $row)) {
