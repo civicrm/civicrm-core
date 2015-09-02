@@ -2484,8 +2484,10 @@ WHERE  contribution_id = %1 ";
     else {
       $addressParams = array('contact_id' => $this->contact_id, 'is_billing' => 1);
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams);
-      $addressDetails = array_values($addressDetails);
-      $values['address'] = $addressDetails[0]['display'];
+      if (!is_null($addressDetails)) {
+        $addressDetails = array_values($addressDetails);
+        $values['address'] = $addressDetails[0]['display'];
+      }
     }
     if ($this->_component == 'contribute') {
       if (isset($this->contribution_page_id)) {
