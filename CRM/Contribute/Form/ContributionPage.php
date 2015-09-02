@@ -89,8 +89,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     // current contribution page id
@@ -153,8 +151,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -356,8 +352,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $pageId = $this->get('id');
