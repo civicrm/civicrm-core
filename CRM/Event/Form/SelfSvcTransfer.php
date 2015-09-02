@@ -236,7 +236,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
         'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
         'last_name' => CRM_Utils_Array::value('last_name', $fields, NULL),
-        'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, FALSE,);
+        'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, FALSE),);
       //create new contact for this name/email pair
       //if new contact, no need to check for contact already registered
       $contact_id = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $contact_id);
@@ -376,7 +376,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       'entity_table' => 'civicrm_event',
     );
     $eventDetails[$participant->event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
-    //need to set a flag for 'transfer' in sendTransactionParticipantEmail or Confirm email won't be sent
     $res = CRM_Event_BAO_Participant::sendTransitionParticipantMail($participant->id, $participantDetails[$participant->id], $eventDetails[$participant->event_id], $contactDetails[$participant->contact_id], $domainValues, "Confirm", TRUE);
     //now registered_id can be updated (mail won't be send if it is set
     return res;

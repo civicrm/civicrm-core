@@ -35,7 +35,7 @@
  */
 
 /**
- * This class generates form components allowing an Event to be cancelled or transferred
+ * This class generates form components allowing an Event to be cancelled or transferred from an email link
  *
  */
 class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
