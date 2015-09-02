@@ -2558,8 +2558,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     else {
       $addressParams = array('contact_id' => $this->contact_id, 'is_billing' => 1);
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams);
-      $addressDetails = array_values($addressDetails);
-      $values['address'] = $addressDetails[0]['display'];
+      if (!is_null($addressDetails)) {
+        $addressDetails = array_values($addressDetails);
+        $values['address'] = $addressDetails[0]['display'];
+      }
     }
     if ($this->_component == 'contribute') {
       //get soft contributions
