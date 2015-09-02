@@ -895,10 +895,11 @@ class CRM_Contribute_BAO_Query {
       array('entity' => 'contribution', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
-    // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
-    $form->add('text', 'contribution_pcp_made_through_id', ts('Personal Campaign Page'), array('class' => 'twenty', 'id' => 'pcp_made_through_id', 'placeholder' => ts('- any -')));
-    // stores the label
-    $form->add('hidden', 'pcp_made_through');
+
+    $form->add('select', 
+      'contribution_pcp_made_through_id', 
+      ts('Personal Campaign Page'), 
+      CRM_Contribute_PseudoConstant::pcPage(), FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')));
 
     $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
     // Remove status values that are only used for recurring contributions or pledges (In Progress, Overdue).
