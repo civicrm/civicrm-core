@@ -35,15 +35,8 @@ require_once 'CiviTest/Custom.php';
  */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function teardown() {
-  }
-
   /**
-   * Create() method (create and update modes)
+   * Create() method (create and update modes).
    */
   public function testCreate() {
     $contactId = Contact::createIndividual();
@@ -90,7 +83,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create() method with custom data
+   * Create() method with custom data.
    */
   public function testCreateWithCustomData() {
     $contactId = Contact::createIndividual();
