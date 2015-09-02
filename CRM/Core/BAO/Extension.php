@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -65,8 +63,7 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    * @param int $id
    *   Id of the extension to be deleted.
    *
-   * @return void
-   *
+   * @return mixed
    */
   public static function del($id) {
     $extension = new CRM_Core_DAO_Extension();
@@ -80,7 +77,8 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    * @param string $fullName
    *   the fully-qualified name (eg "com.example.myextension").
    * @param string $schemaVersion
-   * @return void
+   *
+   * @return \CRM_Core_DAO|object
    */
   public static function setSchemaVersion($fullName, $schemaVersion) {
     $sql = 'UPDATE civicrm_extension SET schema_version = %1 WHERE full_name = %2';
