@@ -29,18 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Case_BAO_Query {
 
   /**
+   * Get fields.
+   *
    * @param bool $excludeActivityFields
    *
    * @return array
    */
   public static function &getFields($excludeActivityFields = FALSE) {
-    $fields = array();
     $fields = CRM_Case_BAO_Case::exportableFields();
 
     // add activity related fields
@@ -54,9 +53,7 @@ class CRM_Case_BAO_Query {
   /**
    * Build select for Case.
    *
-   * @param $query
-   *
-   * @return void
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) || !empty($query->_returnProperties['case_id'])) {
@@ -218,12 +215,9 @@ class CRM_Case_BAO_Query {
   }
 
   /**
-   * Given a list of conditions in query generate the required
-   * where clause
+   * Given a list of conditions in query generate the required where clause.
    *
-   * @param $query
-   *
-   * @return void
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function where(&$query) {
     foreach ($query->_params as $id => $values) {
@@ -244,10 +238,8 @@ class CRM_Case_BAO_Query {
   /**
    * Where clause for a single field.
    *
-   * @param $values
-   * @param $query
-   *
-   * @return void
+   * @param array $values
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -490,9 +482,11 @@ class CRM_Case_BAO_Query {
   }
 
   /**
+   * Build from clause.
+   *
    * @param string $name
-   * @param $mode
-   * @param $side
+   * @param string $mode
+   * @param string $side
    *
    * @return string
    */
@@ -656,12 +650,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
-   * Add all the elements shared between case search and advanaced search.
-   *
+   * Add all the elements shared between case search and advanced search.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildSearchForm(&$form) {
     $config = CRM_Core_Config::singleton();

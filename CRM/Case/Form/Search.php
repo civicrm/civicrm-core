@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This file is for Case search
+ * This file is for Case search.
  */
 class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
