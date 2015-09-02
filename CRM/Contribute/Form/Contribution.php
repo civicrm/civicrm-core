@@ -1156,36 +1156,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
-    if (!empty($submittedValues['pcp_made_through_id'])) {
-      $pcp = array();
-      $fields = array(
-        'pcp_made_through_id',
-        'pcp_display_in_roll',
-        'pcp_roll_nickname',
-        'pcp_personal_note',
-      );
-      foreach ($fields as $f) {
-        $pcp[$f] = CRM_Utils_Array::value($f, $submittedValues);
-      }
-    }
-
     $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
     if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
       //Delete existing soft credit records if soft credit list is empty on update
       CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id, 'pcp_id' => 0));
-    }
-    else {
-      //build soft credit params
-      foreach ($submittedValues['soft_credit_contact_id'] as $key => $val) {
-        if ($val && $submittedValues['soft_credit_amount'][$key]) {
-          $softParams[$key]['contact_id'] = $val;
-          $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($submittedValues['soft_credit_amount'][$key]);
-          $softParams[$key]['soft_credit_type_id'] = $submittedValues['soft_credit_type'][$key];
-          if (!empty($submittedValues['soft_credit_id'][$key])) {
-            $softIDs[] = $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
-          }
-        }
-      }
     }
 
     // set the contact, when contact is selected
@@ -1209,6 +1183,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $params['currency'] = $this->getCurrency($submittedValues);
 
+      CRM_Contribute_Form_Contribution_Confirm::formatSoftCreditParams($submittedValues, $this);
+      $params = array_merge($params, $submittedValues);
+
       $fields = array(
         'financial_type_id',
         'contribution_status_id',
@@ -1220,10 +1197,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       foreach ($fields as $f) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
       }
-
-      $params['pcp'] = !empty($pcp) ? $pcp : NULL;
-      $params['soft_credit'] = !empty($softParams) ? $softParams : array();
-      $params['soft_credit_ids'] = !empty($softIDs) ? $softIDs : array();
 
       // CRM-5740 if priceset is used, no need to cleanup money.
       if ($priceSetId) {

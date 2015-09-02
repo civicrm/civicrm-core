@@ -1382,11 +1382,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_contributionID = $contribution->id;
     }
 
-    //CRM-13981, processing honor contact into soft-credit contribution
-    CRM_Contact_Form_ProfileContact::postProcess($form);
+    // process soft credit / pcp params first
+    CRM_Contribute_Form_Contribution_Confirm::formatSoftCreditParams($params, $form);
 
-    // process soft credit / pcp pages
-    CRM_Contribute_Form_Contribution_Confirm::processPcpSoft($params, $contribution);
+    //CRM-13981, processing honor contact into soft-credit contribution
+    CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
     //handle pledge stuff.
     if (empty($form->_params['separate_membership_payment']) && !empty($form->_values['pledge_block_id']) &&
@@ -1737,44 +1737,79 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function used to save pcp / soft credit entry.
+   * Function used to format pcp / soft credit params.
    *
    * This is used by contribution and also event pcps
    *
    * @param array $params
-   * @param object $contribution
-   *   Contribution object.
+   * @param object $form
+   *   Form object.
    */
-  public static function processPcpSoft(&$params, &$contribution) {
-    // Add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
-    if (!empty($params['soft_credit_to'])) {
-      $contributionSoftParams = array();
-      foreach (array(
-          'pcp_display_in_roll',
-          'pcp_roll_nickname',
-          'pcp_personal_note',
-          'amount',
-        ) as $val) {
-        if (!empty($params[$val])) {
-          $contributionSoftParams[$val] = $params[$val];
-        }
-      }
-
-      $contributionSoftParams['contact_id'] = $params['soft_credit_to'];
-      // add contribution id
-      $contributionSoftParams['contribution_id'] = $contribution->id;
-      // add pcp id
-      $contributionSoftParams['pcp_id'] = $params['pcp_made_through_id'];
-
-      $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
-
-      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
-
-      //Send notification to owner for PCP
-      if ($contributionSoft->id && $contributionSoft->pcp_id) {
-        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+  public static function formatSoftCreditParams(&$params, &$form) {
+    $pcp = $softParams = $softIDs = array();
+    if (!empty($params['pcp_made_through_id'])) {
+      $fields = array(
+        'pcp_made_through_id',
+        'pcp_display_in_roll',
+        'pcp_roll_nickname',
+        'pcp_personal_note',
+      );
+      foreach ($fields as $f) {
+        $pcp[$f] = CRM_Utils_Array::value($f, $params);
       }
     }
+
+    if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
+      $honorId = NULL;
+
+      //check if there is any duplicate contact
+      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
+      $dedupeParams['check_permission'] = FALSE;
+      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType);
+      if (count($ids)) {
+        $honorId = CRM_Utils_Array::value(0, $ids);
+      }
+
+      $honorId = CRM_Contact_BAO_Contact::createProfileContact(
+        $params['honor'], CRM_Core_DAO::$_nullArray,
+        $honorId, NULL,
+        $params['honoree_profile_id']
+      );
+      $softParams[] = array(
+        'contact_id' => $honorId,
+        'soft_credit_type_id' => $params['soft_credit_type_id'],
+      );
+
+      if (CRM_Utils_Array::value('is_email_receipt', $form->_values)) {
+        $form->_values['honor'] = array(
+          'soft_credit_type' => CRM_Utils_Array::value(
+            $params['soft_credit_type_id'],
+            CRM_Core_OptionGroup::values("soft_credit_type")
+          ),
+          'honor_id' => $honorId,
+          'honor_profile_id' => $params['honoree_profile_id'],
+          'honor_profile_values' => $params['honor'],
+        );
+      }
+    }
+    elseif (!empty($params['soft_credit_contact_id'])) {
+      //build soft credit params
+      foreach ($params['soft_credit_contact_id'] as $key => $val) {
+        if ($val && $params['soft_credit_amount'][$key]) {
+          $softParams[$key]['contact_id'] = $val;
+          $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
+          $softParams[$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
+          if (!empty($params['soft_credit_id'][$key])) {
+            $softIDs[] = $softParams[$key]['id'] = $params['soft_credit_id'][$key];
+          }
+        }
+      }
+    }
+
+    $params['pcp'] = !empty($pcp) ? $pcp : NULL;
+    $params['soft_credit'] = $softParams;
+    $params['soft_credit_ids'] = $softIDs;
   }
 
   /**
