@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
@@ -53,8 +51,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
   /**
    * View details of a relationship.
-   *
-   * @return void
    */
   public function view() {
     $viewRelationship = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId, NULL, NULL, NULL, $this->_id);

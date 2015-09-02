@@ -29,21 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * Main page for viewing contact.
- *
  */
 class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
   public function preProcess() {
     parent::preProcess();
@@ -85,10 +81,9 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
   }
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
   public function run() {
     $this->preProcess();
@@ -105,8 +100,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
   /**
    * Edit name and address of a contact.
-   *
-   * @return void
    */
   public function edit() {
     // set the userContext stack
@@ -122,8 +115,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
   /**
    * View summary details of a contact.
-   *
-   * @return void
    */
   public function view() {
     // Add js for tabs, in-place editing, and jstree for tags

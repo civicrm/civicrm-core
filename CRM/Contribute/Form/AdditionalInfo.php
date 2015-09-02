@@ -88,10 +88,7 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Build the form object for Additional Details.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildAdditionalDetail(&$form) {
     //Additional information section
@@ -175,10 +172,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * Build the form object for PaymentReminders Information.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildPaymentReminders(&$form) {
     //PaymentReminders section
@@ -258,8 +252,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param int $contactID
    * @param int $contributionID
    * @param int $contributionNoteID
-   *
-   * @return void
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
     //process note
@@ -280,11 +272,9 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Process the Common data.
    *
-   *
    * @param array $params
-   * @param $formatted
+   * @param array $formatted
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function postProcessCommon(&$params, &$formatted, &$form) {
     $fields = array(

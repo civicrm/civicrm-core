@@ -49,8 +49,6 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
@@ -143,9 +141,6 @@ AND    {$this->_componentClause}";
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // get all the details needed to generate a receipt
