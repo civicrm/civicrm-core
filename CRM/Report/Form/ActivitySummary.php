@@ -378,8 +378,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_groupBy = array();
-    if (!empty($this->_params['group_bys'] &&
-    is_array($this->_params['group_bys']))) {
+    if (!empty($this->_params['group_bys']) &&
+    is_array($this->_params['group_bys'])) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
