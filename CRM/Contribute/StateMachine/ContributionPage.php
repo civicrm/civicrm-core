@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * State machine for managing different states of the Import process.
- *
  */
 class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine {
 
