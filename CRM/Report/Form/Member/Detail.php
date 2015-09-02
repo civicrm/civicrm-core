@@ -455,7 +455,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         }
       }
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'member/detail', 'List all memberships(s) for this ') ? TRUE : $entryFound;
-      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'member/detail') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'member/detail', 'List all memberships(s) for this ') ? TRUE : $entryFound;
 
       if (!$entryFound) {
         break;
