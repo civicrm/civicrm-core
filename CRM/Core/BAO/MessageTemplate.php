@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'Mail/mime.php';
 
 /**
- * Class CRM_Core_BAO_MessageTemplate
+ * Class CRM_Core_BAO_MessageTemplate.
  */
 class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
@@ -100,7 +98,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * Delete the Message Templates.
    *
    * @param int $messageTemplatesID
-   * @return void
    */
   public static function del($messageTemplatesID) {
     // make sure messageTemplatesID is an integer
@@ -270,11 +267,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * Revert a message template to its default subject+text+HTML state
+   * Revert a message template to its default subject+text+HTML state.
    *
    * @param int $id id of the template
-   *
-   * @return void
    */
   public static function revert($id) {
     $diverted = new CRM_Core_BAO_MessageTemplate();

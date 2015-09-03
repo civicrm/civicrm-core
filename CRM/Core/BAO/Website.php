@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contain function for Website handling
+ * This class contain function for Website handling.
  */
 class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
@@ -66,9 +64,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param int $contactID
    *   Contact id.
    *
-   * @param $skipDelete
+   * @param bool $skipDelete
    *
-   * @return void
+   * @return bool
    */
   public static function create(&$params, $contactID, $skipDelete) {
     if (empty($params)) {
@@ -115,7 +113,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param array $ids
    *   Website ids.
    *
-   * @return void
+   * @return bool
    */
   public static function del($ids) {
     $query = 'DELETE FROM civicrm_website WHERE id IN ( ' . implode(',', $ids) . ')';

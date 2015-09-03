@@ -29,20 +29,21 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
+ * Joomla class.
  *
+ * (clearly copied & pasted from a drupal class).
+ *
+ * Still used?
  */
 class CRM_Core_Joomla {
 
   /**
-   * Reuse drupal blocks into a left sidebar. Assign the generated template
-   * to the smarty instance
+   * Reuse drupal blocks into a left sidebar.
    *
-   * @return void
+   * Assign the generated template to the smarty instance.
    */
   public static function sidebarLeft() {
     $config = CRM_Core_Config::singleton();
