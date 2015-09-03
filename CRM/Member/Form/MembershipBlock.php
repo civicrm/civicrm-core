@@ -266,12 +266,6 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         }
       }
 
-      if ($contributionPageId && !empty($params['member_price_set_id']) &&
-        CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contributionPageId, 'amount_block_is_active')
-      ) {
-        $errors['member_price_set_id'] = ts('You cannot use Membership Price Sets with the Contribution Amounts section. However, a membership price set may include additional fields for non-membership options that requires an additional fee (e.g. magazine subscription) or an additional voluntary contribution.');
-      }
-
       if (!empty($params['member_price_set_id'])) {
         return $errors;
       }
@@ -358,6 +352,10 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             $membershipTypes[$k] = CRM_Utils_Array::value("auto_renew_$k", $params);
           }
         }
+      }
+
+      if ($this->_id && !empty($params['member_price_set_id'])) {
+        CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'amount_block_is_active', 0);
       }
 
       // check for price set.
