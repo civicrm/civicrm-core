@@ -2105,11 +2105,6 @@ ORDER BY civicrm_email.is_primary DESC";
         }
 
         if ($contactID) {
-          //CRM-16877 -- include id in params to edit `block` fields
-          if ($blockName != 'address' && !empty($entityId[$loc]['id']) && isset($data[$blockName][$loc])) {
-            $entityId = CRM_Core_BAO_Block::getBlockIds($blockName, $contactID, NULL, TRUE);
-            $data[$blockName][$loc]['id'] = $entityId[$loc]['id'];
-          }
           //get the primary location type
           if ($locTypeId == $primaryLocationType) {
             $data[$blockName][$loc]['is_primary'] = 1;

@@ -164,6 +164,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
     // Process / save openID
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['openid']['isIdSet'] = TRUE;
     foreach ($this->_openids as $count => $value) {
       if (!empty($value['id']) && isset($params['openid'][$count])) {
         $params['openid'][$count]['id'] = $value['id'];

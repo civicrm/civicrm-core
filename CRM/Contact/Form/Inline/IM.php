@@ -164,6 +164,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
     // Process / save IMs
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['im']['isIdSet'] = TRUE;
     foreach ($this->_ims as $count => $value) {
       if (!empty($value['id']) && isset($params['im'][$count])) {
         $params['im'][$count]['id'] = $value['id'];

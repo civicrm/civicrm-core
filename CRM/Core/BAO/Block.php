@@ -230,6 +230,8 @@ class CRM_Core_BAO_Block {
     $name = ucfirst($blockName);
     $isPrimary = $isBilling = TRUE;
     $entityElements = $blocks = array();
+    $resetPrimaryId = NULL;
+    $primaryId = FALSE;
 
     if ($entity) {
       $entityElements = array(
@@ -242,21 +244,77 @@ class CRM_Core_BAO_Block {
     }
 
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
+    $isIdSet = CRM_Utils_Array::value('isIdSet', $params[$blockName], FALSE);
 
     //get existing block ids.
     $blockIds = self::getBlockIds($blockName, $contactId, $entityElements);
+    foreach ($params[$blockName] as $count => $value) {
+      $blockId = CRM_Utils_Array::value('id', $value);
+      if ($blockId) {
+        if (is_array($blockIds) && array_key_exists($blockId, $blockIds)) {
+          unset($blockIds[$blockId]);
+        }
+        else {
+          unset($value['id']);
+        }
+      }
+      //lets allow to update primary w/ more cleanly.
+      if (!$resetPrimaryId && !empty($value['is_primary'])) {
+        $primaryId = TRUE;
+        if (is_array($blockIds)) {
+          foreach ($blockIds as $blockId => $blockValue) {
+            if (!empty($blockValue['is_primary'])) {
+              $resetPrimaryId = $blockId;
+              break;
+            }
+          }
+        }
+        if ($resetPrimaryId) {
+          $baoString = 'CRM_Core_BAO_' . $blockName;
+          $block = new $baoString();
+          $block->selectAdd();
+          $block->selectAdd("id, is_primary");
+          $block->id = $resetPrimaryId;
+          if ($block->find(TRUE)) {
+            $block->is_primary = FALSE;
+            $block->save();
+          }
+          $block->free();
+        }
+      }
+    }
 
     foreach ($params[$blockName] as $count => $value) {
       if (!is_array($value)) {
         continue;
       }
-      // if in some case (eg. email used in Online Conribution Page) id is not set
+      // if in some cases (eg. email used in Online Conribution Page, Profiles, etc.) id is not set
       // lets try to add using the previous method to avoid any false creation of existing data.
       foreach ($blockIds as $blockId => $blockValue) {
-        if (empty($value['id']) && $blockValue['locationTypeId'] == CRM_Utils_Array::value('location_type_id', $value)) {
-          //assigned id as first come first serve basis
-          $value['id'] = $blockValue['id'];
-          break;
+        if (empty($value['id']) && $blockValue['locationTypeId'] == CRM_Utils_Array::value('location_type_id', $value) && !$isIdSet) {
+          $valueId = FALSE;
+          if ($blockName == 'phone') {
+            $phoneTypeBlockValue = CRM_Utils_Array::value('phoneTypeId', $blockValue);
+            if ($phoneTypeBlockValue == CRM_Utils_Array::value('phone_type_id', $value)) {
+              $valueId = TRUE;
+            }
+          }
+          elseif ($blockName == 'im') {
+            $providerBlockValue = CRM_Utils_Array::value('providerId', $blockValue);
+            if (!empty($value['provider_id']) && $providerBlockValue == $value['provider_id']) {
+              $valueId = TRUE;
+            }
+          }
+          else {
+            $valueId = TRUE;
+          }
+          if ($valueId) {
+            $value['id'] = $blockValue['id'];
+            if (!$primaryId && !empty($blockValue['is_primary'])) {
+              $value['is_primary'] = $blockValue['is_primary'];
+            }
+            break;
+          }
         }
       }
       $dataExists = self::dataExists(self::$requiredBlockFields[$blockName], $value);
@@ -271,26 +329,21 @@ class CRM_Core_BAO_Block {
       elseif (!$dataExists) {
         continue;
       }
-
       $contactFields = array(
         'contact_id' => $contactId,
         'location_type_id' => CRM_Utils_Array::value('location_type_id', $value),
       );
 
+      $contactFields['is_primary'] = 0;
       if ($isPrimary && !empty($value['is_primary'])) {
         $contactFields['is_primary'] = $value['is_primary'];
         $isPrimary = FALSE;
       }
-      else {
-        $contactFields['is_primary'] = 0;
-      }
 
+      $contactFields['is_billing'] = 0;
       if ($isBilling && !empty($value['is_billing'])) {
         $contactFields['is_billing'] = $value['is_billing'];
         $isBilling = FALSE;
-      }
-      else {
-        $contactFields['is_billing'] = 0;
       }
 
       $blockFields = array_merge($value, $contactFields);
