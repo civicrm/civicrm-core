@@ -224,7 +224,7 @@
     <uniqueName>activity_details</uniqueName>
     <title>Details</title>
     <import>true</import>
-    <type>text</type>
+    <type>longtext</type>
     <headerPattern>/(activity.)?detail(s)?$/i</headerPattern>
     <comment>Details about the activity (agenda, notes, etc).</comment>
     <html>
