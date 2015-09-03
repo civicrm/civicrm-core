@@ -104,7 +104,6 @@ class CRM_Contact_Form_ProfileContact {
 
   /**
    * @param $form
-   * @param array $params Parameters from the form.
    */
   public static function postProcess($form) {
   }
