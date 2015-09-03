@@ -83,7 +83,12 @@
                 <p class="description">{$enable_innodb_fts_description}</p>
             </td>
         </tr>
-
+        <tr class="crm-search-setting-form-block-searchPrimaryEmailOnly">
+            <td class="label">{$form.searchPrimaryEmailOnly.label}</td>
+            <td>{$form.searchPrimaryEmailOnly.html}<br />
+                <p class="description">{ts}By default, search by Email look only for primary Email. You can extend the search to all contact Emails. It may have impact on the performance.{/ts}</p>
+            </td>
+        </tr>
 
        </table>
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
