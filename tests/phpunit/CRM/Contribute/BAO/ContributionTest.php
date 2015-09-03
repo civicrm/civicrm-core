@@ -35,15 +35,8 @@ require_once 'CiviTest/Custom.php';
  */
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function teardown() {
-  }
-
   /**
-   * Create() method (create and update modes)
+   * Create() method (create and update modes).
    */
   public function testCreate() {
     $contactId = Contact::createIndividual();
@@ -90,7 +83,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create() method with custom data
+   * Create() method with custom data.
    */
   public function testCreateWithCustomData() {
     $contactId = Contact::createIndividual();
@@ -256,8 +249,21 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->assertDBCompareValue('CRM_Contribute_DAO_ContributionSoft', $id, 'contact_id',
       'contribution_id', $honoreeContactId, 'Check DB for honor contact of the contribution'
     );
-    //get honory information
+    //get honorary information
     $getHonorContact = CRM_Contribute_BAO_Contribution::getHonorContacts($honoreeContactId);
+    $this->assertEquals(array(
+      $id => array(
+        'honor_type' => 'In Honor of',
+        'honorId' => $id,
+        'display_name' => 'John Doe',
+        'type' => 'Event Fee',
+        'type_id' => '4',
+        'amount' => '$ 66.00',
+        'source' => NULL,
+        'receive_date' => '2015-09-02 00:00:00',
+        'contribution_status' => 'Completed',
+      ),
+    ), $getHonorContact);
 
     $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,
       'Database check for created honor contact record.'
