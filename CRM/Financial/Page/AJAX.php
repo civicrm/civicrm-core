@@ -427,7 +427,8 @@ class CRM_Financial_Page_AJAX {
       }
       else {
         $row[$financialItem->id]['check'] = NULL;
-        $links = CRM_Financial_Page_BatchTransaction::links();
+        $tempBAO = new CRM_Financial_Page_BatchTransaction();
+        $links = $tempBAO->links();
         unset($links['remove']);
         $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
           $links,
