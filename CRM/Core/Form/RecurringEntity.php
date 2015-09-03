@@ -30,13 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing Entity
- *
+ * This class generates form components for processing Entity.
  */
 class CRM_Core_Form_RecurringEntity {
   /**
@@ -329,9 +326,6 @@ class CRM_Core_Form_RecurringEntity {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public static function postProcess($params = array(), $type, $linkedEntities = array()) {
     //Check entity_id not present in params take it from class variable

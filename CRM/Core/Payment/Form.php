@@ -77,8 +77,6 @@ class CRM_Core_Payment_Form {
    *
    * @param CRM_Core_Form $form
    * @param CRM_Core_Payment $processor
-   *
-   * @return void
    */
   static protected function setBillingAddressFields(&$form, $processor) {
     $billingID = $form->_bltID;

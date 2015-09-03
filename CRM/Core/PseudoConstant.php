@@ -44,8 +44,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_PseudoConstant {
 
@@ -549,11 +547,11 @@ class CRM_Core_PseudoConstant {
    * @param string $condition
    *   The condition that gets passed to the final query as the WHERE clause.
    *
-   * @param null $orderby
+   * @param bool $orderby
    * @param string $key
-   * @param null $force
+   * @param bool $force
    *
-   * @return void
+   * @return array
    */
   public static function populate(
     &$var,

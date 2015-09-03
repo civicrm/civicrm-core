@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *
+ * UF group BAO class.
  */
 class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   const PUBLIC_VISIBILITY = 1,
@@ -952,8 +950,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param bool $absolute
    *   Return urls in absolute form (useful when sending an email).
    * @param null $additionalWhereClause
-   *
-   * @return void
    */
   public static function getValues(
     $cid, &$fields, &$values,
@@ -1494,8 +1490,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *   (reference) an assoc array of name/value pairs.
    * @param int $ufGroupId
    *   Ufgroup id.
-   *
-   * @return void
    */
   public static function createUFJoin(&$params, $ufGroupId) {
     $groupTypes = CRM_Utils_Array::value('uf_group_type', $params);
@@ -1627,8 +1621,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
-   *
-   * @return void
    */
   public static function delUFJoin(&$params) {
     $ufJoin = new CRM_Core_DAO_UFJoin();
@@ -2705,7 +2697,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $id
    *   The profile id to copy.
    *
-   * @return void
+   * @return \CRM_Core_DAO
    */
   public static function copy($id) {
     $fieldsFix = array('prefix' => array('title' => ts('Copy of ')));
@@ -2764,8 +2756,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   Contact id.
    * @param array $values
    *   Associative array of name/value pair.
-   *
-   * @return void
    */
   public static function commonSendMail($contactID, &$values) {
     if (!$contactID || !$values) {
@@ -2859,8 +2849,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   Group id.
    * @param array $values
    * @param CRM_Core_Smarty $template
-   *
-   * @return void
    */
   public function profileDisplay($gid, $values, $template) {
     $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'title');
@@ -3204,8 +3192,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   An array of default values.
    *
    * @param bool $isStandalone
-   *
-   * @return void
    */
   public static function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
     if (!$componentId ||
