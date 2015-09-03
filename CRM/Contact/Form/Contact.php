@@ -988,11 +988,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $parseStatusMsg = self::parseAddressStatusMsg($parseResult);
     }
 
-    $blocks = array('email', 'phone', 'im', 'openid');
+    $blocks = array('address', 'email', 'phone', 'im', 'openid');
     foreach ($blocks as $block) {
-      foreach ($this->_preEditValues[$block] as $count => $value) {
-        if (!empty($value['id'])) {
-          $params[$block][$count]['id'] = $value['id'];
+      if (!empty($this->_preEditValues[$block]) && is_array($this->_preEditValues[$block])) {
+        foreach ($this->_preEditValues[$block] as $count => $value) {
+          if (!empty($value['id'])) {
+            $params[$block][$count]['id'] = $value['id'];
+            $params[$block]['isIdSet'] = TRUE;
+          }
         }
       }
     }
