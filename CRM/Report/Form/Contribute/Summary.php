@@ -571,12 +571,13 @@ ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm
 
     if ($softCredit) {
       $this->from();
-      $softSQL = "SELECT
+      $select = "
 COUNT({$this->_aliases['civicrm_contribution_soft']}.amount )        as civicrm_contribution_soft_soft_amount_count,
 SUM({$this->_aliases['civicrm_contribution_soft']}.amount )          as civicrm_contribution_soft_soft_amount_sum,
-ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_contribution_soft_soft_amount_avg,
-{$this->_aliases['civicrm_contribution']}.currency                    as currency
-{$this->_from} {$this->_where} {$group} {$this->_having}";
+ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_contribution_soft_soft_amount_avg";
+      $contriQuery = "{$select}, {$contriQuery}";
+      $softSQL = "SELECT {$select}, {$this->_aliases['civicrm_contribution']}.currency as currency
+      {$this->_from} {$this->_where} {$group} {$this->_having}";
     }
 
     $contriSQL = "SELECT {$contriQuery} {$group} {$this->_having}";
