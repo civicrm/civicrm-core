@@ -29,13 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Manage simple Tree data structure
- * example of Tree is
+ * Manage simple Tree data structure.
+ *
+ * Example of Tree is
  *
  *                             'a'
  *                              |
@@ -142,6 +141,7 @@ class CRM_Utils_Tree {
 
   /**
    * Check if node is a leaf node.
+   *
    * Currently leaf nodes are strings and non-leaf nodes are arrays
    *
    * @param array $node node which needs to checked
@@ -174,8 +174,6 @@ class CRM_Utils_Tree {
    * @param string $parentName
    *   Name of the parent ?.
    * @param array (ref) $node - node to be added
-   *
-   * @return void
    */
   public function addNode($parentName, &$node) {
     $temp = '';
@@ -190,8 +188,6 @@ class CRM_Utils_Tree {
    * @param string $parentName Name of the parent ?.
    * @param string $childName - key to be used (optional)
    * @param mixed $data - data to be added
-   *
-   * @return void
    */
   public function addData($parentName, $childName, $data) {
     $temp = '';
@@ -216,8 +212,6 @@ class CRM_Utils_Tree {
 
   /**
    * Print the tree.
-   *
-   * @return void
    */
   public function display() {
     print_r($this->tree);

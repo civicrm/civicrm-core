@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 interface CRM_Utils_Cache_Interface {
 
@@ -39,7 +37,6 @@ interface CRM_Utils_Cache_Interface {
    *
    * @param string $key
    * @param mixed $value
-   * @return void
    */
   public function set($key, &$value);
 
@@ -56,14 +53,11 @@ interface CRM_Utils_Cache_Interface {
    * Delete a value from the cache.
    *
    * @param string $key
-   * @return void
    */
   public function delete($key);
 
   /**
    * Delete all values from the cache.
-   *
-   * @return void
    */
   public function flush();
 

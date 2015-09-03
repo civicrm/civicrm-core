@@ -216,8 +216,6 @@ class Analyzer {
 
   /**
    * Flush any cached information.
-   *
-   * @return void
    */
   public function flush() {
     $this->case = NULL;

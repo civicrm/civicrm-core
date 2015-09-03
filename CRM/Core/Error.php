@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'PEAR/ErrorStack.php';
@@ -46,7 +44,8 @@ require_once 'Log.php';
  */
 class CRM_Exception extends PEAR_Exception {
   /**
-   * Redefine the exception so message isn't optional
+   * Redefine the exception so message isn't optional.
+   *
    * Supported signatures:
    *  - PEAR_Exception(string $message);
    *  - PEAR_Exception(string $message, int $code);
@@ -169,8 +168,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * which currently use PEAR::raiseError to notify of error messages.
    *
    * @param object $pearError PEAR_Error
-   *
-   * @return void
    */
   public static function handle($pearError) {
 
@@ -307,8 +304,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   The email address to notify of this situation.
    *
    * @throws Exception
-   *
-   * @return void
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
@@ -393,8 +388,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * something that follows a cleaner separation of concerns.
    *
    * @param Exception $exception
-   *
-   * @return void
    */
   public static function handleUnhandledException($exception) {
     try {
@@ -858,7 +851,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param null $redirect
    * @param string $title
-   * @return void
    */
   public static function statusBounce($status, $redirect = NULL, $title = NULL) {
     $session = CRM_Core_Session::singleton();

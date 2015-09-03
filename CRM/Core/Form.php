@@ -32,8 +32,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'HTML/QuickForm/Page.php';
@@ -245,8 +243,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Register all the standard rules that most forms potentially use.
-   *
-   * @return void
    */
   public function registerRules() {
     static $rules = array(
@@ -360,24 +356,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * called before buildForm. Any pre-processing that
    * needs to be done for buildForm should be done here
    *
-   * This is a virtual function and should be redefined if needed
-   *
-   *
-   * @return void
+   * This is a virtual function and should be redefined if needed.
    */
   public function preProcess() {
   }
 
   /**
-   * called after the form is validated. Any
-   * processing of form state etc should be done in this function.
+   * Called after the form is validated.
+   *
+   * Any processing of form state etc should be done in this function.
    * Typically all processing associated with a form should be done
    * here and relevant state should be stored in the session
    *
    * This is a virtual function and should be redefined if needed
-   *
-   *
-   * @return void
    */
   public function postProcess() {
   }
@@ -419,21 +410,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * This virtual function is used to build the form. It replaces the
-   * buildForm associated with QuickForm_Page. This allows us to put
+   * This virtual function is used to build the form.
+   *
+   * It replaces the buildForm associated with QuickForm_Page. This allows us to put
    * preProcess in front of the actual form building routine
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
+   * This virtual function is used to set the default values of various form elements.
    *
    * @return array|NULL
    *   reference to the array of default values
@@ -443,12 +429,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * This is a virtual function that adds group and global rules to
-   * the form. Keeping it distinct from the form to keep code small
+   * This is a virtual function that adds group and global rules to the form.
+   *
+   * Keeping it distinct from the form to keep code small
    * and localized in the form building code
-   *
-   *
-   * @return void
    */
   public function addRules() {
   }
@@ -545,8 +529,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   displayed. The associate array has 3 fields: 'type', 'name' and 'isDefault'
    *   The base form class will define a bunch of static arrays for commonly used
    *   formats.
-   *
-   * @return void
    */
   public function addButtons($params) {
     $prevnext = $spacing = array();
@@ -777,8 +759,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Setter function for options.
    *
    * @param mixed $options
-   *
-   * @return void
    */
   public function setOptions($options) {
     $this->_options = $options;
@@ -818,8 +798,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Setter function for Form Action.
    *
    * @param string $action
-   *
-   * @return void
    */
   public function setFormAction($action) {
     $this->_attributes['action'] = $action;
@@ -906,8 +884,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Error Code.
    * @param CRM_Core_DAO $dao
    *   A data access object on which we perform a rollback if non - empty.
-   *
-   * @return void
    */
   public function error($message, $code = NULL, $dao = NULL) {
     if ($dao) {
@@ -926,8 +902,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Name of the variable.
    * @param mixed $value
    *   Value of the variable.
-   *
-   * @return void
    */
   public function set($name, $value) {
     $this->controller->set($name, $value);
@@ -959,8 +933,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param int $action
    *   The mode we want to set the form.
-   *
-   * @return void
    */
   public function setAction($action) {
     $this->_action = $action;
@@ -973,8 +945,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Name of variable.
    * @param mixed $value
    *   Value of variable.
-   *
-   * @return void
    */
   public function assign($var, $value = NULL) {
     self::$_template->assign($var, $value);
@@ -986,9 +956,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $var
    *   Name of variable.
    * @param mixed $value
-   *   Value of varaible.
-   *
-   * @return void
+   *   Value of variable.
    */
   public function assign_by_ref($var, &$value) {
     self::$_template->assign_by_ref($var, $value);
@@ -1137,8 +1105,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Button type for the form after processing.
    * @param string $backType
    * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $buttons = array();
