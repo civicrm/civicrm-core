@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class CRM_Utils_OptionBag
+ * Class CRM_Utils_OptionBag.
  */
 class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   protected $data;
@@ -99,7 +99,6 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
    *   <p>.
    * The value to set.
    * </p>
-   * @return void
    */
   public function offsetSet($offset, $value) {
     $this->data[$offset] = $value;
@@ -113,7 +112,6 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
    *   <p>.
    * The offset to unset.
    * </p>
-   * @return void
    */
   public function offsetUnset($offset) {
     unset($this->data[$offset]);
