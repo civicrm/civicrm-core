@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *
+ * Recent items utility class.
  */
 class CRM_Utils_Recent {
 
@@ -54,8 +52,6 @@ class CRM_Utils_Recent {
 
   /**
    * Initialize this class and set the static variables.
-   *
-   * @return void
    */
   public static function initialize() {
     if (!self::$_recent) {
@@ -91,8 +87,6 @@ class CRM_Utils_Recent {
    * @param int $contactId
    * @param string $contactName
    * @param array $others
-   *
-   * @return void
    */
   public static function add(
     $title,
@@ -148,8 +142,6 @@ class CRM_Utils_Recent {
    *
    * @param array $recentItem
    *   Array of the recent Item to be removed.
-   *
-   * @return void
    */
   public static function del($recentItem) {
     self::initialize();
@@ -176,8 +168,6 @@ class CRM_Utils_Recent {
    *
    * @param string $id
    *   Contact id that had to be removed.
-   *
-   * @return void
    */
   public static function delContact($id) {
     self::initialize();

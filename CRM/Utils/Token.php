@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 
 /**
- * Class to abstract token replacement
+ * Class to abstract token replacement.
  */
 class CRM_Utils_Token {
   static $_requiredTokens = NULL;
@@ -866,8 +864,6 @@ class CRM_Utils_Token {
    *  this routine will remove the extra backslashes and braces
    *
    * @param $str ref to the string that will be scanned and modified
-   * @return void
-   *   this function works directly on the string that is passed
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
