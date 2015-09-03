@@ -104,51 +104,8 @@ class CRM_Contact_Form_ProfileContact {
 
   /**
    * @param $form
-   * @param array $params Parameters from the form.
    */
-  public static function postProcess($form, $params) {
-    if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
-      $honorId = NULL;
-
-      //check if there is any duplicate contact
-      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
-      $dedupeParams['check_permission'] = FALSE;
-      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType);
-      if (count($ids)) {
-        $honorId = CRM_Utils_Array::value(0, $ids);
-      }
-
-      $honorId = CRM_Contact_BAO_Contact::createProfileContact(
-        $params['honor'], CRM_Core_DAO::$_nullArray,
-        $honorId, NULL,
-        $params['honoree_profile_id']
-      );
-      $softParams = array();
-      $softParams['contribution_id'] = $form->_contributionID;
-      $softParams['contact_id'] = $honorId;
-      $softParams['soft_credit_type_id'] = $params['soft_credit_type_id'];
-      $contribution = new CRM_Contribute_DAO_Contribution();
-      $contribution->id = $form->_contributionID;
-      $contribution->find();
-      while ($contribution->fetch()) {
-        $softParams['currency'] = $contribution->currency;
-        $softParams['amount'] = $contribution->total_amount;
-      }
-      CRM_Contribute_BAO_ContributionSoft::add($softParams);
-
-      if (CRM_Utils_Array::value('is_email_receipt', $form->_values)) {
-        $form->_values['honor'] = array(
-          'soft_credit_type' => CRM_Utils_Array::value(
-            $params['soft_credit_type_id'],
-            CRM_Core_OptionGroup::values("soft_credit_type")
-          ),
-          'honor_id' => $honorId,
-          'honor_profile_id' => $params['honoree_profile_id'],
-          'honor_profile_values' => $params['honor'],
-        );
-      }
-    }
+  public static function postProcess($form) {
   }
 
 }
