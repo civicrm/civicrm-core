@@ -113,8 +113,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *   Name value pair of contribution data.
    *
    * @param $component
-   *
-   * @return void
    */
   public function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);

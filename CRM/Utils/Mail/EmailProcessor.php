@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 // we should consider moving these to the settings table
@@ -39,7 +37,7 @@ define('EMAIL_ACTIVITY_TYPE_ID', NULL);
 define('MAIL_BATCH_SIZE', 50);
 
 /**
- * Class CRM_Utils_Mail_EmailProcessor
+ * Class CRM_Utils_Mail_EmailProcessor.
  */
 class CRM_Utils_Mail_EmailProcessor {
 
@@ -65,14 +63,12 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Delete old files from a given directory (recursively)
+   * Delete old files from a given directory (recursively).
    *
    * @param string $dir
    *   Directory to cleanup.
    * @param int $age
    *   Files older than this many seconds will be deleted (default: 60 days).
-   *
-   * @return void
    */
   public static function cleanupDir($dir, $age = 5184000) {
     // return early if we can’t read/write the dir
@@ -96,9 +92,7 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce)
-   *
-   * @return void
+   * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce).
    */
   public static function processActivities() {
     $dao = new CRM_Core_DAO_MailSettings();
@@ -120,8 +114,6 @@ class CRM_Utils_Mail_EmailProcessor {
    * Process the mailbox for all the settings from civicrm_mail_settings.
    *
    * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
-   *
-   * @return void
    */
   public static function process($civiMail = TRUE) {
     $dao = new CRM_Core_DAO_MailSettings();

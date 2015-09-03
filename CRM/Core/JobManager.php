@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_JobManager {
 
@@ -53,8 +51,6 @@ class CRM_Core_JobManager {
 
   /**
    * Class constructor.
-   *
-   * @return void
    */
   public function __construct() {
     $config = CRM_Core_Config::singleton();
@@ -207,9 +203,6 @@ class CRM_Core_JobManager {
 
   /**
    * @param string $message
-   *
-   * @return void
-   *   collection of permissions, null if none
    */
   public function logEntry($message) {
     $domainID = CRM_Core_Config::domainID();
