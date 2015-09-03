@@ -261,7 +261,15 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_JSON::output($response);
   }
 
-  public static function getFinancialTransactionsList() {
+  /**
+   * Get output of financial transactions.
+   *
+   * @param bool $return
+   *   Return result. This parameter allows the output to be unit tested.
+   *
+   * @return string
+   */
+  public static function getFinancialTransactionsList($return = FALSE) {
     $sortMapper = array(
       0 => '',
       1 => '',
@@ -463,6 +471,9 @@ class CRM_Financial_Page_AJAX {
       'action',
     );
 
+    if ($return) {
+      return CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
+    }
     header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
