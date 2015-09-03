@@ -87,3 +87,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_status_pref` (
 
 -- CRM-17005
 UPDATE civicrm_country SET name = 'PALESTINIAN TERRITORY' WHERE name = 'PALESTINIAN TERRITORY, OCCUPIED';
+
+-- CRM-16761
+ALTER TABLE civicrm_event ADD COLUMN selfcancelxfer_time INT(10) NULL DEFAULT 0 COMMENT 'Hours before event start to allow cancel';
+ALTER TABLE civicrm_event ADD COLUMN allow_selfcancelxfer TINYINT(4) NULL DEFAULT '0' COMMENT 'Allow self service cancel or transfer';
