@@ -4201,9 +4201,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $entryFound = TRUE;
     }
     if (array_key_exists('civicrm_contact_gender_id', $row)) {
-      $genders = CRM_Contact_BAO_Contact::buildOptions('gender_id');
       if (($value = $row['civicrm_contact_gender_id']) != FALSE) {
-        $rows[$rowNum]['civicrm_contact_gender_id'] = $genders[$rows[$rowNum]['civicrm_contact_gender_id']];
+        $rows[$rowNum]['civicrm_contact_gender_id'] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'gender_id', $rows[$rowNum]['civicrm_contact_gender_id']);
         $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, 'gender_id', 'civicrm_contact', 'Gender');
       }
       $entryFound = TRUE;
