@@ -365,6 +365,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     foreach ($blocks as $name => $value) {
       $contact->$name = $value;
     }
+    if (!empty($params['updateBlankLocInfo'])) {
+      $skipDelete = TRUE;
+    }
 
     //add website
     CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
