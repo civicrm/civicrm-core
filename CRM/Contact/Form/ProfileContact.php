@@ -123,16 +123,5 @@ class CRM_Contact_Form_ProfileContact extends CRM_Core_Form {
       }
     }
 
-/*$prefix = 'honor';
-
-    $honoreeProfileFields = CRM_Core_BAO_UFGroup::getFields(9, FALSE, NULL,
-      NULL, NULL,
-      FALSE, NULL,
-      TRUE, NULL,
-      CRM_Core_Permission::CREATE
-    );
-    $this->addElement('hidden', 'honoree_profile_id', 9);
-    $this->assign('honoreeProfileFields', $honoreeProfileFields);
-*/
   }
 }
