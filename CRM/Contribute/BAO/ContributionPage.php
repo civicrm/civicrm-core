@@ -789,7 +789,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
         'soft_credit_types',
         'multilingual' => array(
           'honor_block_title',
-          'honor_block_text'
+          'honor_block_text',
         ),
       ),
       'on_behalf' => array(

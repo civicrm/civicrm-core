@@ -199,4 +199,5 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
 
     return TRUE;
   }
+
 }
