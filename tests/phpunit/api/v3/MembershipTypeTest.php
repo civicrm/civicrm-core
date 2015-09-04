@@ -40,7 +40,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_apiversion = 3;
-    $this->_contactID = $this->organizationCreate(NULL);
+    $this->_contactID = $this->organizationCreate();
   }
 
   public function testGetWithoutId() {
@@ -74,16 +74,6 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete($params);
   }
 
-  /**
-   * Civicrm_membership_type_create methods.
-   */
-  public function testCreateWithEmptyParams() {
-    $membershiptype = $this->callAPIFailure('membership_type', 'create', array());
-    $this->assertEquals($membershiptype['error_message'],
-      'Mandatory key(s) missing from params array: domain_id, member_of_contact_id, financial_type_id, duration_unit, duration_interval, name'
-                       );
-  }
-
   public function testCreateWithoutMemberOfContactId() {
     $params = array(
       'name' => '60+ Membership',
@@ -100,59 +90,6 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $membershiptype = $this->callAPIFailure('membership_type', 'create', $params,
                       'Mandatory key(s) missing from params array: member_of_contact_id'
                                            );
-  }
-
-  public function testCreateWithoutContributionTypeId() {
-    $params = array(
-      'name' => '70+ Membership',
-      'description' => 'people above 70 are given health instructions',
-      'member_of_contact_id' => $this->_contactID,
-      'domain_id' => '1',
-      'minimum_fee' => '200',
-      'duration_unit' => 'month',
-      'duration_interval' => '10',
-      'period_type' => 'rolling',
-      'visibility' => 'public',
-    );
-    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['error_message'],
-      'Mandatory key(s) missing from params array: financial_type_id'
-                       );
-  }
-
-  public function testCreateWithoutDurationUnit() {
-    $params = array(
-      'name' => '80+ Membership',
-      'description' => 'people above 80 are given health instructions',
-      'member_of_contact_id' => $this->_contactID,
-      'financial_type_id' => 1,
-      'domain_id' => '1',
-      'minimum_fee' => '200',
-      'duration_interval' => '10',
-      'visibility' => 'public',
-    );
-
-    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['error_message'],
-      'Mandatory key(s) missing from params array: duration_unit'
-                       );
-  }
-
-  public function testCreateWithoutDurationInterval() {
-    $params = array(
-      'name' => '70+ Membership',
-      'description' => 'people above 70 are given health instructions',
-      'member_of_contact_id' => $this->_contactID,
-      'domain_id' => '1',
-      'minimum_fee' => '200',
-      'duration_unit' => 'month',
-      'period_type' => 'rolling',
-      'visibility' => 'public',
-    );
-    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params);
-    $this->assertEquals($membershiptype['error_message'],
-      'Mandatory key(s) missing from params array: financial_type_id, duration_interval'
-                       );
   }
 
   public function testCreateWithoutNameandDomainIDandDurationUnit() {
@@ -208,14 +145,6 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $membershipType['id']));
   }
 
-
-  /**
-   * Test mandatory parameter check.
-   */
-  public function testUpdateWithEmptyParams() {
-    $this->callAPIFailure('membership_type', 'create', array());
-  }
-
   /**
    * Test update fails with no ID.
    */
@@ -262,26 +191,49 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->getAndCheck($params, $id, $this->_entity);
   }
 
-  /**
-   * Test for failure when id is not valid.
-   */
-  public function testDeleteNotExists() {
-    $params = array(
-      'id' => 'doesNotExist',
-    );
-    $this->callAPIFailure('membership_type', 'delete', $params,
-      'Error while deleting membership type. id : ' . $params['id']
-    );
-  }
-
   public function testDelete() {
-    $orgID = $this->organizationCreate(NULL);
+    $orgID = $this->organizationCreate();
     $membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $orgID));
     $params = array(
       'id' => $membershipTypeID,
     );
 
     $this->callAPIAndDocument('membership_type', 'delete', $params, __FUNCTION__, __FILE__);
+  }
+
+  public function testDeleteRelationshipTypesUsedByMembershipType() {
+    $rel1 = $this->relationshipTypeCreate(array(
+      'name_a_b' => 'abcde',
+      'name_b_a' => 'abcde',
+    ));
+    $rel2 = $this->relationshipTypeCreate(array(
+      'name_a_b' => 'fghij',
+      'name_b_a' => 'fghij',
+    ));
+    $rel3 = $this->relationshipTypeCreate(array(
+      'name_a_b' => 'lkmno',
+      'name_b_a' => 'lkmno',
+    ));
+    $id = $this->membershipTypeCreate(array(
+      'member_of_contact_id' => $this->_contactID,
+      'relationship_type_id' => array($rel1, $rel2, $rel3),
+      'relationship_direction' => array('a_b', 'a_b', 'b_a'),
+    ));
+
+    $this->callAPISuccess('RelationshipType', 'delete', array('id' => $rel2));
+    $newValues = $this->callAPISuccess('MembershipType', 'getsingle', array('id' => $id));
+    $this->assertEquals(array($rel1, $rel3), $newValues['relationship_type_id']);
+    $this->assertEquals(array('a_b', 'b_a'), $newValues['relationship_direction']);
+
+    $this->callAPISuccess('RelationshipType', 'delete', array('id' => $rel1));
+    $newValues = $this->callAPISuccess('MembershipType', 'getsingle', array('id' => $id));
+    $this->assertEquals(array($rel3), $newValues['relationship_type_id']);
+    $this->assertEquals(array('b_a'), $newValues['relationship_direction']);
+
+    $this->callAPISuccess('RelationshipType', 'delete', array('id' => $rel3));
+    $newValues = $this->callAPISuccess('MembershipType', 'getsingle', array('id' => $id));
+    $this->assertTrue(empty($newValues['relationship_type_id']));
+    $this->assertTrue(empty($newValues['relationship_direction']));
   }
 
 }
