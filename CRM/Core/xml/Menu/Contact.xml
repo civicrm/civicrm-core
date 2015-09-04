@@ -401,6 +401,13 @@
      <access_arguments>merge duplicate contacts</access_arguments>
 </item>
 <item>
+    <path>civicrm/profileContact/form</path>
+    <access_callback>1</access_callback>
+    <page_callback>CRM_Contact_Form_ProfileContact</page_callback>
+    <is_public>true</is_public>
+    <weight>0</weight>
+</item>
+<item>
   <path>civicrm/activity/sms/add</path>
   <path_arguments>action=add</path_arguments>
   <title>Activities</title>
