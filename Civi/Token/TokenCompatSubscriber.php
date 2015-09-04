@@ -93,10 +93,6 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $isHtml = ($e->message['format'] == 'text/html');
     $useSmarty = !empty($e->context['smarty']);
 
-    if (!empty($e->context['contact'])) {
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, NULL, $e->context['contact']['contact_id'], NULL, $useSmarty);
-    }
-
     $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, \CRM_Core_BAO_Domain::getDomain(), $isHtml, $e->message['tokens'], $useSmarty);
 
     if (!empty($e->context['contact'])) {
@@ -104,6 +100,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
 
       // FIXME: This may depend on $contact being merged with hook values.
       $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $e->context['hookTokenCategories'], $isHtml, $useSmarty);
+
+      \CRM_Utils_Token::replaceGreetingTokens($e->string, NULL, $e->context['contact']['contact_id'], NULL, $useSmarty);
     }
 
     if ($useSmarty) {
