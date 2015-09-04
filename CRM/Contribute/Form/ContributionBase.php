@@ -787,33 +787,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
 
-        if ($contactID) {
-          $form->_employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($contactID);
-
-          if (!empty($form->_membershipContactID) && $contactID != $form->_membershipContactID) {
-            // renewal case - membership being renewed may or may not be for organization
-            if (!empty($form->_employers) && array_key_exists($form->_membershipContactID, $form->_employers)) {
-              // if _membershipContactID belongs to employers list, we can say:
-              $form->_relatedOrganizationFound = TRUE;
-            }
-          }
-          elseif (!empty($form->_employers)) {
-            // not a renewal case and _employers list is not empty
-            $form->_relatedOrganizationFound = TRUE;
-          }
-
-          if ($params['is_for_organization'] != 2) {
-            $form->assign('relatedOrganizationFound', $form->_relatedOrganizationFound);
-          }
-          else {
-            $form->assign('onBehalfRequired', $form->_onBehalfRequired);
-          }
-
-          if (count($form->_employers) == 1) {
-            foreach ($form->_employers as $id => $value) {
-              $form->_organizationName = $value['name'];
-            }
-          }
+        $form->addElement('hidden', 'onbehalf_profile_id', $onBehalfProfileId);
+        // TODO: submitted values of on-behalf snippet aren't carried to successive form,
+        // so this is hackish fix for now to carry the submitted on-behalf profile values in json format
+        if (!empty($form->_submitValues['onbehalf'])) {
+          $form->addElement('hidden', 'onbehalf_values', json_encode($form->_submitValues['onbehalf']));
         }
 
         if (CRM_Utils_Array::value('is_for_organization', $params)) {

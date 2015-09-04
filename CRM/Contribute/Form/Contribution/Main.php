@@ -41,10 +41,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   public $_defaultMemTypeId;
 
-  public $_relatedOrganizationFound;
-
-  public $_onBehalfRequired = FALSE;
-  public $_onbehalf = FALSE;
   public $_paymentProcessors;
 
   public $_membershipTypeValues;
@@ -297,9 +293,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // Build payment processor form
-    if (empty($_GET['onbehalf'])) {
-      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-    }
+    CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
     $config = CRM_Core_Config::singleton();
 
@@ -307,11 +301,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if ($contactID) {
       $this->assign('contact_id', $contactID);
       $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
-    }
-
-    // Return if we are in an ajax callback
-    if ($this->_onbehalf && $this->_snippet) {
-      return;
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -1005,10 +994,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //carry campaign from profile.
     if (array_key_exists('contribution_campaign_id', $params)) {
       $params['campaign_id'] = $params['contribution_campaign_id'];
-    }
-
-    if (!empty($params['onbehalfof_id'])) {
-      $params['organization_id'] = $params['onbehalfof_id'];
     }
 
     $params['currencyID'] = $config->defaultCurrency;

@@ -81,8 +81,7 @@ class CRM_Contact_Form_ProfileContact extends CRM_Core_Form {
           $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
           $this->assign('locDataURL', $locDataURL);
         }
-        if (count($employer) > 1) {
-          $this->add('text', 'organization_id', ts('Select an existing related Organization OR enter a new one'));
+        if (count($employer) > 0) {
           $this->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $employer));
 
           $orgOptions = array(
@@ -91,12 +90,6 @@ class CRM_Contact_Form_ProfileContact extends CRM_Core_Form {
           );
           $this->addRadio('org_option', ts('options'), $orgOptions);
           $this->setDefaults(array('org_option' => 0));
-        }
-        elseif (count($employer) == 1) {
-          foreach ($form->_employers as $id => $value) {
-            $form->assign('orgId', $id);
-            $form->assign('organizationName', $value['name']);
-          }
         }
       }
 
