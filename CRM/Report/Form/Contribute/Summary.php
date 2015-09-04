@@ -562,7 +562,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $this->from('contribution');
     $this->customDataFrom();
 
-    $contriQuery = "SELECT
+    $contriQuery = "
 COUNT({$this->_aliases['civicrm_contribution']}.total_amount )        as civicrm_contribution_total_amount_count,
 SUM({$this->_aliases['civicrm_contribution']}.total_amount )          as civicrm_contribution_total_amount_sum,
 ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm_contribution_total_amount_avg,
