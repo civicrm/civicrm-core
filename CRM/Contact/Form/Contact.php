@@ -988,7 +988,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $parseStatusMsg = self::parseAddressStatusMsg($parseResult);
     }
 
-    $blocks = array('address', 'email', 'phone', 'im', 'openid');
+    $blocks = array('email', 'phone', 'im', 'openid', 'address', 'website');
     foreach ($blocks as $block) {
       if (!empty($this->_preEditValues[$block]) && is_array($this->_preEditValues[$block])) {
         foreach ($this->_preEditValues[$block] as $count => $value) {
