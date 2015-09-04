@@ -160,19 +160,7 @@
     <div class="clear"></div>
   </div>
 
-  {if $form.is_for_organization}
-  <div class="crm-section {$form.is_for_organization.name}-section">
-    <div class="label">&nbsp;</div>
-    <div class="content">
-      {$form.is_for_organization.html}&nbsp;{$form.is_for_organization.label}
-    </div>
-    <div class="clear"></div>
-  </div>
-  {/if}
-
-  {if $is_for_organization}
-    {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
-  {/if}
+  {include file="CRM/Contact/Form/ProfileContact.tpl"}
 
   {* User account registration option. Displays if enabled for one of the profiles on this page. *}
   {include file="CRM/common/CMSUser.tpl"}
@@ -317,15 +305,6 @@
       }
     }
   }
-
-  {/literal}
-  {if $relatedOrganizationFound and $reset}
-    cj( "#is_for_organization" ).prop('checked', true );
-    showOnBehalf(false);
-  {elseif $onBehalfRequired}
-    showOnBehalf(true);
-  {/if}
-  {literal}
 
   cj('input[name="soft_credit_type_id"]').on('change', function() {
     enableHonorType();

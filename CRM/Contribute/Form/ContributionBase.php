@@ -710,6 +710,129 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 
+
+  public function buildComponentForm($id, $form) {
+    if (empty($id)) {
+      return;
+    }
+
+    $contactID = $this->getContactID();
+
+    foreach (array('soft_credit', 'on_behalf') as $module) {
+      $ufJoinParams = array(
+        'module' => $module,
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $id,
+      );
+
+      $ufJoin = new CRM_Core_DAO_UFJoin();
+      $ufJoin->copyValues($ufJoinParams);
+      $ufJoin->find(TRUE);
+      if (!$ufJoin->is_active) {
+        continue;
+      }
+
+      if ($module == 'soft_credit') {
+        $form->_honoreeProfileId = $ufJoin->uf_group_id;
+        $form->_honor_block_is_active = $ufJoin->is_active;
+
+        if (!$form->_honoreeProfileId ||
+          !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $form->_honoreeProfileId, 'is_active')
+        ) {
+          CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of honoree and the selected honoree profile is either disabled or not found.'));
+        }
+
+        $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_honoreeProfileId);
+        $requiredProfileFields = array(
+          'Individual' => array('first_name', 'last_name'),
+          'Organization' => array('organization_name', 'email'),
+          'Household' => array('household_name', 'email'),
+        );
+        $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($form->_honoreeProfileId, $requiredProfileFields[$profileContactType]);
+        if (!$validProfile) {
+          CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of honoree and the required fields of the selected honoree profile are disabled or doesn\'t exist.'));
+        }
+
+        //build soft-credit section
+        CRM_Contribute_Form_SoftCredit::buildQuickForm($form);
+      }
+      else {
+        $params = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoin->module_data, TRUE, 'on_behalf');
+        $form->_values = array_merge($params, $form->_values);
+
+        $onBehalfProfileId = $ufJoin->uf_group_id;
+
+        if (!$onBehalfProfileId ||
+          !CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $onBehalfProfileId, 'is_active')
+        ) {
+          CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of an organization and the selected onbehalf profile is either disabled or not found.'));
+        }
+
+        $member = CRM_Member_BAO_Membership::getMembershipBlock($form->_id);
+        if (empty($member['is_active'])) {
+          $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
+          $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($onBehalfProfileId);
+          foreach (array(
+              'Individual',
+              'Organization',
+              'Household',
+            ) as $contactType) {
+            if (in_array($contactType, $onBehalfProfile) &&
+              (in_array('Membership', $onBehalfProfile) ||
+                in_array('Contribution', $onBehalfProfile)
+              )
+            ) {
+              CRM_Core_Error::fatal($msg);
+            }
+          }
+        }
+
+        if ($contactID) {
+          $form->_employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($contactID);
+
+          if (!empty($form->_membershipContactID) && $contactID != $form->_membershipContactID) {
+            // renewal case - membership being renewed may or may not be for organization
+            if (!empty($form->_employers) && array_key_exists($form->_membershipContactID, $form->_employers)) {
+              // if _membershipContactID belongs to employers list, we can say:
+              $form->_relatedOrganizationFound = TRUE;
+            }
+          }
+          elseif (!empty($form->_employers)) {
+            // not a renewal case and _employers list is not empty
+            $form->_relatedOrganizationFound = TRUE;
+          }
+
+          if ($params['is_for_organization'] != 2) {
+            $form->assign('relatedOrganizationFound', $form->_relatedOrganizationFound);
+          }
+          else {
+            $form->assign('onBehalfRequired', $form->_onBehalfRequired);
+          }
+
+          if (count($form->_employers) == 1) {
+            foreach ($form->_employers as $id => $value) {
+              $form->_organizationName = $value['name'];
+            }
+          }
+        }
+
+        if (CRM_Utils_Array::value('is_for_organization', $params)) {
+          if ($params['is_for_organization'] == 2) {
+            $this->assign('onBehalfRequired', TRUE);
+          }
+          else {
+            $form->addElement('checkbox', 'is_for_organization',
+              $form->_values['for_organization'],
+              NULL
+            );
+          }
+        }
+        $form->assign('onBehalfprofileId', $onBehalfProfileId);
+      }
+    }
+
+  }
+
   /**
    * Check template file exists.
    *
