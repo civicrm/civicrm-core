@@ -402,7 +402,7 @@ function _civicrm_api3_get_BAO($name) {
  */
 function _civicrm_api3_separate_values(&$values) {
   // test if this is cheaper that iterating every array
-  if (strpos(implode('', $values), CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+  if (strpos(json_encode($values), CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
     array_walk_recursive($values, "_civicrm_api3_value_to_array");
   }
 }
