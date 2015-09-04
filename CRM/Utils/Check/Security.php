@@ -102,7 +102,7 @@ class CRM_Utils_Check_Security {
       $url[] = $upload_url[0];
       if ($log_path = explode($filePathMarker, $log_filename)) {
         // CRM-17149: check if debug log path includes $filePathMarker
-        if (sizeof($log_path) > 1) {
+        if (count($log_path) > 1) {
           $url[] = $log_path[1];
           $log_url = implode($filePathMarker, $url);
           $headers = @get_headers($log_url);
