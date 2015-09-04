@@ -188,6 +188,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_lineItem = $this->get('lineItem');
     $this->_paymentProcessor = $this->get('paymentProcessor');
     $this->_params = $this->controller->exportValues('Main');
+
+    if (!empty($this->_params['onbehalf_values'])) {
+      $this->_params['onbehalf'] = (array) json_decode($this->_params['onbehalf_values']);
+    }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
     if (isset($this->_params['amount'])) {
@@ -230,14 +234,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // if onbehalf-of-organization
     if (!empty($this->_params['onbehalf_profile_id'])) {
       // CRM-15182
-      if (empty($this->_params['org_option']) && empty($this->_params['organization_id'])) {
-        if (!empty($this->_params['onbehalfof_id'])) {
-          $this->_params['organization_id'] = $this->_params['onbehalfof_id'];
-        }
-        else {
-          $this->_params['organization_id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_params['onbehalf']['organization_name'], 'id', 'display_name');
-        }
-      }
+      $this->_params['organization_id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_params['onbehalf']['organization_name'], 'id', 'display_name');
 
       $this->_params['organization_name'] = $this->_params['onbehalf']['organization_name'];
       $addressBlocks = array(
@@ -1154,7 +1151,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isCurrentEmployer = FALSE;
     $dupeIDs = array();
     $orgID = NULL;
-    if (!empty($behalfOrganization['organization_id']) && empty($behalfOrganization['org_option'])) {
+    if (!empty($behalfOrganization['organization_id'])) {
       $orgID = $behalfOrganization['organization_id'];
       unset($behalfOrganization['organization_id']);
       $isCurrentEmployer = TRUE;
@@ -1971,7 +1968,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // organization params in a separate variable, to make sure
     // normal behavior is continued. And use that variable to
     // process on-behalf-of functionality.
-    if (!empty($this->_params['hidden_onbehalf_profile'])) {
+    if (!empty($this->_params['onbehalf_profile_id'])) {
       $behalfOrganization = array();
       $orgFields = array('organization_name', 'organization_id', 'org_option');
       foreach ($orgFields as $fld) {
@@ -2099,7 +2096,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // If onbehalf-of-organization contribution / signup, add organization
     // and it's location.
-    if (isset($params['hidden_onbehalf_profile']) && isset($behalfOrganization['organization_name'])) {
+    if (isset($params['onbehalf_profile_id']) && isset($behalfOrganization['organization_name'])) {
       $ufFields = array();
       foreach ($this->_fields['onbehalf'] as $name => $value) {
         $ufFields[$name] = 1;

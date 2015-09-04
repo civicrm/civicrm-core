@@ -67,6 +67,35 @@
     var orgOption = $("input:radio[name=org_option]:checked").val( ); 
     selectCreateOrg(orgOption, false);
 
+    if ($('#is_for_organization').length) {
+      var type = $('#is_for_organization').is(':checked');
+      $('#is_for_organization').on('change', function() {
+         type = $(this).is(':checked') ? 1 : 0;
+         buildOnBehalfProfile(type);
+      });
+      if (type) {
+        buildOnBehalfProfile(type);
+      }
+    }
+    else if (!snippet) {
+      var type = {/literal}"{$onBehalfRequired}"{literal}; 
+      buildOnBehalfProfile(type);
+    }
+
+   $("input:radio[name='org_option']").click( function( ) {
+     var orgOption = $(this).val();
+     selectCreateOrg(orgOption, true);
+   });
+
+   var onbehalfof_id = $('#onbehalfof_id');
+   onbehalfof_id.change(function() {
+    setLocationDetails($(this).val());
+   }).change();
+
+   if (onbehalfof_id.length) {
+     setLocationDetails(onbehalfof_id.val());
+   }
+
     function resetValues() {
      // Don't trip chain-select when clearing values
      $('.crm-chain-select-control', "#select_org div").select2('val', '');
@@ -86,26 +115,6 @@
       if (typeof dataUrl != 'undefined') {CRM.loadPage(dataUrl, {target: '#on-behalf-block'})};
     }
 
-    if ($('#is_for_organization').length) {
-      $('#is_for_organization').on('change', function() {
-         var type = $(this).is(':checked') ? 1 : 0;
-         buildOnBehalfProfile(type);
-      });
-    }
-    else if (!snippet) {
-      var type = {/literal}"{$onBehalfRequired}"{literal}; 
-      buildOnBehalfProfile(type);
-    }
-
-   $("input:radio[name='org_option']").click( function( ) {
-     var orgOption = $(this).val();
-     selectCreateOrg(orgOption, true);
-   });
-
-   $('#onbehalfof_id').change(function() {
-    setLocationDetails($(this).val());
-   }).change();
-
    function selectCreateOrg( orgOption, reset ) {
     if (orgOption == 0) {
       $("#onbehalfof_id").show().change();
@@ -114,6 +123,7 @@
     else if ( orgOption == 1 ) {
       $("input#onbehalf_organization_name").show();
       $("#onbehalfof_id").hide();
+      reset = true;
     }
 
     if ( reset ) {
@@ -122,6 +132,8 @@
   }
 
 function setLocationDetails(contactID , reset) {
+  resetValues();
+
   var submittedCID = {/literal}"{$submittedOnBehalf}"{literal};
   var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo}'{literal};
   if (submittedOnBehalfInfo) {
@@ -135,8 +147,9 @@ function setLocationDetails(contactID , reset) {
     }
   }
 
-  resetValues();
-  var locationUrl = {/literal}"{$locDataURL}"{literal} + contactID + "&ufId=" + {/literal}"{$profileId}"{literal};
+  var profileID = {/literal}"{$profileId}"{literal};
+
+  var locationUrl = {/literal}"{$locDataURL}"{literal} + contactID + "&ufId=" + profileID;
    $.ajax({
     url         : locationUrl,
     dataType    : "json",

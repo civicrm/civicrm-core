@@ -133,15 +133,8 @@
                 {/if}
               {else}
                 {if $prefix}
-                  {if $n eq 'organization_name'}
-                    {if !empty($form.onbehalfof_id)}
-                      {$form.onbehalfof_id.html}
-                    {/if}
-                    {if $organizationName}
-                      <span>
-                        ( <a id='createNewOrg' href="#" onclick="createNew( ); return false;">{ts}Enter a new organization{/ts}</a> )
-                      </span>
-                    {/if}
+                  {if $n eq 'organization_name' && !empty($form.onbehalfof_id)}
+                    {$form.onbehalfof_id.html}
                   {/if}
                   {$form.$prefix.$n.html}
 		{else}
