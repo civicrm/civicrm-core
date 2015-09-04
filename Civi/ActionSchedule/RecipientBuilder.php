@@ -254,9 +254,9 @@ class RecipientBuilder {
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : array())
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
-      ->having("TIMEDIFF(!casNow, latest_log_time) >= !hrs")
+      ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval))")
       ->param(array(
-        '!hrs' => $this->parseSqlHrs(),
+        'casRepetitionInterval' => $this->parseRepetitionInterval(),
       ))
       ->strict()
       ->toSQL();
@@ -301,9 +301,9 @@ class RecipientBuilder {
         ->merge($this->prepareAddlFilter('c.id'))
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
         ->groupBy("reminder.contact_id")
-        ->having("TIMEDIFF(!casNow, latest_log_time) >= !hrs")
+        ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval)")
         ->param(array(
-          '!hrs' => $this->parseSqlHrs(),
+          'casRepetitionInterval' => $this->parseRepetitionInterval(),
         ))
         ->strict()
         ->toSQL();
@@ -359,24 +359,24 @@ class RecipientBuilder {
    * @param $actionSchedule
    * @return int|string
    */
-  protected function parseSqlHrs() {
+  protected function parseRepetitionInterval() {
     $actionSchedule = $this->actionSchedule;
     if ($actionSchedule->repetition_frequency_unit == 'day') {
-      $hrs = 24 * $actionSchedule->repetition_frequency_interval;
+      $interval = "{$actionSchedule->repetition_frequency_interval} DAY";
     }
     elseif ($actionSchedule->repetition_frequency_unit == 'week') {
-      $hrs = 24 * $actionSchedule->repetition_frequency_interval * 7;
+      $interval = "{$actionSchedule->repetition_frequency_interval} WEEK";
     }
     elseif ($actionSchedule->repetition_frequency_unit == 'month') {
-      $hrs = "24*(DATEDIFF(DATE_ADD(latest_log_time, INTERVAL 1 MONTH ), latest_log_time))";
+      $interval = "{$actionSchedule->repetition_frequency_interval} MONTH";
     }
     elseif ($actionSchedule->repetition_frequency_unit == 'year') {
-      $hrs = "24*(DATEDIFF(DATE_ADD(latest_log_time, INTERVAL 1 YEAR ), latest_log_time))";
+      $interval = "{$actionSchedule->repetition_frequency_interval} YEAR";
     }
     else {
-      $hrs = $actionSchedule->repetition_frequency_interval;
+      $interval = "{$actionSchedule->repetition_frequency_interval} HOUR";
     }
-    return "TIME('{$hrs}:00:00')";
+    return $interval;
   }
 
   /**
