@@ -127,7 +127,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
-            'default' => FALSE,
+            'default' => '',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           ),
