@@ -160,19 +160,32 @@
     <div class="clear"></div>
   </div>
 
-  {include file="CRM/Contact/Form/ProfileContact.tpl"}
+  {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
 
   {* User account registration option. Displays if enabled for one of the profiles on this page. *}
   {include file="CRM/common/CMSUser.tpl"}
   {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="makeContribution"}
 
   {if $honor_block_is_active}
-  <fieldset class="crm-group honor_block-group">
-    {include file="CRM/Contribute/Form/SoftCredit.tpl"}
-    <div id="honorType" class="honoree-name-email-section">
-      {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
-    </div>
-  </fieldset>
+    <fieldset class="crm-group honor_block-group">
+      {crmRegion name="contribution-soft-credit-block"}
+        <legend>{$honor_block_title}</legend>
+        <div class="crm-section honor_block_text-section">
+          {$honor_block_text}
+        </div>
+        {if $form.soft_credit_type_id.html}
+          <div class="crm-section {$form.soft_credit_type_id.name}-section">
+            <div class="content" >
+              {$form.soft_credit_type_id.html}
+              <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
+            </div>
+          </div>
+        {/if}
+      {/crmRegion}
+      <div id="honorType" class="honoree-name-email-section">
+        {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
+      </div>
+    </fieldset>
   {/if}
 
   <div class="crm-group custom_pre_profile-group">

@@ -232,7 +232,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
     // if onbehalf-of-organization
-    if (!empty($this->_params['onbehalf_profile_id'])) {
+    if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf']['organization_name'])) {
       // CRM-15182
       $this->_params['organization_id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_params['onbehalf']['organization_name'], 'id', 'display_name');
 
@@ -465,7 +465,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
 
-    if (!empty($params['onbehalf_profile_id'])) {
+    if (!empty($params['onbehalf'])) {
 
       $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');

@@ -539,7 +539,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::format($addressFields));
 
-    if (!empty($this->_params['onbehalf_profile_id'])) {
+    if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf'])) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
       $locTypeId = array_keys($this->_params['onbehalf_location']['email']);
       $this->assign('onBehalfEmail', $this->_params['onbehalf_location']['email'][$locTypeId[0]]['email']);
@@ -732,6 +732,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         continue;
       }
 
+      $params = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoin->module_data, TRUE, $module);
+
       if ($module == 'soft_credit') {
         $form->_honoreeProfileId = $ufJoin->uf_group_id;
         $form->_honor_block_is_active = $ufJoin->is_active;
@@ -753,11 +755,43 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of honoree and the required fields of the selected honoree profile are disabled or doesn\'t exist.'));
         }
 
-        //build soft-credit section
-        CRM_Contribute_Form_SoftCredit::buildQuickForm($form);
+        $form->assign('honor_block_is_active', $form->_honor_block_is_active);
+
+        foreach (array('honor_block_title', 'honor_block_text') as $name) {
+          $form->assign($name, $params[$name]);
+        }
+
+        $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+
+        // radio button for Honor Type
+        foreach ($params['soft_credit_types'] as $value) {
+          $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value);
+        }
+        $form->addGroup($honorTypes, 'soft_credit_type_id', NULL)->setAttribute('allowClear', TRUE);
+
+        $prefix = 'honor';
+        $honoreeProfileFields = CRM_Core_BAO_UFGroup::getFields($form->_honoreeProfileId, FALSE, NULL,
+                                NULL, NULL,
+                                FALSE, NULL,
+                                TRUE, NULL,
+                                CRM_Core_Permission::CREATE
+        );
+        $form->addElement('hidden', 'honoree_profile_id', $form->_honoreeProfileId);
+        $form->assign('honoreeProfileFields', $honoreeProfileFields);
+
+        // add the form elements
+        foreach ($honoreeProfileFields as $name => $field) {
+          // If soft credit type is not chosen then make omit requiredness from honoree profile fields
+          if (count($form->_submitValues) &&
+            empty($form->_submitValues['soft_credit_type_id']) &&
+            !empty($field['is_required'])
+          ) {
+            $field['is_required'] = FALSE;
+          }
+            CRM_Core_BAO_UFGroup::buildProfile($form, $field, CRM_Profile_Form::MODE_CREATE, NULL, FALSE, FALSE, NULL, $prefix);
+        }
       }
       else {
-        $params = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoin->module_data, TRUE, 'on_behalf');
         $form->_values = array_merge($params, $form->_values);
 
         $onBehalfProfileId = $ufJoin->uf_group_id;

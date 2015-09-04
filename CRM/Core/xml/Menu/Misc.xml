@@ -207,4 +207,11 @@
     <access_arguments>access CiviCRM</access_arguments>
     <title>Insert CiviCRM Content</title>
   </item>
+  <item>
+    <path>civicrm/onbehalf/form</path>
+    <access_callback>1</access_callback>
+    <page_callback>CRM_Contribute_Form_Contribution_OnBehalfOf</page_callback>
+    <is_public>true</is_public>
+    <weight>0</weight>
+  </item>
 </menu>

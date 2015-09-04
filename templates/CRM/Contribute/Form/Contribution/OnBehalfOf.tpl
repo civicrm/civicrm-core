@@ -110,7 +110,7 @@
       }
       {/literal}{if $onBehalfprofileId}
         {capture assign='onBehalfprofileId'}id={$onBehalfprofileId}&{/capture};
-        var dataUrl = "{crmURL p='civicrm/profileContact/form' h=0 q="`$onBehalfprofileId`prefix=onbehalf"}";
+        var dataUrl = "{crmURL p='civicrm/onbehalf/form' h=0 q="`$onBehalfprofileId`prefix=onbehalf"}";
       {/if}{literal}
       if (typeof dataUrl != 'undefined') {CRM.loadPage(dataUrl, {target: '#on-behalf-block'})};
     }
