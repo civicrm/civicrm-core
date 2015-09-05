@@ -101,19 +101,22 @@ class CRM_Utils_Check_Security {
     if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
       $url[] = $upload_url[0];
       if ($log_path = explode($filePathMarker, $log_filename)) {
-        $url[] = $log_path[1];
-        $log_url = implode($filePathMarker, $url);
-        $headers = @get_headers($log_url);
-        if (stripos($headers[0], '200')) {
-          $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
-          $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
-            . '<br />' .
-            '<a href="%2">Read more about this warning</a>';
-          $messages[] = new CRM_Utils_Check_Message(
-            'checkLogFileIsNotAccessible',
-            ts($msg, array(1 => $log_url, 2 => $docs_url)),
-            ts('Security Warning')
-          );
+        // CRM-17149: check if debug log path includes $filePathMarker
+        if (count($log_path) > 1) {
+          $url[] = $log_path[1];
+          $log_url = implode($filePathMarker, $url);
+          $headers = @get_headers($log_url);
+          if (stripos($headers[0], '200')) {
+            $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
+            $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
+              . '<br />' .
+              '<a href="%2">Read more about this warning</a>';
+            $messages[] = new CRM_Utils_Check_Message(
+              'checkLogFileIsNotAccessible',
+              ts($msg, array(1 => $log_url, 2 => $docs_url)),
+              ts('Security Warning')
+            );
+          }
         }
       }
     }
