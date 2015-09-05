@@ -565,16 +565,14 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     // have been delivered in prior jobs
     $isDelivered = TRUE;
 
-    // make sure that there's no more than $config->mailerBatchLimit mails processed in a run
+    // make sure that there's no more than $mailerBatchLimit mails processed in a run
+    $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
     while ($eq->fetch()) {
       // if ( ( $mailsProcessed % 100 ) == 0 ) {
       // CRM_Utils_System::xMemory( "$mailsProcessed: " );
       // }
 
-      if (
-        $config->mailerBatchLimit > 0 &&
-        self::$mailsProcessed >= $config->mailerBatchLimit
-      ) {
+      if ($mailerBatchLimit > 0 && self::$mailsProcessed >= $mailerBatchLimit) {
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
         }
@@ -798,8 +796,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       }
 
       // If we have enabled the Throttle option, this is the time to enforce it.
-      if (isset($config->mailThrottleTime) && $config->mailThrottleTime > 0) {
-        usleep((int ) $config->mailThrottleTime);
+      $mailThrottleTime = Civi::settings()->get('mailThrottleTime');
+      if (!empty($mailThrottleTime)) {
+        usleep((int ) $mailThrottleTime);
       }
     }
 

@@ -632,7 +632,7 @@ function civicrm_api3_mailing_send_test($params) {
 
   $isComplete = FALSE;
   $config = CRM_Core_Config::singleton();
-  $mailerJobSize = (property_exists($config, 'mailerJobSize')) ? $config->mailerJobSize : NULL;
+  $mailerJobSize = Civi::settings()->get('mailerJobSize');
   while (!$isComplete) {
     // Q: In CRM_Mailing_BAO_Mailing::processQueue(), the three runJobs*()
     // functions are all called. Why does Mailing.send_test only call one?
