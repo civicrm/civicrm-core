@@ -176,9 +176,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     if (is_array($relTypeInd)) {
       asort($relTypeInd);
     }
-    $memberRel = &$this->add('select', 'relationship_type_id', ts('Relationship Type'),
-      array('' => ts('- select -')) + $relTypeInd);
-    $memberRel->setMultiple(TRUE);
+    $memberRel = $this->add('select', 'relationship_type_id', ts('Relationship Type'),
+      $relTypeInd, FALSE, array('class' => 'crm-select2 huge', 'multiple' => 1));
 
     $this->addSelect('visibility', array('placeholder' => NULL, 'option_url' => NULL));
 
