@@ -29,6 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
@@ -36,6 +38,7 @@
  * API for event export in iCalendar format
  * as outlined in Internet Calendaring and
  * Scheduling Core Object Specification
+ *
  */
 class CRM_Utils_ICalendar {
 
@@ -100,6 +103,8 @@ class CRM_Utils_ICalendar {
    *   The file name (for downloads).
    * @param string $disposition
    *   How the file should be sent ('attachment' for downloads).
+   *
+   * @return void
    */
   public static function send($calendar, $content_type = 'text/calendar', $charset = 'us-ascii', $fileName = NULL, $disposition = NULL) {
     $config = CRM_Core_Config::singleton();

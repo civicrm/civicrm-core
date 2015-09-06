@@ -29,10 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
  * System wide utilities.
+ *
  */
 class CRM_Utils_System {
 
@@ -1304,7 +1307,7 @@ class CRM_Utils_System {
    * @param array $params
    *   An array of parameters (see CRM_Utils_System::docURL2 method for names)
    *
-   * @return null|string
+   * @return void|string
    *   URL or link to documentation page, based on provided parameters.
    */
   public static function docURL($params) {

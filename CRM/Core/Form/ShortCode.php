@@ -29,12 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
- * Builds a form of shortcodes that can be added to WP posts.
- *
- * Use hook_civicrm_preProcess to modify this list.
+ * Builds a form of shortcodes that can be added to WP posts
+ * Use hook_civicrm_preProcess to modify this list
  */
 class CRM_Core_Form_ShortCode extends CRM_Core_Form {
   /**
@@ -67,7 +68,9 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
 
 
   /**
-   * Build form data. Can be modified via hook_civicrm_preProcess.
+   * Build form data. Can be modified via hook_civicrm_preProcess
+   *
+   * @return void
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -168,7 +171,9 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
   }
 
   /**
-   * Build form elements based on the above metadata.
+   * Build form elements based on the above metadata
+   *
+   * @return void
    */
   public function buildQuickForm() {
     CRM_Core_Resources::singleton()

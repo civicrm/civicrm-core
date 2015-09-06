@@ -27,12 +27,13 @@
 
 /**
  * Config handles all the run time configuration changes that the system needs to deal with.
- *
  * Typically we'll have different values for a user's sandbox, a qa sandbox and a production area.
  * The default values in general, should reflect production values (minimizes chances of screwing up)
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 require_once 'Log.php';
@@ -422,6 +423,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
   /**
    * Initialize the config variables.
+   *
+   * @return void
    */
   private function _initVariables() {
     // retrieve serialised settings

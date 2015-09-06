@@ -29,6 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
@@ -37,6 +39,7 @@
  *
  * The group column is used for grouping together all settings that logically belong to the same set.
  * Thus all settings in the same group are retrieved with one DB call and then cached for future needs.
+ *
  */
 class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
@@ -363,6 +366,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *   An optional ID to assign the creator to. If not set, retrieved from session.
    *
    * @param int $domainID
+   *
+   * @return void
    */
   public static function setItem(
     $value,

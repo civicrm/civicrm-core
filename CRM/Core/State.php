@@ -33,6 +33,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 class CRM_Core_State {
 
@@ -152,14 +154,20 @@ class CRM_Core_State {
   }
 
   /**
-   * Mark this page as valid for the QFC framework.
+   * Mark this page as valid for the QFC framework. This is needed as
+   * we build more advanced functionality into the StateMachine
+   *
+   * @return void
    */
   public function validate(&$data) {
     $data['valid'][$this->_name] = TRUE;
   }
 
   /**
-   * Mark this page as invalid for the QFC framework.
+   * Mark this page as invalid for the QFC framework. This is needed as
+   * we build more advanced functionality into the StateMachine
+   *
+   * @return void
    */
   public function invalidate(&$data) {
     $data['valid'][$this->_name] = NULL;
@@ -176,6 +184,8 @@ class CRM_Core_State {
 
   /**
    * Setter for name.
+   *
+   * @return void
    */
   public function setName($name) {
     $this->_name = $name;

@@ -33,6 +33,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 class CRM_Core_QuickForm_Action_Reload extends CRM_Core_QuickForm_Action {
 
@@ -56,7 +58,7 @@ class CRM_Core_QuickForm_Action_Reload extends CRM_Core_QuickForm_Action {
    * @param string $actionName
    *   Current action name, as one Action object can serve multiple actions.
    *
-   * @return object|void
+   * @return void
    */
   public function perform(&$page, $actionName) {
     // save the form values and validation status to the session

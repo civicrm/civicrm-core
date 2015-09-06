@@ -29,6 +29,8 @@
  *
  * @package CiviCRM_Hook
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id: $
+ *
  */
 abstract class CRM_Utils_Hook {
 
@@ -1166,7 +1168,7 @@ abstract class CRM_Utils_Hook {
    *                  fieldHeaders    - field headers
    *                  fields          - import fields
    *
-   * @return mixed
+   * @return void
    */
   public static function import($object, $usage, &$objectRef, &$params) {
     return self::singleton()->invoke(4, $object, $usage, $objectRef, $params,
@@ -1243,7 +1245,7 @@ abstract class CRM_Utils_Hook {
    * @param array $selector
    *   the selector object. Allows you access to the context of the search
    *
-   * @return mixed
+   * @return void
    *   modify the header and values object to pass the data u need
    */
   public static function searchColumns($objectName, &$headers, &$rows, &$selector) {
@@ -1781,7 +1783,7 @@ abstract class CRM_Utils_Hook {
    * @param int $otherCaseId
    * @param bool $changeClient
    *
-   * @return mixed
+   * @return void
    */
   public static function pre_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {
     return self::singleton()
@@ -1797,7 +1799,7 @@ abstract class CRM_Utils_Hook {
    * @param int $otherCaseId
    * @param bool $changeClient
    *
-   * @return mixed
+   * @return void
    */
   public static function post_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {
     return self::singleton()

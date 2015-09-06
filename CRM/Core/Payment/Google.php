@@ -29,6 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 require_once 'Google/library/googlecart.php';
@@ -37,9 +39,7 @@ require_once 'Google/library/googlesubscription.php';
 require_once 'Google/library/googlerequest.php';
 
 /**
- * Class CRM_Core_Payment_Google.
- *
- * Possibly not functional.
+ * Class CRM_Core_Payment_Google
  */
 class CRM_Core_Payment_Google extends CRM_Core_Payment {
 
@@ -102,12 +102,29 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
   }
 
   /**
+   * This function collects all the information from a web/api form and invokes
+   * the relevant payment processor specific functions to perform the transaction
+   *
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   *
+   * @return void
+   *   the result in an nice formatted array (or an error object)
+   * @abstract
+   */
+  public function doDirectPayment(&$params) {
+    CRM_Core_Error::fatal(ts('This function is not implemented'));
+  }
+
+  /**
    * Sets appropriate parameters for checking out to google.
    *
    * @param array $params
-   *   Name value pair of contribution data.
+   *   Name value pair of contribution datat.
    *
-   * @param string $component
+   * @param $component
+   *
+   * @return void
    */
   public function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);
@@ -180,7 +197,9 @@ class CRM_Core_Payment_Google extends CRM_Core_Payment {
    * @param string $component
    *   Event/contribution.
    * @param object $cart
-   *   Object of google cart.
+   *   Object of googel cart.
+   *
+   * @return void
    */
   public function submitPostParams($params, $component, $cart) {
     $url = rtrim($this->_paymentProcessor['url_site'], '/') . '/cws/v2/Merchant/' . $this->_paymentProcessor['user_name'] . '/checkout';

@@ -29,10 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
- * BAO object for crm_note table.
+ * BAO object for crm_note table
  */
 class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
@@ -43,7 +45,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   const MAX_NOTES = 3;
 
   /**
-   * Given a note id, retrieve the note text.
+   * Given a note id, retrieve the note text
    *
    * @param int $id
    *   Id of the note to retrieve.
@@ -334,6 +336,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    * @param int $id
    *   ID of the contact for which note needs to be deleted.
+   *
+   * @return void
+   *
    */
   public static function deleteContact($id) {
     // need to delete for both entity_id
@@ -547,6 +552,8 @@ ORDER BY  modified_date desc";
    *
    * @param int $contactID
    *   Contact id whose notes to be deleted.
+   *
+   * @return void
    */
   public static function cleanContactNotes($contactID) {
     $params = array(1 => array($contactID, 'Integer'));

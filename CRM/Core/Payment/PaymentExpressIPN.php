@@ -108,7 +108,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @param $amount
    * @param $transactionReference
    *
-   * @return bool
+   * @internal param \xml $dataRoot response send by google in xml format
+   * @return void
    */
   public function newOrderNotify($success, $privateData, $component, $amount, $transactionReference) {
     $ids = $input = $params = array();

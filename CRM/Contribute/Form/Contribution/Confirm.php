@@ -865,6 +865,25 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $receiptDate = $now;
     }
 
+    // Prepare soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
+    if (!empty($params['pcp_made_through_id']) || !empty($params['soft_credit_to'])) {
+      // if its due to pcp
+      if (!empty($params['pcp_made_through_id'])) {
+        $contributionParams['soft_credit_to'] = CRM_Core_DAO::getFieldValue(
+          'CRM_PCP_DAO_PCP',
+          $params['pcp_made_through_id'],
+          'contact_id'
+        );
+        // Pass these details onto with the contribution to make them
+        // available at hook_post_process, CRM-8908
+        // @todo - obsolete?
+        $params['soft_credit_to'] = $contributionParams['soft_credit_to'];
+      }
+      else {
+        $contributionParams['soft_credit_to'] = CRM_Utils_Array::value('soft_credit_to', $params);
+      }
+    }
+
     if (isset($params['amount'])) {
       $contributionParams = array_merge(self::getContributionParams(
         $params, $financialType->id, $nonDeductibleAmount, TRUE,
@@ -904,11 +923,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_contributionID = $contribution->id;
     }
 
-    // process soft credit / pcp params first
-    CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($params, $form);
-
     //CRM-13981, processing honor contact into soft-credit contribution
-    CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
+    CRM_Contact_Form_ProfileContact::postProcess($form, $params);
+
+    // process soft credit / pcp pages
+    CRM_Contribute_Form_Contribution_Confirm::processPcpSoft($params, $contribution);
 
     //handle pledge stuff.
     if ($isPledge) {
@@ -1250,6 +1269,47 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // contribution / signup will be done using this
       // organization id.
       $contactID = $orgID;
+    }
+  }
+
+  /**
+   * Function used to save pcp / soft credit entry.
+   *
+   * This is used by contribution and also event pcps
+   *
+   * @param array $params
+   * @param object $contribution
+   *   Contribution object.
+   */
+  public static function processPcpSoft(&$params, &$contribution) {
+    // Add soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
+    if (!empty($params['soft_credit_to'])) {
+      $contributionSoftParams = array();
+      foreach (array(
+          'pcp_display_in_roll',
+          'pcp_roll_nickname',
+          'pcp_personal_note',
+          'amount',
+        ) as $val) {
+        if (!empty($params[$val])) {
+          $contributionSoftParams[$val] = $params[$val];
+        }
+      }
+
+      $contributionSoftParams['contact_id'] = $params['soft_credit_to'];
+      // add contribution id
+      $contributionSoftParams['contribution_id'] = $contribution->id;
+      // add pcp id
+      $contributionSoftParams['pcp_id'] = $params['pcp_made_through_id'];
+
+      $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
+
+      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
+
+      //Send notification to owner for PCP
+      if ($contributionSoft->id && $contributionSoft->pcp_id) {
+        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+      }
     }
   }
 

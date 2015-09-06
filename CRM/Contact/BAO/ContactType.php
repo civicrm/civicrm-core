@@ -524,7 +524,9 @@ WHERE  subtype.name IN ('" . implode("','", $subType) . "' )";
    *   true if contact extends, false otherwise.
    */
   public static function isExtendsContactType($subType, $contactType, $ignoreCache = FALSE, $columnName = 'name') {
-    $subType = (array) CRM_Utils_Array::explodePadded($subType);
+    if (!is_array($subType)) {
+      $subType = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
+    }
     $subtypeList = self::subTypes($contactType, TRUE, $columnName, $ignoreCache);
     $intersection = array_intersect($subType, $subtypeList);
     return $subType == $intersection;

@@ -444,7 +444,62 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
+    // Handle soft credit and / or link to personal campaign page
+    $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
+
+    $pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id, TRUE);
+
+    if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
+      $softParams = array();
+      $softParams['id'] = $pcpId ? $pcpId : NULL;
+      $softParams['contribution_id'] = $contribution->id;
+      $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
+      $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
+        $pcp['pcp_made_through_id'], 'contact_id'
+      );
+      $softParams['currency'] = $contribution->currency;
+      $softParams['amount'] = $contribution->total_amount;
+      $softParams['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcp);
+      $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
+      $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
+      $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
+      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
+      //Send notification to owner for PCP
+      if ($contributionSoft->pcp_id && empty($pcpId)) {
+        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+      }
+    }
+    //Delete PCP against this contribution and create new on submitted PCP information
+    elseif (array_key_exists('pcp', $params) && $pcpId) {
+      $deleteParams = array('id' => $pcpId);
+      CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+    }
+    if (isset($params['soft_credit'])) {
+      $softParams = $params['soft_credit'];
+      foreach ($softParams as $softParam) {
+        if (!empty($softIDs)) {
+          $key = key($softIDs);
+          $softParam['id'] = $softIDs[$key];
+          unset($softIDs[$key]);
+        }
+        $softParam['contribution_id'] = $contribution->id;
+        $softParam['currency'] = $contribution->currency;
+        //case during Contribution Import when we assign soft contribution amount as contribution's total_amount by default
+        if (empty($softParam['amount'])) {
+          $softParam['amount'] = $contribution->total_amount;
+        }
+        CRM_Contribute_BAO_ContributionSoft::add($softParam);
+      }
+
+      if (!empty($softIDs)) {
+        foreach ($softIDs as $softID) {
+          if (!in_array($softID, $params['soft_credit_ids'])) {
+            $deleteParams = array('id' => $softID);
+            CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+          }
+        }
+      }
+    }
 
     $transaction->commit();
 
@@ -2426,11 +2481,6 @@ WHERE  contribution_id = %1 ";
       $values['address'] = $addressDetails[0]['display'];
     }
     if ($this->_component == 'contribute') {
-      //get soft contributions
-      $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);
-      if (!empty($softContributions)) {
-        $values['softContributions'] = $softContributions['soft_credit'];
-      }
       if (isset($this->contribution_page_id)) {
         CRM_Contribute_BAO_ContributionPage::setValues(
           $this->contribution_page_id,
@@ -2702,9 +2752,6 @@ WHERE  contribution_id = %1 ";
     $template->assign('address', CRM_Utils_Address::format($input));
     if (!empty($values['customGroup'])) {
       $template->assign('customGroup', $values['customGroup']);
-    }
-    if (!empty($values['softContributions'])) {
-      $template->assign('softContributions', $values['softContributions']);
     }
     if ($this->_component == 'event') {
       $template->assign('title', $values['event']['title']);

@@ -30,16 +30,15 @@ namespace Civi\Core\Lock;
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 class NullLock implements LockInterface {
 
   private $hasLock = FALSE;
 
   /**
-   * Create lock.
-   *
    * @param string $name
-   *
    * @return static
    */
   public static function create($name) {
@@ -47,12 +46,9 @@ class NullLock implements LockInterface {
   }
 
   /**
-   * Acquire lock.
-   *
    * @param int|NULL $timeout
    *   The number of seconds to wait to get the lock.
    *   For a default value, use NULL.
-   *
    * @return bool
    */
   public function acquire($timeout = NULL) {
@@ -61,8 +57,6 @@ class NullLock implements LockInterface {
   }
 
   /**
-   * Release lock.
-   *
    * @return bool|null|string
    *   Trueish/falsish.
    */

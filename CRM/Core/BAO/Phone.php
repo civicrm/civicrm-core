@@ -29,10 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
- * Class contains functions for phone.
+ * Class contains functions for phone
  */
 class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
 
@@ -232,6 +234,8 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    *
    * @param $optionId
    *   Value of option to be deleted.
+   *
+   * @return void
    */
   public static function setOptionToNull($optionId) {
     if (!$optionId) {

@@ -29,10 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
- * The basic class that interfaces with the external user framework.
+ * The basic class that interfaces with the external user framework
  */
 class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
 
@@ -72,6 +74,8 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    *
    * @param $ctype
    * @param bool $isLogin
+   *
+   * @return void
    */
   public static function synchronize(&$user, $update, $uf, $ctype, $isLogin = FALSE) {
     $userSystem = CRM_Core_Config::singleton()->userSystem;
@@ -358,6 +362,8 @@ AND    domain_id    = %4
    *
    * @param int $contactId
    *   Id of the contact to update.
+   *
+   * @return void
    */
   public static function updateUFName($contactId) {
     if (!$contactId) {
@@ -409,8 +415,10 @@ AND    domain_id    = %4
    *
    * @param int $contactId
    *   Contact ID of the user.
-   * @param string $emailAddress
+   * @param $emailAddress
    *   Email to be modified for the user.
+   *
+   * @return void
    */
   public static function updateContactEmail($contactId, $emailAddress) {
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
@@ -463,6 +471,8 @@ AND    domain_id    = %4
    *
    * @param int $ufID
    *   Id of the user to delete.
+   *
+   * @return void
    */
   public static function deleteUser($ufID) {
     $ufmatch = new CRM_Core_DAO_UFMatch();

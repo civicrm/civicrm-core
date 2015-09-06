@@ -30,6 +30,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 require_once 'PEAR.php';
@@ -97,6 +99,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param string $dsn
    *   The database connection string.
+   *
+   * @return void
    */
   public static function init($dsn) {
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
@@ -263,11 +267,11 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Reset the DAO object.
+   * Reset the DAO object. DAO is kinda crappy in that there is an unwritten
+   * rule of one query per DAO. We attempt to get around this crappy restricrion
+   * by resetting some of DAO's internal fields. Use this with caution
    *
-   * DAO is kinda crappy in that there is an unwritten rule of one query per DAO.
-   *
-   * We attempt to get around this crappy restriction by resetting some of DAO's internal fields. Use this with caution
+   * @return void
    */
   public function reset() {
 
@@ -326,6 +330,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param object $factory
    *   The factory application object.
+   *
+   * @return void
    */
   public static function setFactory(&$factory) {
     self::$_factory = &$factory;
@@ -335,6 +341,8 @@ class CRM_Core_DAO extends DB_DataObject {
    * Factory method to instantiate a new object from a table name.
    *
    * @param string $table
+   *
+   * @return void
    */
   public function factory($table = '') {
     if (!isset(self::$_factory)) {
@@ -347,6 +355,8 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Initialization for all DAO objects. Since we access DB_DO programatically
    * we need to set the links manually.
+   *
+   * @return void
    */
   public function initialize() {
     $this->_connect();
@@ -561,6 +571,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *   The object that we are extracting data from.
    * @param array $values
    *   (reference ) associative array of name/value pairs.
+   *
+   * @return void
    */
   public static function storeValues(&$object, &$values) {
     $fields = &$object->fields();
@@ -1126,6 +1138,8 @@ FROM   civicrm_domain
    *   Name of the dao object.
    * @param int $contactId
    *   Id of the contact to delete.
+   *
+   * @return void
    */
   public static function deleteEntityContact($daoName, $contactId) {
     $object = new $daoName();

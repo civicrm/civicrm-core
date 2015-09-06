@@ -29,6 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 class CRM_Core_OptionGroup {
   static $_values = array();
@@ -270,6 +272,9 @@ WHERE  v.option_group_id = g.id
    *
    *
    * @param bool $flip
+   *
+   * @return void
+   *
    */
   public static function lookupValues(&$params, &$names, $flip = FALSE) {
     foreach ($names as $postName => $value) {

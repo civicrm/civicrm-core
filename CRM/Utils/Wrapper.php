@@ -34,6 +34,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id: $
+ *
  */
 class CRM_Utils_Wrapper {
 
@@ -57,7 +59,7 @@ class CRM_Utils_Wrapper {
    *  - bool addSequence: should we add a unique sequence number to the end of the key
    *  - bool ignoreKey: should we not set a qfKey for this controller (for standalone forms)
    *
-   * @return mixed
+   * @return void
    */
   public function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {

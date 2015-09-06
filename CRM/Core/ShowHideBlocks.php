@@ -29,6 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 class CRM_Core_ShowHideBlocks {
 
@@ -81,6 +83,8 @@ class CRM_Core_ShowHideBlocks {
 
   /**
    * Load icon vars used in hide and show links.
+   *
+   * @return void
    */
   public static function setIcons() {
     if (!isset(self::$_showIcon)) {
@@ -92,6 +96,8 @@ class CRM_Core_ShowHideBlocks {
 
   /**
    * Add the values from this class to the template.
+   *
+   * @return void
    */
   public function addToTemplate() {
     $hide = $show = '';
@@ -124,6 +130,8 @@ class CRM_Core_ShowHideBlocks {
    *
    * @param string $name
    *   Id to be added.
+   *
+   * @return void
    */
   public function addShow($name) {
     $this->_show[$name] = 1;
@@ -137,6 +145,8 @@ class CRM_Core_ShowHideBlocks {
    *
    * @param string $name
    *   Id to be added.
+   *
+   * @return void
    */
   public function addHide($name) {
     $this->_hide[$name] = 1;
@@ -175,7 +185,8 @@ class CRM_Core_ShowHideBlocks {
    *
    * @param bool $assign
    *
-   * @return array
+   *
+   * @return void
    */
   public static function links(&$form, $prefix, $showLinkText, $hideLinkText, $assign = TRUE) {
     $showCode = "cj('#id_{$prefix}').show(); cj('#id_{$prefix}_show').hide();";
@@ -213,6 +224,8 @@ class CRM_Core_ShowHideBlocks {
    *   The set the class.
    * @param string $hideLink
    *   The hide block string.
+   *
+   * @return void
    */
   public function linksForArray(&$form, $index, $maxIndex, $prefix, $showLinkText, $hideLinkText, $elementType = NULL, $hideLink = NULL) {
     $showHidePrefix = str_replace(array("]", "["), array("", "_"), $prefix);

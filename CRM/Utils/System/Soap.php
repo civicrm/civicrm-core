@@ -29,10 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
- * Soap specific stuff goes here.
+ * Soap specific stuff goes here
  */
 class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
 
@@ -82,6 +84,8 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @param object $user
    *   Handle to the user object.
+   *
+   * @return void
    */
   public function setEmail(&$user) {
   }

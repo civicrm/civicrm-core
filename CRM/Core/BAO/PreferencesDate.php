@@ -29,6 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
@@ -72,6 +74,10 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *   Id of the database record.
    * @param bool $is_active
    *   Value we want to set the is_active field.
+   *
+   * @return void
+   *   DAO object on success, null otherwise
+   *
    */
   public static function setIsActive($id, $is_active) {
     CRM_Core_Error::fatal();
@@ -81,6 +87,7 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    * Delete preference dates.
    *
    * @param int $id
+   *
    */
   public static function del($id) {
     CRM_Core_Error::fatal();

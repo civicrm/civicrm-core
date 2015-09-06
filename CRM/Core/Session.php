@@ -25,8 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
+
+require_once "PEAR.php";
+
 /**
- * Class CRM_Core_Session.
+ * Class CRM_Core_Session
  */
 class CRM_Core_Session {
 
@@ -98,12 +101,14 @@ class CRM_Core_Session {
   }
 
   /**
-   * Creates an array in the session.
-   *
-   * All variables now will be stored under this array.
+   * Creates an array in the session. All variables now will be stored
+   * under this array
    *
    * @param bool $isRead
    *   Is this a read operation, in this case, the session will not be touched.
+   *
+   *
+   * @return void
    */
   public function initialize($isRead = FALSE) {
     // lets initialize the _session variable just before we need it
@@ -139,12 +144,16 @@ class CRM_Core_Session {
     ) {
       $this->_session[$this->_key] = array();
     }
+    return NULL;
   }
 
   /**
    * Resets the session store.
    *
+   *
    * @param int $all
+   *
+   * @return void
    */
   public function reset($all = 1) {
     if ($all != 1) {
@@ -158,6 +167,7 @@ class CRM_Core_Session {
       $this->_session = array();
     }
 
+    return NULL;
   }
 
   /**
@@ -167,6 +177,9 @@ class CRM_Core_Session {
    *   Local scope name.
    * @param bool $isRead
    *   Is this a read operation, in this case, the session will not be touched.
+   *
+   *
+   * @return void
    */
   public function createScope($prefix, $isRead = FALSE) {
     $this->initialize($isRead);
@@ -185,6 +198,8 @@ class CRM_Core_Session {
    *
    * @param string $prefix
    *   Local scope name.
+   *
+   * @return void
    */
   public function resetScope($prefix) {
     $this->initialize();
@@ -213,6 +228,8 @@ class CRM_Core_Session {
    *   Value of the variable.
    * @param string $prefix
    *   A string to prefix the keys in the session with.
+   *
+   * @return void
    */
   public function set($name, $value = NULL, $prefix = NULL) {
     // create session scope
@@ -271,12 +288,16 @@ class CRM_Core_Session {
   }
 
   /**
-   * Gets all the variables in the current session scope and stuffs them in an associate array.
+   * Gets all the variables in the current session scope
+   * and stuffs them in an associate array
+   *
    *
    * @param array $vars
    *   Associative array to store name/value pairs.
    * @param string $prefix
    *   Will be stripped from the key before putting it in the return.
+   *
+   * @return void
    */
   public function getVars(&$vars, $prefix = '') {
     // create session scope
@@ -297,10 +318,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Set and check a timer.
-   *
-   * If it's expired, it will be set again.
-   *
+   * Set and check a timer. If it's expired, it will be set again.
    * Good for showing a message to the user every hour or day (so not bugging them on every page)
    * Returns true-ish values if the timer is not set or expired, and false if the timer is still running
    * If you want to get more nuanced, you can check the type of the return to see if it's 'not set' or actually expired at a certain time
@@ -329,6 +347,8 @@ class CRM_Core_Session {
    *   The url to return to when done.
    * @param bool $check
    *   Should we do a dupe checking with the top element.
+   *
+   * @return void
    */
   public function pushUserContext($userContext, $check = TRUE) {
     if (empty($userContext)) {
@@ -364,6 +384,8 @@ class CRM_Core_Session {
    *
    * @param string $userContext
    *   The url to return to when done.
+   *
+   * @return void
    */
   public function replaceUserContext($userContext) {
     if (empty($userContext)) {
@@ -404,7 +426,6 @@ class CRM_Core_Session {
 
   /**
    * Dumps the session to the log.
-   *
    * @param int $all
    */
   public function debug($all = 1) {
@@ -441,7 +462,7 @@ class CRM_Core_Session {
   }
 
   /**
-   * Stores an alert to be displayed to the user via crm-messages.
+   * Stores an alert to be displayed to the user via crm-messages
    *
    * @param string $text
    *   The status message
@@ -465,6 +486,9 @@ class CRM_Core_Session {
    *                 set to 0 for no expiration
    *                 defaults to 10 seconds for most messages, 5 if it has a title but no body,
    *                 or 0 for errors or messages containing links
+   *
+   *
+   * @return void
    */
   public static function setStatus($text, $title = '', $type = 'alert', $options = array()) {
     // make sure session is initialized, CRM-8120
@@ -496,8 +520,6 @@ class CRM_Core_Session {
   }
 
   /**
-   * Register and retrieve session objects.
-   *
    * @param string|array $names
    */
   public static function registerAndRetrieveSessionObjects($names) {
@@ -516,8 +538,6 @@ class CRM_Core_Session {
   }
 
   /**
-   * Store session objects.
-   *
    * @param bool $reset
    */
   public static function storeSessionObjects($reset = TRUE) {
@@ -534,7 +554,6 @@ class CRM_Core_Session {
 
   /**
    * Retrieve contact id of the logged in user.
-   *
    * @return int|NULL
    *   contact ID of logged in user
    */
@@ -547,13 +566,12 @@ class CRM_Core_Session {
   }
 
   /**
-   * Check if session is empty.
-   *
-   * if so we don't cache stuff that we can get away with, helps proxies like varnish.
-   *
    * @return bool
    */
   public function isEmpty() {
+    // check if session is empty, if so we don't cache
+    // stuff that we can get away with
+    // helps proxies like varnish
     return empty($_SESSION);
   }
 

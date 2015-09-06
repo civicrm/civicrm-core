@@ -137,7 +137,7 @@
         }
       }
       if (checked) {
-        $('#billingcheckbox').prop('checked', true).data('crm-initial-value', true);
+        $('#billingcheckbox').prop('checked', true);
         if (!CRM.billing || CRM.billing.billingProfileIsHideable) {
           $('.billing_name_address-group').hide();
         }

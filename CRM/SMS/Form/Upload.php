@@ -29,10 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
- * This file is used to build the form configuring mass sms details.
+ * This file is used to build the form configuring mass sms details
  */
 class CRM_SMS_Form_Upload extends CRM_Core_Form {
   public $_mailingID;
@@ -46,6 +48,10 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
+   * the default values are retrieved from the database
+   *
+   *
+   * @return void
    */
   public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
@@ -114,6 +120,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @return void
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
