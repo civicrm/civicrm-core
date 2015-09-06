@@ -371,8 +371,6 @@ class CRM_Case_BAO_Query {
         return;
 
       case 'case_activity_status_id':
-        echo $value;
-
         $names = $value;
         if (($activityStatus = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'status_id', $value)) != FALSE) {
           $names = $activityStatus;
