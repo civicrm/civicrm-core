@@ -90,3 +90,7 @@ UPDATE civicrm_country SET name = 'PALESTINIAN TERRITORY' WHERE name = 'PALESTIN
 
 -- CRM-17145 update Activity detail data type
 ALTER TABLE `civicrm_activity` CHANGE `details` `details` LONGTEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'Details about the activity (agenda, notes, etc).';
+
+--CRM-16761 self service cancel or transfer for Event
+ALTER TABLE civicrm_event ADD selfcancelxfer_time INT(10) unsigned DEFAULT 0 COMMENT 'Time before start date to cancel or transfer';
+ALTER TABLE civicrm_event ADD allow_selfcancelxfer TINYINT(4) DEFAULT '0' COMMENT 'Allow self service cancel or transfer for event';
