@@ -939,20 +939,27 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    * @static
    */
   private static function checkDuplicateCustomFields(&$params, $relationshipId) {
+    // Get the custom values of the existing relationship.
     $existingValues = CRM_Core_BAO_CustomValueTable::getEntityValues($relationshipId, 'Relationship');
-    if (!array_key_exists('custom', $params)) {
-      return TRUE;
-    }
-    // iterate through $params['custom'], and check if the custom
-    // values are the same as the one of the existing relationship.
-    foreach ($params['custom'] as $group) {
-      foreach ($group as $field) {
-        if ($existingValues[$field['custom_field_id']] != $field['value']) {
-          return FALSE;
-        }
+    // Create a similar array for the new relationship.
+    $newValues = array();
+    // $params['custom'] seems to be an array. Each value is again an array.
+    // This array contains one value (key -1), and this value seems to be
+    // an array with the information about the custom value.
+    foreach ($params['custom'] as $value) {
+      foreach ($value as $customValue) {
+        $newValues[$customValue['custom_field_id']] = $customValue['value'];
       }
     }
-    return TRUE;
+
+    // Calculate difference between arrays. If the only key-value pairs
+    // that are in one array but not in the other are empty, the
+    // custom fields are considered to be equal.
+    // See https://github.com/civicrm/civicrm-core/pull/6515#issuecomment-137985667
+    $diff1 = array_diff_assoc($existingValues, $newValues);
+    $diff2 = array_diff_assoc($newValues, $existingValues);
+
+    return !array_filter($diff1) && !array_filter($diff2);
   }
 
   /**
