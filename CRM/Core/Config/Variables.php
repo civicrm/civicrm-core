@@ -417,13 +417,13 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public function defaultCurrencySymbol($defaultCurrency = NULL) {
     static $cachedSymbol = NULL;
     if (!$cachedSymbol || $defaultCurrency) {
-      if ($this->defaultCurrency || $defaultCurrency) {
-        $this->currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
+      $currency = $defaultCurrency ? $defaultCurrency : $this->defaultCurrency;
+      if ($currency) {
+        $currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
           'labelColumn' => 'symbol',
           'orderColumn' => TRUE,
         ));
-        $currency = $defaultCurrency ? $defaultCurrency : $this->defaultCurrency;
-        $cachedSymbol = CRM_Utils_Array::value($currency, $this->currencySymbols, '');
+        $cachedSymbol = CRM_Utils_Array::value($currency, $currencySymbols, '');
       }
       else {
         $cachedSymbol = '$';

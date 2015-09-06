@@ -143,4 +143,9 @@ class CRM_Core_Config_Defaults {
     return $url;
   }
 
+  public static function getDefaultCurrencySymbol() {
+    $config = CRM_Core_Config::singleton();
+    return $config->defaultCurrencySymbol(Civi::settings()->get('defaultCurrency'));
+  }
+
 }

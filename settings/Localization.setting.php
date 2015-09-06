@@ -37,14 +37,32 @@
  */
 
 return array(
+  'customTranslateFunction' => array(
+    'add' => '4.7',
+    'prefetch' => 1,
+    'help_text' => NULL,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'customTranslateFunction',
+    'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => array(
+      'size' => '30',
+      'maxlength' => '100',
+    ),
+    'default' => NULL,
+    'title' => 'Custom Translate Function',
+    'description' => '',
+  ),
   'monetaryThousandSeparator' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'monetaryThousandSeparator',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -65,8 +83,6 @@ return array(
     'name' => 'monetaryDecimalPoint',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -87,8 +103,6 @@ return array(
     'name' => 'moneyformat',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -106,14 +120,12 @@ return array(
     'name' => 'moneyvalueformat',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
     'default' => '%!i',
     'add' => '4.3',
-    'title' => 'Monetary Amount Display',
+    'title' => 'Monetary Value Display',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
@@ -125,13 +137,11 @@ return array(
     'name' => 'defaultCurrency',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
-    'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
     'html_attributes' => array(
-      'size' => 2,
+      'class' => 'crm-select2',
     ),
     'default' => 'USD',
     'add' => '4.3',
@@ -140,6 +150,9 @@ return array(
     'is_contact' => 0,
     'description' => 'Default currency assigned to contributions and other monetary transactions.',
     'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getCurrencySymbols',
+    ),
   ),
   'defaultContactCountry' => array(
     'group_name' => 'Localization Preferences',
@@ -147,13 +160,11 @@ return array(
     'name' => 'defaultContactCountry',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
-    'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
     'html_attributes' => array(
-      'size' => 4,
+      //'class' => 'crm-select2',
     ),
     'default' => '1228',
     'add' => '4.4',
@@ -162,11 +173,13 @@ return array(
     'is_contact' => 0,
     'description' => 'This value is selected by default when adding a new contact address.',
     'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
+    ),
   ),
   'defaultContactStateProvince' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -174,12 +187,13 @@ return array(
     'group' => 'localization',
     'name' => 'defaultContactStateProvince',
     'type' => 'Integer',
-    'quick_form_type' => 'Select',
-    'html_type' => 'Select',
-    'pseudoconstant' => array(
-      'callback' => 'CRM_Core_PseudoConstant::stateProvince',
-    ),
-    'default' => '',
+    'quick_form_type' => 'ChainSelect',
+    'html_type' => 'ChainSelect',
+    //'pseudoconstant' => array(
+    //  'callback' => 'CRM_Core_PseudoConstant::stateProvince',
+    //),
+    //'html_attributes',
+    'default' => NULL,
     'title' => 'Default State/Province',
     'description' => 'This value is selected by default when adding a new contact address.',
   ),
@@ -189,15 +203,12 @@ return array(
     'name' => 'countryLimit',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Array',
-    'quick_form_type' => 'Element',
-    'html_type' => 'advmultiselect',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
     'html_attributes' => array(
-      'size' => 5,
-      'style' => 'width:150px',
-      'class' => 'advmultiselect',
+      'multiple' => 1,
+      'class' => 'crm-select2',
     ),
     'default' => 'null',
     'add' => '4.3',
@@ -206,6 +217,9 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
+    ),
   ),
   'provinceLimit' => array(
     'group_name' => 'Localization Preferences',
@@ -213,15 +227,12 @@ return array(
     'name' => 'provinceLimit',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Array',
-    'quick_form_type' => 'Element',
-    'html_type' => 'advmultiselect',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
     'html_attributes' => array(
-      'size' => 5,
-      'style' => 'width:150px',
-      'class' => 'advmultiselect',
+      'multiple' => 1,
+      'class' => 'crm-select2',
     ),
     'default' => 'null',
     'add' => '4.3',
@@ -230,6 +241,9 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
+    ),
   ),
   'inheritLocale' => array(
     'group_name' => 'Localization Preferences',
@@ -237,8 +251,6 @@ return array(
     'name' => 'inheritLocale',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => '0',
@@ -364,7 +376,6 @@ return array(
   'fieldSeparator' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -404,9 +415,14 @@ return array(
     'name' => 'lcMessages',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
+    //'config_only' => 1,
     //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'class' => 'crm-select2',
+    ),
     'default' => 'en_US',
     'add' => '4.3',
     'title' => 'Default Language',
@@ -414,11 +430,13 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions',
+    ),
   ),
   'legacyEncoding' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,

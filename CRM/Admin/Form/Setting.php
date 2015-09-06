@@ -132,21 +132,32 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       $settingMetaData = civicrm_api('setting', 'getfields', array('version' => 3, 'name' => $setting));
       $props = $settingMetaData['values'][$setting];
       if (isset($props['quick_form_type'])) {
+        if (isset($props['pseudoconstant'])) {
+          $options = civicrm_api3('Setting', 'getoptions', array(
+            'field' => $setting,
+          ));
+        }
+        else {
+          $options = NULL;
+        }
+
         $add = 'add' . $props['quick_form_type'];
         if ($add == 'addElement') {
           $this->$add(
             $props['html_type'],
             $setting,
             ts($props['title']),
-            CRM_Utils_Array::value($props['html_type'] == 'select' ? 'option_values' : 'html_attributes', $props, array()),
-            $props['html_type'] == 'select' ? CRM_Utils_Array::value('html_attributes', $props) : NULL
+            ($options !== NULL) ? $options['values'] : CRM_Utils_Array::value('html_attributes', $props, array()),
+            ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, array()) : NULL
           );
         }
         elseif ($add == 'addSelect') {
-          $options = civicrm_api3('Setting', 'getoptions', array(
-            'field' => $setting,
-          ));
           $this->addElement('select', $setting, ts($props['title']), $options['values'], CRM_Utils_Array::value('html_attributes', $props));
+        }
+        elseif ($add == 'addChainSelect') {
+          $this->addChainSelect($setting, array(
+            'label' => ts($props['title']),
+          ));
         }
         else {
           $this->$add($setting, ts($props['title']));

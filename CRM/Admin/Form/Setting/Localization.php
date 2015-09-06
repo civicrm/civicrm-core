@@ -35,9 +35,23 @@
  * This class generates form components for Localization.
  */
 class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
-  // use this variable to store mappings that we compute in buildForm and also
-  // use in postProcess (CRM-1496)
-  protected $_currencySymbols;
+
+  protected $_settings = array(
+    'countryLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'customTranslateFunction' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'defaultContactCountry' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'defaultContactStateProvince' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'defaultCurrency' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'fieldSeparator' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'inheritLocale' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'lcMessages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'legacyEncoding' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'monetaryThousandSeparator' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'monetaryDecimalPoint' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'moneyformat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'moneyvalueformat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'provinceLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+  );
 
   /**
    * Build the form object.
@@ -45,26 +59,18 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
 
-    $i18n = CRM_Core_I18n::singleton();
     CRM_Utils_System::setTitle(ts('Settings - Localization'));
 
-    $locales = CRM_Core_I18n::languages();
     $warningTitle = json_encode(ts("Warning"));
+    $lcMessages = CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions();
+
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
-    if ($domain->locales) {
-      // for multi-lingual sites, populate default language drop-down with available languages
-      $lcMessages = array();
-      foreach ($locales as $loc => $lang) {
-        if (substr_count($domain->locales, $loc)) {
-          $lcMessages[$loc] = $lang;
-        }
-      }
-      $this->addElement('select', 'lcMessages', ts('Default Language'), $lcMessages);
 
+    if ($domain->locales) {
       // add language limiter and language adder
       $this->addCheckBox('languageLimit', ts('Available Languages'), array_flip($lcMessages), NULL, NULL, NULL, NULL, ' &nbsp; ');
-      $this->addElement('select', 'addLanguage', ts('Add Language'), array_merge(array('' => ts('- select -')), array_diff($locales, $lcMessages)));
+      $this->addElement('select', 'addLanguage', ts('Add Language'), array_merge(array('' => ts('- select -')), array_diff(CRM_Core_I18n::languages(), $lcMessages)));
 
       // add the ability to return to single language
       $warning = ts('This will make your CiviCRM installation a single-language one again. THIS WILL DELETE ALL DATA RELATED TO LANGUAGES OTHER THAN THE DEFAULT ONE SELECTED ABOVE (and only that language will be preserved).');
@@ -75,9 +81,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       );
     }
     else {
-      // for single-lingual sites, populate default language drop-down with all languages
-      $this->addElement('select', 'lcMessages', ts('Default Language'), $locales);
-
       $warning = ts('Enabling multiple languages changes the schema of your database, so make sure you know what you are doing when enabling this function; making a database backup is strongly recommended.');
       $this->assign('warning', $warning);
       $warning = json_encode($warning);
@@ -96,58 +99,9 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       'undefined' => ts('Leave undefined'),
       'current_site_language' => ts('Use language in use at the time'),
     ));
-    $this->addElement('checkbox', 'inheritLocale', ts('Inherit CMS Language'));
-    $this->addElement('text', 'monetaryThousandSeparator', ts('Thousands Separator'), array('size' => 2));
-    $this->addElement('text', 'monetaryDecimalPoint', ts('Decimal Delimiter'), array('size' => 2));
-    $this->addElement('text', 'moneyformat', ts('Monetary Amount Display'));
-    $this->addElement('text', 'moneyvalueformat', ts('Monetary Value Display'));
-
-    $country = array();
-    CRM_Core_PseudoConstant::populate($country, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
-    $i18n->localizeArray($country, array('context' => 'country'));
-    asort($country);
-
-    $includeCountry = &$this->addElement('advmultiselect', 'countryLimit',
-      ts('Available Countries') . ' ', $country,
-      array(
-        'size' => 5,
-        'style' => 'width:150px',
-        'class' => 'advmultiselect',
-      )
-    );
-
-    $includeCountry->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $includeCountry->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-    $includeState = &$this->addElement('advmultiselect', 'provinceLimit',
-      ts('Available States and Provinces') . ' ', $country,
-      array(
-        'size' => 5,
-        'style' => 'width:150px',
-        'class' => 'advmultiselect',
-      )
-    );
-
-    $includeState->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $includeState->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-    $this->addElement('select', 'defaultContactCountry', ts('Default Country'), array('' => ts('- select -')) + $country);
-    $this->addChainSelect('defaultContactStateProvince', array('label' => ts('Default State/Province')));
-
-    // we do this only to initialize currencySymbols, kinda hackish but works!
-    $config->defaultCurrencySymbol();
-
-    $symbol = $config->currencySymbols;
-    foreach ($symbol as $key => $value) {
-      $this->_currencySymbols[$key] = "$key";
-      if ($value) {
-        $this->_currencySymbols[$key] .= " ($value)";
-      }
-    }
-    $this->addElement('select', 'defaultCurrency', ts('Default Currency'), $this->_currencySymbols);
 
     $includeCurrency = &$this->addElement('advmultiselect', 'currencyLimit',
-      ts('Available Currencies') . ' ', $this->_currencySymbols,
+      ts('Available Currencies') . ' ', self::getCurrencySymbols(),
       array(
         'size' => 5,
         'style' => 'width:150px',
@@ -157,10 +111,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     $includeCurrency->setButtonAttributes('add', array('value' => ts('Add >>')));
     $includeCurrency->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-    $this->addElement('text', 'legacyEncoding', ts('Legacy Encoding'));
-    $this->addElement('text', 'customTranslateFunction', ts('Custom Translate Function'));
-    $this->addElement('text', 'fieldSeparator', ts('Import / Export Field Separator'), array('size' => 2));
 
     $this->addFormRule(array('CRM_Admin_Form_Setting_Localization', 'formRule'));
 
@@ -226,11 +176,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   public function postProcess() {
     $values = $this->exportValues();
 
-    // FIXME: stupid QF not submitting unchecked checkboxen…
-    if (!isset($values['inheritLocale'])) {
-      $values['inheritLocale'] = 0;
-    }
-
     //cache contact fields retaining localized titles
     //though we changed localization, so reseting cache.
     CRM_Core_BAO_Cache::deleteGroup('contact fields');
@@ -240,9 +185,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // we do this only to initialize monetary decimal point and thousand separator
     $config = CRM_Core_Config::singleton();
-
-    // set default Currency Symbol
-    $values['defaultCurrencySymbol'] = $config->defaultCurrencySymbol($values['defaultCurrency']);
 
     // save enabled currencies and defaul currency in option group 'currencies_enabled'
     // CRM-1496
@@ -262,9 +204,10 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // get labels for all the currencies
     $options = array();
 
+    $currencySymbols = self::getCurrencySymbols();
     for ($i = 0; $i < count($values['currencyLimit']); $i++) {
       $options[] = array(
-        'label' => $this->_currencySymbols[$values['currencyLimit'][$i]],
+        'label' => $currencySymbols[$values['currencyLimit'][$i]],
         'value' => $values['currencyLimit'][$i],
         'weight' => $i + 1,
         'is_active' => 1,
@@ -311,6 +254,61 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     if ($return) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/setting/localization', 'reset=1'));
     }
+  }
+
+  /**
+   * @return array
+   */
+  public static function getAvailableCountries() {
+    $i18n = CRM_Core_I18n::singleton();
+    $country = array();
+    CRM_Core_PseudoConstant::populate($country, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
+    $i18n->localizeArray($country, array('context' => 'country'));
+    asort($country);
+    return $country;
+  }
+
+  /**
+   * @return array
+   */
+  public static function getDefaultLocaleOptions() {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $locales = CRM_Core_I18n::languages();
+    if ($domain->locales) {
+      // for multi-lingual sites, populate default language drop-down with available languages
+      $lcMessages = array();
+      foreach ($locales as $loc => $lang) {
+        if (substr_count($domain->locales, $loc)) {
+          $lcMessages[$loc] = $lang;
+        }
+      }
+    }
+    else {
+      $lcMessages = $locales;
+    }
+    return $lcMessages;
+  }
+
+  /**
+   * Get a list of currencies (with their symbols).
+   *
+   * @return array
+   *   Array('USD' => 'USD ($)').
+   */
+  public static function getCurrencySymbols() {
+    $symbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
+      'labelColumn' => 'symbol',
+      'orderColumn' => TRUE,
+    ));
+    $_currencySymbols = array();
+    foreach ($symbols as $key => $value) {
+      $_currencySymbols[$key] = "$key";
+      if ($value) {
+        $_currencySymbols[$key] .= " ($value)";
+      }
+    }
+    return $_currencySymbols;
   }
 
 }
