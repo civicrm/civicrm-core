@@ -304,6 +304,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     $this->imageUploadURL = CRM_Core_Config_Defaults::getImageUploadUrl();
 
     $this->geocodeMethod = CRM_Utils_Geocode::getProviderClass();
+    $this->defaultCurrencySymbol = CRM_Core_Config_Defaults::getDefaultCurrencySymbol();
   }
 
   /**
