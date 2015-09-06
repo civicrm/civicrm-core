@@ -63,7 +63,6 @@ function civicrm_api3_domain_get($params) {
         'contact_id' => $domain['contact_id'],
       );
       $values['location'] = CRM_Core_BAO_Location::getValues($locparams, TRUE);
-
       $address_array = array(
         'street_address', 'supplemental_address_1', 'supplemental_address_2',
         'city', 'state_province_id', 'postal_code', 'country_id',
@@ -76,16 +75,15 @@ function civicrm_api3_domain_get($params) {
 
       if (!empty($values['location']['phone'])) {
         $domain['domain_phone'] = array(
-          'phone_type' => CRM_Core_OptionGroup::getLabel(
-          'phone_type',
-          CRM_Utils_Array::value(
-            'phone_type_id',
-          $values['location']['phone'][1]
-          )
+          'phone_type' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id',
+            CRM_Utils_Array::value(
+              'phone_type_id',
+              $values['location']['phone'][1]
+            )
           ),
           'phone' => CRM_Utils_Array::value(
-          'phone',
-          $values['location']['phone'][1]
+            'phone',
+            $values['location']['phone'][1]
           ),
         );
       }

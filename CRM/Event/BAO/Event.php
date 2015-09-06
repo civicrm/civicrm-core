@@ -275,12 +275,9 @@ FROM   `civicrm_event`
 WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
 
     if (!empty($id)) {
-      if (is_array($id)) {
-        $query .= " AND `id` IN (" . implode(',', $id) . ")";
-      }
-      else {
-        $query .= " AND `id` = {$id}";
-      }
+      $op = is_array($id) ? 'IN' : '=';
+      $where = CRM_Contact_BAO_Query::buildClause('id', $op, $id);
+      $query .= " AND {$where}";
     }
     elseif ($all == 0) {
       // find only events ending in the future

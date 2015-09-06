@@ -55,8 +55,8 @@
 
         <div id="fname"><br/>
         </div>
-        <select name="api_entity" type="text" id="api_entity" class="form-select required">
-          {crmAPI entity="Entity" action="get" var="entities" version=3}
+        <select name="api_entity" type="text" id="api_entity" class="crm-form-select required">
+          {crmAPI entity="Entity" var="entities"}
           {foreach from=$entities.values item=entity}
             <option value="{$entity}"{if $entity eq $form.api_entity.value} selected="selected"{/if}>{$entity}</option>
           {/foreach}
