@@ -1301,6 +1301,7 @@ input.crm-form-entityref {
   background-color: #fafafa;
   border: 1px solid #9d9fca;
   height: 220px;
+  overflow: hidden;
 }
 
 #crm-container .thermometer-wrapper,
