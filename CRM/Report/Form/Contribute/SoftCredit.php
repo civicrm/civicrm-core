@@ -232,15 +232,6 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'required' => TRUE,
             'no_display' => TRUE,
           ),
-          'total_amount' => array(
-            'title' => ts('Amount Statistics'),
-            'default' => TRUE,
-            'statistics' => array(
-              'sum' => ts('Aggregate Amount'),
-              'count' => ts('Contributions'),
-              'avg' => ts('Average'),
-            ),
-          ),
         ),
         'grouping' => 'softcredit-fields',
         'filters' => array(
@@ -258,9 +249,6 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
           ),
-          'total_amount' => array(
-            'title' => ts('Contribution Amount'),
-          ),
         ),
       ),
       'civicrm_contribution_soft' => array(
@@ -270,6 +258,15 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'title' => ts('Contribution ID'),
             'no_display' => TRUE,
             'default' => TRUE,
+          ),
+          'amount' => array(
+            'title' => ts('Amount Statistics'),
+            'default' => TRUE,
+            'statistics' => array(
+              'sum' => ts('Aggregate Amount'),
+              'count' => ts('Contributions'),
+              'avg' => ts('Average'),
+            ),
           ),
           'id' => array(
             'default' => TRUE,
@@ -284,6 +281,9 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
+          ),
+          'amount' => array(
+            'title' => ts('Soft Credit Amount'),
           ),
         ),
         'grouping' => 'softcredit-fields',
@@ -474,9 +474,9 @@ GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentn
     $statistics = parent::statistics($rows);
 
     $select = "
-        SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,
-               SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount,
-               ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,
+        SELECT COUNT({$this->_aliases['civicrm_contribution_soft']}.amount ) as count,
+               SUM({$this->_aliases['civicrm_contribution_soft']}.amount ) as amount,
+               ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as avg,
                {$this->_aliases['civicrm_contribution']}.currency as currency
         ";
 
