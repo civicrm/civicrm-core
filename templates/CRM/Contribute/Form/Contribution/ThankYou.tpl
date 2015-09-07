@@ -188,7 +188,18 @@
     </div>
   {/if}
 
-  {if $honor_block_is_active}
+  {if $onbehalfProfile|@count}
+    <div class="crm-group onBehalf_display-group label-left crm-profile-view">
+      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+      <div class="crm-section organization_email-section">
+        <div class="label">{ts}Organization Email{/ts}</div>
+        <div class="content">{$onBehalfEmail}</div>
+        <div class="clear"></div>
+       </div>
+    </div>
+  {/if}
+
+  {if $honoreeProfileFields|@count}
     <div class="crm-group honor_block-group">
       <div class="header-dark">
         {$soft_credit_type}
@@ -231,17 +242,6 @@
         {/if}
         <br />
       </div>
-    </div>
-  {/if}
-
-  {if $onbehalfProfile}
-    <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
-      <div class="crm-section organization_email-section">
-        <div class="label">{ts}Organization Email{/ts}</div>
-        <div class="content">{$onBehalfEmail}</div>
-        <div class="clear"></div>
-       </div>
     </div>
   {/if}
 

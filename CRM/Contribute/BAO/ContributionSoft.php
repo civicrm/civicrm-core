@@ -147,7 +147,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       }
     }
 
-    if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
+    if (!empty($params['honor']) && !empty($params['soft_credit_type_id'])) {
       $honorId = NULL;
 
       $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');

@@ -128,11 +128,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('taxTerm', $taxTerm);
       $this->assign('totalTaxAmount', $params['tax_amount']);
     }
-    if ($this->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
+    if (!empty($params['honor']) && !empty($params['soft_credit_type_id'])) {
       $honorName = NULL;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
-      $this->assign('honor_block_is_active', $this->_honor_block_is_active);
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
       CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
 
@@ -186,7 +185,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
-    if (!empty($params['onbehalf_profile_id'])) {
+    if (!empty($params['onbehalf'])) {
       $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
       $fieldTypes = array_merge($fieldTypes, $contactSubType);

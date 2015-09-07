@@ -831,29 +831,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $errors['_qf_default'] = ts('You cannot set up a recurring contribution if you are not paying online by credit card.');
     }
 
-    if (!empty($fields['is_for_organization']) &&
-      !property_exists($self, 'organizationName')
-    ) {
-
-      if (empty($fields['onbehalf']['organization_name'])) {
-        if (!empty($fields['org_option']) && !$fields['onbehalfof_id']) {
-          $errors['organization_id'] = ts('Please select an organization or enter a new one.');
-        }
-        elseif (empty($fields['org_option'])) {
-          $errors['onbehalf']['organization_name'] = ts('Please enter the organization name.');
-        }
-      }
-
-      foreach ($fields['onbehalf'] as $key => $value) {
-        if (strstr($key, 'email')) {
-          $emailLocType = explode('-', $key);
-        }
-      }
-      if (empty($fields['onbehalf']["email-{$emailLocType[1]}"])) {
-        $errors['onbehalf']["email-{$emailLocType[1]}"] = ts('Organization email is required.');
-      }
-    }
-
     // validate PCP fields - if not anonymous, we need a nick name value
     if ($self->_pcpId && !empty($fields['pcp_display_in_roll']) &&
       (CRM_Utils_Array::value('pcp_is_anonymous', $fields) == 0) &&
