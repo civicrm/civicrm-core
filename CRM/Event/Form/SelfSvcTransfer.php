@@ -412,10 +412,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //now registered_id can be updated (mail won't be send if it is set
     return res;
   }
-   /**
-    * Send confirmation of cancellation to source participant
-    *
-    * return @ void
+  /**
+   * Send confirmation of cancellation to source participant
+   *
+   * return @ void
    */
   public function sendCancellation() {
     $domainValues = array();
