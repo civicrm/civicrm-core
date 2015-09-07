@@ -58,7 +58,10 @@ class CRM_Core_Page_AJAX_Location {
     }
 
     // Verify user permission on related contact
-    $employers = CRM_Contact_BAO_Relationship::getPermissionedContacts($user);
+    $employers = CRM_Contact_BAO_Relationship::getPermissionedContacts(
+      $user,
+      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b')
+    );
     if (!isset($employers[$cid])) {
       CRM_Utils_System::civiExit();
     }
