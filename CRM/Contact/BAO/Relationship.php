@@ -1742,28 +1742,6 @@ WHERE id IN ( {$contacts} )
   }
 
   /**
-   * Return list of permissioned employer for a given contact.
-   *
-   * @param int $contactID
-   *   contact id whose employers.
-   *   are to be found.
-   * @param string $name
-   *   employers sort name.
-   *
-   * @return array
-   *   array of employers.
-   */
-  public static function getPermissionedEmployer($contactID, $name = NULL) {
-    //get the relationship id
-    $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
-      'Employee of', 'id', 'name_a_b'
-    );
-
-    return self::getPermissionedContacts($contactID, $relTypeId, $name);
-  }
-
-
-  /**
    * Function to return list of permissioned contacts for a given contact and relationship type.
    *
    * @param int $contactID
