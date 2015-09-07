@@ -59,8 +59,6 @@ class CRM_Core_BAO_ConfigSetting {
    *   Associated array of civicrm variables.
    */
   public static function add(&$params) {
-    self::fixParams($params);
-
     $domain = new CRM_Core_DAO_Domain();
     $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
@@ -106,36 +104,6 @@ class CRM_Core_BAO_ConfigSetting {
 
     $domain->config_backend = serialize($params);
     $domain->save();
-  }
-
-  /**
-   * Fix civicrm setting variables.
-   *
-   * @param array $params
-   *   Associated array of civicrm variables.
-   */
-  public static function fixParams(&$params) {
-    // in our old civicrm.settings.php we were using ISO code for country and
-    // province limit, now we have changed it to use ids
-
-    $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-
-    $specialArray = array('countryLimit', 'provinceLimit');
-
-    foreach ($params as $key => $value) {
-      if (in_array($key, $specialArray) && is_array($value)) {
-        foreach ($value as $k => $val) {
-          if (!is_numeric($val)) {
-            $params[$key][$k] = array_search($val, $countryIsoCodes);
-          }
-        }
-      }
-      elseif ($key == 'defaultContactCountry') {
-        if (!is_numeric($value)) {
-          $params[$key] = array_search($value, $countryIsoCodes);
-        }
-      }
-    }
   }
 
   /**
