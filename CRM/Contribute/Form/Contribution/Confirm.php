@@ -188,10 +188,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_lineItem = $this->get('lineItem');
     $this->_paymentProcessor = $this->get('paymentProcessor');
     $this->_params = $this->controller->exportValues('Main');
-
-    if (!empty($this->_params['onbehalf_values'])) {
-      $this->_params['onbehalf'] = (array) json_decode($this->_params['onbehalf_values']);
-    }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
     if (isset($this->_params['amount'])) {
@@ -400,11 +396,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $params = $this->_params;
     // make sure we have values for it
-    if ($this->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
+    if (!empty($params['honor']) && !empty($params['soft_credit_type_id'])) {
       $honorName = NULL;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
-      $this->assign('honor_block_is_active', $this->_honor_block_is_active);
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
       CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
 
@@ -466,7 +461,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
 
     if (!empty($params['onbehalf'])) {
-
       $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
       $fieldTypes = array_merge($fieldTypes, $contactSubType);

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -61,33 +61,27 @@
 <script type="text/javascript">
 
   CRM.$(function($) {
-    var snippet = {/literal}"{$snippet}"{literal};
 
-    $("#orgOptions").show( );
-    var orgOption = $("input:radio[name=org_option]:checked").val( ); 
+    var orgOption = $("input:radio[name=org_option]:checked").attr('id');
+    var onBehalfRequired = {/literal}'$onBehalfRequired'{literal};
+    var onbehalfof_id = $('#onbehalfof_id');
+    var is_for_organization = $('#is_for_organization');
+
     selectCreateOrg(orgOption, false);
 
-    if ($('#is_for_organization').length) {
-      var type = $('#is_for_organization').is(':checked');
-      $('#is_for_organization').on('change', function() {
-         type = $(this).is(':checked') ? 1 : 0;
-         buildOnBehalfProfile(type);
-      });
-      if (type) {
-        buildOnBehalfProfile(type);
-      }
-    }
-    else if (!snippet) {
-      var type = {/literal}"{$onBehalfRequired}"{literal}; 
-      buildOnBehalfProfile(type);
+    if (is_for_organization.length) {
+      $('#on-behalf-block').toggle(is_for_organization.is(':checked'));
     }
 
+    is_for_organization.on('change', function(){
+      $('#on-behalf-block').toggle($(this).is(':checked'));
+    });
+
    $("input:radio[name='org_option']").click( function( ) {
-     var orgOption = $(this).val();
+     var orgOption = $(this).attr('id');
      selectCreateOrg(orgOption, true);
    });
 
-   var onbehalfof_id = $('#onbehalfof_id');
    onbehalfof_id.change(function() {
     setLocationDetails($(this).val());
    }).change();
@@ -101,26 +95,15 @@
      $('.crm-chain-select-control', "#select_org div").select2('val', '');
      $('input[type=text], select, textarea', "#select_org div").not('.crm-chain-select-control, #onbehalfof_id').val('').change();
      $('input[type=radio], input[type=checkbox]', "#select_org div").prop('checked', false).change();
-    }
-
-    function buildOnBehalfProfile(type) {
-      if (type == 0) {
-        $("#on-behalf-block").html('');
-        return;
-      }
-      {/literal}{if $onBehalfprofileId}
-        {capture assign='onBehalfprofileId'}id={$onBehalfprofileId}&{/capture};
-        var dataUrl = "{crmURL p='civicrm/onbehalf/form' h=0 q="`$onBehalfprofileId`prefix=onbehalf"}";
-      {/if}{literal}
-      if (typeof dataUrl != 'undefined') {CRM.loadPage(dataUrl, {target: '#on-behalf-block'})};
+     $('#on-behalf-block input').val('');
     }
 
    function selectCreateOrg( orgOption, reset ) {
-    if (orgOption == 0) {
+    if (orgOption == 'CIVICRM_QFID_0_org_option') {
       $("#onbehalfof_id").show().change();
       $("input#onbehalf_organization_name").hide();
     }
-    else if ( orgOption == 1 ) {
+    else if ( orgOption == 'CIVICRM_QFID_1_org_option' ) {
       $("input#onbehalf_organization_name").show();
       $("#onbehalfof_id").hide();
       reset = true;
@@ -131,25 +114,23 @@
     }
   }
 
-function setLocationDetails(contactID , reset) {
-  resetValues();
+ function setLocationDetails(contactID , reset) {
+   resetValues();
+   var locationUrl = {/literal}'{$locDataURL}'{literal} + contactID;
+   var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo}'{literal};
+   var submittedCID = {/literal}"{$submittedOnBehalf}"{literal};
 
-  var submittedCID = {/literal}"{$submittedOnBehalf}"{literal};
-  var submittedOnBehalfInfo = {/literal}'{$submittedOnBehalfInfo}'{literal};
-  if (submittedOnBehalfInfo) {
-    submittedOnBehalfInfo = $.parseJSON(submittedOnBehalfInfo);
+   if (submittedOnBehalfInfo) {
+     submittedOnBehalfInfo = $.parseJSON(submittedOnBehalfInfo);
 
-    if (submittedCID == contactID) {
-      $.each(submittedOnBehalfInfo, function(key, value) {
-        $('#onbehalf_' + key ).val(value);
-      });
-      return;
-    }
-  }
+     if (submittedCID == contactID) {
+       $.each(submittedOnBehalfInfo, function(key, value) {
+         $('#onbehalf_' + key ).val(value);
+       });
+       return;
+     }
+   }
 
-  var profileID = {/literal}"{$profileId}"{literal};
-
-  var locationUrl = {/literal}"{$locDataURL}"{literal} + contactID + "&ufId=" + profileID;
    $.ajax({
     url         : locationUrl,
     dataType    : "json",

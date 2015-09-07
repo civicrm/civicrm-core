@@ -133,7 +133,19 @@
     </div>
     {/if}
 
-    {if $honor_block_is_active}
+
+    {if $onbehalfProfile|@count}
+      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
+         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+         <div class="crm-section organization_email-section">
+            <div class="label">{ts}Organization Email{/ts}</div>
+            <div class="content">{$onBehalfEmail}</div>
+            <div class="clear"></div>
+         </div>
+      </div>
+    {/if}
+
+    {if $honoreeProfileFields|@count}
         <div class="crm-group honor_block-group">
             <div class="header-dark">
                 {$soft_credit_type}
@@ -141,7 +153,7 @@
             <div class="display-block">
                 <div class="label-left crm-section honoree_profile-section">
                     <strong>{$honorName}</strong></br>
-                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
+                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
                 </div>
             </div>
          </div>
@@ -177,17 +189,6 @@
             <br />
         </div>
     </div>
-    {/if}
-
-    {if $onbehalfProfile}
-      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
-         <div class="crm-section organization_email-section">
-            <div class="label">{ts}Organization Email{/ts}</div>
-            <div class="content">{$onBehalfEmail}</div>
-            <div class="clear"></div>
-         </div>
-      </div>
     {/if}
 
     {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }

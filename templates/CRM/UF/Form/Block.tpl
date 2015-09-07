@@ -47,7 +47,7 @@
         <fieldset class="crm-profile crm-profile-id-{$field.group_id} crm-profile-name-{$field.groupName}"><legend>{$field.groupTitle}</legend>
         {/if}
 
-        {if ($form.formName eq 'Confirm' OR $form.formName eq 'ThankYou') AND $prefix neq 'honor' OR $prefix neq 'onbehalf'}
+        {if ($form.formName eq 'Confirm' OR $form.formName eq 'ThankYou') AND $prefix neq 'honor'}
           <div class="header-dark">{$field.groupTitle} </div>
         {/if}
         {assign var=fieldset  value=`$field.groupTitle`}
