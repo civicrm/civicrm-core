@@ -225,7 +225,7 @@
   </table>
 
 
-      {if $contribution_status_id == $refundedStatusId}
+      {if $contribution_status_id == $refundedStatusId || $contribution_status_id == $cancelledStatusId}
     <table style = "margin-top:2px;padding-left:7px;page-break-before: always;">
       <tr>
         <td><img src = "{$resourceBase}/i/civi99.png" height = "34px" width = "99px"></td>
