@@ -110,7 +110,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   protected $_details = array();
   /**
    * Set variables up before form is built based on participant ID from URL
-   * 
+   *
    * @return void
    */
   public function preProcess() {
@@ -187,7 +187,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   /**
    * buildQuickForm -populate input variables for source Event
    * to cancel or transfer to another person
-   * 
+   *
    * return @void
    */
   public function buildQuickForm() {
@@ -208,8 +208,8 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   }
   /**
    * Set default values for contact
-   * 
-   * return @void 
+   *
+   * return @void
    */
   public function setDefaultValues() {
     $this->_defaults = array();
@@ -221,7 +221,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   /**
    * Process submit form - based on user selection of action
    * transfer or cancel the event
-   * 
+   *
    * return @void
    */
   public function postProcess() {
@@ -241,7 +241,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   /**
    * Transfer to a new form, allowing selection of a new contact
    * based on email and name. The Event will be transferred to this new participant
-   * 
+   *
    * return @void
    */
   public function transferParticipant($params) {
@@ -254,7 +254,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   /**
    * Cancel this participant and finish, send cancellation email. At this point no
    * auto-cancellation of payment is handled, so payment needs to be manually cancelled
-   * 
+   *
    * return @void
    */
   public function cancelParticipant($params) {

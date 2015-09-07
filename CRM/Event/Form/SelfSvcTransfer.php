@@ -135,9 +135,9 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    */
   protected $contact_id;
   /**
-   * Get source values for transfer based on participant id in URL. Line items will 
+   * Get source values for transfer based on participant id in URL. Line items will
    * be transferred to this participant - at this point no transaction changes processed
-   * 
+   *
    * return @void
    */
   public function preProcess() {
@@ -189,7 +189,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   }
   /**
    * Build form for input of transferree email, name
-   * 
+   *
    * return @void
    */
   public function buildQuickForm() {
@@ -210,7 +210,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   }
   /**
    * Set defaults
-   * 
+   *
    * return @array _defaults
    */
   public function setDefaultValues() {
@@ -219,7 +219,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   }
   /**
    * Validate email and name input
-   * 
+   *
    * return array $errors
    */
   public static function formRule($fields, $files, $self) {
@@ -233,7 +233,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   }
   /**
    * Check whether profile (name, email) is complete
-   * 
+   *
    * return $contact_id
    */
   public static function checkProfileComplete($fields, &$errors, $self) {
@@ -266,7 +266,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   }
   /**
    * Check contact details
-   * 
+   *
    * return @void
    */
   public static function checkRegistration($fields, $self, $contact_id) {
@@ -350,11 +350,11 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', array(1 => $email));
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
- /**
-  * Based on input, create participant row for transferee and send email
-  * 
-  * return @ void
-  */
+  /**
+   * Based on input, create participant row for transferee and send email
+   *
+   * return @ void
+   */
   public function participantTransfer($participant) {
     $contactDetails = array();
     $contactIds[] = $participant->contact_id;
@@ -412,11 +412,11 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //now registered_id can be updated (mail won't be send if it is set
     return res;
   }
- /**
-  * Send confirmation of cancellation to source participant
-  * 
-  * return @ void
-  */
+   /**
+    * Send confirmation of cancellation to source participant
+    *
+    * return @ void
+   */
   public function sendCancellation() {
     $domainValues = array();
     $domain = CRM_Core_BAO_Domain::getDomain();
