@@ -65,8 +65,7 @@ class CRM_Core_BAO_ConfigSetting {
     $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
     if ($domain->config_backend) {
-      $values = unserialize($domain->config_backend);
-      self::formatParams($params, $values);
+      $params = array_merge(unserialize($domain->config_backend), $params);
     }
 
     // unset any of the variables we read from file that should not be stored in the database
@@ -136,30 +135,6 @@ class CRM_Core_BAO_ConfigSetting {
           $params[$key] = array_search($value, $countryIsoCodes);
         }
       }
-    }
-  }
-
-  /**
-   * Format the array containing before inserting in db.
-   *
-   * @param array $params
-   *   Associated array of civicrm variables(submitted).
-   * @param array $values
-   *   Associated array of civicrm variables stored in db.
-   */
-  public static function formatParams(&$params, &$values) {
-    if (empty($params) ||
-      !is_array($params)
-    ) {
-      $params = $values;
-    }
-    else {
-      foreach ($params as $key => $val) {
-        if (array_key_exists($key, $values)) {
-          unset($values[$key]);
-        }
-      }
-      $params = array_merge($params, $values);
     }
   }
 
