@@ -501,6 +501,16 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
+   * Function for same purpose as convertFormValues.
+   *
+   * Like convert form values this function exists to pre-Process parameters from the form.
+   *
+   * It is unclear why they are different functions & likely relates to advances search
+   * versus search builder.
+   *
+   * The direction we are going is having the form convert values to a standardised format &
+   * moving away from wierd & wonderful where clause switches.
+   *
    * Fix and handle contact deletion nicely.
    *
    * this code is primarily for search builder use case where different clauses can specify if they want deleted.
@@ -905,6 +915,8 @@ class CRM_Contact_BAO_Query {
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchQuery($this, 'select');
 
     if (!empty($this->_cfIDs)) {
+      // @todo This function is the select function but instead of running 'select' it
+      // is running the whole query.
       $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE, $this->_locationSpecificCustomFields);
       $this->_customQuery->query();
       $this->_select = array_merge($this->_select, $this->_customQuery->_select);
@@ -1426,7 +1438,26 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
-   * Convert form values to array for this object.
+   * Convert values from form-appropriate to query-object appropriate.
+   *
+   * The query object is increasingly supporting the sql-filter syntax which is the most flexible syntax.
+   * So, ideally we would convert all fields to look like
+   *  array(
+   *   0 => $fieldName
+   *   // Set the operator for legacy reasons, but it is ignored
+   *   1 =>  '='
+   *   // array in sql filter syntax
+   *   2 => array('BETWEEN' => array(1,60),
+   *   3 => null
+   *   4 => null
+   *  );
+   *
+   * There are some examples of the syntax in
+   * https://github.com/civicrm/civicrm-core/tree/master/api/v3/examples/Relationship
+   *
+   * More notes at CRM_Core_DAO::createSQLFilter
+   *
+   * and a list of supported operators in CRM_Core_DAO
    *
    * @param array $formValues
    * @param int $wildcard
@@ -1457,6 +1488,15 @@ class CRM_Contact_BAO_Query {
         if ($formValues['email_on_hold']['on_hold']) {
           $params[] = array('on_hold', '=', $formValues['email_on_hold']['on_hold'], 0, 0);
         }
+      }
+      elseif (substr($id, 0, 7) == 'custom_'
+          &&  (
+            substr($id, -9, 9) == '_relative'
+            || substr($id, -5, 5) == '_from'
+            || substr($id, -3, 3) == '_to'
+          )
+      ) {
+        self::convertCustomDateRelativeFields($formValues, $params, $values, $id);
       }
       elseif (preg_match('/_date_relative$/', $id) ||
         $id == 'event_relative' ||
@@ -4343,6 +4383,91 @@ civicrm_relationship.is_permission_a_b = 0
   }
 
   /**
+   * Get the actual custom field name by stripping off the appended string.
+   *
+   * The string could be _relative, _from, or _to
+   *
+   * @todo use metadata rather than convention to do this.
+   *
+   * @param string $parameterName
+   *   The name of the parameter submitted to the form.
+   *   e.g
+   *   custom_3_relative
+   *   custom_3_from
+   *
+   * @return string
+   */
+  public static function getCustomFieldName($parameterName) {
+    if (substr($parameterName, -5, 5) == '_from') {
+      return substr($parameterName, 0, strpos($parameterName, '_from'));
+    }
+    if (substr($parameterName, -9, 9) == '_relative') {
+      return substr($parameterName, 0, strpos($parameterName, '_relative'));
+    }
+    if (substr($parameterName, -3, 3) == '_to') {
+      return substr($parameterName, 0, strpos($parameterName, '_to'));
+    }
+  }
+
+  /**
+   * Convert submitted values for relative custom date fields to query object format.
+   *
+   * The query will support the sqlOperator format so convert to that format.
+   *
+   * @param array $formValues
+   *   Submitted values.
+   * @param array $params
+   *   Converted parameters for the query object.
+   * @param string $values
+   *   Submitted value.
+   * @param string $fieldName
+   *   Submitted field name. (Matches form field not DB field.)
+   */
+  protected static function convertCustomDateRelativeFields(&$formValues, &$params, $values, $fieldName) {
+    if (empty($values)) {
+      // e.g we might have relative set & from & to empty. The form flow is a bit funky &
+      // this function gets called again after they fields have been converted which can get ugly.
+      return;
+    }
+    $customFieldName = self::getCustomFieldName($fieldName);
+
+    if (substr($fieldName, -9, 9) == '_relative') {
+      list($from, $to) = CRM_Utils_Date::getFromTo($values, NULL, NULL);
+    }
+    else {
+      if ($fieldName == $customFieldName . '_to' && CRM_Utils_Array::value($customFieldName . '_from', $formValues)) {
+        // Both to & from are set. We only need to acton one, choosing from.
+        return;
+      }
+
+      list($from, $to) = CRM_Utils_Date::getFromTo(
+        NULL,
+        (empty($formValues[$customFieldName . '_from']) ? NULL : $formValues[$customFieldName . '_from']),
+        CRM_Utils_Array::value($customFieldName . '_to', $formValues)
+      );
+    }
+
+    if ($from) {
+      if ($to) {
+        $relativeFunction = array('BETWEEN' => array($from, $to));
+      }
+      else {
+        $relativeFunction = array('>=' => $from);
+      }
+    }
+    else {
+      $relativeFunction = array('<=' => $to);
+    }
+    $params[] = array(
+      $customFieldName,
+      '=',
+      $relativeFunction,
+      0,
+      0,
+    );
+  }
+
+  /**
    * Create and query the db for an contact search.
    *
    * @param int $offset
@@ -5696,34 +5821,43 @@ AND   displayRelType.is_active = 1
    *
    * Qill refers to the query detail visible on the UI.
    *
-   * @param $daoName
-   * @param $fieldName
-   * @param $fieldValue
-   * @param $op
-   * @param array $pseduoExtraParam
+   * @param string $daoName
+   * @param string $fieldName
+   * @param mixed $fieldValue
+   * @param string $op
+   * @param array $pseudoExtraParam
+   * @param int $type
+   *   Type of the field per CRM_Utils_Type
    *
    * @return array
    */
-  public static function buildQillForFieldValue($daoName = NULL, $fieldName, $fieldValue, $op, $pseduoExtraParam = array()) {
+  public static function buildQillForFieldValue(
+    $daoName,
+    $fieldName,
+    $fieldValue,
+    $op,
+    $pseudoExtraParam = array(),
+    $type = CRM_Utils_Type::T_STRING
+  ) {
     $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();
 
     if ($fieldName == 'activity_type_id') {
-      $pseduoOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+      $pseudoOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     }
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
-      $pseduoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
+      $pseudoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, TRUE, TRUE);
     }
     elseif ($fieldName == 'contribution_product_id') {
-      $pseduoOptions = CRM_Contribute_PseudoConstant::products();
+      $pseudoOptions = CRM_Contribute_PseudoConstant::products();
     }
     elseif ($daoName == 'CRM_Contact_DAO_Group' && $fieldName == 'id') {
-      $pseduoOptions = CRM_Core_PseudoConstant::group();
+      $pseudoOptions = CRM_Core_PseudoConstant::group();
     }
     elseif ($fieldName == 'country_id') {
-      $pseduoOptions = CRM_Core_PseudoConstant::country();
+      $pseudoOptions = CRM_Core_PseudoConstant::country();
     }
     elseif ($daoName) {
-      $pseduoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseduoExtraParam = array());
+      $pseudoOptions = CRM_Core_PseudoConstant::get($daoName, $fieldName, $pseudoExtraParam);
     }
 
     //API usually have fieldValue format as array(operator => array(values)),
@@ -5735,18 +5869,33 @@ AND   displayRelType.is_active = 1
 
     if (is_array($fieldValue)) {
       $qillString = array();
-      if (!empty($pseduoOptions)) {
+      if (!empty($pseudoOptions)) {
         foreach ((array) $fieldValue as $val) {
-          $qillString[] = CRM_Utils_Array::value($val, $pseduoOptions, $val);
+          $qillString[] = CRM_Utils_Array::value($val, $pseudoOptions, $val);
         }
         $fieldValue = implode(', ', $qillString);
       }
       else {
-        $fieldValue = implode(', ', $fieldValue);
+        if ($type == CRM_Utils_Type::T_DATE) {
+          foreach ($fieldValue as $index => $value) {
+            $fieldValue[$index] = CRM_Utils_Date::customFormat($value);
+          }
+        }
+        $separator = ', ';
+        // @todo - this is a bit specific (one operator).
+        // However it is covered by a unit test so can be altered later with
+        // some confidence.
+        if ($op == 'BETWEEN') {
+          $separator = ' AND ';
+        }
+        $fieldValue = implode($separator, $fieldValue);
       }
     }
-    elseif (!empty($pseduoOptions) && array_key_exists($fieldValue, $pseduoOptions)) {
-      $fieldValue = $pseduoOptions[$fieldValue];
+    elseif (!empty($pseudoOptions) && array_key_exists($fieldValue, $pseudoOptions)) {
+      $fieldValue = $pseudoOptions[$fieldValue];
+    }
+    elseif ($type === CRM_Utils_Type::T_DATE) {
+      $fieldValue = CRM_Utils_Date::customFormat($fieldValue);
     }
 
     return array(CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue);

@@ -464,6 +464,14 @@ SELECT label, value
             break;
 
           case 'Date':
+            if (in_array($op, CRM_Core_DAO::acceptedSQLOperators())) {
+              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+              list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value,
+                $op, array(), CRM_Utils_Type::T_DATE);
+              $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
+              break;
+            }
+
             $fromValue = CRM_Utils_Array::value('from', $value);
             $toValue = CRM_Utils_Array::value('to', $value);
             $value = CRM_Utils_Array::value($op, $value, $value);
