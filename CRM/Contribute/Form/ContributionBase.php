@@ -819,7 +819,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
           if (count($employer)) {
             // Related org url - pass checksum if needed
-            $args = array('ufId' => $form->_onBehalfProfileId, 'cid' => '',);
+            $args = array(
+              'ufId' => $form->_onBehalfProfileId,
+              'cid' => '',
+            );
             if (!empty($_GET['cs'])) {
               $args = array(
                 'ufId' => $form->_onBehalfProfileId,
