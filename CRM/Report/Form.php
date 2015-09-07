@@ -4186,26 +4186,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   public function alterDisplayContactFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText) {
     $entryFound = FALSE;
-    if (array_key_exists('civicrm_contact_prefix_id', $row)) {
-      $prefixes = CRM_Contact_BAO_Contact::buildOptions('prefix_id');
-      if ($value = $row['civicrm_contact_prefix_id']) {
-        $rows[$rowNum]['civicrm_contact_prefix_id'] = $prefixes[$rows[$rowNum]['civicrm_contact_prefix_id']];
+    foreach (array('prefix_id', 'suffix_id', 'gender_id') as $fieldName) {
+      if (array_key_exists('civicrm_contact_' . $fieldName, $row)) {
+        if (($value = $row['civicrm_contact_' . $fieldName]) != FALSE) {
+          $rows[$rowNum]['civicrm_contact_' . $fieldName] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $value);
+        }
+        $entryFound = TRUE;
       }
-      $entryFound = TRUE;
-    }
-    if (array_key_exists('civicrm_contact_suffix_id', $row)) {
-      $suffixes = CRM_Contact_BAO_Contact::buildOptions('suffix_id');
-      if ($value = $row['civicrm_contact_suffix_id']) {
-        $rows[$rowNum]['civicrm_contact_suffix_id'] = $suffixes[$rows[$rowNum]['civicrm_contact_suffix_id']];
-      }
-      $entryFound = TRUE;
-    }
-    if (array_key_exists('civicrm_contact_gender_id', $row)) {
-      if (($value = $row['civicrm_contact_gender_id']) != FALSE) {
-        $rows[$rowNum]['civicrm_contact_gender_id'] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'gender_id', $rows[$rowNum]['civicrm_contact_gender_id']);
-        $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, 'gender_id', 'civicrm_contact', 'Gender');
-      }
-      $entryFound = TRUE;
     }
     return $entryFound;
   }
