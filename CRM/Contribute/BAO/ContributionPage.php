@@ -786,16 +786,16 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
 
     $moduleDataFormat = array(
       'soft_credit' => array(
-        'soft_credit_types',
+        1 => 'soft_credit_types',
         'multilingual' => array(
           'honor_block_title',
           'honor_block_text',
         ),
       ),
       'on_behalf' => array(
-        'is_for_organization',
+        1 => 'is_for_organization',
         'multilingual' => array(
-          'for_organization'
+          'for_organization',
         ),
       ),
     );
