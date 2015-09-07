@@ -655,7 +655,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       $this->assign('credit_card_number',
         CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
       );
-      $this->assign('credit_card_type', $this->_params['credit_card_type']);
+      $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
   }
