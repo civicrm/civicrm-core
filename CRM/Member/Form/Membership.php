@@ -1832,14 +1832,22 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     //CRM-15187
     // display message when membership type is changed
     if (($this->_action & CRM_Core_Action::UPDATE) && $this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
-      CRM_Core_Session::setStatus(
-        ts('The financial types associated with the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its financial type.'),
-        ts('Warning')
-      );
-      CRM_Core_Session::setStatus(
-        ts('The cost of the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its amount.'),
-        ts('Warning')
-      );
+      $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'membership');
+      $maxID = max(array_keys($lineItem));
+      $lineItem = $lineItem[$maxID];
+      $membershipTypeDetails = $this->allMembershipTypeDetails[$membership->membership_type_id];
+      if ($membershipTypeDetails['financial_type_id'] != $lineItem['financial_type_id']) {
+        CRM_Core_Session::setStatus(
+          ts('The financial types associated with the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its financial type.'),
+          ts('Warning')
+        );
+      }
+      if ($membershipTypeDetails['minimum_fee'] != $lineItem['line_total']) {
+        CRM_Core_Session::setStatus(
+          ts('The cost of the old and new membership types are different. You may want to edit the contribution associated with this membership to adjust its amount.'),
+          ts('Warning')
+        );
+      }
     }
   }
 
