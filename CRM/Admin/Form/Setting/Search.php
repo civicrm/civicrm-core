@@ -40,6 +40,13 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
   protected $_settings = array(
     'search_autocomplete_count' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'enable_innodb_fts' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeWildCardInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeEmailInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeNickNameInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeAlphabeticalPager' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeOrderByClause' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'smartGroupCacheTimeout' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'defaultSearchProfileID' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
   );
 
   /**
@@ -49,23 +56,6 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     CRM_Utils_System::setTitle(ts('Settings - Search Preferences'));
 
     // @todo remove the following adds in favour of setting via the settings array (above).
-    $this->addYesNo('includeWildCardInName', ts('Automatic Wildcard'));
-    $this->addYesNo('includeEmailInName', ts('Include Email'));
-    $this->addYesNo('includeNickNameInName', ts('Include Nickname'));
-
-    $this->addYesNo('includeAlphabeticalPager', ts('Include Alphabetical Pager'));
-    $this->addYesNo('includeOrderByClause', ts('Include Order By Clause'));
-
-    $this->addElement('text', 'smartGroupCacheTimeout', ts('Smart group cache timeout'),
-      array('size' => 3, 'maxlength' => 5)
-    );
-
-    $types = array('Contact', 'Individual', 'Organization', 'Household');
-    $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
-
-    $this->add('select', 'defaultSearchProfileID', ts('Default Contact Search Profile'),
-      array('' => ts('- none -')) + $profiles, FALSE, array('class' => 'crm-select2 huge')
-    );
 
     // Autocomplete for Contact Search (quick search etc.)
     $options = array(
@@ -92,6 +82,18 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     $element->_elements[0]->_flagFrozen = TRUE;
 
     parent::buildQuickForm();
+  }
+
+  /**
+   * @return array
+   */
+  public static function getAvailableProfiles() {
+    return array('' => ts('- none -')) + CRM_Core_BAO_UFGroup::getProfiles(array(
+      'Contact',
+      'Individual',
+      'Organization',
+      'Household',
+    ));
   }
 
 }
