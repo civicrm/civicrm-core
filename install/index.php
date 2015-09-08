@@ -410,7 +410,7 @@ class InstallRequirements {
       $onlyRequire = ($dbName == 'Drupal') ? TRUE : FALSE;
       $this->requireValidDBName(
         $databaseConfig['database'],
-        array(     
+        array(
           ts("MySQL %1 Configuration", array(1 => $dbName)),
           ts("Is the provided database name valid?"),
           ts("The database name provided is not valid. Please use only 0-9, a-z, A-Z and _ as characters in the name."),
