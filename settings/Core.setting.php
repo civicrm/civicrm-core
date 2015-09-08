@@ -434,8 +434,6 @@ return array(
     'name' => 'wkhtmltopdfPath',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -451,14 +449,33 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
+  'recaptchaOptions' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'recaptchaOptions',
+    'prefetch' => 1,
+    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
+    'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_attributes' => array(
+      'size' => 64,
+      'maxlength' => 64,
+    ),
+    'html_type' => 'Text',
+    'default' => NULL,
+    'add' => '4.3',
+    'title' => 'Recaptcha Options',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:\'blackglass\', lang : \'fr\' ). Check the available options at <a href="https://developers.google.com/recaptcha/docs/display#config">Customizing the Look and Feel of reCAPTCHA</a>.',
+    'help_text' => NULL,
+  ),
   'recaptchaPublicKey' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPublicKey',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -480,8 +497,6 @@ return array(
     'name' => 'recaptchaPrivateKey',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -503,8 +518,6 @@ return array(
     'name' => 'dashboardCacheTimeout',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
