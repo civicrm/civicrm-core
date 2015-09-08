@@ -252,17 +252,12 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addRadio('privacy_toggle', ts('Privacy Options'), $options, array('allowClear' => FALSE));
 
     // preferred communication method
-    $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
-
-    $commPreff = array();
-    foreach ($comm as $k => $v) {
-      $commPreff[] = $form->createElement('advcheckbox', $k, NULL, $v);
-    }
 
     $onHold[] = $form->createElement('advcheckbox', 'on_hold', NULL, '');
     $form->addGroup($onHold, 'email_on_hold', ts('Email On Hold'));
 
-    $form->addGroup($commPreff, 'preferred_communication_method', ts('Preferred Communication Method'));
+    $form->addSelect('preferred_communication_method',
+      array('entity' => 'contact', 'multiple' => 'multiple', 'label' => ts('Preferred Communication Method'), 'option_url' => NULL, 'placeholder' => ts('- any -')));
 
     //CRM-6138 Preferred Language
     $form->addSelect('preferred_language', array('class' => 'twenty', 'context' => 'search'));
