@@ -633,7 +633,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // for CRM-3157 purposes
     if (in_array('world_region', $names)) {
       $pseudoconstants['world_region'] = array(
-        'dbName' => 'world_region_id',
+        'dbName' => 'worldregion_id',
         'values' => CRM_Core_PseudoConstant::worldRegion(),
       );
     }
