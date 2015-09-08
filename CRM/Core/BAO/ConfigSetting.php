@@ -66,13 +66,7 @@ class CRM_Core_BAO_ConfigSetting {
       $params = array_merge(unserialize($domain->config_backend), $params);
     }
 
-    // unset any of the variables we read from file that should not be stored in the database
-    // the username and certpath are stored flat with _test and _live
-    // check CRM-1470
-    $skipVars = self::skipVars();
-    foreach ($skipVars as $var) {
-      unset($params[$var]);
-    }
+    $params = CRM_Core_BAO_ConfigSetting::filterSkipVars($params);
 
     // also skip all Dir Params, we dont need to store those in the DB!
     foreach ($params as $name => $val) {
@@ -626,6 +620,7 @@ WHERE  option_group_id = (
       'qfKey',
       'gettextResourceDir',
       'cleanURL',
+      'entryURL',
       'locale_custom_strings',
       'localeCustomStrings',
       'autocompleteContactSearch',
@@ -633,6 +628,23 @@ WHERE  option_group_id = (
       'checksumTimeout',
       'checksum_timeout',
     );
+  }
+
+  /**
+   * @param array $params
+   * @return array
+   */
+  public static function filterSkipVars($params) {
+    $skipVars = self::skipVars();
+    foreach ($skipVars as $var) {
+      unset($params[$var]);
+    }
+    foreach (array_keys($params) as $key) {
+      if (preg_match('/^_qf_/', $key)) {
+        unset($params[$key]);
+      }
+    }
+    return $params;
   }
 
 }

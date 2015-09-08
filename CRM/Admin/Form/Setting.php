@@ -267,7 +267,11 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       CRM_Core_Session::setStatus($result['error_message'], ts('Save Failed'), 'error');
     }
 
-    CRM_Core_BAO_ConfigSetting::create($params);
+    //CRM_Core_BAO_ConfigSetting::create($params);
+    $params = CRM_Core_BAO_ConfigSetting::filterSkipVars($params);
+    if (!empty($params)) {
+      CRM_Core_Error::fatal('Unrecognized setting. This may be a config field which has not been properly migrated to a setting. (' . implode(', ', array_keys($params)) . ')');
+    }
 
     CRM_Core_Config::clearDBCache();
     CRM_Utils_System::flushCache();
