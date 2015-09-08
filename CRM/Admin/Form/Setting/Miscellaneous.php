@@ -39,6 +39,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
   protected $_settings = array(
     'max_attachments' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_undelete' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'dashboardCacheTimeout' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionAlert' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'securityUpdateAlert' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'versionCheck' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -49,6 +50,10 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'doNotAttachPDFReceipt' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'secondDegRelPermissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'checksum_timeout' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'recaptchaOptions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'recaptchaPublicKey' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'recaptchaPrivateKey' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'wkhtmltopdfPath' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   public $_uploadMaxSize;
@@ -71,35 +76,11 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
     $this->assign('validTriggerPermission', CRM_Core_DAO::checkTriggerViewPermission(FALSE));
 
-    $this->addElement(
-      'text',
-      'wkhtmltopdfPath', ts('Path to wkhtmltopdf executable'),
-      array('size' => 64, 'maxlength' => 256)
-    );
-
-    $this->addElement(
-      'text', 'recaptchaPublicKey', ts('Public Key'),
-      array('size' => 64, 'maxlength' => 64)
-    );
-    $this->addElement(
-      'text', 'recaptchaPrivateKey', ts('Private Key'),
-      array('size' => 64, 'maxlength' => 64)
-    );
-
-    $this->addElement(
-      'text', 'dashboardCacheTimeout', ts('Dashboard cache timeout'),
-      array('size' => 3, 'maxlength' => 5)
-    );
-
-    $this->addElement(
-      'text', 'recaptchaOptions', ts('Recaptcha Options'),
-      array('size' => 64, 'maxlength' => 64)
-    );
-
     $this->addFormRule(array('CRM_Admin_Form_Setting_Miscellaneous', 'formRule'), $this);
 
     parent::buildQuickForm();
     $this->addRule('checksum_timeout', ts('Value should be a positive number'), 'positiveInteger');
+    $this->addRule('dashboardCacheTimeout', ts('Value should be a positive number'), 'positiveInteger');
   }
 
   /**
