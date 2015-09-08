@@ -267,12 +267,12 @@ return array(
     'name' => 'dateformatDatetime',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
     'default' => '%B %E%f, %Y %l:%M %P',
     'add' => '4.3',
-    'title' => 'Complete Date and Time',
+    'title' => 'Date Format: Complete Date and Time',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
@@ -284,12 +284,12 @@ return array(
     'name' => 'dateformatFull',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
     'default' => '%B %E%f, %Y',
     'add' => '4.3',
-    'title' => 'Complete Date',
+    'title' => 'Date Format: Complete Date',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
@@ -301,12 +301,12 @@ return array(
     'name' => 'dateformatPartial',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
     'default' => '%B %Y',
     'add' => '4.3',
-    'title' => 'Month and Year',
+    'title' => 'Date Format: Month and Year',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
@@ -315,7 +315,6 @@ return array(
   'dateformatTime' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -336,7 +335,6 @@ return array(
   'dateformatYear' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
