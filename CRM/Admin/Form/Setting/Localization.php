@@ -62,15 +62,15 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     CRM_Utils_System::setTitle(ts('Settings - Localization'));
 
     $warningTitle = json_encode(ts("Warning"));
-    $lcMessages = CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions();
+    $defaultLocaleOptions = CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions();
 
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
 
     if ($domain->locales) {
       // add language limiter and language adder
-      $this->addCheckBox('languageLimit', ts('Available Languages'), array_flip($lcMessages), NULL, NULL, NULL, NULL, ' &nbsp; ');
-      $this->addElement('select', 'addLanguage', ts('Add Language'), array_merge(array('' => ts('- select -')), array_diff(CRM_Core_I18n::languages(), $lcMessages)));
+      $this->addCheckBox('languageLimit', ts('Available Languages'), array_flip($defaultLocaleOptions), NULL, NULL, NULL, NULL, ' &nbsp; ');
+      $this->addElement('select', 'addLanguage', ts('Add Language'), array_merge(array('' => ts('- select -')), array_diff(CRM_Core_I18n::languages(), $defaultLocaleOptions)));
 
       // add the ability to return to single language
       $warning = ts('This will make your CiviCRM installation a single-language one again. THIS WILL DELETE ALL DATA RELATED TO LANGUAGES OTHER THAN THE DEFAULT ONE SELECTED ABOVE (and only that language will be preserved).');
@@ -167,6 +167,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // retrieve default values for currencyLimit
     $this->_defaults['currencyLimit'] = array_keys(CRM_Core_OptionGroup::values('currencies_enabled'));
 
+    $this->_defaults['languageLimit'] = Civi::settings()->get('languageLimit');
+
     // CRM-5111: unset these two unconditionally, we don’t want them to stick – ever
     unset($this->_defaults['makeMultilingual']);
     unset($this->_defaults['makeSinglelingual']);
@@ -248,8 +250,16 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // if we manipulated the language list, return to the localization admin screen
     $return = (bool) (CRM_Utils_Array::value('makeMultilingual', $values) or CRM_Utils_Array::value('addLanguage', $values));
 
+    $filteredValues = $values;
+    unset($filteredValues['makeMultilingual']);
+    unset($filteredValues['makeSinglelingual']);
+    unset($filteredValues['addLanguage']);
+    unset($filteredValues['languageLimit']);
+
+    Civi::settings()->set('languageLimit', CRM_Utils_Array::value('languageLimit', $values));
+
     // save all the settings
-    parent::commonProcess($values);
+    parent::commonProcess($filteredValues);
 
     if ($return) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/setting/localization', 'reset=1'));
@@ -277,17 +287,17 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $locales = CRM_Core_I18n::languages();
     if ($domain->locales) {
       // for multi-lingual sites, populate default language drop-down with available languages
-      $lcMessages = array();
+      $defaultLocaleOptions = array();
       foreach ($locales as $loc => $lang) {
         if (substr_count($domain->locales, $loc)) {
-          $lcMessages[$loc] = $lang;
+          $defaultLocaleOptions[$loc] = $lang;
         }
       }
     }
     else {
-      $lcMessages = $locales;
+      $defaultLocaleOptions = $locales;
     }
-    return $lcMessages;
+    return $defaultLocaleOptions;
   }
 
   /**
@@ -309,6 +319,23 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       }
     }
     return $_currencySymbols;
+  }
+
+  public static function onChangeLcMessages($oldLocale, $newLocale, $metadata, $domainID) {
+    if ($oldLocale == $newLocale) {
+      return;
+    }
+
+    $session = CRM_Core_Session::singleton();
+    if ($newLocale && $session->get('userID')) {
+      $ufm = new CRM_Core_DAO_UFMatch();
+      $ufm->contact_id = $session->get('userID');
+      if ($newLocale && $ufm->find(TRUE)) {
+        $ufm->language = $newLocale;
+        $ufm->save();
+        $session->set('lcMessages', $newLocale);
+      }
+    }
   }
 
 }

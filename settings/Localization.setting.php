@@ -210,7 +210,7 @@ return array(
       'multiple' => 1,
       'class' => 'crm-select2',
     ),
-    'default' => 'null',
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Available Countries',
     'is_domain' => 1,
@@ -234,7 +234,7 @@ return array(
       'multiple' => 1,
       'class' => 'crm-select2',
     ),
-    'default' => 'null',
+    'default' => NULL,
     'add' => '4.3',
     'title' => 'Available States and Provinces',
     'is_domain' => 1,
@@ -407,14 +407,34 @@ return array(
     'title' => 'Fiscal Year Start',
     'description' => '',
   ),
+  'languageLimit' => array(
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'languageLimit',
+    'type' => 'Array',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'multiple' => 1,
+      'class' => 'crm-select2',
+    ),
+    'default' => NULL,
+    'add' => '4.3',
+    'title' => 'Available Languages (Multi-lingual)',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => '',
+    'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Core_I18n::languages',
+    ),
+  ),
   'lcMessages' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
     'name' => 'lcMessages',
     'prefetch' => 1,
     // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    //'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
@@ -430,6 +450,9 @@ return array(
     'help_text' => NULL,
     'pseudoconstant' => array(
       'callback' => 'CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions',
+    ),
+    'on_change' => array(
+      'CRM_Admin_Form_Setting_Localization::onChangeLcMessages',
     ),
   ),
   'legacyEncoding' => array(
