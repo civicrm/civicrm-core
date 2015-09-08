@@ -4186,10 +4186,16 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   public function alterDisplayContactFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText) {
     $entryFound = FALSE;
+    // There is no reason not to add links for all fields but it seems a bit odd to be able to click on
+    // 'Mrs'. Also, we don't have metadata about the title. So, add selectively to addLinks.
+    $addLinks = array('gender_id' => 'Gender');
     foreach (array('prefix_id', 'suffix_id', 'gender_id') as $fieldName) {
       if (array_key_exists('civicrm_contact_' . $fieldName, $row)) {
         if (($value = $row['civicrm_contact_' . $fieldName]) != FALSE) {
           $rows[$rowNum]['civicrm_contact_' . $fieldName] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $value);
+          if (($title = CRM_Utils_Array::value($fieldName, $addLinks)) != FALSE) {
+            $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, $fieldName, 'civicrm_contact', $title);
+          }
         }
         $entryFound = TRUE;
       }
