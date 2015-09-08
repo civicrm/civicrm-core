@@ -5483,10 +5483,11 @@ AND   displayRelType.is_active = 1
    *
    * @param CRM_Core_DAO $dao
    * @param bool $return
+   * @param bool $usedForAPI
    *
    * @return array|NULL
    */
-  public function convertToPseudoNames(&$dao, $return = FALSE) {
+  public function convertToPseudoNames(&$dao, $return = FALSE, $usedForAPI = FALSE) {
     if (empty($this->_pseudoConstantsSelect)) {
       return NULL;
     }
@@ -5519,13 +5520,16 @@ AND   displayRelType.is_active = 1
         }
         // FIX ME: we should potentially move this to component Query and write a wrapper function that
         // handles pseudoconstant fixes for all component
-        elseif (in_array($value['pseudoField'], array('participant_status', 'participant_role'))) {
-          $pseudoOptions = $viewValues = array();
-          $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', $value['pseudoField'], array('flip' => 1));
-          foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $val) as $k => $v) {
-            $viewValues[] = $pseudoOptions[$v];
+        elseif (in_array($value['pseudoField'], array('participant_role_id', 'participant_role'))) {
+          $viewValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $val);
+
+          if ($value['pseudoField'] == 'participant_role') {
+            $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'role_id');
+            foreach ($viewValues as $k => $v) {
+              $viewValues[$k] = $pseudoOptions[$v];
+            }
           }
-          $dao->$key = implode(', ', $viewValues);
+          $dao->$key = ($usedForAPI && count($viewValues) > 1) ? $viewValues : implode(', ', $viewValues);
         }
         else {
           $labels = CRM_Core_OptionGroup::values($value['pseudoField']);
