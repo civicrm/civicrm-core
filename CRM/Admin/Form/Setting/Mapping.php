@@ -36,19 +36,18 @@
  */
 class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
 
+  protected $_settings = array(
+    'mapAPIKey' => CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME,
+    'mapProvider' => CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME,
+    'geoAPIKey' => CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME,
+    'geoProvider' => CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME,
+  );
+
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Mapping and Geocoding Providers'));
-
-    $map = CRM_Core_SelectValues::mapProvider();
-    $geo = CRM_Core_SelectValues::geoProvider();
-    $this->addElement('select', 'mapProvider', ts('Mapping Provider'), array('' => '- select -') + $map, array('class' => 'crm-select2'));
-    $this->add('text', 'mapAPIKey', ts('Map Provider Key'), NULL);
-    $this->addElement('select', 'geoProvider', ts('Geocoding Provider'), array('' => '- select -') + $geo, array('class' => 'crm-select2'));
-    $this->add('text', 'geoAPIKey', ts('Geo Provider Key'), NULL);
-
     parent::buildQuickForm();
   }
 

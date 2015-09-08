@@ -37,7 +37,6 @@ return array(
   'geoAPIKey' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -58,7 +57,6 @@ return array(
   'geoProvider' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -66,8 +64,11 @@ return array(
     'group' => 'map',
     'name' => 'geoProvider',
     'type' => 'String',
-    'quick_form_type' => 'Element',
+    'quick_form_type' => 'Select',
     'html_type' => 'Select',
+    'html_attributes' => array(
+      'class' => 'crm-select2',
+    ),
     'pseudoconstant' => array(
       'callback' => 'CRM_Core_SelectValues::geoProvider',
     ),
@@ -78,7 +79,6 @@ return array(
   'mapAPIKey' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -99,7 +99,6 @@ return array(
   'mapProvider' => array(
     'add' => '4.7',
     'prefetch' => 1,
-    'config_only' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -107,8 +106,11 @@ return array(
     'group' => 'map',
     'name' => 'mapProvider',
     'type' => 'String',
-    'quick_form_type' => 'Element',
-    'html_type' => 'Select ',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'class' => 'crm-select2',
+    ),
     'pseudoconstant' => array(
       'callback' => 'CRM_Core_SelectValues::mapProvider',
     ),

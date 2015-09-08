@@ -50,6 +50,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     DIRECTORY_PREFERENCES_NAME = 'Directory Preferences',
     EVENT_PREFERENCES_NAME = 'Event Preferences',
     MAILING_PREFERENCES_NAME = 'Mailing Preferences',
+    MAP_PREFERENCES_NAME = 'Map Preferences',
     CONTRIBUTE_PREFERENCES_NAME = 'Contribute Preferences',
     MEMBER_PREFERENCES_NAME = 'Member Preferences',
     MULTISITE_PREFERENCES_NAME = 'Multi Site Preferences',
