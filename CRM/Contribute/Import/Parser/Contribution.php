@@ -260,7 +260,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     }
 
     $params = &$this->getActiveFieldParams();
-    $params['contact_type'] = 'Contribution';
     $formatted = array('version' => 3);
 
     // don't add to recent items, CRM-4399
@@ -270,7 +269,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
 
-    $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
+    $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Contribution';
+    $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
 
     //CRM-10994
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
