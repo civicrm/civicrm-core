@@ -165,7 +165,7 @@ class SettingsBag {
    */
   public function getPath($key) {
     if (!isset($this->filteredValues[$key])) {
-      $this->filteredValues[$key] = \CRM_Utils_File::absoluteDirectory($this->get($key));
+      $this->filteredValues[$key] = $this->filterPath($this->get($key));
     }
     return $this->filteredValues[$key];
   }
@@ -350,11 +350,22 @@ class SettingsBag {
     if ($value) {
       if ($ssl || ($ssl === NULL && \CRM_Utils_System::isSSL())) {
         $value = str_replace('http://', 'https://', $value);
-        return $value;
       }
-      return $value;
     }
     return $value;
+  }
+
+  /**
+   * @param string $value
+   * @return bool|string
+   */
+  public function filterPath($value) {
+    if ($value) {
+      return \CRM_Utils_File::absoluteDirectory($value);
+    }
+    else {
+      return FALSE;
+    }
   }
 
 }

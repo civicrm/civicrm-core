@@ -296,7 +296,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     $this->extensionsDir = CRM_Core_Config_Defaults::getExtensionsDir();
     $this->imageUploadDir = CRM_Core_Config_Defaults::getImageUploadDir();
     $this->resourceBase = CRM_Core_Config_Defaults::getResourceBase();
-    $this->uploadDir = CRM_Core_Config_Defaults::getImageUploadDir();
+    $this->uploadDir = CRM_Core_Config_Defaults::getUploadDir();
 
     $this->userFrameworkResourceURL = CRM_Core_Config_Defaults::getUserFrameworkResourceUrl();
     $this->customCSSURL = CRM_Core_Config_Defaults::getCustomCssUrl();
