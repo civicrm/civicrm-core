@@ -159,6 +159,12 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     // Process / save phones
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['phone']['isIdSet'] = TRUE;
+    foreach ($this->_phones as $count => $value) {
+      if (!empty($value['id']) && isset($params['phone'][$count])) {
+        $params['phone'][$count]['id'] = $value['id'];
+      }
+    }
     CRM_Core_BAO_Block::create('phone', $params);
 
     $this->log();

@@ -364,6 +364,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     foreach ($blocks as $name => $value) {
       $contact->$name = $value;
     }
+    if (!empty($params['updateBlankLocInfo'])) {
+      $skipDelete = TRUE;
+    }
 
     //add website
     CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
@@ -1861,6 +1864,14 @@ ORDER BY civicrm_email.is_primary DESC";
     // add ufGroupID to params array ( CRM-2012 )
     if ($ufGroupId) {
       $params['uf_group_id'] = $ufGroupId;
+    }
+
+    // If a user has logged in, or accessed via a checksum
+    // Then deliberately 'blanking' a value in the profile should remove it from their record
+    $session = CRM_Core_Session::singleton();
+    $params['updateBlankLocInfo'] = TRUE;
+    if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
+      $params['updateBlankLocInfo'] = FALSE;
     }
 
     if ($contactID) {

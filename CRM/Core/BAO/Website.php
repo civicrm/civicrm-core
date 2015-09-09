@@ -75,35 +75,20 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
     $ids = self::allWebsites($contactID);
     foreach ($params as $key => $values) {
-      $websiteId = CRM_Utils_Array::value('id', $values);
-      if ($websiteId) {
-        if (array_key_exists($websiteId, $ids)) {
-          unset($ids[$websiteId]);
-        }
-        else {
-          unset($values['id']);
-        }
-      }
-
-      if (empty($values['id']) &&
-        is_array($ids) && !empty($ids)
-      ) {
+      if (empty($values['id']) && is_array($ids) && !empty($ids)) {
         foreach ($ids as $id => $value) {
-          if (($value['website_type_id'] == $values['website_type_id']) && !empty($values['url'])) {
+          if (($value['website_type_id'] == $values['website_type_id'])) {
             $values['id'] = $id;
-            unset($ids[$id]);
-            break;
           }
         }
       }
-      $values['contact_id'] = $contactID;
       if (!empty($values['url'])) {
+        $values['contact_id'] = $contactID;
         self::add($values);
       }
-    }
-
-    if ($skipDelete && !empty($ids)) {
-      self::del(array_keys($ids));
+      elseif ($skipDelete && !empty($values['id'])) {
+        self::del(array($values['id']));
+      }
     }
   }
 
