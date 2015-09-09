@@ -3644,6 +3644,9 @@ div.m ul#civicrm-menu,
   border: 0 none;
   font-size: 11px;
 }
+.crm-container div.ui-notify-message table {
+  margin: 10px 0;
+}
 .crm-container div.ui-notify-message td {
   background: rgba(255,255,255,0.1);
   border: 1px solid #111;
@@ -3654,6 +3657,9 @@ div.m ul#civicrm-menu,
   border: 1px solid #111;
   color: #eee;
   font-size: 11px;
+}
+.crm-container div.ui-notify-message table a.action-item {
+  margin-right: 5px;
 }
 .crm-container div.ui-notify-message ul,
 .crm-container div.ui-notify-message ol {
