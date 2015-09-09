@@ -194,14 +194,12 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
           'receive_date1' => array(
             'title' => ts('Initial Date Range'),
             'default' => 'previous.year',
-            'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
             'name' => 'receive_date',
           ),
           'receive_date2' => array(
             'title' => ts('Second Date Range'),
             'default' => 'this.year',
-            'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
             'name' => 'receive_date',
           ),
