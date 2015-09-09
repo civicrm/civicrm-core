@@ -4130,7 +4130,7 @@ WHERE con.id = {$contributionId}
         $values['receipt_from_email'] = $domainValues[1];
       }
 
-      if (empty($values['receive_date']) && $changeDate) {
+      if (empty($contributionParams['receive_date']) && $changeDate) {
         $contributionParams['receive_date'] = $changeDate;
       }
 
