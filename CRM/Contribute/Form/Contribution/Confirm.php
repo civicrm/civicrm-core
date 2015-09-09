@@ -228,7 +228,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->assign('pay_later_receipt', $this->_values['pay_later_receipt']);
     }
     // if onbehalf-of-organization
-    if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf']['organization_name'])) {
+    if (!empty($this->_values['onbehalf_profile_id']) && !empty($this->_params['onbehalf']['organization_name'])) {
       // CRM-15182
       $this->_params['organization_id'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_params['onbehalf']['organization_name'], 'id', 'display_name');
 
@@ -396,16 +396,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $params = $this->_params;
     // make sure we have values for it
-    if (!empty($params['honor']) && !empty($params['soft_credit_type_id'])) {
+    if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
       $honorName = NULL;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
-      CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
+      CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor']);
 
       $fieldTypes = array('Contact');
-      $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
-      $this->buildCustom($params['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
+      $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($this->_values['honoree_profile_id']);
+      $this->buildCustom($this->_values['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
     $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
     $amount_block_is_active = $this->get('amount_block_is_active');
@@ -460,7 +460,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
 
-    if (!empty($params['onbehalf'])) {
+    if (!empty($this->_values['onbehalf_profile_id']) && !empty($params['onbehalf'])) {
       $fieldTypes = array('Contact', 'Organization');
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
       $fieldTypes = array_merge($fieldTypes, $contactSubType);
@@ -471,7 +471,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $fieldTypes = array_merge($fieldTypes, array('Contribution'));
       }
 
-      $this->buildCustom($params['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
+      $this->buildCustom($this->_values['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
 
     $this->_separateMembershipPayment = $this->get('separateMembershipPayment');
@@ -1214,8 +1214,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // required for mailing/template display ..etc
       $values['related_contact'] = $contactID;
-      // required for IPN
-      $params['related_contact'] = $contactID;
 
       //make this employee of relationship as current
       //employer / employee relationship,  CRM-3532
@@ -1962,7 +1960,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // organization params in a separate variable, to make sure
     // normal behavior is continued. And use that variable to
     // process on-behalf-of functionality.
-    if (!empty($this->_params['onbehalf_profile_id'])) {
+    if (!empty($this->_values['onbehalf_profile_id'])) {
       $behalfOrganization = array();
       $orgFields = array('organization_name', 'organization_id', 'org_option');
       foreach ($orgFields as $fld) {
@@ -2090,7 +2088,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // If onbehalf-of-organization contribution / signup, add organization
     // and it's location.
-    if (isset($params['onbehalf_profile_id']) && isset($behalfOrganization['organization_name'])) {
+    if (isset($this->_values['onbehalf_profile_id']) && isset($behalfOrganization['organization_name'])) {
       $ufFields = array();
       foreach ($this->_fields['onbehalf'] as $name => $value) {
         $ufFields[$name] = 1;

@@ -103,7 +103,7 @@
       $("#onbehalfof_id").show().change();
       $("input#onbehalf_organization_name").hide();
     }
-    else if ( orgOption == 'CIVICRM_QFID_1_org_option' ) {
+    else if (orgOption == 'CIVICRM_QFID_1_org_option') {
       $("input#onbehalf_organization_name").show();
       $("#onbehalfof_id").hide();
       reset = true;

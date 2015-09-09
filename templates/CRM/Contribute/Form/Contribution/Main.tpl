@@ -166,7 +166,7 @@
   {include file="CRM/common/CMSUser.tpl"}
   {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="makeContribution"}
 
-  {if $honor_block_is_active}
+  {if $honoreeProfileFields|@count}
     <fieldset class="crm-group honor_block-group">
       {crmRegion name="contribution-soft-credit-block"}
         <legend>{$honor_block_title}</legend>
