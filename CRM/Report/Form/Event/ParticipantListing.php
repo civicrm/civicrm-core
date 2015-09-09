@@ -71,7 +71,17 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array_merge($this->getBasicContactFields(), array(
+        'fields' => array_merge(array(
+          // CRM-17115 - to avoid changing report output at this stage re-instate
+          // old field name for sort name
+          'sort_name_linked' => array(
+            'title' => ts('Participant Name'),
+            'required' => TRUE,
+            'no_repeat' => TRUE,
+            'dbAlias' => 'contact_civireport.sort_name',
+          )),
+          $this->getBasicContactFields(),
+          array(
           'age_at_event' => array(
             'title' => ts('Age at Event'),
             'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, event_civireport.start_date)',
@@ -375,6 +385,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         ),
       ),
     );
+
+    // CRM-17115 avoid duplication of sort_name - would be better to standardise name
+    // & behaviour across reports but trying for no change at this point.
+    $this->_columns['civicrm_contact']['fields']['sort_name']['no_display'] = TRUE;
 
     // If we have active campaigns add those elements to both the fields and filters
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
