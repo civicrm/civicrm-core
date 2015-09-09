@@ -261,7 +261,15 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_JSON::output($response);
   }
 
-  public static function getFinancialTransactionsList() {
+  /**
+   * Get output of financial transactions.
+   *
+   * @param bool $return
+   *   Return result. This parameter allows the output to be unit tested.
+   *
+   * @return string
+   */
+  public static function getFinancialTransactionsList($return = FALSE) {
     $sortMapper = array(
       0 => '',
       1 => '',
@@ -371,7 +379,7 @@ class CRM_Financial_Page_AJAX {
           $row[$financialItem->id][$columnKey] = '<a href=' . $url . '>' . $financialItem->$columnKey . '</a>';
         }
         elseif ($columnKey == 'payment_method' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] = CRM_Core_OptionGroup::getLabel('payment_instrument', $financialItem->$columnKey);
+          $row[$financialItem->id][$columnKey] = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $financialItem->$columnKey);
           if ($row[$financialItem->id][$columnKey] == 'Check') {
             $checkNumber = $financialItem->check_number ? ' (' . $financialItem->check_number . ')' : '';
             $row[$financialItem->id][$columnKey] = $row[$financialItem->id][$columnKey] . $checkNumber;
@@ -384,7 +392,7 @@ class CRM_Financial_Page_AJAX {
           $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
         }
         elseif ($columnKey == 'status' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] = CRM_Core_OptionGroup::getLabel('contribution_status', $financialItem->$columnKey);
+          $row[$financialItem->id][$columnKey] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $financialItem->$columnKey);
         }
       }
       if ($statusID == CRM_Core_OptionGroup::getValue('batch_status', 'Open')) {
@@ -463,6 +471,9 @@ class CRM_Financial_Page_AJAX {
       'action',
     );
 
+    if ($return) {
+      return CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
+    }
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();

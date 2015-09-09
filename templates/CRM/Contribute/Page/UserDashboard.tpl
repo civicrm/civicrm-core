@@ -52,26 +52,22 @@
                         <td>{$row.receipt_date|truncate:10:''|crmDate}</td>
                         <td>{$row.contribution_status}</td>
                         {if $invoicing && $invoices}
-                            {if $row.contribution_status_name != 'Cancelled'}
-                                <td>
-                                    {assign var='id' value=$row.contribution_id}
-                                    {assign var='contact_id' value=$row.contact_id}
-                                    {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
-                                    {if call_user_func(array('CRM_Core_Permission','check'), 'view my invoices') OR call_user_func(array('CRM_Core_Permission','check'), 'access CiviContribute')}
-                                        <a class="button no-popup "
-                                           href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
-                                            <span class="icon ui-icon-print"></span>
-                                            {if $row.contribution_status != 'Refunded'}
-                                                <span>{ts}Print Invoice{/ts}</span>
-                                            {else}
-                                                <span>{ts}Print Invoice and Credit Note{/ts}</span>
-                                            {/if}
-                                        </a>
+                          <td>
+                            {assign var='id' value=$row.contribution_id}
+                            {assign var='contact_id' value=$row.contact_id}
+                            {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
+                            {if call_user_func(array('CRM_Core_Permission','check'), 'view my invoices') OR call_user_func(array('CRM_Core_Permission','check'), 'access CiviContribute')}
+                                <a class="button no-popup "
+                                   href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
+                                    <span class="icon ui-icon-print"></span>
+                                    {if $row.contribution_status != 'Refunded' && $row.contribution_status != 'Cancelled' }
+                                        <span>{ts}Print Invoice{/ts}</span>
+                                    {else}
+                                        <span>{ts}Print Invoice and Credit Note{/ts}</span>
                                     {/if}
-                                </td>
-                            {else}
-                                <td></td>
+                                </a>
                             {/if}
+                          </td>
                         {/if}
                     </tr>
                 {/foreach}
