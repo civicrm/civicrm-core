@@ -1019,7 +1019,75 @@ INSERT INTO `civicrm_option_value` (`id`, `option_group_id`, `label`, `value`, `
 /*!40000 ALTER TABLE `civicrm_option_value` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
+-- CRM-16195 add relative values
+INSERT INTO civicrm_option_group (`name`, title, is_reserved, is_active)
+VALUES ('relative_date_filters','Relative Date Filters', 1, 1);
+
+SELECT @ogid := max(id) from civicrm_option_group where name = 'relative_date_filters';
+INSERT INTO civicrm_option_value
+(option_group_id, label, value, `name`, weight, is_reserved, is_active)
+VALUES
+(@ogid, 'Previous 2 Years', 'previous_2.year', 'previous_2.year', 1, 0, 1),
+(@ogid, 'Previous 2 Quarters', 'previous_2.quarter', 'previous_2.quarter', 2, 0, 1),
+(@ogid, 'Previous 2 Months', 'previous_2.month', 'previous_2.month', 3,0,1),
+(@ogid, 'Previous 2 Weeks', 'previous_2.week', 'previous_2.week', 4, 0, 1),
+(@ogid, 'Previous 2 Days', 'previous_2.day', 'previous_2.day', 5, 0, 1),
+(@ogid, 'Prior to Previous Year', 'previous_before.year', 'previous_before.year', 6, 0, 1),
+(@ogid, 'Prior to Previous Quarter', 'previous_before.quarter', 'previous_before.quarter', 7, 0, 1),
+(@ogid, 'Prior to Previous Month', 'previous_before.month', 'previous_before.month', 8, 0, 1),
+(@ogid, 'Prior to Previous Week', 'previous_before.week', 'previous_before.week', 9, 0, 1),
+(@ogid, 'Prior to Previous Day', 'previous_before.day', 'previous_before.day', 10, 0, 1),
+(@ogid, 'Previous Year', 'previous.year', 'previous.year', 11, 0, 1),
+(@ogid, 'Previous Fiscal Year', 'previous.fiscal_year', 'previous.fiscal_year', 12, 0, 1),
+(@ogid, 'Previous Quarter', 'previous.quarter', 'previous.quarter', 13, 0, 1),
+(@ogid, 'Previous Month', 'previous.month', 'previous.month', 14, 0, 1),
+(@ogid, 'Previous Week', 'previous.week', 'previous.week', 15, 0, 1),
+(@ogid, 'To End of Previous Year', 'earlier.year', 'earlier.year', 16, 0, 1),
+(@ogid, 'To End of Previous Quarter', 'earlier.quarter', 'earlier.quarter', 17, 0, 1),
+(@ogid, 'To End of Previous Month', 'earlier.month', 'earlier.month', 18, 0, 1),
+(@ogid, 'To End of Previous Week', 'earlier.week', 'earlier.week', 19, 0, 1),
+(@ogid, 'To End of Previous Day', 'earlier.day', 'earlier.day', 20, 0, 1),
+(@ogid, 'From End of Previous Year', 'greater_previous.year', 'greater_previous.year', 21, 0, 1),
+(@ogid, 'From End of Previous Quarter', 'greater_previous.quarter', 'greater_previous.quarter', 22, 0, 1),
+(@ogid, 'From End of Previous Month', 'greater_previous.month', 'greater_previous.month', 23, 0, 1),
+(@ogid, 'From End of Previous Week', 'greater_previous.week', 'greater_previous.week', 24, 0, 1),
+(@ogid, 'From Start of Current Year', 'greater.year', 'greater.year', 25, 0, 1),
+(@ogid, 'From Start of Current Quarter', 'greater.quarter', 'greater.quarter', 26, 0, 1),
+(@ogid, 'From Start of Current Month', 'greater.month', 'greater.month', 27, 0, 1),
+(@ogid, 'From Start of Current Week', 'greater.week', 'greater.week', 28, 0, 1),
+(@ogid, 'From Start of Current Day', 'greater.day', 'greater.day', 29, 0, 1),
+(@ogid, 'Current Year to-date', 'current.year', 'current.year', 30, 0, 1),
+(@ogid, 'Current Quarter to-date', 'current.quarter', 'current.quarter', 31, 0, 1),
+(@ogid, 'Current Month to-date', 'current.month', 'current.month', 32, 0, 1),
+(@ogid, 'Current Week to-date', 'current.week', 'current.week', 33, 0, 1),
+(@ogid, 'Last 3 Years', 'ending_3.year', 'ending_3.year', 34, 0, 1),
+(@ogid, 'Last 2 Years', 'ending_2.year', 'ending_2.year', 35, 0, 1),
+(@ogid, 'Last 12 Months', 'ending.year', 'ending.year', 36, 0, 1),
+(@ogid, 'Last 3 Months', 'ending.quarter', 'ending.quarter', 37, 0, 1),
+(@ogid, 'Last Month', 'ending.month', 'ending.month', 38, 0, 1),
+(@ogid, 'Last 7 days', 'ending.week', 'ending.week', 39, 0, 1),
+(@ogid, 'Yesterday', 'previous.day', 'previous.day', 40, 0, 1),
+(@ogid, 'This Year', 'this.year', 'this.year', 41, 0, 1),
+(@ogid, 'This Fiscal Year', 'this.fiscal_year', 'this.fiscal_year', 42, 0, 1),
+(@ogid, 'This Quarter', 'this.quarter', 'this.quarter', 43, 0, 1),
+(@ogid, 'This Month', 'this.month', 'this.month', 44, 0, 1),
+(@ogid, 'This Week', 'this.week', 'this.week', 45, 0, 1),
+(@ogid, 'Today', 'this.day', 'this.day', 46, 0, 1),
+(@ogid, 'Tomorrow', 'starting.day', 'starting.day', 47, 0, 1),
+(@ogid, 'Upcoming 7 days', 'starting.week', 'starting.week', 48, 0, 1),
+(@ogid, 'Upcoming Month', 'starting.month', 'starting.month', 49, 0, 1),
+(@ogid, 'Upcoming 12 Months', 'starting.year', 'starting.year', 50, 0, 1),
+(@ogid, 'To End of Current Year', 'less.year', 'less.year', 51, 0, 1),
+(@ogid, 'To End of Current Quarter', 'less.quarter', 'less.quarter', 52, 0, 1),
+(@ogid, 'To End of Current Month', 'less.month', 'less.month', 53, 0, 1),
+(@ogid, 'To End of Current Week', 'less.week', 'less.week', 54, 0, 1),
+(@ogid, 'Next Week', 'next.week', 'next.week', 55, 0, 1),
+(@ogid, 'Next Month', 'next.month', 'next.month', 56, 0, 1),
+(@ogid, 'Next Quarter', 'next.quarter', 'next.quarter', 57, 0, 1),
+(@ogid, 'Next Fiscal Year', 'next.fiscal_year', 'next.fiscal_year', 58, 0, 1),
+(@ogid, 'Next Year', 'next.year', 'next.year', 59, 0, 1);
+-- CRM-16195 add relative values ends
+
 -- Dumping data for table `civicrm_participant`
 --
 
