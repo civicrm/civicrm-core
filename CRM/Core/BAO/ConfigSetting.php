@@ -129,7 +129,6 @@ class CRM_Core_BAO_ConfigSetting {
    * @param \Civi\Core\SettingsBag $settings
    * @param string $activatedLocales
    *   Imploded list of locales which are supported in the DB.
-   * @return array
    */
   public static function applyLocale($settings, $activatedLocales) {
     // are we in a multi-language setup?

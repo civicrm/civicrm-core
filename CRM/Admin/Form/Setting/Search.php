@@ -38,6 +38,8 @@
 class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
+    'contact_reference_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'contact_autocomplete_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'search_autocomplete_count' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'enable_innodb_fts' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'includeWildCardInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
@@ -55,33 +57,28 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Search Preferences'));
 
+    parent::buildQuickForm();
+
     // @todo remove the following adds in favour of setting via the settings array (above).
 
     // Autocomplete for Contact Search (quick search etc.)
-    $options = array(
-      ts('Contact Name') => 1,
-    ) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
-        FALSE, FALSE, TRUE
-      ));
-    $this->addCheckBox('autocompleteContactSearch', ts('Autocomplete Contact Search'), $options,
-      NULL, NULL, NULL, NULL, array('&nbsp;&nbsp;')
-    );
-    $element = $this->getElement('autocompleteContactSearch');
+    $element = $this->getElement('contact_autocomplete_options');
     $element->_elements[0]->_flagFrozen = TRUE;
 
     // Autocomplete for Contact Reference (custom fields)
-    $optionsCR = array(
-      ts('Contact Name') => 1,
-    ) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
-        FALSE, FALSE, TRUE
-      ));
-    $this->addCheckBox('autocompleteContactReference', ts('Contact Reference Options'), $optionsCR,
-      NULL, NULL, NULL, NULL, array('&nbsp;&nbsp;')
-    );
-    $element = $this->getElement('autocompleteContactReference');
+    $element = $this->getElement('contact_reference_options');
     $element->_elements[0]->_flagFrozen = TRUE;
+  }
 
-    parent::buildQuickForm();
+  /**
+   * @return array
+   */
+  public static function getContactAutocompleteOptions() {
+    return array(
+      ts('Contact Name') => 1,
+    ) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
+      FALSE, FALSE, TRUE
+    ));
   }
 
   /**
@@ -93,6 +90,17 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
       'Individual',
       'Organization',
       'Household',
+    ));
+  }
+
+  /**
+   * @return array
+   */
+  public static function getContactReferenceOptions() {
+    return array(
+      ts('Contact Name') => 1,
+    ) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
+      FALSE, FALSE, TRUE
     ));
   }
 

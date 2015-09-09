@@ -214,42 +214,4 @@ return array(
     'description' => 'If set, this will be the default profile used for contact search.',
     'help_text' => NULL,
   ),
-  'autocompleteContactSearch' => array(
-    'group_name' => 'Search Preferences',
-    'group' => 'Search Preferences',
-    'name' => 'autocompleteContactSearch',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
-    'type' => 'Integer',
-    'quick_form_type' => 'CheckBox',
-    'default' => 1,
-    'add' => '4.6',
-    'title' => 'Autocomplete Contact Search',
-    'pseudoconstant' => array('optionGroupName' => 'contact_autocomplete_options'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => "Selected fields will be displayed in back-office autocomplete dropdown search results (Quick Search, etc.). Contact Name is always included.",
-    'help_text' => NULL,
-  ),
-  'autocompleteContactReference' => array(
-    'group_name' => 'Search Preferences',
-    'group' => 'Search Preferences',
-    'name' => 'autocompleteContactReference',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
-    'type' => 'Integer',
-    'quick_form_type' => 'CheckBox',
-    'default' => 1,
-    'add' => '4.6',
-    'title' => 'Contact Reference Options',
-    'pseudoconstant' => array('optionGroupName' => 'contact_reference_options'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => "Selected fields will be displayed in autocomplete dropdown search results for 'Contact Reference' custom fields. Contact Name is always included. NOTE: You must assign 'access contact reference fields' permission to the anonymous role if you want to use custom contact reference fields in profiles on public pages. For most situations, you should use the 'Limit List to Group' setting when configuring a contact reference field which will be used in public forms to prevent exposing your entire contact list.",
-    'help_text' => NULL,
-  ),
 );
