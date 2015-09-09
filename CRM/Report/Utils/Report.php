@@ -286,7 +286,7 @@ WHERE  inst.report_id = %1";
           $displayRows[$v] = '"' . $value . '"';
         }
         else {
-          $displayRows[$v] = " ";
+          $displayRows[$v] = "";
         }
       }
       // Add the data row.
