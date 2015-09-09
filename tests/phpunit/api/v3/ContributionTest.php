@@ -1542,9 +1542,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'receipt_date' => 'now'));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id']));
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id'], 'trxn_date' => date('Y-m-d')));
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1));
     $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
     $mut->checkMailLog(array(
       'Receipt - Contribution',
       'Please print this confirmation for your records.',
