@@ -61,10 +61,11 @@ class CRM_Core_Config_Defaults {
   }
 
   public static function getCustomFileUploadDir() {
-    $value = Civi::settings()->getPath('customFileUploadDir');
+    $settings = Civi::settings();
+    $value = $settings->getPath('customFileUploadDir');
     if (empty($value)) {
       $defaultFileStorage = CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
-      $value = $defaultFileStorage['url'] . "custom/";
+      $value = $settings->filterPath($defaultFileStorage['path'] . "custom/");
     }
     $value = CRM_Utils_File::addTrailingSlash($value);
     CRM_Utils_File::createDir($value);
@@ -90,10 +91,11 @@ class CRM_Core_Config_Defaults {
   }
 
   public static function getImageUploadDir() {
-    $value = Civi::settings()->getPath('imageUploadDir');
+    $settings = Civi::settings();
+    $value = $settings->getPath('imageUploadDir');
     if (empty($value)) {
       $defaultFileStorage = CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
-      $value = $defaultFileStorage['path'] . "persist/contribute/";
+      $value = $settings->filterPath($defaultFileStorage['path'] . "persist/contribute/");
     }
     $value = CRM_Utils_File::addTrailingSlash($value);
     CRM_Utils_File::createDir($value);
@@ -101,19 +103,21 @@ class CRM_Core_Config_Defaults {
   }
 
   public static function getImageUploadUrl() {
-    $imageUploadURL = Civi::settings()->getUrl('imageUploadURL', 'absolute');
+    $settings = Civi::settings();
+    $imageUploadURL = $settings->getUrl('imageUploadURL', 'absolute');
     if (empty($imageUploadURL)) {
       $defaultFileStorage = CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
-      $imageUploadURL = $defaultFileStorage['url'] . 'persist/contribute/';
+      $imageUploadURL = $settings->filterUrl($defaultFileStorage['url'] . 'persist/contribute/', 'absolute');
     }
     return $imageUploadURL;
   }
 
   public static function getUploadDir() {
-    $value = Civi::settings()->getPath('uploadDir');
+    $settings = Civi::settings();
+    $value = $settings->getPath('uploadDir');
     if (empty($value)) {
       $defaultFileStorage = CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
-      $value = $defaultFileStorage['path'] . "upload/";
+      $value = $settings->filterPath($defaultFileStorage['path'] . "upload/");
     }
     $value = CRM_Utils_File::addTrailingSlash($value);
     CRM_Utils_File::createDir($value);
