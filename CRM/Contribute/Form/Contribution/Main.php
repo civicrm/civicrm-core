@@ -182,7 +182,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
-      if ($this->_honor_block_is_active && count($completedContributionIds)) {
+      if (count($completedContributionIds)) {
         $softCredit = array();
         foreach ($completedContributionIds as $id) {
           $softCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($id);

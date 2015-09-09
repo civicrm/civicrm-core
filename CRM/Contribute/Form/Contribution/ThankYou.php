@@ -128,16 +128,16 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('taxTerm', $taxTerm);
       $this->assign('totalTaxAmount', $params['tax_amount']);
     }
-    if (!empty($params['honor']) && !empty($params['soft_credit_type_id'])) {
+    if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
       $honorName = NULL;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
-      CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
+      CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor']);
 
       $fieldTypes = array('Contact');
-      $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
-      $this->buildCustom($params['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
+      $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($this->_values['honoree_profile_id']);
+      $this->buildCustom($this->_values['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
@@ -196,7 +196,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         $fieldTypes = array_merge($fieldTypes, array('Contribution'));
       }
 
-      $this->buildCustom($params['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
+      $this->buildCustom($this->_values['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
 
     $this->assign('trxn_id',
@@ -240,9 +240,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->_submitValues = array_merge($this->_submitValues, $defaults);
 
-    if (!empty($this->_params['onbehalf_values'])) {
-      $defaults['onbehalf'] = (array) json_decode($this->_params['onbehalf_values']);
-    }
     $this->setDefaults($defaults);
 
     $values['entity_id'] = $this->_id;

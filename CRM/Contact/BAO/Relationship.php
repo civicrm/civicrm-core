@@ -1764,7 +1764,7 @@ WHERE id IN ( {$contacts} )
       $relationshipTypeClause = 'AND cr.relationship_type_id IN (%2) ';
       $args[2] = array($relTypeId, 'String');
     }
-      $query = "
+    $query = "
 SELECT cc.id as id, cc.sort_name as name
 FROM civicrm_relationship cr, civicrm_contact cc
 WHERE
@@ -1777,20 +1777,19 @@ cc.is_deleted = 0
 $relationshipTypeClause
 ";
 
-      if (!empty($name)) {
-        $name = CRM_Utils_Type::escape($name, 'String');
-        $query .= "
+    if (!empty($name)) {
+      $name = CRM_Utils_Type::escape($name, 'String');
+      $query .= "
 AND cc.sort_name LIKE '%$name%'";
-      }
+    }
 
-      $dao = CRM_Core_DAO::executeQuery($query, $args);
-
-      while ($dao->fetch()) {
-        $contacts[$dao->id] = array(
-          'name' => $dao->name,
-          'value' => $dao->id,
-        );
-      }
+    $dao = CRM_Core_DAO::executeQuery($query, $args);
+    while ($dao->fetch()) {
+      $contacts[$dao->id] = array(
+        'name' => $dao->name,
+        'value' => $dao->id,
+      );
+    }
 
     return $contacts;
   }

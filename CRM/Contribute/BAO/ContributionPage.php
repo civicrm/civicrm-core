@@ -88,25 +88,50 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $values
    */
   public static function setValues($id, &$values) {
-    $params = array(
-      'id' => $id,
-    );
+    $modules = array('CiviContribute', 'soft_credit', 'on_behalf');
+    $values['custom_pre_id'] = $values['custom_post_id'] = NULL;
 
+    $params = array('id' => $id);
     CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage', $params, $values);
 
     // get the profile ids
     $ufJoinParams = array(
-      'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $id,
     );
-    list($values['custom_pre_id'], $customPostIds) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
-    if (!empty($customPostIds)) {
-      $values['custom_post_id'] = $customPostIds[0];
-    }
-    else {
-      $values['custom_post_id'] = '';
+    // retrieve profile id as also unserialize module_data corresponding to each $module
+    foreach ($modules as $module) {
+      $ufJoinParams['module'] = $module;
+      $ufJoin = new CRM_Core_DAO_UFJoin();
+      $ufJoin->copyValues($ufJoinParams);
+      if ($module == 'CiviContribute') {
+        $ufJoin->orderBy('weight asc');
+        $ufJoin->find();
+        while ($ufJoin->fetch()) {
+          if ($ufJoin->weight == 1) {
+            $values['custom_pre_id'] = $ufJoin->uf_group_id;
+          }
+          else {
+            $values['custom_post_id'] = $ufJoin->uf_group_id;
+          }
+        }
+      }
+      else {
+        $ufJoin->find(TRUE);
+        if (!$ufJoin->is_active) {
+          continue;
+        }
+        $params = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoin->module_data, TRUE, $module);
+        $values = array_merge($params, $values);
+        if ($module == 'soft_credit') {
+          $values['honoree_profile_id'] = $ufJoin->uf_group_id;
+          $values['honor_block_is_active'] = $ufJoin->is_active;
+        }
+        else {
+          $values['onbehalf_profile_id'] = $ufJoin->uf_group_id;
+        }
+      }
     }
   }
 
@@ -301,10 +326,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
       if (isset($values['honor'])) {
         $honorValues = $values['honor'];
+        $template->_values = array('honoree_profile_id' => $values['honoree_profile_id']);
         CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields(
           $template,
           $honorValues['honor_profile_values'],
-          $honorValues['honor_profile_id'],
           $honorValues['honor_id']
         );
       }
@@ -362,15 +387,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['onBehalfName'] = $displayName;
         $tplParams['onBehalfEmail'] = $email;
 
-        $ufJoinParams = array(
-          'module' => 'onBehalf',
-          'entity_table' => 'civicrm_contribution_page',
-          'entity_id' => $values['id'],
-        );
-        $OnBehalfProfile = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-        $profileId = $OnBehalfProfile[0];
-        $userID = $contactID;
-        self::buildCustomDisplay($profileId, 'onBehalfProfile', $userID, $template, $params['onbehalf_profile'], $fieldTypes);
+        if (!empty($values['onbehalf_profile_id'])) {
+          self::buildCustomDisplay($values['onbehalf_profile_id'], 'onBehalfProfile', $contactID, $template, $params['onbehalf_profile'], $fieldTypes);
+        }
       }
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
