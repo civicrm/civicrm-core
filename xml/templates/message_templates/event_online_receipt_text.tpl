@@ -1,4 +1,4 @@
-Dear {contact.display_name},
+{contact.email_greeting},
 
 {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
 {$event.confirm_email_text}
@@ -308,4 +308,3 @@ This event allows for self-cancel or transfer
    {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
     {ts}Self service cancel transfer:{/ts} {$selfService}
 {/if}
-
