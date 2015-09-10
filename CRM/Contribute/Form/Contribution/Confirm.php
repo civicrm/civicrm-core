@@ -1142,28 +1142,28 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   Array of fields from the onbehalf profile relevant to the organization.
    */
   public static function processOnBehalfOrganization(&$behalfOrganization, &$contactID, &$values, &$params, $fields = NULL) {
-    $isCurrentEmployer = FALSE;
+    $isNotCurrentEmployer = FALSE;
     $dupeIDs = array();
     $orgID = NULL;
     if (!empty($behalfOrganization['organization_id'])) {
       $orgID = $behalfOrganization['organization_id'];
       unset($behalfOrganization['organization_id']);
-      $isCurrentEmployer = TRUE;
+    }
+    // create employer relationship with $contactID only when new organization is there
+    // else retain the existing relationship
+    else {
+      // get the Employee relationship type id
+      $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
+;
+      // keep relationship params ready
+      $relParams['relationship_type_id'] = $relTypeId . '_a_b';
+      $relParams['is_permission_a_b'] = 1;
+      $relParams['is_active'] = 1;
+      $isNotCurrentEmployer = TRUE;
     }
 
     // formalities for creating / editing organization.
     $behalfOrganization['contact_type'] = 'Organization';
-
-    // get the relationship type id
-    $relType = new CRM_Contact_DAO_RelationshipType();
-    $relType->name_a_b = 'Employee of';
-    $relType->find(TRUE);
-    $relTypeId = $relType->id;
-
-    // keep relationship params ready
-    $relParams['relationship_type_id'] = $relTypeId . '_a_b';
-    $relParams['is_permission_a_b'] = 1;
-    $relParams['is_active'] = 1;
 
     if (!$orgID) {
       // check if matching organization contact exists
@@ -1195,9 +1195,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       NULL, NULL, 'Organization'
     );
     // create relationship
-    $relParams['contact_check'][$orgID] = 1;
-    $cid = array('contact' => $contactID);
-    CRM_Contact_BAO_Relationship::legacyCreateMultiple($relParams, $cid);
+    if ($isNotCurrentEmployer) {
+      $relParams['contact_check'][$orgID] = 1;
+      $cid = array('contact' => $contactID);
+      CRM_Contact_BAO_Relationship::legacyCreateMultiple($relParams, $cid);
+    }
 
     // if multiple match - send a duplicate alert
     if ($dupeIDs && (count($dupeIDs) > 1)) {
@@ -1217,13 +1219,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       //make this employee of relationship as current
       //employer / employee relationship,  CRM-3532
-      if ($isCurrentEmployer &&
+      if ($isNotCurrentEmployer &&
         ($orgID != CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id'))
       ) {
-        $isCurrentEmployer = FALSE;
+        $isNotCurrentEmployer = FALSE;
       }
 
-      if (!$isCurrentEmployer && $orgID) {
+      if (!$isNotCurrentEmployer && $orgID) {
         //build current employer params
         $currentEmpParams[$contactID] = $orgID;
         CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);

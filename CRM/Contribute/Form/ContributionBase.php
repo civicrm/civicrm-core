@@ -215,14 +215,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->_defaultMemTypeId = $membership->membership_type_id;
           if ($membership->contact_id != $this->_contactID) {
             $validMembership = FALSE;
-            $employers = CRM_Contact_BAO_Relationship::getPermissionedContacts(
-              $this->_userID,
-              CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b')
-            );
-            if (!empty($employers) && array_key_exists($membership->contact_id, $employers)) {
+            $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, NULL, NULL, 'Organization');
+            if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
               $this->_membershipContactID = $membership->contact_id;
               $this->assign('membershipContactID', $this->_membershipContactID);
-              $this->assign('membershipContactName', $employers[$this->_membershipContactID]['name']);
+              $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
               $validMembership = TRUE;
             }
             else {
@@ -804,12 +801,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         if ($contactID) {
-          $employers = CRM_Contact_BAO_Relationship::getPermissionedContacts(
-            $contactID,
-            CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b')
-          );
+          // retrieve all permissioned organizations of contact $contactID
+          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($contactID, NULL, NULL, 'Organization');
 
-          if (count($employers)) {
+          if (count($organizations)) {
             // Related org url - pass checksum if needed
             $args = array(
               'ufId' => $form->_values['onbehalf_profile_id'],
@@ -826,8 +821,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
             $form->assign('locDataURL', $locDataURL);
           }
-          if (count($employers) > 0) {
-            $form->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $employers));
+          if (count($organizations) > 0) {
+            $form->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $organizations));
 
             $orgOptions = array(
               0 => ts('Select an existing organization'),

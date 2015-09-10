@@ -1749,14 +1749,15 @@ WHERE id IN ( {$contacts} )
    * @param int $relTypeId
    *   one or more relationship type id's.
    * @param string $name
+   * @param string $contactType
    *
    * @return array
    *   Array of contacts
    */
-  public static function getPermissionedContacts($contactID, $relTypeId = NULL, $name = NULL) {
+  public static function getPermissionedContacts($contactID, $relTypeId = NULL, $name = NULL, $contactType = NULL) {
     $contacts = array();
     $args = array(1 => array($contactID, 'Integer'));
-    $relationshipTypeClause = '';
+    $relationshipTypeClause = $contactTypeClause = '';
 
     if ($relTypeId) {
       // @todo relTypeId is only ever passed in as an int. Change this to reflect that -
@@ -1764,9 +1765,15 @@ WHERE id IN ( {$contacts} )
       $relationshipTypeClause = 'AND cr.relationship_type_id IN (%2) ';
       $args[2] = array($relTypeId, 'String');
     }
+
+    if ($contactType) {
+      $contactTypeClause = ' AND cr.relationship_type_id = crt.id AND crt.contact_type_b = %3 ';
+      $args[3] = array($contactType, 'String');
+    }
+
     $query = "
 SELECT cc.id as id, cc.sort_name as name
-FROM civicrm_relationship cr, civicrm_contact cc
+FROM civicrm_relationship cr, civicrm_contact cc, civicrm_relationship_type crt
 WHERE
 cr.contact_id_a         = %1 AND
 cr.is_permission_a_b    = 1 AND
@@ -1775,6 +1782,7 @@ cr.is_active = 1 AND
 cc.id = cr.contact_id_b AND
 cc.is_deleted = 0
 $relationshipTypeClause
+$contactTypeClause
 ";
 
     if (!empty($name)) {
