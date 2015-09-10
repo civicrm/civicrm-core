@@ -13,7 +13,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    CRM_Core_BAO_Navigation::rebuildReportsNavigation();
+    CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
   }
 
   /**
@@ -23,24 +23,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $reportCount = $this->getCountReportInstances();
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url = 'civicrm/report/instance/1?reset=1'");
     $this->assertEquals($reportCount - 1, $this->getCountReportInstances());
-    CRM_Core_BAO_Navigation::rebuildReportsNavigation();
-
-    $this->assertEquals($reportCount, $this->getCountReportInstances());
-    $url = 'civicrm/report/instance/1';
-    $url_params = 'reset=1';
-    $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
-    $this->assertObjectHasAttribute('id', $new_nav);
-    $this->assertNotNull($new_nav->id);
-  }
-
-  /**
-   * Test that a missing report menu link is added by rebuildReportsNavigation.
-   */
-  public function testCreateMissingReportMenuItemLinkViaAPI() {
-    $reportCount = $this->getCountReportInstances();
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url = 'civicrm/report/instance/1?reset=1'");
-    $this->assertEquals($reportCount - 1, $this->getCountReportInstances());
-    $this->callAPISuccess('Navigation', 'reset', array('for' => 'report'));
+    CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
 
     $this->assertEquals($reportCount, $this->getCountReportInstances());
     $url = 'civicrm/report/instance/1';
@@ -62,7 +45,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $this->assertNotEquals(FALSE, $existing_nav);
     $existing_nav->parent_id = 1;
     $existing_nav->save();
-    CRM_Core_BAO_Navigation::rebuildReportsNavigation();
+    CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
     $parent_url = 'civicrm/report/list';
     $parent_url_params = 'compid=99&reset=1';
     $parent_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($parent_url, $parent_url_params);
