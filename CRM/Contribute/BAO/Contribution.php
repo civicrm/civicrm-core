@@ -4073,8 +4073,7 @@ WHERE con.id = {$contributionId}
    * @param int $isFirstOrLastRecurringPayment
    *   Deprecated param only used by AuthorizeNetIPN.
    */
-  public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution, $isRecurring,
-      $isFirstOrLastRecurringPayment) {
+  public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution, $isRecurring, $isFirstOrLastRecurringPayment) {
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
     // The previous details are used when calculating line items so keep it before any code that 'does something'
     if (!empty($contribution->id)) {
@@ -4129,6 +4128,10 @@ WHERE con.id = {$contributionId}
         $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
         $values['receipt_from_name'] = $domainValues[0];
         $values['receipt_from_email'] = $domainValues[1];
+      }
+
+      if (empty($contributionParams['receive_date']) && $changeDate) {
+        $contributionParams['receive_date'] = $changeDate;
       }
 
       if ($recurContrib && $recurContrib->id && !isset($input['is_email_receipt'])) {
