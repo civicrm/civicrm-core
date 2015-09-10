@@ -1224,8 +1224,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               if ($countryValue) {
                 CRM_Core_PseudoConstant::populate($countryNames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
                 CRM_Core_PseudoConstant::populate($countryIsoCodes, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
-                $config = CRM_Core_Config::singleton();
-                $limitCodes = $config->countryLimit();
+                $limitCodes = CRM_Core_BAO_Country::countryLimit();
 
                 $error = TRUE;
                 foreach (array(
@@ -1414,8 +1413,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                 if ($stateValue['country']) {
                   CRM_Core_PseudoConstant::populate($countryNames, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active');
                   CRM_Core_PseudoConstant::populate($countryIsoCodes, 'CRM_Core_DAO_Country', TRUE, 'iso_code');
-                  $config = CRM_Core_Config::singleton();
-                  $limitCodes = $config->countryLimit();
+                  $limitCodes = CRM_Core_BAO_Country::countryLimit();
                   //If no country is selected in
                   //localization then take all countries
                   if (empty($limitCodes)) {

@@ -44,80 +44,6 @@ require_once 'api/api.php';
  * Class CRM_Core_Config
  */
 class CRM_Core_Config extends CRM_Core_Config_Variables {
-  ///
-  /// BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)
-  ///
-
-  /**
-   * The dsn of the database connection
-   *
-   * @var string
-   */
-  public $dsn;
-
-  /**
-   * The name of user framework
-   *
-   * @var string
-   */
-  public $userFramework = 'Drupal';
-
-  /**
-   * The name of user framework url variable name
-   *
-   * @var string
-   */
-  public $userFrameworkURLVar = 'q';
-
-  /**
-   * The dsn of the database connection for user framework
-   *
-   * @var string
-   */
-  public $userFrameworkDSN = NULL;
-
-  /**
-   * The connector module for the CMS/UF
-   * @todo Introduce an interface.
-   *
-   * @var CRM_Utils_System_Base
-   */
-  public $userSystem = NULL;
-
-  /**
-   * @var CRM_Core_Permission_Base
-   */
-  public $userPermissionClass;
-
-  /**
-   * The root directory where Smarty should store compiled files.
-   *
-   * @var string
-   */
-  public $templateCompileDir;
-
-  /**
-   * @var string
-   */
-  public $configAndLogDir = NULL;
-
-  // END: BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)
-
-  ///
-  /// BEGIN HELPER CLASS PROPERTIES
-  ///
-
-  /**
-   * Are we initialized and in a proper state
-   *
-   * @var string
-   */
-  public $initialized = 0;
-
-  /**
-   * @var string
-   */
-  public $customPHPPathDir;
 
   /**
    * The handle to the log that we are using
@@ -133,35 +59,12 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    */
   private static $_singleton = NULL;
 
-  ///
-  /// END HELPER CLASS PROPERTIES
-  ///
-
-  ///
-  /// RUNTIME SET CLASS PROPERTIES
-  ///
-
-  /**
-   * @var bool
-   *   TRUE, if the call is CiviCRM.
-   *   FALSE, if the call is from the CMS.
-   */
-  public $inCiviCRM = FALSE;
-
-  ///
-  /// END: RUNTIME SET CLASS PROPERTIES
-  ///
-
-  /**
-   * @var string
-   */
-  public $recaptchaPublicKey;
-
   /**
    * The constructor. Sets domain id if defined, otherwise assumes
    * single instance installation.
    */
-  private function __construct() {
+  public function __construct() {
+    //parent::__construct();
   }
 
   /**
@@ -620,6 +523,34 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    */
   public static function isEnabledBackOfficeCreditCardPayments() {
     return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
+  }
+
+  /**
+   * @deprecated
+   */
+  public function addressSequence() {
+    return CRM_Utils_Address::sequence(Civi::settings()->get('address_format'));
+  }
+
+  /**
+   * @deprecated
+   */
+  public function defaultContactCountry() {
+    return CRM_Core_BAO_Country::defaultContactCountry();
+  }
+
+  /**
+   * @deprecated
+   */
+  public function defaultContactCountryName() {
+    return CRM_Core_BAO_Country::defaultContactCountryName();
+  }
+
+  /**
+   * @deprecated
+   */
+  public function defaultCurrencySymbol($defaultCurrency = NULL) {
+    return CRM_Core_BAO_Country::defaultCurrencySymbol($defaultCurrency);
   }
 
   /**
