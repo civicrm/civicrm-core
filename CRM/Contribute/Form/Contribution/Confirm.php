@@ -1154,7 +1154,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     else {
       // get the Employee relationship type id
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
-;
+
       // keep relationship params ready
       $relParams['relationship_type_id'] = $relTypeId . '_a_b';
       $relParams['is_permission_a_b'] = 1;
