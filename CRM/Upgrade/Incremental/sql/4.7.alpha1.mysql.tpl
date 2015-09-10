@@ -20,6 +20,10 @@ UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Detail
 UPDATE civicrm_option_value SET {localize field="label"}label = 'Activity Summary Report'{/localize}
   WHERE value = 'activitySummary' AND option_group_id = @option_group_id_report;
 
+--CRM-11369
+UPDATE civicrm_participant_status_type SET label = {localize field='label'}label = 'Pending (pay later)'{/localize} WHERE name = 'Pending from pay later';
+UPDATE civicrm_participant_status_type SET label = {localize field='label'}label = 'Pending (incomplete transaction)'{/localize} WHERE name = 'Pending from incomplete transaction';
+
 --CRM-16853 PCP Owner Notification
 --CRM-16853 Contribution Invoice Receipt Translation
 
