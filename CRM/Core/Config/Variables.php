@@ -37,6 +37,95 @@
  */
 class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
 
+  ///
+  /// BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)
+  ///
+
+  /**
+   * The dsn of the database connection
+   *
+   * @var string
+   */
+  public $dsn;
+
+  /**
+   * The name of user framework
+   *
+   * @var string
+   */
+  public $userFramework = 'Drupal';
+
+  /**
+   * The name of user framework url variable name
+   *
+   * @var string
+   */
+  public $userFrameworkURLVar = 'q';
+
+  /**
+   * The dsn of the database connection for user framework
+   *
+   * @var string
+   */
+  public $userFrameworkDSN = NULL;
+
+  /**
+   * The connector module for the CMS/UF
+   * @todo Introduce an interface.
+   *
+   * @var CRM_Utils_System_Base
+   */
+  public $userSystem = NULL;
+
+  /**
+   * The root directory where Smarty should store compiled files.
+   *
+   * @var string
+   */
+  public $templateCompileDir;
+
+  /**
+   * @var string
+   */
+  public $configAndLogDir = NULL;
+
+  // END: BASE SYSTEM PROPERTIES (CIVICRM.SETTINGS.PHP)
+
+
+  /**
+   * determine whether the call is from cms or civicrm
+   *
+   * @var bool
+   *   TRUE, if the call is CiviCRM.
+   *   FALSE, if the call is from the CMS.
+   */
+  public $inCiviCRM = FALSE;
+
+  ///
+  /// END: RUNTIME SET CLASS PROPERTIES
+  ///
+
+  /**
+   * @var string
+   */
+  public $recaptchaPublicKey;
+
+  ///
+  /// BEGIN HELPER CLASS PROPERTIES
+  ///
+
+  /**
+   * Are we initialized and in a proper state
+   *
+   * @var string
+   */
+  public $initialized = 0;
+
+  /**
+   * @var string
+   */
+  public $customPHPPathDir;
+
   /**
    * The debug level for civicrm.
    * @var int
@@ -224,7 +313,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   /**
    * Default user framework. This basically makes Drupal 7 the default
    */
-  public $userFramework = 'Drupal';
   public $userFrameworkClass = 'CRM_Utils_System_Drupal';
   public $userHookClass = 'CRM_Utils_Hook_Drupal';
 
@@ -238,8 +326,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
    */
   public $userPermissionTemp = NULL;
 
-  public $userFrameworkURLVar = 'q';
-  public $userFrameworkDSN = NULL;
   public $userFrameworkBaseURL = NULL;
   public $userFrameworkResourceURL = NULL;
   public $userFrameworkFrontend = FALSE;
@@ -365,11 +451,6 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $includeOrderByClause = 1;
 
   /**
-   * determine whether the call is from cms or civicrm
-   */
-  public $inCiviCRM = FALSE;
-
-  /**
    * PDF receipt as attachment is disabled by default (CRM-8350)
    */
   public $doNotAttachPDFReceipt = FALSE;
@@ -392,142 +473,7 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
 
   public $verpSeparator = '.', $mailThrottleTime = 0, $mailerJobsMax = 0, $mailerJobSize = 0, $mailerBatchLimit = 0;
 
-  /**
-   * Provide addressSequence.
-   *
-   * @param
-   *
-   * @return string
-   */
-  public function addressSequence() {
-    $addressFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'address_format'
-    );
-
-    return CRM_Utils_Address::sequence($addressFormat);
-  }
-
-  /**
-   * Provide cached default currency symbol.
-   *
-   * @param
-   *
-   * @return string
-   */
-  public function defaultCurrencySymbol($defaultCurrency = NULL) {
-    static $cachedSymbol = NULL;
-    if (!$cachedSymbol || $defaultCurrency) {
-      $currency = $defaultCurrency ? $defaultCurrency : $this->defaultCurrency;
-      if ($currency) {
-        $currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
-          'labelColumn' => 'symbol',
-          'orderColumn' => TRUE,
-        ));
-        $cachedSymbol = CRM_Utils_Array::value($currency, $currencySymbols, '');
-      }
-      else {
-        $cachedSymbol = '$';
-      }
-    }
-    return $cachedSymbol;
-  }
-
-  /**
-   * Provide cached default currency symbol.
-   *
-   * @param
-   *
-   * @return string
-   */
-  public function defaultContactCountry() {
-    static $cachedContactCountry = NULL;
-
-    if (!empty($this->defaultContactCountry) &&
-      !$cachedContactCountry
-    ) {
-      $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-      $cachedContactCountry = CRM_Utils_Array::value($this->defaultContactCountry,
-        $countryIsoCodes
-      );
-    }
-    return $cachedContactCountry;
-  }
-
-  /**
-   * Provide cached default country name.
-   *
-   * @param
-   *
-   * @return string
-   */
-  public function defaultContactCountryName() {
-    static $cachedContactCountryName = NULL;
-    if (!$cachedContactCountryName && $this->defaultContactCountry) {
-      $countryCodes = CRM_Core_PseudoConstant::country();
-      $cachedContactCountryName = $countryCodes[$this->defaultContactCountry];
-    }
-    return $cachedContactCountryName;
-  }
-
-  /**
-   * Provide cached country limit translated to names.
-   *
-   * @param
-   *
-   * @return array
-   */
-  public function countryLimit() {
-    static $cachedCountryLimit = NULL;
-    if (!$cachedCountryLimit) {
-      $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-      $country = array();
-      if (is_array($this->countryLimit)) {
-        foreach ($this->countryLimit as $val) {
-          // CRM-12007
-          // some countries have disappeared and hence they might be in country limit
-          // but not in the country table
-          if (isset($countryIsoCodes[$val])) {
-            $country[] = $countryIsoCodes[$val];
-          }
-        }
-      }
-      else {
-        $country[] = $countryIsoCodes[$this->countryLimit];
-      }
-      $cachedCountryLimit = $country;
-    }
-    return $cachedCountryLimit;
-  }
-
-  /**
-   * Provide cached province limit translated to names.
-   *
-   * @param
-   *
-   * @return array
-   */
-  public function provinceLimit() {
-    static $cachedProvinceLimit = NULL;
-    if (!$cachedProvinceLimit) {
-      $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-      $country = array();
-      if (is_array($this->provinceLimit)) {
-        foreach ($this->provinceLimit as $val) {
-          // CRM-12007
-          // some countries have disappeared and hence they might be in country limit
-          // but not in the country table
-          if (isset($countryIsoCodes[$val])) {
-            $country[] = $countryIsoCodes[$val];
-          }
-        }
-      }
-      else {
-        $country[] = $countryIsoCodes[$this->provinceLimit];
-      }
-      $cachedProvinceLimit = $country;
-    }
-    return $cachedProvinceLimit;
-  }
+  public $inheritLocale = 0;
 
 }
 // end CRM_Core_Config
