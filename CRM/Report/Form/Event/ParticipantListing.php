@@ -71,49 +71,22 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
+        'fields' => array_merge(array(
+          // CRM-17115 - to avoid changing report output at this stage re-instate
+          // old field name for sort name
           'sort_name_linked' => array(
             'title' => ts('Participant Name'),
             'required' => TRUE,
             'no_repeat' => TRUE,
             'dbAlias' => 'contact_civireport.sort_name',
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-          ),
-          'middle_name' => array(
-            'title' => ts('Middle Name'),
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'employer_id' => array(
-            'title' => ts('Organization'),
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-          ),
-          'age' => array(
-            'title' => ts('Age'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ),
-          'age_at_event' => array(
-            'title' => ts('Age at Event'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, event_civireport.start_date)',
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
+          )),
+          $this->getBasicContactFields(),
+          array(
+            'age_at_event' => array(
+              'title' => ts('Age at Event'),
+              'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, event_civireport.start_date)',
+            ),
+          )
         ),
         'grouping' => 'contact-fields',
         'order_bys' => array(
@@ -414,6 +387,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
       ),
     );
 
+    // CRM-17115 avoid duplication of sort_name - would be better to standardise name
+    // & behaviour across reports but trying for no change at this point.
+    $this->_columns['civicrm_contact']['fields']['sort_name']['no_display'] = TRUE;
+
     // If we have active campaigns add those elements to both the fields and filters
     if ($campaignEnabled && !empty($this->activeCampaigns)) {
       $this->_columns['civicrm_participant']['fields']['campaign_id'] = array(
@@ -696,7 +673,6 @@ ORDER BY  cv.label
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
-    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
 
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
@@ -822,8 +798,7 @@ ORDER BY  cv.label
       // handle financial type
       $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contribution_financial_type_id', $rowNum, $financialTypes);
 
-      // handle gender id
-      $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_contact_gender_id', $rowNum, $genders);
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'event/participantListing', 'View Event Income Details') ? TRUE : $entryFound;
 
       // display birthday in the configured custom format
       if (array_key_exists('civicrm_contact_birth_date', $row)) {
