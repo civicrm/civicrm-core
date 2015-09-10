@@ -25,7 +25,7 @@
 
   <tr>
    <td>
-  <p>Dear {contact.display_name},</p>
+  <p>{contact.email_greeting},</p>
 
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
@@ -507,12 +507,11 @@
        {/foreach}
       {/foreach}
      {/if}
-{if $event.allow_selfcancelxfer }
-This event allows for self-cancel or transfer
-{capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
- <a href="{$selfService}">{ts}Self service cancel transfer{/ts}</a>
-{/if}
-
+     {if $event.allow_selfcancelxfer }
+     This event allows for self-cancel or transfer
+     {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
+     <a href="{$selfService}">{ts}Self service cancel transfer{/ts}</a>
+     {/if}
     </table>
    </td>
   </tr>
@@ -521,4 +520,3 @@ This event allows for self-cancel or transfer
 
 </body>
 </html>
-
