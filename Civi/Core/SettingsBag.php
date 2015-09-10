@@ -87,28 +87,52 @@ class SettingsBag {
    *   The domain for which we want settings.
    * @param int|NULL $contactId
    *   The contact for which we want settings. Use NULL for domain settings.
-   * @param array $defaults
-   *   Array(string $settingName => mixed $value).
-   * @param array $mandatory
-   *   Array(string $settingName => mixed $value).
    */
-  public function __construct($domainId, $contactId, $defaults, $mandatory) {
+  public function __construct($domainId, $contactId) {
     $this->domainId = $domainId;
     $this->contactId = $contactId;
-    $this->defaults = $defaults;
-    $this->mandatory = $mandatory;
+    $this->filteredValues = array();
     $this->combined = NULL;
   }
 
   /**
-   * Load all settings that apply to this domain or contact.
+   * Set/replace the default values.
+   *
+   * @param array $defaults
+   *   Array(string $settingName => mixed $value).
+   * @return $this
+   */
+  public function loadDefaults($defaults) {
+    $this->defaults = $defaults;
+    $this->filteredValues = array();
+    $this->combined = NULL;
+    return $this;
+  }
+
+  /**
+   * Set/replace the mandatory values.
+   *
+   * @param array $mandatory
+   *   Array(string $settingName => mixed $value).
+   * @return $this
+   */
+  public function loadMandatory($mandatory) {
+    $this->mandatory = $mandatory;
+    $this->filteredValues = array();
+    $this->combined = NULL;
+    return $this;
+  }
+
+  /**
+   * Load all explicit settings that apply to this domain or contact.
    *
    * @return $this
    */
-  public function load() {
+  public function loadValues() {
     $this->values = array();
-    $dao = $this->createDao();
-    $dao->find();
+    // Note: Don't use Setting DAO. It requires fields() which requires
+    // translations -- which are keyed off settings!
+    $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
     while ($dao->fetch()) {
       $this->values[$dao->name] = ($dao->value !== NULL) ? unserialize($dao->value) : NULL;
     }
@@ -267,19 +291,24 @@ class SettingsBag {
   }
 
   /**
-   * @return \CRM_Core_DAO_Setting
+   * @return \CRM_Utils_SQL_Select
    */
-  protected function createDao() {
-    $dao = new \CRM_Core_DAO_Setting();
-    $dao->domain_id = $this->domainId;
+  protected function createQuery() {
+    $select = \CRM_Utils_SQL_Select::from('civicrm_setting')
+      ->select('id, group_name, name, value, domain_id, contact_id, is_domain, component_id, created_date, created_id')
+      ->where('domain_id = #id', array(
+        'id' => $this->domainId,
+      ));
     if ($this->contactId === NULL) {
-      $dao->is_domain = 1;
+      $select->where('is_domain = 1');
     }
     else {
-      $dao->contact_id = $this->contactId;
-      $dao->is_domain = 0;
+      $select->where('contact_id = #id', array(
+        'id' => $this->contactId,
+      ));
+      $select->where('is_domain = 0');
     }
-    return $dao;
+    return $select;
   }
 
   /**

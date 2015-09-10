@@ -101,6 +101,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
       CRM_Utils_Hook::config(self::$_singleton);
       self::$_singleton->authenticate();
+      Civi::service('settings_manager')->useDefaults();
     }
     return self::$_singleton;
   }

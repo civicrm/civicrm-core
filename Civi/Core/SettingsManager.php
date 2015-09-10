@@ -31,6 +31,26 @@ namespace Civi\Core;
  * Class SettingsManager
  * @package Civi\Core
  *
+ * The SettingsManager is responsible for tracking settings across various
+ * domains and users.
+ *
+ * Generally, for any given setting, there are three levels where values
+ * can be declared:
+ *
+ *   - Mandatory values (which come from a global $civicrm_setting).
+ *   - Explicit values (which are chosen by the user and stored in the DB).
+ *   - Default values (which come from the settings metadata).
+ *
+ * Note: During the early stages of bootstrap, default values are not be available.
+ * Loading the defaults requires loading metadata from various sources. However,
+ * near the end of bootstrap, one calls SettingsManager::useDefaults() to fetch
+ * and merge the defaults.
+ *
+ * Note: In a typical usage, there will only be one active domain and one
+ * active contact (each having its own bag) within a given request. However,
+ * in some edge-cases, you may need to work with multiple domains/contacts
+ * at the same time.
+ *
  * @see SettingsManagerTest
  */
 class SettingsManager {
@@ -48,12 +68,23 @@ class SettingsManager {
 
   /**
    * @var array
+   *   Array(string $entity => array(string $settingName => mixed $value)).
+   *   Ex: $mandatory['domain']['uploadDir'].
    */
   protected $mandatory = NULL;
 
   /**
+   * Whether to use defaults.
+   *
+   * @var bool
+   */
+  protected $useDefaults = FALSE;
+
+  /**
    * @param \CRM_Utils_Cache_Interface $cache
+   *   A semi-durable location to store metadata.
    * @param NULL|array $mandatory
+   *   Ex: $mandatory['domain']['uploadDir'].
    */
   public function __construct($cache, $mandatory = NULL) {
     $this->cache = $cache;
@@ -61,7 +92,33 @@ class SettingsManager {
   }
 
   /**
-   * @param int $domainId
+   * Ensure that all defaults and mandatory values are included with
+   * all current and future bags.
+   *
+   * @return $this
+   */
+  public function useDefaults() {
+    if (!$this->useDefaults) {
+      $this->useDefaults = TRUE;
+
+      if (!empty($this->bagsByDomain)) {
+        foreach ($this->bagsByDomain as $bag) {
+          $bag->loadDefaults($this->getDefaults('domain'));
+        }
+      }
+
+      if (!empty($this->bagsByContact)) {
+        foreach ($this->bagsByContact as $bag) {
+          $bag->loadDefaults($this->getDefaults('contact'));
+        }
+      }
+    }
+
+    return $this;
+  }
+
+  /**
+   * @param int|NULL $domainId
    * @return SettingsBag
    */
   public function getBagByDomain($domainId) {
@@ -70,18 +127,17 @@ class SettingsManager {
     }
 
     if (!isset($this->bagsByDomain[$domainId])) {
-      $defaults = $this->getDefaults('domain');
-      // Filter $mandatory to only include domain-settings.
-      $mandatory = \CRM_Utils_Array::subset($this->getMandatory(), array_keys($defaults));
-      $this->bagsByDomain[$domainId] = new SettingsBag($domainId, NULL, $defaults, $mandatory);
-      $this->bagsByDomain[$domainId]->load();
+      $this->bagsByDomain[$domainId] = new SettingsBag($domainId, NULL);
+      $this->bagsByDomain[$domainId]->loadValues()
+        ->loadMandatory($this->getMandatory('domain'))
+        ->loadDefaults($this->getDefaults('domain'));
     }
     return $this->bagsByDomain[$domainId];
   }
 
   /**
-   * @param int $domainId
-   * @param int $contactId
+   * @param int|NULL $domainId
+   * @param int|NULL $contactId
    * @return SettingsBag
    */
   public function getBagByContact($domainId, $contactId) {
@@ -91,11 +147,10 @@ class SettingsManager {
 
     $key = "$domainId:$contactId";
     if (!isset($this->bagsByContact[$key])) {
-      $defaults = $this->getDefaults('contact');
-      // Filter $mandatory to only include domain-settings.
-      $mandatory = \CRM_Utils_Array::subset($this->getMandatory(), array_keys($defaults));
-      $this->bagsByContact[$key] = new SettingsBag($domainId, $contactId, $defaults, $mandatory);
-      $this->bagsByContact[$key]->load();
+      $this->bagsByContact[$key] = new SettingsBag($domainId, $contactId);
+      $this->bagsByContact[$key]->loadValues()
+        ->loadDefaults($this->getDefaults('contact'))
+        ->loadMandatory($this->getMandatory('contact'));
     }
     return $this->bagsByContact[$key];
   }
@@ -108,7 +163,11 @@ class SettingsManager {
    * @return array
    *   Array(string $settingName => mixed $value).
    */
-  public function getDefaults($entity) {
+  protected function getDefaults($entity) {
+    if (!$this->useDefaults) {
+      return array();
+    }
+
     $cacheKey = 'defaults:' . $entity;
     $defaults = $this->cache->get($cacheKey);
     if (!is_array($defaults)) {
@@ -127,10 +186,13 @@ class SettingsManager {
   /**
    * Get a list of mandatory/overriden settings.
    *
+   * @param string $entity
+   *   Ex: 'domain' or 'contact'.
    * @return array
    *   Array(string $settingName => mixed $value).
    */
-  public function getMandatory() {
+  protected function getMandatory($entity) {
+    // Prepare and cache list of all mandatory settings.
     if ($this->mandatory === NULL) {
       if (isset($GLOBALS['civicrm_setting'])) {
         $this->mandatory = self::parseMandatorySettings($GLOBALS['civicrm_setting']);
@@ -139,11 +201,22 @@ class SettingsManager {
         $this->mandatory = array();
       }
     }
-    return $this->mandatory;
+
+    return \CRM_Utils_Array::value($entity, $this->mandatory, array());
   }
 
   /**
-   * Parse
+   * Parse mandatory settings.
+   *
+   * In previous versions, settings were broken down into verbose+dynamic group names, e.g.
+   *
+   *   $civicrm_settings['Foo Bar Preferences']['foo'] = 'bar';
+   *
+   * We now simplify to two simple groups, 'domain' and 'contact'.
+   *
+   *    $civicrm_settings['domain']['foo'] = 'bar';
+   *
+   * However, the old groups are grand-fathered in as aliases.
    *
    * @param array $civicrm_setting
    *   Ex: $civicrm_setting['Group Name']['field'] = 'value'.
@@ -151,18 +224,36 @@ class SettingsManager {
    * @return array
    */
   public static function parseMandatorySettings($civicrm_setting) {
-    $tmp = array();
+    $rewriteGroups = array(
+      \CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME => 'contact',
+      \CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => 'domain',
+      \CRM_Core_BAO_Setting::URL_PREFERENCES_NAME => 'domain',
+    );
+
     if (is_array($civicrm_setting)) {
-      foreach ($civicrm_setting as $group => $settings) {
-        foreach ($settings as $k => $v) {
-          if ($v !== NULL) {
-            $tmp[$k] = $v;
-          }
+      foreach ($rewriteGroups as $oldGroup => $newGroup) {
+        if (!isset($civicrm_setting[$newGroup])) {
+          $civicrm_setting[$newGroup] = array();
+        }
+        if (isset($civicrm_setting[$oldGroup])) {
+          $civicrm_setting[$newGroup] = array_merge($civicrm_setting[$oldGroup], $civicrm_setting[$newGroup]);
+          unset($civicrm_setting[$oldGroup]);
         }
       }
-      return $tmp;
     }
-    return $tmp;
+    return $civicrm_setting;
   }
 
 }
