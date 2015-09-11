@@ -128,7 +128,10 @@ class SettingsManager {
 
     if (!isset($this->bagsByDomain[$domainId])) {
       $this->bagsByDomain[$domainId] = new SettingsBag($domainId, NULL);
-      $this->bagsByDomain[$domainId]->loadValues()
+      if (\CRM_Core_Config::singleton()->dsn) {
+        $this->bagsByDomain[$domainId]->loadValues();
+      }
+      $this->bagsByDomain[$domainId]
         ->loadMandatory($this->getMandatory('domain'))
         ->loadDefaults($this->getDefaults('domain'));
     }
@@ -148,7 +151,10 @@ class SettingsManager {
     $key = "$domainId:$contactId";
     if (!isset($this->bagsByContact[$key])) {
       $this->bagsByContact[$key] = new SettingsBag($domainId, $contactId);
-      $this->bagsByContact[$key]->loadValues()
+      if (\CRM_Core_Config::singleton()->dsn) {
+        $this->bagsByContact[$key]->loadValues();
+      }
+      $this->bagsByContact[$key]
         ->loadDefaults($this->getDefaults('contact'))
         ->loadMandatory($this->getMandatory('contact'));
     }

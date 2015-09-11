@@ -91,6 +91,7 @@ class SettingsBag {
   public function __construct($domainId, $contactId) {
     $this->domainId = $domainId;
     $this->contactId = $contactId;
+    $this->values = array();
     $this->filteredValues = array();
     $this->combined = NULL;
   }
