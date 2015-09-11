@@ -4493,7 +4493,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     );
   }
 
-
+  /*
+   * Generate temporary table to hold all contributions with permissioned FTs. 
+   *
+   * @param object $query
+   * @param string $alias
+   * @param bool $return
+   */
   public function getPermissionedFTQuery(&$query, $alias = NULL, $return = FALSE) {
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
       return FALSE;
