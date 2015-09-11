@@ -620,6 +620,14 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     return 'CRM_Member_BAO_Membership';
   }
 
+  /**
+   * Get a list of links based on permissioned FTs.
+   *
+   * @param int $memTypeID
+   *   membership type ID
+   * @param int $links
+   *   (reference ) action links
+   */
   public static function getPermissionedLinks($memTypeID, &$links) {
     if (!self::isACLFinancialTypeStatus()) {
       return FALSE;
