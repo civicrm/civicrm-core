@@ -160,6 +160,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $setPrevContribution = FALSE;
       }
     }
+    if ($contributionID && $setPrevContribution) {
+      $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    }
 
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
@@ -175,10 +178,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (!CRM_Utils_Rule::currencyCode($contribution->currency)) {
       $config = CRM_Core_Config::singleton();
       $contribution->currency = $config->defaultCurrency;
-    }
-
-    if ($contributionID && $setPrevContribution) {
-      $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
 
     $result = $contribution->save();
