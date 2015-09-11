@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class generates form components for Localization
- *
  */
 class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   // use this variable to store mappings that we compute in buildForm and also
@@ -44,8 +41,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
