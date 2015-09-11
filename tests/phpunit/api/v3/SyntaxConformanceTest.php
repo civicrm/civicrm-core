@@ -1154,6 +1154,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_LONGTEXT:
         case CRM_Utils_Type::T_EMAIL:
           $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
+          // typecast with array to satisfy changes made in CRM-13160
+          if ($entityName == 'MembershipType' && in_array($fieldName, array('relationship_type_id', 'relationship_direction'))) {
+            $entity[$fieldName] = (array) $entity[$fieldName];
+          }
           break;
 
         case CRM_Utils_Type::T_INT:
