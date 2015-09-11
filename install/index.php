@@ -394,6 +394,16 @@ class InstallRequirements {
             ts("An auto_increment_increment value greater than 1 is not currently supported. Please see issue CRM-7923 for further details and potential workaround."),
           )
         );
+        if (!$this->requireValidDBName(
+          $databaseConfig['database'],
+          array(
+            ts("MySQL %1 Configuration", array(1 => $dbName)),
+            ts("Is the provided database name valid?"),
+            ts("The database name provided is not valid. Please use only 0-9, a-z, A-Z and _ as characters in the name."),
+          ))
+        ) {
+          return FALSE;
+        }
         $this->requireMySQLThreadStack($databaseConfig['server'],
           $databaseConfig['username'],
           $databaseConfig['password'],
@@ -408,14 +418,6 @@ class InstallRequirements {
         );
       }
       $onlyRequire = ($dbName == 'Drupal') ? TRUE : FALSE;
-      $this->requireValidDBName(
-        $databaseConfig['database'],
-        array(
-          ts("MySQL %1 Configuration", array(1 => $dbName)),
-          ts("Is the provided database name valid?"),
-          ts("The database name provided is not valid. Please use only 0-9, a-z, A-Z and _ as characters in the name."),
-        )
-      );
       $this->requireDatabaseOrCreatePermissions(
         $databaseConfig['server'],
         $databaseConfig['username'],
@@ -1296,8 +1298,10 @@ class InstallRequirements {
     );
     if (empty($matches)) {
       $this->error($testDetails);
-      return;
+      return FALSE;
     }
+    $this->testing($testDetails);
+    return TRUE;
   }
 
 }
