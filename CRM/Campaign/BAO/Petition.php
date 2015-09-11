@@ -222,7 +222,8 @@ SELECT  petition.id                         as id,
       }
 
       // set permanent cookie to indicate this petition already signed on the computer
-      setcookie('signed_' . $params['sid'], $activity->id, time() + $this->cookieExpire, '/');
+      $config = CRM_Core_Config::singleton();
+      setcookie('signed_' . $params['sid'], $activity->id, time() + $this->cookieExpire, $config->userFrameworkBaseURL);
     }
 
     return $activity;
@@ -271,10 +272,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     if (isset($petition_id) && is_numeric($petition_id)
       && isset($activity_id) && is_numeric($activity_id)) {
       // set permanent cookie to indicate this users email address now confirmed
+      $config = CRM_Core_Config::singleton();
       setcookie("confirmed_{$petition_id}",
         $activity_id,
         time() + $this->cookieExpire,
-        '/'
+        $config->userFrameworkBaseURL
       );
       return TRUE;
     }
