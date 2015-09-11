@@ -81,7 +81,7 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
  */
 function civicrm_api3_membership_type_get($params) {
   $results = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-  if (!empty($results['values'])) {
+  if (!empty($results['values']) && is_array($results['values'])) {
     foreach ($results['values'] as &$item) {
       // Workaround for fields using nonstandard serialization
       foreach (array('relationship_type_id', 'relationship_direction') as $field) {
