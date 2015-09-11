@@ -49,6 +49,11 @@
                 <td>{$form.inheritLocale.html}<br />
                 <span class="description">{ts}If checked, CiviCRM will follow CMS language changes.{/ts}</span></td>
             </tr>
+          <tr class="crm-localization-form-contact_default_language">
+            <td class="label">{$form.contact_default_language.label}</td>
+            <td>{$form.contact_default_language.html}<br />
+              <span class="description">{ts}Default language (if any) for contact records.{/ts}</span></td>
+          </tr>
             <tr class="crm-localization-form-block-defaultCurrency">
                 <td class="label">{$form.defaultCurrency.label}</td>
                 <td>{$form.defaultCurrency.html}<br />
