@@ -110,10 +110,13 @@ class CRM_Core_Payment_ProcessorForm {
     //@todo document why this addHidden is here
     //CRM-15743 - we should not set/create hidden element for pay later
     // because payment processor is not selected
-    if (!empty($form->_paymentProcessorID)) {
+    $processorId = $form->getVar('_paymentProcessorID');
+    $isBillingAddressRequiredForPayLater = $form->_isBillingAddressRequiredForPayLater;
+    if (!empty($processorId)) {
+      $isBillingAddressRequiredForPayLater = FALSE;
       $form->addElement('hidden', 'hidden_processor', 1);
     }
-    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($form->_isBillingAddressRequiredForPayLater), FALSE);
+    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($isBillingAddressRequiredForPayLater), FALSE);
   }
 
 }
