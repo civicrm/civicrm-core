@@ -147,12 +147,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       }
     }
 
-    if (!empty($form->_honor_block_is_active) && !empty($params['soft_credit_type_id'])) {
+    if (!empty($form->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
       $honorId = NULL;
 
       $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
       //check if there is any duplicate contact
-      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
+      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']);
       $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
       $dedupeParams['check_permission'] = FALSE;
       $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType);
@@ -163,7 +163,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $honorId = CRM_Contact_BAO_Contact::createProfileContact(
         $params['honor'], CRM_Core_DAO::$_nullArray,
         $honorId, NULL,
-        $params['honoree_profile_id']
+        $form->_values['honoree_profile_id']
       );
       $softParams[] = array(
         'contact_id' => $honorId,
@@ -177,7 +177,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
             CRM_Core_OptionGroup::values("soft_credit_type")
           ),
           'honor_id' => $honorId,
-          'honor_profile_id' => $params['honoree_profile_id'],
+          'honor_profile_id' => $form->_values['honoree_profile_id'],
           'honor_profile_values' => $params['honor'],
         );
       }
@@ -453,12 +453,14 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @param CRM_Core_Form $form
    * @param array $params
-   * @param int $honoreeprofileId
    * @param int $honorId
    */
-  public static function formatHonoreeProfileFields($form, $params, $honoreeprofileId, $honorId = NULL) {
-    $profileContactType = CRM_Core_BAO_UFGroup::getContactType($honoreeprofileId);
-    $profileFields = CRM_Core_BAO_UFGroup::getFields($honoreeprofileId);
+  public static function formatHonoreeProfileFields($form, $params, $honorId = NULL) {
+    if (empty($form->_values['honoree_profile_id'])) {
+      return;
+    }
+    $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']);
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($form->_values['honoree_profile_id']);
     $honoreeProfileFields = $values = array();
     $honorName = NULL;
 

@@ -88,25 +88,50 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $values
    */
   public static function setValues($id, &$values) {
-    $params = array(
-      'id' => $id,
-    );
+    $modules = array('CiviContribute', 'soft_credit', 'on_behalf');
+    $values['custom_pre_id'] = $values['custom_post_id'] = NULL;
 
+    $params = array('id' => $id);
     CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage', $params, $values);
 
     // get the profile ids
     $ufJoinParams = array(
-      'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $id,
     );
-    list($values['custom_pre_id'], $customPostIds) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
-    if (!empty($customPostIds)) {
-      $values['custom_post_id'] = $customPostIds[0];
-    }
-    else {
-      $values['custom_post_id'] = '';
+    // retrieve profile id as also unserialize module_data corresponding to each $module
+    foreach ($modules as $module) {
+      $ufJoinParams['module'] = $module;
+      $ufJoin = new CRM_Core_DAO_UFJoin();
+      $ufJoin->copyValues($ufJoinParams);
+      if ($module == 'CiviContribute') {
+        $ufJoin->orderBy('weight asc');
+        $ufJoin->find();
+        while ($ufJoin->fetch()) {
+          if ($ufJoin->weight == 1) {
+            $values['custom_pre_id'] = $ufJoin->uf_group_id;
+          }
+          else {
+            $values['custom_post_id'] = $ufJoin->uf_group_id;
+          }
+        }
+      }
+      else {
+        $ufJoin->find(TRUE);
+        if (!$ufJoin->is_active) {
+          continue;
+        }
+        $params = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoin->module_data, TRUE, $module);
+        $values = array_merge($params, $values);
+        if ($module == 'soft_credit') {
+          $values['honoree_profile_id'] = $ufJoin->uf_group_id;
+          $values['honor_block_is_active'] = $ufJoin->is_active;
+        }
+        else {
+          $values['onbehalf_profile_id'] = $ufJoin->uf_group_id;
+        }
+      }
     }
   }
 
@@ -301,10 +326,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
       if (isset($values['honor'])) {
         $honorValues = $values['honor'];
+        $template->_values = array('honoree_profile_id' => $values['honoree_profile_id']);
         CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields(
           $template,
           $honorValues['honor_profile_values'],
-          $honorValues['honor_profile_id'],
           $honorValues['honor_id']
         );
       }
@@ -362,15 +387,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['onBehalfName'] = $displayName;
         $tplParams['onBehalfEmail'] = $email;
 
-        $ufJoinParams = array(
-          'module' => 'onBehalf',
-          'entity_table' => 'civicrm_contribution_page',
-          'entity_id' => $values['id'],
-        );
-        $OnBehalfProfile = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-        $profileId = $OnBehalfProfile[0];
-        $userID = $contactID;
-        self::buildCustomDisplay($profileId, 'onBehalfProfile', $userID, $template, $params['onbehalf_profile'], $fieldTypes);
+        if (!empty($values['onbehalf_profile_id'])) {
+          self::buildCustomDisplay($values['onbehalf_profile_id'], 'onBehalfProfile', $contactID, $template, $params['onbehalf_profile'], $fieldTypes);
+        }
       }
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
@@ -770,82 +789,104 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * Get or Set multilingually affected honor params for processing module_data or setting default values.
+   * Get or Set honor/on_behalf params for processing module_data or setting default values.
    *
-   * @param string $params :
+   * @param array $params :
    * @param bool $setDefault : If yes then returns array to used for setting default value afterward
+   * @param string $module : processing module_data for which module? e.g. soft_credit, on_behalf
    *
    * @return array|string
    */
-  public static function formatMultilingualHonorParams($params, $setDefault = FALSE) {
+  public static function formatModuleData($params, $setDefault = FALSE, $module) {
     $config = CRM_Core_Config::singleton();
-    $sctJson = $sctJsonDecode = NULL;
+    $json = $jsonDecode = NULL;
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
+
+    $moduleDataFormat = array(
+      'soft_credit' => array(
+        1 => 'soft_credit_types',
+        'multilingual' => array(
+          'honor_block_title',
+          'honor_block_text',
+        ),
+      ),
+      'on_behalf' => array(
+        1 => 'is_for_organization',
+        'multilingual' => array(
+          'for_organization',
+        ),
+      ),
+    );
 
     //When we are fetching the honor params respecting both multi and mono lingual state
     //and setting it to default param of Contribution Page's Main and Setting form
     if ($setDefault) {
-      $sctJsonDecode = json_decode($params);
-      $sctJsonDecode = (array) $sctJsonDecode->soft_credit;
-      if (!$domain->locales && !empty($sctJsonDecode['default'])) {
+      $jsonDecode = json_decode($params);
+      $jsonDecode = (array) $jsonDecode->$module;
+      if (!$domain->locales && !empty($jsonDecode['default'])) {
         //monolingual state
-        $sctJsonDecode += (array) $sctJsonDecode['default'];
+        $jsonDecode += (array) $jsonDecode['default'];
+        unset($jsonDecode['default']);
       }
-      elseif (!empty($sctJsonDecode[$config->lcMessages])) {
+      elseif (!empty($jsonDecode[$config->lcMessages])) {
         //multilingual state
-        foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
-          $sctJsonDecode[$column] = $value;
+        foreach ($jsonDecode[$config->lcMessages] as $column => $value) {
+          $jsonDecode[$column] = $value;
         }
-        unset($sctJsonDecode[$config->lcMessages]);
+        unset($jsonDecode[$config->lcMessages]);
       }
-      return $sctJsonDecode;
+      return $jsonDecode;
     }
 
     //check and handle multilingual honoree params
     if (!$domain->locales) {
       //if in singlelingual state simply return the array format
-      $sctJson = json_encode(
-        array(
-          'soft_credit' => array(
-            'soft_credit_types' => $params['soft_credit_types'],
-            'default' => array(
-              'honor_block_title' => $params['honor_block_title'],
-              'honor_block_text' => $params['honor_block_text'],
-            ),
-          ),
-        )
-      );
+      $json = array($module => NULL);
+      foreach ($moduleDataFormat[$module] as $key => $attribute) {
+        if ($key === 'multilingual') {
+          $json[$module]['default'] = array();
+          foreach ($attribute as $attr) {
+            $json[$module]['default'][$attr] = $params[$attr];
+          }
+        }
+        else {
+          $json[$module][$attribute] = $params[$attribute];
+        }
+      }
+      $json = json_encode($json);
     }
     else {
       //if in multilingual state then retrieve the module_data against this contribution and
       //merge with earlier module_data json data to current so not to lose earlier multilingual module_data information
-      $sctJson = array(
-        'soft_credit' => array(
-          'soft_credit_types' => $params['soft_credit_types'],
-          $config->lcMessages => array(
-            'honor_block_title' => $params['honor_block_title'],
-            'honor_block_text' => $params['honor_block_text'],
-          ),
-        ),
-      );
+      $json = array($module => NULL);
+      foreach ($moduleDataFormat[$module] as $key => $attribute) {
+        if ($key === 'multilingual') {
+          $json[$module][$config->lcMessages] = array();
+          foreach ($attribute as $attr) {
+            $json[$module][$config->lcMessages][$attr] = $params[$attr];
+          }
+        }
+        else {
+          $json[$module][$attribute] = $params[$attribute];
+        }
+      }
 
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
-      $ufJoinDAO->module = 'soft_credit';
+      $ufJoinDAO->module = $module;
       $ufJoinDAO->entity_id = $params['id'];
       $ufJoinDAO->find(TRUE);
       $jsonData = json_decode($ufJoinDAO->module_data);
       if ($jsonData) {
-        $sctJson['soft_credit'] = array_merge((array) $jsonData->soft_credit, $sctJson['soft_credit']);
+        $json[$module] = array_merge((array) $jsonData->$module, $json[$module]);
       }
-      $sctJson = json_encode($sctJson);
+      $json = json_encode($json);
     }
-    return $sctJson;
+    return $json;
   }
 
   /**
-   * Generate html for pdf in confirmation receipt email attachment.
-   *
+   * Generate html for pdf in confirmation receipt email  attachment.
    * @param int $contributionId
    *   Contribution Page Id.
    * @param int $userID

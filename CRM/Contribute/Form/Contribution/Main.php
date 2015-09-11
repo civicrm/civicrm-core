@@ -41,10 +41,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   public $_defaultMemTypeId;
 
-  public $_relatedOrganizationFound;
-
-  public $_onBehalfRequired = FALSE;
-  public $_onbehalf = FALSE;
   public $_paymentProcessors;
 
   public $_membershipTypeValues;
@@ -78,38 +74,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->assign('mainDisplay', CRM_Utils_Request::retrieve('_qf_Main_display', 'Boolean',
       CRM_Core_DAO::$_nullObject));
 
-    // Possible values for 'is_for_organization':
-    // * 0 - org profile disabled
-    // * 1 - org profile optional
-    // * 2 - org profile required
-    $this->_onbehalf = FALSE;
-    if (!empty($this->_values['is_for_organization'])) {
-      if ($this->_values['is_for_organization'] == 2) {
-        $this->_onBehalfRequired = TRUE;
-      }
-      // Add organization profile if 1 of the following are true:
-      // If the org profile is required
-      if ($this->_onBehalfRequired ||
-        // Or we are building the form for the first time
-        empty($_POST) ||
-        // Or the user has submitted the form and checked the "On Behalf" checkbox
-        !empty($_POST['is_for_organization'])
-      ) {
-        $this->_onbehalf = TRUE;
-        CRM_Contribute_Form_Contribution_OnBehalfOf::preProcess($this);
-      }
-    }
-    $this->assign('onBehalfRequired', $this->_onBehalfRequired);
-
-    if ($this->_honor_block_is_active) {
-      CRM_Contact_Form_ProfileContact::preprocess($this);
-    }
-
-    if ($this->_snippet) {
-      $this->assign('isOnBehalfCallback', CRM_Utils_Array::value('onbehalf', $_GET, FALSE));
-      return;
-    }
-
     if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
     }
@@ -125,54 +89,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if (!empty($this->_values['footer_text'])) {
       $this->assign('footer_text', $this->_values['footer_text']);
-    }
-
-    //CRM-5001
-    //CRM-15787
-    $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
-    if (!empty($this->_values['is_for_organization']) && empty($member['is_active'])) {
-      $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
-      $ufJoinParams = array(
-        'module' => 'onBehalf',
-        'entity_table' => 'civicrm_contribution_page',
-        'entity_id' => $this->_id,
-      );
-      $onBehalfProfileIDs = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-      // getUFGroupIDs returns an array with the first item being the ID we need
-      $onBehalfProfileID = $onBehalfProfileIDs[0];
-      if ($onBehalfProfileID) {
-        $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($onBehalfProfileID);
-        foreach (array(
-                   'Individual',
-                   'Organization',
-                   'Household',
-                 ) as $contactType) {
-          if (in_array($contactType, $onBehalfProfile) &&
-            (in_array('Membership', $onBehalfProfile) ||
-              in_array('Contribution', $onBehalfProfile)
-            )
-          ) {
-            CRM_Core_Error::fatal($msg);
-          }
-        }
-      }
-
-      if ($postID = CRM_Utils_Array::value('custom_post_id', $this->_values)) {
-        $postProfile = CRM_Core_BAO_UFGroup::profileGroups($postID);
-        foreach (array(
-                   'Individual',
-                   'Organization',
-                   'Household',
-                 ) as $contactType) {
-          if (in_array($contactType, $postProfile) &&
-            (in_array('Membership', $postProfile) ||
-              in_array('Contribution', $postProfile)
-            )
-          ) {
-            CRM_Core_Error::fatal($msg);
-          }
-        }
-      }
     }
   }
 
@@ -266,7 +182,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
-      if ($this->_honor_block_is_active && count($completedContributionIds)) {
+      if (count($completedContributionIds)) {
         $softCredit = array();
         foreach ($completedContributionIds as $id) {
           $softCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($id);
@@ -366,6 +282,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
     $this->buildCustom($this->_values['custom_post_id'], 'customPost');
 
+    $this->buildComponentForm($this->_id, $this);
+
     if (!empty($this->_fields) && !empty($this->_values['custom_pre_id'])) {
       $profileAddressFields = array();
       foreach ($this->_fields as $key => $value) {
@@ -375,9 +293,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // Build payment processor form
-    if (empty($_GET['onbehalf'])) {
-      CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
-    }
+    CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
     $config = CRM_Core_Config::singleton();
 
@@ -385,14 +301,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if ($contactID) {
       $this->assign('contact_id', $contactID);
       $this->assign('display_name', CRM_Contact_BAO_Contact::displayName($contactID));
-    }
-
-    if ($this->_onbehalf) {
-      CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
-      // Return if we are in an ajax callback
-      if ($this->_snippet) {
-        return;
-      }
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -487,23 +395,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    if ($this->_values['is_for_organization']) {
-      $this->buildOnBehalfOrganization();
-    }
-
     //we allow premium for pledge during pledge creation only.
     if (empty($this->_values['pledge_id'])) {
       CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, TRUE);
-    }
-
-    //add honor block
-    if ($this->_honor_block_is_active) {
-      $this->assign('honor_block_is_active', TRUE);
-
-      //build soft-credit section
-      CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
-      //build honoree profile section
-      CRM_Contact_Form_ProfileContact::buildQuickForm($this);
     }
 
     //don't build pledge block when mid is passed
@@ -607,26 +501,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution_Main', 'formRule'), $this);
-  }
-
-  /**
-   * Build elements to enable pay on behalf of an organization.
-   */
-  public function buildOnBehalfOrganization() {
-    if ($this->_membershipContactID) {
-      $entityBlock = array('contact_id' => $this->_membershipContactID);
-      CRM_Core_BAO_Location::getValues($entityBlock, $this->_defaults);
-    }
-
-    if (!$this->_onBehalfRequired) {
-      $this->addElement('checkbox', 'is_for_organization',
-        $this->_values['for_organization'],
-        NULL, array('onclick' => "showOnBehalf( );")
-      );
-    }
-
-    $this->assign('is_for_organization', TRUE);
-    $this->assign('urlPath', 'civicrm/contribute/transact');
   }
 
   /**
@@ -957,29 +831,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $errors['_qf_default'] = ts('You cannot set up a recurring contribution if you are not paying online by credit card.');
     }
 
-    if (!empty($fields['is_for_organization']) &&
-      !property_exists($self, 'organizationName')
-    ) {
-
-      if (empty($fields['onbehalf']['organization_name'])) {
-        if (!empty($fields['org_option']) && !$fields['onbehalfof_id']) {
-          $errors['organization_id'] = ts('Please select an organization or enter a new one.');
-        }
-        elseif (empty($fields['org_option'])) {
-          $errors['onbehalf']['organization_name'] = ts('Please enter the organization name.');
-        }
-      }
-
-      foreach ($fields['onbehalf'] as $key => $value) {
-        if (strstr($key, 'email')) {
-          $emailLocType = explode('-', $key);
-        }
-      }
-      if (empty($fields['onbehalf']["email-{$emailLocType[1]}"])) {
-        $errors['onbehalf']["email-{$emailLocType[1]}"] = ts('Organization email is required.');
-      }
-    }
-
     // validate PCP fields - if not anonymous, we need a nick name value
     if ($self->_pcpId && !empty($fields['pcp_display_in_roll']) &&
       (CRM_Utils_Array::value('pcp_is_anonymous', $fields) == 0) &&
@@ -1120,10 +971,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //carry campaign from profile.
     if (array_key_exists('contribution_campaign_id', $params)) {
       $params['campaign_id'] = $params['contribution_campaign_id'];
-    }
-
-    if (!empty($params['onbehalfof_id'])) {
-      $params['organization_id'] = $params['onbehalfof_id'];
     }
 
     $params['currencyID'] = $config->defaultCurrency;

@@ -132,7 +132,14 @@
                   &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
-                {if $prefix}{$form.$prefix.$n.html}{else}{$form.$n.html}{/if}
+                {if $prefix}
+                  {if $n eq 'organization_name' && !empty($form.onbehalfof_id)}
+                    {$form.onbehalfof_id.html}
+                  {/if}
+                  {$form.$prefix.$n.html}
+		{else}
+		  {$form.$n.html}
+		{/if}
               {/if}
 
             {*CRM-4564*}
