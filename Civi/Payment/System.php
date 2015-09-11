@@ -99,11 +99,11 @@ class System {
    * Flush processors from static cache.
    *
    * This is particularly used for tests.
-   *
    */
   public function flushProcessors() {
     $this->cache = array();
-    \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors(NULL, TRUE);
+    \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('all', TRUE);
+    \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('live', TRUE);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('test', TRUE);
   }
 
