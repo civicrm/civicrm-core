@@ -43,7 +43,7 @@ require_once 'api/api.php';
 /**
  * Class CRM_Core_Config
  */
-class CRM_Core_Config extends CRM_Core_Config_Variables {
+class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * The handle to the log that we are using
@@ -64,7 +64,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * single instance installation.
    */
   public function __construct() {
-    //parent::__construct();
+    parent::__construct();
   }
 
   /**
@@ -90,11 +90,16 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       self::$_singleton = $cache->get('CRM_Core_Config' . CRM_Core_Config::domainID());
       if (!self::$_singleton) {
         self::$_singleton = new CRM_Core_Config();
-        self::$_singleton->_initialize($loadFromDB);
+        self::$_singleton->getRuntime()->initialize($loadFromDB);
         $cache->set('CRM_Core_Config' . CRM_Core_Config::domainID(), self::$_singleton);
       }
       else {
-        self::$_singleton->_initialize(FALSE);
+        self::$_singleton->getRuntime()->initialize(FALSE);
+      }
+
+      if (self::$_singleton->getRuntime()->dsn) {
+        $domain = \CRM_Core_BAO_Domain::getDomain();
+        \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
       }
 
       unset($errorScope);
@@ -107,58 +112,11 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Initializes the entire application.
-   * Reads constants defined in civicrm.settings.php and
-   * stores them in config properties.
-   *
-   * @param bool $loadFromDB
-   */
-  private function _initialize($loadFromDB = TRUE) {
-    if (!defined('CIVICRM_DSN') && $loadFromDB) {
-      $this->fatal('You need to define CIVICRM_DSN in civicrm.settings.php');
-    }
-    $this->dsn = defined('CIVICRM_DSN') ? CIVICRM_DSN : NULL;
-
-    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') && $loadFromDB) {
-      $this->fatal('You need to define CIVICRM_TEMPLATE_COMPILEDIR in civicrm.settings.php');
-    }
-
-    if (defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
-      $this->configAndLogDir = CRM_Utils_File::baseFilePath() . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
-      CRM_Utils_File::createDir($this->configAndLogDir);
-      CRM_Utils_File::restrictAccess($this->configAndLogDir);
-
-      $this->templateCompileDir = defined('CIVICRM_TEMPLATE_COMPILEDIR') ? CRM_Utils_File::addTrailingSlash(CIVICRM_TEMPLATE_COMPILEDIR) : NULL;
-      CRM_Utils_File::createDir($this->templateCompileDir);
-      CRM_Utils_File::restrictAccess($this->templateCompileDir);
-    }
-
-    CRM_Core_DAO::init($this->dsn);
-
-    if (!defined('CIVICRM_UF')) {
-      $this->fatal('You need to define CIVICRM_UF in civicrm.settings.php');
-    }
-    $this->setUserFramework(CIVICRM_UF);
-
-    if ($loadFromDB) {
-      $this->_initVariables();
-    }
-
-    if (CRM_Utils_System::isSSL()) {
-      $this->userSystem->mapConfigToSSL();
-    }
-
-    if (isset($this->customPHPPathDir) && $this->customPHPPathDir) {
-      set_include_path($this->customPHPPathDir . PATH_SEPARATOR . get_include_path());
-    }
-
-    $this->initialized = 1;
-  }
-
-  /**
    * Returns the singleton logger for the application.
    *
+   * @deprecated
    * @return object
+   * @see Civi::log()
    */
   static public function &getLog() {
     if (!isset(self::$_log)) {
@@ -169,53 +127,11 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Initialize the config variables.
-   */
-  private function _initVariables() {
-    $this->templateDir = array(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
-
-    // retrieve serialised settings
-    $variables = array();
-    CRM_Core_BAO_ConfigSetting::retrieve($variables);
-
-    // if settings are not available, go down the full path
-    if (empty($variables)) {
-      // Step 1. get system variables with their hardcoded defaults
-      $variables = get_object_vars($this);
-
-      // serialise settings
-      $settings = $variables;
-      CRM_Core_BAO_ConfigSetting::add($settings);
-    }
-
-    foreach ($variables as $key => $value) {
-      $this->$key = $value;
-    }
-
-    $this->enableComponents = Civi::settings()->get('enable_components');
-
-    $this->customFileUploadDir = CRM_Core_Config_Defaults::getCustomFileUploadDir();
-    $this->customPHPPathDir = CRM_Core_Config_Defaults::getCustomPhpPathDir();
-    $this->customTemplateDir = CRM_Core_Config_Defaults::getCustomTemplateDir();
-    $this->extensionsDir = CRM_Core_Config_Defaults::getExtensionsDir();
-    $this->imageUploadDir = CRM_Core_Config_Defaults::getImageUploadDir();
-    $this->resourceBase = CRM_Core_Config_Defaults::getResourceBase();
-    $this->uploadDir = CRM_Core_Config_Defaults::getUploadDir();
-
-    $this->userFrameworkResourceURL = CRM_Core_Config_Defaults::getUserFrameworkResourceUrl();
-    $this->customCSSURL = CRM_Core_Config_Defaults::getCustomCssUrl();
-    $this->extensionsURL = CRM_Core_Config_Defaults::getExtensionsUrl();
-    $this->imageUploadURL = CRM_Core_Config_Defaults::getImageUploadUrl();
-
-    $this->geocodeMethod = CRM_Utils_Geocode::getProviderClass();
-    $this->defaultCurrencySymbol = CRM_Core_Config_Defaults::getDefaultCurrencySymbol();
-  }
-
-  /**
    * Retrieve a mailer to send any mail from the application.
    *
    * @return Mail
    * @deprecated
+   * @see Civi::service()
    */
   public static function getMailer() {
     return Civi::service('pear_mail');
@@ -471,50 +387,17 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     return FALSE;
   }
 
+
   /**
    * Wrapper function to allow unit tests to switch user framework on the fly.
    *
    * @param string $userFramework
    *   One of 'Drupal', 'Joomla', etc.
+   * @deprecated
    */
   public function setUserFramework($userFramework) {
-    $this->userFramework = $userFramework;
-    $this->userFrameworkClass = 'CRM_Utils_System_' . $userFramework;
-    $this->userHookClass = 'CRM_Utils_Hook_' . $userFramework;
-    $userPermissionClass = 'CRM_Core_Permission_' . $userFramework;
-    $this->userPermissionClass = new $userPermissionClass();
-
-    $class = $this->userFrameworkClass;
-    $this->userSystem = new $class();
-
-    if ($userFramework == 'Joomla') {
-      $this->userFrameworkURLVar = 'task';
-    }
-
-    if (defined('CIVICRM_UF_BASEURL')) {
-      $this->userFrameworkBaseURL = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
-
-      //format url for language negotiation, CRM-7803
-      $this->userFrameworkBaseURL = CRM_Utils_System::languageNegotiationURL($this->userFrameworkBaseURL);
-
-      if (CRM_Utils_System::isSSL()) {
-        $this->userFrameworkBaseURL = str_replace('http://', 'https://', $this->userFrameworkBaseURL);
-      }
-    }
-
-    if (defined('CIVICRM_UF_DSN')) {
-      $this->userFrameworkDSN = CIVICRM_UF_DSN;
-    }
-
-    // this is dynamically figured out in the civicrm.settings.php file
-    if (defined('CIVICRM_CLEANURL')) {
-      $this->cleanURL = CIVICRM_CLEANURL;
-    }
-    else {
-      $this->cleanURL = 0;
-    }
+    $this->getRuntime()->setUserFramework($userFramework);
   }
-
   /**
    * Is back office credit card processing enabled for this site - ie are there any installed processors that support
    * it?
@@ -565,11 +448,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    */
   public function free() {
     self::$_singleton = NULL;
-  }
-
-  private function fatal($message) {
-    echo $message;
-    exit();
   }
 
 }

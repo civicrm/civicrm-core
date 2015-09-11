@@ -56,11 +56,11 @@ class CRM_Core_Config_Defaults {
   public static function setValues(&$defaults, $formMode = FALSE) {
   }
 
-  public static function getCustomCssUrl() {
+  public static function getCustomCssUrl($k = NULL) {
     return Civi::settings()->getUrl('customCSSURL', 'absolute');
   }
 
-  public static function getCustomFileUploadDir() {
+  public static function getCustomFileUploadDir($k = NULL) {
     $settings = Civi::settings();
     $value = $settings->getPath('customFileUploadDir');
     if (empty($value)) {
@@ -74,23 +74,23 @@ class CRM_Core_Config_Defaults {
   }
 
 
-  public static function getCustomPhpPathDir() {
+  public static function getCustomPhpPathDir($k = NULL) {
     return Civi::settings()->getPath('customPHPPathDir');
   }
 
-  public static function getCustomTemplateDir() {
+  public static function getCustomTemplateDir($k = NULL) {
     return Civi::settings()->getPath('customTemplateDir');
   }
 
-  public static function getExtensionsUrl() {
+  public static function getExtensionsUrl($k = NULL) {
     return Civi::settings()->getUrl('extensionsURL', 'absolute');
   }
 
-  public static function getExtensionsDir() {
+  public static function getExtensionsDir($k = NULL) {
     return Civi::settings()->getPath('extensionsDir');
   }
 
-  public static function getImageUploadDir() {
+  public static function getImageUploadDir($k = NULL) {
     $settings = Civi::settings();
     $value = $settings->getPath('imageUploadDir');
     if (empty($value)) {
@@ -102,7 +102,7 @@ class CRM_Core_Config_Defaults {
     return $value;
   }
 
-  public static function getImageUploadUrl() {
+  public static function getImageUploadUrl($k = NULL) {
     $settings = Civi::settings();
     $imageUploadURL = $settings->getUrl('imageUploadURL', 'absolute');
     if (empty($imageUploadURL)) {
@@ -112,7 +112,7 @@ class CRM_Core_Config_Defaults {
     return $imageUploadURL;
   }
 
-  public static function getUploadDir() {
+  public static function getUploadDir($k = NULL) {
     $settings = Civi::settings();
     $value = $settings->getPath('uploadDir');
     if (empty($value)) {
@@ -125,7 +125,7 @@ class CRM_Core_Config_Defaults {
     return $value;
   }
 
-  public static function getUserFrameworkResourceUrl() {
+  public static function getUserFrameworkResourceUrl($k = NULL) {
     $settings = Civi::settings();
     $url = $settings->getUrl('userFrameworkResourceURL', 'absolute');
     if (empty($url)) {
@@ -136,7 +136,7 @@ class CRM_Core_Config_Defaults {
     return $url;
   }
 
-  public static function getResourceBase() {
+  public static function getResourceBase($k = NULL) {
     $settings = Civi::settings();
     $url = $settings->getUrl('userFrameworkResourceURL', 'relative');
     if (empty($url)) {
@@ -147,9 +147,21 @@ class CRM_Core_Config_Defaults {
     return $url;
   }
 
-  public static function getDefaultCurrencySymbol() {
+  public static function getDefaultCurrencySymbol($k = NULL) {
     $config = CRM_Core_Config::singleton();
     return $config->defaultCurrencySymbol(Civi::settings()->get('defaultCurrency'));
+  }
+
+  public static function setPath($key, $value) {
+    Civi::settings()->setPath($key, $value);
+  }
+
+  public static function setUrl($key, $value) {
+    Civi::settings()->setPath($key, $value);
+  }
+
+  public static function revert($key) {
+    Civi::settings()->revert($key);
   }
 
 }
