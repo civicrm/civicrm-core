@@ -246,6 +246,18 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
   }
 
+  /**
+   * Get available Financial Types.
+   *
+   * @param array $financialTypes
+   *   (reference ) an array of financial types
+   * @param string $action
+   *   the type of action, can be add, view, edit, delete
+   * @param bool $resetCache
+   *   load values from static cache
+   *
+   * @return array
+   */
   public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view', $resetCache = FALSE) {
     if (empty($financialTypes)) {
       $financialTypes = CRM_Contribute_PseudoConstant::financialType();
@@ -267,6 +279,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     return $financialTypes;
   }
 
+  /**
+   * Get available Membership Types.
+   *
+   * @param array $membershipTypes
+   *   (reference ) an array of membership types
+   * @param string $action
+   *   the type of action, can be add, view, edit, delete
+   *
+   * @return array
+   */
   public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = 'view') {
     if (empty($membershipTypes)) {
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
@@ -284,6 +306,17 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     return $membershipTypes;
   }
 
+  /**
+   * Function to build a permissioned sql where clause based on available financial types.
+   *
+   * @param array $whereclauses
+   *   (reference ) an array of clauses
+   * @param string $component
+   *   the type of component
+   * @param string $alias
+   *   the alias to use
+   *
+   */
   public static function buildPermissionedClause(&$whereClauses, $component = NULL, $alias = NULL) {
     if (!self::isACLFinancialTypeStatus()) {
       return FALSE;
@@ -314,6 +347,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
   }
 
+  /**
+   * Function to check if lineitems present in a contribution have permissioned FTs.
+   *
+   * @param int $id
+   *   contribution id
+   * @param string $op
+   *   the mode of operation, can be add, view, edit, delete
+   * @param bool $force
+   *
+   */
   public static function checkPermissionedLineItems($id, $op, $force = TRUE) {
     if (!self::isACLFinancialTypeStatus()) {
       return TRUE;
@@ -335,6 +378,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     return $flag;
   }
+
   /**
    * Check if FT-ACL is turned on or off
    *
