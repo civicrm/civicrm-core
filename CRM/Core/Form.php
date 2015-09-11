@@ -1401,6 +1401,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
         }
+        if (!empty($props['data-api-field']) && (in_array($props['data-api-field'], array('state_province_id', 'county_id')))) {
+          return $this->addChainSelect($name, $props);
+        }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add('select', $name, $label, $options, $required, $props);
 
