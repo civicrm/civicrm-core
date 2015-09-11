@@ -160,33 +160,32 @@
     <div class="clear"></div>
   </div>
 
-  {if $form.is_for_organization}
-  <div class="crm-section {$form.is_for_organization.name}-section">
-    <div class="label">&nbsp;</div>
-    <div class="content">
-      {$form.is_for_organization.html}&nbsp;{$form.is_for_organization.label}
-    </div>
-    <div class="clear"></div>
-  </div>
-  {/if}
-
-  {if $is_for_organization}
-  <div id='onBehalfOfOrg' class="crm-section">
-    {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
-  </div>
-  {/if}
+  {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
 
   {* User account registration option. Displays if enabled for one of the profiles on this page. *}
   {include file="CRM/common/CMSUser.tpl"}
   {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="makeContribution"}
 
-  {if $honor_block_is_active}
-  <fieldset class="crm-group honor_block-group">
-    {include file="CRM/Contribute/Form/SoftCredit.tpl"}
-    <div id="honorType" class="honoree-name-email-section">
-      {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
-    </div>
-  </fieldset>
+  {if $honoreeProfileFields|@count}
+    <fieldset class="crm-group honor_block-group">
+      {crmRegion name="contribution-soft-credit-block"}
+        <legend>{$honor_block_title}</legend>
+        <div class="crm-section honor_block_text-section">
+          {$honor_block_text}
+        </div>
+        {if $form.soft_credit_type_id.html}
+          <div class="crm-section {$form.soft_credit_type_id.name}-section">
+            <div class="content" >
+              {$form.soft_credit_type_id.html}
+              <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
+            </div>
+          </div>
+        {/if}
+      {/crmRegion}
+      <div id="honorType" class="honoree-name-email-section">
+        {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
+      </div>
+    </fieldset>
   {/if}
 
   <div class="crm-group custom_pre_profile-group">
@@ -319,15 +318,6 @@
       }
     }
   }
-
-  {/literal}
-  {if $relatedOrganizationFound and $reset}
-    cj( "#is_for_organization" ).prop('checked', true );
-    showOnBehalf(false);
-  {elseif $onBehalfRequired}
-    showOnBehalf(true);
-  {/if}
-  {literal}
 
   cj('input[name="soft_credit_type_id"]').on('change', function() {
     enableHonorType();

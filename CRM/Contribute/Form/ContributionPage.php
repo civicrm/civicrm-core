@@ -321,10 +321,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
     }
 
-    if (!isset($defaults['for_organization'])) {
-      $defaults['for_organization'] = ts('I am contributing on behalf of an organization.');
-    }
-
     if (!empty($defaults['recur_frequency_unit'])) {
       $defaults['recur_frequency_unit'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
         $defaults['recur_frequency_unit']
@@ -333,13 +329,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     else {
       # CRM 10860
       $defaults['recur_frequency_unit'] = array('month' => 1);
-    }
-
-    if (!empty($defaults['is_for_organization'])) {
-      $defaults['is_organization'] = 1;
-    }
-    else {
-      $defaults['is_for_organization'] = 1;
     }
 
     // confirm page starts out enabled
