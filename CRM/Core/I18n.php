@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_I18n {
 
@@ -220,6 +218,7 @@ class CRM_Core_I18n {
    *   The params of the translation (if any).
    *   - domain: string|array a list of translation domains to search (in order)
    *   - context: string
+   *
    * @return string
    *   the translated string
    */
@@ -316,7 +315,8 @@ class CRM_Core_I18n {
    * @param int|NULL $count
    * @param string $plural
    * @param string $context
-   * @return mixed|string|translated
+   *
+   * @return string
    */
   protected function crm_translate_raw($text, $domain, $count, $plural, $context) {
     // gettext domain for extensions
@@ -412,8 +412,6 @@ class CRM_Core_I18n {
    *   the array for localization (in place).
    * @param array $params
    *   an array of additional parameters.
-   *
-   * @return void
    */
   public function localizeArray(
     &$array,
@@ -437,8 +435,6 @@ class CRM_Core_I18n {
    *
    * @param array $array
    *   the array for localization (in place).
-   *
-   * @return void
    */
   public function localizeTitles(&$array) {
     foreach ($array as $key => $value) {
@@ -490,7 +486,7 @@ class CRM_Core_I18n {
         }
       }
       catch (CRM_Extension_Exception $e) {
-        // Intentionally not translating this string to avoid possible infinit loops
+        // Intentionally not translating this string to avoid possible infinite loops
         // Only developers should see this string, if they made a mistake in their ts() usage.
         CRM_Core_Session::setStatus('Unknown extension key in a translation string: ' . $key, '', 'error');
         $this->_extensioncache[$key] = FALSE;
@@ -551,7 +547,7 @@ class CRM_Core_I18n {
 /**
  * Short-named function for string translation, defined in global scope so it's available everywhere.
  *
- * @param $text
+ * @param string $text
  *   String string for translating.
  * @param array $params
  *   Array an array of additional parameters.
