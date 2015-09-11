@@ -306,12 +306,13 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $config = CRM_Core_Config::singleton();
 
     // CRM-6942: set preferred language to the current language if it’s unset (and we’re creating a contact).
-    if (empty($params['contact_id']) && empty($params['preferred_language'])) {
-      $params['preferred_language'] = $config->lcMessages;
-    }
-
-    // CRM-9739: set greeting & addressee if unset and we’re creating a contact.
     if (empty($params['contact_id'])) {
+      // A case could be made for checking isset rather than empty but this is more consistent with previous behaviour.
+      if (empty($params['preferred_language']) && ($language = CRM_Core_I18n::getContactDefaultLanguage()) != FALSE) {
+        $params['preferred_language'] = $language;
+      }
+
+      // CRM-9739: set greeting & addressee if unset and we’re creating a contact.
       foreach (self::$_greetingTypes as $greeting) {
         if (empty($params[$greeting . '_id'])) {
           if ($defaultGreetingTypeId
