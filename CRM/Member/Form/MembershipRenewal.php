@@ -33,7 +33,6 @@
 
 /**
  * This class generates form components for Membership Renewal
- *
  */
 class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
@@ -120,6 +119,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     'receive_date' => array('default' => 'now'),
   );
 
+  /**
+   * Pre-process form.
+   *
+   * @throws \Exception
+   */
   public function preProcess() {
 
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
@@ -577,7 +581,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     // These variable sets prior to renewMembership may not be required for this form. They were in
     // a function this form shared with other forms.
-    $contributionRecurID = isset($this->_params['contributionRecurID']) ? $this->_params['contributionRecurID'] : NULL;
     $membershipSource = NULL;
     if (!empty($this->_params['membership_source'])) {
       $membershipSource = $this->_params['membership_source'];

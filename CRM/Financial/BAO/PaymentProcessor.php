@@ -267,9 +267,9 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @throws CiviCRM_API3_Exception
    * @return array
    */
-  public static function getAllPaymentProcessors($mode, $reset = FALSE) {
+  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE) {
 
-    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all') . '_' . CRM_Core_Config::domainID();
+    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . CRM_Core_Config::domainID();
     if (!$reset) {
       $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
       if (!empty($processors)) {
@@ -328,7 +328,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   public static function getPaymentProcessors($capabilities = array(), $ids = FALSE) {
     $mode = NULL;
     $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : array();
-    $processors = $liveProcessors = self::getAllPaymentProcessors('live');
+    $processors = $liveProcessors = self::getAllPaymentProcessors('all');
 
     if (in_array('TestMode', $capabilities)) {
       if ($ids) {
