@@ -41,7 +41,9 @@
     </div>
 {/if}
 
-{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
+<div class="crm-public-form-item crm-section custom_pre-section">
+  {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre}
+</div>
 
 {if $priceSet && $allowGroupOnWaitlist}
     {include file="CRM/Price/Form/ParticipantCount.tpl"}
@@ -51,7 +53,7 @@
 
 <div class="crm-block crm-event-additionalparticipant-form-block">
 {if $priceSet}
-     <fieldset id="priceset" class="crm-group priceset-group"><legend>{$event.fee_label}</legend>
+     <fieldset id="priceset" class="crm-public-form-item crm-group priceset-group"><legend>{$event.fee_label}</legend>
         {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
     </fieldset>
 {else}
@@ -66,7 +68,9 @@
     {/if}
 {/if}
 
-{include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
+<div class="crm-public-form-item crm-section custom_post-section">
+  {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
+</div>
 
 <div id="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl"}
