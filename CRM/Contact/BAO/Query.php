@@ -2782,9 +2782,14 @@ class CRM_Contact_BAO_Query {
         $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
       }
       $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
-      $groupClause = "{$gcTable}.group_id $op $groupIds";
       if (strpos($op, 'IN') !== FALSE) {
         $groupClause = "{$gcTable}.group_id $op ( $groupIds )";
+      }
+      elseif ($op == '!=') {
+        $groupClause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds)";
+      }
+      else {
+        $groupClause = "{$gcTable}.group_id $op $groupIds";
       }
     }
 
@@ -3025,8 +3030,13 @@ WHERE  $smartGroupClause
         $op = str_replace('EMPTY', 'NULL', $op);
         $this->_where[$grouping][] = "{$etTable}.tag_id $op";
       }
-      else {
-        $this->_where[$grouping][] = "{$etTable}.tag_id $op (" . $value . ')';
+      // CRM-16941: for tag tried with != operator we don't show contact who don't have given $value AND also in other tag
+      elseif ($op == '!=') {
+        $this->_where[$grouping][] = "{$etTable}.entity_id NOT IN (SELECT entity_id FROM civicrm_entity_tag cet WHERE cet.entity_table = 'civicrm_contact' AND " . self::buildClause("cet.tag_id", '=', $value, 'Int') . ")";
+      }
+      elseif ($op == '=' || strstr($op, 'IN')) {
+        $op = ($op == '=') ? 'IN' : $op;
+        $this->_where[$grouping][] = "{$etTable}.tag_id $op ( $value )";
       }
     }
     $this->_qill[$grouping][] = ts('Tagged %1 %2', array(1 => $qillop, 2 => $qillVal));
@@ -3806,7 +3816,7 @@ WHERE  $smartGroupClause
   public function preferredCommunication(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    if (!is_array($values)) {
+    if (!is_array($value)) {
       $value = str_replace(array('(', ')'), '', explode(",", $value));
     }
     elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
