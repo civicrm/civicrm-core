@@ -10,7 +10,7 @@
  * in creating this payment processor module
  */
 
-if (!empty($_SERVER['PRESSFLOW_SETTINGS'])) {
+if (defined('PANTHEON_ENVIRONMENT')) {
   ini_set('session.save_handler', 'files');
 }
 session_start();
