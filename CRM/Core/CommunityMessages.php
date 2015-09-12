@@ -60,10 +60,7 @@ class CRM_Core_CommunityMessages {
    */
   public static function create() {
     return new CRM_Core_CommunityMessages(
-      new CRM_Utils_Cache_SqlGroup(array(
-        'group' => 'community-messages',
-        'prefetch' => FALSE,
-      )),
+      Civi::cache('community_messages'),
       CRM_Utils_HttpClient::singleton()
     );
   }

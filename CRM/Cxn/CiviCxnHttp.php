@@ -22,17 +22,11 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
    */
   public static function singleton($fresh = FALSE) {
     if (self::$singleton === NULL || $fresh) {
-      $config = CRM_Core_Config::singleton();
-
-      if ($config->debug) {
-        $cache = new CRM_Utils_Cache_Arraycache(array());
-      }
-      else {
-        $cache = new CRM_Utils_Cache_SqlGroup(array(
-          'group' => 'CiviCxnHttp',
-          'prefetch' => FALSE,
-        ));
-      }
+      $cache = CRM_Utils_Cache::create(array(
+        'name' => 'CiviCxnHttp',
+        'type' => Civi::settings()->get('debug_enabled') ? 'ArrayCache' : array('SqlGroup', 'ArrayCache'),
+        'prefetch' => FALSE,
+      ));
 
       self::$singleton = new CRM_Cxn_CiviCxnHttp($cache);
     }

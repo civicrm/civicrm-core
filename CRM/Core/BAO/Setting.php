@@ -44,6 +44,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Various predefined settings that have been migrated to the setting table.
    */
   const
+    ALL = 'all',
     ADDRESS_STANDARDIZATION_PREFERENCES_NAME = 'Address Standardization Preferences',
     CAMPAIGN_PREFERENCES_NAME = 'Campaign Preferences',
     DEVELOPER_PREFERENCES_NAME = 'Developer Preferences',
@@ -633,22 +634,25 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $domainID = NULL,
     $profile = NULL
   ) {
-    $cacheString = 'settingsMetadata_' . $domainID . '_' . $profile;
+    $cache = Civi::cache('settings');
+
+    $cacheString = 'settingsMetadata_' . $domainID . '_' . $profile . '_' . $componentID;
     foreach ($filters as $filterField => $filterString) {
       $cacheString .= "_{$filterField}_{$filterString}";
     }
     $cached = 1;
     // the caching into 'All' seems to be a duplicate of caching to
     // settingsMetadata__ - I think the reason was to cache all settings as defined & then those altered by a hook
-    $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Specs', $cacheString, $componentID);
+    $settingsMetadata = $cache->get($cacheString);
+
     if ($settingsMetadata === NULL) {
-      $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Spec', 'All', $componentID);
+      $settingsMetadata = $cache->get(self::ALL);
       if (empty($settingsMetadata)) {
         global $civicrm_root;
         $metaDataFolders = array($civicrm_root . '/settings');
         CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
         $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
-        CRM_Core_BAO_Cache::setItem($settingsMetadata, 'CiviCRM setting Spec', 'All', $componentID);
+        $cache->set(self::ALL, $settingsMetadata);
       }
       $cached = 0;
     }
@@ -660,12 +664,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       // this is a bit 'heavy' if you are using hooks but this function
       // is expected to only be called during setting administration
       // it should not be called by 'getvalue' or 'getitem
-      CRM_Core_BAO_Cache::setItem(
-        $settingsMetadata,
-        'CiviCRM setting Specs',
-        $cacheString,
-        $componentID
-      );
+      $cache->set($cacheString, $settingsMetadata);
     }
     return $settingsMetadata;
 
@@ -700,7 +699,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $settings = include $file;
       $settingMetaData = array_merge($settingMetaData, $settings);
     }
-    CRM_Core_BAO_Cache::setItem($settingMetaData, 'CiviCRM setting Spec', 'All');
+    Civi::cache('settings')->set(self::ALL, $settingMetaData);
     return $settingMetaData;
   }
 

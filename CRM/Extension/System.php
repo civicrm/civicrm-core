@@ -240,16 +240,13 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      if (defined('CIVICRM_DSN')) {
-        $cacheGroup = md5(serialize(array('ext', $this->parameters)));
-        $this->cache = new CRM_Utils_Cache_SqlGroup(array(
-          'group' => $cacheGroup,
-          'prefetch' => TRUE,
-        ));
-      }
-      else {
-        $this->cache = new CRM_Utils_Cache_ArrayCache(array());
-      }
+      $cacheGroup = md5(serialize(array('ext', $this->parameters)));
+      // Extension system starts before container. Manage our own cache.
+      $this->cache = CRM_Utils_Cache::create(array(
+        'name' => $cacheGroup,
+        'type' => array('SqlGroup', 'ArrayCache'),
+        'prefetch' => TRUE,
+      ));
     }
     return $this->cache;
   }
