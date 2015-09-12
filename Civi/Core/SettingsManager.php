@@ -177,7 +177,7 @@ class SettingsManager {
     $cacheKey = 'defaults:' . $entity;
     $defaults = $this->cache->get($cacheKey);
     if (!is_array($defaults)) {
-      $specs = \CRM_Core_BAO_Setting::getSettingSpecification(NULL, array(
+      $specs = SettingsMetadata::getMetadata(array(
         'is_contact' => ($entity === 'contact' ? 1 : 0),
       ));
       $defaults = array();
