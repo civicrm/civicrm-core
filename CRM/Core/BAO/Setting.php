@@ -274,29 +274,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $config = CRM_Core_Config::singleton($reloadConfig, $reloadConfig);
       $result[$domainID] = array();
       foreach ($fieldsToGet as $name => $value) {
-        if (!empty($fields['values'][$name]['prefetch'])) {
-          if (isset($params['filters']) && isset($params['filters']['prefetch'])
-            && $params['filters']['prefetch'] == 0
-          ) {
-            // we are filtering out the prefetches from the return array
-            // so we will skip
-            continue;
-          }
-          $configKey = CRM_Utils_Array::value('config_key', $fields['values'][$name], $name);
-          if (isset($config->$configKey)) {
-            $setting = $config->$configKey;
-          }
-        }
-        else {
-          $setting = CRM_Core_BAO_Setting::getItem(
-            $fields['values'][$name]['group_name'],
-            $name,
-            CRM_Utils_Array::value('component_id', $params),
-            NULL,
-            CRM_Utils_Array::value('contact_id', $params),
-            $domainID
-          );
-        }
+        $setting = CRM_Core_BAO_Setting::getItem(
+          $fields['values'][$name]['group_name'],
+          $name,
+          CRM_Utils_Array::value('component_id', $params),
+          NULL,
+          CRM_Utils_Array::value('contact_id', $params),
+          $domainID
+        );
         if (!is_null($setting)) {
           // we won't return if not set - helps in return all scenario - otherwise we can't indentify the missing ones
           // e.g for revert of fill actions
@@ -430,8 +415,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Store multiple items in the setting table. Note that this will also store config keys
    * the storage is determined by the metdata and is affected by
    *  'name' setting's name
-   *  'prefetch' = store in config
-   *  'config_only' = don't store in settings
    *  'config_key' = the config key is different to the settings key - e.g. debug where there was a conflict
    *  'legacy_key' = rename from config or setting with this name
    *
@@ -470,15 +453,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $result[$domainID] = array();
       $realSettingsToSet = array(); // need to separate config_backend stuff
       foreach ($fieldsToSet as $name => $value) {
-        if (empty($fields['values'][$name]['config_only'])) {
-          $realSettingsToSet[$name] = $value;
-        }
-        if (!empty($fields['values'][$name]['prefetch'])) {
-          if (!empty($fields['values'][$name]['config_key'])) {
-            $name = $fields['values'][$name]['config_key'];
-          }
-          $config_keys[$name] = $value;
-        }
+        $realSettingsToSet[$name] = $value;
         $result[$domainID][$name] = $value;
       }
       $manager->getBagByDomain($domainID)->add($realSettingsToSet);
@@ -688,21 +663,17 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
     $spec = self::getSettingSpecification(NULL, array('name' => $name), $domainID);
     $configKey = CRM_Utils_Array::value('config_key', $spec[$name], CRM_Utils_Array::value('legacy_key', $spec[$name], $name));
-    //if the key is set to config_only we don't need to do anything
-    if (empty($spec[$name]['config_only'])) {
-      if (!empty($values[$configKey])) {
-        civicrm_api('setting', 'create', array('version' => 3, $name => $values[$configKey], 'domain_id' => $domainID));
-      }
-      else {
-        civicrm_api('setting', 'fill', array('version' => 3, 'name' => $name, 'domain_id' => $domainID));
-      }
+    if (!empty($values[$configKey])) {
+      civicrm_api('setting', 'create', array('version' => 3, $name => $values[$configKey], 'domain_id' => $domainID));
+    }
+    else {
+      civicrm_api('setting', 'fill', array('version' => 3, 'name' => $name, 'domain_id' => $domainID));
+    }
 
-      if (empty($spec[$name]['prefetch']) && !empty($values[$configKey])) {
-        unset($values[$configKey]);
-        $domain->config_backend = serialize($values);
-        $domain->save();
-        unset($config->$configKey);
-      }
+    if (!empty($values[$configKey])) {
+      unset($values[$configKey]);
+      $domain->config_backend = serialize($values);
+      $domain->save();
     }
   }
 

@@ -49,7 +49,6 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "Set this value to Yes if you want CiviCRM error/debugging messages to appear in the Drupal error logs",
-    'prefetch' => 1,
     'help_text' => "Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log. In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)",
   ),
   'debug_enabled' => array(
@@ -65,7 +64,6 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "Set this value to Yes if you want to use one of CiviCRM's debugging tools. This feature should NOT be enabled for production sites",
-    'prefetch' => 1,
     'help_text' => 'Do not turn this on on production sites',
   ),
   'backtrace' => array(
@@ -80,7 +78,6 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "Set this value to Yes if you want to display a backtrace listing when a fatal error is encountered. This feature should NOT be enabled for production sites",
-    'prefetch' => 1,
   ),
   'fatalErrorHandler' => array(
     'group_name' => 'Developer Preferences',
@@ -95,6 +92,5 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "Enter the path and class for a custom PHP error-handling function if you want to override built-in CiviCRM error handling for your site.",
-    'prefetch' => 1,
   ),
 );

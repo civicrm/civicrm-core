@@ -285,7 +285,6 @@ return array(
     'group' => 'core',
     'name' => 'max_attachments',
     'legacy_key' => 'maxAttachments',
-    'prefetch' => 0,
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -305,8 +304,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'maxFileSize',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -412,8 +409,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'doNotAttachPDFReceipt',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config object. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -428,8 +423,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'wkhtmltopdfPath',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -449,8 +442,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaOptions',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -470,8 +461,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPublicKey',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -491,8 +480,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'recaptchaPrivateKey',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -512,8 +499,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'dashboardCacheTimeout',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -552,7 +537,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'blogUrl',
-    'prefetch' => 0,
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -572,7 +556,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'communityMessagesUrl',
-    'prefetch' => 0,
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -642,8 +625,6 @@ return array(
     'type' => 'String',
     'html_type' => 'text',
     'quick_form_type' => 'Element',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'default' => '',
     'add' => '4.3',
     'title' => 'WordPress Base Page',
@@ -656,8 +637,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'secondDegRelPermissions',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 0,
@@ -711,8 +690,6 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'empoweredBy',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -725,7 +702,6 @@ return array(
   ),
   'logging' => array(
     'add' => '4.7',
-    'prefetch' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -769,8 +745,6 @@ return array(
     'type' => 'String',
     'html_type' => 'text',
     'quick_form_type' => 'Element',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'default' => '',
     'add' => '4.6',
     'title' => 'WordPress Path to wp-load.php',
