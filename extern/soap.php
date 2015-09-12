@@ -33,6 +33,9 @@ if (phpversion() == "5.2.2" &&
   $GLOBALS['HTTP_RAW_POST_DATA'] = file_get_contents('php://input');
 }
 
+if (!empty($_SERVER['PRESSFLOW_SETTINGS'])) {
+  ini_set('session.save_handler', 'files');
+}
 session_start();
 
 require_once '../civicrm.config.php';
