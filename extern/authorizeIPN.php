@@ -31,6 +31,7 @@
  * $Id$
  */
 
+ini_set('session.save_handler', 'files');
 session_start();
 
 require_once '../civicrm.config.php';
