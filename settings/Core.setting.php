@@ -411,7 +411,7 @@ return array(
     'name' => 'doNotAttachPDFReceipt',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
-    'default' => 1,
+    'default' => 0,
     'add' => '4.3',
     'title' => 'Attach PDF copy to receipts',
     'is_domain' => 1,
