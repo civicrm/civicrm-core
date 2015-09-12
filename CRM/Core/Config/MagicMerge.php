@@ -54,7 +54,7 @@ class CRM_Core_Config_MagicMerge {
    */
   private $map;
 
-  private $runtime, $locals;
+  private $runtime, $locals, $settings;
 
   public function __construct() {
     $this->map = self::getPropertyMap();
@@ -190,13 +190,13 @@ class CRM_Core_Config_MagicMerge {
 
     switch ($type) {
       case 'setting':
-        return \Civi::settings()->get($name);
+        return $this->getSettings()->get($name);
 
       case 'setting-path':
-        return \Civi::settings()->getPath($name);
+        return $this->getSettings()->getPath($name);
 
       case 'setting-url':
-        return \Civi::settings()->getUrl($name, 'absolute');
+        return $this->getSettings()->getUrl($name, 'absolute');
 
       case 'runtime':
         return $this->getRuntime()->{$name};
@@ -228,15 +228,15 @@ class CRM_Core_Config_MagicMerge {
 
     switch ($type) {
       case 'setting':
-        \Civi::settings()->set($name, $v);
+        $this->getSettings()->set($name, $v);
         return;
 
       case 'setting-path':
-        \Civi::settings()->setPath($name, $v);
+        $this->getSettings()->setPath($name, $v);
         return;
 
       case 'setting-url':
-        \Civi::settings()->setUrl($name, $v);
+        $this->getSettings()->setUrl($name, $v);
         return;
 
       case 'runtime':
@@ -275,7 +275,7 @@ class CRM_Core_Config_MagicMerge {
       case 'setting':
       case 'setting-path':
       case 'setting-url':
-        \Civi::settings()->revert($k);
+        $this->getSettings()->revert($k);
         return;
 
       case 'local':
@@ -304,6 +304,16 @@ class CRM_Core_Config_MagicMerge {
       $this->runtime = new CRM_Core_Config_Runtime();
     }
     return $this->runtime;
+  }
+
+  /**
+   * @return \Civi\Core\SettingsBag
+   */
+  protected function getSettings() {
+    if ($this->settings === NULL) {
+      $this->settings = Civi::settings();
+    }
+    return $this->settings;
   }
 
   private function initLocals() {
