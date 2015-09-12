@@ -66,8 +66,6 @@ class CRM_Core_I18n {
   public function __construct($locale) {
     $this->locale = $locale;
     if ($locale != '' and $locale != 'en_US') {
-      $config = CRM_Core_Config::singleton();
-
       if (defined('CIVICRM_GETTEXT_NATIVE') && CIVICRM_GETTEXT_NATIVE && function_exists('gettext')) {
         // Note: the file hierarchy for .po must be, for example: l10n/fr_FR/LC_MESSAGES/civicrm.mo
 
@@ -137,7 +135,6 @@ class CRM_Core_I18n {
       $all = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
 
       // check which ones are available; add them to $all if not there already
-      $config = CRM_Core_Config::singleton();
       $codes = array();
       if (is_dir(CRM_Core_I18n::getResourceDir()) && $dir = opendir(CRM_Core_I18n::getResourceDir())) {
         while ($filename = readdir($dir)) {
@@ -483,8 +480,6 @@ class CRM_Core_I18n {
 
     // It's only necessary to find/bind once
     if (!isset($this->_extensioncache[$key])) {
-      $config = CRM_Core_Config::singleton();
-
       try {
         $mapper = CRM_Extension_System::singleton()->getMapper();
         $path = $mapper->keyToBasePath($key);
@@ -498,7 +493,7 @@ class CRM_Core_I18n {
         }
         else {
           // phpgettext
-          $mo_file = $path . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $config->lcMessages . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
+          $mo_file = $path . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $this->locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
           $streamer = new FileReader($mo_file);
           $this->_extensioncache[$key] = new gettext_reader($streamer);
         }
