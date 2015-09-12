@@ -174,12 +174,17 @@ class Container {
 
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
 
-    $container->setDefinition('cache.settings', new Definition(
-      'CRM_Utils_Cache_SqlGroup',
-      array(
-        array('group' => 'Settings', 'prefetch' => 0),
-      )
-    ));
+    foreach (array('settings', 'js_strings', 'community_messages') as $cacheName) {
+      $container->setDefinition("cache.{$cacheName}", new Definition(
+        'CRM_Utils_Cache_Interface',
+        array(
+          array(
+            'name' => $cacheName,
+            'type' => array('SqlGroup', 'ArrayCache'),
+          ),
+        )
+      ))->setFactoryClass('CRM_Utils_Cache')->setFactoryMethod('create');
+    }
 
     $container->setDefinition('settings_manager', new Definition(
       'Civi\Core\SettingsManager',

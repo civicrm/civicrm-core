@@ -162,4 +162,43 @@ class CRM_Utils_Cache {
     return $defaults;
   }
 
+  /**
+   * Create a new, named, limited-use cache.
+   *
+   * This is a factory function. Generally, you should use Civi::cache($name)
+   * to locate managed cached instance.
+   *
+   * @param array $params
+   *   Array with keys:
+   *   - name: string, unique symbolic name.
+   *   - type: array|string, list of acceptable cache types, in order of preference.
+   *   - prefetch: bool, whether to prefetch all data in cache (if possible).
+   * @return CRM_Utils_Cache_Interface
+   * @throws CRM_Core_Exception
+   * @see Civi::cache()
+   */
+  public static function create($params = array()) {
+    $types = (array) $params['type'];
+
+    foreach ($types as $type) {
+      switch ($type) {
+        case 'SqlGroup':
+          if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
+            return new CRM_Utils_Cache_SqlGroup(array(
+              'group' => $params['name'],
+              'prefetch' => CRM_Utils_Array::value('prefetch', $params, FALSE),
+            ));
+          }
+          break;
+
+        case 'Arraycache':
+        case 'ArrayCache':
+          return new CRM_Utils_Cache_ArrayCache(array());
+
+      }
+    }
+
+    throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
+  }
+
 }

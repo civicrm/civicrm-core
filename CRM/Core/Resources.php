@@ -111,10 +111,7 @@ class CRM_Core_Resources {
     }
     if (self::$_singleton === NULL) {
       $sys = CRM_Extension_System::singleton();
-      $cache = new CRM_Utils_Cache_SqlGroup(array(
-                 'group' => 'js-strings',
-                 'prefetch' => FALSE,
-               ));
+      $cache = Civi::cache('js_strings');
       self::$_singleton = new CRM_Core_Resources(
         $sys->getMapper(),
         $cache,
