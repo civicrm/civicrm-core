@@ -140,6 +140,9 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $params['noRelationships'] = $params['noNotes'] = $params['noGroups'] = TRUE;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, TRUE);
+    // Let summary page know if outbound mail is disabled so email links can be built conditionally
+    $mailingBackend = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'mailing_backend');
+    $this->assign('mailingOutboundOption', $mailingBackend['outBound_option']);
 
     $communicationType = array(
       'phone' => array(
