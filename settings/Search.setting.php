@@ -40,7 +40,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'search_autocomplete_count',
-    'prefetch' => 0,
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -60,7 +59,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'enable_innodb_fts',
-    'prefetch' => 0,
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 0,
@@ -78,7 +76,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'fts_query_mode',
-    'prefetch' => 0,
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -98,8 +95,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeOrderByClause',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -114,8 +109,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeWildCardInName',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -130,8 +123,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeEmailInName',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -146,8 +137,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeNickNameInName',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 0,
@@ -162,8 +151,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeAlphabeticalPager',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -178,8 +165,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'smartGroupCacheTimeout',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -195,8 +180,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'defaultSearchProfileID',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
     'type' => 'Integer',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',

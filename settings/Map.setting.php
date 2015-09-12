@@ -36,7 +36,6 @@
 return array(
   'geoAPIKey' => array(
     'add' => '4.7',
-    'prefetch' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -56,7 +55,6 @@ return array(
   ),
   'geoProvider' => array(
     'add' => '4.7',
-    'prefetch' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -78,7 +76,6 @@ return array(
   ),
   'mapAPIKey' => array(
     'add' => '4.7',
-    'prefetch' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,
@@ -98,7 +95,6 @@ return array(
   ),
   'mapProvider' => array(
     'add' => '4.7',
-    'prefetch' => 1,
     'help_text' => NULL,
     'is_domain' => 1,
     'is_contact' => 0,

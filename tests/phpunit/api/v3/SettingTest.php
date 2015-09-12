@@ -135,16 +135,6 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that getfields will filter on another field (prefetch)
-   */
-  public function testGetFieldsPrefetchFilters() {
-    $params = array('filters' => array('prefetch' => 1));
-    $result = $this->callAPISuccess('setting', 'getfields', $params);
-    $this->assertArrayNotHasKey('disable_mandatory_tokens_check', $result['values']);
-    $this->assertArrayHasKey('monetaryDecimalPoint', $result['values']);
-  }
-
-  /**
    * Ensure that on_change callbacks fire.
    *
    * Note: api_v3_SettingTest::testOnChange and CRM_Core_BAO_SettingTest::testOnChange
