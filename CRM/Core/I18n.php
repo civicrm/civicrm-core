@@ -51,6 +51,11 @@ class CRM_Core_I18n {
   private $_extensioncache = array();
 
   /**
+   * @var string
+   */
+  private $locale;
+
+  /**
    * A locale-based constructor that shouldn't be called from outside of this class (use singleton() instead).
    *
    * @param string $locale
@@ -59,6 +64,7 @@ class CRM_Core_I18n {
    * @return \CRM_Core_I18n
    */
   public function __construct($locale) {
+    $this->locale = $locale;
     if ($locale != '' and $locale != 'en_US') {
       $config = CRM_Core_Config::singleton();
 
@@ -336,16 +342,15 @@ class CRM_Core_I18n {
     }
 
     // do all wildcard translations first
-    $config = CRM_Core_Config::singleton();
-    if (!isset(Civi::$statics[__CLASS__][$config->lcMessages])) {
-      if ($config->dsn && !CRM_Core_Config::isUpgradeMode()) {
-        Civi::$statics[__CLASS__][$config->lcMessages] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($config->lcMessages);
+    if (!isset(Civi::$statics[__CLASS__][$this->locale])) {
+      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
+        Civi::$statics[__CLASS__][$this->locale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($this->locale);
       }
       else {
-        Civi::$statics[__CLASS__][$config->lcMessages] = array();
+        Civi::$statics[__CLASS__][$this->locale] = array();
       }
     }
-    $stringTable = Civi::$statics[__CLASS__][$config->lcMessages];
+    $stringTable = Civi::$statics[__CLASS__][$this->locale];
 
     $exactMatch = FALSE;
     if (isset($stringTable['enabled']['exactMatch'])) {
