@@ -429,15 +429,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @return array
    */
   public static function setItems(&$params, $domains = NULL) {
-    /** @var \Civi\Core\SettingsManager $manager */
-    $manager = \Civi::service('settings_manager');
     $domains = empty($domains) ? array(CRM_Core_Config::domainID()) : $domains;
 
     // FIXME: redundant validation
     // FIXME: this whole thing should just be a loop to call $settings->add() on each domain.
 
-    $reloadConfig = FALSE;
-    $fields = $config_keys = array();
+    $fields = array();
     $fieldsToSet = self::validateSettingsInput($params, $fields);
 
     foreach ($fieldsToSet as $settingField => &$settingValue) {
@@ -445,28 +442,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
 
     foreach ($domains as $domainID) {
-
-      if ($domainID != CRM_Core_Config::domainID()) {
-        $reloadConfig = TRUE;
-        CRM_Core_BAO_Domain::setDomain($domainID);
-      }
-      $result[$domainID] = array();
-      $realSettingsToSet = array(); // need to separate config_backend stuff
-      foreach ($fieldsToSet as $name => $value) {
-        $realSettingsToSet[$name] = $value;
-        $result[$domainID][$name] = $value;
-      }
-      $manager->getBagByDomain($domainID)->add($realSettingsToSet);
-      if ($reloadConfig) {
-        CRM_Core_Config::singleton($reloadConfig, $reloadConfig);
-      }
-
-      if (!empty($config_keys)) {
-        CRM_Core_BAO_ConfigSetting::create($config_keys);
-      }
-      if ($reloadConfig) {
-        CRM_Core_BAO_Domain::resetDomain();
-      }
+      Civi::settings($domainID)->add($fieldsToSet);
+      $result[$domainID] = $fieldsToSet;
     }
 
     return $result;
