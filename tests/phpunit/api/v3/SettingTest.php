@@ -110,11 +110,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testGetFieldsCaching() {
     $settingsMetadata = array();
-    CRM_Core_BAO_Cache::setItem($settingsMetadata, 'CiviCRM setting Specs', 'settingsMetadata__');
-    CRM_Core_BAO_Cache::setItem($settingsMetadata, 'CiviCRM setting Spec', 'All');
+    Civi::cache('settings')->set('settingsMetadata__', $settingsMetadata);
+    Civi::cache('settings')->set(\Civi\Core\SettingsMetadata::ALL, $settingsMetadata);
     $result = $this->callAPISuccess('setting', 'getfields', array());
     $this->assertArrayNotHasKey('customCSSURL', $result['values']);
     $this->quickCleanup(array('civicrm_cache'));
+    Civi::cache('settings')->flush();
   }
 
   public function testGetFieldsFilters() {
@@ -369,20 +370,19 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testSetConfigSetting() {
     $config = CRM_Core_Config::singleton();
     $this->assertFalse($config->debug == 1);
+
     $params = array(
       'domain_id' => $this->_domainID2,
       'debug_enabled' => 1,
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
+
+    $this->assertEquals(1, Civi::settings($this->_domainID2)->get('debug_enabled'));
+
     CRM_Core_BAO_Domain::setDomain($this->_domainID2);
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_BAO_Domain::resetDomain();
-    $this->assertTrue($config->debug == 1);
-    // this should NOT be stored in the settings table now - only in config
-    $sql = " SELECT count(*) as c FROM civicrm_setting WHERE name LIKE '%maxFileSize%'";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    $dao->fetch();
-    $this->assertEquals($dao->c, 0);
+    $this->assertEquals(1, $config->debug);
   }
 
   /**
@@ -541,7 +541,10 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
     $this->assertArrayHasKey('tag_unconfirmed', $result['values'][$dom['id']]);
-    $this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
+
+    // Setting has NULL default. Not returned.
+    //$this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
+
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
   }
 
