@@ -221,156 +221,6 @@ class CRM_Core_BAO_ConfigSetting {
   }
 
   /**
-   * @return array
-   */
-  public static function getConfigSettings() {
-    $config = CRM_Core_Config::singleton();
-
-    $url = $dir = $siteName = $siteRoot = NULL;
-    if ($config->userFramework == 'Joomla') {
-      $url = preg_replace(
-        '|administrator/components/com_civicrm/civicrm/|',
-        '',
-        $config->userFrameworkResourceURL
-      );
-
-      // lets use imageUploadDir since we dont mess around with its values
-      // in the config object, lets kep it a bit generic since folks
-      // might have different values etc
-
-      //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
-      if (DIRECTORY_SEPARATOR == '\\') {
-        $dir = preg_replace(
-          '|civicrm[/\\\\]templates_c[/\\\\].*$|',
-          '',
-          $config->templateCompileDir
-        );
-      }
-      else {
-        $dir = preg_replace(
-          '|civicrm/templates_c/.*$|',
-          '',
-          $config->templateCompileDir
-        );
-      }
-
-      $siteRoot = preg_replace(
-        '|/media/civicrm/.*$|',
-        '',
-        $config->imageUploadDir
-      );
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      $url = preg_replace(
-        '|wp-content/plugins/civicrm/civicrm/|',
-        '',
-        $config->userFrameworkResourceURL
-      );
-
-      // lets use imageUploadDir since we dont mess around with its values
-      // in the config object, lets kep it a bit generic since folks
-      // might have different values etc
-
-      //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
-      if (DIRECTORY_SEPARATOR == '\\') {
-        $dir = preg_replace(
-          '|civicrm[/\\\\]templates_c[/\\\\].*$|',
-          '',
-          $config->templateCompileDir
-        );
-      }
-      else {
-        $dir = preg_replace(
-          '|civicrm/templates_c/.*$|',
-          '',
-          $config->templateCompileDir
-        );
-      }
-
-      $siteRoot = preg_replace(
-        '|/wp-content/plugins/files/civicrm/.*$|',
-        '',
-        $config->imageUploadDir
-      );
-    }
-    else {
-      $url = preg_replace(
-        '|sites/[\w\.\-\_]+/modules/civicrm/|',
-        '',
-        $config->userFrameworkResourceURL
-      );
-
-      // lets use imageUploadDir since we dont mess around with its values
-      // in the config object, lets kep it a bit generic since folks
-      // might have different values etc
-
-      //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
-      if (DIRECTORY_SEPARATOR == '\\') {
-        $dir = preg_replace(
-          '|[/\\\\]files[/\\\\]civicrm[/\\\\].*$|',
-          '\\\\files\\\\',
-          $config->imageUploadDir
-        );
-      }
-      else {
-        $dir = preg_replace(
-          '|/files/civicrm/.*$|',
-          '/files/',
-          $config->imageUploadDir
-        );
-      }
-
-      $matches = array();
-      if (preg_match(
-        '|/sites/([\w\.\-\_]+)/|',
-        $config->imageUploadDir,
-        $matches
-      )) {
-        $siteName = $matches[1];
-        if ($siteName) {
-          $siteName = "/sites/$siteName/";
-          $siteNamePos = strpos($dir, $siteName);
-          if ($siteNamePos !== FALSE) {
-            $siteRoot = substr($dir, 0, $siteNamePos);
-          }
-        }
-      }
-    }
-
-    return array($url, $dir, $siteName, $siteRoot);
-  }
-
-  /**
-   * Return likely default settings.
-   * @return array
-   *   site settings
-   *   - $url
-   *   - $dir Base Directory
-   *   - $siteName
-   *   - $siteRoot
-   */
-  public static function getBestGuessSettings() {
-    $config = CRM_Core_Config::singleton();
-
-    //CRM-15365 - Fix preg_replace to handle backslash for Windows File Paths
-    if (DIRECTORY_SEPARATOR == '\\') {
-      $needle = 'civicrm[/\\\\]templates_c[/\\\\].*$';
-    }
-    else {
-      $needle = 'civicrm/templates_c/.*$';
-    }
-
-    $dir = preg_replace(
-      "|$needle|",
-      '',
-      $config->templateCompileDir
-    );
-
-    list($url, $siteName, $siteRoot) = $config->userSystem->getDefaultSiteSettings($dir);
-    return array($url, $dir, $siteName, $siteRoot);
-  }
-
-  /**
    * @param array $defaultValues
    *
    * @return string
@@ -378,106 +228,26 @@ class CRM_Core_BAO_ConfigSetting {
    */
   public static function doSiteMove($defaultValues = array()) {
     $moveStatus = ts('Beginning site move process...') . '<br />';
-    // get the current and guessed values
-    list($oldURL, $oldDir, $oldSiteName, $oldSiteRoot) = self::getConfigSettings();
-    list($newURL, $newDir, $newSiteName, $newSiteRoot) = self::getBestGuessSettings();
+    $settings = Civi::settings();
 
-    // retrieve these values from the argument list
-    $variables = array('URL', 'Dir', 'SiteName', 'SiteRoot', 'Val_1', 'Val_2', 'Val_3');
-    $states = array('old', 'new');
-    foreach ($variables as $varSuffix) {
-      foreach ($states as $state) {
-        $var = "{$state}{$varSuffix}";
-        if (!isset($$var)) {
-          if (isset($defaultValues[$var])) {
-            $$var = $defaultValues[$var];
-          }
-          else {
-            $$var = NULL;
-          }
+    foreach (array_merge(self::getPathSettings(), self::getUrlSettings()) as $key) {
+      $value = $settings->get($key);
+      if ($value && $value != $settings->getDefault($key)) {
+        if ($settings->getMandatory($key) === NULL) {
+          $settings->revert($key);
+          $moveStatus .= ts("WARNING: The setting (%1) has been reverted.", array(
+            1 => $key,
+          ));
+          $moveStatus .= '<br />';
         }
-        $$var = CRM_Utils_Request::retrieve($var,
-          'String',
-          CRM_Core_DAO::$_nullArray,
-          FALSE,
-          $$var,
-          'REQUEST'
-        );
-      }
-    }
-
-    $from = $to = array();
-    foreach ($variables as $varSuffix) {
-      $oldVar = "old{$varSuffix}";
-      $newVar = "new{$varSuffix}";
-      //skip it if either is empty or both are exactly the same
-      if ($$oldVar &&
-        $$newVar &&
-        $$oldVar != $$newVar
-      ) {
-        $from[] = $$oldVar;
-        $to[] = $$newVar;
-      }
-    }
-
-    $sql = "
-SELECT config_backend
-FROM   civicrm_domain
-WHERE  id = %1
-";
-    $params = array(1 => array(CRM_Core_Config::domainID(), 'Integer'));
-    $configBackend = CRM_Core_DAO::singleValueQuery($sql, $params);
-    if (!$configBackend) {
-      CRM_Core_Error::fatal(ts('Returning early due to unexpected error - civicrm_domain.config_backend column value is NULL. Try visiting CiviCRM Home page.'));
-    }
-    $configBackend = unserialize($configBackend);
-
-    $configBackend = str_replace($from,
-      $to,
-      $configBackend
-    );
-
-    $configBackend = serialize($configBackend);
-    $sql = "
-UPDATE civicrm_domain
-SET    config_backend = %2
-WHERE  id = %1
-";
-    $params[2] = array($configBackend, 'String');
-    CRM_Core_DAO::executeQuery($sql, $params);
-
-    // Apply the changes to civicrm_option_values
-    $optionGroups = array('url_preferences', 'directory_preferences');
-    foreach ($optionGroups as $option) {
-      foreach ($variables as $varSuffix) {
-        $oldVar = "old{$varSuffix}";
-        $newVar = "new{$varSuffix}";
-
-        $from = $$oldVar;
-        $to = $$newVar;
-
-        if ($from && $to && $from != $to) {
-          $sql = '
-UPDATE civicrm_option_value
-SET    value = REPLACE(value, %1, %2)
-WHERE  option_group_id = (
-  SELECT id
-  FROM   civicrm_option_group
-  WHERE  name = %3 )
-';
-          $params = array(
-            1 => array($from, 'String'),
-            2 => array($to, 'String'),
-            3 => array($option, 'String'),
-          );
-          CRM_Core_DAO::executeQuery($sql, $params);
+        else {
+          $moveStatus .= ts("WARNING: The setting (%1) is overridden and could not be reverted.", array(
+            1 => $key,
+          ));
+          $moveStatus .= '<br />';
         }
       }
     }
-
-    $moveStatus .=
-      ts('Directory and Resource URLs have been updated in the moved database to reflect current site location.') .
-      '<br />';
 
     $config = CRM_Core_Config::singleton();
 
@@ -634,6 +404,32 @@ WHERE  option_group_id = (
       }
     }
     return $params;
+  }
+
+  /**
+   * @return array
+   */
+  private static function getUrlSettings() {
+    return array(
+      'userFrameworkResourceURL',
+      'imageUploadURL',
+      'customCSSURL',
+      'extensionsURL',
+    );
+  }
+
+  /**
+   * @return array
+   */
+  private static function getPathSettings() {
+    return array(
+      'uploadDir',
+      'imageUploadDir',
+      'customFileUploadDir',
+      'customTemplateDir',
+      'customPHPPathDir',
+      'extensionsDir',
+    );
   }
 
 }
