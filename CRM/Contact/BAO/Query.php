@@ -2538,7 +2538,7 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_group':
-          $from .= " $side JOIN civicrm_group ON (civicrm_group.id = civicrm_group_contact.group_id OR civicrm_group.id = civicrm_group_contact_cache.group_id) ";
+          $from .= " $side JOIN civicrm_group ON (civicrm_group.id = civicrm_group_contact.group_id) ";
           continue;
 
         case 'civicrm_group_contact':
