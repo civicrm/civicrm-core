@@ -36,6 +36,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_entity = 'MembershipType';
 
+  /**
+   * Set up for tests.
+   */
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -43,6 +46,11 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->_contactID = $this->organizationCreate();
   }
 
+  /**
+   * Get the membership without providing an ID.
+   *
+   * This should return an empty array but not an error.
+   */
   public function testGetWithoutId() {
     $params = array(
       'name' => '60+ Membership',
@@ -54,23 +62,26 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     );
 
-    $membershiptype = $this->callAPISuccess('membership_type', 'get', $params);
-    $this->assertEquals($membershiptype['count'], 0);
+    $membershipType = $this->callAPISuccess('membership_type', 'get', $params);
+    $this->assertEquals($membershipType['count'], 0);
   }
 
+  /**
+   * Test get works.
+   */
   public function testGet() {
     $id = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
 
     $params = array(
       'id' => $id,
     );
-    $membershiptype = $this->callAPIAndDocument('membership_type', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($membershiptype['values'][$id]['name'], 'General');
-    $this->assertEquals($membershiptype['values'][$id]['member_of_contact_id'], $this->_contactID);
-    $this->assertEquals($membershiptype['values'][$id]['financial_type_id'], 1);
-    $this->assertEquals($membershiptype['values'][$id]['duration_unit'], 'year');
-    $this->assertEquals($membershiptype['values'][$id]['duration_interval'], '1');
-    $this->assertEquals($membershiptype['values'][$id]['period_type'], 'rolling');
+    $membershipType = $this->callAPIAndDocument('membership_type', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals($membershipType['values'][$id]['name'], 'General');
+    $this->assertEquals($membershipType['values'][$id]['member_of_contact_id'], $this->_contactID);
+    $this->assertEquals($membershipType['values'][$id]['financial_type_id'], 1);
+    $this->assertEquals($membershipType['values'][$id]['duration_unit'], 'year');
+    $this->assertEquals($membershipType['values'][$id]['duration_interval'], '1');
+    $this->assertEquals($membershipType['values'][$id]['period_type'], 'rolling');
     $this->membershipTypeDelete($params);
   }
 
@@ -87,9 +98,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     );
 
-    $membershiptype = $this->callAPIFailure('membership_type', 'create', $params,
-                      'Mandatory key(s) missing from params array: member_of_contact_id'
-                                           );
+    $this->callAPIFailure('membership_type', 'create', $params, 'Mandatory key(s) missing from params array: member_of_contact_id');
   }
 
   public function testCreateWithoutNameandDomainIDandDurationUnit() {
