@@ -238,8 +238,14 @@ class CRM_Utils_Mail_EmailProcessor {
 
         // preseve backward compatibility
         if ($usedfor == 0 || !$civiMail) {
-          // if its the activities that needs to be processed ..
-          $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
+           // if its the activities that needs to be processed ..
+          try {
+			$mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
+		  } catch (Exception $e) {
+			echo $e->getMessage();
+			$store->markIgnored($key);
+			continue;
+		  }
 
           require_once 'CRM/Utils/DeprecatedUtils.php';
           $params = _civicrm_api3_deprecated_activity_buildmailparams($mailParams, $emailActivityTypeId);
