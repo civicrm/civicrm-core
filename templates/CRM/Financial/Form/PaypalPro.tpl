@@ -32,7 +32,7 @@
   <div class="crm-section no-label {$form.$expressButtonName.name}-section">
     <div class="content description">
       {$form.$expressButtonName.html}
-      <div class="description">{ts}Save time. Checkout securely. Pay without sharing your financial information.{/ts}</div>
+      <div class="description">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</div>
     </div>
   </div>
 {/if}
