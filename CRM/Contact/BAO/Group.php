@@ -201,7 +201,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   this array contains the list of members for this group id
    */
   public static function &getMember($groupID, $useCache = TRUE) {
-    $params = array(array('group', 'IN', array($groupID => 1), 0, 0));
+    $params = array(array('group', '=', $groupID, 0, 0));
     $returnProperties = array('contact_id');
     list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, $useCache);
 
