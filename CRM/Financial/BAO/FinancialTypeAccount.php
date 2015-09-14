@@ -227,6 +227,9 @@ WHERE cog.name = 'payment_instrument' ";
     $titles = array();
     $financialAccountTypeID = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
     $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
+
+    // the 'ts' construction below is a little awkward, but it works around
+    // CRM-16029.
     $relationships = array(
       array_search(ts('Accounts Receivable Account is'), $accountRelationship) => array_search(ts('Asset'), $financialAccountTypeID),
       array_search(ts('Expense Account is'), $accountRelationship) => array_search(ts('Expenses'), $financialAccountTypeID),
