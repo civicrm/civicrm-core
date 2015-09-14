@@ -94,6 +94,10 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       'civicrm_grant' => array(
         'dao' => 'CRM_Grant_DAO_Grant',
         'fields' => array(
+          'id' => array(
+            'name' => 'grant_id',
+            'title' => ts('Grant ID'),
+          ),
           'grant_type_id' => array(
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
