@@ -56,6 +56,10 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
 
     if ($id = CRM_Utils_Array::value('id', $ids)) {
       $fieldValueBAO->id = $id;
+      $prevLabel = self::getOptionLabel($id);
+      if ($prevLabel != $params['label']) {
+        self::updateAmountAndFeeLevel($id, $prevLabel, $params['label']);
+      }
     }
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
@@ -278,6 +282,41 @@ cps.financial_type_id = %3
 WHERE cpse.id IS NOT NULL {$where}";
 
     CRM_Core_DAO::executeQuery($sql, $params);
+  }
+
+  /**
+   * Update price option label in line_item, civicrm_contribution and civicrm_participant.
+   *
+   * @param int $id - id of the price_field_value
+   * @param string $prevLabel
+   * @param string $newLabel
+   *
+   */
+  public static function updateAmountAndFeeLevel($id, $prevLabel, $newLabel) {
+    // update price field label in line item.
+    $lineItem = new CRM_Price_DAO_LineItem();
+    $lineItem->price_field_value_id = $id;
+    $lineItem->label = $prevLabel;
+    $lineItem->find();
+    while ($lineItem->fetch()) {
+      $lineItem->label = $newLabel;
+      $lineItem->save();
+    }
+
+    // update amount and fee level in civicrm_contribution and civicrm_participant
+    $prevLabel = CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -';
+    $newLabel = CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -';
+    $params = array(1 => array($prevLabel, 'String'), 2 => array($newLabel, 'String'));
+    $query = CRM_Core_DAO::executeQuery("SELECT `id` as `contributionId` FROM `civicrm_contribution` WHERE `amount_level` LIKE '%{$prevLabel}%'");
+    while ($query->fetch()) {
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution` SET `amount_level` = REPLACE(amount_level, %1, %2) WHERE id = {$query->contributionId}", $params);
+      $participantIds = CRM_Event_BAO_Participant::getParticipantIds($query->contributionId);
+      foreach ($participantIds as $key => $id) {
+        if (!empty($id)) {
+          CRM_Core_DAO::executeQuery("UPDATE `civicrm_participant` SET `fee_level` = REPLACE(fee_level, %1, %2) WHERE id = {$id}", $params);
+        }
+      }
+    }
   }
 
 }
