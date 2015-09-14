@@ -413,6 +413,12 @@ class CRM_Member_BAO_Query {
       'class' => 'crm-select2',
     ));
 
+    $form->addEntityRef('membership_type_id', ts('Membership Type(s)'), array(
+      'entity' => 'MembershipType',
+      'multiple' => TRUE,
+      'placeholder' => ts('- any -'),
+    ));
+
     $form->addElement('text', 'member_source', ts('Source'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'member_join_date', 1, '_low', '_high', ts('From'), FALSE);

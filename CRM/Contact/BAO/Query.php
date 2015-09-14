@@ -1481,15 +1481,23 @@ class CRM_Contact_BAO_Query {
    *
    * @param string $apiEntity
    *
+   * @param array $entityReferenceFields
+   *   Field names of any entity reference fields (which will need reformatting to IN syntax).
+   *
    * @return array
    */
-  public static function convertFormValues(&$formValues, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL) {
+  public static function convertFormValues(&$formValues, $wildcard = 0, $useEquals = FALSE, $apiEntity = NULL,
+    $entityReferenceFields = array()) {
     $params = array();
     if (empty($formValues)) {
       return $params;
     }
 
     foreach ($formValues as $id => $values) {
+      if (self::isAlreadyProcessedForQueryFormat($values)) {
+        $params[] = $values;
+        continue;
+      }
       if ($id == 'privacy') {
         if (is_array($formValues['privacy'])) {
           $op = !empty($formValues['privacy']['do_not_toggle']) ? '=' : '!=';
@@ -1540,6 +1548,10 @@ class CRM_Contact_BAO_Query {
           CRM_Contact_BAO_Query::fixDateValues($formValues[$id], $formValues[$fromRange], $formValues[$toRange]);
           continue;
         }
+      }
+      elseif (in_array($id, $entityReferenceFields) && !empty($values) && is_string($values) && (strpos($values, ',') !=
+        FALSE)) {
+        $params[] = array($id, 'IN', explode(',', $values), 0, 0);
       }
       else {
         $values = CRM_Contact_BAO_Query::fixWhereValues($id, $values, $wildcard, $useEquals, $apiEntity);
@@ -4541,6 +4553,30 @@ civicrm_relationship.is_permission_a_b = 0
       0,
     );
     return array($formValues, $params);
+  }
+
+  /**
+   * Has this field already been reformatting to Query object syntax.
+   *
+   * The form layer passed formValues to this function in preProcess & postProcess. Reason unknown. This seems
+   * to come with associated double queries & is possibly damaging performance.
+   *
+   * However, here we add a tested function to ensure convertFormValues identifies pre-processed fields & returns
+   * them as they are.
+   *
+   * @param mixed $values
+   *   Value in formValues for the field.
+   *
+   * @return bool;
+   */
+  protected static function isAlreadyProcessedForQueryFormat($values) {
+    if (!is_array($values)) {
+      return FALSE;
+    }
+    if (($operator = CRM_Utils_Array::value(1, $values)) == FALSE) {
+      return FALSE;
+    }
+    return in_array($operator, CRM_Core_DAO::acceptedSQLOperators());
   }
 
   /**
