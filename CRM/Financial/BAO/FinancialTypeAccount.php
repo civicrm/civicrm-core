@@ -228,10 +228,10 @@ WHERE cog.name = 'payment_instrument' ";
     $financialAccountTypeID = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
     $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
     $relationships = array(
-      array_search('Accounts Receivable Account is', $accountRelationship) => array_search('Asset', $financialAccountTypeID),
-      array_search('Expense Account is', $accountRelationship) => array_search('Expenses', $financialAccountTypeID),
-      array_search('Cost of Sales Account is', $accountRelationship) => array_search('Cost of Sales', $financialAccountTypeID),
-      array_search('Income Account is', $accountRelationship) => array_search('Revenue', $financialAccountTypeID),
+      array_search(ts('Accounts Receivable Account is'), $accountRelationship) => array_search(ts('Asset'), $financialAccountTypeID),
+      array_search(ts('Expense Account is'), $accountRelationship) => array_search(ts('Expenses'), $financialAccountTypeID),
+      array_search(ts('Cost of Sales Account is'), $accountRelationship) => array_search(ts('Cost of Sales'), $financialAccountTypeID),
+      array_search(ts('Income Account is'), $accountRelationship) => array_search(ts('Revenue'), $financialAccountTypeID),
     );
 
     $dao = CRM_Core_DAO::executeQuery('SELECT id, financial_account_type_id FROM civicrm_financial_account WHERE name LIKE %1',
