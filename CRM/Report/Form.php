@@ -4494,7 +4494,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /*
-   * Generate temporary table to hold all contributions with permissioned FTs. 
+   * Generate temporary table to hold all contributions with permissioned FTs.
    *
    * @param object $query
    * @param string $alias
