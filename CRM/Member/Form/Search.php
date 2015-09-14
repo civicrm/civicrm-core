@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -38,7 +36,9 @@
  */
 
 /**
- * This file is for civimember search
+ * Membership search.
+ *
+ * Class is a pane in advanced search and the membership search page.
  */
 class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
@@ -72,15 +72,10 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
 
-    /**
-     * set the button names
-     */
     $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
@@ -154,9 +149,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -188,10 +180,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_done) {
@@ -264,15 +252,23 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
+  /**
+   * Set default values.
+   *
+   * @todo - can this function override be removed?
+   *
+   * @return array
+   */
   public function setDefaultValues() {
     return $this->_defaults;
   }
 
+  /**
+   * If this search has been forced then see if there are any get values, and if so over-ride the post values.
+   *
+   * Note that this means that GET over-rides POST :) & that force with no parameters can be very destructive.
+   */
   public function fixFormValues() {
-    // if this search has been forced
-    // then see if there are any get values, and if so over-ride the post values
-    // note that this means that GET over-rides POST :)
-
     if (!$this->_force) {
       return;
     }
@@ -354,7 +350,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Return a descriptive name for the page, used in wizard header
+   * Return a descriptive name for the page, used in wizard header.
    *
    * @return string
    */
