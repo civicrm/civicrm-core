@@ -231,7 +231,6 @@ class CRM_Utils_Mail_EmailProcessor {
                 $p_file = $v_part->__get('fileName');
                 $c_file = file_get_contents($p_file);
                 if (preg_match($rpXheaderRegex, $c_file, $matches)) {
-                  self::_log("file match rpXheaderRegex", $matches);
                   list($match, $action, $job, $queue, $hash) = $matches;
                 }
               }
