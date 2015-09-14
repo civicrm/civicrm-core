@@ -241,7 +241,7 @@ class CRM_Utils_Mail_EmailProcessor {
           // if its the activities that needs to be processed ..
           try {
             $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
-          } 
+          }
           catch (Exception $e) {
             echo $e->getMessage();
             $store->markIgnored($key);
