@@ -309,7 +309,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   /**
    * Function to build a permissioned sql where clause based on available financial types.
    *
-   * @param array $whereclauses
+   * @param array $whereClauses
    *   (reference ) an array of clauses
    * @param string $component
    *   the type of component
