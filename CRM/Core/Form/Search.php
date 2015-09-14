@@ -80,6 +80,16 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $_taskList = array();
 
   /**
+   * Declare entity reference fields as they will need to be converted.
+   *
+   * The entity reference format looks like '2,3' whereas the Query object expects array(2, 3)
+   * or array('IN' => array(2, 3). The latter is the one we are moving towards standardising on.
+   *
+   * @var array
+   */
+  protected $entityReferenceFields = array();
+
+  /**
    * Builds the list of tasks or actions that a searcher can perform on a result set.
    *
    * To modify the task list, child classes should alter $this->_taskList,

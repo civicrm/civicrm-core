@@ -71,9 +71,14 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = "member_";
 
   /**
-   * Processing needed for buildForm and later.
+   * Declare entity reference fields as they will need to be converted to using 'IN'.
    *
-   * @return void
+   * @var array
+   */
+  protected $entityReferenceFields = array('membership_type_id');
+
+  /**
+   * Processing needed for buildForm and later.
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
@@ -121,7 +126,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
       );
     }
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
     $selector = new CRM_Member_Selector_Search($this->_queryParams,
       $this->_action,
       NULL,
@@ -233,7 +238,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
 
     $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
