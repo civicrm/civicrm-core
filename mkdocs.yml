@@ -1,0 +1,10 @@
+site_name: CiviCRM Development
+pages:
+ - Introduction: index.md
+ - Requirements: requirements.md
+ - Develop: develop.md
+ - Extend: extend.md
+ - Test: test.md
+ - Customize: customize.md
+ - Reference: reference.md
+theme: readthedocs
