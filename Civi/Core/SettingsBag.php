@@ -204,7 +204,7 @@ class SettingsBag {
    *   The result data may not meet the preference -- if the setting
    *   refers to an external domain, then the result will be
    *   absolute (regardless of preference).
-   * @parma bool|NULL $ssl
+   * @param bool|NULL $ssl
    *   NULL to autodetect. TRUE to force to SSL.
    * @return string|NULL
    *   URL.
@@ -218,14 +218,37 @@ class SettingsBag {
   }
 
   /**
+   * Determine the default value of a setting.
+   *
+   * @param string $key
+   *   The simple name of the setting.
+   * @return mixed|NULL
+   */
+  public function getDefault($key) {
+    return isset($this->defaults[$key]) ? $this->defaults[$key] : NULL;
+  }
+
+  /**
    * Determine the explicitly designated value, regardless of
    * any default or mandatory values.
    *
    * @param string $key
-   * @return null
+   *   The simple name of the setting.
+   * @return mixed|NULL
    */
   public function getExplicit($key) {
     return (isset($this->values[$key]) ? $this->values[$key] : NULL);
+  }
+
+  /**
+   * Determine the mandatory value of a setting.
+   *
+   * @param string $key
+   *   The simple name of the setting.
+   * @return mixed|NULL
+   */
+  public function getMandatory($key) {
+    return isset($this->mandatory[$key]) ? $this->mandatory[$key] : NULL;
   }
 
   /**
@@ -235,6 +258,7 @@ class SettingsBag {
    * mandatory values or defaults.
    *
    * @param string $key
+   *   The simple name of the setting.
    * @return bool
    */
   public function hasExplict($key) {
@@ -246,6 +270,7 @@ class SettingsBag {
    * Removes any explicit settings. This restores the default.
    *
    * @param string $key
+   *   The simple name of the setting.
    * @return $this
    */
   public function revert($key) {
@@ -258,7 +283,9 @@ class SettingsBag {
    * Add a single setting. Save it.
    *
    * @param string $key
+   *   The simple name of the setting.
    * @param mixed $value
+   *   The new, explicit value of the setting.
    * @return $this
    */
   public function set($key, $value) {
@@ -271,6 +298,7 @@ class SettingsBag {
 
   /**
    * @param string $key
+   *   The simple name of the setting.
    * @param string $value
    *   Absolute path.
    * @return $this
@@ -282,6 +310,7 @@ class SettingsBag {
 
   /**
    * @param string $key
+   *   The simple name of the setting.
    * @param string $value
    *   Absolute URL.
    * @return $this
@@ -317,7 +346,8 @@ class SettingsBag {
    * null values. Later values override earlier
    * values.
    *
-   * @param $arrays
+   * @param array $arrays
+   *   List of arrays to combine.
    * @return array
    */
   protected function combine($arrays) {
@@ -333,8 +363,10 @@ class SettingsBag {
   }
 
   /**
-   * @param $key
-   * @param $value
+   * @param string $name
+   *   The simple name of the setting.
+   * @param mixed $value
+   *   The new value of the setting.
    */
   protected function setDb($name, $value) {
     $fields = array();
@@ -361,9 +393,17 @@ class SettingsBag {
   /**
    * Filter a URL, the same way that it would be if it were read from settings.
    *
-   * @param $value
-   * @param $preferFormat
-   * @param $ssl
+   * This converts an expression like "persist/contribute" to an absolute path
+   * like "http://example.org/sites/default/files/civicrm/persist/contribute".
+   *
+   * @param string $value
+   * @param string $preferFormat
+   *   The preferred format ('absolute', 'relative').
+   *   The result data may not meet the preference -- if the setting
+   *   refers to an external domain, then the result will be
+   *   absolute (regardless of preference).
+   * @param bool|NULL $ssl
+   *   NULL to autodetect. TRUE to force to SSL.
    * @return mixed|string
    */
   public function filterUrl($value, $preferFormat, $ssl = NULL) {
@@ -386,8 +426,16 @@ class SettingsBag {
   }
 
   /**
+   * Filter a path, the same way that it would be it it were from the settings.
+   *
+   * This converts an expression like "persist/contribute" to an absolute path
+   * like "/var/www/drupal/sites/default/files/civicrm/persist/contribute".
+   *
    * @param string $value
+   *   The value like "persist/contribute".
    * @return bool|string
+   *   The value like "/var/www/drupal/sites/default/files/civicrm/persist/contribute",
+   *   or FALSE if empty.
    */
   public function filterPath($value) {
     if ($value) {
