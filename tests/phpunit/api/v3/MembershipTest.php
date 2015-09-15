@@ -32,7 +32,6 @@
  * @subpackage API_Member
  */
 
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -50,9 +49,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   protected $_entity;
   protected $_params;
 
-
+  /**
+   * Set up for tests.
+   */
   public function setUp() {
-    // Connect to the database.
     parent::setUp();
     $this->_apiversion = 3;
     $this->_contactID = $this->individualCreate();
@@ -83,6 +83,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Clean up after tests.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
     $this->quickCleanup(array(
         'civicrm_membership',
@@ -211,6 +216,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_membership_get with params not array.
+   *
    * Gets treated as contact_id, memberships expected.
    */
   public function testGetWithParamsMemberShipTypeId() {
@@ -223,14 +229,14 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $membership['id'],
     ));
     $result = $membership['values'][$membership['id']];
-    $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
-    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
-    $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($result['join_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
-    $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
+    $this->assertEquals($result['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($result['join_date'], '2009-01-21');
+    $this->assertEquals($result['start_date'], '2009-01-21');
+    $this->assertEquals($result['end_date'], '2009-12-21');
+    $this->assertEquals($result['source'], 'Payment');
+    $this->assertEquals($result['is_override'], 1);
     $this->assertEquals($result['id'], $membership['id']);
   }
 
@@ -262,7 +268,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with complete array + custom field
+   * Check with complete array + custom field.
+   *
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -299,15 +306,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $membership['id'],
     ));
-    $this->assertEquals($result['join_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
-    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
-    $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
+    $this->assertEquals($result['join_date'], '2009-01-21');
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
+    $this->assertEquals($result['status_id'], $this->_membershipStatusID);
 
-    $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
-    $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['start_date'], '2009-01-21');
+    $this->assertEquals($result['end_date'], '2009-12-21');
+    $this->assertEquals($result['source'], 'Payment');
+    $this->assertEquals($result['is_override'], 1);
   }
 
 
@@ -372,7 +379,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
 
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals($membership['count'], 0, "In line " . __LINE__);
+    $this->assertEquals($membership['count'], 0);
   }
 
   /**
