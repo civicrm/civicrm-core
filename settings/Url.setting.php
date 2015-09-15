@@ -37,6 +37,7 @@
  */
 return array(
   'userFrameworkResourceURL' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'userFrameworkResourceURL',
@@ -53,6 +54,7 @@ return array(
     'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
   'imageUploadURL' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'title' => 'Image Upload URL',
@@ -69,6 +71,7 @@ return array(
     'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
   'customCSSURL' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'customCSSURL',
@@ -85,6 +88,7 @@ return array(
     'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
   'extensionsURL' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'title' => 'Extension Resource URL',
