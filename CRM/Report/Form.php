@@ -3837,8 +3837,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Check for empty order_by configurations and remove them; also set
-   * template to hide them.
+   * Check for empty order_by configurations and remove them.
+   *
+   * Also set template to hide them.
    *
    * @param array $formValues
    */
@@ -3969,9 +3970,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
         'fields' => array(
-          'name' => array(
+          'address_name' => array(
             'title' => ts('Address Name'),
             'default' => CRM_Utils_Array::value('name', $defaults, FALSE),
+            'name' => 'name',
           ),
           'street_address' => array(
             'title' => ts('Street Address'),
@@ -4114,11 +4116,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $rows
    * @param int $rowNum
    * @param string $baseUrl
-   * @param string $urltxt
+   * @param string $linkText
    *
    * @return bool
    */
-  public function alterDisplayAddressFields(&$row, &$rows, &$rowNum, $baseUrl, $urltxt) {
+  public function alterDisplayAddressFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText) {
     $criteriaQueryParams = CRM_Report_Utils_Report::getPreviewCriteriaQueryParams($this->_defaults, $this->_params);
     $entryFound = FALSE;
     // handle country
@@ -4132,7 +4134,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         );
         $rows[$rowNum]['civicrm_address_country_id_link'] = $url;
         $rows[$rowNum]['civicrm_address_country_id_hover'] = ts("%1 for this country.",
-          array(1 => $urltxt)
+          array(1 => $linkText)
         );
       }
 
@@ -4148,7 +4150,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         );
         $rows[$rowNum]['civicrm_address_county_id_link'] = $url;
         $rows[$rowNum]['civicrm_address_county_id_hover'] = ts("%1 for this county.",
-          array(1 => $urltxt)
+          array(1 => $linkText)
         );
       }
       $entryFound = TRUE;
@@ -4164,12 +4166,42 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         );
         $rows[$rowNum]['civicrm_address_state_province_id_link'] = $url;
         $rows[$rowNum]['civicrm_address_state_province_id_hover'] = ts("%1 for this state.",
-          array(1 => $urltxt)
+          array(1 => $linkText)
         );
       }
       $entryFound = TRUE;
     }
 
+    return $entryFound;
+  }
+
+  /**
+   * Do AlterDisplay processing on Address Fields.
+   *
+   * @param array $row
+   * @param array $rows
+   * @param int $rowNum
+   * @param string $baseUrl
+   * @param string $linkText
+   *
+   * @return bool
+   */
+  public function alterDisplayContactFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText) {
+    $entryFound = FALSE;
+    // There is no reason not to add links for all fields but it seems a bit odd to be able to click on
+    // 'Mrs'. Also, we don't have metadata about the title. So, add selectively to addLinks.
+    $addLinks = array('gender_id' => 'Gender');
+    foreach (array('prefix_id', 'suffix_id', 'gender_id') as $fieldName) {
+      if (array_key_exists('civicrm_contact_' . $fieldName, $row)) {
+        if (($value = $row['civicrm_contact_' . $fieldName]) != FALSE) {
+          $rows[$rowNum]['civicrm_contact_' . $fieldName] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $value);
+          if (($title = CRM_Utils_Array::value($fieldName, $addLinks)) != FALSE) {
+            $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, $fieldName, 'civicrm_contact', $title);
+          }
+        }
+        $entryFound = TRUE;
+      }
+    }
     return $entryFound;
   }
 
@@ -4285,6 +4317,71 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Get a standard set of contact fields.
+   *
+   * @return array
+   */
+  public function getBasicContactFields() {
+    return array(
+      'sort_name' => array(
+        'title' => ts('Contact Name'),
+        'required' => TRUE,
+        'default' => TRUE,
+      ),
+      'id' => array(
+        'no_display' => TRUE,
+        'required' => TRUE,
+      ),
+      'prefix_id' => array(
+        'title' => ts('Contact Prefix'),
+      ),
+      'first_name' => array(
+        'title' => ts('First Name'),
+      ),
+      'nick_name' => array(
+        'title' => ts('Nick Name'),
+      ),
+      'middle_name' => array(
+        'title' => ts('Middle Name'),
+      ),
+      'last_name' => array(
+        'title' => ts('Last Name'),
+      ),
+      'suffix_id' => array(
+        'title' => ts('Contact Suffix'),
+      ),
+      'postal_greeting_display' => array('title' => ts('Postal Greeting')),
+      'email_greeting_display' => array('title' => ts('Email Greeting')),
+      'addressee_display' => array('title' => ts('Address Greeting')),
+      'contact_type' => array(
+        'title' => ts('Contact Type'),
+      ),
+      'contact_sub_type' => array(
+        'title' => ts('Contact Subtype'),
+      ),
+      'gender_id' => array(
+        'title' => ts('Gender'),
+      ),
+      'birth_date' => array(
+        'title' => ts('Birth Date'),
+      ),
+      'age' => array(
+        'title' => ts('Age'),
+        'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
+      ),
+      'job_title' => array(
+        'title' => ts('Contact Job title'),
+      ),
+      'organization_name' => array(
+        'title' => ts('Organization Name'),
+      ),
+      'external_identifier' => array(
+        'title' => ts('Contact identifier from external system'),
+      ),
+    );
+  }
+
+  /**
    * Add contact to group.
    *
    * @param int $groupID
@@ -4362,6 +4459,34 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'entity' => CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table)),
       'multiple' => TRUE,
       'placeholder' => ts('- select -'),
+    );
+  }
+
+  /**
+   * Add link fields to the row.
+   *
+   * Function adds the _link & _hover fields to the row.
+   *
+   * @param array $row
+   * @param string $baseUrl
+   * @param string $linkText
+   * @param string $value
+   * @param string $fieldName
+   * @param string $tablePrefix
+   * @param string $fieldLabel
+   *
+   * @return mixed
+   */
+  protected function addLinkToRow(&$row, $baseUrl, $linkText, $value, $fieldName, $tablePrefix, $fieldLabel) {
+    $criteriaQueryParams = CRM_Report_Utils_Report::getPreviewCriteriaQueryParams($this->_defaults, $this->_params);
+    $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
+      "reset=1&force=1&{$criteriaQueryParams}&" .
+      $fieldName . "_op=in&{$fieldName}_value={$value}",
+      $this->_absoluteUrl, $this->_id
+    );
+    $row["{$tablePrefix}_{$fieldName}_link"] = $url;
+    $row["{$tablePrefix}_{$fieldName}_hover"] = ts("%1 for this %2.",
+      array(1 => $linkText, 2 => $fieldLabel)
     );
   }
 

@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* Callback snippet: Load payment processor *}
-
   {if $action & 1024}
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
   {/if}
@@ -53,20 +52,20 @@
       </div>
     {/if}
     {if $event.intro_text}
-      <div id="intro_text" class="crm-section intro_text-section">
+      <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
         <p>{$event.intro_text}</p>
       </div>
     {/if}
 
     {include file="CRM/common/cidzero.tpl"}
     {if $pcpSupporterText}
-      <div class="crm-section pcpSupporterText-section">
+      <div class="crm-public-form-item crm-section pcpSupporterText-section">
         <div class="content">{$pcpSupporterText}</div>
       </div>
     {/if}
 
     {if $form.additional_participants.html}
-      <div class="crm-section additional_participants-section" id="noOfparticipants">
+      <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
         <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
         <div class="content">
           {$form.additional_participants.html}{if $contact_id || $contact_id == NULL} &nbsp; ({ts}including yourself{/ts}){/if}
@@ -78,36 +77,40 @@
       </div>
     {/if}
 
-    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
-    {include file="CRM/common/CMSUser.tpl"}
+    <div class="crm-public-form-item crm-section cms_user-section">
+      {* User account registration option. Displays if enabled for one of the profiles on this page. *}
+      {include file="CRM/common/CMSUser.tpl"}
+    </div>
 
-    {* Display "Top of page" profile immediately after the introductory text *}
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+    <div class="crm-public-form-item crm-section custom_pre-section">
+      {* Display "Top of page" profile immediately after the introductory text *}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+    </div>
 
     {if $priceSet}
-      {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
+      {if ! $quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
         <legend>{$event.fee_label}</legend>{/if}
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
     {/if}
     {if $pcp && $is_honor_roll }
-      <fieldset class="crm-group pcp-group">
-        <div class="crm-section pcp-section">
-          <div class="crm-section display_in_roll-section">
+      <fieldset class="crm-public-form-item crm-group pcp-group">
+        <div class="crm-public-form-item crm-section pcp-section">
+          <div class="crm-public-form-item crm-section display_in_roll-section">
             <div class="content">
               {$form.pcp_display_in_roll.html} &nbsp;
               {$form.pcp_display_in_roll.label}
             </div>
             <div class="clear"></div>
           </div>
-          <div id="nameID" class="crm-section is_anonymous-section">
+          <div id="nameID" class="crm-public-form-item crm-section is_anonymous-section">
             <div class="content">
               {$form.pcp_is_anonymous.html}
             </div>
             <div class="clear"></div>
           </div>
-          <div id="nickID" class="crm-section pcp_roll_nickname-section">
+          <div id="nickID" class="crm-public-form-item crm-section pcp_roll_nickname-section">
             <div class="label">{$form.pcp_roll_nickname.label}</div>
             <div class="content">{$form.pcp_roll_nickname.html}
               <div
@@ -115,7 +118,7 @@
             </div>
             <div class="clear"></div>
           </div>
-          <div id="personalNoteID" class="crm-section pcp_personal_note-section">
+          <div id="personalNoteID" class="crm-public-form-item crm-section pcp_personal_note-section">
             <div class="label">{$form.pcp_personal_note.label}</div>
             <div class="content">
               {$form.pcp_personal_note.html}
@@ -128,7 +131,7 @@
     {/if}
 
     {if $form.payment_processor_id.label}
-      <fieldset class="crm-group payment_options-group" style="display:none;">
+      <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
         <div class="crm-section payment_processor-section">
           <div class="label">{$form.payment_processor_id.label}</div>
@@ -146,7 +149,9 @@
     </div>
     {include file="CRM/common/paymentBlock.tpl"}
 
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+    <div class="crm-public-form-item crm-section custom_pre-section">
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+    </div>
 
     {if $isCaptcha}
       {include file='CRM/common/ReCAPTCHA.tpl'}
@@ -157,7 +162,7 @@
     </div>
 
     {if $event.footer_text}
-      <div id="footer_text" class="crm-section event_footer_text-section">
+      <div id="footer_text" class="crm-public-form-item crm-section event_footer_text-section">
         <p>{$event.footer_text}</p>
       </div>
     {/if}

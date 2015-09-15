@@ -68,6 +68,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Restore the DB for the next test.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
     // truncate a few tables
     $tablesToTruncate = array(
@@ -796,6 +801,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Test group filter syntaxes.
+   */
   public function testGetGroupIDFromContact() {
     $groupId = $this->groupCreate();
     $description = "Get all from group and display contacts.";
@@ -1572,7 +1580,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test to check return works OK.
    */
   public function testContactGetReturnValues() {
-    $extraParams = array('nick_name' => 'Bob', 'phone' => '456', 'email' => 'e@mail.com');
+    $extraParams = array(
+      'nick_name' => 'Bob',
+      'phone' => '456',
+      'email' => 'e@mail.com',
+    );
     $contactID = $this->individualCreate($extraParams);
     //actually it turns out the above doesn't create a phone
     $this->callAPISuccess('phone', 'create', array('contact_id' => $contactID, 'phone' => '456'));
@@ -1590,6 +1602,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test creating multiple phones using chaining.
+   *
+   * @throws \Exception
+   */
   public function testCRM13252MultipleChainedPhones() {
     $contactID = $this->householdCreate();
     $this->callAPISuccessGetCount('phone', array('contact_id' => $contactID), 0);
@@ -1635,7 +1652,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Verify attempt to create individual with chained arrays and sequential
+   * Verify attempt to create individual with chained arrays and sequential.
    */
   public function testGetIndividualWithChainedArraysAndSequential() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -1670,7 +1687,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Verify attempt to create individual with chained arrays
+   * Verify attempt to create individual with chained arrays.
    */
   public function testGetIndividualWithChainedArrays() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -1738,7 +1755,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Verify attempt to create individual with chained arrays and sequential.
+   * Verify attempt to create individual with chained arrays and sequential.
    *
    *  See https://issues.civicrm.org/jira/browse/CRM-15815
    */
@@ -1778,6 +1795,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values'][0]['api.website.get']['count']);
   }
 
+  /**
+   * Test retrieving an individual with chained array syntax.
+   */
   public function testGetIndividualWithChainedArraysFormats() {
     $description = "This demonstrates the usage of chained api functions.\nIn this case no notes or custom fields have been created.";
     $subfile = "APIChainedArrayFormats";
@@ -1930,7 +1950,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = array(
       'display_name' => 'batman',
       'contact_type' => 'Individual',
-      'api.tag.create' => array('name' => '$value.id', 'description' => '$value.display_name', 'format.only_id' => 1),
+      'api.tag.create' => array(
+        'name' => '$value.id',
+        'description' => '$value.display_name',
+        'format.only_id' => 1,
+      ),
       'api.entity_tag.create' => array('tag_id' => '$value.api.tag.create'),
     );
     $result = $this->callAPIAndDocument('Contact', 'Create', $params, __FUNCTION__, __FILE__, $description, $subfile);
@@ -2047,7 +2071,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('API permission check failed for Contact/create call; insufficient permission: require access CiviCRM and add contacts', $result['error_message'], 'lacking permissions should not be enough to create a contact');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'import contacts');
-    $this->callAPISuccess('contact', 'create', $params, NULL, 'overfluous permissions should be enough to create a contact');
+    $this->callAPISuccess('contact', 'create', $params);
   }
 
   /**
@@ -2080,7 +2104,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'edit all contacts',
       'import contacts',
     );
-    $this->callAPISuccess('contact', 'update', $params, NULL, 'overfluous permissions should be enough to update a contact');
+    $this->callAPISuccess('contact', 'update', $params);
   }
 
   /**
@@ -2485,6 +2509,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue(!isset($refCountsIdx['sql:civicrm_address:contact_id']));
   }
 
+  /**
+   * Test the use of sql operators.
+   */
   public function testSQLOperatorsOnContactAPI() {
     $this->individualCreate();
     $this->organizationCreate();
@@ -2551,7 +2578,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-15443 - ensure getlist api does not return deleted contacts
+   * CRM-15443 - ensure getlist api does not return deleted contacts.
    */
   public function testGetlistExcludeConditions() {
     $name = md5(time());

@@ -48,8 +48,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
 
@@ -65,33 +64,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-            'required' => TRUE,
-            'default' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'fields' => $this->getBasicContactFields(),
         'filters' => array(
           'sort_name' => array(
             'title' => ts('Contact Name'),
@@ -183,21 +156,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         ),
         'grouping' => 'member-fields',
       ),
-      'civicrm_address' => array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'fields' => array(
-          'street_address' => NULL,
-          'city' => NULL,
-          'postal_code' => NULL,
-          'state_province_id' => array(
-            'title' => ts('State/Province'),
-          ),
-          'country_id' => array(
-            'title' => ts('Country'),
-          ),
-        ),
-        'grouping' => 'contact-fields',
-      ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array('email' => NULL),
@@ -271,7 +229,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         ),
         'grouping' => 'contri-fields',
       ),
-    );
+    ) + $this->getAddressColumns(array(
+      // These options are only excluded because they were not previously present.
+      'order_by' => FALSE,
+      'group_by' => FALSE,
+    ));
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -306,10 +268,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_email') {
+            if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
             elseif ($tableName == 'civicrm_phone') {
@@ -341,14 +300,14 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                           ON {$this->_aliases['civicrm_membership_status']}.id =
                              {$this->_aliases['civicrm_membership']}.status_id ";
 
-    //used when address field is selected
-    if ($this->_addressField) {
+    if ($this->isTableSelected('civicrm_address')) {
       $this->_from .= "
              LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
                        ON {$this->_aliases['civicrm_contact']}.id =
                           {$this->_aliases['civicrm_address']}.contact_id AND
                           {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
+
     //used when email field is selected
     if ($this->_emailField) {
       $this->_from .= "
@@ -495,6 +454,8 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'member/detail', 'List all memberships(s) for this ') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'member/detail', 'List all memberships(s) for this ') ? TRUE : $entryFound;
 
       if (!$entryFound) {
         break;

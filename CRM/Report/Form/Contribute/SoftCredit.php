@@ -599,8 +599,11 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
 
       //convert soft_credit_type_id into label
       if (array_key_exists('civicrm_contribution_soft_soft_credit_type_id', $rows[$rowNum])) {
-        $rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id'] = CRM_Core_OptionGroup::getLabel('soft_credit_type',
-          $row['civicrm_contribution_soft_soft_credit_type_id']);
+        $rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id'] = CRM_Core_PseudoConstant::getLabel(
+          'CRM_Contribute_BAO_ContributionSoft',
+          'soft_credit_type_id',
+          $row['civicrm_contribution_soft_soft_credit_type_id']
+        );
       }
 
       //handle gender
