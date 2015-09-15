@@ -260,7 +260,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
         'type_id' => '4',
         'amount' => '$ 66.00',
         'source' => NULL,
-        'receive_date' => date('Y-m-d H:i:s'),
+        'receive_date' => date('Y-m-d 00:00:00'),
         'contribution_status' => 'Completed',
       ),
     ), $getHonorContact);

@@ -52,7 +52,8 @@
         {/foreach}
       </div>
     </fieldset>
-  {if $billingDetailsFields|@count}
+  {/if}
+  {if $billingDetailsFields|@count && $paymentProcessor.payment_processor_type neq 'PayPal_Express'}
     {if $profileAddressFields}
       <input type="checkbox" id="billingcheckbox" value="0">
       <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>
@@ -77,7 +78,6 @@
       </div>
     </fieldset>
   {/if}
-{/if}
 </div>
 {if $profileAddressFields}
   <script type="text/javascript">
