@@ -289,4 +289,32 @@ class SettingsManager {
     return $result;
   }
 
+  /**
+   * Flush all in-memory and persistent caches related to settings.
+   *
+   * @return $this
+   */
+  public function flush() {
+    $this->mandatory = NULL;
+
+    $this->cache->flush();
+    \Civi::cache('settings')->flush(); // SettingsMetadata; not guaranteed to use same cache.
+
+    foreach ($this->bagsByDomain as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->loadValues();
+      $bag->loadDefaults($this->getDefaults('domain'));
+      $bag->loadMandatory($this->getMandatory('domain'));
+    }
+
+    foreach ($this->bagsByDomain as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->loadValues();
+      $bag->loadDefaults($this->getDefaults('contact'));
+      $bag->loadMandatory($this->getMandatory('contact'));
+    }
+
+    return $this;
+  }
+
 }

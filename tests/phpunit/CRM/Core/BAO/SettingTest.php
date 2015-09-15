@@ -137,8 +137,9 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $currentDomain = CRM_Core_Config::domainID();
     // we are setting up an artificial situation here as we are trying to drive out
     // previous memory of this setting so we need to flush it out
-    $cachekey = CRM_Core_BAO_Setting::inCache('CiviCRM Preferences', 'max_attachments', NULL, NULL, TRUE, $currentDomain);
-    CRM_Core_BAO_Setting::flushCache($cachekey);
+    //$cachekey = CRM_Core_BAO_Setting::inCache('CiviCRM Preferences', 'max_attachments', NULL, NULL, TRUE, $currentDomain);
+    //CRM_Core_BAO_Setting::flushCache($cachekey);
+    Civi::service('settings_manager')->flush();
     CRM_Core_BAO_Setting::updateSettingsFromMetaData();
     //check current domain
     $value = civicrm_api('setting', 'getvalue', array(
