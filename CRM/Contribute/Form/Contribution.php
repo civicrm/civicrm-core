@@ -972,10 +972,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ));
       return;
     }
+    // Get the submitted form values.
     $submittedValues = $this->controller->exportValues($this->_name);
 
     try {
-      // Get the submitted form values.
       $contribution = $this->submit($submittedValues, $this->_action, $this->_ppID);
     }
     catch (PaymentProcessorException $e) {
