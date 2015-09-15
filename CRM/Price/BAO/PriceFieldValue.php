@@ -57,7 +57,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     if ($id = CRM_Utils_Array::value('id', $ids)) {
       $fieldValueBAO->id = $id;
       $prevLabel = self::getOptionLabel($id);
-      if ($prevLabel != $params['label']) {
+      if (!empty($params['label']) && $prevLabel != $params['label']) {
         self::updateAmountAndFeeLevel($id, $prevLabel, $params['label']);
       }
     }
