@@ -1388,4 +1388,20 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Test that all membership types are returned when getoptions is called.
+   *
+   * This test locks in current behaviour where types for all domains are returned. It should possibly be domain
+   * specific but that should only be done in conjunction with adding a hook to allow that to be altered as the
+   * multisite use case expects the master domain to be able to see all sites.
+   *
+   * See CRM-17075.
+   */
+  public function testGetOptionsMembershipTypeID() {
+    $options = $this->callAPISuccess('Membership', 'getoptions', array('field' => 'membership_type_id'));
+    $this->assertEquals('General', array_pop($options['values']));
+    $this->assertEquals('General', array_pop($options['values']));
+    $this->assertEquals(NULL, array_pop($options['values']));
+  }
+
 }
