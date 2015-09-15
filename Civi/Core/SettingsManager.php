@@ -51,6 +51,12 @@ namespace Civi\Core;
  * in some edge-cases, you may need to work with multiple domains/contacts
  * at the same time.
  *
+ * Note: The global $civicrm_setting is meant to provide sysadmins with a way
+ * to override settings in `civicrm.settings.php`, but it has traditionally been
+ * possible for extensions to manipulate $civicrm_setting in a hook. If you do
+ * this, please call `useMandatory()` to tell SettingsManager to re-scan
+ * $civicrm_setting.
+ *
  * @see SettingsManagerTest
  */
 class SettingsManager {
@@ -67,9 +73,10 @@ class SettingsManager {
   protected $bagsByDomain = array(), $bagsByContact = array();
 
   /**
-   * @var array
+   * @var array|NULL
    *   Array(string $entity => array(string $settingName => mixed $value)).
    *   Ex: $mandatory['domain']['uploadDir'].
+   *   NULL means "autoload from $civicrm_setting".
    */
   protected $mandatory = NULL;
 
@@ -83,16 +90,13 @@ class SettingsManager {
   /**
    * @param \CRM_Utils_Cache_Interface $cache
    *   A semi-durable location to store metadata.
-   * @param NULL|array $mandatory
-   *   Ex: $mandatory['domain']['uploadDir'].
    */
-  public function __construct($cache, $mandatory = NULL) {
+  public function __construct($cache) {
     $this->cache = $cache;
-    $this->mandatory = $mandatory;
   }
 
   /**
-   * Ensure that all defaults and mandatory values are included with
+   * Ensure that all defaults values are included with
    * all current and future bags.
    *
    * @return $this
@@ -103,15 +107,42 @@ class SettingsManager {
 
       if (!empty($this->bagsByDomain)) {
         foreach ($this->bagsByDomain as $bag) {
+          /** @var SettingsBag $bag */
           $bag->loadDefaults($this->getDefaults('domain'));
         }
       }
 
       if (!empty($this->bagsByContact)) {
         foreach ($this->bagsByContact as $bag) {
+          /** @var SettingsBag $bag */
           $bag->loadDefaults($this->getDefaults('contact'));
         }
       }
+    }
+
+    return $this;
+  }
+
+  /**
+   * Ensure that mandatory values are included with
+   * all current and future bags.
+   *
+   * If you call useMandatory multiple times, it will
+   * re-scan the global $civicrm_setting.
+   *
+   * @return $this
+   */
+  public function useMandatory() {
+    $this->mandatory = NULL;
+
+    foreach ($this->bagsByDomain as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->loadMandatory($this->getMandatory('domain'));
+    }
+
+    foreach ($this->bagsByContact as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->loadMandatory($this->getMandatory('contact'));
     }
 
     return $this;
@@ -198,17 +229,10 @@ class SettingsManager {
    *   Array(string $settingName => mixed $value).
    */
   protected function getMandatory($entity) {
-    // Prepare and cache list of all mandatory settings.
     if ($this->mandatory === NULL) {
-      if (isset($GLOBALS['civicrm_setting'])) {
-        $this->mandatory = self::parseMandatorySettings($GLOBALS['civicrm_setting']);
-      }
-      else {
-        $this->mandatory = array();
-      }
+      $this->mandatory = self::parseMandatorySettings(\CRM_Utils_Array::value('civicrm_setting', $GLOBALS));
     }
-
-    return \CRM_Utils_Array::value($entity, $this->mandatory, array());
+    return $this->mandatory[$entity];
   }
 
   /**
@@ -230,36 +254,39 @@ class SettingsManager {
    * @return array
    */
   public static function parseMandatorySettings($civicrm_setting) {
+    $result = array(
+      'domain' => array(),
+      'contact' => array(),
+    );
+
     $rewriteGroups = array(
-      \CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME => 'contact',
-      \CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => 'domain',
-      \CRM_Core_BAO_Setting::URL_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME => 'contact',
+      'Personal Preferences' => 'contact',
+      //\CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => 'domain',
+      //\CRM_Core_BAO_Setting::URL_PREFERENCES_NAME => 'domain',
+      'domain' => 'domain',
+      'contact' => 'contact',
     );
 
     if (is_array($civicrm_setting)) {
-      foreach ($rewriteGroups as $oldGroup => $newGroup) {
-        if (!isset($civicrm_setting[$newGroup])) {
-          $civicrm_setting[$newGroup] = array();
-        }
-        if (isset($civicrm_setting[$oldGroup])) {
-          $civicrm_setting[$newGroup] = array_merge($civicrm_setting[$oldGroup], $civicrm_setting[$newGroup]);
-          unset($civicrm_setting[$oldGroup]);
-        }
+      foreach ($civicrm_setting as $oldGroup => $values) {
+        $newGroup = isset($rewriteGroups[$oldGroup]) ? $rewriteGroups[$oldGroup] : 'domain';
+        $result[$newGroup] = array_merge($result[$newGroup], $values);
       }
     }
-    return $civicrm_setting;
+    return $result;
   }
 
 }
