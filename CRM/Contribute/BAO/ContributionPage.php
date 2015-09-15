@@ -838,7 +838,9 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    * @return array|string
    */
   public static function formatMultilingualHonorParams($params, $setDefault = FALSE) {
+    global $tsLocale;
     $config = CRM_Core_Config::singleton();
+
     $sctJson = $sctJsonDecode = NULL;
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
@@ -852,12 +854,12 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
         //monolingual state
         $sctJsonDecode += (array) $sctJsonDecode['default'];
       }
-      elseif (!empty($sctJsonDecode[$config->lcMessages])) {
+      elseif (!empty($sctJsonDecode[$tsLocale])) {
         //multilingual state
-        foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
+        foreach ($sctJsonDecode[$tsLocale] as $column => $value) {
           $sctJsonDecode[$column] = $value;
         }
-        unset($sctJsonDecode[$config->lcMessages]);
+        unset($sctJsonDecode[$tsLocale]);
       }
       return $sctJsonDecode;
     }
