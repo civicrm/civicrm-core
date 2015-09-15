@@ -417,6 +417,7 @@ class CRM_Member_BAO_Query {
       'entity' => 'MembershipType',
       'multiple' => TRUE,
       'placeholder' => ts('- any -'),
+      'select' => array('minimumInputLength' => 0),
     ));
 
     $form->addElement('text', 'member_source', ts('Source'));
