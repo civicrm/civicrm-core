@@ -103,10 +103,6 @@ class CRM_Core_Config_Runtime {
    */
   public $templateDir;
 
-  //public $customFileUploadDir, $customPHPPathDir, $customTemplateDir, $extensionsDir, $imageUploadDir, $resourceBase, $uploadDir;
-  //public $userFrameworkResourceURL, $customCSSURL, $extensionsURL, $imageUploadURL;
-  //public $geocodeMethod, $defaultCurrencySymbol;
-
   /**
    * @param bool $loadFromDB
    */
@@ -138,27 +134,6 @@ class CRM_Core_Config_Runtime {
     $this->setUserFramework(CIVICRM_UF);
 
     $this->templateDir = array(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
-    //if ($loadFromDB) {
-    //  // //$this->enableComponents = \Civi::settings()->get('enable_components');
-    //
-    //  $this->customFileUploadDir = CRM_Core_Config_Defaults::getCustomFileUploadDir();
-    //  $this->customPHPPathDir = CRM_Core_Config_Defaults::getCustomPhpPathDir();
-    //  $this->customTemplateDir = CRM_Core_Config_Defaults::getCustomTemplateDir();
-    //  $this->extensionsDir = CRM_Core_Config_Defaults::getExtensionsDir();
-    //  $this->imageUploadDir = CRM_Core_Config_Defaults::getImageUploadDir();
-    //  $this->uploadDir = CRM_Core_Config_Defaults::getUploadDir();
-    //
-    //  $this->resourceBase = CRM_Core_Config_Defaults::getResourceBase();
-    //  $this->useFrameworkRelativeBase = CRM_Core_Config_Defaults::getUserFrameworkRelativeBase();
-    //
-    //  $this->userFrameworkResourceURL = CRM_Core_Config_Defaults::getUserFrameworkResourceUrl();
-    //  $this->customCSSURL = CRM_Core_Config_Defaults::getCustomCssUrl();
-    //  $this->extensionsURL = CRM_Core_Config_Defaults::getExtensionsUrl();
-    //  $this->imageUploadURL = CRM_Core_Config_Defaults::getImageUploadUrl();
-    //
-    //  $this->geocodeMethod = CRM_Utils_Geocode::getProviderClass();
-    //  $this->defaultCurrencySymbol = CRM_Core_Config_Defaults::getDefaultCurrencySymbol();
-    //}
 
     if (CRM_Utils_System::isSSL()) {
       $this->userSystem->mapConfigToSSL();

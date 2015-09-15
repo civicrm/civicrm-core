@@ -169,10 +169,7 @@ class CRM_Utils_Rule {
     if (empty($url)) {
       return TRUE;
     }
-    if (!preg_match('/^([a-z]+):/', $url)) {
-      // allow relative URL's (CRM-15598)
-      $url = 'http://' . $_SERVER['HTTP_HOST'] . '/' . ltrim($url, '/');
-    }
+    $url = Civi::paths()->getUrl($url, 'absolute');
     return (bool) filter_var($url, FILTER_VALIDATE_URL);
   }
 
@@ -733,7 +730,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function settingPath($path) {
-    return is_dir(\CRM_Utils_File::absoluteDirectory($path));
+    return is_dir(Civi::paths()->getPath($path));
   }
 
   /**
