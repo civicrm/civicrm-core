@@ -59,98 +59,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     URL_PREFERENCES_NAME = 'URL Preferences',
     LOCALIZATION_PREFERENCES_NAME = 'Localization Preferences',
     SEARCH_PREFERENCES_NAME = 'Search Preferences';
-  static $_cache = NULL;
-
-  /**
-   * Checks whether an item is present in the in-memory cache table
-   *
-   * @param string $group
-   *   (required) The group name of the item.
-   * @param string $name
-   *   (required) The name of the setting.
-   * @param int $componentID
-   *   The optional component ID (so components can share the same name space).
-   * @param int $contactID
-   *   If set, this is a contactID specific setting, else its a global setting.
-   * @param bool|int $load if true, load from local cache (typically memcache)
-   *
-   * @param int $domainID
-   * @param bool $force
-   *
-   * @return bool
-   *   true if item is already in cache
-   */
-  public static function inCache(
-    $group,
-    $name,
-    $componentID = NULL,
-    $contactID = NULL,
-    $load = FALSE,
-    $domainID = NULL,
-    $force = FALSE
-  ) {
-    if (!isset(self::$_cache)) {
-      self::$_cache = array();
-    }
-
-    $cacheKey = "CRM_Setting_{$group}_{$componentID}_{$contactID}_{$domainID}";
-
-    if (
-      $load &&
-      ($force || !isset(self::$_cache[$cacheKey]))
-    ) {
-
-      // check in civi cache if present (typically memcache)
-      $globalCache = CRM_Utils_Cache::singleton();
-      $result = $globalCache->get($cacheKey);
-      if ($result) {
-
-        self::$_cache[$cacheKey] = $result;
-      }
-    }
-
-    return isset(self::$_cache[$cacheKey]) ? $cacheKey : NULL;
-  }
-
-  /**
-   * Allow key o be cleared.
-   * @param string $cacheKey
-   */
-  public static function flushCache($cacheKey) {
-    unset(self::$_cache[$cacheKey]);
-    $globalCache = CRM_Utils_Cache::singleton();
-    $globalCache->delete($cacheKey);
-  }
-
-  /**
-   * @param $values
-   * @param $group
-   * @param int $componentID
-   * @param int $contactID
-   * @param int $domainID
-   *
-   * @return string
-   */
-  public static function setCache(
-    $values,
-    $group,
-    $componentID = NULL,
-    $contactID = NULL,
-    $domainID = NULL
-  ) {
-    if (!isset(self::$_cache)) {
-      self::$_cache = array();
-    }
-
-    $cacheKey = "CRM_Setting_{$group}_{$componentID}_{$contactID}_{$domainID}";
-
-    self::$_cache[$cacheKey] = $values;
-
-    $globalCache = CRM_Utils_Cache::singleton();
-    $result = $globalCache->set($cacheKey, $values);
-
-    return $cacheKey;
-  }
 
   /**
    * @param $group
@@ -403,12 +311,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
     $dao->save();
     $dao->free();
-
-    // also save in cache if needed
-    $cacheKey = self::inCache($group, $name, $componentID, $contactID, FALSE, $domainID);
-    if ($cacheKey) {
-      self::$_cache[$cacheKey][$name] = $value;
-    }
   }
 
   /**
@@ -585,7 +487,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $domainID = NULL,
     $profile = NULL
   ) {
-    return \Civi\Core\SettingsMetadata::getMetadata($filters, $domainID, $profile);
+    return \Civi\Core\SettingsMetadata::getMetadata($filters, $domainID);
   }
 
   /**
@@ -760,29 +662,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
 
     self::setItem($optionValue, $group, $name);
-  }
-
-  /**
-   * Determine what, if any, overrides have been provided
-   * for a setting.
-   *
-   * @param $group
-   * @param string $name
-   * @param $default
-   *
-   * @return mixed, NULL or an overriden value
-   */
-  protected static function getOverride($group, $name, $default) {
-    global $civicrm_setting;
-    if ($group && $name && isset($civicrm_setting[$group][$name])) {
-      return $civicrm_setting[$group][$name];
-    }
-    elseif ($group && !isset($name) && isset($civicrm_setting[$group])) {
-      return $civicrm_setting[$group];
-    }
-    else {
-      return $default;
-    }
   }
 
   /**

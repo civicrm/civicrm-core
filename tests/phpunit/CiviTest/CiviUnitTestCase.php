@@ -2843,9 +2843,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @return void
    */
   public function setMockSettingsMetaData($extras) {
-    CRM_Core_BAO_Setting::$_cache = array();
-    $this->callAPISuccess('system', 'flush', array());
-    CRM_Core_BAO_Setting::$_cache = array();
+    Civi::service('settings_manager')->flush();
 
     CRM_Utils_Hook::singleton()
       ->setHook('civicrm_alterSettingsMetaData', function (&$metadata, $domainId, $profile) use ($extras) {

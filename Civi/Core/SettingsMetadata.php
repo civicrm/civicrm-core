@@ -53,7 +53,6 @@ class SettingsMetadata {
    *
    * @param array $filters
    * @param int $domainID
-   * @param null $profile
    *
    * @return array
    *   the following information as appropriate for each setting
@@ -66,13 +65,13 @@ class SettingsMetadata {
    *   - description
    *   - help_text
    */
-  public static function getMetadata(
-    $filters = array(),
-    $domainID = NULL,
-    $profile = NULL
-  ) {
+  public static function getMetadata($filters = array(), $domainID = NULL) {
+    if ($domainID === NULL) {
+      $domainID = \CRM_Core_Config::domainID();
+    }
+
     $cache = \Civi::cache('settings');
-    $cacheString = 'settingsMetadata_' . $domainID . '_' . $profile;
+    $cacheString = 'settingsMetadata_' . $domainID . '_';
     // the caching into 'All' seems to be a duplicate of caching to
     // settingsMetadata__ - I think the reason was to cache all settings as defined & then those altered by a hook
     $settingsMetadata = $cache->get($cacheString);
@@ -89,7 +88,7 @@ class SettingsMetadata {
       }
     }
 
-    \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, $profile);
+    \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
 
     if (!$cached) {
       $cache->set($cacheString, $settingsMetadata);
@@ -129,7 +128,6 @@ class SettingsMetadata {
       $settings = include $file;
       $settingMetaData = array_merge($settingMetaData, $settings);
     }
-    \Civi::cache('settings')->set(self::ALL, $settingMetaData);
     return $settingMetaData;
   }
 
