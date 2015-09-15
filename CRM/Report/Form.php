@@ -383,6 +383,15 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_createNew;
 
   /**
+   * SQL being run in this report.
+   *
+   * The sql in the report is stored in this variable in order to be displayed on the developer tab.
+   *
+   * @var string
+   */
+
+  protected $sql;
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -1195,6 +1204,35 @@ class CRM_Report_Form extends CRM_Core_Form {
     $order = array_intersect_key(array_fill_keys($order, 1), $this->tabs);
     $order = array_merge($order, $this->tabs);
     $this->assign('tabs', $order);
+  }
+
+  /**
+   * The intent is to add a tab for developers to view the sql.
+   *
+   * Currently using dpm.
+   *
+   * @param string $sql
+   */
+  protected function addToDeveloperTab($sql) {
+    if (!CRM_Core_Permission::check('view report sql')) {
+      return;
+    }
+    $this->tabs['Developer'] = array(
+      'title' => ts('Developer'),
+      'tpl' => 'Developer',
+      'div_label' => 'set-developer',
+    );
+
+    $this->assignTabs();
+    foreach (array('LEFT JOIN') as $term) {
+      $this->sql = str_replace($term, '<br>&nbsp&nbsp' . $term, $sql);
+    }
+    foreach (array('FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';') as $term) {
+      $sql = str_replace($term, '<br><br>' . $term, $sql);
+    }
+    $this->sql .= $sql;
+
+    $this->assign('sql', $this->sql);
   }
 
   /**
@@ -3271,6 +3309,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
     // build query
     $sql = $this->buildQuery();
+    $this->addToDeveloperTab($sql);
 
     // build array of result based on column headers. This method also allows
     // modifying column headers before using it to build result set i.e $rows.
