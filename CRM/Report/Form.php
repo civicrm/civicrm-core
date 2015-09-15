@@ -673,6 +673,11 @@ class CRM_Report_Form extends CRM_Core_Form {
                 $this->_defaults["{$fieldName}_relative"] = $field['default'];
               }
             }
+            elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_INT && is_array($field['default'])) {
+              $this->_defaults["{$fieldName}_min"] = CRM_Utils_Array::value('min', $field['default']);
+              $this->_defaults["{$fieldName}_max"] = CRM_Utils_Array::value('max', $field['default']);
+              $this->_defaults["{$fieldName}_value"] = 0;
+            }
             else {
               $this->_defaults["{$fieldName}_value"] = $field['default'];
             }
