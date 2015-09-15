@@ -8,8 +8,11 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   protected $domainDefaults;
   protected $contactDefaults;
   protected $mandates;
+  protected $origSetting;
 
   protected function setUp() {
+    $this->origSetting = $GLOBALS['civicrm_setting'];
+
     parent::setUp();
     $this->useTransaction(TRUE);
 
@@ -35,6 +38,11 @@ class SettingsManagerTest extends \CiviUnitTestCase {
         'c3' => 'GAMMA MAN!',
       ),
     );
+  }
+
+  public function tearDown() {
+    $GLOBALS['civicrm_setting'] = $this->origSetting;
+    parent::tearDown();
   }
 
   /**
@@ -166,7 +174,12 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $cache = new \CRM_Utils_Cache_Arraycache(array());
     $cache->set('defaults:domain', $this->domainDefaults);
     $cache->set('defaults:contact', $this->contactDefaults);
-    $manager = new SettingsManager($cache, SettingsManager::parseMandatorySettings($this->mandates));
+    foreach ($this->mandates as $entity => $keyValues) {
+      foreach ($keyValues as $k => $v) {
+        $GLOBALS['civicrm_setting'][$entity][$k] = $v;
+      }
+    }
+    $manager = new SettingsManager($cache);
     return $manager;
   }
 
