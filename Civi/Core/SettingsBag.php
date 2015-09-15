@@ -363,31 +363,69 @@ class SettingsBag {
   }
 
   /**
+   * Update the DB record for this setting.
+   *
    * @param string $name
    *   The simple name of the setting.
    * @param mixed $value
    *   The new value of the setting.
    */
   protected function setDb($name, $value) {
+    if (\CRM_Core_BAO_Setting::isUpgradeFromPreFourOneAlpha1()) {
+      // civicrm_setting table is not going to be present.
+      return;
+    }
+
     $fields = array();
     $fieldsToSet = \CRM_Core_BAO_Setting::validateSettingsInput(array($name => $value), $fields);
     //We haven't traditionally validated inputs to setItem, so this breaks things.
     //foreach ($fieldsToSet as $settingField => &$settingValue) {
     //  self::validateSetting($settingValue, $fields['values'][$settingField]);
     //}
-    // NOTE: We don't have any notion of createdID
-    \CRM_Core_BAO_Setting::_setItem($fields['values'][$name], $value, '', $name, NULL, $this->contactId, NULL, $this->domainId);
 
-    //$dao = $this->createDao();
-    //$dao->name = $key;
-    //$dao->group_name = '';
-    //$dao->find();
-    //$serializedValue = ($value === NULL ? 'null' : serialize($value));
-    //if ($dao->value !== $serializedValue) {
-    //  $dao->created_date = \CRM_Utils_Time::getTime('Ymdhis');
-    //  $dao->value = $serializedValue;
-    //  $dao->save();
-    //}
+    $metadata = $fields['values'][$name];
+
+    $dao = new \CRM_Core_DAO_Setting();
+    $dao->name = $name;
+    $dao->domain_id = $this->domainId;
+    if ($this->contactId) {
+      $dao->contact_id = $this->contactId;
+      $dao->is_domain = 0;
+    }
+    else {
+      $dao->is_domain = 1;
+    }
+    $dao->find(TRUE);
+    $dao->group_name = '';
+
+    if (isset($metadata['on_change'])) {
+      foreach ($metadata['on_change'] as $callback) {
+        call_user_func(
+          \Civi\Core\Resolver::singleton()->get($callback),
+          unserialize($dao->value),
+          $value,
+          $metadata,
+          $this->domainId
+        );
+      }
+    }
+
+    if (\CRM_Utils_System::isNull($value)) {
+      $dao->value = 'null';
+    }
+    else {
+      $dao->value = serialize($value);
+    }
+
+    $dao->created_date = \CRM_Utils_Time::getTime('Ymdhis');
+
+    $session = \CRM_Core_Session::singleton();
+    if (\CRM_Contact_BAO_Contact_Utils::isContactId($session->get('userID'))) {
+      $dao->created_id = $session->get('userID');
+    }
+
+    $dao->save();
+    $dao->free();
   }
 
   /**

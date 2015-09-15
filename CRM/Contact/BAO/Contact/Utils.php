@@ -1123,4 +1123,26 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
     $templateString = $smarty->fetch("string:$templateString");
   }
 
+  /**
+   * Determine if a contact ID is real/valid.
+   *
+   * @param int $contactId
+   *   The hypothetical contact ID
+   * @return bool
+   */
+  public static function isContactId($contactId) {
+    if ($contactId) {
+      // ensure that this is a valid contact id (for session inconsistency rules)
+      $cid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+        $contactId,
+        'id',
+        'id'
+      );
+      if ($cid) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
 }

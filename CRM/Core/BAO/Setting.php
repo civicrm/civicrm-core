@@ -61,54 +61,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     SEARCH_PREFERENCES_NAME = 'Search Preferences';
 
   /**
-   * @param $group
-   * @param null $name
-   * @param int $componentID
-   * @param int $contactID
-   * @param int $domainID
-   *
-   * @return CRM_Core_DAO_Domain|CRM_Core_DAO_Setting
-   */
-  public static function dao(
-    $group,
-    $name = NULL,
-    $componentID = NULL,
-    $contactID = NULL,
-    $domainID = NULL
-  ) {
-    if (self::isUpgradeFromPreFourOneAlpha1()) {
-      // civicrm_setting table is not going to be present. For now we'll just
-      // return a dummy object
-      $dao = new CRM_Core_DAO_Domain();
-      $dao->id = -1; // so ->find() doesn't fetch any data later on
-      return $dao;
-    }
-    $dao = new CRM_Core_DAO_Setting();
-
-    if (!empty($group)) {
-      $dao->group_name = $group;
-    }
-    $dao->name = $name;
-    $dao->component_id = $componentID;
-    if (empty($domainID)) {
-      $dao->domain_id = CRM_Core_Config::domainID();
-    }
-    else {
-      $dao->domain_id = $domainID;
-    }
-
-    if ($contactID) {
-      $dao->contact_id = $contactID;
-      $dao->is_domain = 0;
-    }
-    else {
-      $dao->is_domain = 1;
-    }
-
-    return $dao;
-  }
-
-  /**
    * Retrieve the value of a setting from the DB table.
    *
    * @param string $group
@@ -233,84 +185,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
     $settings->set($name, $value);
-  }
-
-  /**
-   * Store an item in a setting table.
-   *
-   * _setItem() is the common logic shared by setItem() and setItems().
-   *
-   * @param array $metadata
-   *   Metadata describing this field.
-   * @param $value
-   * @param $group
-   * @param string $name
-   * @param int $componentID
-   * @param int $contactID
-   * @param int $createdID
-   * @param int $domainID
-   */
-  public static function _setItem(
-    $metadata,
-    $value,
-    $group,
-    $name,
-    $componentID = NULL,
-    $contactID = NULL,
-    $createdID = NULL,
-    $domainID = NULL
-  ) {
-    if (empty($domainID)) {
-      $domainID = CRM_Core_Config::domainID();
-    }
-
-    $dao = self::dao($group, $name, $componentID, $contactID, $domainID);
-    $dao->find(TRUE);
-    $dao->group_name = $group;
-
-    if (isset($metadata['on_change'])) {
-      foreach ($metadata['on_change'] as $callback) {
-        call_user_func(
-          Civi\Core\Resolver::singleton()->get($callback),
-          unserialize($dao->value),
-          $value,
-          $metadata,
-          $domainID
-        );
-      }
-    }
-
-    if (CRM_Utils_System::isNull($value)) {
-      $dao->value = 'null';
-    }
-    else {
-      $dao->value = serialize($value);
-    }
-
-    $dao->created_date = date('Ymdhis');
-
-    if ($createdID) {
-      $dao->created_id = $createdID;
-    }
-    else {
-      $session = CRM_Core_Session::singleton();
-      $createdID = $session->get('userID');
-
-      if ($createdID) {
-        // ensure that this is a valid contact id (for session inconsistency rules)
-        $cid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $createdID,
-          'id',
-          'id'
-        );
-        if ($cid) {
-          $dao->created_id = $session->get('userID');
-        }
-      }
-    }
-
-    $dao->save();
-    $dao->free();
   }
 
   /**
