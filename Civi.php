@@ -62,6 +62,19 @@ class Civi {
   }
 
   /**
+   * Obtain the core file/path mapper.
+   *
+   * @return \Civi\Core\Paths
+   */
+  public static function paths() {
+    // Paths must be available before container can boot.
+    if (!isset(Civi::$statics[__CLASS__]['paths'])) {
+      Civi::$statics[__CLASS__]['paths'] = new \Civi\Core\Paths();
+    }
+    return Civi::$statics[__CLASS__]['paths'];
+  }
+
+  /**
    * Fetch a service from the container.
    *
    * @param string $id
@@ -79,6 +92,13 @@ class Civi {
   public static function reset() {
     Civi\Core\Container::singleton(TRUE);
     self::$statics = array();
+  }
+
+  /**
+   * @return CRM_Core_Resources
+   */
+  public static function resources() {
+    return CRM_Core_Resources::singleton();
   }
 
   /**

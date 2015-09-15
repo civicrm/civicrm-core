@@ -68,117 +68,105 @@ class CRM_Core_Config_MagicMerge {
    * @return array
    */
   public static function getPropertyMap() {
+    // Each mapping: $propertyName => Array(0 => $type, 1 => $foreignName|NULL, ...).
+    // If $foreignName is omitted/null, then it's assumed to match the $propertyName.
+    // Other parameters may be specified, depending on the type.
     return array(
-      'backtrace' => array('setting', 'backtrace'),
-      'countryLimit' => array('setting', 'countryLimit'),
-      'dashboardCacheTimeout' => array('setting', 'dashboardCacheTimeout'),
-      'dateInputFormat' => array('setting', 'dateInputFormat'),
-      'dateformatDatetime' => array('setting', 'dateformatDatetime'),
-      'dateformatFull' => array('setting', 'dateformatFull'),
-      'dateformatPartial' => array('setting', 'dateformatPartial'),
-      'dateformatTime' => array('setting', 'dateformatTime'),
-      'dateformatYear' => array('setting', 'dateformatYear'),
+      'backtrace' => array('setting'),
+      'countryLimit' => array('setting'),
+      'dashboardCacheTimeout' => array('setting'),
+      'dateInputFormat' => array('setting'),
+      'dateformatDatetime' => array('setting'),
+      'dateformatFull' => array('setting'),
+      'dateformatPartial' => array('setting'),
+      'dateformatTime' => array('setting'),
+      'dateformatYear' => array('setting'),
       'debug' => array('setting', 'debug_enabled'), // renamed.
-      'defaultContactCountry' => array('setting', 'defaultContactCountry'),
-      'defaultContactStateProvince' => array('setting', 'defaultContactStateProvince'),
-      'defaultCurrency' => array('setting', 'defaultCurrency'),
-      'defaultSearchProfileID' => array('setting', 'defaultSearchProfileID'),
-      'doNotAttachPDFReceipt' => array('setting', 'doNotAttachPDFReceipt'),
-      'empoweredBy' => array('setting', 'empoweredBy'),
+      'defaultContactCountry' => array('setting'),
+      'defaultContactStateProvince' => array('setting'),
+      'defaultCurrency' => array('setting'),
+      'defaultSearchProfileID' => array('setting'),
+      'doNotAttachPDFReceipt' => array('setting'),
+      'empoweredBy' => array('setting'),
       'enableComponents' => array('setting', 'enable_components'), // renamed.
-      'enableSSL' => array('setting', 'enableSSL'),
-      'fatalErrorHandler' => array('setting', 'fatalErrorHandler'),
-      'fieldSeparator' => array('setting', 'fieldSeparator'),
-      'fiscalYearStart' => array('setting', 'fiscalYearStart'),
-      'geoAPIKey' => array('setting', 'geoAPIKey'),
-      'geoProvider' => array('setting', 'geoProvider'),
-      'includeAlphabeticalPager' => array('setting', 'includeAlphabeticalPager'),
-      'includeEmailInName' => array('setting', 'includeEmailInName'),
-      'includeNickNameInName' => array('setting', 'includeNickNameInName'),
-      'includeOrderByClause' => array('setting', 'includeOrderByClause'),
-      'includeWildCardInName' => array('setting', 'includeWildCardInName'),
-      'inheritLocale' => array('setting', 'inheritLocale'),
-      'languageLimit' => array('setting', 'languageLimit'),
-      'lcMessages' => array('setting', 'lcMessages'),
-      'legacyEncoding' => array('setting', 'legacyEncoding'),
-      'logging' => array('setting', 'logging'),
-      'mailThrottleTime' => array('setting', 'mailThrottleTime'),
-      'mailerBatchLimit' => array('setting', 'mailerBatchLimit'),
-      'mailerJobSize' => array('setting', 'mailerJobSize'),
-      'mailerJobsMax' => array('setting', 'mailerJobsMax'),
-      'mapAPIKey' => array('setting', 'mapAPIKey'),
-      'mapProvider' => array('setting', 'mapProvider'),
-      'maxFileSize' => array('setting', 'maxFileSize'),
+      'enableSSL' => array('setting'),
+      'fatalErrorHandler' => array('setting'),
+      'fieldSeparator' => array('setting'),
+      'fiscalYearStart' => array('setting'),
+      'geoAPIKey' => array('setting'),
+      'geoProvider' => array('setting'),
+      'includeAlphabeticalPager' => array('setting'),
+      'includeEmailInName' => array('setting'),
+      'includeNickNameInName' => array('setting'),
+      'includeOrderByClause' => array('setting'),
+      'includeWildCardInName' => array('setting'),
+      'inheritLocale' => array('setting'),
+      'languageLimit' => array('setting'),
+      'lcMessages' => array('setting'),
+      'legacyEncoding' => array('setting'),
+      'logging' => array('setting'),
+      'mailThrottleTime' => array('setting'),
+      'mailerBatchLimit' => array('setting'),
+      'mailerJobSize' => array('setting'),
+      'mailerJobsMax' => array('setting'),
+      'mapAPIKey' => array('setting'),
+      'mapProvider' => array('setting'),
+      'maxFileSize' => array('setting'),
       'maxAttachments' => array('setting', 'max_attachments'), // renamed.
-      'monetaryDecimalPoint' => array('setting', 'monetaryDecimalPoint'),
-      'monetaryThousandSeparator' => array('setting', 'monetaryThousandSeparator'),
-      'moneyformat' => array('setting', 'moneyformat'),
-      'moneyvalueformat' => array('setting', 'moneyvalueformat'),
-      'provinceLimit' => array('setting', 'provinceLimit'),
-      'recaptchaOptions' => array('setting', 'recaptchaOptions'),
-      'recaptchaPublicKey' => array('setting', 'recaptchaPublicKey'),
-      'recaptchaPrivateKey' => array('setting', 'recaptchaPrivateKey'),
-      'secondDegRelPermissions' => array('setting', 'secondDegRelPermissions'),
-      'smartGroupCacheTimeout' => array('setting', 'smartGroupCacheTimeout'),
-      'timeInputFormat' => array('setting', 'timeInputFormat'),
-      'userFrameworkLogging' => array('setting', 'userFrameworkLogging'),
-      'userFrameworkUsersTableName' => array('setting', 'userFrameworkUsersTableName'),
-      'verpSeparator' => array('setting', 'verpSeparator'),
-      'wkhtmltopdfPath' => array('setting', 'wkhtmltopdfPath'),
-      'wpBasePage' => array('setting', 'wpBasePage'),
-      'wpLoadPhp' => array('setting', 'wpLoadPhp'),
+      'monetaryDecimalPoint' => array('setting'),
+      'monetaryThousandSeparator' => array('setting'),
+      'moneyformat' => array('setting'),
+      'moneyvalueformat' => array('setting'),
+      'provinceLimit' => array('setting'),
+      'recaptchaOptions' => array('setting'),
+      'recaptchaPublicKey' => array('setting'),
+      'recaptchaPrivateKey' => array('setting'),
+      'secondDegRelPermissions' => array('setting'),
+      'smartGroupCacheTimeout' => array('setting'),
+      'timeInputFormat' => array('setting'),
+      'userFrameworkLogging' => array('setting'),
+      'userFrameworkUsersTableName' => array('setting'),
+      'verpSeparator' => array('setting'),
+      'wkhtmltopdfPath' => array('setting'),
+      'wpBasePage' => array('setting'),
+      'wpLoadPhp' => array('setting'),
 
-      'doNotResetCache' => array('local', 'doNotResetCache'),
-      'inCiviCRM' => array('local', 'inCiviCRM'),
-      'userFrameworkFrontend' => array('local', 'userFrameworkFrontend'),
-      'initialized' => array('local', 'initialized'),
+      'doNotResetCache' => array('local'),
+      'inCiviCRM' => array('local'),
+      'userFrameworkFrontend' => array('local'),
+      'initialized' => array('local'),
 
-      'dsn' => array('runtime', 'dsn'),
-      'userFramework' => array('runtime', 'userFramework'),
-      'userFrameworkBaseURL' => array('runtime', 'userFrameworkBaseURL'),
-      'userFrameworkClass' => array('runtime', 'userFrameworkClass'),
-      'userFrameworkDSN' => array('runtime', 'userFrameworkDSN'),
+      'dsn' => array('runtime'),
+      'userFramework' => array('runtime'),
+      'userFrameworkBaseURL' => array('runtime'),
+      'userFrameworkClass' => array('runtime'),
+      'userFrameworkDSN' => array('runtime'),
       'useFrameworkRelativeBase' => array('runtime', 'useFrameworkRelativeBase'),
-      'userFrameworkURLVar' => array('runtime', 'userFrameworkURLVar'),
-      'userPermissionClass' => array('runtime', 'userPermissionClass'),
-      'userPermissionTemp' => array('runtime', 'userPermissionTemp'),
-      'userSystem' => array('runtime', 'userSystem'),
-      'userHookClass' => array('runtime', 'userHookClass'),
-      'cleanURL' => array('runtime', 'cleanURL'),
-      'configAndLogDir' => array('runtime', 'configAndLogDir'),
-      'templateCompileDir' => array('runtime', 'templateCompileDir'),
-      'templateDir' => array('runtime', 'templateDir'),
+      'userFrameworkURLVar' => array('runtime'),
+      'userPermissionClass' => array('runtime'),
+      'userPermissionTemp' => array('runtime'),
+      'userSystem' => array('runtime'),
+      'userHookClass' => array('runtime'),
+      'cleanURL' => array('runtime'),
+      'configAndLogDir' => array('runtime'),
+      'templateCompileDir' => array('runtime'),
+      'templateDir' => array('runtime'),
 
-      'customFileUploadDir' => array('callback', 'CRM_Core_Config_Defaults', 'getCustomFileUploadDir', 'setPath', 'revert'),
-      'customPHPPathDir' => array('callback', 'CRM_Core_Config_Defaults', 'getCustomPhpPathDir', 'setPath', 'revert'),
-      'customTemplateDir' => array('callback', 'CRM_Core_Config_Defaults', 'getCustomTemplateDir', 'setPath', 'revert'),
-      'extensionsDir' => array('callback', 'CRM_Core_Config_Defaults', 'getExtensionsDir', 'setPath', 'revert'),
-      'imageUploadDir' => array('callback', 'CRM_Core_Config_Defaults', 'getImageUploadDir', 'setPath', 'revert'),
-      'uploadDir' => array('callback', 'CRM_Core_Config_Defaults', 'getUploadDir', 'setPath'),
+      'customFileUploadDir' => array('setting-path', NULL, '[civicrm.files]/custom/', array('mkdir', 'restrict')),
+      'customPHPPathDir' => array('setting-path'),
+      'customTemplateDir' => array('setting-path'),
+      'extensionsDir' => array('setting-path'),
+      'imageUploadDir' => array('setting-path', NULL, '[civicrm.files]/persist/contribute/', array('mkdir')),
+      'uploadDir' => array('setting-path', NULL, '[civicrm.files]/upload/', array('mkdir', 'restrict')),
 
-      'customCSSURL' => array('callback', 'CRM_Core_Config_Defaults', 'getCustomCssUrl', 'setUrl', 'revert'),
-      'extensionsURL' => array('callback', 'CRM_Core_Config_Defaults', 'getExtensionsUrl', 'setUrl', 'revert'),
-      'imageUploadURL' => array('callback', 'CRM_Core_Config_Defaults', 'getImageUploadUrl', 'setUrl', 'revert'),
-      'resourceBase' => array('callback', 'CRM_Core_Config_Defaults', 'getResourceBase', 'setUrl', 'revert'),
-      'userFrameworkResourceURL' => array('callback', 'CRM_Core_Config_Defaults', 'getUserFrameworkResourceUrl', 'setUrl', 'revert'),
+      'customCSSURL' => array('setting-url-abs'),
+      'extensionsURL' => array('setting-url-abs'),
+      'imageUploadURL' => array('setting-url-abs', NULL, '[civicrm.files]/persist/contribute/'),
+      'resourceBase' => array('setting-url-rel', 'userFrameworkResourceURL', '[civicrm]/.'),
+      'userFrameworkResourceURL' => array('setting-url-abs', NULL, '[civicrm]/.'),
 
       'geocodeMethod' => array('callback', 'CRM_Utils_Geocode', 'getProviderClass'),
       'defaultCurrencySymbol' => array('callback', 'CRM_Core_Config_Defaults', 'getDefaultCurrencySymbol'),
-      //'customFileUploadDir' => array('runtime', 'customFileUploadDir'),
-      //'customPHPPathDir' => array('runtime', 'customPHPPathDir'),
-      //'customTemplateDir' => array('runtime', 'customTemplateDir'),
-      //'extensionsDir' => array('runtime', 'extensionsDir'),
-      //'imageUploadDir' => array('runtime', 'imageUploadDir'),
-      //'uploadDir' => array('runtime', 'uploadDir'),
-      //
-      //'customCSSURL' => array('runtime', 'customCSSURL'),
-      //'extensionsURL' => array('runtime', 'extensionsURL'),
-      //'imageUploadURL' => array('runtime', 'imageUploadURL'),
-      //'resourceBase' => array('runtime', 'resourceBase'),
-      //'userFrameworkResourceURL' => array('runtime', 'userFrameworkResourceURL'),
-      //
-      //'geocodeMethod' => array('runtime', 'geocodeMethod'),
-      //'defaultCurrencySymbol' => array('runtime', 'defaultCurrencySymbol'),
     );
   }
 
@@ -186,17 +174,47 @@ class CRM_Core_Config_MagicMerge {
     if (!isset($this->map[$k])) {
       throw new \CRM_Core_Exception("Cannot read unrecognized property CRM_Core_Config::\${$k}.");
     }
-    list ($type, $name) = $this->map[$k];
+
+    $type = $this->map[$k][0];
+    $name = isset($this->map[$k][1]) ? $this->map[$k][1] : $k;
 
     switch ($type) {
       case 'setting':
         return $this->getSettings()->get($name);
 
       case 'setting-path':
-        return $this->getSettings()->getPath($name);
+        // Array(0 => $type, 1 => $setting, 2 => $default, 3 => $actions).
+        $value = $this->getSettings()->get($name);
+        if (empty($value) && isset($this->map[$k][2])) {
+          $value = $this->map[$k][2];
+        }
+        $value = Civi::paths()->getPath($value);
+        if ($value) {
+          $value = CRM_Utils_File::addTrailingSlash($value);
+          if (isset($this->map[$k][3]) && in_array('mkdir', $this->map[$k][3])) {
+            CRM_Utils_File::createDir($value);
+          }
+          if (isset($this->map[$k][3]) && in_array('restrict', $this->map[$k][3])) {
+            CRM_Utils_File::restrictAccess($value);
+          }
+        }
+        return $value;
 
-      case 'setting-url':
-        return $this->getSettings()->getUrl($name, 'absolute');
+      case 'setting-url-abs':
+        // Array(0 => $type, 1 => $setting, 2 => $default).
+        $value = $this->getSettings()->get($name);
+        if (empty($value) && isset($this->map[$k][2])) {
+          $value = $this->map[$k][2];
+        }
+        return Civi::paths()->getUrl($value, 'absolute');
+
+      case 'setting-url-rel':
+        // Array(0 => $type, 1 => $setting, 2 => $default).
+        $value = $this->getSettings()->get($name);
+        if (empty($value) && isset($this->map[$k][2])) {
+          $value = $this->map[$k][2];
+        }
+        return Civi::paths()->getUrl($value, 'relative');
 
       case 'runtime':
         return $this->getRuntime()->{$name};
@@ -229,14 +247,6 @@ class CRM_Core_Config_MagicMerge {
     switch ($type) {
       case 'setting':
         $this->getSettings()->set($name, $v);
-        return;
-
-      case 'setting-path':
-        $this->getSettings()->setPath($name, $v);
-        return;
-
-      case 'setting-url':
-        $this->getSettings()->setUrl($name, $v);
         return;
 
       case 'runtime':
@@ -274,7 +284,8 @@ class CRM_Core_Config_MagicMerge {
     switch ($type) {
       case 'setting':
       case 'setting-path':
-      case 'setting-url':
+      case 'setting-url-abs':
+      case 'setting-url-rel':
         $this->getSettings()->revert($k);
         return;
 
