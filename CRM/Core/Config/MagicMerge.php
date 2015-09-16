@@ -56,6 +56,8 @@ class CRM_Core_Config_MagicMerge {
 
   private $runtime, $locals, $settings;
 
+  private $cache = array();
+
   public function __construct() {
     $this->map = self::getPropertyMap();
   }
@@ -174,6 +176,9 @@ class CRM_Core_Config_MagicMerge {
     if (!isset($this->map[$k])) {
       throw new \CRM_Core_Exception("Cannot read unrecognized property CRM_Core_Config::\${$k}.");
     }
+    if (isset($this->cache[$k])) {
+      return $this->cache[$k];
+    }
 
     $type = $this->map[$k][0];
     $name = isset($this->map[$k][1]) ? $this->map[$k][1] : $k;
@@ -198,6 +203,7 @@ class CRM_Core_Config_MagicMerge {
             CRM_Utils_File::restrictAccess($value);
           }
         }
+        $this->cache[$k] = $value;
         return $value;
 
       case 'setting-url-abs':
@@ -206,7 +212,8 @@ class CRM_Core_Config_MagicMerge {
         if (empty($value) && isset($this->map[$k][2])) {
           $value = $this->map[$k][2];
         }
-        return Civi::paths()->getUrl($value, 'absolute');
+        $this->cache[$k] = Civi::paths()->getUrl($value, 'absolute');
+        return $this->cache[$k];
 
       case 'setting-url-rel':
         // Array(0 => $type, 1 => $setting, 2 => $default).
@@ -214,7 +221,8 @@ class CRM_Core_Config_MagicMerge {
         if (empty($value) && isset($this->map[$k][2])) {
           $value = $this->map[$k][2];
         }
-        return Civi::paths()->getUrl($value, 'relative');
+        $this->cache[$k] = Civi::paths()->getUrl($value, 'relative');
+        return $this->cache[$k];
 
       case 'runtime':
         return $this->getRuntime()->{$name};
@@ -242,6 +250,7 @@ class CRM_Core_Config_MagicMerge {
     if (!isset($this->map[$k])) {
       throw new \CRM_Core_Exception("Cannot set unrecognized property CRM_Core_Config::\${$k}");
     }
+    unset($this->cache[$k]);
     list ($type, $name) = $this->map[$k];
 
     switch ($type) {
@@ -279,6 +288,7 @@ class CRM_Core_Config_MagicMerge {
     if (!isset($this->map[$k])) {
       throw new \CRM_Core_Exception("Cannot unset unrecognized property CRM_Core_Config::\${$k}");
     }
+    unset($this->cache[$k]);
     list ($type, $name) = $this->map[$k];
 
     switch ($type) {
