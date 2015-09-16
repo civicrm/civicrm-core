@@ -1937,7 +1937,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     }
     elseif ($context == 'cancelPending') {
       $compareParams = array(
-        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 7,
         'total_amount' => -100,
         'status_id' => 3,
       );
