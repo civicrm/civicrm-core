@@ -2476,7 +2476,7 @@ class CRM_Contact_BAO_Query {
 
     // add group_contact table if group table is present
     if (!empty($tables['civicrm_group']) && empty($tables['civicrm_group_contact'])) {
-      $tables['civicrm_group_contact'] = " LEFT JOIN civicrm_group_contact ON civicrm_group_contact.contact_id = contact_a.id AND civicrm_group_contact.status = 'Added'";
+     // $tables['civicrm_group_contact'] = " LEFT JOIN civicrm_group_contact ON civicrm_group_contact.contact_id = contact_a.id AND civicrm_group_contact.status = 'Added'";
     }
 
     // add group_contact and group table is subscription history is present
@@ -2888,16 +2888,18 @@ class CRM_Contact_BAO_Query {
 
     if (!$isSmart) {
       $groupIds = implode(',', (array) $value);
-      $gcTable = "`civicrm_group_contact-{$groupIds}`";
+      $gcTable = "civicrm_group_contact";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
       if ($statii) {
         $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
       }
-      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
+      $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON " . implode(' AND ', $joinClause);
       $groupClause = "{$gcTable}.group_id $op $groupIds";
       if (strpos($op, 'IN') !== FALSE) {
         $groupClause = "{$gcTable}.group_id $op ( $groupIds )";
+        $this->_whereTables[$gcTable] .= " AND " . $groupClause;
       }
+      $this->_tables[$gcTable] = $this->_whereTables[$gcTable];
     }
 
     if ($ssClause) {
