@@ -86,31 +86,24 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         error_reporting(error_reporting() & ~E_DEPRECATED);
       }
 
-      $cache = CRM_Utils_Cache::singleton();
-      self::$_singleton = $cache->get('CRM_Core_Config' . CRM_Core_Config::domainID());
-      if (!self::$_singleton) {
-        self::$_singleton = new CRM_Core_Config();
-        self::$_singleton->getRuntime()->initialize($loadFromDB);
-        $cache->set('CRM_Core_Config' . CRM_Core_Config::domainID(), self::$_singleton);
-      }
-      else {
-        self::$_singleton->getRuntime()->initialize(FALSE);
-      }
+      self::$_singleton = new CRM_Core_Config();
+      self::$_singleton->getRuntime()->initialize($loadFromDB);
+      if ($loadFromDB && self::$_singleton->getRuntime()->dsn) {
+        CRM_Core_DAO::init(self::$_singleton->getRuntime()->dsn);
 
-      if (self::$_singleton->getRuntime()->dsn) {
         $domain = \CRM_Core_BAO_Domain::getDomain();
         \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
+
+        unset($errorScope);
+
+        CRM_Utils_Hook::config(self::$_singleton);
+        self::$_singleton->authenticate();
+
+        // Extreme backward compat: $config binds to active domain at moment of setup.
+        self::$_singleton->getSettings();
+
+        Civi::service('settings_manager')->useDefaults();
       }
-
-      unset($errorScope);
-
-      CRM_Utils_Hook::config(self::$_singleton);
-      self::$_singleton->authenticate();
-
-      // Extreme backward compat: $config binds to active domain at moment of setup.
-      self::$_singleton->getSettings();
-
-      Civi::service('settings_manager')->useDefaults();
     }
     return self::$_singleton;
   }

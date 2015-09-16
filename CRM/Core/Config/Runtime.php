@@ -126,8 +126,6 @@ class CRM_Core_Config_Runtime {
       CRM_Utils_File::restrictAccess($this->templateCompileDir);
     }
 
-    CRM_Core_DAO::init($this->dsn);
-
     if (!defined('CIVICRM_UF')) {
       $this->fatal('You need to define CIVICRM_UF in civicrm.settings.php');
     }
