@@ -68,6 +68,11 @@ abstract class CRM_Utils_Hook {
   private $commonCiviModules = array();
 
   /**
+   * @var CRM_Utils_Cache_Interface
+   */
+  protected $cache;
+
+  /**
    * Constructor and getter for the singleton instance.
    *
    * @param bool $fresh
@@ -82,6 +87,14 @@ abstract class CRM_Utils_Hook {
       self::$_singleton = new $class();
     }
     return self::$_singleton;
+  }
+
+  public function __construct() {
+    $this->cache = CRM_Utils_Cache::create(array(
+      'name' => 'hooks',
+      'type' => array('ArrayCache'),
+      'prefetch' => 1,
+    ));
   }
 
   /**
@@ -186,51 +199,60 @@ abstract class CRM_Utils_Hook {
     // to reproduce the issue are pretty intricate.
     $result = array();
 
-    if ($civiModules !== NULL) {
-      foreach ($civiModules as $module) {
-        $fnName = "{$module}_{$fnSuffix}";
-        if (function_exists($fnName)) {
-          $fResult = array();
-          switch ($numParams) {
-            case 0:
-              $fResult = $fnName();
-              break;
-
-            case 1:
-              $fResult = $fnName($arg1);
-              break;
-
-            case 2:
-              $fResult = $fnName($arg1, $arg2);
-              break;
-
-            case 3:
-              $fResult = $fnName($arg1, $arg2, $arg3);
-              break;
-
-            case 4:
-              $fResult = $fnName($arg1, $arg2, $arg3, $arg4);
-              break;
-
-            case 5:
-              $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5);
-              break;
-
-            case 6:
-              $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
-              break;
-
-            default:
-              CRM_Core_Error::fatal(ts('Invalid hook invocation'));
-              break;
-          }
-
-          if (!empty($fResult) &&
-            is_array($fResult)
-          ) {
-            $result = array_merge($result, $fResult);
+    $fnNames = $this->cache->get($fnSuffix);
+    if (!is_array($fnNames)) {
+      $fnNames = array();
+      if ($civiModules !== NULL) {
+        foreach ($civiModules as $module) {
+          $fnName = "{$module}_{$fnSuffix}";
+          if (function_exists($fnName)) {
+            $fnNames[] = $fnName;
           }
         }
+        $this->cache->set($fnSuffix, $fnNames);
+      }
+    }
+
+    foreach ($fnNames as $fnName) {
+      $fResult = array();
+      switch ($numParams) {
+        case 0:
+          $fResult = $fnName();
+          break;
+
+        case 1:
+          $fResult = $fnName($arg1);
+          break;
+
+        case 2:
+          $fResult = $fnName($arg1, $arg2);
+          break;
+
+        case 3:
+          $fResult = $fnName($arg1, $arg2, $arg3);
+          break;
+
+        case 4:
+          $fResult = $fnName($arg1, $arg2, $arg3, $arg4);
+          break;
+
+        case 5:
+          $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5);
+          break;
+
+        case 6:
+          $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
+          break;
+
+        default:
+          CRM_Core_Error::fatal(ts('Invalid hook invocation'));
+          break;
+      }
+
+      if (!empty($fResult) &&
+        is_array($fResult)
+      ) {
+        $result = array_merge($result, $fResult);
       }
     }
 
