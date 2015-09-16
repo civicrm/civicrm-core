@@ -75,9 +75,9 @@ class SettingsMetadata {
     // the caching into 'All' seems to be a duplicate of caching to
     // settingsMetadata__ - I think the reason was to cache all settings as defined & then those altered by a hook
     $settingsMetadata = $cache->get($cacheString);
-    $cached = ($settingsMetadata === NULL);
+    $cached = is_array($settingsMetadata);
 
-    if ($settingsMetadata === NULL) {
+    if (!$cached) {
       $settingsMetadata = $cache->get(self::ALL);
       if (empty($settingsMetadata)) {
         global $civicrm_root;

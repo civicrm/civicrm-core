@@ -180,7 +180,7 @@ class Container {
         array(
           array(
             'name' => $cacheName,
-            'type' => array('SqlGroup', 'ArrayCache'),
+            'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
           ),
         )
       ))->setFactoryClass('CRM_Utils_Cache')->setFactoryMethod('create');

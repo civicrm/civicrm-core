@@ -182,6 +182,15 @@ class CRM_Utils_Cache {
 
     foreach ($types as $type) {
       switch ($type) {
+        case '*memory*':
+          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, array('Memcache', 'Memcached'))) {
+            $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
+            $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
+            $settings['prefix'] = $settings['prefix'] . '_' . $params['name'];
+            return new $dbCacheClass($settings);
+          }
+          break;
+
         case 'SqlGroup':
           if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
             return new CRM_Utils_Cache_SqlGroup(array(
