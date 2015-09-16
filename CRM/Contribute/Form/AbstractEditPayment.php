@@ -432,12 +432,14 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       }
       $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
-        $this->_processors[$id] = ts($processor['name']);
-        if (!empty($processor['description'])) {
-          $this->_processors[$id] .= ' : ' . ts($processor['description']);
-        }
-        if ($processor['is_recur']) {
-          $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
+        if ($processor['is_test'] == ($this->_mode == 'test')) {
+          $this->_processors[$id] = ts($processor['name']);
+          if (!empty($processor['description'])) {
+            $this->_processors[$id] .= ' : ' . ts($processor['description']);
+          }
+          if ($processor['is_recur']) {
+            $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
+          }
         }
       }
       CRM_Financial_Form_Payment::addCreditCardJs();
