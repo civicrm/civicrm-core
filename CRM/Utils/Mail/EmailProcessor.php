@@ -289,7 +289,27 @@ class CRM_Utils_Mail_EmailProcessor {
                 $text = $mail->body->text;
               }
               elseif ($mail->body instanceof ezcMailMultipart) {
-                if ($mail->body instanceof ezcMailMultipartRelated) {
+                if ($mail->body instanceof ezcMailMultipartReport) {
+                  $part = $mail->body->getMachinePart();
+                  if ($part instanceof ezcMailDeliveryStatus) {
+                    foreach ($part->recipients as $rec) {
+                      if (isset($rec["Diagnostic-Code"])) {
+                        $text = $rec["Diagnostic-Code"];
+                        break;
+                      }
+                    }
+                    if (empty($text)) {
+                      $text = $part->text;
+                    }
+                  }
+                  elseif ($part != null) {
+                    $text = $part->text;
+                  }
+                  elseif (($part = $mail->body->getReadablePart()) != null) {
+                    $text = $part->text;
+                  }
+                }
+                elseif ($mail->body instanceof ezcMailMultipartRelated) {
                   foreach ($mail->body->getRelatedParts() as $part) {
                     if (isset($part->subType) and $part->subType == 'plain') {
                       $text = $part->text;
@@ -308,7 +328,7 @@ class CRM_Utils_Mail_EmailProcessor {
               }
 
               if (
-                $text == NULL &&
+                empty($text) &&
                 $mail->subject == "Delivery Status Notification (Failure)"
               ) {
                 // Exchange error - CRM-9361
@@ -316,7 +336,12 @@ class CRM_Utils_Mail_EmailProcessor {
                   if ($part instanceof ezcMailDeliveryStatus) {
                     foreach ($part->recipients as $rec) {
                       if ($rec["Status"] == "5.1.1") {
-                        $text = "Delivery to the following recipients failed";
+                        if (isset($rec["Description"])) {
+                          $text = $rec["Description"];
+                        }
+                        else {
+                          $text = "Delivery to the following recipients failed";
+                        }
                         break;
                       }
                     }
