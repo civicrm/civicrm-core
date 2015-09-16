@@ -244,7 +244,7 @@ class CRM_Extension_System {
       // Extension system starts before container. Manage our own cache.
       $this->cache = CRM_Utils_Cache::create(array(
         'name' => $cacheGroup,
-        'type' => array('SqlGroup', 'ArrayCache'),
+        'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
         'prefetch' => TRUE,
       ));
     }
