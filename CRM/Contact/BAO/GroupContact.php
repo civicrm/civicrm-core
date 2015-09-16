@@ -381,10 +381,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
     $from = CRM_Contact_BAO_Query::fromClause($tables);
 
-    //CRM-16945: seems hackish but as per CRM-16483 of using group criteria for Search Builder it is mandatory
-    //to include group_contact_cache clause when group table is present, so following code remove duplicacy
-    $from = str_replace("OR civicrm_group.id = civicrm_group_contact_cache.group_id", '', $from);
-
     $where .= " AND $permission ";
 
     if ($onlyPublicGroups) {
