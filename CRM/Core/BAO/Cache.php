@@ -161,7 +161,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $dao->find(TRUE);
     $dao->data = serialize($data);
     $dao->created_date = date('YmdHis');
-    $dao->save();
+    $dao->save(FALSE);
 
     $lock->release();
 
