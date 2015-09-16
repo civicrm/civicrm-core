@@ -251,28 +251,23 @@ class CRM_Core_Config_MagicMerge {
       throw new \CRM_Core_Exception("Cannot set unrecognized property CRM_Core_Config::\${$k}");
     }
     unset($this->cache[$k]);
-    list ($type, $name) = $this->map[$k];
+    $type = $this->map[$k][0];
+    $name = isset($this->map[$k][1]) ? $this->map[$k][1] : $k;
 
     switch ($type) {
       case 'setting':
-        $this->getSettings()->set($name, $v);
-        return;
-
+      case 'setting-path':
+      case 'setting-url-abs':
+      case 'setting-url-rel':
       case 'runtime':
-        $this->getRuntime()->{$name} = $v;
+      case 'callback':
+        // In the past, changes to $config were not persisted automatically.
+        $this->cache[$name] = $v;
         return;
 
       case 'local':
         $this->initLocals();
         $this->locals[$name] = $v;
-        return;
-
-      case 'callback':
-        // Array(0 => $type, 1 => $obj, 2 => $getter, 3 => $setter, 4 => $unsetter).
-        if (!isset($this->map[$k][1], $this->map[$k][3])) {
-          throw new \CRM_Core_Exception("Cannot find setter for property CRM_Core_Config::\${$k}");
-        }
-        \Civi\Core\Resolver::singleton()->call(array($this->map[$k][1], $this->map[$k][3]), array($k, $v));
         return;
 
       default:
@@ -289,7 +284,8 @@ class CRM_Core_Config_MagicMerge {
       throw new \CRM_Core_Exception("Cannot unset unrecognized property CRM_Core_Config::\${$k}");
     }
     unset($this->cache[$k]);
-    list ($type, $name) = $this->map[$k];
+    $type = $this->map[$k][0];
+    $name = isset($this->map[$k][1]) ? $this->map[$k][1] : $k;
 
     switch ($type) {
       case 'setting':
