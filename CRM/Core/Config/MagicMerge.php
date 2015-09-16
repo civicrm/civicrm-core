@@ -168,7 +168,7 @@ class CRM_Core_Config_MagicMerge {
       'userFrameworkResourceURL' => array('setting-url-abs', NULL, '[civicrm]/.'),
 
       'geocodeMethod' => array('callback', 'CRM_Utils_Geocode', 'getProviderClass'),
-      'defaultCurrencySymbol' => array('callback', 'CRM_Core_Config_Defaults', 'getDefaultCurrencySymbol'),
+      'defaultCurrencySymbol' => array('callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'),
     );
   }
 
