@@ -3000,13 +3000,16 @@ WHERE  contribution_id = %1 ";
           && $params['prevContribution']->is_pay_later) || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)
       ) {
         $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+        $arAccountId = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeID, $relationTypeId);
+
         if ($params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)) {
-          $params['trxnParams']['to_financial_account_id'] = NULL;
+          $params['trxnParams']['to_financial_account_id'] = $arAccountId;
           $params['trxnParams']['total_amount'] = -$params['total_amount'];
         }
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-        $params['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
-          $financialTypeID, $relationTypeId);
+        else {
+          $params['trxnParams']['from_financial_account_id'] = $arAccountId;
+        }
       }
       $itemAmount = $params['trxnParams']['total_amount'];
     }
