@@ -302,10 +302,10 @@ class CRM_Utils_Mail_EmailProcessor {
                       $text = $part->text;
                     }
                   }
-                  elseif ($part != null) {
+                  elseif ($part != NULL) {
                     $text = $part->text;
                   }
-                  elseif (($part = $mail->body->getReadablePart()) != null) {
+                  elseif (($part = $mail->body->getReadablePart()) != NULL) {
                     $text = $part->text;
                   }
                 }
