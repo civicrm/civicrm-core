@@ -1153,19 +1153,19 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       ) {
         $this->set('contributeMode', 'notify');
       }
-      else {
-        $params['description'] = ts('Online Event Registration') . ' ' . $this->_values['event']['title'];
+    }
+    else {
+      $params['description'] = ts('Online Event Registration') . ' ' . $this->_values['event']['title'];
 
-        $this->_params = array();
-        $this->_params[] = $params;
-        $this->set('params', $this->_params);
+      $this->_params = array();
+      $this->_params[] = $params;
+      $this->set('params', $this->_params);
 
-        if (
-          empty($params['additional_participants'])
-          && !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
-        ) {
-          self::processRegistration($this->_params);
-        }
+      if (
+        empty($params['additional_participants'])
+        && !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
+      ) {
+        self::processRegistration($this->_params);
       }
     }
 
