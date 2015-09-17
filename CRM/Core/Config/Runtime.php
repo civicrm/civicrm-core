@@ -61,6 +61,8 @@ class CRM_Core_Config_Runtime {
    */
   public $userFrameworkURLVar = 'q';
 
+  public $userFrameworkVersion;
+
   public $useFrameworkRelativeBase;
 
   public $userHookClass;
@@ -176,6 +178,8 @@ class CRM_Core_Config_Runtime {
     if (defined('CIVICRM_UF_DSN')) {
       $this->userFrameworkDSN = CIVICRM_UF_DSN;
     }
+
+    $this->userFrameworkVersion = $this->userSystem->getVersion();
 
     // this is dynamically figured out in the civicrm.settings.php file
     if (defined('CIVICRM_CLEANURL')) {
