@@ -100,32 +100,8 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
 
     $this->addressSequence = isset($newSequence) ? $newSequence : "";
 
-    if (empty($this->_config->address_format)) {
-      $defaults['address_format'] = "
-{contact.street_address}
-{contact.supplemental_address_1}
-{contact.supplemental_address_2}
-{contact.city}{, }{contact.state_province}{ }{contact.postal_code}
-{contact.country}
-";
-    }
-    else {
-      $defaults['address_format'] = $this->_config->address_format;
-    }
-
-    if (empty($this->_config->mailing_format)) {
-      $defaults['mailing_format'] = "
-{contact.addressee}
-{contact.street_address}
-{contact.supplemental_address_1}
-{contact.supplemental_address_2}
-{contact.city}{, }{contact.state_province}{ }{contact.postal_code}
-{contact.country}
-";
-    }
-    else {
-      $defaults['mailing_format'] = $this->_config->mailing_format;
-    }
+    $defaults['address_format'] = $this->_config->address_format;
+    $defaults['mailing_format'] = $this->_config->mailing_format;
 
     parent::cbsDefaultValues($defaults);
 
