@@ -99,6 +99,11 @@ class CRM_Core_Resources {
   public $ajaxPopupsEnabled;
 
   /**
+   * @var \Civi\Core\Paths
+   */
+  protected $paths;
+
+  /**
    * Get or set the single instance of CRM_Core_Resources.
    *
    * @param CRM_Core_Resources $instance
@@ -141,6 +146,7 @@ class CRM_Core_Resources {
       $this->resetCacheCode();
     }
     $this->ajaxPopupsEnabled = (bool) Civi::settings()->get('ajaxPopupsEnabled');
+    $this->paths = Civi::paths();
   }
 
   /**
@@ -465,10 +471,13 @@ class CRM_Core_Resources {
    */
   public function getPath($ext, $file = NULL) {
     // TODO consider caching results
+    $base = $this->paths->hasVariable($ext)
+      ? rtrim($this->paths->getVariable($ext, 'path'), '/')
+      : $this->extMapper->keyToBasePath($ext);
     if ($file === NULL) {
-      return $this->extMapper->keyToBasePath($ext);
+      return $base;
     }
-    $path = $this->extMapper->keyToBasePath($ext) . '/' . $file;
+    $path = $base . '/' . $file;
     if (is_file($path)) {
       return $path;
     }
@@ -494,7 +503,10 @@ class CRM_Core_Resources {
       $file .= '?r=' . $this->getCacheCode();
     }
     // TODO consider caching results
-    return $this->extMapper->keyToUrl($ext) . '/' . $file;
+    $base = $this->paths->hasVariable($ext)
+      ? $this->paths->getVariable($ext, 'url')
+      : ($this->extMapper->keyToUrl($ext) . '/');
+    return $base . $file;
   }
 
   /**

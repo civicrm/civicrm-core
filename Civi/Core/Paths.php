@@ -22,15 +22,12 @@ class Paths {
    * @var array
    *   Array(string $name => array(url => $, path => $)).
    */
-  private $containers = array();
+  private $variables = array();
 
-  protected $containerFactory = array();
+  private $variableFactory = array();
 
   public function __construct() {
     $this
-      //->register('civicrm', function () {
-      //  return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
-      //})
       ->register('civicrm.root', function () {
         return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
       })
@@ -56,7 +53,7 @@ class Paths {
    * Register a new URL/file path mapping.
    *
    * @param string $name
-   *   The name of the container.
+   *   The name of the variable.
    * @param callable $factory
    *   Function which returns an array with keys:
    *    - path: string.
@@ -64,28 +61,39 @@ class Paths {
    * @return $this
    */
   public function register($name, $factory) {
-    $this->containerFactory[$name] = $factory;
+    $this->variableFactory[$name] = $factory;
     return $this;
   }
 
-  protected function getContainerAttr($name, $attr) {
-    if (!isset($this->containers[$name])) {
-      $this->containers[$name] = call_user_func($this->containerFactory[$name]);
+  /**
+   * @param string $name
+   *   Ex: 'civicrm.root'.
+   * @param string $attr
+   *   Ex: 'url', 'path'.
+   * @return mixed
+   */
+  public function getVariable($name, $attr) {
+    if (!isset($this->variables[$name])) {
+      $this->variables[$name] = call_user_func($this->variableFactory[$name]);
     }
-    if (!isset($this->containers[$name][$attr])) {
+    if (!isset($this->variables[$name][$attr])) {
       throw new \RuntimeException("Cannot resolve path using \"$name.$attr\"");
     }
-    return $this->containers[$name][$attr];
+    return $this->variables[$name][$attr];
+  }
+
+  public function hasVariable($name) {
+    return isset($this->variableFactory[$name]);
   }
 
   /**
    * Determine the absolute path to a file, given that the file is most likely
-   * in a given particular container.
+   * in a given particular variable.
    *
    * @param string $value
-   *   The file path (which is probably relative to $container).
-   *   Use "." to reference to container root.
-   *   Values may explicitly specify the a container, e.g. "[civicrm.files]/upload".
+   *   The file path.
+   *   Use "." to reference to default file root.
+   *   Values may begin with a variable, e.g. "[civicrm.files]/upload".
    * @return mixed|string
    */
   public function getPath($value) {
@@ -100,16 +108,14 @@ class Paths {
     if ($value === '.') {
       $value = '';
     }
-    return \CRM_Utils_File::absoluteDirectory($value, $this->getContainerAttr($defaultContainer, 'path'));
+    return \CRM_Utils_File::absoluteDirectory($value, $this->getVariable($defaultContainer, 'path'));
   }
 
   /**
-   * Determine the absolute URL to a file, given that the file is most likely
-   * in a given particular container.
+   * Determine the URL to a file.
    *
    * @param string $value
-   *   The file path (which is probably relative to $container).
-   *   Values may explicitly specify the a container, e.g. "[civicrm.files]/upload".
+   *   The file path. The path may begin with a variable, e.g. "[civicrm.files]/upload".
    * @param string $preferFormat
    *   The preferred format ('absolute', 'relative').
    *   The result data may not meet the preference -- if the setting
@@ -136,7 +142,7 @@ class Paths {
       return $value;
     }
 
-    $value = $this->getContainerAttr($defaultContainer, 'url') . $value;
+    $value = $this->getVariable($defaultContainer, 'url') . $value;
 
     if ($preferFormat === 'relative') {
       $parsed = parse_url($value);

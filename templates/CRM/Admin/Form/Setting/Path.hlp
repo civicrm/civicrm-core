@@ -1,0 +1,22 @@
+{htxt id='id-path_vars'}
+{ts}Path Variables{/ts}
+  <table>
+    <tbody>
+    <tr>
+      <td><tt>[cms.root]</tt></td>
+      <td><tt>{crmResPath ext='cms.root'}</tt></td>
+    </tr>
+    <tr>
+      <td><tt>[civicrm.root]</tt></td>
+      <td><tt>{crmResPath ext='civicrm.root'}</tt></td>
+    </tr>
+    <tr>
+      <td><tt>[civicrm.files]</tt></td>
+      <td><tt>{crmResPath ext='civicrm.files'}</tt></td>
+    </tr>
+    </tbody>
+  </table>
+  <p>
+    {ts}These variables are computed automatically using <tt>civicrm.settings.php</tt> and its options, such as <tt>CIVICRM_TEMPLATE_COMPILEDIR</tt>.{/ts}
+  </p>
+{/htxt}
