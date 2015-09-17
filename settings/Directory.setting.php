@@ -38,7 +38,7 @@
 
 return array(
   'uploadDir' => array(
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'uploadDir',
@@ -54,7 +54,7 @@ return array(
     'help_text' => 'File system path where temporary CiviCRM files - such as import data files - are uploaded.',
   ),
   'imageUploadDir' => array(
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'imageUploadDir',
@@ -70,7 +70,7 @@ return array(
     'help_text' => NULL,
   ),
   'customFileUploadDir' => array(
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customFileUploadDir',
@@ -86,7 +86,7 @@ return array(
     'help_text' => NULL,
   ),
   'customTemplateDir' => array(
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customTemplateDir',
@@ -102,7 +102,7 @@ return array(
     'help_text' => NULL,
   ),
   'customPHPPathDir' => array(
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'customPHPPathDir',
@@ -118,7 +118,7 @@ return array(
     'help_text' => NULL,
   ),
   'extensionsDir' => array(
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults and other metadata may not be available during bootstrap.',
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
     'name' => 'extensionsDir',

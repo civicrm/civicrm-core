@@ -165,18 +165,18 @@ class CRM_Core_Config_MagicMerge {
       'templateCompileDir' => array('runtime'),
       'templateDir' => array('runtime'),
 
-      'customFileUploadDir' => array('setting-path', NULL, '[civicrm.files]/custom/', array('mkdir', 'restrict')),
+      'customFileUploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
       'customPHPPathDir' => array('setting-path'),
       'customTemplateDir' => array('setting-path'),
       'extensionsDir' => array('setting-path'),
-      'imageUploadDir' => array('setting-path', NULL, '[civicrm.files]/persist/contribute/', array('mkdir')),
-      'uploadDir' => array('setting-path', NULL, '[civicrm.files]/upload/', array('mkdir', 'restrict')),
+      'imageUploadDir' => array('setting-path', NULL, array('mkdir')),
+      'uploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
 
       'customCSSURL' => array('setting-url-abs'),
       'extensionsURL' => array('setting-url-abs'),
-      'imageUploadURL' => array('setting-url-abs', NULL, '[civicrm.files]/persist/contribute/'),
-      'resourceBase' => array('setting-url-rel', 'userFrameworkResourceURL', '[civicrm]/.'),
-      'userFrameworkResourceURL' => array('setting-url-abs', NULL, '[civicrm]/.'),
+      'imageUploadURL' => array('setting-url-abs'),
+      'resourceBase' => array('setting-url-rel', 'userFrameworkResourceURL'),
+      'userFrameworkResourceURL' => array('setting-url-abs'),
 
       'geocodeMethod' => array('callback', 'CRM_Utils_Geocode', 'getProviderClass'),
       'defaultCurrencySymbol' => array('callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'),
@@ -199,18 +199,15 @@ class CRM_Core_Config_MagicMerge {
         return $this->getSettings()->get($name);
 
       case 'setting-path':
-        // Array(0 => $type, 1 => $setting, 2 => $default, 3 => $actions).
+        // Array(0 => $type, 1 => $setting, 2 => $actions).
         $value = $this->getSettings()->get($name);
-        if (empty($value) && isset($this->map[$k][2])) {
-          $value = $this->map[$k][2];
-        }
         $value = Civi::paths()->getPath($value);
         if ($value) {
           $value = CRM_Utils_File::addTrailingSlash($value);
-          if (isset($this->map[$k][3]) && in_array('mkdir', $this->map[$k][3])) {
+          if (isset($this->map[$k][2]) && in_array('mkdir', $this->map[$k][2])) {
             CRM_Utils_File::createDir($value);
           }
-          if (isset($this->map[$k][3]) && in_array('restrict', $this->map[$k][3])) {
+          if (isset($this->map[$k][2]) && in_array('restrict', $this->map[$k][2])) {
             CRM_Utils_File::restrictAccess($value);
           }
         }
@@ -218,20 +215,12 @@ class CRM_Core_Config_MagicMerge {
         return $value;
 
       case 'setting-url-abs':
-        // Array(0 => $type, 1 => $setting, 2 => $default).
         $value = $this->getSettings()->get($name);
-        if (empty($value) && isset($this->map[$k][2])) {
-          $value = $this->map[$k][2];
-        }
         $this->cache[$k] = Civi::paths()->getUrl($value, 'absolute');
         return $this->cache[$k];
 
       case 'setting-url-rel':
-        // Array(0 => $type, 1 => $setting, 2 => $default).
         $value = $this->getSettings()->get($name);
-        if (empty($value) && isset($this->map[$k][2])) {
-          $value = $this->map[$k][2];
-        }
         $this->cache[$k] = Civi::paths()->getUrl($value, 'relative');
         return $this->cache[$k];
 
