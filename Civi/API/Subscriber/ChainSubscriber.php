@@ -132,7 +132,7 @@ class ChainSubscriber implements EventSubscriberInterface {
             //'entity_table' will be set to 'contact' & 'id' to the contact id
             //from the parent call. in this case 'contact_id' will also be
             //set to the parent's id
-            if (!($subEntity == 'line_item' && $lowercase_entity == 'contribution')) {
+            if (!($subEntity == 'line_item' && $lowercase_entity == 'contribution' && $action != 'create')) {
               $subParams["entity_id"] = $parentAPIValues['id'];
               $subParams['entity_table'] = 'civicrm_' . $lowercase_entity;
             }
