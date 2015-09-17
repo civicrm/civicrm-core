@@ -383,7 +383,7 @@ class CRM_Core_Invoke {
     // rebuild word replacement cache - pass false to prevent operations redundant with this fn
     CRM_Core_BAO_WordReplacement::rebuild(FALSE);
 
-    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
+    Civi::service('settings_manager')->flush();
     // Clear js caches
     CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
     CRM_Case_XMLRepository::singleton(TRUE);

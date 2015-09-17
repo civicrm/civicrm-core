@@ -134,14 +134,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $config = CRM_Core_Config::singleton($reloadConfig, $reloadConfig);
       $result[$domainID] = array();
       foreach ($fieldsToGet as $name => $value) {
-        $setting = CRM_Core_BAO_Setting::getItem(
-          $fields['values'][$name]['group_name'],
-          $name,
-          CRM_Utils_Array::value('component_id', $params),
-          NULL,
-          CRM_Utils_Array::value('contact_id', $params),
-          $domainID
-        );
+        $contactID = CRM_Utils_Array::value('contact_id', $params);
+        $setting = CRM_Core_BAO_Setting::getItem(NULL, $name, NULL, NULL, $contactID, $domainID);
         if (!is_null($setting)) {
           // we won't return if not set - helps in return all scenario - otherwise we can't indentify the missing ones
           // e.g for revert of fill actions
@@ -362,72 +356,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $profile = NULL
   ) {
     return \Civi\Core\SettingsMetadata::getMetadata($filters, $domainID);
-  }
-
-  /**
-   * Look for any missing settings and convert them from config or load default as appropriate.
-   * This should be run from GenCode & also from upgrades to add any new defaults.
-   *
-   * Multisites have often been overlooked in upgrade scripts so can be expected to be missing
-   * a number of settings
-   */
-  public static function updateSettingsFromMetaData() {
-    $apiParams = array(
-      'version' => 3,
-      'domain_id' => 'all',
-      'filters' => array('prefetch' => 0),
-    );
-    $existing = civicrm_api('setting', 'get', $apiParams);
-
-    if (!empty($existing['values'])) {
-      $allSettings = civicrm_api('setting', 'getfields', array('version' => 3));
-      foreach ($existing['values'] as $domainID => $domainSettings) {
-        CRM_Core_BAO_Domain::setDomain($domainID);
-        $missing = array_diff_key($allSettings['values'], $domainSettings);
-        foreach ($missing as $name => $settings) {
-          self::convertConfigToSetting($name, $domainID);
-        }
-        CRM_Core_BAO_Domain::resetDomain();
-      }
-    }
-  }
-
-  /**
-   * Move an item from being in the config array to being stored as a setting
-   * remove from config - as appropriate based on metadata
-   *
-   * Note that where the key name is being changed the 'legacy_key' will give us the old name
-   */
-  public static function convertConfigToSetting($name, $domainID = NULL) {
-    // we have to force this here in case more than one domain is in play.
-    // whenever there is a possibility of more than one domain we must force it
-    $config = CRM_Core_Config::singleton();
-    if (empty($domainID)) {
-      $domainID = CRM_Core_Config::domainID();
-    }
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->id = $domainID;
-    $domain->find(TRUE);
-    if ($domain->config_backend) {
-      $values = unserialize($domain->config_backend);
-    }
-    else {
-      $values = array();
-    }
-    $spec = self::getSettingSpecification(NULL, array('name' => $name), $domainID);
-    $configKey = CRM_Utils_Array::value('config_key', $spec[$name], CRM_Utils_Array::value('legacy_key', $spec[$name], $name));
-    if (!empty($values[$configKey])) {
-      civicrm_api('setting', 'create', array('version' => 3, $name => $values[$configKey], 'domain_id' => $domainID));
-    }
-    else {
-      civicrm_api('setting', 'fill', array('version' => 3, 'name' => $name, 'domain_id' => $domainID));
-    }
-
-    if (!empty($values[$configKey])) {
-      unset($values[$configKey]);
-      $domain->config_backend = serialize($values);
-      $domain->save();
-    }
   }
 
   /**
