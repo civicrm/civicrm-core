@@ -46,17 +46,24 @@ function civicrm_api3_contribution_create(&$params) {
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
   $params = array_merge($params, $values);
 
-  if (empty($params['id'])) {
-    $op = 'add';
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+    if (empty($params['id'])) {
+      $op = 'add';
+    }
+    else {
+      if (empty($params['financial_type_id'])) {
+        $params['financial_type_id'] = civicrm_api3('Contribution', 'getvalue', array(
+          'id' => $params['id'],
+          'return' => 'financial_type_id',
+        ));
+      }
+      $op = 'edit';
+    }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
+    if (!in_array($params['financial_type_id'], array_keys($types))) {
+      return civicrm_api3_create_error('You do not have permission to create this contribution');
+    }
   }
-  else {
-    $op = 'edit';
-  }
-  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
-  if (!in_array($params['financial_type_id'], array_keys($types))) {
-    return civicrm_api3_create_error('You do not have permission to create this contribution');
-  }
-
   if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
     $error = array();
     //throw error for invalid status change such as setting completed back to pending
