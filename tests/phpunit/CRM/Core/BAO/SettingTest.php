@@ -114,94 +114,12 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $this->assertEquals('/test/override', $values['imageUploadDir']);
   }
 
-  /**
-   * This test checks that CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-   * 1) Removes 'maxAttachments' from config (because 'prefetch' is not set in the metadata it should
-   * be removed
-   *  2) for current domain setting max_attachments is set to the value that $config->maxAttachments
-   *    had (6)
-   *  3) for other domain (2) max_attachments is set to the configured default (3)
-   */
-  public function testConvertAndFillSettings() {
-    $settings = array('maxAttachments' => 6);
-    CRM_Core_BAO_ConfigSetting::add($settings);
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $this->assertEquals(6, $config->maxAttachments);
-    $checkSQL = "SELECT  count(*) FROM civicrm_domain WHERE config_backend LIKE '%\"maxAttachments\";i:6%' AND id = 1
-    ";
-    $checkresult = CRM_Core_DAO::singleValueQuery($checkSQL);
-    $this->assertEquals(1, $checkresult, "Check that maxAttachments has been saved to database not just stored in config");
-    $sql = " DELETE FROM civicrm_setting WHERE name = 'max_attachments'";
-    CRM_Core_DAO::executeQuery($sql);
-
-    $currentDomain = CRM_Core_Config::domainID();
-    // we are setting up an artificial situation here as we are trying to drive out
-    // previous memory of this setting so we need to flush it out
-    //$cachekey = CRM_Core_BAO_Setting::inCache('CiviCRM Preferences', 'max_attachments', NULL, NULL, TRUE, $currentDomain);
-    //CRM_Core_BAO_Setting::flushCache($cachekey);
+  public function testDefaults() {
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "max_attachments"');
     Civi::service('settings_manager')->flush();
-    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-    //check current domain
-    $value = civicrm_api('setting', 'getvalue', array(
-      'version' => 3,
-      'name' => 'max_attachments',
-      'group' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    ));
-
-    $this->assertEquals(6, $value);
-    // check alternate domain
-    $value = civicrm_api('setting', 'getvalue', array(
-      'version' => 3,
-      'name' => 'max_attachments',
-      'group' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'domain_id' => 2,
-    ));
-
-    $this->assertEquals(3, $value);
-
-    //some caching inconsistency here
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $maxAttachments = empty($config->maxAttachments) ? NULL : $config->maxAttachments;
-    $this->assertEmpty($maxAttachments, "Config item still Set to $maxAttachments
-    . This works fine when test run alone");
+    $this->assertEquals(3, Civi::settings()->get('max_attachments'));
+    $this->assertEquals(3, CRM_Core_Config::singleton()->maxAttachments);
   }
-
-  /**
-   * Ensure that overrides in $civicrm_setting apply when
-   * when using getItem().
-   */
-  public function testConvertConfigToSettingNoPrefetch() {
-    $settings = array('maxAttachments' => 6);
-    CRM_Core_BAO_ConfigSetting::add($settings);
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $this->assertEquals(6, $config->maxAttachments);
-
-    CRM_Core_BAO_Setting::convertConfigToSetting('max_attachments');
-    $value = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
-    $this->assertEquals(6, $value);
-
-    $this->callAPISuccess('system', 'flush', array());
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $maxAttachments = empty($config->maxAttachments) ? NULL : $config->maxAttachments;
-    $this->assertEmpty($maxAttachments);
-  }
-
-  /* @codingStandardsIgnoreStart
-   * Check that setting is converted without config value being removed
-   *
-    public function testConvertConfigToSettingPrefetch() {
-    $settings = array('debug' => 1);
-    CRM_Core_BAO_ConfigSetting::add($settings);
-    $config = CRM_Core_Config::singleton(true, true);
-    $this->assertEquals(1, $config->debug);
-    CRM_Core_BAO_Setting::convertConfigToSetting('debug_is_enabled');
-    $value = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DEBUG_PREFERENCES_NAME, 'debug_is_enabled');
-    $this->assertEquals(1, $value);
-    civicrm_api('system', 'flush', array('version' => 3));
-    $config = CRM_Core_Config::singleton(true, true);
-    $this->assertEmpty($config->debug);
-  }
-  @codingStandardsIgnoreEnd */
 
   /**
    * Ensure that on_change callbacks fire.
