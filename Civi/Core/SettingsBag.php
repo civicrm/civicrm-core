@@ -130,14 +130,35 @@ class SettingsBag {
    * @return $this
    */
   public function loadValues() {
-    $this->values = array();
-    // Note: Don't use Setting DAO. It requires fields() which requires
+    // Note: Don't use DAO child classes. They require fields() which require
     // translations -- which are keyed off settings!
-    $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
-    while ($dao->fetch()) {
-      $this->values[$dao->name] = ($dao->value !== NULL) ? unserialize($dao->value) : NULL;
-    }
+
+    $this->values = array();
     $this->combined = NULL;
+
+    // Ordinarily, we just load values from `civicrm_setting`. But upgrades require care.
+    // In v4.0 and earlier, all values were stored in `civicrm_domain.config_backend`.
+    // In v4.1-v4.6, values were split between `civicrm_domain` and `civicrm_setting`.
+    // In v4.7+, all values are stored in `civicrm_setting`.
+    // Whenever a value is available in civicrm_setting, it will take precedence.
+
+    $isUpgradeMode = \CRM_Core_Config::isUpgradeMode();
+
+    if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_DAO::checkFieldExists('civicrm_domain', 'config_backend', FALSE)) {
+      $config_backend = \CRM_Core_DAO::singleValueQuery('SELECT config_backend FROM civicrm_domain WHERE id = %1',
+        array(1 => array($this->domainId, 'Positive')));
+      $oldSettings = \CRM_Upgrade_Incremental_php_FourSeven::convertBackendToSettings($this->domainId, $config_backend);
+      \CRM_Utils_Array::extend($this->values, $oldSettings);
+    }
+
+    // Normal case. Aside: Short-circuit prevents unnecessary query.
+    if (!$isUpgradeMode || \CRM_Core_DAO::checkTableExists('civicrm_setting')) {
+      $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
+      while ($dao->fetch()) {
+        $this->values[$dao->name] = ($dao->value !== NULL) ? unserialize($dao->value) : NULL;
+      }
+    }
+
     return $this;
   }
 
@@ -265,7 +286,7 @@ class SettingsBag {
    */
   protected function createQuery() {
     $select = \CRM_Utils_SQL_Select::from('civicrm_setting')
-      ->select('id, group_name, name, value, domain_id, contact_id, is_domain, component_id, created_date, created_id')
+      ->select('id, name, value, domain_id, contact_id, is_domain, component_id, created_date, created_id')
       ->where('domain_id = #id', array(
         'id' => $this->domainId,
       ));
@@ -336,7 +357,6 @@ class SettingsBag {
       $dao->is_domain = 1;
     }
     $dao->find(TRUE);
-    $dao->group_name = '';
 
     if (isset($metadata['on_change'])) {
       foreach ($metadata['on_change'] as $callback) {

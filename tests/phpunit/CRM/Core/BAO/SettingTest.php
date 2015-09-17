@@ -98,7 +98,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $this->assertEquals('/test/dataride', $values['databaseSetting']);
     // CRM-14974 tear down
     unset($civicrm_setting['Test Preferences']);
-    $query = "DELETE FROM civicrm_setting WHERE group_name = 'Test Preferences';";
+    $query = "DELETE FROM civicrm_setting WHERE name IN ('overrideSetting', 'databaseSetting');";
     CRM_Core_DAO::executeQuery($query);
   }
 
