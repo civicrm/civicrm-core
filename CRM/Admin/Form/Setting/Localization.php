@@ -91,7 +91,11 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
         );
       }
     }
-
+    $this->addElement('select', 'contact_default_language', ts('Default Language for users'), array(
+      '*default*' => ts('Use default site language'),
+      'undefined' => ts('Leave undefined'),
+      'current_site_language' => ts('Use language in use at the time'),
+    ));
     $this->addElement('checkbox', 'inheritLocale', ts('Inherit CMS Language'));
     $this->addElement('text', 'monetaryThousandSeparator', ts('Thousands Separator'), array('size' => 2));
     $this->addElement('text', 'monetaryDecimalPoint', ts('Decimal Delimiter'), array('size' => 2));
