@@ -202,7 +202,7 @@ class SettingsManager {
    */
   protected function getDefaults($entity) {
     if (!$this->useDefaults) {
-      return array();
+      return self::getSystemDefaults($entity);
     }
 
     $cacheKey = 'defaults:' . $entity;
@@ -215,6 +215,7 @@ class SettingsManager {
       foreach ($specs as $key => $spec) {
         $defaults[$key] = \CRM_Utils_Array::value('default', $spec);
       }
+      \CRM_Utils_Array::extend($defaults, self::getSystemDefaults($entity));
       $this->cache->set($cacheKey, $defaults);
     }
     return $defaults;
@@ -307,7 +308,7 @@ class SettingsManager {
       $bag->loadMandatory($this->getMandatory('domain'));
     }
 
-    foreach ($this->bagsByDomain as $bag) {
+    foreach ($this->bagsByContact as $bag) {
       /** @var SettingsBag $bag */
       $bag->loadValues();
       $bag->loadDefaults($this->getDefaults('contact'));
@@ -315,6 +316,34 @@ class SettingsManager {
     }
 
     return $this;
+  }
+
+  /**
+   * Get a list of critical system defaults.
+   *
+   * The setting system can be modified by extensions, which means that it's not fully available
+   * during bootstrap -- in particular, defaults cannot be loaded. For a very small number of settings,
+   * we must define defaults before the system bootstraps.
+   *
+   * @return array
+   */
+  private static function getSystemDefaults($entity) {
+    $defaults = array();
+    switch ($entity) {
+      case 'domain':
+        $defaults = array(
+          'enable_components' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'),
+          'customFileUploadDir' => '[civicrm.files]/custom/',
+          'imageUploadDir' => '[civicrm.files]/persist/contribute/',
+          'uploadDir' => '[civicrm.files]/upload/',
+          'imageUploadURL' => '[civicrm.files]/persist/contribute/',
+          'resourceBase' => '[civicrm.root]/',
+          'userFrameworkResourceURL' => '[civicrm.root]/',
+        );
+        break;
+
+    }
+    return $defaults;
   }
 
 }

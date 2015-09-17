@@ -80,8 +80,6 @@ class SettingsBag {
    */
   protected $values;
 
-  protected $filteredValues;
-
   /**
    * @param int $domainId
    *   The domain for which we want settings.
@@ -92,7 +90,6 @@ class SettingsBag {
     $this->domainId = $domainId;
     $this->contactId = $contactId;
     $this->values = array();
-    $this->filteredValues = array();
     $this->combined = NULL;
   }
 
@@ -105,7 +102,6 @@ class SettingsBag {
    */
   public function loadDefaults($defaults) {
     $this->defaults = $defaults;
-    $this->filteredValues = array();
     $this->combined = NULL;
     return $this;
   }
@@ -119,7 +115,6 @@ class SettingsBag {
    */
   public function loadMandatory($mandatory) {
     $this->mandatory = $mandatory;
-    $this->filteredValues = array();
     $this->combined = NULL;
     return $this;
   }
@@ -276,7 +271,6 @@ class SettingsBag {
   public function set($key, $value) {
     $this->setDb($key, $value);
     $this->values[$key] = $value;
-    unset($this->filteredValues[$key]);
     $this->combined = NULL;
     return $this;
   }

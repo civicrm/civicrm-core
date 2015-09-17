@@ -662,6 +662,7 @@ return array(
     'help_text' => NULL,
   ),
   'enable_components' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'enable_components',
@@ -673,7 +674,7 @@ return array(
       'style' => 'width:150px',
       'class' => 'advmultiselect',
     ),
-    'default' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'),
+    'default' => NULL,
     'add' => '4.4',
     'title' => 'Enable Components',
     'is_domain' => '1',

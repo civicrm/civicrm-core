@@ -28,9 +28,9 @@ class Paths {
 
   public function __construct() {
     $this
-      ->register('civicrm', function () {
-        return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
-      })
+      //->register('civicrm', function () {
+      //  return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
+      //})
       ->register('civicrm.root', function () {
         return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
       })
@@ -121,9 +121,9 @@ class Paths {
    */
   public function getUrl($value, $preferFormat = 'relative', $ssl = NULL) {
     $defaultContainer = self::DEFAULT_URL;
-    if ($value && $value{0} == '[' && preg_match(';^\[([a-zA-Z0-9\._]+)\]/(.*);', $value, $matches)) {
+    if ($value && $value{0} == '[' && preg_match(';^\[([a-zA-Z0-9\._]+)\](/(.*))$;', $value, $matches)) {
       $defaultContainer = $matches[1];
-      $value = $matches[2];
+      $value = empty($matches[3]) ? '.' : $matches[3];
     }
 
     if (empty($value)) {
