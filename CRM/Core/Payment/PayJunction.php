@@ -92,6 +92,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
       'pan' => $params['credit_card_number'],
       'expdate' => $expiry_string,
       'crypt_type' => '7',
+      'cavv' => $params['cvv2'],
       'cust_id' => $params['contact_id'],
     );
 
