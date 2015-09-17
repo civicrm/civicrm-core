@@ -67,6 +67,14 @@ class CRM_Core_Config_MagicMerge {
   }
 
   /**
+   * Get a list of $config properties and the entities to which they map.
+   *
+   * This is used for two purposes:
+   *
+   *  1. Runtime: Provide backward-compatible interface for reading these
+   *     properties.
+   *  2. Upgrade: Migrate old properties of config_backend into settings.
+   *
    * @return array
    */
   public static function getPropertyMap() {
