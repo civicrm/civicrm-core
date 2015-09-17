@@ -179,7 +179,6 @@ return array(
     'pseudoconstant' => array(
       'callback' => 'CRM_Core_PseudoConstant::stateProvince',
     ),
-    'html_attributes',
     'default' => '',
     'title' => 'Default State/Province',
     'description' => 'This value is selected by default when adding a new contact address.',
@@ -476,5 +475,19 @@ return array(
     'is_contact' => 0,
     'description' => "",
     'help_text' => NULL,
+  ),
+  'contact_default_language' => array(
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'contact_default_language',
+    'type' => 'String',
+    'default' => '*default*',
+    'add' => '4.7',
+    'title' => 'Default Language for contacts',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Default language (if any) for contact records',
+    'help_text' => 'If a contact is created with no language this setting will determine the language data (if any) to save.'
+    . 'You may or may not wish to make an assumption here about whether it matches the site language',
   ),
 );
