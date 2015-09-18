@@ -358,6 +358,7 @@ class CRM_Report_Form_Instance {
       'report_header',
       'report_footer',
       'grouprole',
+      'task',
     );
     foreach ($unsetFields as $field) {
       unset($formValues[$field]);
