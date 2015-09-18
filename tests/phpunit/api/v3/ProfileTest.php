@@ -45,8 +45,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_apiversion = 3;
     parent::setUp();
     $config = CRM_Core_Config::singleton();
-    $config->countryLimit[1] = 1013;
-    $config->stateLimit[1] = 1013;
+    $countryLimit = $config->countryLimit;
+    $countryLimit[1] = 1013;
+    $config->countryLimit = $countryLimit;
+
     $this->createLoggedInUser();
     $this->_membershipTypeID = $this->membershipTypeCreate();
   }

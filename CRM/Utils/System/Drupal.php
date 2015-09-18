@@ -299,6 +299,14 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
+  protected function getUsersTableName() {
+    $userFrameworkUsersTableName = Civi::settings()->get('userFrameworkUsersTableName');
+    if (empty($userFrameworkUsersTableName)) {
+      $userFrameworkUsersTableName = 'users';
+    }
+    return $userFrameworkUsersTableName;
+  }
+
   /**
    * @inheritDoc
    */
@@ -340,9 +348,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
       $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
       $name = $dbDrupal->escapeSimple($strtolower($name));
+      $userFrameworkUsersTableName = $this->getUsersTableName();
       $sql = "
 SELECT u.*
-FROM   {$config->userFrameworkUsersTableName} u
+FROM   {$userFrameworkUsersTableName} u
 WHERE  LOWER(u.name) = '$name'
 AND    u.status = 1
 ";

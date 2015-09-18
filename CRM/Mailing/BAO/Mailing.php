@@ -2847,13 +2847,14 @@ WHERE  civicrm_mailing_job.id = %1
     // CRM-8460
     $gotCronLock = FALSE;
 
-    if (property_exists($config, 'mailerJobsMax') && $config->mailerJobsMax && $config->mailerJobsMax > 0) {
-      $lockArray = range(1, $config->mailerJobsMax);
+    $mailerJobsMax = Civi::settings()->get('mailerJobsMax');
+    if (is_numeric($mailerJobsMax) && $mailerJobsMax > 0) {
+      $lockArray = range(1, $mailerJobsMax);
       shuffle($lockArray);
 
       // check if we are using global locks
       foreach ($lockArray as $lockID) {
-        $cronLock = Civi\Core\Container::singleton()->get('lockManager')->acquire("worker.mailing.send.{$lockID}");
+        $cronLock = Civi::service('lockManager')->acquire("worker.mailing.send.{$lockID}");
         if ($cronLock->isAcquired()) {
           $gotCronLock = TRUE;
           break;
@@ -2875,7 +2876,7 @@ WHERE  civicrm_mailing_job.id = %1
     // load bootstrap to call hooks
 
     // Split up the parent jobs into multiple child jobs
-    $mailerJobSize = (property_exists($config, 'mailerJobSize')) ? $config->mailerJobSize : NULL;
+    $mailerJobSize = Civi::settings()->get('mailerJobSize');
     CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs_post($mode);

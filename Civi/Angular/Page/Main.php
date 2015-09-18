@@ -50,7 +50,7 @@ class Main extends \CRM_Core_Page {
   public function __construct($title = NULL, $mode = NULL, $res = NULL) {
     parent::__construct($title, $mode);
     $this->res = \CRM_Core_Resources::singleton();
-    $this->angular = \Civi\Core\Container::singleton()->get('angular');
+    $this->angular = \Civi::service('angular');
     $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
   }
 

@@ -500,21 +500,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Rewrite various system URLs to https.
-   */
-  public static function mapConfigToSSL() {
-    $config = CRM_Core_Config::singleton();
-    $config->userFrameworkResourceURL = str_replace('http://', 'https://', $config->userFrameworkResourceURL);
-    $config->resourceBase = $config->userFrameworkResourceURL;
-
-    if (!empty($config->extensionsURL)) {
-      $config->extensionsURL = str_replace('http://', 'https://', $config->extensionsURL);
-    }
-
-    return $config->userSystem->mapConfigToSSL();
-  }
-
-  /**
    * Get the base URL of the system.
    *
    * @return string
@@ -1771,7 +1756,7 @@ class CRM_Utils_System {
    * @return bool
    */
   public static function isInUpgradeMode() {
-    $args = explode('/', $_GET['q']);
+    $args = explode('/', CRM_Utils_Array::value('q', $_GET));
     $upgradeInProcess = CRM_Core_Session::singleton()->get('isUpgradePending');
     if ((isset($args[1]) && $args[1] == 'upgrade') || $upgradeInProcess) {
       return TRUE;

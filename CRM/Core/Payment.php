@@ -451,11 +451,7 @@ abstract class CRM_Core_Payment {
           'maxlength' => 10,
           'autocomplete' => 'off',
         ),
-        'is_required' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-          'cvv_backoffice_required',
-          NULL,
-          1
-        ),
+        'is_required' => Civi::settings()->get('cvv_backoffice_required'),
         'rules' => array(
           array(
             'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),

@@ -110,11 +110,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testGetFieldsCaching() {
     $settingsMetadata = array();
-    CRM_Core_BAO_Cache::setItem($settingsMetadata, 'CiviCRM setting Specs', 'settingsMetadata__');
-    CRM_Core_BAO_Cache::setItem($settingsMetadata, 'CiviCRM setting Spec', 'All');
+    Civi::cache('settings')->set('settingsMetadata_' . \CRM_Core_Config::domainID() . '_', $settingsMetadata);
+    Civi::cache('settings')->set(\Civi\Core\SettingsMetadata::ALL, $settingsMetadata);
     $result = $this->callAPISuccess('setting', 'getfields', array());
     $this->assertArrayNotHasKey('customCSSURL', $result['values']);
     $this->quickCleanup(array('civicrm_cache'));
+    Civi::cache('settings')->flush();
   }
 
   public function testGetFieldsFilters() {
@@ -132,16 +133,6 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('setting', 'getfields', $params);
     $this->assertArrayNotHasKey('customCSSURL', $result['values']);
     $this->assertArrayHasKey('domain_group_id', $result['values']);
-  }
-
-  /**
-   * Test that getfields will filter on another field (prefetch)
-   */
-  public function testGetFieldsPrefetchFilters() {
-    $params = array('filters' => array('prefetch' => 1));
-    $result = $this->callAPISuccess('setting', 'getfields', $params);
-    $this->assertArrayNotHasKey('disable_mandatory_tokens_check', $result['values']);
-    $this->assertArrayHasKey('monetaryDecimalPoint', $result['values']);
   }
 
   /**
@@ -244,7 +235,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testCreateInvalidURLSettings() {
     $params = array(
       'domain_id' => $this->_domainID2,
-      'userFrameworkResourceURL' => 'dfhkdhfd',
+      'userFrameworkResourceURL' => 'dfhkd*hfd',
     );
     $result = $this->callAPIFailure('setting', 'create', $params);
     $params = array(
@@ -364,9 +355,11 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     // the caching of data to all duplicates the caching of data to the empty string
     CRM_Core_BAO_Cache::setItem($data, 'CiviCRM setting Spec', 'All');
     CRM_Core_BAO_Cache::setItem($data, 'CiviCRM setting Specs', 'settingsMetadata__');
+    Civi::cache('settings')->flush();
     $fields = $this->callAPISuccess('setting', 'getfields', array('filters' => array('group_name' => 'Test Settings')));
     $this->assertArrayHasKey('test_key', $fields['values']);
     $this->callAPISuccess('setting', 'create', array('test_key' => 'keyset'));
+    $this->assertEquals('keyset', Civi::settings()->get('test_key'));
     $result = $this->callAPISuccess('setting', 'getvalue', array('name' => 'test_key', 'group' => 'Test Settings'));
     $this->assertEquals('keyset', $result);
   }
@@ -377,20 +370,19 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testSetConfigSetting() {
     $config = CRM_Core_Config::singleton();
     $this->assertFalse($config->debug == 1);
+
     $params = array(
       'domain_id' => $this->_domainID2,
       'debug_enabled' => 1,
     );
     $result = $this->callAPISuccess('setting', 'create', $params);
+
+    $this->assertEquals(1, Civi::settings($this->_domainID2)->get('debug_enabled'));
+
     CRM_Core_BAO_Domain::setDomain($this->_domainID2);
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
     CRM_Core_BAO_Domain::resetDomain();
-    $this->assertTrue($config->debug == 1);
-    // this should NOT be stored in the settings table now - only in config
-    $sql = " SELECT count(*) as c FROM civicrm_setting WHERE name LIKE '%maxFileSize%'";
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    $dao->fetch();
-    $this->assertEquals($dao->c, 0);
+    $this->assertEquals(1, $config->debug);
   }
 
   /**
@@ -518,9 +510,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Tests filling missing params.
+   * Settings should respect their defaults
    */
-  public function testFill() {
+  public function testDefaults() {
     $domparams = array(
       'name' => 'B Team Domain',
     );
@@ -540,13 +532,19 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
-    $this->assertArrayNotHasKey('tag_unconfirmed', $result['values'][$dom['id']], 'setting for domain 3 should not be set. Debug this IF domain test is passing');
+    $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
+
+    // The 'fill' operation is no longer necessary, but third parties might still use it, so let's
+    // make sure it doesn't do anything weird (crashing or breaking values).
     $result = $this->callAPISuccess('setting', 'fill', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertAPISuccess($result, "in line " . __LINE__);
     $this->assertArrayHasKey('tag_unconfirmed', $result['values'][$dom['id']]);
-    $this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
+
+    // Setting has NULL default. Not returned.
+    //$this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
+
     $this->assertEquals('Unconfirmed', $result['values'][$dom['id']]['tag_unconfirmed']);
   }
 

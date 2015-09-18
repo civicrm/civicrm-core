@@ -516,6 +516,119 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Determine the default location for file storage.
+   *
+   * FIXME:
+   *  1. This was pulled out from a bigger function. It should be split
+   *     into even smaller pieces and marked abstract.
+   *  2. This would be easier to compute by a calling a CMS API, but
+   *     for whatever reason Civi gets it from config data.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/foo.com/files/civicrm"
+   *   - path: string. ex: "/var/www/sites/foo.com/files/civicrm"
+   */
+  public function getDefaultFileStorage() {
+    global $civicrm_root;
+    $config = CRM_Core_Config::singleton();
+    $baseURL = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
+
+    $filesURL = NULL;
+    $filesPath = NULL;
+
+    if ($config->userFramework == 'Joomla') {
+      // gross hack
+      // we need to remove the administrator/ from the end
+      $tempURL = str_replace("/administrator/", "/", $baseURL);
+      $filesURL = $tempURL . "media/civicrm/";
+    }
+    elseif ($config->userFramework == 'WordPress') {
+      //for standalone no need of sites/defaults directory
+      $filesURL = $baseURL . "wp-content/plugins/files/civicrm/";
+    }
+    elseif ($this->is_drupal) {
+      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
+      if ($siteName) {
+        $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
+      }
+      else {
+        $filesURL = $baseURL . "sites/default/files/civicrm/";
+      }
+    }
+    elseif ($config->userFramework == 'UnitTests') {
+      $filesURL = $baseURL . "sites/default/files/civicrm/";
+    }
+    else {
+      throw new CRM_Core_Exception("Failed to locate default file storage ($config->userFramework)");
+    }
+
+    return array(
+      'url' => $filesURL,
+      'path' => CRM_Utils_File::baseFilePath(),
+    );
+  }
+
+  /**
+   * Determine the location of the CiviCRM source tree.
+   *
+   * FIXME:
+   *  1. This was pulled out from a bigger function. It should be split
+   *     into even smaller pieces and marked abstract.
+   *  2. This would be easier to compute by a calling a CMS API, but
+   *     for whatever reason we take the hard way.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
+   *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
+   */
+  public function getCiviSourceStorage() {
+    global $civicrm_root;
+    $config = CRM_Core_Config::singleton();
+
+    // Don't use $config->userFrameworkBaseURL; it has garbage on it.
+    // More generally, w shouldn't be using $config here.
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
+    }
+    $baseURL = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
+    if (CRM_Utils_System::isSSL()) {
+      $baseURL = str_replace('http://', 'https://', $baseURL);
+    }
+
+    if ($config->userFramework == 'Joomla') {
+      $userFrameworkResourceURL = $baseURL . "components/com_civicrm/civicrm/";
+    }
+    elseif ($config->userFramework == 'WordPress') {
+      $userFrameworkResourceURL = $baseURL . "wp-content/plugins/civicrm/civicrm/";
+    }
+    elseif ($this->is_drupal) {
+      // Drupal setting
+      // check and see if we are installed in sites/all (for D5 and above)
+      // we dont use checkURL since drupal generates an error page and throws
+      // the system for a loop on lobo's macosx box
+      // or in modules
+      $cmsPath = $config->userSystem->cmsRootPath();
+      $userFrameworkResourceURL = $baseURL . str_replace("$cmsPath/", '',
+          str_replace('\\', '/', $civicrm_root)
+        );
+
+      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
+      if ($siteName) {
+        $civicrmDirName = trim(basename($civicrm_root));
+        $userFrameworkResourceURL = $baseURL . "sites/$siteName/modules/$civicrmDirName/";
+      }
+    }
+    else {
+      $userFrameworkResourceURL = NULL;
+    }
+
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL),
+      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+    );
+  }
+
+  /**
    * Perform any post login activities required by the CMS.
    *
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,

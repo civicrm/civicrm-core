@@ -187,8 +187,8 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
     // CRM-12578 - Prior to this version a CSS file under drupal would disable core css
     if (!empty($config->customCSSURL) && strpos($config->userFramework, 'Drupal') === 0) {
       // The new setting doesn't exist yet - need to create it first
-      CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-      CRM_Core_BAO_Setting::setItem('1', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css');
+      Civi::service('settings_manager')->flush();
+      Civi::settings()->set('disable_core_css', 1);
     }
 
     // CRM-13701 - Fix $config->timeInputFormat

@@ -240,7 +240,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public static function custom_data_entities() {
     $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
-    $enabledComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents = Civi::settings()->get('enable_components');
     $customDataEntities = array();
     $invalidEntities = array('Individual', 'Organization', 'Household');
     $entitiesToFix = array('Case', 'Relationship');

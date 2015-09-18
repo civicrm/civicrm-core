@@ -68,6 +68,11 @@ abstract class CRM_Utils_Hook {
   private $commonCiviModules = array();
 
   /**
+   * @var CRM_Utils_Cache_Interface
+   */
+  protected $cache;
+
+  /**
    * Constructor and getter for the singleton instance.
    *
    * @param bool $fresh
@@ -82,6 +87,14 @@ abstract class CRM_Utils_Hook {
       self::$_singleton = new $class();
     }
     return self::$_singleton;
+  }
+
+  public function __construct() {
+    $this->cache = CRM_Utils_Cache::create(array(
+      'name' => 'hooks',
+      'type' => array('ArrayCache'),
+      'prefetch' => 1,
+    ));
   }
 
   /**
@@ -186,51 +199,60 @@ abstract class CRM_Utils_Hook {
     // to reproduce the issue are pretty intricate.
     $result = array();
 
-    if ($civiModules !== NULL) {
-      foreach ($civiModules as $module) {
-        $fnName = "{$module}_{$fnSuffix}";
-        if (function_exists($fnName)) {
-          $fResult = array();
-          switch ($numParams) {
-            case 0:
-              $fResult = $fnName();
-              break;
-
-            case 1:
-              $fResult = $fnName($arg1);
-              break;
-
-            case 2:
-              $fResult = $fnName($arg1, $arg2);
-              break;
-
-            case 3:
-              $fResult = $fnName($arg1, $arg2, $arg3);
-              break;
-
-            case 4:
-              $fResult = $fnName($arg1, $arg2, $arg3, $arg4);
-              break;
-
-            case 5:
-              $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5);
-              break;
-
-            case 6:
-              $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
-              break;
-
-            default:
-              CRM_Core_Error::fatal(ts('Invalid hook invocation'));
-              break;
-          }
-
-          if (!empty($fResult) &&
-            is_array($fResult)
-          ) {
-            $result = array_merge($result, $fResult);
+    $fnNames = $this->cache->get($fnSuffix);
+    if (!is_array($fnNames)) {
+      $fnNames = array();
+      if ($civiModules !== NULL) {
+        foreach ($civiModules as $module) {
+          $fnName = "{$module}_{$fnSuffix}";
+          if (function_exists($fnName)) {
+            $fnNames[] = $fnName;
           }
         }
+        $this->cache->set($fnSuffix, $fnNames);
+      }
+    }
+
+    foreach ($fnNames as $fnName) {
+      $fResult = array();
+      switch ($numParams) {
+        case 0:
+          $fResult = $fnName();
+          break;
+
+        case 1:
+          $fResult = $fnName($arg1);
+          break;
+
+        case 2:
+          $fResult = $fnName($arg1, $arg2);
+          break;
+
+        case 3:
+          $fResult = $fnName($arg1, $arg2, $arg3);
+          break;
+
+        case 4:
+          $fResult = $fnName($arg1, $arg2, $arg3, $arg4);
+          break;
+
+        case 5:
+          $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5);
+          break;
+
+        case 6:
+          $fResult = $fnName($arg1, $arg2, $arg3, $arg4, $arg5, $arg6);
+          break;
+
+        default:
+          CRM_Core_Error::fatal(ts('Invalid hook invocation'));
+          break;
+      }
+
+      if (!empty($fResult) &&
+        is_array($fResult)
+      ) {
+        $result = array_merge($result, $fResult);
       }
     }
 
@@ -273,8 +295,8 @@ abstract class CRM_Utils_Hook {
    */
   public static function pre($op, $objectName, $id, &$params) {
     $event = new \Civi\Core\Event\PreEvent($op, $objectName, $id, $params);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_pre", $event);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_pre::$objectName", $event);
+    \Civi::service('dispatcher')->dispatch("hook_civicrm_pre", $event);
+    \Civi::service('dispatcher')->dispatch("hook_civicrm_pre::$objectName", $event);
     return self::singleton()
       ->invoke(4, $op, $objectName, $id, $params, self::$_nullObject, self::$_nullObject, 'civicrm_pre');
   }
@@ -297,8 +319,8 @@ abstract class CRM_Utils_Hook {
    */
   public static function post($op, $objectName, $objectId, &$objectRef) {
     $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post", $event);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_post::$objectName", $event);
+    \Civi::service('dispatcher')->dispatch("hook_civicrm_post", $event);
+    \Civi::service('dispatcher')->dispatch("hook_civicrm_post::$objectName", $event);
     return self::singleton()
       ->invoke(4, $op, $objectName, $objectId, $objectRef, self::$_nullObject, self::$_nullObject, 'civicrm_post');
   }
@@ -1611,7 +1633,7 @@ abstract class CRM_Utils_Hook {
 
     // == 4.5+ ==
     $event = new \Civi\Core\Event\UnhandledExceptionEvent($exception, self::$_nullObject);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_unhandled_exception", $event);
+    \Civi::service('dispatcher')->dispatch("hook_civicrm_unhandled_exception", $event);
   }
 
   /**
@@ -1861,7 +1883,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function caseChange(\Civi\CCase\Analyzer $analyzer) {
     $event = new \Civi\CCase\Event\CaseChangeEvent($analyzer);
-    \Civi\Core\Container::singleton()->get('dispatcher')->dispatch("hook_civicrm_caseChange", $event);
+    \Civi::service('dispatcher')->dispatch("hook_civicrm_caseChange", $event);
 
     return self::singleton()->invoke(1, $angularModules,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
@@ -1892,6 +1914,31 @@ abstract class CRM_Utils_Hook {
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_crudLink'
     );
+  }
+
+  /**
+   * Modify the CiviCRM container - add new services, parameters, extensions, etc.
+   *
+   * @code
+   * use Symfony\Component\Config\Resource\FileResource;
+   * use Symfony\Component\DependencyInjection\Definition;
+   *
+   * function mymodule_civicrm_container($container) {
+   *   $container->addResource(new FileResource(__FILE__));
+   *   $container->setDefinition('mysvc', new Definition('My\Class', array()));
+   * }
+   * @endcode
+   *
+   * Tip: The container configuration will be compiled/cached. The default cache
+   * behavior is aggressive. When you first implement the hook, be sure to
+   * flush the cache. Additionally, you should relax caching during development.
+   * In `civicrm.settings.php`, set define('CIVICRM_CONTAINER_CACHE', 'auto').
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @see http://symfony.com/doc/current/components/dependency_injection/index.html
+   */
+  public static function container(\Symfony\Component\DependencyInjection\ContainerBuilder $container) {
+    self::singleton()->invoke(1, $container, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_container');
   }
 
   /**

@@ -508,13 +508,14 @@ class CRM_Core_Permission {
     }
 
     // if component_id is present, ensure it is enabled
-    if (isset($item['component_id']) &&
-      $item['component_id']
-    ) {
+    if (isset($item['component_id']) && $item['component_id']) {
+      if (!isset(Civi::$statics[__CLASS__]['componentNameId'])) {
+        Civi::$statics[__CLASS__]['componentNameId'] = array_flip(CRM_Core_Component::getComponentIDs());
+      }
+      $componentName = Civi::$statics[__CLASS__]['componentNameId'][$item['component_id']];
+
       $config = CRM_Core_Config::singleton();
-      if (is_array($config->enableComponentIDs) &&
-        in_array($item['component_id'], $config->enableComponentIDs)
-      ) {
+      if (is_array($config->enableComponents) && in_array($componentName, $config->enableComponents)) {
         // continue with process
       }
       else {

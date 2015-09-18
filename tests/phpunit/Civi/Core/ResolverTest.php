@@ -76,7 +76,7 @@ namespace Civi\Core {
      */
     public function testCall() {
       // Note: ResolverTestExampleService is implemented at the bottom of this file.
-      Container::singleton()->set('callbackTestService', new ResolverTestExampleService());
+      \Civi::container()->set('callbackTestService', new ResolverTestExampleService());
       $cb = $this->resolver->get('call://callbackTestService/ping');
       $expected = 'service dummy received foo';
       $actual = call_user_func($cb, 'foo');
@@ -116,7 +116,7 @@ namespace Civi\Core {
      */
     public function testObj() {
       // Note: ResolverTestExampleService is implemented at the bottom of this file.
-      Container::singleton()->set('callbackTestService', new ResolverTestExampleService());
+      \Civi::container()->set('callbackTestService', new ResolverTestExampleService());
       $obj = $this->resolver->get('obj://callbackTestService');
       $this->assertTrue($obj instanceof ResolverTestExampleService);
     }

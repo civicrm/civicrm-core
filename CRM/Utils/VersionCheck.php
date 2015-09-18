@@ -288,10 +288,10 @@ class CRM_Utils_VersionCheck {
         'uf' => $config->userFramework,
         'lang' => $config->lcMessages,
         'co' => $config->defaultContactCountry,
-        'ufv' => $config->userFrameworkVersion,
+        'ufv' => $config->userSystem->getVersion(),
         'PHP' => phpversion(),
         'MySQL' => CRM_CORE_DAO::singleValueQuery('SELECT VERSION()'),
-        'communityMessagesUrl' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'communityMessagesUrl', NULL, '*default*'),
+        'communityMessagesUrl' => Civi::settings()->get('communityMessagesUrl'),
       );
       $this->getPayProcStats();
       $this->getEntityStats();

@@ -217,9 +217,7 @@ class CRM_Core_Page {
     // Intermittent alert to admins
     CRM_Utils_Check::singleton()->showPeriodicAlerts();
 
-    if ($this->useLivePageJS &&
-      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE)
-    ) {
+    if ($this->useLivePageJS && Civi::settings()->get('ajaxPopupsEnabled')) {
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
     }
 

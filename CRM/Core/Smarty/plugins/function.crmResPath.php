@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                  |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,14 +26,31 @@
  */
 
 /**
- * Config handles all the run time configuration changes that the system needs to deal with.
- * Typically we'll have different values for a user's sandbox, a qa sandbox and a production area.
- * The default values in general, should reflect production values (minimizes chances of screwing up)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC
  * $Id$
  *
  */
-class CRM_Pledge_Config extends CRM_Core_Component_Config {
+
+/**
+ * Determine the path of a resource file
+ *
+ * @param array $params
+ *   Array with keys:
+ *   - ext: string, extension name. see CRM_Core_Resources::getPath
+ *   - file: string, relative file path. see CRM_Core_Resources::getPath
+ * @param CRM_Core_Smarty $smarty
+ *
+ * @return string
+ */
+function smarty_function_crmResPath($params, &$smarty) {
+  $res = CRM_Core_Resources::singleton();
+  if (!array_key_exists('ext', $params)) {
+    $params['ext'] = 'civicrm';
+  }
+  if (!array_key_exists('file', $params)) {
+    $params['file'] = NULL;
+  }
+  return $res->getPath($params['ext'], $params['file']);
 }

@@ -396,19 +396,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // "initialize" CiviCRM to avoid problems when running single tests
     // FIXME: look at it closer in second stage
 
-    // initialize the object once db is loaded
-    $config = CRM_Core_Config::singleton();
-    Civi\Core\Container::singleton(TRUE);
-
-    // when running unit tests, use mockup user framework
-    $config->setUserFramework('UnitTests');
-    $this->hookClass = CRM_Utils_Hook::singleton(TRUE);
-    // also fix the fatal error handler to throw exceptions,
-    // rather than exit
-    $config->fatalErrorHandler = 'CiviUnitTestCase_fatalErrorHandler';
-
-    // enable backtrace to get meaningful errors
-    $config->backtrace = 1;
+    $GLOBALS['civicrm_setting']['domain']['fatalErrorHandler'] = 'CiviUnitTestCase_fatalErrorHandler';
+    $GLOBALS['civicrm_setting']['domain']['backtrace'] = 1;
 
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
@@ -416,13 +405,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // reset all the caches
     CRM_Utils_System::flushCache();
 
+    // initialize the object once db is loaded
+    \Civi::reset();
+    $config = CRM_Core_Config::singleton(TRUE, TRUE); // ugh, performance
+
+    // when running unit tests, use mockup user framework
+    $config->setUserFramework('UnitTests');
+    $this->hookClass = CRM_Utils_Hook::singleton(TRUE);
+
     // Make sure the DB connection is setup properly
     $config->userSystem->setMySQLTimeZone();
     $env = new CRM_Utils_Check_Env();
     CRM_Utils_Check::singleton()->assertValid($env->checkMysqlTime());
 
     // clear permissions stub to not check permissions
-    $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = NULL;
 
     //flush component settings
@@ -2847,9 +2843,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @return void
    */
   public function setMockSettingsMetaData($extras) {
-    CRM_Core_BAO_Setting::$_cache = array();
-    $this->callAPISuccess('system', 'flush', array());
-    CRM_Core_BAO_Setting::$_cache = array();
+    Civi::service('settings_manager')->flush();
 
     CRM_Utils_Hook::singleton()
       ->setHook('civicrm_alterSettingsMetaData', function (&$metadata, $domainId, $profile) use ($extras) {
