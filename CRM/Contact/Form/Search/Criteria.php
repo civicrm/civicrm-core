@@ -565,10 +565,10 @@ class CRM_Contact_Form_Search_Criteria {
    */
   public static function recurringcontribution(&$form) {
     $form->add('hidden', 'hidden_recurringcontribution', 1);
-     // Add field to check if payment is made for recurring contribution
+    // Add field to check if payment is made for recurring contribution
     $recurringPaymentOptions = array(
-        0 => ts(' All recurring contributions'),
-        1 => ts(' Made at least one payment for the recurring contributions'),
+      0 => ts(' All recurring contributions'),
+      1 => ts(' Made at least one payment for the recurring contributions'),
     );
     $form->addRadio('contribution_recur_payment_made', ts(''), $recurringPaymentOptions, array('allowClear' => TRUE));
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_recur_start_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
@@ -596,4 +596,5 @@ class CRM_Contact_Form_Search_Criteria {
       }
     }
   }
+
 }

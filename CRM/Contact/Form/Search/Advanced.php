@@ -66,7 +66,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contact_view_options',
       TRUE
     );
-    
+
     if (!$this->_searchPane || $this->_searchPane == 'basic') {
       CRM_Contact_Form_Search_Criteria::basic($this);
     }
@@ -119,10 +119,10 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       $paneNames[$pane['title']] = $pane['name'];
       if ($pane['name'] == 'CiviContribute') {
         $paneNames[ts('Recurring Contributions')] = 'recurringcontribution';
-        if (array_key_exists('CiviContribute', $this->_searchOptions) 
-          && !empty($this->_viewOptions['CiviContributeRecur']) 
+        if (array_key_exists('CiviContribute', $this->_searchOptions)
+          && !empty($this->_viewOptions['CiviContributeRecur'])
           && CRM_Core_Permission::access('CiviContribute')) {
-            $this->_searchOptions['recurringcontribution'] = 1;
+          $this->_searchOptions['recurringcontribution'] = 1;
         }
       }
     }

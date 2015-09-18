@@ -623,7 +623,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
       );
     }
-    
+
     $this->_paymentProcessors = $this->getValidProcessors();
     if (!$this->_mode) {
       $this->_mode = 'live';
@@ -633,14 +633,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('showRecurringField', 1);
       $this->assign('backOfficePaymentProcessors', json_encode($this->_recurPaymentProcessors));
       $recurringContribution = $this->add('select', 'contribution_recur_id', ts('Recurring Contribution'), FALSE, NULL);
-    } else {
+    }
+    else {
       $recurContributions = array();
       $existingRecurContributions = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($this->_contactID);
       // Get all backoffice payment processors
       if (!empty($existingRecurContributions)) {
         foreach ($existingRecurContributions as $ids => $recur) {
           if (array_key_exists($recur['payment_processor_id'], $this->_recurPaymentProcessors)) {
-           $recurContributions[$ids] = CRM_Utils_Money::format($recur['amount']) . ' / ' . $this->_recurPaymentProcessors[$recur['payment_processor_id']] . ' / ' . CRM_Contribute_PseudoConstant::contributionStatus($recur['contribution_status_id']) . ' / ' . CRM_Utils_Date::customFormat($recur['start_date']);
+            $recurContributions[$ids] = CRM_Utils_Money::format($recur['amount']) . ' / ' . $this->_recurPaymentProcessors[$recur['payment_processor_id']] . ' / ' . CRM_Contribute_PseudoConstant::contributionStatus($recur['contribution_status_id']) . ' / ' . CRM_Utils_Date::customFormat($recur['start_date']);
           }
         }
       }
@@ -982,7 +983,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', array(1 => $fields['trxn_id']));
       }
     }
-    
+
     if (!empty($fields['contribution_recur_id'])) {
       $contributionRecur = new CRM_Contribute_DAO_ContributionRecur();
       $contributionRecur->id = $fields['contribution_recur_id'];

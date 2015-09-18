@@ -40,7 +40,7 @@ class CRM_Contribute_BAO_Query {
   static $_contributionFields = NULL;
 
   static $_contribOrSoftCredit = "only_contribs";
-  
+
   static $_contribRecurPayment = "no";
 
   /**
@@ -596,11 +596,12 @@ class CRM_Contribute_BAO_Query {
 
       case 'civicrm_contribution_recur':
         if ($mode == 1) {
-            // 'Made payment for the recurring contributions?' is ticked yes
+          // 'Made payment for the recurring contributions?' is ticked yes
           if (self::$_contribRecurPayment == 'yes') {
             $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
             $from .= " INNER JOIN civicrm_contribution ON civicrm_contribution.contact_id = contact_a.id ";
-          } else {
+          }
+          else {
             $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
           }
         }
@@ -922,7 +923,7 @@ class CRM_Contribute_BAO_Query {
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
     );
 
-  // Add fields for thank you and receipt
+    // Add fields for thank you and receipt
     $form->addYesNo('contribution_thankyou_date_is_not_null', ts('Thank-you sent?'), TRUE);
     $form->addYesNo('contribution_receipt_date_is_not_null', ts('Receipt sent?'), TRUE);
 
@@ -965,11 +966,11 @@ class CRM_Contribute_BAO_Query {
         'context' => 'search',
       )
     );
-    
+
     // Add field to check if payment is made for recurring contribution
     $recurringPaymentOptions = array(
-        0 => ts('All recurring contributions'),
-        1 => ts('Made at least one payment for the recurring contributions'),
+      0 => ts('All recurring contributions'),
+      1 => ts('Made at least one payment for the recurring contributions'),
     );
     $form->addRadio('contribution_recur_payment_made', ts(''), $recurringPaymentOptions);
 

@@ -24,7 +24,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
- 
+
 require_once 'CRM/Contribute/DAO/ContributionRecur.php';
 
 /**
@@ -62,12 +62,12 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
    * @return void
    * @access public
    */
-  function preProcess() { 
+  public function preProcess() {
     // Check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
-    
+
     $this->setPageTitle(ts('Recurring Contribution record'));
 
     // Get the contact id
@@ -91,7 +91,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
       $this->assign('displayName', $this->userDisplayName);
     }
-    
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -99,17 +99,17 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     // Get backoffice payment processors
     $this->assignPaymentRelatedVariables();
     $this->_paymentProcessors = $this->getValidProcessors();
-    
+
     // Get recurring processors
     $this->_mode = 'live';
     $this->assignProcessors();
-    
+
     $this->_values = array();
 
     $ids = array();
     $params = array('id' => $this->_id);
-		if (!empty($this->_id)) {
-			$recurring = new CRM_Contribute_BAO_ContributionRecur();
+    if (!empty($this->_id)) {
+      $recurring = new CRM_Contribute_BAO_ContributionRecur();
       $recurring->copyValues($params);
       $recurring->find(TRUE);
       $ids['contributionrecur'] = $recurring->id;
@@ -118,16 +118,16 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       $membership = new CRM_Member_DAO_Membership();
       $membership->contribution_recur_id = $this->_id;
       $membership->is_test = 0;
-      if ($membership->find(true)) {
+      if ($membership->find(TRUE)) {
         $this->_membershipID = $membership->id;
         $this->assign('membershipID', $this->_membershipID);
       }
 
-      // Done allow Edit, if no back office support 
+      // Done allow Edit, if no back office support
       if (!array_key_exists($this->_values['payment_processor_id'], $this->_paymentProcessors)) {
         CRM_Core_Error::fatal(ts('You are not allowed to edit this recurring record, as back office edit is not supported by the related payment processor.'));
       }
-		}
+    }
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
@@ -142,7 +142,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     parent::preProcess();
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = $this->_values;
 
     if ($this->_id) {
@@ -160,14 +160,14 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
           $defaults[$key . '_time']
           ) = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value($key, $defaults),
           'activityDateTime'
-        );
+          );
       }
     }
-    
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return $defaults;
     }
-    
+
     // Set move existing contributions to TRUE as default
     $defaults['move_existing_contributions'] = 1;
     $defaults['contact_id'] = $this->_contactID;
@@ -175,22 +175,22 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
 
     $this->_defaults = $defaults;
     return $defaults;
-  }  
-    
+  }
+ 
   /**
    * Build the form
    *
    * @access public
    * @return void
    */
-  function buildQuickForm( ) {
+  public function buildQuickForm() {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       // Check if any contributions created for the recurring record
       $recurringIds = array($this->_id);
       $contributionCount = CRM_Contribute_BAO_ContributionRecur::getCount($recurringIds);
       if (isset($contributionCount[$this->_id]) && $contributionCount[$this->_id] > 0) {
-        $this->assign('contributionCount' , $contributionCount[$this->_id]);
+        $this->assign('contributionCount', $contributionCount[$this->_id]);
       }
       $this->addButtons(array(
           array(
@@ -201,8 +201,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
           ),
           array(
             'type' => 'cancel',
-            'name' => ts('Cancel')
-          )
+            'name' => ts('Cancel'),
+          ),
         )
       );
       return;
@@ -211,10 +211,10 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     //need to assign custom data type to the template
     $this->assign('customDataType', 'ContributionRecur');
     $this->assign('entityID', $this->_id);
-    
+
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur');
 
-    $cid        = CRM_Utils_Request::retrieve('cid',  'Integer', $this);
+    $cid        = CRM_Utils_Request::retrieve('cid', 'Integer', $this);
     $id         = CRM_Utils_Request::retrieve('crid', 'Integer', $this);
 
     $paymentProcessor = $this->add('select', 'payment_processor_id',
@@ -233,7 +233,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       TRUE,
       NULL
     );
-    
+
     $contributionStatus = $this->add('select', 'contribution_status_id',
       ts('Status'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::contributionStatus(),
@@ -246,12 +246,12 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     $memParams = array('contact_id' => $this->_contactID);
     CRM_Member_BAO_Membership::getValues($memParams, $contactMembershipsList, TRUE);
     if (count($contactMembershipsList) > 0) {
-        foreach ($contactMembershipsList as $memid => $mem) {
-            $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($memid);
-            $contactMemberships[$memid] = $statusANDType[$memid]['membership_type']
-                                .' / '.$statusANDType[$memid]['status']
-                                .' / '.$mem['start_date']
-                                .' / '.$mem['end_date'];
+      foreach ($contactMembershipsList as $memid => $mem) {
+        $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($memid);
+        $contactMemberships[$memid] = $statusANDType[$memid]['membership_type']
+                                 . ' / '.$statusANDType[$memid]['status']
+                                 . ' / '.$mem['start_date']
+                                 . ' / '.$mem['end_date'];
         }
     }
 
@@ -276,32 +276,32 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
       TRUE, NULL
     );
-    
+
     $frequencyUnit = $this->add('select', 'frequency_unit',
       NULL,
       array('' => ts('- select -')) + CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, FALSE, NULL, 'name'),
       TRUE, NULL
     );
 
-    $frequencyInterval = $this->add('text', 'frequency_interval', ts('Every'), array('maxlength' => 2, 'size' => 2), true);
-    
+    $frequencyInterval = $this->add('text', 'frequency_interval', ts('Every'), array('maxlength' => 2, 'size' => 2), TRUE);
+
     // add dates
     $this->addDateTime('start_date', ts('Start Date'), TRUE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('end_date', ts('End Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('cancel_date', ts('Cancel Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('next_sched_contribution_date', ts('Next Scheduled Contribution Date'), FALSE, array('formatType' => 'activityDateTime'));
 
-    $cycleDay = $this->add('text', 'cycle_day', ts('Cycle day'), array('maxlength' => 2, 'size' => 2), true);
+    $cycleDay = $this->add('text', 'cycle_day', ts('Cycle day'), array('maxlength' => 2, 'size' => 2), TRUE);
 
     // Move recurring record to another contact/membership
     // Field for moving contribution to another contact/membership
-		if (!empty($this->_id)) {
-			$this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
-			$this->addElement('text', 'contact_name', 'Contact', array('size' => 50, 'maxlength' => 255));
-			$this->addElement('hidden', 'selected_cid', 'selected_cid');
-			$this->addElement('checkbox', 'move_recurring_record', ts('Move Recurring Record?'));
-			$this->addElement('checkbox', 'move_existing_contributions', ts('Move Existing Contributions?'));
-			
+    if (!empty($this->_id)) {
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE, 'api' => array('extra' => array('email'))), TRUE);
+      $this->addElement('text', 'contact_name', 'Contact', array('size' => 50, 'maxlength' => 255));
+      $this->addElement('hidden', 'selected_cid', 'selected_cid');
+      $this->addElement('checkbox', 'move_recurring_record', ts('Move Recurring Record?'));
+      $this->addElement('checkbox', 'move_existing_contributions', ts('Move Existing Contributions?'));
+
       // Get memberships of the contact
       // This will allow the recur record to be attached to a different membership of the same contact
       $existingMemberships = array('' => ts('- select -')) + $contactMemberships;
@@ -309,9 +309,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       if ($existingMemberships[$this->_membershipID]) {
         unset($existingMemberships[$this->_membershipID]);
       }
-			$this->add('select', 'membership_record', ts('Membership'), $existingMemberships, FALSE);
-			$this->assign('show_move_membership_field', 1);
-		}
+      $this->add('select', 'membership_record', ts('Membership'), $existingMemberships, FALSE);
+      $this->assign('show_move_membership_field', 1);
+    }
 
     // build associated contributions
     $associatedContributions = array();
@@ -330,38 +330,37 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
         array(
           'type' => 'upload',
           'name' => ts('Save'),
-          'isDefault' => TRUE
+          'isDefault' => TRUE,
         ),
         array(
           'type' => 'cancel',
-          'name' => ts('Cancel')
+          'name' => ts('Cancel'),
         ),
       )
     );
   }
-        
+ 
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
+   * @param array $values posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
    */
-  static function formRule( $values ) 
-  {
-      $errors = array( );
+  public static function formRule($values) {
+    $errors = array();
 
-      if (!empty($values['start_date']) && !empty($values['end_date']) ) {
-          $start = CRM_Utils_Date::processDate( $values['start_date'] );
-          $end   = CRM_Utils_Date::processDate( $values['end_date'] );
-          if ( ($end < $start) && ($end != 0) ) {
-              $errors['end_date'] = ts( 'End date should be greater than Start date' );
-          }
-      }  
-      return $errors;
-  }   
+    if (!empty($values['start_date']) && !empty($values['end_date']) ) {
+      $start = CRM_Utils_Date::processDate($values['start_date']);
+      $end   = CRM_Utils_Date::processDate($values['end_date']);
+      if (($end < $start) && ($end != 0)) {
+        $errors['end_date'] = ts('End date should be greater than Start date');
+      }
+    }
+    return $errors;
+  }
    
   /**
    * process the form after the input has been submitted and validated
@@ -388,7 +387,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       ));
       return;
     }
-    
+
     // get the submitted form values.
     $submittedValues = $this->controller->exportValues($this->_name);  
 
@@ -410,7 +409,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     foreach ($dates as $d) {
       $params[$d] = CRM_Utils_Date::processDate($formValues[$d], $formValues[$d . '_time'], TRUE);
     }
-    
+
     if (empty($this->_id)) {
       $params['create_date'] = CRM_Utils_Date::processDate(date('Y-m-d'));
     }
@@ -419,16 +418,16 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       $params['next_sched_contribution_date'] = $params['start_date'];
     }
     $fields = array(
-        'payment_processor_id',
-        'processor_id',
-        'trxn_id',
-        'financial_type_id',
-        'amount',
-        'payment_instrument_id',
-        'frequency_interval',
-        'frequency_unit',
-        'cycle_day',
-        'contribution_status_id',
+      'payment_processor_id',
+      'processor_id',
+      'trxn_id',
+      'financial_type_id',
+      'amount',
+      'payment_instrument_id',
+      'frequency_interval',
+      'frequency_unit',
+      'cycle_day',
+      'contribution_status_id',
     );
     foreach ($fields as $f) {
       $params[$f] = CRM_Utils_Array::value($f, $formValues);
@@ -445,7 +444,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     );
 
     $contributionRecur = CRM_Contribute_BAO_ContributionRecur::create($params);
-    
+
     // Link the recurring contribution with membership record, if selected
     if ($this->_action == 1 && !empty($formValues['membership_id'])) {
       civicrm_api3('Membership', 'create', array(
@@ -455,7 +454,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     }
 
     // Move the recurring record
-    if (isset($submittedValues['move_recurring_record']) && $submittedValues['move_recurring_record'] == 1 ) {
+    if (isset($submittedValues['move_recurring_record']) && $submittedValues['move_recurring_record'] == 1) {
       self::moveRecurringRecord($submittedValues);
     }
 
@@ -469,7 +468,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       'status' => 'fatal',
       'content' => '<div class="messages status no-popup"><div class="icon inform-icon"></div>' . ts( $message ) . '</div>',
     );
-    CRM_Core_Session::setStatus($message, ts( $messageTitle ), 'error');
+    CRM_Core_Session::setStatus($message, ts($messageTitle), 'error');
     CRM_Core_Page_AJAX::returnJsonResponse($out);
   }
 
@@ -489,9 +488,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       $recurring = new CRM_Contribute_BAO_ContributionRecur();
       $recurring->$this->_id;
       if ($recurring->find(TRUE)) {
-          $recurParams = (array) $recurring;
-          $recurParams['contact_id'] = $selected_cid;
-          CRM_Contribute_BAO_ContributionRecur::create($recurParams);
+        $recurParams = (array) $recurring;
+        $recurParams['contact_id'] = $selected_cid;
+        CRM_Contribute_BAO_ContributionRecur::create($recurParams);
       }
 
       // Update contact id in civicrm_contribution table, if 'Move Existing Contributions?' is ticked
@@ -500,24 +499,24 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
         $contribution->contribution_recur_id = $this->_id;
         $contribution->find();
         while ($contribution->fetch()) {
-            $contributionParams = (array) $contribution;
-            $contributionParams['contact_id'] = $selected_cid;
-            // Update contact_id of contributions
-            // related to the recurring contribution
-            CRM_Contribute_BAO_Contribution::create($contributionParams);
+          $contributionParams = (array) $contribution;
+          $contributionParams['contact_id'] = $selected_cid;
+          // Update contact_id of contributions
+          // related to the recurring contribution
+          CRM_Contribute_BAO_Contribution::create($contributionParams);
         }
       }
     }
-    
+
     if (!empty($membership_record)) {
       // Remove the contribution_recur_id from existing membership
       if (!empty($this->_membershipID)) {
         $membership = new CRM_Member_DAO_Membership();
         $membership->id = $this->_membershipID;
         if ($membership->find(TRUE)) {
-            $membershipParams = (array) $membership;
-            $membershipParams['contribution_recur_id'] = 'NULL';
-            CRM_Member_BAO_Membership::add($membershipParams);
+          $membershipParams = (array) $membership;
+          $membershipParams['contribution_recur_id'] = 'NULL';
+          CRM_Member_BAO_Membership::add($membershipParams);
         }
       }
 
@@ -525,10 +524,11 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       $membership = new CRM_Member_DAO_Membership();
       $membership->id = $membership_record;
       if ($membership->find(TRUE)) {
-          $membershipParams = (array) $membership;
-          $membershipParams['contribution_recur_id'] = $this->_id;
-          CRM_Member_BAO_Membership::add($membershipParams);
+        $membershipParams = (array) $membership;
+        $membershipParams['contribution_recur_id'] = $this->_id;
+        CRM_Member_BAO_Membership::add($membershipParams);
       }
     }
   }
+
 }

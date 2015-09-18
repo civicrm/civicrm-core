@@ -84,7 +84,7 @@ class CRM_Contribute_Page_ContributionRecurTab extends CRM_Core_Page {
         ),
       );
     }
-    
+
     if ($recurID) {
       $paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($recurID, 'recur', 'obj');
       if (is_object($paymentProcessorObj) && $paymentProcessorObj->isSupported('cancelSubscription')) {
@@ -144,7 +144,7 @@ class CRM_Contribute_Page_ContributionRecurTab extends CRM_Core_Page {
     if (!empty($params)) {
       foreach ($params as $ids => $recur) {
         $action = array_sum(array_keys($this->recurLinks($ids)));
-        
+
         // no action allowed if it's not active
         $params[$ids]['is_active'] = ($recur['contribution_status_id'] != 3);
 
@@ -161,12 +161,12 @@ class CRM_Contribute_Page_ContributionRecurTab extends CRM_Core_Page {
 
         $links = self::recurLinks($ids);
 
-        // Disable Edit/Delete link if no back office support 
+        // Disable Edit/Delete link if no back office support
         if (!array_key_exists($recur['payment_processor_id'], $backOfficePaymentProcessors)) {
           unset($links[2]);
           unset($links[8]);
         }
-        
+
         // Remove cancel link for already cancelled recurring records
         if ($recur['contribution_status_id'] == 3) {
           unset($links[64]);

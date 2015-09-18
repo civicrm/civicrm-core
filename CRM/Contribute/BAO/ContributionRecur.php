@@ -97,7 +97,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     else {
       CRM_Utils_Hook::post('create', 'ContributionRecur', $recurring->id, $recurring);
     }
-    
+
     if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
@@ -178,7 +178,7 @@ SELECT r.payment_processor_id
 
     return CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID, $mode);
   }
-  
+
   /**
    * @param int $contactId
    *

@@ -2613,8 +2613,8 @@ AND       civicrm_openid.is_primary = 1";
         return CRM_Contribute_BAO_Contribution::contributionCount($contactId);
 
       case 'contributionrecur':
-        return CRM_Contribute_BAO_ContributionRecur::contributionRecurCount($contactId);  
-        
+        return CRM_Contribute_BAO_ContributionRecur::contributionRecurCount($contactId);
+
       case 'membership':
         return CRM_Member_BAO_Membership::getContactMembershipCount($contactId, TRUE);
 

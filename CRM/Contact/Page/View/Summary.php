@@ -329,8 +329,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     // Recurring contributions in seperate tab
     // Display only if CiviContribute is enabled
-    if (array_key_exists('CiviContribute', $components) 
-      && !empty($this->_viewOptions['CiviContributeRecur']) 
+    if (array_key_exists('CiviContribute', $components)
+      && !empty($this->_viewOptions['CiviContributeRecur'])
       && CRM_Core_Permission::access('CiviContribute')) {
       $allTabs[] = array(
         'id' => 'contribute-recur',
