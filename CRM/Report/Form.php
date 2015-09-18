@@ -813,6 +813,10 @@ class CRM_Report_Form extends CRM_Core_Form {
               }
             }
             else {
+              if ((CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_INT) && is_array($field['default'])) {
+                $this->_defaults["{$fieldName}_min"] = CRM_Utils_Array::value('min', $field['default']);
+                $this->_defaults["{$fieldName}_max"] = CRM_Utils_Array::value('max', $field['default']);
+              }
               $this->_defaults["{$fieldName}_value"] = $field['default'];
             }
           }
