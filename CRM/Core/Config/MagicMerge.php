@@ -83,6 +83,7 @@ class CRM_Core_Config_MagicMerge {
     // Other parameters may be specified, depending on the type.
     return array(
       'backtrace' => array('setting'),
+      'contact_default_language' => array('contact_default_language'),
       'countryLimit' => array('setting'),
       'dashboardCacheTimeout' => array('setting'),
       'dateInputFormat' => array('setting'),

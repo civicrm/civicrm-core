@@ -485,6 +485,14 @@ return array(
     'group' => 'localization',
     'name' => 'contact_default_language',
     'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'class' => 'crm-select2',
+    ),
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getDefaultLanguageOptions',
+    ),
     'default' => '*default*',
     'add' => '4.7',
     'title' => 'Default Language for contacts',
