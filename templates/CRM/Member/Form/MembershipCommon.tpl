@@ -1,5 +1,5 @@
 {if !$membershipMode}
-  {if $accessContribution}
+  {if $accessContribution && $action != 2}
     <table>
       <tr class="crm-{$formClass}-form-block-contribution-contact">
         <td class="label">{$form.is_different_contribution_contact.label}</td>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -51,6 +51,49 @@ class CRM_Logging_Schema {
     'civicrm_job' => array('last_run'),
     'civicrm_group' => array('cache_date', 'refresh_date'),
   );
+
+  /**
+   * (Setting Callback - Validate)
+   *
+   * @param mixed $value
+   * @param array $fieldSpec
+   * @return bool
+   * @throws API_Exception
+   */
+  public static function checkLoggingSupport(&$value, $fieldSpec) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if (!(CRM_Core_DAO::checkTriggerViewPermission(FALSE)) && $value) {
+      throw new API_Exception("In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.");
+    }
+    return TRUE;
+  }
+
+  /**
+   * (Setting Callback - On Change)
+   * Respond to changes in the "logging" setting. Set up or destroy
+   * triggers, etal.
+   *
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
+   */
+  public static function onToggle($oldValue, $newValue, $metadata) {
+    if ($oldValue == $newValue) {
+      return;
+    }
+
+    $logging = new CRM_Logging_Schema();
+    if ($newValue) {
+      $logging->enableLogging();
+    }
+    else {
+      $logging->disableLogging();
+    }
+  }
 
   /**
    * Populate $this->tables and $this->logs with current db state.
@@ -372,7 +415,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
     if (!isset($columnsOf[$table]) || $force) {
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from");
+      $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
       if (is_a($dao, 'DB_Error')) {
         return array();
       }
@@ -491,7 +534,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
    * Create a log table with schema mirroring the given table’s structure and seeding it with the given table’s contents.
    */
   private function createLogTableFor($table) {
-    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table");
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
     $dao->fetch();
     $query = $dao->Create_Table;
 
@@ -519,10 +562,10 @@ COLS;
     $query = self::fixTimeStampAndNotNullSQL($query);
     $query = preg_replace("/^\) /m", "$cols\n) ", $query);
 
-    CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
 
     $columns = implode(', ', $this->columnsOf($table));
-    CRM_Core_DAO::executeQuery("INSERT INTO `{$this->db}`.log_$table ($columns, log_conn_id, log_user_id, log_action) SELECT $columns, CONNECTION_ID(), @civicrm_user_id, 'Initialization' FROM {$table}");
+    CRM_Core_DAO::executeQuery("INSERT INTO `{$this->db}`.log_$table ($columns, log_conn_id, log_user_id, log_action) SELECT $columns, CONNECTION_ID(), @civicrm_user_id, 'Initialization' FROM {$table}", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
 
     $this->tables[] = $table;
     $this->logs[$table] = "log_$table";

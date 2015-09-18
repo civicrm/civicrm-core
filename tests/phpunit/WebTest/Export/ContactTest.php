@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -100,7 +100,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Select the task action to export.
     $this->click("task");
-    $this->select("task", "label=Export Contacts");
+    $this->select("task", "label=Export contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $csvFile = $this->downloadCSV("_qf_Select_next-bottom");
@@ -212,12 +212,12 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $childSortName, "Contact did not found in search result!");
 
-    // select to export all the contasct from search result.
+    // select to export all the contacts from search result.
     $this->click("CIVICRM_QFID_ts_all_4");
 
     // Select the task action to export.
     $this->click("task");
-    $this->select("task", "label=Export Contacts");
+    $this->select("task", "label=Export contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $csvFile = $this->downloadCSV("_qf_Select_next-bottom");
@@ -282,7 +282,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->type("address_1_street_address", "121A Sherman St. Apt. 12");
     $this->type("address_1_city", "Dumfries");
     $this->type("address_1_postal_code", "1234");
-    $this->select("address_1_country_id", "United States");
+    $this->select("address_1_country_id", "UNITED STATES");
     $this->select("address_1_state_province_id", "value=1019");
 
     $this->click('_qf_Contact_upload_view');
@@ -370,7 +370,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Select the task action to export.
     $this->click("task");
-    $this->select("task", "label=Export Contacts");
+    $this->select("task", "label=Export contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("CIVICRM_QFID_2_10");

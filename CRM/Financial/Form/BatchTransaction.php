@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -64,7 +64,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
         'created_by' => ts('Created By'),
         'status' => ts('Status'),
         'description' => ts('Description'),
-        'payment_instrument' => ts('Payment Instrument'),
+        'payment_instrument' => ts('Payment Method'),
         'item_count' => ts('Entered Transactions'),
         'assigned_item_count' => ts('Assigned Transactions'),
         'total' => ts('Entered Total'),
@@ -169,14 +169,16 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     }
     if (isset(self::$_entityID)) {
       $paymentInstrumentID = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'payment_instrument_id');
-      $defaults['contribution_payment_instrument_id'] = $paymentInstrumentID;
+      $defaults['payment_instrument_id'] = $paymentInstrumentID;
       $this->assign('paymentInstrumentID', $paymentInstrumentID);
     }
     return $defaults;
   }
 
   /**
-   * @return array|null
+   * Get action links.
+   *
+   * @return array
    */
   public function &links() {
     if (!(self::$_links)) {

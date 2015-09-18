@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class helps to print the labels for contacts
- *
+ * This class helps to print the labels for contacts.
  */
 class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('contactIds', $this->_contactIds);
@@ -51,9 +46,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Make Mailing Labels'));
@@ -106,9 +98,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $fv = $this->controller->exportValues($this->_name);
@@ -380,10 +369,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Create labels (pdf)
+   * Create labels (pdf).
    *
    * @param array $contactRows
-   *   Assciated array of contact data.
+   *   Associated array of contact data.
    * @param string $format
    *   Format in which labels needs to be printed.
    * @param string $fileName

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -92,11 +92,11 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
     );
 
     if ($type == 'html') {
-      header('Content-Type: text/html; charset=utf-8');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'text/html; charset=utf-8');
       print $mime->getHTMLBody();
     }
     else {
-      header('Content-Type: text/plain; charset=utf-8');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain; charset=utf-8');
       print $mime->getTXTBody();
     }
     CRM_Utils_System::civiExit();

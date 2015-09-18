@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -47,11 +47,11 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
     {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
-    {if $invoicing && $cancelledStatus}
+    {if $invoicing}
       <div class="css_right">
         <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
           <div class="icon ui-icon-print"></div>
-        {if $contribution_status != 'Refunded'}
+        {if $contribution_status != 'Refunded' && $contribution_status != 'Cancelled' }
           {ts}Print Invoice{/ts}</a>
         {else}
           {ts}Print Invoice and Credit Note{/ts}</a>
@@ -149,7 +149,7 @@
     {/if}
   {/if}
   <tr>
-    <td class="label">{ts}Paid By{/ts}</td>
+    <td class="label">{ts}Payment Method{/ts}</td>
     <td>{$payment_instrument}{if $payment_processor_name} ({$payment_processor_name}){/if}</td>
   </tr>
 

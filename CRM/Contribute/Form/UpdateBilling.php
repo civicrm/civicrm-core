@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing a contribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   protected $_crid = NULL;
@@ -57,8 +54,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
@@ -185,8 +180,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $type = 'next';
@@ -207,7 +200,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       )
     );
 
-    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor['object'], TRUE, TRUE);
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, TRUE, TRUE);
     $this->addFormRule(array('CRM_Contribute_Form_UpdateBilling', 'formRule'), $this);
   }
 
@@ -236,8 +229,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

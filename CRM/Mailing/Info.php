@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -102,6 +102,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $civiMails = civicrm_api3('Mailing', 'get', array(
       'is_completed' => 1,
       'mailing_type' => array('IN' => array('standalone', 'winner')),
+      'domain_id' => CRM_Core_Config::domainID(),
       'return' => array('id', 'name', 'scheduled_date'),
       'sequential' => 1,
       'options' => array(
@@ -117,6 +118,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
     $groupNames = civicrm_api3('Group', 'get', $params + array(
       'is_active' => 1,
+      'check_permissions' => TRUE,
       'return' => array('title', 'visibility', 'group_type', 'is_hidden'),
     ));
     $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + array(
@@ -130,11 +132,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'contact_id' => $contactID,
     ));
 
-    // FIXME: Loading the contents of every template into the dom does not scale well
     $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + array(
       'sequential' => 1,
       'is_active' => 1,
-      'return' => array("msg_html", "id", "msg_title", "msg_subject", "msg_text"),
+      'return' => array("id", "msg_title"),
       'workflow_id' => array('IS NULL' => ""),
     ));
     $mailTokens = civicrm_api3('Mailing', 'gettokens', array(
@@ -143,6 +144,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     $fromAddress = civicrm_api3('OptionValue', 'get', $params + array(
       'option_group_id' => "from_email_address",
+      'domain_id' => CRM_Core_Config::domainID(),
     ));
     CRM_Core_Resources::singleton()
       ->addSetting(array(
@@ -174,6 +176,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'schedule mailings',
         'approve mailings',
         'delete in CiviMail',
+        'edit message templates',
       ));
 
     return $result;

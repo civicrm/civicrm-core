@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,17 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains all the function that are called using AJAX
+ * This class contains all the function that are called using AJAX.
  */
 class CRM_Admin_Page_AJAX {
 
   /**
-   * CRM-12337 Output navigation menu as executable javascript
+   * CRM-12337 Output navigation menu as executable javascript.
+   *
    * @see smarty_function_crmNavigationMenu
    */
   public static function getNavigationMenu() {
@@ -62,15 +61,14 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Process drag/move action for menu tree
+   * Process drag/move action for menu tree.
    */
   public static function menuTree() {
     CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
   /**
-   * Build status message while.
-   * enabling/ disabling various objects
+   * Build status message while enabling/ disabling various objects.
    */
   public static function getStatusMsg() {
     require_once 'api/v3/utils.php';
@@ -250,7 +248,7 @@ class CRM_Admin_Page_AJAX {
   public static function mergeTagList() {
     $name = CRM_Utils_Type::escape($_GET['term'], 'String');
     $fromId = CRM_Utils_Type::escape($_GET['fromId'], 'Integer');
-    $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
+    $limit = Civi::settings()->get('search_autocomplete_count');
 
     // build used-for clause to be used in main query
     $usedForTagA = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $fromId, 'used_for');
@@ -295,7 +293,12 @@ LIMIT $limit";
     CRM_Utils_JSON::output($result);
   }
 
-  public function mappingList() {
+  /**
+   * Get a list of mappings.
+   *
+   * This appears to be only used by scheduled reminders.
+   */
+  static public function mappingList() {
     if (empty($_GET['mappingID'])) {
       CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
     }

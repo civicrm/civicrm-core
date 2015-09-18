@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -1263,7 +1263,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
-            $from = self::intervalAdd('month', -3, $to);
+            $from = self::intervalAdd('day', -90, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
 
@@ -1306,6 +1306,16 @@ class CRM_Utils_Date {
             $to['M'] = 3 * $quarter;
             $to['Y'] = $from['Y'] = $now['year'] - $subtractYear;
             $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
+            break;
+
+          case 'starting':
+            $from['d'] = $now['mday'];
+            $from['M'] = $now['mon'];
+            $from['Y'] = $now['year'];
+            $from['H'] = 00;
+            $from['i'] = $to['s'] = 00;
+            $to = self::intervalAdd('day', 90, $from);
+            $to = self::intervalAdd('second', -1, $to);
             break;
         }
         break;
@@ -1405,6 +1415,16 @@ class CRM_Utils_Date {
             unset($to);
             break;
 
+          case 'ending_2':
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $from = self::intervalAdd('day', -60, $to);
+            $from = self::intervalAdd('second', 1, $from);
+            break;
+
           case 'ending':
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
@@ -1453,19 +1473,37 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
-            $to = self::intervalAdd('month', 1, $from);
+            $to = self::intervalAdd('day', 30, $from);
+            $to = self::intervalAdd('second', -1, $to);
+            break;
+
+          case 'starting_2':
+            $from['d'] = $now['mday'];
+            $from['M'] = $now['mon'];
+            $from['Y'] = $now['year'];
+            $from['H'] = 00;
+            $from['i'] = $to['s'] = 00;
+            $to = self::intervalAdd('day', 60, $from);
             $to = self::intervalAdd('second', -1, $to);
             break;
         }
         break;
 
       case 'week':
+        $weekFirst = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'weekBegins', NULL, 0);
+        $thisDay = $now['wday'];
+        if ($weekFirst > $thisDay) {
+          $diffDay = $thisDay - $weekFirst + 7;
+        }
+        else {
+          $diffDay = $thisDay - $weekFirst;
+        }
         switch ($relativeTerm) {
           case 'this':
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']), $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
             $to = self::intervalAdd('day', 6, $from);
             break;
 
@@ -1473,7 +1511,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) - 7, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) - 7, $from);
             $to = self::intervalAdd('day', 6, $from);
             break;
 
@@ -1481,7 +1519,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) - 14, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) - 14, $from);
             $to = self::intervalAdd('day', 6, $from);
             break;
 
@@ -1489,7 +1527,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) - 14, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) - 14, $from);
             $to = self::intervalAdd('day', 13, $from);
             break;
 
@@ -1497,7 +1535,7 @@ class CRM_Utils_Date {
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
-            $to = self::intervalAdd('day', -1 * ($now['wday']) - 1, $to);
+            $to = self::intervalAdd('day', -1 * ($diffDay) - 1, $to);
             unset($from);
             break;
 
@@ -1505,7 +1543,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']), $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
             unset($to);
             break;
 
@@ -1513,7 +1551,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) - 1, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) - 1, $from);
             unset($to);
             break;
 
@@ -1531,7 +1569,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']), $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
@@ -1544,7 +1582,7 @@ class CRM_Utils_Date {
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
             //CRM-14550 QA Fix
-            $to = self::intervalAdd('day', -1 * ($now['wday']) + 6, $to);
+            $to = self::intervalAdd('day', -1 * ($diffDay) + 6, $to);
             unset($from);
             break;
 
@@ -1552,7 +1590,7 @@ class CRM_Utils_Date {
             $from['d'] = $now['mday'];
             $from['M'] = $now['mon'];
             $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($now['wday']) + 7, $from);
+            $from = self::intervalAdd('day', -1 * ($diffDay) + 7, $from);
             $to = self::intervalAdd('day', 6, $from);
             break;
 

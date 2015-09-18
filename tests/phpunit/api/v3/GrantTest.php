@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -143,92 +143,6 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count']);
-  }
-
-  /**
-   * This is a test to check if setting fields one at a time alters other fields.
-   *
-   * Issues Hit so far =
-   * 1) Currency keeps getting reset to USD -  BUT this may be the only enabled currency
-   *  - in which case it is valid
-   * 2)
-   */
-  public function testCreateAutoGrant() {
-    $entityName = $this->_entity;
-    $baoString = 'CRM_Grant_BAO_Grant';
-    $fields = $this->callAPISuccess($entityName, 'getfields', array(
-        'action' => 'create',
-      )
-    );
-
-    $fields = $fields['values'];
-    $return = array_keys($fields);
-    $baoObj = new CRM_Core_DAO();
-    $baoObj->createTestObject($baoString, array('currency' => 'USD'), 2, 0);
-    $getentities = $this->callAPISuccess($entityName, 'get', array(
-      'sequential' => 1,
-      'return' => $return,
-    ));
-
-    // lets use first rather than assume only one exists
-    $entity = $getentities['values'][0];
-    $entity2 = $getentities['values'][1];
-    foreach ($fields as $field => $specs) {
-      if ($field == 'currency' || $field == 'id') {
-        continue;
-      }
-      switch ($specs['type']) {
-        case CRM_Utils_Type::T_DATE:
-        case CRM_Utils_Type::T_TIMESTAMP:
-          $entity[$field] = '2012-05-20';
-          break;
-
-        case CRM_Utils_Type::T_STRING:
-        case CRM_Utils_Type::T_BLOB:
-        case CRM_Utils_Type::T_MEDIUMBLOB:
-        case CRM_Utils_Type::T_TEXT:
-        case CRM_Utils_Type::T_LONGTEXT:
-        case CRM_Utils_Type::T_EMAIL:
-          $entity[$field] = 'New String';
-          break;
-
-        case CRM_Utils_Type::T_INT:
-          // probably created with a 1
-          $entity[$field] = 2;
-          if (!empty($specs['FKClassName'])) {
-            $entity[$field] = empty($entity2[$field]) ? $entity2[$specs]['uniqueName'] : $entity2[$field];
-          }
-          break;
-
-        case CRM_Utils_Type::T_BOOLEAN:
-          // probably created with a 1
-          $entity[$field] = 0;
-          break;
-
-        case CRM_Utils_Type::T_FLOAT:
-        case CRM_Utils_Type::T_MONEY:
-          $entity[$field] = 222;
-          break;
-
-        case CRM_Utils_Type::T_URL:
-          $entity[$field] = 'warm.beer.com';
-      }
-      $updateParams = array(
-        'id' => $entity['id'],
-        $field => $entity[$field],
-        'debug' => 1,
-      );
-      $update = $this->callAPISuccess($entityName, 'create', $updateParams);
-      $this->assertAPISuccess($update, "setting $field to {$entity[$field]} in line " . __LINE__);
-      $checkParams = array(
-        'id' => $entity['id'],
-        'sequential' => 1,
-      );
-      $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
-      $this->assertAPIArrayComparison((array) $entity, $checkEntity);
-    }
-    $baoObj->deleteTestObjects($baoString);
-    $baoObj->free();
   }
 
 }

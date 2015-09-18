@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -428,7 +428,7 @@ class CRM_Core_SelectValues {
   public static function mapProvider() {
     static $map = NULL;
     if (!$map) {
-      $map = CRM_Utils_System::getPluginList('templates/CRM/Contact/Form/Task/Map', ".tpl");
+      $map = array('' => '- select -') + CRM_Utils_System::getPluginList('templates/CRM/Contact/Form/Task/Map', ".tpl");
     }
     return $map;
   }
@@ -442,7 +442,7 @@ class CRM_Core_SelectValues {
   public static function geoProvider() {
     static $geo = NULL;
     if (!$geo) {
-      $geo = CRM_Utils_System::getPluginList('CRM/Utils/Geocode');
+      $geo = array('' => '- select -') + CRM_Utils_System::getPluginList('CRM/Utils/Geocode');
     }
     return $geo;
   }
@@ -554,8 +554,8 @@ class CRM_Core_SelectValues {
       '{contribution.fee_amount}' => ts('Fee Amount'),
       '{contribution.net_amount}' => ts('Net Amount'),
       '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
-      '{contribution.receive_date}' => ts('Contribution Receive Date'),
-      '{contribution.payment_instrument}' => ts('Payment Instrument'),
+      '{contribution.receive_date}' => ts('Contribution Date Received'),
+      '{contribution.payment_instrument}' => ts('Payment Method'),
       '{contribution.trxn_id}' => ts('Transaction ID'),
       '{contribution.invoice_id}' => ts('Invoice ID'),
       '{contribution.currency}' => ts('Currency'),
@@ -874,6 +874,9 @@ class CRM_Core_SelectValues {
    */
   public static function getJobFrequency() {
     return array(
+      '1stOfQtr' => ts('1st day of every quarter'),
+      '1stOfMth' => ts('1st day of every month'),
+      'Mondays' => ts('Monday of every week'),
       'Daily' => ts('Daily'),
       'Hourly' => ts('Hourly'),
       'Always' => ts('Every time cron job is run'),
@@ -993,6 +996,47 @@ class CRM_Core_SelectValues {
       'week' => ts('week', array('plural' => 'weeks', 'count' => $count)),
       'month' => ts('month', array('plural' => 'months', 'count' => $count)),
       'year' => ts('year', array('plural' => 'years', 'count' => $count)),
+    );
+  }
+
+  /**
+   * Relative Date Terms.
+   *
+   * @return array
+   */
+  public static function getRelativeDateTerms() {
+    return array(
+      'previous' => ts('Previous'),
+      'previous_2' => ts('Previous 2'),
+      'previous_before' => ts('Prior to Previous'),
+      'before_previous' => ts('All Prior to Previous'),
+      'earlier' => ts('To End of Previous'),
+      'greater_previous' => ts('From End of Previous'),
+      'greater' => ts('From Start Of Current'),
+      'current' => ts('Current'),
+      'ending_3' => ts('Last 3'),
+      'ending_2' => ts('Last 2'),
+      'ending' => ts('Last'),
+      'this' => ts('This'),
+      'starting' => ts('Upcoming'),
+      'less' => ts('To End of'),
+      'next' => ts('Next'),
+    );
+  }
+
+  /**
+   * Relative Date Units.
+   *
+   * @return array
+   */
+  public static function getRelativeDateUnits() {
+    return array(
+      'year' => ts('Years'),
+      'fiscal_year' => ts('Fiscal Years'),
+      'quarter' => ts('Quarters'),
+      'month' => ts('Months'),
+      'week' => ts('Weeks'),
+      'day' => ts('Days'),
     );
   }
 

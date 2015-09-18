@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -116,7 +116,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
         'Financial Type' => 'Event Fee',
         'Total Amount' => '$ 800.00',
         'Contribution Status' => 'Completed',
-        'Paid By' => 'Check',
+        'Payment Method' => 'Check',
         'Check Number' => '1044',
       )
     );
@@ -309,7 +309,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
         'From' => $displayName,
         'Financial Type' => 'Event Fee',
         'Contribution Status' => 'Completed',
-        'Paid By' => 'Check',
+        'Payment Method' => 'Check',
         'Check Number' => '1044',
       )
     );

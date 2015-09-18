@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -426,7 +426,7 @@ SELECT  id, html_type
         $form->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
         $form->add('select', 'payment_instrument_id',
-          ts('Paid By'),
+          ts('Payment Method'),
           array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
           FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
         );

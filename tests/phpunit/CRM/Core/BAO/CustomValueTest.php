@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -42,7 +40,6 @@ require_once 'CiviTest/Custom.php';
 class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
   public function testTypeCheckWithValidInput() {
 
-    $values = array();
     $values = array(
       'Memo' => 'Test1',
       'String' => 'Test',
@@ -66,7 +63,6 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
   }
 
   public function testTypeCheckWithInvalidInput() {
-    $values = array();
     $values = array('check1' => 'chk');
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
@@ -75,7 +71,6 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
   }
 
   public function testTypeCheckWithWrongInput() {
-    $values = array();
     $values = array(
       'String' => 1,
       'Boolean' => 'US',
@@ -87,7 +82,6 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
   }
 
   public function testTypeToFieldWithValidInput() {
-    $values = array();
     $values = array(
       'String' => 'char_data',
       'File' => 'char_data',
@@ -109,7 +103,6 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
   }
 
   public function testTypeToFieldWithWrongInput() {
-    $values = array();
     $values = array(
       'String' => 'memo_data',
       'File' => 'date_data',
@@ -121,7 +114,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function testFixFieldValueOfTypeMemo() {
+  public function fixCustomFieldValue() {
     $customGroup = Custom::createGroup(array(), 'Individual');
 
     $fields = array(
@@ -133,22 +126,21 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     $customField = Custom::createField(array(), $fields);
 
     $custom = 'custom_' . $customField->id;
-    $params = array();
     $params = array(
       'email' => 'abc@webaccess.co.in',
       $custom => 'note',
     );
 
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($params);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
     $this->assertEquals($params[$custom], '%note%', 'Checking the returned value of type Memo.');
 
     Custom::deleteField($customField);
     Custom::deleteGroup($customGroup);
   }
 
-  public function testFixFieldValueOfTypeMemoWithEmptyParams() {
+  public function testFixCustomFieldValueWithEmptyParams() {
     $params = array();
-    $result = CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($params);
+    $result = CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
     $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');
   }
 

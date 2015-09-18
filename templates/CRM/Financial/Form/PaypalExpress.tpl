@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,7 +25,6 @@
 *}
 
   <div id="paypalExpress">
-    {assign var=expressButtonName value='_qf_Main_upload_express'}
     <fieldset class="crm-group paypal_checkout-group">
       <legend>{ts}Checkout with PayPal{/ts}</legend>
       <div class="section">
@@ -37,10 +36,18 @@
         </div>
         <div class="crm-section {$expressButtonName}-section">
           <div class="content">
-            {$form.$expressButtonName.html} <span class="description">Checkout securely. Pay without sharing your financial information. </span>
+            {$form.$expressButtonName.html} <span class="description">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</span>
           </div>
           <div class="clear"></div>
         </div>
       </div>
     </fieldset>
   </div>
+{literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      var $form = $('#billing-payment-block').closest('form');
+      $('.crm-submit-buttons', $form).hide();
+    });
+  </script>
+{/literal}

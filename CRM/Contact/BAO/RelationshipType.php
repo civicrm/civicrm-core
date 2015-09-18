@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType {
 
@@ -154,19 +152,20 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     $relationship->relationship_type_id = $relationshipTypeId;
     $relationship->delete();
 
-    // set all membership_type to null
-    $query = "
-UPDATE civicrm_membership_type
-  SET  relationship_type_id = NULL
- WHERE relationship_type_id = %1
-";
-    $params = array(
-      1 => array(
-        CRM_Core_DAO::VALUE_SEPARATOR . $relationshipTypeId . CRM_Core_DAO::VALUE_SEPARATOR,
-        'String',
-      ),
-    );
-    CRM_Core_DAO::executeQuery($query, $params);
+    // remove this relationship type from membership types
+    $mems = civicrm_api3('MembershipType', 'get', array(
+      'relationship_type_id' => array('LIKE' => "%{$relationshipTypeId}%"),
+      'return' => array('id', 'relationship_type_id', 'relationship_direction'),
+    ));
+    foreach ($mems['values'] as $membershipTypeId => $membershipType) {
+      $pos = array_search($relationshipTypeId, $membershipType['relationship_type_id']);
+      // Api call may have returned false positives but currently the relationship_type_id uses
+      // nonstandard serialization which makes anything more accurate impossible.
+      if ($pos !== FALSE) {
+        unset($membershipType['relationship_type_id'][$pos], $membershipType['relationship_direction'][$pos]);
+        civicrm_api3('MembershipType', 'create', $membershipType);
+      }
+    }
 
     //fixed for CRM-3323
     $mappingField = new CRM_Core_DAO_MappingField();

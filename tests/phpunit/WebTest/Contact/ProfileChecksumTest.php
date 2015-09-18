@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -76,7 +76,7 @@ class WebTest_Contact_ProfileChecksumTest extends CiviSeleniumTestCase {
         'location' => 0,
         'default_value' => '1228',
         'update_value' => '1228',
-        'update_value_label' => 'United States',
+        'update_value_label' => 'UNITED STATES',
         'element_name' => 'country-Primary',
         'html_type' => 'select',
       ),

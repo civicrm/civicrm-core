@@ -1,5 +1,5 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.6                                                |
+-- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
 -- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
@@ -30,66 +30,6 @@ SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 
 -- Initial default state of system preferences
 
--- Initial default state of system settings
-INSERT INTO civicrm_setting
-  ( domain_id, contact_id, is_domain, group_name, name, value )
-VALUES
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_view_options', '{serialize}123456789101113{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_smart_group_display', '{serialize}1{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_edit_options', '{serialize}123456789111214151617{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'advanced_search_options', '{serialize}123456789101112131516171819{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'user_dashboard_options', '{serialize}1234578{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'address_options', '{serialize}123456891011{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'address_format', '{serialize}{literal}{contact.address_name}
-{contact.street_address}
-{contact.supplemental_address_1}
-{contact.supplemental_address_2}
-{contact.city}{, }{contact.state_province}{ }{contact.postal_code}
-{contact.country}{/literal}{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'mailing_format', '{serialize}{literal}{contact.addressee}
-{contact.street_address}
-{contact.supplemental_address_1}
-{contact.supplemental_address_2}
-{contact.city}{, }{contact.state_province}{ }{contact.postal_code}
-{contact.country}{/literal}{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'display_name_format', '{serialize}{literal}{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}{/literal}{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'sort_name_format', '{serialize}{literal}{contact.last_name}{, }{contact.first_name}{/literal}{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'editor_id', '{serialize}CKEditor{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_ajax_check_similar', '{serialize}1{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'activity_assignee_notification', '{serialize}1{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'activity_assignee_notification_ics', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_autocomplete_options', '{serialize}12{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_reference_options', '{serialize}12{/serialize}' ),
-  ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_provider', NULL ),
-  ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_userid', NULL ),
-  ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_url', NULL ),
-  ( @domainID, NULL, 1, 'Campaign Preferences', 'tag_unconfirmed', '{serialize}Unconfirmed{/serialize}' ),
-  ( @domainID, NULL, 1, 'Campaign Preferences', 'petition_contacts', '{serialize}Petition Contacts{/serialize}' ),
-  ( @domainID, NULL, 1, 'Event Preferences'   , 'enable_cart', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'profile_double_optin', '{serialize}1{/serialize}' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'profile_add_to_group_double_optin', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'track_civimail_replies', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'civimail_workflow', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'civimail_server_wide_lock', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'mailing_backend', {literal}'a:1:{s:15:"outBound_option";s:1:"3";}'{/literal} ),
-  ( @domainID, NULL, 1, 'Mailing Preferences', 'write_activity_record', '{serialize}1{/serialize}' ),
-  ( @domainID, NULL, 1, 'Member Preferences' , 'default_renewal_contribution_page', NULL ),
-  ( @domainID, NULL, 1, 'Multi Site Preferences', 'is_enabled', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Multi Site Preferences', 'uniq_email_per_site', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Multi Site Preferences', 'domain_group_id', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Multi Site Preferences', 'event_price_set_domain_id', '{serialize}0{/serialize}' ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'uploadDir'          , NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'imageUploadDir'     , NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'customFileUploadDir', NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'customTemplateDir'  , NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'customPHPPathDir'   , NULL ),
-  ( @domainID, NULL, 1, 'Directory Preferences', 'extensionsDir'      , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'userFrameworkResourceURL' , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'imageUploadURL'           , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'customCSSURL'             , NULL ),
-  ( @domainID, NULL, 1, 'URL Preferences', 'extensionsURL'            , NULL ),
-  ( @domainID, NULL, 1, 'Contribute Preferences', 'contribution_invoice_settings', {literal}'a:7:{s:14:"invoice_prefix";s:4:"INV_";s:19:"credit_notes_prefix";s:3:"CN_";s:8:"due_date";s:2:"10";s:15:"due_date_period";s:4:"days";s:5:"notes";s:0:"";s:8:"tax_term";s:9:"Sales Tax";s:20:"tax_display_settings";s:9:"Inclusive";}'{/literal});
-
 -- mail settings
 
 INSERT INTO civicrm_mail_settings (domain_id, name, is_default, domain) VALUES (@domainID, 'default', true, 'EXAMPLE.ORG');
@@ -100,6 +40,8 @@ INSERT INTO `civicrm_dashboard`
     ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`)
     VALUES
     ( @domainID, 'blog', '{ts escape="sql"}CiviCRM News{/ts}', 'civicrm/dashlet/blog?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/blog?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
+    ( @domainID, 'getting-started', '{ts escape="sql"}Getting Started{/ts}', 'civicrm/dashlet/getting-started?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/getting-started?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
+
     ( @domainID, 'activity', '{ts escape="sql"}Activities{/ts}', 'civicrm/dashlet/activity?reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 1, 'civicrm/dashlet/activity?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
     ( @domainID, 'myCases', '{ts escape="sql"}My Cases{/ts}', 'civicrm/dashlet/myCases?reset=1&snippet=5', 'access my cases and activities', NULL , 0, 0, 1, 2, 'civicrm/dashlet/myCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
     ( @domainID, 'allCases', '{ts escape="sql"}All Cases{/ts}', 'civicrm/dashlet/allCases?reset=1&snippet=5', 'access all cases and activities', NULL , 0, 0, 1, 3, 'civicrm/dashlet/allCases?reset=1&snippet=5&context=dashletFullscreen', 1, 1),
@@ -514,7 +456,7 @@ VALUES
     ( @domainID, 'civicrm/admin/contribute/managePremiums?reset=1',        '{ts escape="sql" skip="true"}Premiums (Thank-you Gifts){/ts}', 'Premiums',                  'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', 1,    9 ),
     ( @domainID, 'civicrm/admin/financial/financialType?reset=1',      '{ts escape="sql" skip="true"}Financial Types{/ts}',         'Financial Types',        'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 10),
     ( @domainID, 'civicrm/admin/financial/financialAccount?reset=1',      '{ts escape="sql" skip="true"}Financial Accounts{/ts}',         'Financial Accounts',        'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 11),
-    ( @domainID, 'civicrm/admin/options/payment_instrument?reset=1',  '{ts escape="sql" skip="true"}Payment Instruments{/ts}',    'Payment Instruments',   'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 12 ),
+    ( @domainID, 'civicrm/admin/options/payment_instrument?reset=1',  '{ts escape="sql" skip="true"}Payment Methods{/ts}',    'Payment Instruments',   'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 12 ),
     ( @domainID, 'civicrm/admin/options/accept_creditcard?reset=1',    '{ts escape="sql" skip="true"}Accepted Credit Cards{/ts}',  'Accepted Credit Cards', 'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 13 ),
     ( @domainID, 'civicrm/admin/options/soft_credit_type?reset=1', '{ts escape="sql" skip="true"}Soft Credit Types{/ts}', 'Soft Credit Types', 'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', 1, 14  ),
     ( @domainID, 'civicrm/admin/price?reset=1&action=add',                  '{ts escape="sql" skip="true"}New Price Set{/ts}',              'New Price Set',             'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 15 ),
@@ -605,28 +547,31 @@ VALUES
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Help{/ts}', 'Help', NULL, '',  NULL, '1', NULL, 110);
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Support{/ts}', 'Support', NULL, '',  NULL, '1', NULL, 110);
 
 SET @adminHelplastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, 'http://documentation.civicrm.org',   '{ts escape="sql" skip="true"}Documentation{/ts}',      'Documentation',    NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
-    ( @domainID, 'http://forum.civicrm.org',           '{ts escape="sql" skip="true"}Community Forums{/ts}',   'Community Forums', NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
-    ( @domainID, 'http://civicrm.org/participate',     '{ts escape="sql" skip="true"}Participate{/ts}',        'Participate',      NULL, 'AND', @adminHelplastID, '1', NULL, 3 ),
-    ( @domainID, 'http://civicrm.org/what/whatiscivicrm', '{ts escape="sql" skip="true"}About{/ts}',              'About',            NULL, 'AND', @adminHelplastID, '1', NULL, 4 );
+    ( @domainID, 'http://civicrm.org/get-started?src=iam',        '{ts escape="sql" skip="true"}Get started{/ts}',        'Get started',        NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
+    ( @domainID, 'http://civicrm.org/documentation?src=iam',      '{ts escape="sql" skip="true"}Documentation{/ts}',      'Documentation',      NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
+    ( @domainID, 'http://civicrm.org/ask-a-question?src=iam',     '{ts escape="sql" skip="true"}Ask a question{/ts}',     'Ask a question',     NULL, 'AND', @adminHelplastID, '1', NULL, 3 ),
+    ( @domainID, 'http://civicrm.org/experts?src=iam', 		  '{ts escape="sql" skip="true"}Get expert help{/ts}',    'Get expert help',    NULL, 'AND', @adminHelplastID, '1', NULL, 4 ),
+    ( @domainID, 'http://civicrm.org/about?src=iam', 		  '{ts escape="sql" skip="true"}About CiviCRM{/ts}',      'About CiviCRM',      NULL, 'AND', @adminHelplastID, '1', 1, 5 ),
+    ( @domainID, 'http://civicrm.org/register-your-site?src=iam', '{ts escape="sql" skip="true"}Register your site{/ts}', 'Register your site', NULL, 'AND', @adminHelplastID, '1', NULL, 6 ),    
+    ( @domainID, 'http://civicrm.org/become-member?src=iam',      '{ts escape="sql" skip="true"}Join CiviCRM{/ts}',       'Join CiviCRM',       NULL, 'AND', @adminHelplastID, '1', NULL, 7 );
 
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Developer{/ts}', 'Developer', 'administer CiviCRM', '', @adminHelplastID, '1', NULL, 5 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Developer{/ts}', 'Developer', 'administer CiviCRM', '', @adminHelplastID, '1', 1, 8 );
 
 SET @devellastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
 ( @domainID, 'civicrm/api', '{ts escape="sql" skip="true"}API Explorer{/ts}','API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1 ),
-( @domainID, 'http://wiki.civicrm.org/confluence/display/CRMDOC/Develop', '{ts escape="sql" skip="true"}Developer Docs{/ts}', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
+( @domainID, 'http://civicrm.org/developer-documentation?src=iam', '{ts escape="sql" skip="true"}Developer Docs{/ts}', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -690,7 +635,7 @@ VALUES
 INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
-    ( @domainID, '{ts escape="sql" skip="true"}Activities{/ts}', 'activity', '{ts escape="sql" skip="true"}Provides a list of constituent activity including activity statistics for one/all contacts during a given date range(required){/ts}', 'administer CiviCRM', '{literal}a:26:{s:6:"fields";a:6:{s:16:"contact_assignee";s:1:"1";s:14:"contact_target";s:1:"1";s:16:"activity_type_id";s:1:"1";s:16:"activity_subject";s:1:"1";s:18:"activity_date_time";s:1:"1";s:9:"status_id";s:1:"1";}s:17:"contact_source_op";s:3:"has";s:20:"contact_source_value";s:0:"";s:19:"contact_assignee_op";s:3:"has";s:22:"contact_assignee_value";s:0:"";s:17:"contact_target_op";s:3:"has";s:20:"contact_target_value";s:0:"";s:15:"current_user_op";s:2:"eq";s:18:"current_user_value";s:1:"0";s:27:"activity_date_time_relative";s:10:"this.month";s:23:"activity_date_time_from";s:0:"";s:21:"activity_date_time_to";s:0:"";s:19:"activity_subject_op";s:3:"has";s:22:"activity_subject_value";s:0:"";s:19:"activity_type_id_op";s:2:"in";s:22:"activity_type_id_value";a:0:{}s:12:"status_id_op";s:2:"in";s:15:"status_id_value";a:0:{}s:11:"description";s:126:"Provides a list of constituent activity including activity statistics for one/all contacts during a given date range(required)";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:18:"administer CiviCRM";s:6:"groups";s:0:"";s:9:"group_bys";N;s:9:"domain_id";i:1;}{/literal}');
+    ( @domainID, '{ts escape="sql" skip="true"}Activity Details{/ts}', 'activity', '{ts escape="sql" skip="true"}Provides a list of constituent activity including activity statistics for one/all contacts during a given date range(required){/ts}', 'administer CiviCRM', '{literal}a:26:{s:6:"fields";a:6:{s:16:"contact_assignee";s:1:"1";s:14:"contact_target";s:1:"1";s:16:"activity_type_id";s:1:"1";s:16:"activity_subject";s:1:"1";s:18:"activity_date_time";s:1:"1";s:9:"status_id";s:1:"1";}s:17:"contact_source_op";s:3:"has";s:20:"contact_source_value";s:0:"";s:19:"contact_assignee_op";s:3:"has";s:22:"contact_assignee_value";s:0:"";s:17:"contact_target_op";s:3:"has";s:20:"contact_target_value";s:0:"";s:15:"current_user_op";s:2:"eq";s:18:"current_user_value";s:1:"0";s:27:"activity_date_time_relative";s:10:"this.month";s:23:"activity_date_time_from";s:0:"";s:21:"activity_date_time_to";s:0:"";s:19:"activity_subject_op";s:3:"has";s:22:"activity_subject_value";s:0:"";s:19:"activity_type_id_op";s:2:"in";s:22:"activity_type_id_value";a:0:{}s:12:"status_id_op";s:2:"in";s:15:"status_id_value";a:0:{}s:11:"description";s:126:"Provides a list of constituent activity including activity statistics for one/all contacts during a given date range(required)";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:18:"administer CiviCRM";s:6:"groups";s:0:"";s:9:"group_bys";N;s:9:"domain_id";i:1;}{/literal}');
 
 INSERT INTO `civicrm_report_instance`
     (`domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
@@ -701,6 +646,11 @@ INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
     ( @domainID, '{ts escape="sql" skip="true"}Relationships{/ts}', 'contact/relationship', '{ts escape="sql" skip="true"}Gives relationship details between two contacts{/ts}', 'administer CiviCRM', '{literal}a:28:{s:6:"fields";a:4:{s:11:"sort_name_a";s:1:"1";s:11:"sort_name_b";s:1:"1";s:9:"label_a_b";s:1:"1";s:9:"label_b_a";s:1:"1";}s:14:"sort_name_a_op";s:3:"has";s:17:"sort_name_a_value";s:0:"";s:14:"sort_name_b_op";s:3:"has";s:17:"sort_name_b_value";s:0:"";s:17:"contact_type_a_op";s:2:"in";s:20:"contact_type_a_value";a:0:{}s:17:"contact_type_b_op";s:2:"in";s:20:"contact_type_b_value";a:0:{}s:12:"is_active_op";s:2:"eq";s:15:"is_active_value";s:0:"";s:23:"relationship_type_id_op";s:2:"eq";s:26:"relationship_type_id_value";s:0:"";s:13:"country_id_op";s:2:"in";s:16:"country_id_value";a:0:{}s:20:"state_province_id_op";s:2:"in";s:23:"state_province_id_value";a:0:{}s:6:"gid_op";s:2:"in";s:9:"gid_value";a:0:{}s:8:"tagid_op";s:2:"in";s:11:"tagid_value";a:0:{}s:11:"description";s:19:"Relationship Report";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:18:"administer CiviCRM";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}{/literal}');
+
+INSERT INTO `civicrm_report_instance`
+    ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
+VALUES
+    ( @domainID, '{ts escape="sql" skip="true"}Activity Summary{/ts}', 'activitySummary', '{ts escape="sql" skip="true"}Shows activity statistics by type / date{/ts}', 'administer CiviCRM', '{literal}a:26:{s:6:"fields";a:4:{s:16:"activity_type_id";s:1:"1";s:9:"status_id";s:1:"1";s:8:"duration";s:1:"1";s:2:"id";s:1:"1";}s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:27:"activity_date_time_relative";s:0:"";s:23:"activity_date_time_from";s:0:"";s:21:"activity_date_time_to";s:0:"";s:19:"activity_type_id_op";s:2:"in";s:22:"activity_type_id_value";a:0:{}s:12:"status_id_op";s:2:"in";s:15:"status_id_value";a:0:{}s:14:"priority_id_op";s:2:"in";s:17:"priority_id_value";a:0:{}s:6:"gid_op";s:2:"in";s:9:"gid_value";a:0:{}s:9:"group_bys";a:2:{s:16:"activity_type_id";s:1:"1";s:9:"status_id";s:1:"1";}s:14:"group_bys_freq";a:1:{s:18:"activity_date_time";s:5:"MONTH";}s:9:"order_bys";a:1:{i:1;a:2:{s:6:"column";s:16:"activity_type_id";s:5:"order";s:3:"ASC";}}s:11:"description";s:40:"Shows activity statistics by type / date";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:9:"row_count";s:0:"";s:10:"permission";s:18:"administer CiviCRM";s:9:"parent_id";s:0:"";s:6:"groups";s:0:"";s:11:"instance_id";N;}{/literal}');
 
 -- Contribution reports
 INSERT INTO `civicrm_report_instance`
@@ -746,7 +696,7 @@ VALUES
 INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
-    ( @domainID, '{ts escape="sql" skip="true"}Soft Credits{/ts}', 'contribute/softcredit', '{ts escape="sql" skip="true"}Shows contributions made by contacts that have been soft-credited to other contacts.{/ts}', 'access CiviContribute', '{literal}a:23:{s:6:"fields";a:5:{s:21:"display_name_creditor";s:1:"1";s:24:"display_name_constituent";s:1:"1";s:14:"email_creditor";s:1:"1";s:14:"phone_creditor";s:1:"1";s:12:"total_amount";s:1:"1";}s:5:"id_op";s:2:"in";s:8:"id_value";a:0:{}s:21:"receive_date_relative";s:1:"0";s:17:"receive_date_from";s:0:"";s:15:"receive_date_to";s:0:"";s:25:"contribution_status_id_op";s:2:"in";s:28:"contribution_status_id_value";a:1:{i:0;s:1:"1";}s:16:"total_amount_min";s:0:"";s:16:"total_amount_max";s:0:"";s:15:"total_amount_op";s:3:"lte";s:18:"total_amount_value";s:0:"";s:6:"gid_op";s:2:"in";s:9:"gid_value";a:0:{}s:8:"tagid_op";s:2:"in";s:11:"tagid_value";a:0:{}s:11:"description";s:20:"Soft Credit details.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:21:"access CiviContribute";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}{/literal}');
+    ( @domainID, '{ts escape="sql" skip="true"}Soft Credits{/ts}', 'contribute/softcredit', '{ts escape="sql" skip="true"}Shows contributions made by contacts that have been soft-credited to other contacts.{/ts}', 'access CiviContribute', '{literal}a:23:{s:6:"fields";a:5:{s:21:"display_name_creditor";s:1:"1";s:24:"display_name_constituent";s:1:"1";s:14:"email_creditor";s:1:"1";s:14:"phone_creditor";s:1:"1";s:6:"amount";s:1:"1";}s:5:"id_op";s:2:"in";s:8:"id_value";a:0:{}s:21:"receive_date_relative";s:1:"0";s:17:"receive_date_from";s:0:"";s:15:"receive_date_to";s:0:"";s:25:"contribution_status_id_op";s:2:"in";s:28:"contribution_status_id_value";a:1:{i:0;s:1:"1";}s:10:"amount_min";s:0:"";s:10:"amount_max";s:0:"";s:9:"amount_op";s:3:"lte";s:12:"amount_value";s:0:"";s:6:"gid_op";s:2:"in";s:9:"gid_value";a:0:{}s:8:"tagid_op";s:2:"in";s:11:"tagid_value";a:0:{}s:11:"description";s:20:"Soft Credit details.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:21:"access CiviContribute";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}{/literal}');
 
 INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
@@ -840,7 +790,7 @@ VALUES
 INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
-    ( @domainID, '{ts escape="sql" skip="true"}Mailing Summary{/ts}', 'Mailing/summary','{ts escape="sql" skip="true"}Summary statistics for mailings{/ts}', 'access CiviMail','{literal}a:25:{s:6:"fields";a:5:{s:4:"name";s:1:"1";s:11:"queue_count";s:1:"1";s:15:"delivered_count";s:1:"1";s:12:"bounce_count";s:1:"1";s:10:"open_count";s:1:"1";}s:15:"is_completed_op";s:2:"eq";s:18:"is_completed_value";s:1:"1";s:15:"mailing_name_op";s:2:"in";s:18:"mailing_name_value";a:0:{}s:9:"status_op";s:3:"has";s:12:"status_value";s:8:"Complete";s:11:"is_test_min";s:0:"";s:11:"is_test_max";s:0:"";s:10:"is_test_op";s:3:"lte";s:13:"is_test_value";s:1:"0";s:19:"start_date_relative";s:9:"this.year";s:15:"start_date_from";s:0:"";s:13:"start_date_to";s:0:"";s:17:"end_date_relative";s:9:"this.year";s:13:"end_date_from";s:0:"";s:11:"end_date_to";s:0:"";s:11:"description";s:31:"Summary statistics for mailings";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:15:"access CiviMail";s:6:"groups";s:0:"";s:6:"charts";s:0:"";s:9:"domain_id";i:1;}{/literal}');
+    ( @domainID, '{ts escape="sql" skip="true"}Mailing Summary{/ts}', 'Mailing/summary','{ts escape="sql" skip="true"}Summary statistics for mailings{/ts}', 'access CiviMail','{literal}a:25:{s:6:"fields";a:5:{s:4:"name";s:1:"1";s:11:"queue_count";s:1:"1";s:15:"delivered_count";s:1:"1";s:12:"bounce_count";s:1:"1";s:17:"unique_open_count";s:1:"1";}s:15:"is_completed_op";s:2:"eq";s:18:"is_completed_value";s:1:"1";s:15:"mailing_name_op";s:2:"in";s:18:"mailing_name_value";a:0:{}s:9:"status_op";s:3:"has";s:12:"status_value";s:8:"Complete";s:11:"is_test_min";s:0:"";s:11:"is_test_max";s:0:"";s:10:"is_test_op";s:3:"lte";s:13:"is_test_value";s:1:"0";s:19:"start_date_relative";s:9:"this.year";s:15:"start_date_from";s:0:"";s:13:"start_date_to";s:0:"";s:17:"end_date_relative";s:9:"this.year";s:13:"end_date_from";s:0:"";s:11:"end_date_to";s:0:"";s:11:"description";s:31:"Summary statistics for mailings";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:15:"access CiviMail";s:6:"groups";s:0:"";s:6:"charts";s:0:"";s:9:"domain_id";i:1;}{/literal}');
 
 INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)

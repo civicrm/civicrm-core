@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -172,7 +172,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $mailing_obj->find(TRUE);
 
     $config = CRM_Core_Config::singleton();
-    $mailer = $config->getMailer();
+    $mailer = \Civi::service('pear_mail');
 
     $recipient = NULL;
     $attachments = NULL;

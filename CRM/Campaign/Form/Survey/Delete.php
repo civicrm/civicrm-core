@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class is to build the form for deleting a Survey
+ * This class is to build the form for deleting a Survey.
  */
 class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
 
@@ -55,8 +53,6 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
@@ -73,8 +69,6 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -93,8 +87,6 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
 
   /**
    * Process the form when submitted.
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_surveyId) {

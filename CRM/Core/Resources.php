@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -99,6 +99,11 @@ class CRM_Core_Resources {
   public $ajaxPopupsEnabled;
 
   /**
+   * @var \Civi\Core\Paths
+   */
+  protected $paths;
+
+  /**
    * Get or set the single instance of CRM_Core_Resources.
    *
    * @param CRM_Core_Resources $instance
@@ -111,10 +116,7 @@ class CRM_Core_Resources {
     }
     if (self::$_singleton === NULL) {
       $sys = CRM_Extension_System::singleton();
-      $cache = new CRM_Utils_Cache_SqlGroup(array(
-                 'group' => 'js-strings',
-                 'prefetch' => FALSE,
-               ));
+      $cache = Civi::cache('js_strings');
       self::$_singleton = new CRM_Core_Resources(
         $sys->getMapper(),
         $cache,
@@ -143,9 +145,8 @@ class CRM_Core_Resources {
     if (!$this->cacheCode) {
       $this->resetCacheCode();
     }
-    $this->ajaxPopupsEnabled = (bool) CRM_Core_BAO_Setting::getItem(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE
-    );
+    $this->ajaxPopupsEnabled = (bool) Civi::settings()->get('ajaxPopupsEnabled');
+    $this->paths = Civi::paths();
   }
 
   /**
@@ -470,10 +471,13 @@ class CRM_Core_Resources {
    */
   public function getPath($ext, $file = NULL) {
     // TODO consider caching results
+    $base = $this->paths->hasVariable($ext)
+      ? rtrim($this->paths->getVariable($ext, 'path'), '/')
+      : $this->extMapper->keyToBasePath($ext);
     if ($file === NULL) {
-      return $this->extMapper->keyToBasePath($ext);
+      return $base;
     }
-    $path = $this->extMapper->keyToBasePath($ext) . '/' . $file;
+    $path = $base . '/' . $file;
     if (is_file($path)) {
       return $path;
     }
@@ -499,7 +503,10 @@ class CRM_Core_Resources {
       $file .= '?r=' . $this->getCacheCode();
     }
     // TODO consider caching results
-    return $this->extMapper->keyToUrl($ext) . '/' . $file;
+    $base = $this->paths->hasVariable($ext)
+      ? $this->paths->getVariable($ext, 'url')
+      : ($this->extMapper->keyToUrl($ext) . '/');
+    return $base . $file;
   }
 
   /**
@@ -582,7 +589,7 @@ class CRM_Core_Resources {
 
       // Add resources from coreResourceList
       $jsWeight = -9999;
-      foreach ($this->coreResourceList() as $item) {
+      foreach ($this->coreResourceList($region) as $item) {
         if (is_array($item)) {
           $this->addSetting($item);
         }
@@ -685,9 +692,10 @@ class CRM_Core_Resources {
    *
    * Note: non-compressed versions of .min files will be used in debug mode
    *
+   * @param string $region
    * @return array
    */
-  public function coreResourceList() {
+  public function coreResourceList($region) {
     $config = CRM_Core_Config::singleton();
 
     // Scripts needed by everyone, everywhere
@@ -756,8 +764,8 @@ class CRM_Core_Resources {
       }
     }
 
-    // CMS-specific resources
-    $config->userSystem->appendCoreResources($items);
+    // Allow hooks to modify this list
+    CRM_Utils_Hook::coreResourceList($items, $region);
 
     return $items;
   }

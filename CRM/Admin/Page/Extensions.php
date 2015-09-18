@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -48,8 +46,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
    * Obtains the group name from url and sets the title.
-   *
-   * @return void
    */
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
@@ -117,8 +113,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -127,9 +121,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
    * Browse all options.
-   *
-   *
-   * @return void
    */
   public function browse() {
     $mapper = CRM_Extension_System::singleton()->getMapper();

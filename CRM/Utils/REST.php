@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
@@ -145,11 +145,11 @@ class CRM_Utils_REST {
     }
 
     if (!empty($requestParams['json'])) {
-      header('Content-Type: application/json');
       if (!empty($requestParams['prettyprint'])) {
-        // Used by the api explorer
+        // Don't set content-type header for api explorer output
         return self::jsonFormated(array_merge($result));
       }
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
       return json_encode(array_merge($result));
     }
 
@@ -309,7 +309,7 @@ class CRM_Utils_REST {
       }
     }
     else {
-      // or the new format (entity+action)
+      // or the api format (entity+action)
       $args = array();
       $args[0] = 'civicrm';
       $args[1] = CRM_Utils_array::value('entity', $requestParams);
@@ -329,10 +329,7 @@ class CRM_Utils_REST {
     }
 
     // At this point we know we are not calling ping which does not require authentication.
-    //  Therefore, at this point we need to make sure we're working with a trusted user.
-    //  Valid users are those who provide a valid server key and API key
-
-    $valid_user = FALSE;
+    // Therefore we now need a valid server key and API key
 
     // Check and see if a valid secret API key is provided.
     $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
@@ -454,7 +451,7 @@ class CRM_Utils_REST {
    * @param $pearError
    */
   public static function fatal($pearError) {
-    header('Content-Type: text/xml');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'text/xml');
     $error = array();
     $error['code'] = $pearError->getCode();
     $error['error_message'] = $pearError->getMessage();
@@ -487,7 +484,7 @@ class CRM_Utils_REST {
     $smarty = CRM_Core_Smarty::singleton();
     CRM_Utils_System::setTitle("$entity::$tplfile inline $tpl");
     if (!$smarty->template_exists($tpl)) {
-      header("Status: 404 Not Found");
+      CRM_Utils_System::setHttpHeader("Status", "404 Not Found");
       die ("Can't find the requested template file templates/$tpl");
     }
     if (array_key_exists('id', $_GET)) {// special treatmenent, because it's often used
@@ -535,7 +532,7 @@ class CRM_Utils_REST {
     $requestParams = CRM_Utils_Request::exportValues();
 
     require_once 'api/v3/utils.php';
-    // Why is $config undefined -- $config = CRM_Core_Config::singleton();
+    $config = CRM_Core_Config::singleton();
     if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
         $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
       )

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates view mode for CiviCase
- *
+ * This class generates view mode for CiviCase.
  */
 class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
@@ -46,8 +43,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_showRelatedCases = CRM_Utils_Array::value('relatedCases', $_GET);
@@ -194,11 +189,9 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * @return array;
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -207,8 +200,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //this call is for show related cases.
@@ -444,8 +435,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,17 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * Base Search / View form for *all* listing of multiple
- * contacts
+ * Base Search / View form for *all* listing of multiple contacts.
  */
 class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
@@ -52,9 +45,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // text for sort_name or email criteria
@@ -139,9 +129,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Search_Basic', 'formRule'));
@@ -149,8 +136,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Basic');
@@ -167,8 +152,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
 
   /**
    * This method is called for processing a submitted search form.
-   *
-   * @return void
    */
   public function postProcess() {
     $this->set('isAdvanced', '0');
@@ -182,7 +165,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     }
 
     if (isset($this->_groupID) && empty($this->_formValues['group'])) {
-      $this->_formValues['group'][$this->_groupID] = 1;
+      $this->_formValues['group'] = $this->_groupID;
     }
     elseif (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
@@ -216,31 +199,16 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
   }
 
   /**
-   * Normalize the form values to make it look similar to the advanced form values
-   * this prevents a ton of work downstream and allows us to use the same code for
-   * multiple purposes (queries, save/edit etc)
+   * Normalize the form values to make it look similar to the advanced form values.
    *
-   * @return void
+   * This prevents a ton of work downstream and allows us to use the same code for
+   * multiple purposes (queries, save/edit etc)
    */
   public function normalizeFormValues() {
     $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);
     if ($contactType && !is_array($contactType)) {
       unset($this->_formValues['contact_type']);
       $this->_formValues['contact_type'][$contactType] = 1;
-    }
-
-    $config = CRM_Core_Config::singleton();
-
-    $group = CRM_Utils_Array::value('group', $this->_formValues);
-    if ($group && !is_array($group)) {
-      unset($this->_formValues['group']);
-      $this->_formValues['group'][$group] = 1;
-    }
-
-    $tag = CRM_Utils_Array::value('tag', $this->_formValues);
-    if ($tag && !is_array($tag)) {
-      unset($this->_formValues['tag']);
-      $this->_formValues['tag'][$tag] = 1;
     }
 
     return NULL;

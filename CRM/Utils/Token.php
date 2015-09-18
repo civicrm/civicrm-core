@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 
 /**
- * Class to abstract token replacement
+ * Class to abstract token replacement.
  */
 class CRM_Utils_Token {
   static $_requiredTokens = NULL;
@@ -486,15 +484,11 @@ class CRM_Utils_Token {
         break;
 
       case 'editUrl':
+      case 'scheduleUrl':
+        // Note: editUrl and scheduleUrl used to be different, but now there's
+        // one screen which can adapt based on permissions (in workflow mode).
         $value = CRM_Utils_System::url('civicrm/mailing/send',
           "reset=1&mid={$mailing->id}&continue=true",
-          TRUE, NULL, FALSE, TRUE
-        );
-        break;
-
-      case 'scheduleUrl':
-        $value = CRM_Utils_System::url('civicrm/mailing/schedule',
-          "reset=1&mid={$mailing->id}",
           TRUE, NULL, FALSE, TRUE
         );
         break;
@@ -870,8 +864,6 @@ class CRM_Utils_Token {
    *  this routine will remove the extra backslashes and braces
    *
    * @param $str ref to the string that will be scanned and modified
-   * @return void
-   *   this function works directly on the string that is passed
    */
   public static function unescapeTokens(&$str) {
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
@@ -1452,7 +1444,7 @@ class CRM_Utils_Token {
           $greetingDetails,
           TRUE,
           $greetingTokens,
-          FALSE,
+          TRUE,
           $escapeSmarty
         );
       }
@@ -1460,10 +1452,10 @@ class CRM_Utils_Token {
       // check if there are still any unevaluated tokens
       $remainingTokens = self::getTokens($tokenString);
 
-      // contact related $greetingTokens not empty, there are customized or hook tokens to replace
-      if (!empty($remainingTokens['contact'])) {
+      // $greetingTokens not empty, there are customized or hook tokens to replace
+      if (!empty($remainingTokens)) {
         // Fill the return properties array
-        $greetingTokens = $remainingTokens['contact'];
+        $greetingTokens = $remainingTokens;
         reset($greetingTokens);
         $greetingsReturnProperties = array();
         while (list($key) = each($greetingTokens)) {

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -88,19 +88,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var bool
    */
   protected $_separateMembershipPayment;
-  /**
-   * The default values for the form
-   *
-   * @var array
-   */
-  protected $_defaults;
 
   /**
    * The params submitted by the form and computed by the app
    *
    * @var array
    */
-  public $_params;
+  public $_params = array();
 
   /**
    * The fields involved in this contribution page
@@ -177,13 +171,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_action;
 
   /**
-   * Is honor block is enabled for this contribution?
-   *
-   * @var boolean
-   */
-  public $_honor_block_is_active = FALSE;
-
-  /**
    * Contribution mode e.g express for payment express, notify for off-site + notification back to CiviCRM
    * @var string
    */
@@ -216,17 +203,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = CRM_Core_Session::singleton()->get('userID');
 
-    //Check if honor block is enabled for current contribution
-    $ufJoinParams = array(
-      'module' => 'soft_credit',
-      'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $this->_id,
-    );
-    $ufJoin = new CRM_Core_DAO_UFJoin();
-    $ufJoin->copyValues($ufJoinParams);
-    $ufJoin->find(TRUE);
-    $this->_honor_block_is_active = $ufJoin->is_active;
-
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
     if ($this->_contactID) {
@@ -239,11 +215,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->_defaultMemTypeId = $membership->membership_type_id;
           if ($membership->contact_id != $this->_contactID) {
             $validMembership = FALSE;
-            $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($this->_userID);
-            if (!empty($employers) && array_key_exists($membership->contact_id, $employers)) {
+            $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, NULL, NULL, 'Organization');
+            if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
               $this->_membershipContactID = $membership->contact_id;
               $this->assign('membershipContactID', $this->_membershipContactID);
-              $this->assign('membershipContactName', $employers[$this->_membershipContactID]['name']);
+              $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
               $validMembership = TRUE;
             }
             else {
@@ -341,11 +317,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_membershipBlock = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
       $this->set('membershipBlock', $this->_membershipBlock);
 
-      if ($this->_values['custom_pre_id']) {
+      if (!empty($this->_values['custom_pre_id'])) {
         $preProfileType = CRM_Core_BAO_UFField::getProfileType($this->_values['custom_pre_id']);
       }
 
-      if ($this->_values['custom_post_id']) {
+      if (!empty($this->_values['custom_post_id'])) {
         $postProfileType = CRM_Core_BAO_UFField::getProfileType($this->_values['custom_post_id']);
       }
 
@@ -556,7 +532,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::format($addressFields));
 
-    if (!empty($this->_params['hidden_onbehalf_profile'])) {
+    if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf'])) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
       $locTypeId = array_keys($this->_params['onbehalf_location']['email']);
       $this->assign('onBehalfEmail', $this->_params['onbehalf_location']['email'][$locTypeId[0]]['email']);
@@ -648,7 +624,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($fields) {
         // unset any email-* fields since we already collect it, CRM-2888
         foreach (array_keys($fields) as $fieldName) {
-          if (substr($fieldName, 0, 6) == 'email-' && $profileContactType != 'honor') {
+          if (substr($fieldName, 0, 6) == 'email-' && !in_array($profileContactType, array('honor', 'onbehalf'))) {
             unset($fields[$fieldName]);
           }
         }
@@ -673,17 +649,19 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
           if ($profileContactType) {
             //Since we are showing honoree name separately so we are removing it from honoree profile just for display
-            $honoreeNamefields = array(
-              'prefix_id',
-              'first_name',
-              'last_name',
-              'suffix_id',
-              'organization_name',
-              'household_name',
-            );
-            if ($profileContactType == 'honor' && in_array($field['name'], $honoreeNamefields)) {
-              unset($fields[$field['name']]);
-              continue;
+            if ($profileContactType == 'honor') {
+              $honoreeNamefields = array(
+                'prefix_id',
+                'first_name',
+                'last_name',
+                'suffix_id',
+                'organization_name',
+                'household_name',
+              );
+              if (in_array($field['name'], $honoreeNamefields)) {
+                unset($fields[$field['name']]);
+                continue;
+              }
             }
             if (!empty($fieldTypes) && in_array($field['field_type'], $fieldTypes)) {
               CRM_Core_BAO_UFGroup::buildProfile(
@@ -725,6 +703,188 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
     }
+  }
+
+  /**
+   * Add onbehalf/honoree profile fields and native module fields.
+   *
+   * @param int $id
+   * @param CRM_Core_Form $form
+   */
+  public function buildComponentForm($id, $form) {
+    if (empty($id)) {
+      return;
+    }
+
+    $contactID = $this->getContactID();
+
+    foreach (array('soft_credit', 'on_behalf') as $module) {
+      if ($module == 'soft_credit') {
+        if (empty($form->_values['honoree_profile_id'])) {
+          continue;
+        }
+
+        if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $form->_values['honoree_profile_id'], 'is_active')) {
+          CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of honoree and the selected honoree profile is either disabled or not found.'));
+        }
+
+        $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']);
+        $requiredProfileFields = array(
+          'Individual' => array('first_name', 'last_name'),
+          'Organization' => array('organization_name', 'email'),
+          'Household' => array('household_name', 'email'),
+        );
+        $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($form->_values['honoree_profile_id'], $requiredProfileFields[$profileContactType]);
+        if (!$validProfile) {
+          CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of honoree and the required fields of the selected honoree profile are disabled or doesn\'t exist.'));
+        }
+
+        foreach (array('honor_block_title', 'honor_block_text') as $name) {
+          $form->assign($name, $form->_values[$name]);
+        }
+
+        $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+
+        // radio button for Honor Type
+        foreach ($form->_values['soft_credit_types'] as $value) {
+          $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value);
+        }
+        $form->addGroup($honorTypes, 'soft_credit_type_id', NULL)->setAttribute('allowClear', TRUE);
+
+        $honoreeProfileFields = CRM_Core_BAO_UFGroup::getFields(
+          $this->_values['honoree_profile_id'], FALSE,
+          NULL, NULL,
+          NULL, FALSE,
+          NULL, TRUE,
+          NULL, CRM_Core_Permission::CREATE
+        );
+        $form->assign('honoreeProfileFields', $honoreeProfileFields);
+
+        // add the form elements
+        foreach ($honoreeProfileFields as $name => $field) {
+          // If soft credit type is not chosen then make omit requiredness from honoree profile fields
+          if (count($form->_submitValues) &&
+            empty($form->_submitValues['soft_credit_type_id']) &&
+            !empty($field['is_required'])
+          ) {
+            $field['is_required'] = FALSE;
+          }
+          CRM_Core_BAO_UFGroup::buildProfile($form, $field, CRM_Profile_Form::MODE_CREATE, NULL, FALSE, FALSE, NULL, 'honor');
+        }
+      }
+      else {
+        if (empty($form->_values['onbehalf_profile_id'])) {
+          continue;
+        }
+
+        if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $form->_values['onbehalf_profile_id'], 'is_active')) {
+          CRM_Core_Error::fatal(ts('This contribution page has been configured for contribution on behalf of an organization and the selected onbehalf profile is either disabled or not found.'));
+        }
+
+        $member = CRM_Member_BAO_Membership::getMembershipBlock($form->_id);
+        if (empty($member['is_active'])) {
+          $msg = ts('Mixed profile not allowed for on behalf of registration/sign up.');
+          $onBehalfProfile = CRM_Core_BAO_UFGroup::profileGroups($form->_values['onbehalf_profile_id']);
+          foreach (array(
+              'Individual',
+              'Organization',
+              'Household',
+            ) as $contactType) {
+            if (in_array($contactType, $onBehalfProfile) &&
+              (in_array('Membership', $onBehalfProfile) ||
+                in_array('Contribution', $onBehalfProfile)
+              )
+            ) {
+              CRM_Core_Error::fatal($msg);
+            }
+          }
+        }
+
+        if ($contactID) {
+          // retrieve all permissioned organizations of contact $contactID
+          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($contactID, NULL, NULL, 'Organization');
+
+          if (count($organizations)) {
+            // Related org url - pass checksum if needed
+            $args = array(
+              'ufId' => $form->_values['onbehalf_profile_id'],
+              'cid' => '',
+            );
+            if (!empty($_GET['cs'])) {
+              $args = array(
+                'ufId' => $form->_values['onbehalf_profile_id'],
+                'uid' => $this->_contactID,
+                'cs' => $_GET['cs'],
+                'cid' => '',
+              );
+            }
+            $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', $args, FALSE, NULL, FALSE);
+            $form->assign('locDataURL', $locDataURL);
+          }
+          if (count($organizations) > 0) {
+            $form->add('select', 'onbehalfof_id', '', CRM_Utils_Array::collect('name', $organizations));
+
+            $orgOptions = array(
+              0 => ts('Select an existing organization'),
+              1 => ts('Enter a new organization'),
+            );
+            $form->addRadio('org_option', ts('options'), $orgOptions);
+            $form->setDefaults(array('org_option' => 0));
+          }
+        }
+
+        $form->assign('fieldSetTitle', ts('Organization Details'));
+
+        if (CRM_Utils_Array::value('is_for_organization', $form->_values)) {
+          if ($form->_values['is_for_organization'] == 2) {
+            $form->assign('onBehalfRequired', TRUE);
+          }
+          else {
+            $form->addElement('checkbox', 'is_for_organization',
+              $form->_values['for_organization'],
+              NULL
+            );
+          }
+        }
+
+        $profileFields = CRM_Core_BAO_UFGroup::getFields(
+          $form->_values['onbehalf_profile_id'],
+          FALSE, CRM_Core_Action::VIEW, NULL,
+          NULL, FALSE, NULL, FALSE, NULL,
+          CRM_Core_Permission::CREATE, NULL
+        );
+
+        $form->assign('onBehalfOfFields', $profileFields);
+        if (!empty($form->_submitValues['onbehalf'])) {
+          if (!empty($form->_submitValues['onbehalfof_id'])) {
+            $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
+          }
+          $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf']));
+        }
+
+        $fieldTypes = array('Contact', 'Organization');
+        $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
+        $fieldTypes = array_merge($fieldTypes, $contactSubType);
+
+        foreach ($profileFields as $name => $field) {
+          if (in_array($field['field_type'], $fieldTypes)) {
+            list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
+            if (in_array($prefixName, array('organization_name', 'email')) && empty($field['is_required'])) {
+              $field['is_required'] = 1;
+            }
+            if (count($form->_submitValues) &&
+              empty($form->_submitValues['is_for_organization']) &&
+              $form->_values['is_for_organization'] == 1 &&
+              !empty($field['is_required'])
+            ) {
+              $field['is_required'] = FALSE;
+            }
+            CRM_Core_BAO_UFGroup::buildProfile($form, $field, NULL, NULL, FALSE, 'onbehalf', NULL, 'onbehalf');
+          }
+        }
+      }
+    }
+
   }
 
   /**
@@ -932,7 +1092,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
           elseif ($memType['is_active']) {
             $javascriptMethod = NULL;
-            $allowAutoRenewOpt = 1;
+            $allowAutoRenewOpt = (int) $memType['auto_renew'];
             if (is_array($this->_paymentProcessors)) {
               foreach ($this->_paymentProcessors as $id => $val) {
                 if (!$val['is_recur']) {
@@ -1034,6 +1194,50 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     return $separateMembershipPayment;
+  }
+
+  /**
+   * Determine if recurring parameters need to be added to the form parameters.
+   *  - is_recur
+   *  - frequency_interval
+   *  - frequency_unit
+   *
+   * For membership this is based on the membership type.
+   *
+   * This needs to be done before processing the pre-approval redirect where relevant on the main page or before any payment processing.
+   *
+   * Arguably the form should start to build $this->_params in the pre-process main page & use that array consistently throughout.
+   */
+  protected function setRecurringMembershipParams() {
+    if (!empty($this->_params['priceSetId']) && !empty($this->_params['selectMembership'])) {
+      // @todo the price_x fields will ALWAYS allow us to determine the membership - so we should ignore
+      // 'selectMembership' and calculate from the price_x fields so we have one method that always works
+      // this is lazy & only catches when selectMembership is set, but the worst of all worlds would be to fix
+      // this with an else (calculate for price set).
+      $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->_params['priceSetId']);
+      if (in_array($this->_params['selectMembership'], $membershipTypes['autorenew'])) {
+        $this->_params['auto_renew'] = TRUE;
+      }
+    }
+    if ((!empty($this->_params['selectMembership']) || !empty($this->_params['priceSetId'])) && !empty($this->_paymentProcessor['is_recur']) &&
+      CRM_Utils_Array::value('auto_renew', $this->_params) && empty($this->_params['is_recur']) && empty($this->_params['frequency_interval'])
+    ) {
+
+      $this->_params['is_recur'] = $this->_values['is_recur'] = 1;
+      // check if price set is not quick config
+      if (!empty($this->_params['priceSetId']) && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_params['priceSetId'], 'is_quick_config')) {
+        list($this->_params['frequency_interval'], $this->_params['frequency_unit']) = CRM_Price_BAO_PriceSet::getRecurDetails($this->_params['priceSetId']);
+      }
+      else {
+        // FIXME: set interval and unit based on selected membership type
+        $this->_params['frequency_interval'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
+          $this->_params['selectMembership'], 'duration_interval'
+        );
+        $this->_params['frequency_unit'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
+          $this->_params['selectMembership'], 'duration_unit'
+        );
+      }
+    }
   }
 
 }

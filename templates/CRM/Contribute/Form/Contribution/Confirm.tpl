@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -54,7 +54,7 @@
 
     {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="confirmContribution"}
 
-    {if $amount GT 0 OR $minimum_fee GT 0 OR ( $priceSetID and $lineItem ) }
+    {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
     <div class="crm-group amount_display-group">
        {if !$useForMember}
         <div class="header-dark">
@@ -82,8 +82,8 @@
                 {if $totalTaxAmount }
                      {ts}Total Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
                 {/if}
-                {if $amount }
-                    {ts}Total Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
+		{if $amount}
+                    {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if} : <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
                 {else}
                     {$membership_name} {ts}Membership{/ts}: <strong>{$minimum_fee|crmMoney}</strong>
                 {/if}
@@ -133,7 +133,14 @@
     </div>
     {/if}
 
-    {if $honor_block_is_active}
+
+    {if $onbehalfProfile|@count}
+      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
+         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+      </div>
+    {/if}
+
+    {if $honoreeProfileFields|@count}
         <div class="crm-group honor_block-group">
             <div class="header-dark">
                 {$soft_credit_type}
@@ -141,7 +148,7 @@
             <div class="display-block">
                 <div class="label-left crm-section honoree_profile-section">
                     <strong>{$honorName}</strong></br>
-                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
+                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
                 </div>
             </div>
          </div>
@@ -177,17 +184,6 @@
             <br />
         </div>
     </div>
-    {/if}
-
-    {if $onbehalfProfile}
-      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
-         <div class="crm-section organization_email-section">
-            <div class="label">{ts}Organization Email{/ts}</div>
-            <div class="content">{$onBehalfEmail}</div>
-            <div class="clear"></div>
-         </div>
-      </div>
     {/if}
 
     {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
@@ -290,7 +286,7 @@
                 <td class="description">{ts}Click the Google Checkout button to continue.{/ts}</td>
             </tr>
             <tr>
-                <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span></td>
+                <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</span></td>
             </tr>
         </table>
         </fieldset>

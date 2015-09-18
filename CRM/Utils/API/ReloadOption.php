@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -80,6 +80,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
       if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
         $reloadMode = $apiRequest['params']['options']['reload'];
       }
+      $id = (!empty($apiRequest['params']['sequential'])) ? 0 : $result['id'];
     }
 
     switch ($reloadMode) {
@@ -98,16 +99,16 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
         if ($reloadResult['is_error']) {
           throw new API_Exception($reloadResult['error_message']);
         }
-        $result['values'][$result['id']] = array_merge($result['values'][$result['id']], $reloadResult['values'][$result['id']]);
+        $result['values'][$id] = array_merge($result['values'][$id], $reloadResult['values'][$result['id']]);
         return $result;
 
       case 'selected':
         $params = array(
-          'id' => $result['id'],
+          'id' => $id,
           'return' => $this->pickReturnFields($apiRequest),
         );
         $reloadResult = civicrm_api3($apiRequest['entity'], 'get', $params);
-        $result['values'][$result['id']] = array_merge($result['values'][$result['id']], $reloadResult['values'][$result['id']]);
+        $result['values'][$id] = array_merge($result['values'][$id], $reloadResult['values'][$id]);
         return $result;
 
       default:

@@ -272,6 +272,14 @@
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         if (that.options.crmForm) that.element.trigger('crmFormLoad', data);
+        // This is only needed by forms that load via ajax but submit without ajax, e.g. configure contribution page tabs
+        // TODO: remove this when those forms have been converted to use ajax submit
+        if (data.status === 'form_error' && $.isPlainObject(data.errors)) {
+          that.element.trigger('crmFormError', data);
+          $.each(data.errors, function(formElement, msg) {
+            $('[name="'+formElement+'"]', that.element).crmError(msg);
+          });
+        }
       }).fail(function(data, msg, status) {
         that._onFailure(data, status);
       });

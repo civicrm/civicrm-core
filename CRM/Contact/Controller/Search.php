@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -41,8 +39,7 @@
  *
  * Typically the first form will display the search criteria and it's results
  *
- * The second form is used to process search results with the asscociated actions
- *
+ * The second form is used to process search results with the associated actions.
  */
 class CRM_Contact_Controller_Search extends CRM_Core_Controller {
 

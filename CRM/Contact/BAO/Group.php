@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -29,13 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -65,11 +63,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Delete the group and all the object that connect to
-   * this group. Incredibly destructive
+   * Delete the group and all the object that connect to this group.
    *
-   * @param int $id
-   *   Group id.
+   * Incredibly destructive.
+   *
+   * @param int $id Group id.
    */
   public static function discard($id) {
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
@@ -203,7 +201,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   this array contains the list of members for this group id
    */
   public static function &getMember($groupID, $useCache = TRUE) {
-    $params = array(array('group', 'IN', array($groupID => 1), 0, 0));
+    $params = array(array('group', '=', $groupID, 0, 0));
     $returnProperties = array('contact_id');
     list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, $useCache);
 
@@ -501,7 +499,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * and store it for future use
    */
   public function buildClause() {
-    $params = array(array('group', 'IN', array($this->id => 1), 0, 0));
+    $params = array(array('group', 'IN', array($this->id), 0, 0));
 
     if (!empty($params)) {
       $tables = $whereTables = array();
@@ -795,6 +793,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $orderBy = ' ORDER BY groups.title asc';
     if (!empty($params['sort'])) {
       $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
+
+      // CRM-16905 - Sort by count cannot be done with sql
+      if (strpos($params['sort'], 'count') === 0) {
+        $orderBy = $limit = '';
+      }
     }
 
     $select = $from = $where = "";
@@ -974,6 +977,17 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       while ($dao->fetch()) {
         $values[$dao->group_id]['count'] = $dao->count;
       }
+    }
+
+    // CRM-16905 - Sort by count cannot be done with sql
+    if (!empty($params['sort']) && strpos($params['sort'], 'count') === 0) {
+      usort($values, function($a, $b) {
+        return $a['count'] - $b['count'];
+      });
+      if (strpos($params['sort'], 'desc')) {
+        $values = array_reverse($values, TRUE);
+      }
+      return array_slice($values, $params['offset'], $params['rowCount']);
     }
 
     return $values;

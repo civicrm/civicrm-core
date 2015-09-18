@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * Business objects for managing custom data values.
- *
  */
 class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
@@ -165,7 +162,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param array $formValues
    * @return null
    */
-  public static function fixFieldValueOfTypeMemo(&$formValues) {
+  public static function fixCustomFieldValue(&$formValues) {
     if (empty($formValues)) {
       return NULL;
     }
@@ -180,14 +177,24 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       $htmlType = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_CustomField',
         substr($key, 7), 'html_type'
       );
-      if (($htmlType == 'TextArea') &&
+      $dataType = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_CustomField',
+        substr($key, 7), 'data_type'
+      );
+
+      if (is_array($formValues[$key])) {
+        if (!in_array(key($formValues[$key]), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $formValues[$key] = array('IN' => $formValues[$key]);
+        }
+      }
+      elseif (($htmlType == 'TextArea' ||
+          ($htmlType == 'Text' && $dataType == 'String')
+        ) &&
         !((substr($formValues[$key], 0, 1) == '%') ||
           (substr($formValues[$key], -1, 1) == '%')
         )
       ) {
-        $formValues[$key] = '%' . $formValues[$key] . '%';
+        $formValues[$key] = array('LIKE' => '%' . $formValues[$key] . '%');
       }
-
     }
   }
 
@@ -198,8 +205,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    *   Custom value ID.
    * @param int $customGroupID
    *   Custom group ID.
-   *
-   * @return void
    */
   public static function deleteCustomValue($customValueID, $customGroupID) {
     // first we need to find custom value table, from custom group ID

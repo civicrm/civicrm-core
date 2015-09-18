@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -63,11 +63,9 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -107,8 +105,6 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $urlParams = 'civicrm/admin/contribute/premium';
@@ -224,8 +220,6 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     // get the submitted form values.

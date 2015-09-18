@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -101,19 +101,22 @@ class CRM_Utils_Check_Security {
     if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
       $url[] = $upload_url[0];
       if ($log_path = explode($filePathMarker, $log_filename)) {
-        $url[] = $log_path[1];
-        $log_url = implode($filePathMarker, $url);
-        $headers = @get_headers($log_url);
-        if (stripos($headers[0], '200')) {
-          $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
-          $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
-            . '<br />' .
-            '<a href="%2">Read more about this warning</a>';
-          $messages[] = new CRM_Utils_Check_Message(
-            'checkLogFileIsNotAccessible',
-            ts($msg, array(1 => $log_url, 2 => $docs_url)),
-            ts('Security Warning')
-          );
+        // CRM-17149: check if debug log path includes $filePathMarker
+        if (count($log_path) > 1) {
+          $url[] = $log_path[1];
+          $log_url = implode($filePathMarker, $url);
+          $headers = @get_headers($log_url);
+          if (stripos($headers[0], '200')) {
+            $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
+            $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
+              . '<br />' .
+              '<a href="%2">Read more about this warning</a>';
+            $messages[] = new CRM_Utils_Check_Message(
+              'checkLogFileIsNotAccessible',
+              ts($msg, array(1 => $log_url, 2 => $docs_url)),
+              ts('Security Warning')
+            );
+          }
         }
       }
     }
@@ -159,7 +162,8 @@ class CRM_Utils_Check_Security {
               2 => $privateDir,
               3 => $heuristicUrl,
             )),
-          ts('Security Warning')
+          ts('Private Files Readable'),
+          \Psr\Log\LogLevel::WARNING
         );
       }
     }
@@ -205,7 +209,8 @@ class CRM_Utils_Check_Security {
         $messages[] = new CRM_Utils_Check_Message(
           'checkDirectoriesAreNotBrowseable',
           ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url)),
-          ts('Security Warning')
+          ts('Browseable Directories'),
+          \Psr\Log\LogLevel::ERROR
         );
       }
     }
@@ -227,16 +232,34 @@ class CRM_Utils_Check_Security {
 
     $messages = array();
     $files = array(
-      "{$civicrm_root}/packages/dompdf/dompdf.php", // CRM-16005, upgraded from Civi <= 4.5.6
-      "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.5.7
-      "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.6.0
+      array(
+        "{$civicrm_root}/packages/dompdf/dompdf.php", // CRM-16005, upgraded from Civi <= 4.5.6
+        \Psr\Log\LogLevel::CRITICAL,
+      ),
+      array(
+        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.5.7
+        \Psr\Log\LogLevel::CRITICAL,
+      ),
+      array(
+        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.6.0
+        \Psr\Log\LogLevel::CRITICAL,
+      ),
+      array(
+        "{$civicrm_root}/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php", // CIVI-SA-2013-001
+        \Psr\Log\LogLevel::CRITICAL,
+      ),
+      array(
+        "{$civicrm_root}/packages/html2text/class.html2text.inc",
+        \Psr\Log\LogLevel::CRITICAL,
+      ),
     );
     foreach ($files as $file) {
-      if (file_exists($file)) {
+      if (file_exists($file[0])) {
         $messages[] = new CRM_Utils_Check_Message(
           'checkFilesAreNotPresent',
           ts('File \'%1\' presents a security risk and should be deleted.', array(1 => $file)),
-          ts('Security Warning')
+          ts('Unsafe Files'),
+          $file[1]
         );
       }
     }

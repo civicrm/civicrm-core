@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -49,9 +49,15 @@
       </div>
       <div class="crm-content crm-contact_email">
         {if !$item.on_hold and !$privacy.do_not_email}
-          <a href="{crmURL p="civicrm/activity/email/add" q="action=add&reset=1&email_id=`$item.id`"}" class="crm-popup" title="{ts 1=$item.email}Send email to %1{/ts}">
+          {if $mailingOutboundOption == 2} {* Outbound email is disabled, use a mailto link *}
+            <a href="mailto:{$item.email}" title="{ts 1=$item.email}Send email to %1{/ts}">
             {$item.email}
-          </a>
+            </a>
+          {else}
+            <a href="{crmURL p="civicrm/activity/email/add" q="action=add&reset=1&email_id=`$item.id`"}" class="crm-popup" title="{ts 1=$item.email}Send email to %1{/ts}">
+            {$item.email}
+            </a>
+          {/if}
         {else}
           {$item.email}
         {/if}

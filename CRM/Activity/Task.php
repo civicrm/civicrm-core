@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
- * Class to represent the actions that can be performed on a group of contacts
- * used by the search forms.
+ * Class to represent the actions that can be performed on a group of contacts used by the search forms.
  */
 class CRM_Activity_Task {
   const
@@ -70,17 +68,17 @@ class CRM_Activity_Task {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Activities'),
+          'title' => ts('Delete activities'),
           'class' => 'CRM_Activity_Form_Task_Delete',
           'result' => FALSE,
         ),
         2 => array(
-          'title' => ts('Print Selected Rows'),
+          'title' => ts('Print selected rows'),
           'class' => 'CRM_Activity_Form_Task_Print',
           'result' => FALSE,
         ),
         3 => array(
-          'title' => ts('Export Activities'),
+          'title' => ts('Export activities'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
@@ -88,7 +86,7 @@ class CRM_Activity_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Batch Update Activities Via Profile'),
+          'title' => ts('Batch update activities via profile'),
           'class' => array(
             'CRM_Activity_Form_Task_PickProfile',
             'CRM_Activity_Form_Task_Batch',
@@ -96,7 +94,7 @@ class CRM_Activity_Task {
           'result' => FALSE,
         ),
         5 => array(
-          'title' => ts('Send Email to Contacts'),
+          'title' => ts('Email - send now'),
           'class' => array(
             'CRM_Activity_Form_Task_PickOption',
             'CRM_Activity_Form_Task_Email',
@@ -104,17 +102,17 @@ class CRM_Activity_Task {
           'result' => FALSE,
         ),
         6 => array(
-          'title' => ts('Send Reply SMS To Contacts'),
+          'title' => ts('SMS - send reply'),
           'class' => 'CRM_Activity_Form_Task_SMS',
           'result' => FALSE,
         ),
         7 => array(
-          'title' => ts('Tag Activities (assign tags)'),
+          'title' => ts('Tag - add to activities'),
           'class' => 'CRM_Activity_Form_Task_AddToTag',
           'result' => FALSE,
         ),
         8 => array(
-          'title' => ts('Untag Activities (remove tags)'),
+          'title' => ts('Tag - remove from activities'),
           'class' => 'CRM_Activity_Form_Task_RemoveFromTag',
           'result' => FALSE,
         ),
@@ -126,7 +124,7 @@ class CRM_Activity_Task {
           CRM_Core_Permission::check('access my cases and activities')
         ) {
           self::$_tasks[6] = array(
-            'title' => ts('File on Case'),
+            'title' => ts('File on case'),
             'class' => 'CRM_Activity_Form_Task_FileOnCase',
             'result' => FALSE,
           );

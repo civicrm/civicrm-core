@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -182,7 +182,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '1998-12-25',
       ),
       array(
@@ -195,7 +195,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '1999-11-26',
       ),
     );
@@ -235,7 +235,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '12/23/98',
       ),
       array(
@@ -248,7 +248,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '11/24/88',
       ),
     );
@@ -288,7 +288,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '11/12/1995',
       ),
       array(
@@ -301,7 +301,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '12/12/1995',
       ),
     );
@@ -341,7 +341,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => 'December 12, 1998',
       ),
       array(
@@ -354,7 +354,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => 'December 13, 1998',
       ),
     );
@@ -394,7 +394,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '25/12/98',
       ),
       array(
@@ -407,7 +407,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '26/12/99',
       ),
     );
@@ -447,7 +447,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '25/12/1998',
       ),
       array(
@@ -460,7 +460,7 @@ class WebTest_Import_DateFormatTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'birth_date' => '24/11/1996',
       ),
     );

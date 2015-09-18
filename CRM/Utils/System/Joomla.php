@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,15 +29,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Joomla specific stuff goes here
+ * Joomla specific stuff goes here.
  */
 class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
+   * Class constructor.
    */
   public function __construct() {
     /**
@@ -117,8 +116,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   Array of errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   * @return void
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
@@ -275,10 +272,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $fragment = '#' . $fragment;
     }
 
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
     if (!empty($query)) {
@@ -318,8 +311,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *
    * @param object $user
    *   Handle to the user object.
-   *
-   * @return void
    */
   public function setEmail(&$user) {
     global $database;
@@ -456,7 +447,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function logout() {
     session_destroy();
-    header("Location:index.php");
+    CRM_Utils_System::setHttpHeader("Location", "index.php");
   }
 
   /**

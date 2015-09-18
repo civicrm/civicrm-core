@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -99,7 +99,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
   public function testBasic() {
     $this->createContactsInGroup(10, $this->_groupID);
-    $this->setSettings(array(
+    Civi::settings()->add(array(
       'mailerBatchLimit' => 2,
     ));
     $this->callAPISuccess('mailing', 'create', $this->_params);
@@ -238,7 +238,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $settings = array_merge($this->defaultSettings, $settings);
 
     $this->createContactsInGroup($settings['recipients'], $this->_groupID);
-    $this->setSettings(CRM_Utils_Array::subset($settings, array(
+    Civi::settings()->add(CRM_Utils_Array::subset($settings, array(
       'mailerBatchLimit',
       'mailerJobsMax',
       'mailThrottleTime',
@@ -301,19 +301,6 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       $recipients[][0] = 'mail' . $i . '@' . $domain;
     }
     return $recipients;
-  }
-
-  /**
-   * @param array $params
-   *   - mailerBatchLimit
-   *   - mailerJobSize
-   *   - mailerJobsMax
-   *   - mailThrottleTime
-   */
-  protected function setSettings($params) {
-    // FIXME: These settings are not available via Setting API.
-    // When they become available, use that instead.
-    CRM_Core_BAO_ConfigSetting::create($params);
   }
 
   protected function cleanupMailingTest() {

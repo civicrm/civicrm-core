@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -241,7 +241,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->select2("group", "Summer", TRUE);
     $this->select2("group", "Advisory", TRUE);
     $this->clickAjaxLink("location", 'country');
-    $this->select2("country", "United States", FALSE);
+    $this->select2("country", "UNITED STATES", FALSE);
     $this->waitForElementPresent('state_province');
     $this->multiselect2("state_province", array(
         "Ohio",
@@ -304,7 +304,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("postal_code_low", "100010");
     $this->type("postal_code_high", "101000");
     // select country
-    $this->select("country", "United States");
+    $this->select("country", "UNITED STATES");
     // select state-province
     $this->waitForElementPresent('state_province');
     $this->select2("state_province", "Alaska", TRUE);
@@ -482,7 +482,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     $this->type("address_1_supplemental_address_2", "street supplement 2 $firstName");
     $this->type("address_1_city", "city$firstName");
     $this->type("address_1_postal_code", "100100");
-    $this->select("address_1_country_id", "United States");
+    $this->select("address_1_country_id", "UNITED STATES");
     $this->select("address_1_state_province_id", "Alaska");
 
     // --- fill few values in communication preferences

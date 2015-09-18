@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   const
@@ -53,21 +51,19 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * This is function is called by the form object to get the DataSource's
-   * form snippet. It should add all fields necesarry to get the data
+   * This is function is called by the form object to get the DataSource's form snippet.
+   *
+   * It should add all fields necessary to get the data
    * uploaded to the temporary table in the DB.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
-   *   (operates directly on form argument)
    */
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
     $config = CRM_Core_Config::singleton();
 
-    $uploadFileSize = CRM_Core_Config_Defaults::formatUnitSize($config->maxFileSize . 'm', TRUE);
+    $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);

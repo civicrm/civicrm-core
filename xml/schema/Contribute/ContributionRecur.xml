@@ -299,7 +299,7 @@
   </foreignKey>
   <field>
     <name>payment_instrument_id</name>
-    <title>Payment Instrument</title>
+    <title>Payment Method</title>
     <type>int unsigned</type>
     <comment>FK to Payment Instrument</comment>
     <pseudoconstant>

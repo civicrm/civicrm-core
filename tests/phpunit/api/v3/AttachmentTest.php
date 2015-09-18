@@ -62,7 +62,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   protected function tearDown() {
     parent::tearDown();
     $this->cleanupFiles();
-    \Civi\Core\Container::singleton(TRUE);
+    \Civi::reset();
   }
 
   /**

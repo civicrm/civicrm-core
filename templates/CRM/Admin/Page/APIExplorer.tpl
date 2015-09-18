@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -53,17 +53,33 @@
   #api-params-table th:first-child,
   #api-params-table td:first-child {
     width: 35%;
+    min-width: 190px;
+  }
+  #api-params-table td[colspan] {
+    width: 100%;
   }
   #api-params-table td:first-child + td,
-  #api-params-table th:first-child + th,
+  #api-params-table th:first-child + th {
+    width: 140px;
+  }
+  #api-params-table td:first-child + td select {
+    width: 132px;
+  }
+  #api-params-table td:first-child + td + td,
+  #api-params-table th:first-child + th + th {
+    width: 65%
+  }
   #api-generated td:first-child {
-    width: 9em;
+    width: 60px;
   }
   #api-params {
     min-height: 1em;
   }
   #api-params .red-icon {
     margin-top: .5em;
+  }
+  .api-param-remove {
+    float: right;
   }
   #mainTabContainer label {
     display: inline;
@@ -146,7 +162,7 @@
       <label for="api-entity">{ts}Entity{/ts}:</label>
       <select class="crm-form-select big required" id="api-entity" name="entity">
         <option value="" selected="selected">{ts}Choose{/ts}...</option>
-        {crmAPI entity="Entity" action="get" var="entities" version=3}
+        {crmAPI entity="Entity" var="entities"}
         {foreach from=$entities.values item=entity}
           <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
             {$entity}

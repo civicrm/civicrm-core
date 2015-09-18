@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -1141,8 +1141,7 @@ class WebTest_Event_PricesetMaxCountTest extends CiviSeleniumTestCase {
       $this->click('is_multiple_registrations');
     }
 
-    $this->click('intro_text-plain');
-    $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.');
+    $this->fillRichTextField('intro_text', 'Fill in all the fields below and click Continue.', 'CKEditor', TRUE);
 
     // enable confirmation email
     $this->click('CIVICRM_QFID_1_is_email_confirm');

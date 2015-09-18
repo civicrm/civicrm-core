@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -51,6 +51,10 @@
            <td>{$form.skipColumnHeader.html}{$form.skipColumnHeader.label}<br />
                <span class="description">{ts}Check this box if the first row of your file consists of field names (Example: 'Contact ID', 'Activity Type', 'Activity Date').{/ts}</span>
            </td>
+        </tr>
+        <tr class="crm-import-datasource-form-block-fieldSeparator">
+          <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+          <td>{$form.fieldSeparator.html}</td>
         </tr>
         <tr>{include file="CRM/Core/Date.tpl"}</tr>
         {if $savedMapping}

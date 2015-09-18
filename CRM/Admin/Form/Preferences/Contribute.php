@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,23 +29,18 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for the display preferences
- *
+ * This class generates form components for the display preferences.
  */
 class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   protected $_settings = array(
     'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
   );
+
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
@@ -121,8 +116,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //CRM-16691: Changes made related to settings of 'CVV'.
@@ -152,10 +145,8 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
 
   /**
    * Set default values for the form.
+   *
    * default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
@@ -175,9 +166,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -114,7 +114,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
    * @param int $id
    */
   public function memberAddTest($campaignTitle, $id) {
-    //Add new memebershipType
+    //Add new membershipType
     $memTypeParams = $this->webtestAddMembershipType();
 
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd

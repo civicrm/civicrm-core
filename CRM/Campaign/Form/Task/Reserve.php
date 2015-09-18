@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to add contacts for
- * voter reservation.
+ * This class provides the functionality to add contacts for voter reservation.
  */
 class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   /**
-   * Survet id`
-   *
    * @var int
+   *   Survey id.
    */
   protected $_surveyId;
 
@@ -69,8 +65,6 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -158,9 +152,6 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // allow to add contact to either new or existing group.
@@ -240,9 +231,6 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     //add reservation.

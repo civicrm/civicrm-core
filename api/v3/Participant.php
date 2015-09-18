@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -163,6 +163,7 @@ function civicrm_api3_participant_get($params) {
 
   $participant = array();
   while ($dao->fetch()) {
+    $query->convertToPseudoNames($dao, FALSE, TRUE);
     $participant[$dao->participant_id] = $query->store($dao);
     //@todo - is this required - contribution & pledge use the same query but don't self-retrieve custom data
     _civicrm_api3_custom_data_get($participant[$dao->participant_id], 'Participant', $dao->participant_id, NULL);

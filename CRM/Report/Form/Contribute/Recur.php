@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -191,22 +191,22 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'start_date' => array(
             'title' => ts('Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_TIME,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
           'next_sched_contribution_date' => array(
             'title' => ts('Next Scheduled Contribution Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_TIME,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
           'end_date' => array(
             'title' => ts('End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_TIME,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
-          'contribution_processed_date' => array(
+          'modified_date' => array(
             'title' => ts('Last Contribution Processed'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_TIME,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
           'calculated_end_date' => array(
             'title' => ts('Calculated end date (either end date or date all installments will be made)'),
@@ -313,13 +313,8 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 ";
         $isBreak = TRUE;
       }
-      if (!empty($this->_params['contribution_processed_date_' . $suffix])) {
-        $relative = CRM_Utils_Array::value("contribution_processed_date_relative", $this->_params);
-        $from = CRM_Utils_Array::value("contribution_processed_date_from", $this->_params);
-        $to = CRM_Utils_Array::value("contribution_processed_date_to", $this->_params);
-        $this->_where .= " AND contribution_civireport.id IN (SELECT MAX(cc.id) FROM civicrm_contribution cc WHERE cc.contribution_status_id = 1 AND (" .
-        $this->dateClause("DATE(cc.receive_date)",
-            $relative, $from, $to, CRM_Utils_Type::T_DATE, NULL, NULL) . " ) GROUP BY cc.contribution_recur_id)";
+      if (!empty($this->_params['modified_date_' . $suffix])) {
+        $this->_where .= " AND {$this->_aliases['civicrm_contribution_recur']}.contribution_status_id = 1";
         $isBreak = TRUE;
       }
       if (!empty($isBreak)) {

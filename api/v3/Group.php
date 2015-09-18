@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -71,13 +71,18 @@ function _civicrm_api3_group_create_spec(&$params) {
  */
 function civicrm_api3_group_get($params) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, 'Group', 'get');
-  if (empty($options['return']) || !in_array('member_count', $options['return'])) {
+  if ((empty($options['return']) || !in_array('member_count', $options['return'])) && empty($params['check_permissions'])) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Group');
   }
 
   $groups = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Group');
   foreach ($groups as $id => $group) {
-    $groups[$id]['member_count'] = CRM_Contact_BAO_Group::memberCount($id);
+    if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Group::checkPermission($group['id'])) {
+      unset($groups[$id]);
+    }
+    elseif (!empty($options['return']) && in_array('member_count', $options['return'])) {
+      $groups[$id]['member_count'] = CRM_Contact_BAO_Group::memberCount($id);
+    }
   }
   return civicrm_api3_create_success($groups, $params, 'Group', 'get');
 }

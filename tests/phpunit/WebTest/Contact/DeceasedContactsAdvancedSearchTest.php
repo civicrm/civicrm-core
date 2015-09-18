@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -70,7 +70,7 @@ class WebTest_Contact_DeceasedContactsAdvancedSearchTest extends CiviSeleniumTes
     $this->click("toggleSelect");
     $this->waitForTextPresent('2 Selected records only');
 
-    $this->select('task', 'label=Remove Contacts from Group');
+    $this->select('task', 'label=Group - remove contacts');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent('_qf_RemoveFromGroup_back-bottom');
     $this->assertElementContainsText('crm-container', 'Number of selected contacts: 2');

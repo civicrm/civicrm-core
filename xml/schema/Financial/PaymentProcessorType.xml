@@ -156,7 +156,7 @@
     <name>billing_mode</name>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Billing Mode</comment>
+    <comment>Billing Mode (deprecated)</comment>
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::billingMode</callback>
     </pseudoconstant>
@@ -177,7 +177,18 @@
     <title>Processor Type Payment Type</title>
     <type>int unsigned</type>
     <default>1</default>
-    <comment>Payment Type: Credit or Debit</comment>
+    <comment>Payment Type: Credit or Debit (deprecated)</comment>
     <add>3.0</add>
+  </field>
+  <field>
+    <name>payment_instrument_id</name>
+    <title>Payment Method</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>Payment Instrument ID</comment>
+    <pseudoconstant>
+      <optionGroupName>payment_instrument</optionGroupName>
+    </pseudoconstant>
+    <add>4.7</add>
   </field>
 </table>

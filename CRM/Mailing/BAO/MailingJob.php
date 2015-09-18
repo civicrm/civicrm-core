@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -71,7 +71,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $params['mailing_id'];
     if ($mailing->id && $mailing->find(TRUE)) {
-      $mailing->getRecipients($job->id, $params['mailing_id'], NULL, NULL, TRUE, $mailing->dedupe_email);
+      $mailing->getRecipients($job->id, $params['mailing_id'], TRUE, $mailing->dedupe_email);
       return $job;
     }
     else {
@@ -136,7 +136,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.mailing.job.{$job->id}");
+      $lock = Civi::service('lockManager')->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -184,9 +184,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       }
 
       // Get the mailer
-      // make it a persistent connection, CRM-9349
       if ($mode === NULL) {
-        $mailer = $config->getMailer(TRUE);
+        $mailer = \Civi::service('pear_mail');
       }
       elseif ($mode == 'sms') {
         $mailer = CRM_SMS_Provider::singleton(array('mailing_id' => $job->mailing_id));
@@ -342,7 +341,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     // X Number of child jobs
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.mailing.job.{$job->id}");
+      $lock = Civi::service('lockManager')->acquire("data.mailing.job.{$job->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -566,16 +565,14 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     // have been delivered in prior jobs
     $isDelivered = TRUE;
 
-    // make sure that there's no more than $config->mailerBatchLimit mails processed in a run
+    // make sure that there's no more than $mailerBatchLimit mails processed in a run
+    $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
     while ($eq->fetch()) {
       // if ( ( $mailsProcessed % 100 ) == 0 ) {
       // CRM_Utils_System::xMemory( "$mailsProcessed: " );
       // }
 
-      if (
-        $config->mailerBatchLimit > 0 &&
-        self::$mailsProcessed >= $config->mailerBatchLimit
-      ) {
+      if ($mailerBatchLimit > 0 && self::$mailsProcessed >= $mailerBatchLimit) {
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
         }
@@ -669,7 +666,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $replyToEmail = $mailing->replyto_email;
       }
 
-      $message = &$mailing->compose(
+      $message = $mailing->compose(
         $this->id, $field['id'], $field['hash'],
         $field['contact_id'], $field['email'],
         $recipient, FALSE, $details[0][$contactID], $attachments,
@@ -799,8 +796,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       }
 
       // If we have enabled the Throttle option, this is the time to enforce it.
-      if (isset($config->mailThrottleTime) && $config->mailThrottleTime > 0) {
-        usleep((int ) $config->mailThrottleTime);
+      $mailThrottleTime = Civi::settings()->get('mailThrottleTime');
+      if (!empty($mailThrottleTime)) {
+        usleep((int ) $mailThrottleTime);
       }
     }
 

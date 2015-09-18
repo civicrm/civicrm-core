@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_ACL_API {
 
@@ -99,7 +97,7 @@ class CRM_ACL_API {
     $onlyDeleted = FALSE,
     $skipDeleteClause = FALSE
   ) {
-    // the default value which is valid for rhe final AND
+    // the default value which is valid for the final AND
     $deleteClause = ' ( 1 ) ';
     if (!$skipDeleteClause) {
       if (CRM_Core_Permission::check('access deleted contacts') and $onlyDeleted) {
@@ -113,24 +111,17 @@ class CRM_ACL_API {
 
     // first see if the contact has edit / view all contacts
     if (CRM_Core_Permission::check('edit all contacts') ||
-      ($type == self::VIEW &&
-        CRM_Core_Permission::check('view all contacts')
-      )
+      ($type == self::VIEW && CRM_Core_Permission::check('view all contacts'))
     ) {
-      return $skipDeleteClause ? ' ( 1 ) ' : $deleteClause;
-    }
-
-    if ($contactID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      return $deleteClause;
     }
 
     if (!$contactID) {
-      // anonymous user
-      $contactID = 0;
+      $contactID = CRM_Core_Session::getLoggedInContactID();
     }
+    $contactID = (int) $contactID;
 
-    return implode(' AND ',
+    $where = implode(' AND ',
       array(
         CRM_ACL_BAO_ACL::whereClause($type,
           $tables,
@@ -140,6 +131,14 @@ class CRM_ACL_API {
         $deleteClause,
       )
     );
+
+    // Add permission on self
+    if ($contactID && (CRM_Core_Permission::check('edit my contact') ||
+      $type == self::VIEW && CRM_Core_Permission::check('view my contact'))
+    ) {
+      $where = "contact_a.id = $contactID OR ($where)";
+    }
+    return $where;
   }
 
   /**
@@ -226,6 +225,9 @@ class CRM_ACL_API {
     else {
       $groups = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
       $cache[$key] = $groups;
+    }
+    if (empty($groups)) {
+      return FALSE;
     }
 
     return in_array($groupID, $groups) ? TRUE : FALSE;

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -68,7 +68,7 @@ class WebTest_Event_ChangeParticipantStatus extends CiviSeleniumTestCase {
     $this->click($id2);
 
     // Change participant status for selected participants
-    $this->select('task', "label=Change Participant Status");
+    $this->select('task', "label=Participant status - change");
     $this->waitForElementPresent('_qf_ParticipantStatus_next');
 
     $this->select('status_change', "label=Attended");

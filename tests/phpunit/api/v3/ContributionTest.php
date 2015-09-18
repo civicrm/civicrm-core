@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -1368,6 +1368,28 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test completing a transaction via the API.
+   *
+   * Note that we are creating a logged in user because email goes out from
+   * that person
+   */
+  public function testCompleteTransactionFeeAmount() {
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+      'fee_amount' => '.56',
+      'trxn_id' => '7778888',
+    ));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id'], 'sequential' => 1));
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals('7778888', $contribution['trxn_id']);
+    $this->assertEquals('.56', $contribution['fee_amount']);
+    $this->assertEquals('99.44', $contribution['net_amount']);
+  }
+
+  /**
    * Test repeat contribution successfully creates line items.
    */
   public function testRepeatTransaction() {
@@ -1563,10 +1585,29 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCompleteTransactionMembershipPriceSet() {
     $this->createPriceSetWithPage('membership');
+    $stateOfGrace = $this->callAPISuccess('MembershipStatus', 'getvalue', array(
+      'name' => 'Grace',
+      'return' => 'id')
+    );
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
+    $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
+    $logs = $this->callAPISuccess('MembershipLog', 'get', array(
+      'membership_id' => $this->_ids['membership'],
+    ));
+    $this->assertEquals(1, $logs['count']);
+    $this->assertEquals($stateOfGrace, $membership['status_id']);
     $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 1 year')), $membership['end_date']);
+    $this->callAPISuccessGetSingle('LineItem', array(
+      'entity_id' => $this->_ids['membership'],
+      'entity_table' => 'civicrm_membership',
+    ));
+    $logs = $this->callAPISuccess('MembershipLog', 'get', array(
+      'membership_id' => $this->_ids['membership'],
+    ));
+    $this->assertEquals(2, $logs['count']);
+    $this->assertNotEquals($stateOfGrace, $logs['values'][2]['status_id']);
     $this->cleanUpAfterPriceSets();
   }
 
@@ -1661,6 +1702,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'membership_type_id' => $this->_ids['membership_type'],
       'start_date' => 'yesterday - 1 year',
       'end_date' => 'yesterday',
+      'join_date' => 'yesterday - 1 year',
     ));
     $contribution = $this->callAPISuccess('contribution', 'create', array(
       'domain_id' => 1,
@@ -1916,8 +1958,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $contribution
-   * @param $context
+   * @param array $contribution
+   * @param string $context
    * @param int $instrumentId
    */
   public function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {

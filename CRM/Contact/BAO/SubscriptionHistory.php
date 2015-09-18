@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * BAO object for crm_email table
+ * BAO object for crm_email table.
  */
 class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHistory {
   /**
    * Class constructor.
-   *
-   * @return \CRM_Contact_DAO_SubscriptionHistory
-   */
-  /**
    */
   public function __construct() {
     parent::__construct();
@@ -66,12 +60,10 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
   }
 
   /**
-   * Erase a contact's subscription history records
+   * Erase a contact's subscription history records.
    *
    * @param int $id
    *   The contact id.
-   *
-   * @return void
    */
   public static function deleteContact($id) {
     $history = new CRM_Contact_BAO_SubscriptionHistory();

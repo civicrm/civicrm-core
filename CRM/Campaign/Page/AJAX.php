@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -106,7 +106,7 @@ class CRM_Campaign_Page_AJAX {
 
   public static function loadOptionGroupDetails() {
 
-    $id = CRM_Utils_Array::value('option_group_id', $_POST);
+    $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     $status = 'fail';
     $opValues = array();
 
@@ -115,7 +115,7 @@ class CRM_Campaign_Page_AJAX {
       CRM_Core_OptionValue::getValues($groupParams, $opValues);
     }
 
-    $surveyId = CRM_Utils_Array::value('survey_id', $_POST);
+    $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
     if ($surveyId) {
       $survey = new CRM_Campaign_DAO_Survey();
       $survey->id = $surveyId;
@@ -146,7 +146,8 @@ class CRM_Campaign_Page_AJAX {
 
   public function voterList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
@@ -360,7 +361,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -569,11 +570,12 @@ class CRM_Campaign_Page_AJAX {
    */
   public function campaignList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (isset($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -660,7 +662,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -671,7 +673,8 @@ class CRM_Campaign_Page_AJAX {
    */
   public function surveyList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
@@ -764,7 +767,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -775,7 +778,8 @@ class CRM_Campaign_Page_AJAX {
    */
   public function petitionList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
@@ -863,7 +867,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

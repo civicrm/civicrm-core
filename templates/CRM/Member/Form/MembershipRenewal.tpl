@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -285,6 +285,8 @@
       else {
         cj("#total_amount").val(allMemberships[memType]['total_amount']);
       }
+
+      cj('.totaltaxAmount').html(allMemberships[memType]['tax_message']);
     }
 
     // show/hide different contact section

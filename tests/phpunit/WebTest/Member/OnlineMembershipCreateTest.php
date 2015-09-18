@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
@@ -208,7 +208,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
    * @param $hash
    * @param bool $otherAmount
    */
-  public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE, $amountSection = TRUE) {
+  public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE, $amountSection = TRUE, $freeMembership = FALSE) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
     // Select membership type 1
@@ -243,24 +243,30 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->type("postal_code-1", "94117");
     $this->select("country-1", "value=1228");
     $this->select("state_province-1", "value=1001");
-    if (!$payLater && $amountSection) {
-      //Credit Card Info
-      $this->select("credit_card_type", "value=Visa");
-      $this->type("credit_card_number", "4111111111111111");
-      $this->type("cvv2", "000");
-      $this->select("credit_card_exp_date[M]", "value=1");
-      $this->select("credit_card_exp_date[Y]", "value=2020");
 
-      //Billing Info
-      $this->waitForElementPresent("billing_first_name");
-      $this->type("billing_first_name", $firstName . "billing");
-      $this->waitForElementPresent("billing_last_name");
-      $this->type("billing_last_name", $lastName . "billing");
-      $this->type("billing_street_address-5", "15 Main St.");
-      $this->type(" billing_city-5", "San Jose");
-      $this->select("billing_country_id-5", "value=1228");
-      $this->select("billing_state_province_id-5", "value=1004");
-      $this->type("billing_postal_code-5", "94129");
+    if ($freeMembership) {
+      $this->waitForElementPresent("xpath=//div[@id='payment_information'][@style='display: none;']");
+    }
+    else {
+      if (!$payLater && $amountSection) {
+        //Credit Card Info
+        $this->select("credit_card_type", "value=Visa");
+        $this->type("credit_card_number", "4111111111111111");
+        $this->type("cvv2", "000");
+        $this->select("credit_card_exp_date[M]", "value=1");
+        $this->select("credit_card_exp_date[Y]", "value=2020");
+
+        //Billing Info
+        $this->waitForElementPresent("billing_first_name");
+        $this->type("billing_first_name", $firstName . "billing");
+        $this->waitForElementPresent("billing_last_name");
+        $this->type("billing_last_name", $lastName . "billing");
+        $this->type("billing_street_address-5", "15 Main St.");
+        $this->type(" billing_city-5", "San Jose");
+        $this->select("billing_country_id-5", "value=1228");
+        $this->select("billing_state_province_id-5", "value=1004");
+        $this->type("billing_postal_code-5", "94129");
+      }
     }
     $this->click("_qf_Main_upload-bottom");
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
@@ -411,59 +417,74 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_MembershipBlock_next', '_qf_MembershipBlock_next-bottom');
     $text = "'MembershipBlock' information has been saved.";
     $this->waitForText('crm-notification-container', $text);
-    $this->click('link=Amounts');
-    $this->waitForElementPresent('_qf_Amount_cancel-bottom');
-    $this->click('is_monetary');
-    $this->clickLink('_qf_Amount_upload_done-bottom');
-    $text = "'Amount' information has been saved.";
-    $this->waitForText('crm-notification-container', $text);
 
-    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName = 'An' . substr(sha1(rand()), 0, 7);
-
-    //logout
-    $this->webtestLogout();
-
-    $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection);
-
-    // Log in using webtestLogin() method
-    $this->webtestLogin();
-
-    //Find Contribution
-    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-    $this->type("sort_name", "$lastName $firstName");
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
-
-    //View Contribution Record and verify data
-    $expected = array(
-      'From' => "{$firstName} {$lastName}",
-      'Financial Type' => 'Member Dues',
-      'Total Amount' => '0.00',
-      'Contribution Status' => 'Completed',
-      'Received Into' => 'Deposit Bank Account',
-      'Source' => "Online Contribution: $contributionTitle",
-      'Online Contribution Page' => $contributionTitle,
+    $processors = array(
+      'Test Processor',
+      'AuthNet',
+      'PayPal',
+      'PayPal_Standard',
     );
-    $this->webtestVerifyTabularData($expected);
+    foreach ($processors as $processor) {
+      if ($processor == 'Test Processor') {
+        $processorName = $processor;
+      }
+      else {
+        $processorName = $processor . substr(sha1(rand()), 0, 7);
+        $this->webtestAddPaymentProcessor($processorName, $processor);
+      }
+      $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id={$pageId}", '_qf_Amount_upload_done-bottom');
+      $this->assertTrue($this->isTextPresent($processorName));
+      $this->check("xpath=//label[text() = '{$processorName}']/preceding-sibling::input[1]");
+      $this->clickLink('_qf_Amount_upload_done-bottom');
+      $this->waitForText('crm-notification-container', "'Amount' information has been saved.");
 
-    //Find Member
-    $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
+      $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
+      $lastName = 'An' . substr(sha1(rand()), 0, 7);
 
-    $this->type("sort_name", "$lastName $firstName");
-    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
-    $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
-    $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+      //logout
+      $this->webtestLogout();
 
-    //View Membership Record
-    $verifyData = array(
-      'Member' => $firstName . ' ' . $lastName,
-      'Membership Type' => $memTypeTitle,
-      'Source' => 'Online Contribution:' . ' ' . $contributionTitle,
-      'Status' => 'New',
-    );
+      $this->_testOnlineMembershipSignup($pageId, $memTypeTitle, $firstName, $lastName, $payLater, $hash, $allowOtherAmount, $amountSection, TRUE);
 
-    $this->webtestVerifyTabularData($verifyData);
+      // Log in using webtestLogin() method
+      $this->webtestLogin();
+
+      //Find Contribution
+      $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
+      $this->type("sort_name", "$lastName $firstName");
+      $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+      $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
+
+      //View Contribution Record and verify data
+      $expected = array(
+        'From' => "{$firstName} {$lastName}",
+        'Financial Type' => 'Member Dues',
+        'Total Amount' => '0.00',
+        'Contribution Status' => 'Completed',
+        'Received Into' => 'Payment Processor Account',
+        'Source' => "Online Contribution: $contributionTitle",
+        'Online Contribution Page' => $contributionTitle,
+      );
+      $this->webtestVerifyTabularData($expected);
+
+      //Find Member
+      $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
+
+      $this->type("sort_name", "$lastName $firstName");
+      $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
+      $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
+      $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
+
+      //View Membership Record
+      $verifyData = array(
+        'Member' => $firstName . ' ' . $lastName,
+        'Membership Type' => $memTypeTitle,
+        'Source' => 'Online Contribution:' . ' ' . $contributionTitle,
+        'Status' => 'New',
+      );
+
+      $this->webtestVerifyTabularData($verifyData);
+    }
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -142,6 +142,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // skip amount field
           if (!in_array($name, $skipFields)) {
             $params[$name] = $value;
+          }
+          if (substr($name, 0, 6) == 'price_') {
+            $params[$name] = $this->_params[0][$name];
           }
         }
         $this->set('getExpressCheckoutDetails', $params);
@@ -581,6 +584,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($this->_values['event']['is_monetary'] && !($this->_allowWaitlist || $this->_requireApproval)) {
         if (is_array($this->_paymentProcessor)) {
           $payment = $this->_paymentProcessor['object'];
+        }
+        if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
+          $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
+          $value = array_merge($value, $preApprovalParams);
         }
         $result = NULL;
 
@@ -1045,24 +1052,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }
 
-    // Prepare soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
-    if (!empty($params['pcp_made_through_id']) || !empty($params['soft_credit_to'])) {
-
-      // if its due to pcp
-      if (!empty($params['pcp_made_through_id'])) {
-        $contribSoftContactId = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
-          $params['pcp_made_through_id'],
-          'contact_id'
-        );
-      }
-      else {
-        $contribSoftContactId = CRM_Utils_Array::value('soft_credit_to', $params);
-      }
-
-      // Pass these details onto with the contribution to make them
-      // available at hook_post_process, CRM-8908
-      $contribParams['soft_credit_to'] = $params['soft_credit_to'] = $contribSoftContactId;
-    }
     $contribParams['payment_processor'] = CRM_Utils_Array::value('payment_processor', $params);
     $contribParams['skipLineItem'] = 1;
     // create contribution record
@@ -1071,7 +1060,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, CRM_Utils_Array::value('amount_priceset_level_radio', $params, NULL));
 
     // process soft credit / pcp pages
-    CRM_Contribute_Form_Contribution_Confirm::processPcpSoft($params, $contribution);
+    if (!empty($params['pcp_made_through_id'])) {
+      CRM_Contribute_Form_Contribution_Confirm::formatSoftCreditParams($params, $form);
+      CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
+    }
 
     $transaction->commit();
 

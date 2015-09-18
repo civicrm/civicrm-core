@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,18 +32,27 @@
     <form method="post">
         <p>
           <span class="crm-status-icon info"> </span>
-          {ts 1=$currentVersion 2=$newVersion}Use this utility to upgrade your CiviCRM database from %1 to %2.{/ts}
+          {ts 1=$currentVersion 2=$newVersion}The database will be upgraded from %1 to %2.{/ts}
         </p>
         {if $preUpgradeMessage}
-            <div style="background-color: #E43D2B; padding: 10px;"><strong>{ts}Warning:{/ts}&nbsp;</strong>{$preUpgradeMessage}</div>
+            <div style="border: 2px solid #E43D2B; background-color: rgba(228, 61, 43, 0.08); padding: 10px; margin-bottom: 15px;">
+              <span class="crm-status-icon"></span>
+              <strong style="vertical-align: middle; font-size: 1.2em;">{ts}Warning:{/ts}</strong>
+              {$preUpgradeMessage}
+            </div>
         {/if}
         <p><strong>{ts}Back up your database before continuing.{/ts}</strong>
             {capture assign=docLink}{docURL page="Installation and Upgrades" text="Upgrade Documentation" style="text-decoration: underline;" resource="wiki"}{/capture}
             {ts 1=$docLink}This process may change your database structure and values. In case of emergency you may need to revert to a backup. For more detailed information, refer to the %1.{/ts}</p>
-        <p>{ts}Click 'Upgrade Now' if you are ready to proceed. Otherwise click 'Cancel' to return to the CiviCRM home page.{/ts}</p>
         <input type="hidden" name="action" value="begin" />
-        <input type="submit" value="{ts}Upgrade Now{/ts}" name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" /> &nbsp;&nbsp;
-        <a class="button cancel crm-form-submit" value="{ts}Cancel{/ts}" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+        <button type="submit" class="crm-button" name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" >
+          <span class="icon ui-icon-check"></span>
+          {ts}Upgrade Now{/ts}
+        </button>&nbsp;&nbsp;
+        <a class="button cancel crm-form-submit" href="{$cancelURL}">
+          <span class="icon ui-icon-close"></span>
+          {ts}Cancel{/ts}
+        </a>
     </form>
   </div>
 

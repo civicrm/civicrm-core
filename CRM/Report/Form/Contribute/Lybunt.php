@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -339,7 +339,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
  WHERE contri.is_test = 0 AND " .
               self::fiscalYearOffset('contri.receive_date') . " = $current_year) AND contribution_civireport.contact_id IN (SELECT distinct contri.contact_id FROM civicrm_contribution contri
  WHERE " . self::fiscalYearOffset('contri.receive_date') .
-              " = $previous_year AND contri.is_test = 0)";
+              " = $previous_year AND contri.is_test = 0) AND " . self::fiscalYearOffset('contribution_civireport.receive_date') . " = $previous_year";
           }
           elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
           ) {
@@ -397,11 +397,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     if (!empty($rows)) {
-      $select = "
-                      SELECT
-                            SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
+      $select = "SELECT SUM({$this->_aliases['civicrm_contribution']}.total_amount ) as amount ";
+      $where = "WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
+        AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause}";
 
-      $sql = "{$select} {$this->_from} {$this->_where}";
+      $sql = "{$select} {$this->_from} {$where}";
       $dao = CRM_Core_DAO::executeQuery($sql);
       if ($dao->fetch()) {
         $statistics['counts']['amount'] = array(
@@ -427,29 +427,23 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->where();
     $this->groupBy();
 
-    $rows = $contactIds = array();
+    $rows = $this->_contactIds = array();
+    $this->limit();
+    $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}  GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
+
+    $dao = CRM_Core_DAO::executeQuery($getContacts);
+
+    while ($dao->fetch()) {
+      $this->_contactIds[] = $dao->cid;
+    }
+    $dao->free();
     if (empty($this->_params['charts'])) {
-      $this->limit();
-      $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}  GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
-
-      $dao = CRM_Core_DAO::executeQuery($getContacts);
-
-      while ($dao->fetch()) {
-        $contactIds[] = $dao->cid;
-      }
-      $dao->free();
       $this->setPager();
     }
 
-    if (!empty($contactIds) || !empty($this->_params['charts'])) {
-      if (!empty($this->_params['charts'])) {
-        $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy}";
-      }
-      else {
-        $sql = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
-          implode(',', $contactIds) .
-          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
-      }
+    if (!empty($this->_contactIds) || !empty($this->_params['charts'])) {
+      $sql = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
+        AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
 
       $dao = CRM_Core_DAO::executeQuery($sql);
       $current_year = $this->_params['yid_value'];

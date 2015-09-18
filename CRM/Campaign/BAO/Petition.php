@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,11 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -222,7 +221,8 @@ SELECT  petition.id                         as id,
       }
 
       // set permanent cookie to indicate this petition already signed on the computer
-      setcookie('signed_' . $params['sid'], $activity->id, time() + $this->cookieExpire, '/');
+      $config = CRM_Core_Config::singleton();
+      setcookie('signed_' . $params['sid'], $activity->id, time() + $this->cookieExpire, $config->userFrameworkBaseURL);
     }
 
     return $activity;
@@ -267,15 +267,22 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       2 => array($tag_name, 'String'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);
-
-    // set permanent cookie to indicate this users email address now confirmed
-    setcookie("confirmed_{$petition_id}",
-      $activity_id,
-      time() + $this->cookieExpire,
-      '/'
-    );
-
-    return TRUE;
+    // validate arguments to setcookie are numeric to prevent header manipulation
+    if (isset($petition_id) && is_numeric($petition_id)
+      && isset($activity_id) && is_numeric($activity_id)) {
+      // set permanent cookie to indicate this users email address now confirmed
+      $config = CRM_Core_Config::singleton();
+      setcookie("confirmed_{$petition_id}",
+        $activity_id,
+        time() + $this->cookieExpire,
+        $config->userFrameworkBaseURL
+      );
+      return TRUE;
+    }
+    else {
+      CRM_Core_Error::fatal(ts('Petition Id and/or Activity Id is not of the type Positive.'));
+      return FALSE;
+    }
   }
 
   /**
@@ -536,10 +543,9 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @param $sendEmailMode
+   * @param int $sendEmailMode
    *
    * @throws Exception
-   * @return void
    */
   public static function sendEmail($params, $sendEmailMode) {
 

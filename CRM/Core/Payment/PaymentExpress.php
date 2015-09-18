@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -113,8 +113,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *   Name value pair of contribution data.
    *
    * @param $component
-   *
-   * @return void
    */
   public function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);

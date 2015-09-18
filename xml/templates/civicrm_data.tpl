@@ -1,5 +1,5 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.6                                                |
+-- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
 -- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
@@ -141,7 +141,7 @@ VALUES
    ('individual_suffix'             , '{ts escape="sql"}Individual contact suffixes{/ts}'        , 1, 1, 0),
    ('acl_role'                      , '{ts escape="sql"}ACL Role{/ts}'                           , 1, 1, 0),
    ('accept_creditcard'             , '{ts escape="sql"}Accepted Credit Cards{/ts}'              , 1, 1, 0),
-   ('payment_instrument'            , '{ts escape="sql"}Payment Instruments{/ts}'                , 1, 1, 0),
+   ('payment_instrument'            , '{ts escape="sql"}Payment Methods{/ts}'                    , 1, 1, 0),
    ('contribution_status'           , '{ts escape="sql"}Contribution Status{/ts}'                , 1, 1, 1),
    ('pcp_status'                    , '{ts escape="sql"}PCP Status{/ts}'                         , 1, 1, 1),
    ('pcp_owner_notify'              , '{ts escape="sql"}PCP owner notifications{/ts}'            , 1, 1, 1),
@@ -208,7 +208,8 @@ VALUES
    ('name_badge'                    , '{ts escape="sql"}Name Badge Format{/ts}'                  , 1, 1, 0),
    ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1, 0),
    ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , 1, 1, 0),
-   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1);
+   ('contact_date_reminder_options' , '{ts escape="sql"}Contact Date Reminder Options{/ts}'      , 1, 1, 1),
+   ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , 1, 1, 0);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -286,6 +287,7 @@ SELECT @option_group_id_name_badge := max(id) from civicrm_option_group where na
 SELECT @option_group_id_communication_style := max(id) from civicrm_option_group where name = 'communication_style';
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group where name = 'contact_date_reminder_options';
+SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group where name = 'relative_date_filters';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -546,7 +548,7 @@ VALUES
   (@option_group_id_adOpt, '{ts escape="sql"}Supplemental Address 1{/ts}'  ,  2, 'supplemental_address_1', NULL, 0, NULL,  2, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_adOpt, '{ts escape="sql"}Supplemental Address 2{/ts}'  ,  3, 'supplemental_address_2', NULL, 0, NULL,  3, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_adOpt, '{ts escape="sql"}City{/ts}'              ,  4, 'city'          , NULL, 0, NULL,  4, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_adOpt, '{ts escape="sql"}Zip / Postal Code{/ts}' ,  5, 'postal_code'   , NULL, 0, NULL,  5, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_adOpt, '{ts escape="sql"}Postal Code{/ts}' ,  5, 'postal_code'   , NULL, 0, NULL,  5, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_adOpt, '{ts escape="sql"}Postal Code Suffix{/ts}',  6, 'postal_code_suffix', NULL, 0, NULL,  6, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_adOpt, '{ts escape="sql"}County{/ts}'            ,  7, 'county'        , NULL, 0, NULL,  7, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_adOpt, '{ts escape="sql"}State/Province{/ts}'  ,  8, 'state_province', NULL, 0, NULL,  8, NULL, 0, 0, 1, NULL, NULL),
@@ -948,7 +950,68 @@ VALUES
 
 -- Reminder Options for Contact Date Fields
 (@option_group_id_contactDateMode, '{ts escape="sql"}Actual date only{/ts}', '1', 'Actual date only', NULL, NULL, 0, 1, NULL, 0, 1, 1, NULL, NULL),
-(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL);
+(@option_group_id_contactDateMode, '{ts escape="sql"}Each anniversary{/ts}', '2', 'Each anniversary', NULL, NULL, 0, 2, NULL, 0, 1, 1, NULL, NULL),
+
+-- Relative Date Filters
+(@option_group_id_date_filter, '{ts escape="sql"}Previous 2 Years{/ts}', 'previous_2.year', 'previous_2.year', NULL, NULL, NULL,1, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous 2 Quarters{/ts}', 'previous_2.quarter', 'previous_2.quarter', NULL, NULL, NULL,2, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous 2 Months{/ts}', 'previous_2.month', 'previous_2.month', NULL, NULL, NULL,3, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous 2 Weeks{/ts}', 'previous_2.week', 'previous_2.week', NULL, NULL, NULL,4, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous 2 Days{/ts}', 'previous_2.day', 'previous_2.day', NULL, NULL, NULL,5, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Prior to Previous Year{/ts}', 'previous_before.year', 'previous_before.year', NULL, NULL, NULL,6, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Prior to Previous Quarter{/ts}', 'previous_before.quarter', 'previous_before.quarter', NULL, NULL, NULL,7, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Prior to Previous Month{/ts}', 'previous_before.month', 'previous_before.month', NULL, NULL, NULL,8, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Prior to Previous Week{/ts}', 'previous_before.week', 'previous_before.week', NULL, NULL, NULL,9, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Prior to Previous Day{/ts}', 'previous_before.day', 'previous_before.day', NULL, NULL, NULL,10, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous Year{/ts}', 'previous.year', 'previous.year', NULL, NULL, NULL,11, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous Fiscal Year{/ts}', 'previous.fiscal_year', 'previous.fiscal_year', NULL, NULL, NULL,12, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous Quarter{/ts}', 'previous.quarter', 'previous.quarter', NULL, NULL, NULL,13, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous Month{/ts}', 'previous.month', 'previous.month', NULL, NULL, NULL,14, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Previous Week{/ts}', 'previous.week', 'previous.week', NULL, NULL, NULL,15, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Previous Year{/ts}', 'earlier.year', 'earlier.year', NULL, NULL, NULL,16, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Previous Quarter{/ts}', 'earlier.quarter', 'earlier.quarter', NULL, NULL, NULL,17, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Previous Month{/ts}', 'earlier.month', 'earlier.month', NULL, NULL, NULL,18, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Previous Week{/ts}', 'earlier.week', 'earlier.week', NULL, NULL, NULL,19, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Previous Day{/ts}', 'earlier.day', 'earlier.day', NULL, NULL, NULL,20, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From End of Previous Year{/ts}', 'greater_previous.year', 'greater_previous.year', NULL, NULL, NULL,21, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From End of Previous Quarter{/ts}', 'greater_previous.quarter', 'greater_previous.quarter', NULL, NULL, NULL,22, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From End of Previous Month{/ts}', 'greater_previous.month', 'greater_previous.month', NULL, NULL, NULL,23, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From End of Previous Week{/ts}', 'greater_previous.week', 'greater_previous.week', NULL, NULL, NULL,24, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From Start of Current Year{/ts}', 'greater.year', 'greater.year', NULL, NULL, NULL,25, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From Start of Current Quarter{/ts}', 'greater.quarter', 'greater.quarter', NULL, NULL, NULL,26, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From Start of Current Month{/ts}', 'greater.month', 'greater.month', NULL, NULL, NULL,27, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From Start of Current Week{/ts}', 'greater.week', 'greater.week', NULL, NULL, NULL,28, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}From Start of Current Day{/ts}', 'greater.day', 'greater.day', NULL, NULL, NULL,29, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Current Year to-date{/ts}', 'current.year', 'current.year', NULL, NULL, NULL,30, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Current Quarter to-date{/ts}', 'current.quarter', 'current.quarter', NULL, NULL, NULL,31, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Current Month to-date{/ts}', 'current.month', 'current.month', NULL, NULL, NULL,32, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Current Week to-date{/ts}', 'current.week', 'current.week', NULL, NULL, NULL,33, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Last 3 Years{/ts}', 'ending_3.year', 'ending_3.year', NULL, NULL, NULL,34, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Last 2 Years{/ts}', 'ending_2.year', 'ending_2.year', NULL, NULL, NULL,35, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Last 12 Months{/ts}', 'ending.year', 'ending.year', NULL, NULL, NULL,36, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Last 3 Months{/ts}', 'ending.quarter', 'ending.quarter', NULL, NULL, NULL,37, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Last Month{/ts}', 'ending.month', 'ending.month', NULL, NULL, NULL,38, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Last 7 days{/ts}', 'ending.week', 'ending.week', NULL, NULL, NULL,39, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Yesterday{/ts}', 'previous.day', 'previous.day', NULL, NULL, NULL,40, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}This Year{/ts}', 'this.year', 'this.year', NULL, NULL, NULL,41, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}This Fiscal Year{/ts}', 'this.fiscal_year', 'this.fiscal_year', NULL, NULL, NULL,42, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}This Quarter{/ts}', 'this.quarter', 'this.quarter', NULL, NULL, NULL,43, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}This Month{/ts}', 'this.month', 'this.month', NULL, NULL, NULL,44, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}This Week{/ts}', 'this.week', 'this.week', NULL, NULL, NULL,45, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Today{/ts}', 'this.day', 'this.day', NULL, NULL, NULL,46, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Tomorrow{/ts}', 'starting.day', 'starting.day', NULL, NULL, NULL,47, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Upcoming 7 days{/ts}', 'starting.week', 'starting.week', NULL, NULL, NULL,48, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Upcoming Month{/ts}', 'starting.month', 'starting.month', NULL, NULL, NULL,49, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Upcoming 12 Months{/ts}', 'starting.year', 'starting.year', NULL, NULL, NULL,50, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Current Year{/ts}', 'less.year', 'less.year', NULL, NULL, NULL,51, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Current Quarter{/ts}', 'less.quarter', 'less.quarter', NULL, NULL, NULL,52, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Current Month{/ts}', 'less.month', 'less.month', NULL, NULL, NULL,53, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}To End of Current Week{/ts}', 'less.week', 'less.week', NULL, NULL, NULL,54, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Next Week{/ts}', 'next.week', 'next.week', NULL, NULL, NULL,55, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Next Month{/ts}', 'next.month', 'next.month', NULL, NULL, NULL,56, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Next Quarter{/ts}', 'next.quarter', 'next.quarter', NULL, NULL, NULL,57, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Next Fiscal Year{/ts}', 'next.fiscal_year', 'next.fiscal_year', NULL, NULL, NULL,58, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_date_filter, '{ts escape="sql"}Next Year{/ts}', 'next.year', 'next.year', NULL, NULL, NULL,59, NULL, 0, 0, 1, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
@@ -1056,7 +1119,7 @@ VALUES
  ('PayPal_Express',     '{ts escape="sql"}PayPal - Express{/ts}',       NULL,1,0,'{ts escape="sql"}User Name{/ts}','{ts escape="sql"}Password{/ts}','{ts escape="sql"}Signature{/ts}',NULL,'Payment_PayPalImpl','https://www.paypal.com/','https://api-3t.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/','https://api-3t.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',2,NULL),
  ('Google_Checkout',    '{ts escape="sql"}Google Checkout{/ts}',        NULL,1,0,'{ts escape="sql"}Merchant ID{/ts}','{ts escape="sql"}Key{/ts}',NULL,NULL,'Payment_Google','https://checkout.google.com/',NULL,'https://checkout.google.com/','https://checkout.google.com/buttons/checkout.gif?merchant_id=YOURMERCHANTIDHERE&w=160&h=43&style=white&variant=text&loc=en_US','https://sandbox.google.com/checkout/',NULL,'https://sandbox.google.com/checkout/','https://sandbox.google.com/checkout/buttons/checkout.gif?merchant_id=YOURMERCHANTIDHERE&w=160&h=43&style=white&variant=text&loc=en_US',4,1),
  ('Moneris',            '{ts escape="sql"}Moneris{/ts}',                NULL,1,0,'{ts escape="sql"}User Name{/ts}','{ts escape="sql"}Password{/ts}','{ts escape="sql"}Store ID{/ts}',NULL,'Payment_Moneris','https://www3.moneris.com/',NULL,NULL,NULL,'https://esqa.moneris.com/',NULL,NULL,NULL,1,1),
- ('AuthNet',            '{ts escape="sql"}Authorize.Net{/ts}',          NULL,1,0,'{ts escape="sql"}API Login{/ts}','{ts escape="sql"}Payment Key{/ts}','{ts escape="sql"}MD5 Hash{/ts}',NULL,'Payment_AuthorizeNet','https://secure.authorize.net/gateway/transact.dll',NULL,'https://api.authorize.net/xml/v1/request.api',NULL,'https://test.authorize.net/gateway/transact.dll',NULL,'https://apitest.authorize.net/xml/v1/request.api',NULL,1,1),
+ ('AuthNet',            '{ts escape="sql"}Authorize.Net{/ts}',          NULL,1,0,'{ts escape="sql"}API Login{/ts}','{ts escape="sql"}Payment Key{/ts}','{ts escape="sql"}MD5 Hash{/ts}',NULL,'Payment_AuthorizeNet','https://secure2.authorize.net/gateway/transact.dll',NULL,'https://api2.authorize.net/xml/v1/request.api',NULL,'https://test.authorize.net/gateway/transact.dll',NULL,'https://apitest.authorize.net/xml/v1/request.api',NULL,1,1),
  ('PayJunction',        '{ts escape="sql"}PayJunction{/ts}',            NULL,1,0,'User Name','Password',NULL,NULL,'Payment_PayJunction','https://payjunction.com/quick_link',NULL,NULL,NULL,'https://www.payjunctionlabs.com/quick_link',NULL,NULL,NULL,1,1),
  ('eWAY',               '{ts escape="sql"}eWAY (Single Currency){/ts}', NULL,1,0,'Customer ID',NULL,NULL,NULL,'Payment_eWAY','https://www.eway.com.au/gateway_cvn/xmlpayment.asp',NULL,NULL,NULL,'https://www.eway.com.au/gateway_cvn/xmltest/testpage.asp',NULL,NULL,NULL,1,0),
  ('Payment_Express',    '{ts escape="sql"}DPS Payment Express{/ts}',    NULL,1,0,'User ID','Key','Mac Key - pxaccess only',NULL,'Payment_PaymentExpress','https://www.paymentexpress.com/pleaseenteraurl',NULL,NULL,NULL,'https://www.paymentexpress.com/pleaseenteratesturl',NULL,NULL,NULL,4,0),
@@ -1479,7 +1542,7 @@ INSERT INTO civicrm_uf_field
        ( 10,     'contribution_status_id',      1, 1, 3, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Status{/ts}', 'Contribution', NULL, NULL ),
        ( 10,     'receive_date',                1, 1, 4, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Received{/ts}', 'Contribution', NULL, NULL ),
        ( 10,     'contribution_source',         0, 0, 5, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Source{/ts}', 'Contribution', NULL, NULL ),
-       ( 10,     'payment_instrument',          0, 0, 6, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Paid By{/ts}', 'Contribution', NULL, NULL ),
+       ( 10,     'payment_instrument',          0, 0, 6, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Payment Method{/ts}', 'Contribution', NULL, NULL ),
        ( 10,     'check_number',                0, 0, 7, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Check Number{/ts}', 'Contribution', NULL, NULL ),
        ( 10,     'send_receipt',                0, 0, 8, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Send Receipt{/ts}', 'Contribution', NULL, NULL ),
        ( 10,     'invoice_id',                  0, 0, 9, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Invoice ID{/ts}', 'Contribution', NULL, NULL ),
@@ -1494,7 +1557,7 @@ INSERT INTO civicrm_uf_field
        ( 11,     'financial_type',              0, 1, 7, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Financial Type{/ts}', 'Membership', NULL, NULL ),
        ( 11,     'total_amount',                0, 1, 8, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Amount{/ts}', 'Membership', NULL, NULL ),
        ( 11,     'receive_date',                1, 1, 9, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Received{/ts}', 'Membership', NULL, NULL ),
-       ( 11,     'payment_instrument',          0, 0, 10, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Paid By{/ts}', 'Membership', NULL, NULL ),
+       ( 11,     'payment_instrument',          0, 0, 10, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Payment Method{/ts}', 'Membership', NULL, NULL ),
        ( 11,     'check_number',                0, 0, 11, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Check Number{/ts}', 'Membership', NULL, NULL ),
        ( 11,     'contribution_status_id',      1, 1, 12, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Payment Status{/ts}', 'Membership', NULL, NULL ),
        ( 11,     'soft_credit',                 0, 0, 13, 'User and User Admin Only', 0, 0, NULL, '{ts escape="sql"}Soft Credit{/ts}', 'Membership', NULL, NULL ),
@@ -1514,8 +1577,8 @@ INSERT INTO civicrm_participant_status_type
   (2,  'Attended',                            '{ts escape="sql"}Attended{/ts}',                            'Positive', 0,           1,         1,          2,      2            ),
   (3,  'No-show',                             '{ts escape="sql"}No-show{/ts}',                             'Negative', 0,           1,         0,          3,      2            ),
   (4,  'Cancelled',                           '{ts escape="sql"}Cancelled{/ts}',                           'Negative', 1,           1,         0,          4,      2            ),
-  (5,  'Pending from pay later',              '{ts escape="sql"}Pending from pay later{/ts}',              'Pending',  1,           1,         1,          5,      2            ),
-  (6,  'Pending from incomplete transaction', '{ts escape="sql"}Pending from incomplete transaction{/ts}', 'Pending',  1,           1,         0,          6,      2            ),
+  (5,  'Pending from pay later',              '{ts escape="sql"}Pending (pay later){/ts}',                 'Pending',  1,           1,         1,          5,      2            ),
+  (6,  'Pending from incomplete transaction', '{ts escape="sql"}Pending (incomplete transaction){/ts}',    'Pending',  1,           1,         0,          6,      2            ),
   (7,  'On waitlist',                         '{ts escape="sql"}On waitlist{/ts}',                         'Waiting',  1,           0,         0,          7,      2            ),
   (8,  'Awaiting approval',                   '{ts escape="sql"}Awaiting approval{/ts}',                   'Waiting',  1,           0,         1,          8,      2            ),
   (9,  'Pending from waitlist',               '{ts escape="sql"}Pending from waitlist{/ts}',               'Pending',  1,           0,         1,          9,      2            ),

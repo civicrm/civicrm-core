@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -39,11 +39,6 @@
  *
  */
 class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_Registration {
-
-  /**
-   * The defaults involved in this page.
-   */
-  public $_defaults = array();
 
   /**
    * Pre-registered additional participant id.

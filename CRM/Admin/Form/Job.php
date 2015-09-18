@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 
 /**
- *
+ * Class for configuring jobs.
  */
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
   protected $_id = NULL;
@@ -65,8 +63,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * Build the form object.
    *
    * @param bool $check
-   *
-   * @return void
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -123,7 +119,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     require_once 'api/api.php';
 
     /** @var \Civi\API\Kernel $apiKernel */
-    $apiKernel = \Civi\Core\Container::singleton()->get('civi_api_kernel');
+    $apiKernel = \Civi::service('civi_api_kernel');
     $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
     try {
       $apiKernel->resolve($apiRequest);
@@ -172,9 +168,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
 

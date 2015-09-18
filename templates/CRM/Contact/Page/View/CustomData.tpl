@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -25,6 +25,13 @@
 *}
 {* template for custom data *}
 {assign var="customDataGroupName" value=$customDataGroup.name}
+{strip}
+  {if $displayStyle neq 'tableOriented' and ($action eq 16 or $action eq 4)} {* Browse or View actions *}
+    <div class="form-item">
+      {include file="CRM/Custom/Page/CustomDataView.tpl"}
+    </div>
+  {/if}
+{/strip}
 {foreach from=$viewCustomData item=customGroupWrapper}
   {foreach from=$customGroupWrapper item=customGroup key=customGroupId}
     {assign var="customRegion" value='contact-custom-data-'|cat:$customGroup.name}
@@ -59,14 +66,6 @@
           </script>
         {/literal}
       {else}
-        {strip}
-          {if $action eq 16 or $action eq 4} {* Browse or View actions *}
-            <div class="form-item">
-              {include file="CRM/Custom/Page/CustomDataView.tpl"}
-            </div>
-          {/if}
-        {/strip}
-
         {if $mainEditForm}
           <script type="text/javascript">
             var showBlocks1 = new Array({$showBlocks1});

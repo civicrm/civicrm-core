@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,17 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Class contains functions for individual contact type
+ * Class contains functions for individual contact type.
  */
 class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
   /**
-   * This is a contructor of the class.
+   * Class constructor.
    */
   public function __construct() {
   }
@@ -49,7 +47,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param array $contact
+   * @param CRM $contact
    *   Contact object.
    *
    * @return CRM_Contact_BAO_Contact
@@ -254,7 +252,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     }
 
     //now set the names.
-    $names = array('sortName' => 'sort_name', 'displayName' => 'display_name');
+    $names = array('displayName' => 'display_name', 'sortName' => 'sort_name');
     foreach ($names as $value => $name) {
       if (empty($$value)) {
         if ($email) {
@@ -262,6 +260,13 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
         elseif ($uniqId) {
           $$value = $uniqId;
+        }
+        elseif (!empty($params[$name])) {
+          $$value = $params[$name];
+        }
+        // If we have nothing else going on set sort_name to display_name.
+        elseif ($displayName) {
+          $$value = $displayName;
         }
       }
       //finally if we could not pass anything lets keep db.
@@ -344,14 +349,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
   }
 
   /**
-   * Regenerates display_name for contacts with given prefixes/suffixes
+   * Regenerates display_name for contacts with given prefixes/suffixes.
    *
    * @param array $ids
    *   The array with the prefix/suffix id governing which contacts to regenerate.
    * @param int $action
    *   The action describing whether prefix/suffix was UPDATED or DELETED.
-   *
-   * @return void
    */
   public static function updateDisplayNames(&$ids, $action) {
     // get the proper field name (prefix_id or suffix_id) and its value
@@ -408,11 +411,10 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    * Check if there is data to create the object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return bool
    */
-  public static function dataExists(&$params) {
+  public static function dataExists($params) {
     if ($params['contact_type'] == 'Individual') {
       return TRUE;
     }

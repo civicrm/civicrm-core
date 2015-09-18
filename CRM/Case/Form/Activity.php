@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class create activities for a case
- *
+ * This class create activities for a case.
  */
 class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
@@ -54,13 +51,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   public $_caseType;
 
   /**
-   * The default values of an activity.
-   *
-   * @var array
-   */
-  public $_defaults = array();
-
-  /**
    * The array of releted contact info.
    *
    * @var array
@@ -69,8 +59,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function preProcess() {
     $caseIds = CRM_Utils_Request::retrieve('caseid', 'String', $this);
@@ -214,11 +202,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
+   * Set default values for the form.
    */
   public function setDefaultValues() {
     $this->_defaults = parent::setDefaultValues();
@@ -361,10 +345,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   /**
    * Process the form submission.
    *
-   *
    * @param array $params
-   *
-   * @return void
    */
   public function postProcess($params = NULL) {
     $transaction = new CRM_Core_Transaction();

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This is class to handle address related functions
+ * This is class to handle address related functions.
  */
 class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
@@ -83,27 +81,16 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       }
 
       $addressExists = self::dataExists($value);
-
-      // If the ID is empty then this is either a new address, or an edit coming
-      // from a Profile. So we need to match up the location type with any
-      // that are currently on the contact.
-      if (empty($value['id']) && !empty($value['location_type_id']) && !empty($addresses)) {
-
-        // Does the submitted address type already exist?
-        if (array_key_exists($value['location_type_id'], $addresses)) {
-
-          // Match the address ID and remove from the list so we know its matched
-          $value['id'] = $addresses[$value['location_type_id']];
-          unset($addresses[$value['location_type_id']]);
-
+      if (empty($value['id'])) {
+        if (!empty($addresses) && array_key_exists(CRM_Utils_Array::value('location_type_id', $value), $addresses)) {
+          $value['id'] = $addresses[CRM_Utils_Array::value('location_type_id', $value)];
         }
-
       }
 
       // Note there could be cases when address info already exist ($value[id] is set) for a contact/entity
       // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
-      if (!empty($value['id']) && !$addressExists && $updateBlankLocInfo) {
+      if (isset($value['id']) && !$addressExists && $updateBlankLocInfo) {
         //delete the existing record
         CRM_Core_BAO_Block::blockDelete('Address', array('id' => $value['id']));
         continue;
@@ -131,14 +118,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       }
       $value['contact_id'] = $contactId;
       $blocks[] = self::add($value, $fixAddress);
-    }
-
-    // If this is an edit from the full contact edit page then delete any
-    // addresses that we couldn't match on - because they were deleted on the form
-    if (!empty($params['isFullContactEdit']) && count($addresses)) {
-      foreach ($addresses as $addressId) {
-        CRM_Core_BAO_Block::blockDelete('Address', array('id' => $addressId));
-      }
     }
 
     return $blocks;
@@ -212,8 +191,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return void
    */
   public static function fixAddress(&$params) {
     if (!empty($params['billing_street_address'])) {
@@ -571,11 +548,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   }
 
   /**
-   * Add the formatted address to $this-> display
+   * Add the formatted address to $this-> display.
    *
    * @param bool $microformat
-   *
-   * @return void
+   *   Unexplained parameter that I've always wondered about.
    */
   public function addDisplay($microformat = FALSE) {
     $fields = array(
@@ -612,12 +588,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @param int $id
    *   The contact id.
    *
+   * @param bool $updateBlankLocInfo
+   *
    * @return array
-   *   the array of address data
+   *   the array of adrress data
    */
-  public static function allAddress($id) {
-
-    $addresses = array();
+  public static function allAddress($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
       return NULL;
     }
@@ -627,11 +603,18 @@ SELECT civicrm_address.id as address_id, civicrm_address.location_type_id as loc
 FROM civicrm_contact, civicrm_address
 WHERE civicrm_address.contact_id = civicrm_contact.id AND civicrm_contact.id = %1
 ORDER BY civicrm_address.is_primary DESC, address_id ASC";
-
     $params = array(1 => array($id, 'Integer'));
+
+    $addresses = array();
     $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $count = 1;
     while ($dao->fetch()) {
-      $addresses[$dao->location_type_id] = $dao->address_id;
+      if ($updateBlankLocInfo) {
+        $addresses[$count++] = $dao->address_id;
+      }
+      else {
+        $addresses[$dao->location_type_id] = $dao->address_id;
+      }
     }
     return $addresses;
   }
@@ -644,10 +627,9 @@ ORDER BY civicrm_address.is_primary DESC, address_id ASC";
    *   entity_table name
    *
    * @return array
-   *   the array of address data
+   *   the array of adrress data
    */
   public static function allEntityAddress(&$entityElements) {
-
     $addresses = array();
     if (empty($entityElements)) {
       return $addresses;
@@ -657,7 +639,7 @@ ORDER BY civicrm_address.is_primary DESC, address_id ASC";
     $entityTable = $entityElements['entity_table'];
 
     $sql = "
-SELECT civicrm_address.id as address_id, civicrm_address.location_type_id as location_type_id
+SELECT civicrm_address.id as address_id
 FROM civicrm_loc_block loc, civicrm_location_type ltype, civicrm_address, {$entityTable} ev
 WHERE ev.id = %1
   AND loc.id = ev.loc_block_id
@@ -667,8 +649,10 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
 
     $params = array(1 => array($entityId, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $locationCount = 1;
     while ($dao->fetch()) {
-      $addresses[$dao->location_type_id] = $dao->address_id;
+      $addresses[$locationCount] = $dao->address_id;
+      $locationCount++;
     }
     return $addresses;
   }
@@ -1009,8 +993,6 @@ SELECT is_primary,
    *   Address id.
    * @param array $params
    *   Associated array of address params.
-   *
-   * @return void
    */
   public static function processSharedAddress($addressId, $params) {
     $query = 'SELECT id FROM civicrm_address WHERE master_id = %1';
@@ -1114,8 +1096,6 @@ SELECT is_primary,
    *   Master address id.
    * @param array $params
    *   Associated array of submitted values.
-   *
-   * @return void
    */
   public static function processSharedAddressRelationship($masterAddressId, $params) {
     // get the contact type of contact being edited / created

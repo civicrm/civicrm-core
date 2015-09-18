@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_I18n {
 
@@ -53,6 +51,11 @@ class CRM_Core_I18n {
   private $_extensioncache = array();
 
   /**
+   * @var string
+   */
+  private $locale;
+
+  /**
    * A locale-based constructor that shouldn't be called from outside of this class (use singleton() instead).
    *
    * @param string $locale
@@ -61,9 +64,8 @@ class CRM_Core_I18n {
    * @return \CRM_Core_I18n
    */
   public function __construct($locale) {
+    $this->locale = $locale;
     if ($locale != '' and $locale != 'en_US') {
-      $config = CRM_Core_Config::singleton();
-
       if (defined('CIVICRM_GETTEXT_NATIVE') && CIVICRM_GETTEXT_NATIVE && function_exists('gettext')) {
         // Note: the file hierarchy for .po must be, for example: l10n/fr_FR/LC_MESSAGES/civicrm.mo
 
@@ -77,7 +79,7 @@ class CRM_Core_I18n {
         setlocale(LC_MESSAGES, $locale);
         setlocale(LC_CTYPE, $locale);
 
-        bindtextdomain('civicrm', $config->gettextResourceDir);
+        bindtextdomain('civicrm', CRM_Core_I18n::getResourceDir());
         bind_textdomain_codeset('civicrm', 'UTF-8');
         textdomain('civicrm');
 
@@ -93,11 +95,11 @@ class CRM_Core_I18n {
       require_once 'PHPgettext/streams.php';
       require_once 'PHPgettext/gettext.php';
 
-      $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
+      $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . 'civicrm.mo';
 
       if (!file_exists($mo_file)) {
         // fallback to pre-4.5 mode
-        $mo_file = $config->gettextResourceDir . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
+        $mo_file = CRM_Core_I18n::getResourceDir() . $locale . DIRECTORY_SEPARATOR . 'civicrm.mo';
       }
 
       $streamer = new FileReader($mo_file);
@@ -133,9 +135,8 @@ class CRM_Core_I18n {
       $all = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
 
       // check which ones are available; add them to $all if not there already
-      $config = CRM_Core_Config::singleton();
       $codes = array();
-      if (is_dir($config->gettextResourceDir) && $dir = opendir($config->gettextResourceDir)) {
+      if (is_dir(CRM_Core_I18n::getResourceDir()) && $dir = opendir(CRM_Core_I18n::getResourceDir())) {
         while ($filename = readdir($dir)) {
           if (preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $filename)) {
             $codes[] = $filename;
@@ -199,6 +200,14 @@ class CRM_Core_I18n {
     return strtr($str, $tr);
   }
 
+  public static function getResourceDir() {
+    static $dir = NULL;
+    if ($dir === NULL) {
+      $dir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR;
+    }
+    return $dir;
+  }
+
   /**
    * Smarty block function, provides gettext support for smarty.
    *
@@ -220,6 +229,7 @@ class CRM_Core_I18n {
    *   The params of the translation (if any).
    *   - domain: string|array a list of translation domains to search (in order)
    *   - context: string
+   *
    * @return string
    *   the translated string
    */
@@ -316,7 +326,8 @@ class CRM_Core_I18n {
    * @param int|NULL $count
    * @param string $plural
    * @param string $context
-   * @return mixed|string|translated
+   *
+   * @return string
    */
   protected function crm_translate_raw($text, $domain, $count, $plural, $context) {
     // gettext domain for extensions
@@ -328,11 +339,15 @@ class CRM_Core_I18n {
     }
 
     // do all wildcard translations first
-    $config = CRM_Core_Config::singleton();
-    $stringTable = CRM_Utils_Array::value(
-      $config->lcMessages,
-      $config->localeCustomStrings
-    );
+    if (!isset(Civi::$statics[__CLASS__][$this->locale])) {
+      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
+        Civi::$statics[__CLASS__][$this->locale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($this->locale);
+      }
+      else {
+        Civi::$statics[__CLASS__][$this->locale] = array();
+      }
+    }
+    $stringTable = Civi::$statics[__CLASS__][$this->locale];
 
     $exactMatch = FALSE;
     if (isset($stringTable['enabled']['exactMatch'])) {
@@ -412,8 +427,6 @@ class CRM_Core_I18n {
    *   the array for localization (in place).
    * @param array $params
    *   an array of additional parameters.
-   *
-   * @return void
    */
   public function localizeArray(
     &$array,
@@ -437,8 +450,6 @@ class CRM_Core_I18n {
    *
    * @param array $array
    *   the array for localization (in place).
-   *
-   * @return void
    */
   public function localizeTitles(&$array) {
     foreach ($array as $key => $value) {
@@ -469,8 +480,6 @@ class CRM_Core_I18n {
 
     // It's only necessary to find/bind once
     if (!isset($this->_extensioncache[$key])) {
-      $config = CRM_Core_Config::singleton();
-
       try {
         $mapper = CRM_Extension_System::singleton()->getMapper();
         $path = $mapper->keyToBasePath($key);
@@ -484,7 +493,7 @@ class CRM_Core_I18n {
         }
         else {
           // phpgettext
-          $mo_file = $path . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $config->lcMessages . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
+          $mo_file = $path . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR . $this->locale . DIRECTORY_SEPARATOR . 'LC_MESSAGES' . DIRECTORY_SEPARATOR . $domain . '.mo';
           $streamer = new FileReader($mo_file);
           $this->_extensioncache[$key] = new gettext_reader($streamer);
         }
@@ -546,12 +555,40 @@ class CRM_Core_I18n {
     return $locales[$tsLocale];
   }
 
+  /**
+   * Get the default language for contacts where no language is provided.
+   *
+   * Note that NULL is a valid option so be careful with checking for empty etc.
+   *
+   * NULL would mean 'we don't know & we don't want to hazard a guess'.
+   *
+   * @return string
+   */
+  public static  function getContactDefaultLanguage() {
+    $language = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME, 'contact_default_language');
+    if ($language == 'undefined') {
+      return NULL;
+    }
+    if (empty($language) || $language === '*default*') {
+      $language = civicrm_api3('setting', 'getvalue', array(
+        'name' => 'lcMessages',
+        'group' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+      ));
+    }
+    elseif ($language == 'current_site_language') {
+      global $tsLocale;
+      return $tsLocale;
+    }
+
+    return $language;
+  }
+
 }
 
 /**
  * Short-named function for string translation, defined in global scope so it's available everywhere.
  *
- * @param $text
+ * @param string $text
  *   String string for translating.
  * @param array $params
  *   Array an array of additional parameters.

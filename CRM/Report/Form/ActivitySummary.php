@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -52,7 +52,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'sort_name' => array(
             'title' => ts('Contact Name'),
-            'default' => TRUE,
             'no_repeat' => TRUE,
           ),
         ),
@@ -65,7 +64,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           'sort_name' => array(
             'name' => 'id',
             'title' => ts('Contact'),
-            'default' => TRUE,
           ),
         ),
         'order_bys' => array(
@@ -80,7 +78,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'fields' => array(
           'email' => array(
             'title' => 'Email',
-            'default' => TRUE,
           ),
         ),
         'order_bys' => array(
@@ -114,9 +111,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'duration' => array(
             'title' => 'Duration',
-            'statistics' => array(
-              'sum' => ts('Duration'),
-            ),
+            'default' => TRUE,
           ),
           'id' => array(
             'title' => 'Total Activities',
@@ -132,6 +127,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
+            'default' => '',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           ),
@@ -247,13 +243,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                 switch (strtolower($stat)) {
                   case 'count':
                     $select[] = "COUNT(DISTINCT({$field['dbAlias']})) as {$tableName}_{$fieldName}_{$stat}";
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = CRM_Utils_Type::T_INT;
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
-                    $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
-                    break;
-
-                  case 'sum':
-                    $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}_{$stat}";
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = CRM_Utils_Type::T_INT;
                     $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
                     $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
@@ -383,15 +372,14 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
 
     if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
+      $this->_where .= " AND ({$this->_aclWhere} OR civicrm_contact_source.is_deleted=0 OR civicrm_contact_assignee.is_deleted=0)";
     }
   }
 
   public function groupBy() {
     $this->_groupBy = array();
-    if (is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
-    ) {
+    if (!empty($this->_params['group_bys']) &&
+    is_array($this->_params['group_bys'])) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
@@ -452,6 +440,22 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         }
       }
     }
+
+    // don't allow add to group action unless contact fields are selected.
+    if (isset($fields['_qf_ActivitySummary_submit_group'])) {
+      $contactFieldSelected = FALSE;
+      foreach ($fields['fields'] as $fieldName => $val) {
+        if (in_array($fieldName, $contactFields)) {
+          $contactFieldSelected = TRUE;
+          break;
+        }
+      }
+
+      if (!$contactFieldSelected) {
+        $errors['fields'] = ts('You cannot use "Add Contacts to Group" action unless contacts fields are selected.');
+      }
+    }
+
     return $errors;
   }
 
@@ -470,17 +474,21 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
     $totalType = $totalActivity = $totalDuration = 0;
 
+    $query = "SELECT SUM(activity_civireport.duration)
+    FROM civicrm_activity activity_civireport
+    {$this->_where}";
+
     $actSQL = "SELECT
       COUNT(DISTINCT {$this->_aliases['civicrm_activity']}.activity_type_id ) as civicrm_activity_activity_type_id_count,
-      COUNT({$this->_aliases['civicrm_activity']}.activity_type_id ) as civicrm_activity_activity_type_count,
-      SUM({$this->_aliases['civicrm_activity']}.duration ) as civicrm_activity_activity_duration
-      {$this->_from} {$this->_where}";
+      COUNT(DISTINCT {$this->_aliases['civicrm_activity']}.id ) as civicrm_activity_activity_id_count,
+      ($query) as civicrm_activity_activity_duration
+      {$this->_from} {$this->_where} {$this->_groupBy}";
 
     $actDAO = CRM_Core_DAO::executeQuery($actSQL);
 
     while ($actDAO->fetch()) {
       $totalType += $actDAO->civicrm_activity_activity_type_id_count;
-      $totalActivity += $actDAO->civicrm_activity_activity_type_count;
+      $totalActivity += $actDAO->civicrm_activity_activity_id_count;
       $totalDuration += $actDAO->civicrm_activity_activity_duration;
     }
 
@@ -614,6 +622,13 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       if (array_key_exists('civicrm_activity_status_id', $row)) {
         if ($value = $row['civicrm_activity_status_id']) {
           $rows[$rowNum]['civicrm_activity_status_id'] = $activityStatus[$value];
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_activity_duration', $row)) {
+        if ($value = $row['civicrm_activity_duration']) {
+          $rows[$rowNum]['civicrm_activity_duration'] += $rows[$rowNum]['civicrm_activity_duration'];
           $entryFound = TRUE;
         }
       }

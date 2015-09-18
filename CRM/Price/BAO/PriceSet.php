@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -1360,10 +1360,7 @@ GROUP BY     mt.member_of_contact_id";
    * @return object
    */
   public static function eventPriceSetDomainID() {
-    return CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
-      'event_price_set_domain_id',
-      NULL, FALSE
-    );
+    return Civi::settings()->get('event_price_set_domain_id');
   }
 
   /**
@@ -1382,14 +1379,29 @@ GROUP BY     mt.member_of_contact_id";
   }
 
   /**
-   * Check if price set id provides option for
-   * user to select both auto-renew and non-auto-renew memberships
+   * Check if price set id provides option for user to select both auto-renew and non-auto-renew memberships
    *
    * @param int $id
    *
    * @return bool
    */
-  public static function checkMembershipPriceSet($id) {
+  public static function isMembershipPriceSetContainsMixOfRenewNonRenew($id) {
+    $membershipTypes = self::getMembershipTypesFromPriceSet($id);
+    if (!empty($membershipTypes['autorenew']) && !empty($membershipTypes['non_renew'])) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get an array of the membership types in a price set.
+   *
+   * @param int $id
+   *
+   * @return array(
+   *   Membership types in the price set
+   */
+  public static function getMembershipTypesFromPriceSet($id) {
     $query
       = "SELECT      pfv.id, pfv.price_field_id, pfv.name, pfv.membership_type_id, pf.html_type, mt.auto_renew
 FROM        civicrm_price_field_value pfv
@@ -1402,23 +1414,31 @@ WHERE       ps.id = %1
     $params = array(1 => array($id, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $autoRenew = array();
-    //FIXME: do a comprehensive check of whether
-    //2 membership types can be selected
-    //instead of comparing all of them
+    $membershipTypes = array(
+      'all' => array(),
+      'autorenew' => array(),
+      'autorenew_required' => array(),
+      'autorenew_optional' => array(),
+    );
     while ($dao->fetch()) {
-      //temp fix for #CRM-10370
-      //if its NULL consider it '0' i.e. 'No auto-renew option'
-      $daoAutoRenew = $dao->auto_renew;
-      if ($daoAutoRenew === NULL) {
-        $daoAutoRenew = 0;
+      if (empty($dao->membership_type_id)) {
+        continue;
       }
-      if (!empty($autoRenew) && !in_array($daoAutoRenew, $autoRenew)) {
-        return TRUE;
+      $membershipTypes['all'][] = $dao->membership_type_id;
+      if (!empty($dao->auto_renew)) {
+        $membershipTypes['autorenew'][] = $dao->membership_type_id;
+        if ($dao->auto_renew == 2) {
+          $membershipTypes['autorenew_required'][] = $dao->membership_type_id;
+        }
+        else {
+          $membershipTypes['autorenew_optional'][] = $dao->membership_type_id;
+        }
       }
-      $autoRenew[] = $daoAutoRenew;
+      else {
+        $membershipTypes['non_renew'][] = $dao->membership_type_id;
+      }
     }
-    return FALSE;
+    return $membershipTypes;
   }
 
   /**

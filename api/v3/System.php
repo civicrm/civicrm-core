@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -84,6 +84,11 @@ function _civicrm_api3_system_flush_spec(&$params) {
  */
 function _civicrm_api3_system_check_spec(&$spec) {
   // $spec['magicword']['api.required'] = 1;
+  $spec['show_hushed'] = array(
+    'api.default' => FALSE,
+    'title' => 'Show hushed',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }
 
 /**
@@ -99,8 +104,9 @@ function _civicrm_api3_system_check_spec(&$spec) {
  */
 function civicrm_api3_system_check($params) {
   $returnValues = array();
-  foreach (CRM_Utils_Check::singleton()->checkAll() as $message) {
-    $returnValues[] = $message->toArray();
+  $messages = CRM_Utils_Check::singleton()->checkAll(CRM_Utils_Array::value('show_hushed', $params));
+  foreach ($messages as $msg) {
+    $returnValues[] = $msg->toArray();
   }
 
   // Spec: civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL)

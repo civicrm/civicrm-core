@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Class for activity task actions
- *
+ * Class for activity task actions.
  */
 class CRM_Activity_Form_Task extends CRM_Core_Form {
 
@@ -76,16 +73,14 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @param
-   *
-   * @return void
    */
   public function preProcess() {
     self::preProcessCommon($this);
   }
 
   /**
+   * Common pre-process function.
+   *
    * @param CRM_Core_Form $form
    * @param bool $useTable
    */
@@ -194,8 +189,6 @@ WHERE  activity_id IN ( $IDs ) AND
    *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(

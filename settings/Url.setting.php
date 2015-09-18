@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -37,49 +37,71 @@
  */
 return array(
   'userFrameworkResourceURL' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'userFrameworkResourceURL',
-    'title' => 'Script and CSS Resources URL',
+    'title' => 'CiviCRM Resource URL',
     'type' => 'String',
+    'html_type' => 'Text',
+    'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'CiviCRM Resource URL',
+    'description' => 'Absolute URL of the location where the civicrm module or component has been installed.',
     'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Rule::url',
+    'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
   'imageUploadURL' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
-    'title' => 'Image URL Prefix',
+    'title' => 'Image Upload URL',
     'name' => 'imageUploadURL',
     'type' => 'String',
+    'html_type' => 'Text',
+    'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Image Upload URL',
+    'description' => 'URL of the location for uploaded image files.',
     'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Rule::url',
+    'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
   'customCSSURL' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
     'name' => 'customCSSURL',
-    'title' => 'Custom CSS',
+    'title' => 'Custom CSS URL',
     'type' => 'String',
+    'html_type' => 'Text',
+    'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
-    'prefetch' => 1,
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Custom CiviCRM CSS URL',
+    'description' => 'You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.',
     'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Rule::url',
+    'validate_callback' => 'CRM_Utils_Rule::urlish',
   ),
-
+  'extensionsURL' => array(
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
+    'group' => 'url',
+    'group_name' => 'URL Preferences',
+    'title' => 'Extension Resource URL',
+    'name' => 'extensionsURL',
+    'type' => 'String',
+    'html_type' => 'Text',
+    'quick_form_type' => 'Element',
+    'default' => NULL,
+    'add' => '4.1',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Base URL for extension resources (images, stylesheets, etc). This should match extensionsDir.',
+    'help_text' => NULL,
+    'validate_callback' => 'CRM_Utils_Rule::urlish',
+  ),
 );

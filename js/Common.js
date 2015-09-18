@@ -201,8 +201,9 @@ function showHideRow(index) {
 
 /* jshint ignore:end */
 
-CRM.utils = CRM.utils || {};
-CRM.strings = CRM.strings || {};
+if (!CRM.utils) CRM.utils = {};
+if (!CRM.strings) CRM.strings = {};
+if (!CRM.vars) CRM.vars = {};
 
 (function ($, _, undefined) {
   "use strict";
@@ -362,6 +363,13 @@ CRM.strings = CRM.strings || {};
    * @param options object
    */
   $.fn.crmSelect2 = function(options) {
+    if (options === 'destroy') {
+      return $(this).each(function() {
+        $(this)
+          .removeClass('crm-ajax-select')
+          .select2('destroy');
+      });
+    }
     return $(this).each(function () {
       var
         $el = $(this),
@@ -396,6 +404,15 @@ CRM.strings = CRM.strings || {};
    * @param options object
    */
   $.fn.crmEntityRef = function(options) {
+    if (options === 'destroy') {
+      return $(this).each(function() {
+        var entity = $(this).data('api-entity') || '';
+        $(this)
+          .off('.crmEntity')
+          .removeClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref')
+          .crmSelect2('destroy');
+      });
+    }
     options = options || {};
     options.select = options.select || {};
     return $(this).each(function() {
@@ -928,8 +945,7 @@ CRM.strings = CRM.strings || {};
   $.fn.crmtooltip = function () {
     $(document)
       .on('mouseover', 'a.crm-summary-link:not(.crm-processed)', function (e) {
-        $(this).addClass('crm-processed');
-        $(this).addClass('crm-tooltip-active');
+        $(this).addClass('crm-processed crm-tooltip-active');
         var topDistance = e.pageY - $(window).scrollTop();
         if (topDistance < 300 || topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
           $(this).addClass('crm-tooltip-down');
@@ -942,8 +958,7 @@ CRM.strings = CRM.strings || {};
         }
       })
       .on('mouseout', 'a.crm-summary-link', function () {
-        $(this).removeClass('crm-processed');
-        $(this).removeClass('crm-tooltip-active crm-tooltip-down');
+        $(this).removeClass('crm-processed crm-tooltip-active crm-tooltip-down');
       })
       .on('click', 'a.crm-summary-link', false);
   };
@@ -1296,15 +1311,6 @@ CRM.strings = CRM.strings || {};
       // Initialize notifications
       $('#crm-notification-container').notify();
       messagesFromMarkup.call($('#crm-container'));
-    }
-
-    // Hide CiviCRM menubar when editor is fullscreen
-    if (window.CKEDITOR) {
-      CKEDITOR.on('instanceCreated', function (e) {
-        e.editor.on('maximize', function (e) {
-          $('#civicrm-menu').toggle(e.data === 2);
-        });
-      });
     }
 
     $('body')

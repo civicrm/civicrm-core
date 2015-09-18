@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -134,7 +134,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
     // Check if searching by parent group  returns both parent and child group contacts
     $searchParams = array(
-      'group' => array($parentGroup->id => 1),
+      'group' => $parentGroup->id,
       'version' => 3,
     );
     $result = civicrm_api('contact', 'get', $searchParams);
@@ -148,7 +148,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
     // Check if searching by child group returns just child group contacts
     $searchParams = array(
-      'group' => array($childGroup->id => 1),
+      'group' => $childGroup->id,
       'version' => 3,
     );
     $result = civicrm_api('contact', 'get', $searchParams);

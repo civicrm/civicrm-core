@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -55,6 +55,12 @@ class CRM_Utils_Check_Message {
   private $level;
 
   /**
+   * @var string
+   *   help text (to be presented separately from the message)
+   */
+  private $help;
+
+  /**
    * @param string $name
    *   Symbolic name for the check.
    * @param string $message
@@ -70,6 +76,10 @@ class CRM_Utils_Check_Message {
     $this->name = $name;
     $this->message = $message;
     $this->title = $title;
+    // Handle non-integer severity levels.
+    if (!CRM_Utils_Rule::integer($level)) {
+      $level = CRM_Utils_Check::severityMap($level);
+    }
     $this->level = $level;
   }
 
@@ -103,15 +113,35 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Alias for Level
+   * @return string
+   */
+  public function getSeverity() {
+    return $this->getLevel();
+  }
+
+  /**
+   * Set optional additional help text
+   * @param string $help
+   */
+  public function addHelp($help) {
+    $this->help = $help;
+  }
+
+  /**
    * @return array
    */
   public function toArray() {
-    return array(
+    $array = array(
       'name' => $this->name,
       'message' => $this->message,
       'title' => $this->title,
-      'level' => $this->level,
+      'severity' => $this->level,
     );
+    if (!empty($this->help)) {
+      $array['help'] = $this->help;
+    }
+    return $array;
   }
 
 }

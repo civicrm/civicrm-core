@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -44,14 +44,14 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search/builder', 'reset=1');
 
     $this->enterValues(1, 1, 'Contacts', 'Group(s)', NULL, '=', array($groupName));
-    $this->enterValues(1, 2, 'Contacts', 'Country', NULL, '=', array('United States'));
+    $this->enterValues(1, 2, 'Contacts', 'Country', NULL, '=', array('UNITED STATES'));
     $this->enterValues(1, 3, 'Individual', 'Gender', NULL, '=', array('Male'));
     $this->click('_qf_Builder_refresh');
     $this->waitForPageToLoad();
 
     // We should get no results. But check the options are all still set
     $this->waitForTextPresent('No matches found for:');
-    foreach (array($groupName, 'United States', 'Male') as $i => $label) {
+    foreach (array($groupName, 'UNITED STATES', 'Male') as $i => $label) {
       $this->waitForElementPresent("//span[@id='crm_search_value_1_$i']/select/option[2]");
       $this->assertSelectedLabel("//span[@id='crm_search_value_1_$i']/select", $label);
     }
@@ -68,7 +68,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $sortName = "adv$firstName, $firstName";
     $displayName = "$firstName adv$firstName";
 
-    $this->_searchBuilder("Zip / Postal Code", "100[0-9]", $sortName, "RLIKE");
+    $this->_searchBuilder("Postal Code", "100[0-9]", $sortName, "RLIKE");
   }
 
   /**
@@ -103,7 +103,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->type("address_1_supplemental_address_2", "street supplement 2 $firstName");
     $this->type("address_1_city", "city$firstName");
     $this->type("address_1_postal_code", "100100");
-    $this->select("address_1_country_id", "United States");
+    $this->select("address_1_country_id", "UNITED STATES");
     $this->select("address_1_state_province_id", "Alaska");
 
     // save contact
@@ -198,7 +198,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->_createContact('Household', $firstName7, "$firstName7@advsearch.co.in", NULL, $postalCode);
 
     // check if the resultset of search builder and advanced search match for the postal code
-    $this->_searchBuilder('Zip / Postal Code', $postalCode, NULL, 'LIKE', '4');
+    $this->_searchBuilder('Postal Code', $postalCode, NULL, 'LIKE', '4');
     $this->_advancedSearch($postalCode, NULL, NULL, '4', 'postal_code');
 
     $firstName8 = "abcc" . substr(sha1(rand()), 0, 7);
@@ -363,7 +363,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->type("email_1_email", $email);
     $this->type("phone_1_phone", "9876543210");
     $this->type("address_1_street_address", $streetName);
-    $this->select("address_1_country_id", "United States");
+    $this->select("address_1_country_id", "UNITED STATES");
     $this->select("address_1_state_province_id", "Alaska");
     $this->type("address_1_postal_code", $postalCode);
 

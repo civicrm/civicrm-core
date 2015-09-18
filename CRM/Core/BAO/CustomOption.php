@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -414,6 +414,49 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
     CRM_Utils_Hook::customFieldOptions($customFieldID, $options, FALSE);
 
     return $options;
+  }
+
+  /**
+   * When changing the value of an option this is called to update all corresponding custom data
+   *
+   * @param int $optionId
+   * @param string $newValue
+   */
+  public static function updateValue($optionId, $newValue) {
+    $optionValue = new CRM_Core_DAO_OptionValue();
+    $optionValue->id = $optionId;
+    $optionValue->find(TRUE);
+    $oldValue = $optionValue->value;
+    if ($oldValue == $newValue) {
+      return;
+    }
+
+    $customField = new CRM_Core_DAO_CustomField();
+    $customField->option_group_id = $optionValue->option_group_id;
+    $customField->find();
+    while ($customField->fetch()) {
+      $customGroup = new CRM_Core_DAO_CustomGroup();
+      $customGroup->id = $customField->custom_group_id;
+      $customGroup->find(TRUE);
+      if (CRM_Core_BAO_CustomField::isSerialized($customField)) {
+        $params = array(
+          1 => array(CRM_Utils_Array::implodePadded($oldValue), 'String'),
+          2 => array(CRM_Utils_Array::implodePadded($newValue), 'String'),
+          3 => array('%' . CRM_Utils_Array::implodePadded($oldValue) . '%', 'String'),
+        );
+      }
+      else {
+        $params = array(
+          1 => array($oldValue, 'String'),
+          2 => array($newValue, 'String'),
+          3 => array($oldValue, 'String'),
+        );
+      }
+      $sql = "UPDATE `{$customGroup->table_name}` SET `{$customField->column_name}` = REPLACE(`{$customField->column_name}`, %1, %2) WHERE `{$customField->column_name}` LIKE %3";
+      $customGroup->free();
+      CRM_Core_DAO::executeQuery($sql, $params);
+    }
+    $customField->free();
   }
 
 }

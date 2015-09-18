@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -39,7 +39,18 @@ use Civi\Payment\Exception\PaymentProcessorException;
 abstract class CRM_Core_Payment {
 
   /**
-   * How are we getting billing information?
+   * Component - ie. event or contribute.
+   *
+   * This is used for setting return urls.
+   *
+   * @var string
+   */
+  protected $_component;
+
+  /**
+   * How are we getting billing information.
+   *
+   * We are trying to completely deprecate these parameters.
    *
    * FORM   - we collect it on the same page
    * BUTTON - the processor collects it and sends it back to us via some protocol
@@ -70,6 +81,25 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_END = 'END';
 
   protected $_paymentProcessor;
+
+  /**
+   * Base url of the calling form.
+   *
+   * This is used for processors that need to return the browser back to the CiviCRM site.
+   *
+   * @var string
+   */
+  protected $baseReturnUrl;
+
+  /**
+   * Set Base return URL.
+   *
+   * @param string $url
+   *   Url of site to return browser to.
+   */
+  public function setBaseReturnUrl($url) {
+    $this->baseReturnUrl = $url;
+  }
 
   /**
    * Opportunity for the payment processor to override the entire form build.
@@ -192,6 +222,15 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return method_exists(CRM_Utils_System::getClassName($this), 'cancelSubscription');
+  }
+
+  /**
    * Does this processor support pre-approval.
    *
    * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
@@ -203,6 +242,22 @@ abstract class CRM_Core_Payment {
    * @return bool
    */
   protected function supportsPreApproval() {
+    return FALSE;
+  }
+
+  /**
+   * Can recurring contributions be set against pledges.
+   *
+   * In practice all processors that use the baseIPN function to finish transactions or
+   * call the completetransaction api support this by looking up previous contributions in the
+   * series and, if there is a prior contribution against a pledge, and the pledge is not complete,
+   * adding the new payment to the pledge.
+   *
+   * However, only enabling for processors it has been tested against.
+   *
+   * @return bool
+   */
+  protected function supportsRecurContributionsForPledges() {
     return FALSE;
   }
 
@@ -396,11 +451,7 @@ abstract class CRM_Core_Payment {
           'maxlength' => 10,
           'autocomplete' => 'off',
         ),
-        'is_required' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-          'cvv_backoffice_required',
-          NULL,
-          1
-        ),
+        'is_required' => Civi::settings()->get('cvv_backoffice_required'),
         'rules' => array(
           array(
             'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
@@ -501,11 +552,151 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get billing fields required for this processor.
+   *
+   * We apply the existing default of returning fields only for payment processor type 1. Processors can override to
+   * alter.
+   *
+   * @param int $billingLocationID
+   *
+   * @return array
+   */
+  public function getBillingAddressFields($billingLocationID) {
+    if ($this->_paymentProcessor['billing_mode'] != 1 && $this->_paymentProcessor['billing_mode'] != 3) {
+      return array();
+    }
+    return array(
+      'first_name' => 'billing_first_name',
+      'middle_name' => 'billing_middle_name',
+      'last_name' => 'billing_last_name',
+      'street_address' => "billing_street_address-{$billingLocationID}",
+      'city' => "billing_city-{$billingLocationID}",
+      'country' => "billing_country_id-{$billingLocationID}",
+      'state_province' => "billing_state_province_id-{$billingLocationID}",
+      'postal_code' => "billing_postal_code-{$billingLocationID}",
+    );
+  }
+
+  /**
+   * Get form metadata for billing address fields.
+   *
+   * @param int $billingLocationID
+   *
+   * @return array
+   *    Array of metadata for address fields.
+   */
+  public function getBillingAddressFieldsMetadata($billingLocationID) {
+    $metadata = array();
+    $metadata['billing_first_name'] = array(
+      'htmlType' => 'text',
+      'name' => 'billing_first_name',
+      'title' => ts('Billing First Name'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata['billing_middle_name'] = array(
+      'htmlType' => 'text',
+      'name' => 'billing_middle_name',
+      'title' => ts('Billing Middle Name'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => FALSE,
+    );
+
+    $metadata['billing_last_name'] = array(
+      'htmlType' => 'text',
+      'name' => 'billing_last_name',
+      'title' => ts('Billing Last Name'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_street_address-{$billingLocationID}"] = array(
+      'htmlType' => 'text',
+      'name' => "billing_street_address-{$billingLocationID}",
+      'title' => ts('Street Address'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_city-{$billingLocationID}"] = array(
+      'htmlType' => 'text',
+      'name' => "billing_city-{$billingLocationID}",
+      'title' => ts('City'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_state_province_id-{$billingLocationID}"] = array(
+      'htmlType' => 'chainSelect',
+      'title' => ts('State/Province'),
+      'name' => "billing_state_province_id-{$billingLocationID}",
+      'cc_field' => TRUE,
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_postal_code-{$billingLocationID}"] = array(
+      'htmlType' => 'text',
+      'name' => "billing_postal_code-{$billingLocationID}",
+      'title' => ts('Postal Code'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        'size' => 30,
+        'maxlength' => 60,
+        'autocomplete' => 'off',
+      ),
+      'is_required' => TRUE,
+    );
+
+    $metadata["billing_country_id-{$billingLocationID}"] = array(
+      'htmlType' => 'select',
+      'name' => "billing_country_id-{$billingLocationID}",
+      'title' => ts('Country'),
+      'cc_field' => TRUE,
+      'attributes' => array(
+        '' => ts('- select -'),
+      ) + CRM_Core_PseudoConstant::country(),
+      'is_required' => TRUE,
+    );
+    return $metadata;
+  }
+
+  /**
    * Get base url dependent on component.
    *
-   * @return string|void
+   * (or preferably set it using the setter function).
+   *
+   * @return string
    */
   protected function getBaseReturnUrl() {
+    if ($this->baseReturnUrl) {
+      return $this->baseReturnUrl;
+    }
     if ($this->_component == 'event') {
       $baseURL = 'civicrm/event/register';
     }
@@ -660,6 +851,7 @@ abstract class CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
+    $this->_component = $component;
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
@@ -668,12 +860,7 @@ abstract class CRM_Core_Payment {
       }
     }
     else {
-      if ($this->_paymentProcessor['billing_mode'] == 1) {
-        $result = $this->doDirectPayment($params, $component);
-      }
-      else {
-        $result = $this->doExpressCheckout($params);
-      }
+      $result = $this->doDirectPayment($params, $component);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
           // See comment block.
@@ -688,6 +875,24 @@ abstract class CRM_Core_Payment {
       throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
     return $result;
+  }
+
+  /**
+   * Query payment processor for details about a transaction.
+   *
+   * @param array $params
+   *   Array of parameters containing one of:
+   *   - trxn_id Id of an individual transaction.
+   *   - processor_id Id of a recurring contribution series as stored in the civicrm_contribution_recur table.
+   *
+   * @return array
+   *   Extra parameters retrieved.
+   *   Any parameters retrievable through this should be documented in the function comments at
+   *   CRM_Core_Payment::doQuery. Currently:
+   *   - fee_amount Amount of fee paid
+   */
+  public function doQuery($params) {
+    return array();
   }
 
   /**
@@ -848,6 +1053,8 @@ abstract class CRM_Core_Payment {
 
   /**
    * Check whether a method is present ( & supported ) by the payment processor object.
+   *
+   * @deprecated - use $paymentProcessor->supports(array('cancelRecurring');
    *
    * @param string $method
    *   Method to check for.

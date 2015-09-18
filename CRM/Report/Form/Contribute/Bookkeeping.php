@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -268,7 +268,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'default' => TRUE,
           ),
           'payment_instrument_id' => array(
-            'title' => ts('Payment Instrument'),
+            'title' => ts('Payment Method'),
             'default' => TRUE,
           ),
           'currency' => array(
@@ -287,7 +287,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         ),
         'filters' => array(
           'payment_instrument_id' => array(
-            'title' => ts('Payment Instrument'),
+            'title' => ts('Payment Method'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           ),
@@ -305,7 +305,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           ),
         ),
         'order_bys' => array(
-          'payment_instrument_id' => array('title' => ts('Payment Instrument')),
+          'payment_instrument_id' => array('title' => ts('Payment Method')),
         ),
       ),
       'civicrm_entity_financial_trxn' => array(
@@ -483,6 +483,10 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  public function groupBy() {
+    $this->_groupBy = " GROUP BY  {$this->_aliases['civicrm_contribution']}.id, {$this->_aliases['civicrm_line_item']}.id ";
+  }
+
   /**
    * @param $rows
    *
@@ -490,20 +494,22 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
    */
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
-
-    $select = " SELECT COUNT({$this->_aliases['civicrm_financial_trxn']}.id ) as count,
-                {$this->_aliases['civicrm_contribution']}.currency,
-                SUM(CASE
-                  WHEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
-                  THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
-                  ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
-                END) as amount
+    $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_contribution');
+    $select = "SELECT {$this->_aliases['civicrm_contribution']}.id, {$this->_aliases['civicrm_entity_financial_trxn']}.id as trxnID, {$this->_aliases['civicrm_contribution']}.currency,
+               CASE
+                 WHEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
+                 THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
+                 ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
+               END as amount
 ";
 
-    $sql = "{$select} {$this->_from} {$this->_where}
-            GROUP BY {$this->_aliases['civicrm_contribution']}.currency
-";
+    $tempQuery = "CREATE TEMPORARY TABLE {$tempTableName} CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
+                  {$select} {$this->_from} {$this->_where} {$this->_groupBy} ";
+    CRM_Core_DAO::executeQuery($tempQuery);
 
+    $sql = "SELECT COUNT(trxnID) as count, SUM(amount) as amount, currency
+            FROM {$tempTableName}
+            GROUP BY currency";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $amount = $avg = array();
     while ($dao->fetch()) {

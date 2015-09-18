@@ -6,10 +6,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Extension_Manager_ModuleTest
  */
 class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
 
   public function setUp() {
     parent::setUp();
@@ -283,6 +279,9 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
    */
   public static function incHookCount($module, $name) {
     global $_test_extension_manager_moduletest_counts;
+    if (!isset($_test_extension_manager_moduletest_counts[$module][$name])) {
+      $_test_extension_manager_moduletest_counts[$module][$name] = 0;
+    }
     $_test_extension_manager_moduletest_counts[$module][$name] = 1 + (int) $_test_extension_manager_moduletest_counts[$module][$name];
   }
 

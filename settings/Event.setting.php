@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -36,18 +36,17 @@
  * Settings metadata file
  */
 return array(
-  'event_enable_cart' =>
-  array(
+  'enable_cart' => array(
     'name' => 'enable_cart',
     'group_name' => 'Event Preferences',
     'group' => 'event',
-    'type' => 'String',
+    'type' => 'Boolean',
     'quick_form_type' => 'Element',
-    'default' => 0,
-    'add' => 4.1,
+    'default' => '0',
+    'add' => '4.1',
     'title' => 'Enable Event Cart',
     'is_domain' => 1,
-    'is_contact' => 1,
+    'is_contact' => 0,
     'description' => "WRITE ME",
     'help_text' => 'WRITE ME',
   ),

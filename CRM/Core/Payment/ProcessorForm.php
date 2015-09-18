@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -39,7 +39,7 @@ use Civi\Payment\System;
 class CRM_Core_Payment_ProcessorForm {
 
   /**
-   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register $form
+   * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register|CRM_Financial_Form_Payment $form
    * @param null $type
    * @param null $mode
    *
@@ -104,16 +104,21 @@ class CRM_Core_Payment_ProcessorForm {
   }
 
   /**
-   * @param $form
+   * Build the payment processor form.
+   *
+   * @param CRM_Core_Form $form
    */
   public static function buildQuickform(&$form) {
     //@todo document why this addHidden is here
     //CRM-15743 - we should not set/create hidden element for pay later
     // because payment processor is not selected
-    if (!empty($form->_paymentProcessorID)) {
+    $processorId = $form->getVar('_paymentProcessorID');
+    $isBillingAddressRequiredForPayLater = $form->_isBillingAddressRequiredForPayLater;
+    if (!empty($processorId)) {
+      $isBillingAddressRequiredForPayLater = FALSE;
       $form->addElement('hidden', 'hidden_processor', 1);
     }
-    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($form->_isBillingAddressRequiredForPayLater), FALSE);
+    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($isBillingAddressRequiredForPayLater), FALSE);
   }
 
 }

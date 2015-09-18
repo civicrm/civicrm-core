@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -33,6 +33,106 @@
  *
  */
 class CRM_Utils_Mail {
+
+  /**
+   * Create a new mailer to send any mail from the application.
+   *
+   * Note: The mailer is opened in persistent mode.
+   *
+   * Note: You probably don't want to call this directly. Get a reference
+   * to the mailer through the container.
+   *
+   * @return Mail
+   */
+  public static function createMailer() {
+    $mailingInfo = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      'mailing_backend'
+    );
+
+    if ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB ||
+      (defined('CIVICRM_MAILER_SPOOL') && CIVICRM_MAILER_SPOOL)
+    ) {
+      $mailer = self::_createMailer('CRM_Mailing_BAO_Spool', array());
+    }
+    elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
+      if ($mailingInfo['smtpServer'] == '' || !$mailingInfo['smtpServer']) {
+        CRM_Core_Error::debug_log_message(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+        CRM_Core_Error::fatal(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+      }
+
+      $params['host'] = $mailingInfo['smtpServer'] ? $mailingInfo['smtpServer'] : 'localhost';
+      $params['port'] = $mailingInfo['smtpPort'] ? $mailingInfo['smtpPort'] : 25;
+
+      if ($mailingInfo['smtpAuth']) {
+        $params['username'] = $mailingInfo['smtpUsername'];
+        $params['password'] = CRM_Utils_Crypt::decrypt($mailingInfo['smtpPassword']);
+        $params['auth'] = TRUE;
+      }
+      else {
+        $params['auth'] = FALSE;
+      }
+
+      // set the localhost value, CRM-3153
+      $params['localhost'] = CRM_Utils_Array::value('SERVER_NAME', $_SERVER, 'localhost');
+
+      // also set the timeout value, lets set it to 30 seconds
+      // CRM-7510
+      $params['timeout'] = 30;
+
+      // CRM-9349
+      $params['persist'] = TRUE;
+
+      $mailer = self::_createMailer('smtp', $params);
+    }
+    elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SENDMAIL) {
+      if ($mailingInfo['sendmail_path'] == '' ||
+        !$mailingInfo['sendmail_path']
+      ) {
+        CRM_Core_Error::debug_log_message(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+        CRM_Core_Error::fatal(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+      }
+      $params['sendmail_path'] = $mailingInfo['sendmail_path'];
+      $params['sendmail_args'] = $mailingInfo['sendmail_args'];
+
+      $mailer = self::_createMailer('sendmail', $params);
+    }
+    elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MAIL) {
+      $mailer = self::_createMailer('mail', array());
+    }
+    elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK) {
+      $mailer = self::_createMailer('mock', array());
+    }
+    elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
+      CRM_Core_Error::debug_log_message(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+      CRM_Core_Session::setStatus(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+    }
+    else {
+      CRM_Core_Error::debug_log_message(ts('There is no valid SMTP server Setting Or SendMail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+      CRM_Core_Session::setStatus(ts('There is no valid SMTP server Setting Or sendMail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+      CRM_Core_Error::debug_var('mailing_info', $mailingInfo);
+    }
+    return $mailer;
+  }
+
+  /**
+   * Create a new instance of a PEAR Mail driver.
+   *
+   * @param string $driver
+   *   'CRM_Mailing_BAO_Spool' or a name suitable for Mail::factory().
+   * @param array $params
+   * @return object
+   *   More specifically, a class which implements the "send()" function
+   */
+  public static function _createMailer($driver, $params) {
+    if ($driver == 'CRM_Mailing_BAO_Spool') {
+      $mailer = new CRM_Mailing_BAO_Spool($params);
+    }
+    else {
+      $mailer = Mail::factory($driver, $params);
+    }
+    CRM_Utils_Hook::alterMail($mailer, $driver, $params);
+    return $mailer;
+  }
 
   /**
    * Wrapper function to send mail in CiviCRM. Hooks are called from this function. The input parameter
@@ -160,7 +260,7 @@ class CRM_Utils_Mail {
 
     $to = array($params['toEmail']);
     $result = NULL;
-    $mailer =& CRM_Core_Config::getMailer();
+    $mailer = \Civi::service('pear_mail');
 
     // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
     // be included in both $to and $headers['Cc', 'Bcc']

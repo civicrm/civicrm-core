@@ -16,27 +16,27 @@
  * limitations under the License.
  */
 
-/* This is the response handler code that will be invoked every time
-  * a notification or request is sent by the Google Server
-  *
-  * To allow this code to receive responses, the url for this file
-  * must be set on the seller page under Settings->Integration as the
-  * "API Callback URL'
-  * Order processing commands can be sent automatically by placing these
-  * commands appropriately
-  *
-  * To use this code for merchant-calculated feedback, this url must be
-  * set also as the merchant-calculations-url when the cart is posted
-  * Depending on your calculations for shipping, taxes, coupons and gift
-  * certificates update parts of the code as required
-  *
-  */
-
+/**
+ * Response handler code.
+ *
+ * This will be invoked every time a notification or request is sent by the Google Server.
+ *
+ * To allow this code to receive responses, the url for this file
+ * must be set on the seller page under Settings->Integration as the
+ * "API Callback URL'
+ * Order processing commands can be sent automatically by placing these
+ * commands appropriately
+ *
+ * To use this code for merchant-calculated feedback, this url must be
+ * set also as the merchant-calculations-url when the cart is posted
+ * Depending on your calculations for shipping, taxes, coupons and gift
+ * certificates update parts of the code as required.
+ */
 
 define('GOOGLE_DEBUG_PP', 0);
 
 /**
- * Class CRM_Core_Payment_GoogleIPN
+ * Class CRM_Core_Payment_GoogleIPN.
  */
 class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -107,9 +107,9 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $privateData
    *   Contains the name value pair of <merchant-private-data>.
    *
-   * @param $component
+   * @param string $component
    *
-   * @return void
+   * @return bool
    */
   public function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();
@@ -149,7 +149,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     if ($ids['contributionRecur']) {
       if ($objects['contributionRecur']->invoice_id == $dataRoot['serial-number']) {
         CRM_Core_Error::debug_log_message("The new order notification already handled: {$dataRoot['serial-number']}.");
-        return;
+        return FALSE;
       }
       else {
         $transaction = new CRM_Core_Transaction();
@@ -196,8 +196,8 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     $contribution = &$objects['contribution'];
 
     if ($contribution->invoice_id != $input['invoice']) {
-      CRM_Core_Error::debug_log_message("Invoice values dont match between database and IPN request");
-      return;
+      CRM_Core_Error::debug_log_message("Invoice values don't match between database and IPN request");
+      return FALSE;
     }
 
     // lets replace invoice-id with google-order-number because thats what is common and unique
@@ -208,7 +208,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
     if ($contribution->total_amount != $input['amount']) {
       CRM_Core_Error::debug_log_message("Amount values dont match between database and IPN request");
-      return;
+      return FALSE;
     }
 
     if (!$this->getInput($input, $ids, $dataRoot)) {
@@ -220,7 +220,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     // check if contribution is already completed, if so we ignore this ipn
     if ($contribution->contribution_status_id == 1) {
       CRM_Core_Error::debug_log_message("returning since contribution has already been handled");
-      return;
+      return FALSE;
     }
     else {
       /* Since trxn_id hasn't got any use here,
@@ -250,9 +250,9 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $privateData
    *   Contains the name value pair of <merchant-private-data>.
    *
-   * @param $component
+   * @param string $component
    *
-   * @return void
+   * @return bool
    */
   public function orderStateChange($status, $dataRoot, $privateData, $component) {
     $input = $objects = $ids = array();
@@ -267,14 +267,14 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
     if (!$contribution->find(TRUE)) {
       CRM_Core_Error::debug_log_message("orderStateChange: Could not find contribution record with invoice id: $serial");
-      return;
+      return FALSE;
     }
 
     // Google sends the charged notification twice.
     // So to make sure, code is not executed again.
     if ($contribution->contribution_status_id == 1) {
       CRM_Core_Error::debug_log_message("Contribution already handled (ContributionID = {$contribution->id}).");
-      return;
+      return FALSE;
     }
 
     // make sure invoice is set to serial no for recurring payments, to avoid violating uniqueness

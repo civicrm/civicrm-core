@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -508,13 +508,14 @@ class CRM_Core_Permission {
     }
 
     // if component_id is present, ensure it is enabled
-    if (isset($item['component_id']) &&
-      $item['component_id']
-    ) {
+    if (isset($item['component_id']) && $item['component_id']) {
+      if (!isset(Civi::$statics[__CLASS__]['componentNameId'])) {
+        Civi::$statics[__CLASS__]['componentNameId'] = array_flip(CRM_Core_Component::getComponentIDs());
+      }
+      $componentName = Civi::$statics[__CLASS__]['componentNameId'][$item['component_id']];
+
       $config = CRM_Core_Config::singleton();
-      if (is_array($config->enableComponentIDs) &&
-        in_array($item['component_id'], $config->enableComponentIDs)
-      ) {
+      if (is_array($config->enableComponents) && in_array($componentName, $config->enableComponents)) {
         // continue with process
       }
       else {
@@ -591,9 +592,14 @@ class CRM_Core_Permission {
     $permissions = self::getCorePermissions($descriptions);
 
     if (self::isMultisiteEnabled()) {
-      $permissions['administer Multiple Organizations'] = $prefix . ts('administer Multiple Organizations');
+      $permissions['administer Multiple Organizations'] = array($prefix . ts('administer Multiple Organizations'));
     }
 
+    if (!$descriptions) {
+      foreach ($permissions as $name => $attr) {
+        $permissions[$name] = array_shift($attr);
+      }
+    }
     if (!$all) {
       $components = CRM_Core_Component::getEnabledComponents();
     }
@@ -605,16 +611,19 @@ class CRM_Core_Permission {
       $perm = $comp->getPermissions(FALSE, $descriptions);
       if ($perm) {
         $info = $comp->getInfo();
-        if ($descriptions) {
-          foreach ($perm as $p => $attr) {
-            $title = $info['translatedName'] . ': ' . array_shift($attr);
-            array_unshift($attr, $title);
+        foreach ($perm as $p => $attr) {
+
+          if (!is_array($attr)) {
+            $attr = array($attr);
+          }
+
+          $attr[0] = $info['translatedName'] . ': ' . $attr[0];
+
+          if ($descriptions) {
             $permissions[$p] = $attr;
           }
-        }
-        else {
-          foreach ($perm as $p) {
-            $permissions[$p] = $info['translatedName'] . ': ' . $p;
+          else {
+            $permissions[$p] = $attr[0];
           }
         }
       }
@@ -656,12 +665,11 @@ class CRM_Core_Permission {
   }
 
   /**
-   * @param bool $descriptions
-   *   whether to return descriptions
+   * Get core permissions.
    *
    * @return array
    */
-  public static function getCorePermissions($descriptions = FALSE) {
+  public static function getCorePermissions() {
     $prefix = ts('CiviCRM') . ': ';
     $permissions = array(
       'add contacts' => array(
@@ -768,6 +776,10 @@ class CRM_Core_Permission {
         $prefix . ts('merge duplicate contacts'),
         ts('Delete Contacts must also be granted in order for this to work.'),
       ),
+      'force merge duplicate contacts' => array(
+        $prefix . ts('force merge duplicate contacts'),
+        ts('Delete Contacts must also be granted in order for this to work.'),
+      ),
       'view debug output' => array(
         $prefix . ts('view debug output'),
         ts('View results of debug and backtrace'),
@@ -832,12 +844,6 @@ class CRM_Core_Permission {
         ts('Allow users to view/ download their own invoices'),
       ),
     );
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
 
     return $permissions;
   }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -103,7 +103,7 @@
           </tr>
           <tr class="crm-contribution-contributionpage-premium-form-block-premiums_nothankyou_label">
             <td class="label">
-              {$form.premiums_nothankyou_label.label}<span class="marker"> *</span>
+              {$form.premiums_nothankyou_label.label}<span class="crm-marker"> *</span>
             </td>
             <td class="html-adjust">{$form.premiums_nothankyou_label.html}<br/>
               <span class="description">{ts}You can change the text for the 'No thank-you' radio button.{/ts}</span>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing a campaign
- *
+ * This class generates form components for processing a campaign.
  */
 class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
@@ -294,9 +291,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
   /**
    * Form submission of new/edit campaign is processed.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

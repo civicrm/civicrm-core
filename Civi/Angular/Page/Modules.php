@@ -26,7 +26,7 @@ class Modules extends \CRM_Core_Page {
     /**
      * @var \Civi\Angular\Manager $angular
      */
-    $angular = \Civi\Core\Container::singleton()->get('angular');
+    $angular = \Civi::service('angular');
     $moduleNames = $this->parseModuleNames(\CRM_Utils_Request::retrieve('modules', 'String'), $angular);
 
     switch (\CRM_Utils_Request::retrieve('format', 'String')) {

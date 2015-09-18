@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -143,8 +141,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -404,15 +400,12 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
-    $params = array();
 
     if ($this->_action & CRM_Core_Action::ADD) {
       if (array_key_exists('TagsAndGroups', $this->_editOptions)) {
@@ -572,7 +565,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return void
    * @see valid_date
    */
   public function addRules() {
@@ -738,8 +730,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //load form for child blocks
@@ -861,17 +851,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
     $this->assign('oldSubtypes', json_encode($this->_oldSubtypes));
 
-    // Add an element to distinguish the full contact edit form
-    $this->addElement('hidden', 'isFullContactEdit', TRUE);
-
     $this->addButtons($buttons);
   }
 
   /**
    * Form submission of new/edit contact is processed.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // check if dedupe button, if so return.
@@ -989,6 +973,18 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if ($this->_parseStreetAddress) {
       $parseResult = self::parseAddress($params);
       $parseStatusMsg = self::parseAddressStatusMsg($parseResult);
+    }
+
+    $blocks = array('email', 'phone', 'im', 'openid', 'address', 'website');
+    foreach ($blocks as $block) {
+      if (!empty($this->_preEditValues[$block]) && is_array($this->_preEditValues[$block])) {
+        foreach ($this->_preEditValues[$block] as $count => $value) {
+          if (!empty($value['id'])) {
+            $params[$block][$count]['id'] = $value['id'];
+            $params[$block]['isIdSet'] = TRUE;
+          }
+        }
+      }
     }
 
     // Allow un-setting of location info, CRM-5969

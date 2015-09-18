@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing a survey
- *
+ * This class generates form components for processing a survey.
  */
 class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
@@ -137,8 +134,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -179,8 +174,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

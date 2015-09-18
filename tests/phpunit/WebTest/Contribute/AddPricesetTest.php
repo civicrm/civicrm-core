@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -639,7 +639,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'From' => $contact['display_name'],
       'Financial Type' => $financialType,
       'Contribution Amount' => 'Contribution Total: $ 590.00',
-      'Paid By' => 'Check',
+      'Payment Method' => 'Check',
       'Check Number' => '1041',
       'Contribution Status' => 'Completed',
     );
@@ -704,7 +704,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
       'Financial Type' => $fields['values'][$fields['id']]['financial_type'],
       'Contribution Amount' => $fields['values'][$fields['id']]['total_amount'],
       'Contribution Status' => $fields['values'][$fields['id']]['contribution_status'],
-      'Paid By' => $fields['values'][$fields['id']]['payment_instrument'],
+      'Payment Method' => $fields['values'][$fields['id']]['payment_instrument'],
       'Check Number' => $fields['values'][$fields['id']]['contribution_check_number'],
     );
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -135,7 +135,7 @@ class CRM_Core_Page_AJAX_Attachment {
     if ($isError) {
       $sapi_type = php_sapi_name();
       if (substr($sapi_type, 0, 3) == 'cgi') {
-        header("Status: 500 Internal Server Error");
+        CRM_Utils_System::setHttpHeader("Status", "500 Internal Server Error");
       }
       else {
         header("HTTP/1.1 500 Internal Server Error");

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -135,12 +135,12 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->click("location");
     $this->waitForElementPresent("country");
-    $this->select("country", "United States");
+    $this->select("country", "UNITED STATES");
     $this->clickLink("_qf_Advanced_refresh");
     $this->waitForElementPresent("task");
     $this->click('radio_ts', 'ts_all');
     $this->click('task');
-    $this->select('task', 'label=New Smart Group');
+    $this->select('task', 'label=Smart group - create');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $smartGroupTitle = "SmartGroup" . substr(sha1(rand()), 0, 4);
     $this->type("title", $smartGroupTitle);
@@ -212,11 +212,11 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->openCiviPage('contact/search/advanced', 'reset=1');
     $this->click("location");
     $this->waitForElementPresent("country");
-    $this->select("country", "United States");
+    $this->select("country", "UNITED STATES");
     $this->clickLink("_qf_Advanced_refresh");
     $this->waitForElementPresent("xpath=//div[@class='crm-search-results']");
     $this->assertElementNotContainsText("xpath=//form[@id='Advanced']/div[3]/div/div", "No matches found for");
-    $this->verifyText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[8]", 'United States');
+    $this->verifyText("xpath=//div[@class='crm-search-results']//table/tbody/tr[1]/td[8]", 'UNITED STATES');
 
     $this->checkEditOnEventProfile();
   }

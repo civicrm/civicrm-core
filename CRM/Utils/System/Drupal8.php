@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Drupal specific stuff goes here
+ * Drupal specific stuff goes here.
  */
 class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
@@ -128,9 +126,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *   Errors.
    * @param string $emailName
    *   Field label for the 'email'.
-   *
-   *
-   * @return void
    */
   public static function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     // If we are given a name, let's check to see if it already exists.
@@ -222,6 +217,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'html-header':
       case 'page-footer':
         break;
+
       default:
         return FALSE;
     }
@@ -246,6 +242,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'html-header':
       case 'page-footer':
         break;
+
       default:
         return FALSE;
     }
@@ -484,7 +481,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
    * Determine the location of the CMS root.
-   * @param null $path
+   *
+   * @param string $path
    *
    * @return NULL|string
    */
@@ -538,6 +536,18 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function getDefaultBlockLocation() {
     return 'sidebar_first';
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function flush() {
+    // CiviCRM and Drupal both provide (different versions of) Symfony (and possibly share other classes too).
+    // If we call drupal_flush_all_caches(), Drupal will attempt to rediscover all of its classes, use Civicrm's
+    // alternatives instead and then die. Instead, we only clear cache bins and no more.
+    foreach (Drupal\Core\Cache\Cache::getBins() as $service_id => $cache_backend) {
+      $cache_backend->deleteAll();
+    }
   }
 
 }

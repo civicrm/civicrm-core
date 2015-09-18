@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,16 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * This file is for activity search
+ * This file is for activity search.
  */
 class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
@@ -68,8 +62,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_prefix = "activity_";
 
-  protected $_defaults;
-
   /**
    * The saved search ID retrieved from the GET vars.
    *
@@ -79,8 +71,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
@@ -160,9 +150,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -211,9 +198,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
           if (is_array($value)) {
             if ($element == 'status_id') {
               unset($this->_formValues[$element]);
-              $element = 'activity_' . $element;
+              $this->_formValues['activity_' . $element] = $value;
             }
-            $this->_formValues[$element] = array('IN' => $value);
           }
           else {
             $this->_formValues[$element] = array('LIKE' => "%$value%");
@@ -234,7 +220,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues["activity_test"] = 0;
     }
 
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 

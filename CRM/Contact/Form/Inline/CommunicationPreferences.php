@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,19 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for communication preferences inline edit section
+ * Form helper class for communication preferences inline edit section.
  */
 class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements for communication preferences.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -81,8 +77,6 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

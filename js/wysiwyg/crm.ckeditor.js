@@ -41,6 +41,10 @@
       editor.on('pasteState', function() {
         $(item).trigger("paste");
       });
+      // Hide CiviCRM menubar when editor is fullscreen
+      editor.on('maximize', function (e) {
+        $('#civicrm-menu').toggle(e.data === 2);
+      });
     }
   };
   CRM.wysiwyg.destroy = function(item) {

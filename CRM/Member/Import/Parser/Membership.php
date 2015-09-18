@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -516,7 +516,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           $checkCid->external_identifier = $formatValues['external_identifier'];
           $checkCid->find(TRUE);
           if ($checkCid->id != $formatted['contact_id']) {
-            array_unshift($values, 'Mismatch of External identifier :' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
+            array_unshift($values, 'Mismatch of External ID:' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
             return CRM_Import_Parser::ERROR;
           }
         }

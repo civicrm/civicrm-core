@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -123,6 +123,12 @@ class CRM_Mailing_BAO_Query {
         $query->_element['mailing_recipients_id'] = 1;
       }
     }
+
+    if (CRM_Utils_Array::value('mailing_campaign_id', $query->_returnProperties)) {
+      $query->_select['mailing_campaign_id'] = 'civicrm_mailing.campaign_id as mailing_campaign_id';
+      $query->_element['mailing_campaign_id'] = 1;
+      $query->_tables['civicrm_campaign'] = 1;
+    }
   }
 
   /**
@@ -207,6 +213,7 @@ class CRM_Mailing_BAO_Query {
     if ($mode & CRM_Contact_BAO_Query::MODE_MAILING) {
       $properties = array(
         'mailing_id' => 1,
+        'mailing_campaign_id' => 1,
         'mailing_name' => 1,
         'sort_name' => 1,
         'email' => 1,
@@ -375,6 +382,15 @@ class CRM_Mailing_BAO_Query {
           $query->_qill[$grouping][] = "Mailing Job Status IS \"$value\"";
         }
         return;
+
+      case 'mailing_campaign_id':
+        $name = 'campaign_id';
+        CRM_Contact_BAO_Query::buildClause("civicrm_mailing.$name", $op, $value, 'Integer');
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Mailing_DAO_Mailing', $name, $value, $op);
+        $query->_qill[$grouping][] = ts('Campaign %1 %2', array(1 => $op, 2 => $value));
+        $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
+        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
+        return;
     }
   }
 
@@ -423,6 +439,8 @@ class CRM_Mailing_BAO_Query {
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));
     $form->add('checkbox', 'mailing_forward', ts('Forwards'));
+    // Campaign select field
+    CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'mailing_campaign_id');
 
     $form->assign('validCiviMailing', TRUE);
   }

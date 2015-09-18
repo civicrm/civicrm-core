@@ -199,7 +199,7 @@
   <field>
     <name>payment_instrument_id</name>
     <uniqueName>financial_trxn_payment_instrument_id</uniqueName>
-    <title>Payment Instrument</title>
+    <title>Payment Method</title>
     <type>int unsigned</type>
     <comment>FK to payment_instrument option group values</comment>
     <pseudoconstant>

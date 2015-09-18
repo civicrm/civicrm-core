@@ -1,5 +1,5 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.6                                                |
+-- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
 -- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
@@ -2505,7 +2505,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4046, 1170, "APA", "Apayao"),
 (4047, 1170, "AUR", "Aurora"),
 (4048, 1170, "BAS", "Basilan"),
-(4049, 1170, "BAN", "Batasn"),
+(4049, 1170, "BAN", "Bataan"),
 (4050, 1170, "BTN", "Batanes"),
 (4051, 1170, "BTG", "Batangas"),
 (4052, 1170, "BEN", "Benguet"),
@@ -3992,4 +3992,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1081, "RL", "Racha-Lechkhumi and Kvemo Svaneti"),
 (NULL, 1081, "SZ", "Samegrelo-Zemo Svaneti"),
 (NULL, 1081, "SJ", "Samtskhe-Javakheti"),
-(NULL, 1081, "SK", "Shida Kartli");
+(NULL, 1081, "SK", "Shida Kartli"),
+(NULL, 1074, "C", "Central"),
+
+-- CRM-17136 Add missing Pakistani Province (Punjab)
+(NULL, 1163, "PB", "Punjab");

@@ -28,17 +28,11 @@
 
   CKEDITOR.document.getById( 'toolbarModifierWrapper' ).append( toolbarModifier.mainContainer );
 
-  $('.toolbar button:last', '#toolbarModifierWrapper').hide();
-
   $(function() {
     var selectorOpen = false,
       changedWhileOpen = false;
 
     $('#toolbarModifierForm')
-      // The buttons in the configurator are not submit buttons!
-      .on('click', 'button', function(e) {
-        e.preventDefault();
-      })
       .on('submit', function(e) {
         $('.toolbar button:last', '#toolbarModifierWrapper')[0].click();
         $('.configContainer textarea', '#toolbarModifierWrapper').attr('name', 'config');

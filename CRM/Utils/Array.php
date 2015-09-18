@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -902,6 +902,66 @@ class CRM_Utils_Array {
       $result[$newKey] = $value;
     }
     return $result;
+  }
+
+  /**
+   * Copy all properties of $other into $array (recursively).
+   *
+   * @param array|ArrayAccess $array
+   * @param array $other
+   */
+  public static function extend(&$array, $other) {
+    foreach ($other as $key => $value) {
+      if (is_array($value)) {
+        self::extend($array[$key], $value);
+      }
+      else {
+        $array[$key] = $value;
+      }
+    }
+  }
+
+  /**
+   * Get a single value from an array-tre.
+   *
+   * @param array $arr
+   *   Ex: array('foo'=>array('bar'=>123)).
+   * @param array $pathParts
+   *   Ex: array('foo',bar').
+   * @return mixed|NULL
+   *   Ex 123.
+   */
+  public static function pathGet($arr, $pathParts) {
+    $r = $arr;
+    foreach ($pathParts as $part) {
+      if (!isset($r[$part])) {
+        return NULL;
+      }
+      $r = $r[$part];
+    }
+    return $r;
+  }
+
+  /**
+   * Set a single value in an array tree.
+   *
+   * @param array $arr
+   *   Ex: array('foo'=>array('bar'=>123)).
+   * @param array $pathParts
+   *   Ex: array('foo',bar').
+   * @param $value
+   *   Ex: 456.
+   */
+  public static function pathSet(&$arr, $pathParts, $value) {
+    $r = &$arr;
+    $last = array_pop($pathParts);
+    foreach ($pathParts as $part) {
+      if (!isset($r[$part])) {
+        $r[$part] = array();
+      }
+      $r = &$r[$part];
+    }
+    $r[$last] = $value;
   }
 
 }

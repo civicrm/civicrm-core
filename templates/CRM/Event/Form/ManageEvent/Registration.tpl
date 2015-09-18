@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -247,7 +247,7 @@ class="crm-hover-button crm-button-add-profile"><span
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-confirm_title">
         <td scope="row" class="label" width="20%">{$form.confirm_title.label} <span
-            class="marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_title' id=$eventID}{/if}
+            class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_title' id=$eventID}{/if}
         </td>
         <td>{$form.confirm_title.html}<br/>
                 <span
@@ -278,7 +278,7 @@ class="crm-hover-button crm-button-add-profile"><span
   <table class="form-layout-compressed">
     <tr class="crm-event-manage-registration-form-block-confirm_thankyou_title">
       <td scope="row" class="label" width="20%">{$form.thankyou_title.label} <span
-          class="marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_title' id=$eventID}{/if}
+          class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_title' id=$eventID}{/if}
       </td>
       <td>{$form.thankyou_title.html}
         <div class="description">{ts}Page title for registration Thank-you screen.{/ts}</div>
@@ -328,14 +328,14 @@ class="crm-hover-button crm-button-add-profile"><span
         </tr>
         <tr class="crm-event-manage-registration-form-block-confirm_from_name">
           <td scope="row" class="label" width="20%">{$form.confirm_from_name.label} <span
-              class="marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_from_name' id=$eventID}{/if}
+              class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_from_name' id=$eventID}{/if}
           </td>
           <td>{$form.confirm_from_name.html}<br/>
             <span class="description">{ts}FROM name for email.{/ts}</span>
           </td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-confirm_from_email">
-          <td scope="row" class="label" width="20%">{$form.confirm_from_email.label} <span class="marker">*</span></td>
+          <td scope="row" class="label" width="20%">{$form.confirm_from_email.label} <span class="crm-marker">*</span></td>
           <td>{$form.confirm_from_email.html}<br/>
             <span
               class="description">{ts}FROM email address (this must be a valid email account with your SMTP email service provider).{/ts}</span>

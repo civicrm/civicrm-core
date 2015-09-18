@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -124,8 +124,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     // since we want only first function argument
     $newArgs = $newArgs[0];
     if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
-      $config = CRM_Core_Config::singleton();
-      CRM_Mailing_BAO_MailingJob::runJobs_pre($config->mailerJobSize);
+      $mailerJobSize = Civi::settings()->get('mailerJobSize');
+      CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize);
       CRM_Mailing_BAO_MailingJob::runJobs();
       CRM_Mailing_BAO_MailingJob::runJobs_post();
     }

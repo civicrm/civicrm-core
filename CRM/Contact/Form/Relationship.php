@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -131,6 +131,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $this->_display_name_a = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'display_name');
 
     $this->assign('display_name_a', $this->_display_name_a);
+
+    // Check for permissions
+    if (in_array($this->_action, array(CRM_Core_Action::ADD, CRM_Core_Action::UPDATE, CRM_Core_Action::DELETE))) {
+      if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
+        CRM_Core_Error::statusBounce(ts('You do not have the necessary permission to edit this contact.'));
+      }
+    }
 
     // Set page title based on action
     switch ($this->_action) {

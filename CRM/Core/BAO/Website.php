@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contain function for Website handling
+ * This class contain function for Website handling.
  */
 class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
@@ -66,59 +64,30 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param int $contactID
    *   Contact id.
    *
-   * @return void
+   * @param bool $skipDelete
+   *
+   * @return bool
    */
-  public static function create(&$params, $contactID) {
-
-    if (empty($params['website'])) {
+  public static function create(&$params, $contactID, $skipDelete) {
+    if (empty($params)) {
       return FALSE;
     }
 
-    // CRM-10551
-    // Use updateBlankLocInfo to overwrite blanked values of matching type
-    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
-
-    // Get websites submitted in the form, and already on the Contact
-    $submittedWebsites = $params['website'];
-    $existingWebsites = self::allWebsites($contactID);
-
-    // For each website submitted on the form
-    foreach ($submittedWebsites as $key => $submittedValue) {
-
-      // Check for matching IDs on submitted / existing data
-      $websiteId = CRM_Utils_Array::value('id', $submittedValue);
-      if ($websiteId) {
-        if (array_key_exists($websiteId, $existingWebsites)) {
-          unset($existingWebsites[$websiteId]);
-        }
-        else {
-          unset($submittedValue['id']);
-        }
-      }
-
-      // Match up submitted values to existing ones, based on type
-      if (empty($submittedValue['id']) && !empty($existingWebsites)) {
-        foreach ($existingWebsites as $id => $existingValue) {
-          if ($existingValue['website_type_id'] == $submittedValue['website_type_id']) {
-            $submittedValue['id'] = $id;
-            unset($existingWebsites[$id]);
-            break;
+    $ids = self::allWebsites($contactID);
+    foreach ($params as $key => $values) {
+      if (empty($values['id']) && is_array($ids) && !empty($ids)) {
+        foreach ($ids as $id => $value) {
+          if (($value['website_type_id'] == $values['website_type_id'])) {
+            $values['id'] = $id;
           }
         }
       }
-
-      $submittedValue['contact_id'] = $contactID;
-
-      // CRM-10551
-      // If there is a matching ID, the URL is empty and we are deleting blanked values
-      // Then remove it from the contact
-      if (!empty($submittedValue['id']) && empty($submittedValue['url']) && $updateBlankLocInfo) {
-        self::del(array($submittedValue['id']));
+      if (!empty($values['url'])) {
+        $values['contact_id'] = $contactID;
+        self::add($values);
       }
-
-      // Otherwise, add the website if the URL isn't empty
-      elseif (!empty($submittedValue['url'])) {
-        self::add($submittedValue);
+      elseif ($skipDelete && !empty($values['id'])) {
+        self::del(array($values['id']));
       }
     }
   }
@@ -129,7 +98,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param array $ids
    *   Website ids.
    *
-   * @return void
+   * @return bool
    */
   public static function del($ids) {
     $query = 'DELETE FROM civicrm_website WHERE id IN ( ' . implode(',', $ids) . ')';

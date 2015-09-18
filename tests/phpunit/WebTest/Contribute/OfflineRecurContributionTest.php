@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -82,7 +82,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->webtestAddBillingDetails($firstName, $middleName, $lastName);
     $this->click('_qf_Contribution_upload-bottom');
     $this->waitForElementPresent('link=Edit');
-    $this->waitForText('crm-notification-container', "The contribution record has been processed.");
+    $this->waitForText('crm-notification-container', "The contribution record has been saved.");
     // Use Find Contributions to make sure test recurring contribution exists
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_currency_type');
 
@@ -100,7 +100,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
       'Financial Type' => 'Donation (test)',
       'Total Amount' => 'Installments: 12, Interval: 1 month(s)',
       'Contribution Status' => 'Pending : Incomplete Transaction',
-      'Paid By' => 'Credit Card',
+      'Payment Method' => 'Credit Card',
     );
 
     foreach ($verifyData as $label => $value) {

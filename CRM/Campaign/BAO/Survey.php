@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
-require_once 'CRM/Campaign/DAO/Survey.php';
 
 /**
- * Class CRM_Campaign_BAO_Survey
+ * Class CRM_Campaign_BAO_Survey.
  */
 class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
 

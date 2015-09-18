@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Base class for settings forms
- *
+ * Base class for settings forms.
  */
 class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   protected $_system = FALSE;
@@ -88,10 +85,10 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
       $this->_config->contact_id = $this->_contactID;
     }
 
+    $settings = Civi::settings();
     foreach ($this->_varNames as $groupName => $settingNames) {
-      $values = CRM_Core_BAO_Setting::getItem($groupName);
-      foreach ($values as $name => $value) {
-        $this->_config->$name = $value;
+      foreach ($settingNames as $settingName => $options) {
+        $this->_config->$settingName = $settings->get($settingName);
       }
     }
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
@@ -140,8 +137,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -235,9 +230,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
@@ -252,9 +244,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcessCommon() {
     foreach ($this->_varNames as $groupName => $groupValues) {

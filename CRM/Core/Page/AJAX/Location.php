@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -58,8 +58,8 @@ class CRM_Core_Page_AJAX_Location {
     }
 
     // Verify user permission on related contact
-    $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($user);
-    if (!isset($employers[$cid])) {
+    $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($user, NULL, NULL, 'Organization');
+    if (!isset($organizations[$cid])) {
       CRM_Utils_System::civiExit();
     }
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
@@ -54,13 +53,6 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
    * @var int
    */
   public $_contactId;
-
-  /**
-   * Form defaults.
-   *
-   * @var array
-   */
-  protected $_defaults = array();
 
   /**
    * Build all the data structures needed to build the form.

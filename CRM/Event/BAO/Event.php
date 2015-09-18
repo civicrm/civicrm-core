@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -275,12 +275,9 @@ FROM   `civicrm_event`
 WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
 
     if (!empty($id)) {
-      if (is_array($id)) {
-        $query .= " AND `id` IN (" . implode(',', $id) . ")";
-      }
-      else {
-        $query .= " AND `id` = {$id}";
-      }
+      $op = is_array($id) ? 'IN' : '=';
+      $where = CRM_Contact_BAO_Query::buildClause('id', $op, $id);
+      $query .= " AND {$where}";
     }
     elseif ($all == 0) {
       // find only events ending in the future
@@ -466,7 +463,7 @@ $event_summary_limit
               $params = array('entity_id' => $dao->id, 'entity_table' => 'civicrm_event');
               $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
               if (is_numeric(CRM_Utils_Array::value('geo_code_1', $values['location']['address'][1])) ||
-                ($config->mapGeoCoding &&
+                (
                   !empty($values['location']['address'][1]['city']) &&
                   !empty($values['location']['address'][1]['state_province_id'])
                 )
@@ -1176,7 +1173,7 @@ WHERE civicrm_event.is_active = 1
         // CRM-13890 : NOTE wait list condition need to be given so that
         // wait list message is shown properly in email i.e. WRT online event registration template
         if (empty($tplParams['participant_status']) && empty($values['params']['isOnWaitlist'])) {
-          $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id');
+          $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id', TRUE);
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
         }
         //CRM-15754 - if participant_status contains status ID
@@ -1923,10 +1920,7 @@ WHERE  ce.loc_block_id = $locBlockId";
     if ($startDate && $startDate >= $now) {
       $validDate = FALSE;
     }
-    if ($endDate && $endDate < $now) {
-      $validDate = FALSE;
-    }
-    if ($eventEnd && $eventEnd < $now) {
+    if ($endDate && $endDate < $now && $eventEnd && $eventEnd < $now) {
       $validDate = FALSE;
     }
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality for batch profile update
+ * This class provides the functionality for batch profile update.
  */
 class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
@@ -67,8 +65,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     // initialize the task and row fields
@@ -77,9 +73,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
@@ -220,9 +213,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -264,6 +254,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * Parse street address.
+   *
    * @param array $contactValues
    *   Contact values.
    * @param CRM_Core_Form $form

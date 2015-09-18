@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -55,7 +55,7 @@
     <tr>
       <th class="crm-batch-checkbox">{$form.toggleSelect.html}</th>
       <th class="crm-batch-name">{ts}Batch Name{/ts}</th>
-      <th class="crm-batch-payment_instrument">{ts}Payment Instrument{/ts}</th>
+      <th class="crm-batch-payment_instrument">{ts}Payment Method{/ts}</th>
       <th class="crm-batch-item_count">{ts}Item Count{/ts}</th>
       <th class="crm-batch-total">{ts}Total Amount{/ts}</th>
       <th class="crm-batch-status">{ts}Status{/ts}</th>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
@@ -42,8 +40,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Create option value - note that the create function calls 'add' but
-   * has more business logic
+   * Create option value.
+   *
+   * Note that the create function calls 'add' but has more business logic.
    *
    * @param array $params
    *   Input parameters.
@@ -181,6 +180,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
       $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
       $params['filter'] = CRM_Utils_Array::value('filter', $params, FALSE);
+    }
+    // Update custom field data to reflect the new value
+    elseif (isset($params['value'])) {
+      CRM_Core_BAO_CustomOption::updateValue($ids['optionValue'], $params['value']);
     }
 
     // action is taken depending upon the mode
@@ -419,8 +422,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param int $opGroupId
    * @param array $opWeights
    *   Options value , weight pair.
-   *
-   * @return void
    */
   public static function updateOptionWeights($opGroupId, $opWeights) {
     if (!is_array($opWeights) || empty($opWeights)) {

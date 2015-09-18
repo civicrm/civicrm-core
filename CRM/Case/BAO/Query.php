@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,18 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Case_BAO_Query {
 
   /**
+   * Get fields.
+   *
    * @param bool $excludeActivityFields
    *
    * @return array
    */
   public static function &getFields($excludeActivityFields = FALSE) {
-    $fields = array();
     $fields = CRM_Case_BAO_Case::exportableFields();
 
     // add activity related fields
@@ -54,9 +53,7 @@ class CRM_Case_BAO_Query {
   /**
    * Build select for Case.
    *
-   * @param $query
-   *
-   * @return void
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) || !empty($query->_returnProperties['case_id'])) {
@@ -218,12 +215,9 @@ class CRM_Case_BAO_Query {
   }
 
   /**
-   * Given a list of conditions in query generate the required
-   * where clause
+   * Given a list of conditions in query generate the required where clause.
    *
-   * @param $query
-   *
-   * @return void
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function where(&$query) {
     foreach ($query->_params as $id => $values) {
@@ -235,7 +229,6 @@ class CRM_Case_BAO_Query {
         if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
-        $grouping = $query->_params[$id][3];
         self::whereClauseSingle($query->_params[$id], $query);
       }
     }
@@ -244,76 +237,47 @@ class CRM_Case_BAO_Query {
   /**
    * Where clause for a single field.
    *
-   * @param $values
-   * @param $query
+   * CRM-17120 adds a test that checks the Qill on some of these parameters.
+   * However, I couldn't find a way, other than via test, to access the
+   * case_activity options in the code below and invalid sql was returned.
+   * Perhaps the options are just legacy?
    *
-   * @return void
+   * Also, CRM-17120 locks in the Qill - but it probably is not quite right as I
+   * see 'Activity Type = Scheduled' (rather than activity status).
+   *
+   * See CRM_Case_BAO_QueryTest for more.
+   *
+   * @param array $values
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $val = $names = array();
     switch ($name) {
-      case 'case_status':
-      case 'case_status_id':
-        $statuses = CRM_Case_PseudoConstant::caseStatus();
-        // Standardize input from checkboxes or single value
-        if (is_array($value) && $query->_mode == CRM_Contact_BAO_Query::MODE_CASE) {
-          $value = array_keys($value, 1);
-        }
-        foreach ((array) $value as $k) {
-          if ($k && isset($statuses[$k])) {
-            $val[$k] = $k;
-            $names[] = $statuses[$k];
-          }
-          elseif ($k && ($v = CRM_Utils_Array::key($k, $statuses))) {
-            $val[$v] = $v;
-            $names[] = $k;
-          }
-        }
-        if ($val) {
-          $query->_where[$grouping][] = "civicrm_case.status_id IN (" . implode(',', $val) . ")";
-        }
-        else {
-          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_case.status_id', $op, $value, "Integer");
-        }
-        $query->_qill[$grouping][] = ts('Case Status is %1', array(1 => implode(' ' . ts('or') . ' ', $names)));
-        $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
-        return;
 
       case 'case_type_id':
       case 'case_type':
-        $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
+      case 'case_status':
+      case 'case_status_id':
+      case 'case_id':
 
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            if ($v) {
-              $val[$k] = $k;
-              $names[] = $caseTypes[$k];
-            }
-          }
+        if (strpos($name, 'type')) {
+          $name = 'case_type_id';
+          $label = 'Case Type(s)';
         }
-        elseif (is_numeric($value)) {
-          $val[$value] = $value;
-          $names[] = $value;
-        }
-        elseif ($caseTypeId = CRM_Utils_Array::key($value, $caseTypes)) {
-          $val[$caseTypeId] = $caseTypeId;
-          $names[] = $caseTypes[$caseTypeId];
-        }
-
-        if ($val) {
-          $query->_where[$grouping][] = "(civicrm_case.case_type_id IN (" . implode(',', $val) . "))";
+        elseif (strpos($name, 'status')) {
+          $name = 'status_id';
+          $label = 'Case Status(s)';
         }
         else {
-          $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_case.case_type_id', $op, $value, "Integer");
+          $name = 'id';
+          $label = 'Case ID';
         }
 
-        $query->_qill[$grouping][] = ts('Case Type is %1', array(1 => implode(' ' . ts('or') . ' ', $names)));
-        $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
-        return;
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_case.{$name}", $op, $value, "Integer");
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Case_DAO_Case', $name, $value, $op);
 
-      case 'case_id':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_case.id", $op, $value, 'Int');
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $label, 2 => $op, 3 => $value));
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         return;
 
@@ -394,7 +358,7 @@ class CRM_Case_BAO_Query {
 
       case 'case_recent_activity_type':
         $names = $value;
-        if ($activityType = CRM_Core_OptionGroup::getLabel('activity_type', $value, 'value')) {
+        if (($activityType = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $value)) != FALSE) {
           $names = $activityType;
         }
 
@@ -408,7 +372,7 @@ class CRM_Case_BAO_Query {
 
       case 'case_activity_status_id':
         $names = $value;
-        if ($activityStatus = CRM_Core_OptionGroup::getLabel('activity_status', $value, 'value')) {
+        if (($activityStatus = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'status_id', $value)) != FALSE) {
           $names = $activityStatus;
         }
 
@@ -430,7 +394,7 @@ class CRM_Case_BAO_Query {
 
       case 'case_activity_medium_id':
         $names = $value;
-        if ($activityMedium = CRM_Core_OptionGroup::getLabel('encounter_medium', $value, 'value')) {
+        if (($activityMedium = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'medium_id', $value)) != FALSE) {
           $names = $activityMedium;
         }
 
@@ -527,9 +491,11 @@ class CRM_Case_BAO_Query {
   }
 
   /**
+   * Build from clause.
+   *
    * @param string $name
-   * @param $mode
-   * @param $side
+   * @param string $mode
+   * @param string $side
    *
    * @return string
    */
@@ -693,12 +659,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
-   * Add all the elements shared between case search and advanaced search.
-   *
+   * Add all the elements shared between case search and advanced search.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildSearchForm(&$form) {
     $config = CRM_Core_Config::singleton();
@@ -707,15 +670,17 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);
 
-    $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
-    foreach ($caseTypes as $id => $name) {
-      $form->addElement('checkbox', "case_type_id[$id]", NULL, $name);
-    }
+    $form->add('select', 'case_type_id',
+      ts('Case Type'),
+      CRM_Case_PseudoConstant::caseType('title', FALSE),
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
+    );
 
-    $statuses = CRM_Case_PseudoConstant::caseStatus('label', FALSE);
-    foreach ($statuses as $id => $name) {
-      $form->addElement('checkbox', "case_status_id[$id]", NULL, $name);
-    }
+    $form->add('select', 'case_status_id',
+      ts('Case Status'),
+      CRM_Case_PseudoConstant::caseStatus('label', FALSE),
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
+    );
 
     CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);

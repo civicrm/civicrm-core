@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,16 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Edit_Notes {
 
   /**
-   * build form elements.
-   * params object $form object of the form
+   * Build form elements.
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
     $form->applyFilter('__ALL__', 'trim');

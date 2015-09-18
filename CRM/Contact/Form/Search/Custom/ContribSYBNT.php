@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -40,6 +38,8 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
   public $_permissionedComponent;
 
   /**
+   * Class constructor.
+   *
    * @param $formValues
    */
   public function __construct(&$formValues) {
@@ -167,18 +167,15 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
 
     $from = $this->from();
 
+    $select = $this->select();
     if ($justIDs) {
-      $select = $this->select();
       $select .= ', contact_a.id, display_name';
     }
     else {
-      $select = $this->select();
       $select = "
            DISTINCT contact_a.id as contact_id,
            contact_a.display_name as display_name,
-           $select
-";
-
+           $select ";
     }
     $this->buildACLClause('contact_a');
     $sql = "

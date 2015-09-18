@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * Main page for viewing contact.
- *
  */
 class CRM_Contact_Page_View extends CRM_Core_Page {
 
@@ -68,10 +65,9 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   protected $_permission;
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
   public function preProcess() {
     // process url params

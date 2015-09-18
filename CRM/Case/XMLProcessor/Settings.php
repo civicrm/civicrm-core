@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,19 +29,19 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Case_XMLProcessor_Settings extends CRM_Case_XMLProcessor {
 
   private $_settings = array();
 
   /**
-   * Input: The base filename without the .xml extension
-   * Output: An array of settings.
+   * Run.
+   *
    * @param string $filename
+   *   The base filename without the .xml extension
    *
    * @return array
+   *   An array of settings.
    */
   public function run($filename = 'settings') {
     $xml = $this->retrieve($filename);

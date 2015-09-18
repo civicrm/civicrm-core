@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying list of Gender
+ * Page for displaying list of Gender.
  */
 class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
 
@@ -77,9 +75,8 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
 
   /**
    * Obtains the group name from url string or id from $_GET['gid'].
-   * Sets the title.
    *
-   * @return void
+   * Sets the title.
    */
   public function preProcess() {
     if (!self::$_gName && !empty($this->urlPath[3])) {
@@ -221,8 +218,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -231,9 +226,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
 
   /**
    * Browse all options.
-   *
-   *
-   * @return void
    */
   public function browse() {
     if (!self::$_gName) {
@@ -250,7 +242,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       'id', $returnURL, $filter
     );
 
-    // retrieve financial account name for the payment instrument page
+    // retrieve financial account name for the payment method page
     if ($gName = "payment_instrument") {
       foreach ($optionValue as $key => $option) {
         $optionValue[$key]['financial_account'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($key, 'civicrm_option_value');

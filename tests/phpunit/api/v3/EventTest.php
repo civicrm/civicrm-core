@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -281,6 +281,65 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
+   * Chaining get event and loc block.
+   */
+  public function testChainingGetLocBlock() {
+    // create a loc block and an event for that loc block.
+    $eventParams = $this->_params[0];
+    $eventParams['loc_bloc_id'] = '$value.id';
+    $locBlockParams = array(
+      'address' => array(
+        'street_address' => 'Kipdorp 24',
+        'postal_code' => '2000',
+        'city' => 'Antwerpen',
+        'country_id' => '1020',
+        'location_type_id' => '1',
+      ),
+      'api.Event.create' => $eventParams,
+      'sequential' => 1,
+    );
+    $createResult = $this->callAPIAndDocument('LocBlock', 'create', $locBlockParams, __FUNCTION__, __FILE__);
+    $locBlockId = $createResult['id'];
+    $addressId = $createResult['values'][0]['address_id'];
+    $eventId = $createResult['values'][0]['api.Event.create']['id'];
+
+    // request the event with its loc block:
+    $check = $this->callAPISuccess($this->_entity, 'getsingle', array(
+      'id' => $eventId,
+      'api.LocBlock.get' => array('id' => '$value.loc_block_id'),
+      'sequential' => 1,
+    ));
+
+    // assert
+    $this->assertEquals($eventId, $check['id'], ' in line ' . __LINE__);
+    $this->assertEquals(1, $check['api.LocBlock.get']['count'], ' in line ' . __LINE__);
+    $this->assertEquals($locBlockId, $check['api.LocBlock.get']['id'], ' in line ' . __LINE__);
+
+    // cleanup
+    $this->callAPISuccess($this->_entity, 'delete', array('id' => $eventId));
+  }
+
+  /**
+   * Chaining get event and non existing loc block.
+   *
+   * Even if there is no loc block, at least the event should be returned.
+   * http://forum.civicrm.org/index.php/topic,36113.0.html
+   */
+  public function testChainingGetNonExistingLocBlock() {
+    $params = $this->_params[0];
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+      'id' => $result['id'],
+      // this chaining request should not break things:
+      'api.LocBlock.get' => array('id' => '$value.loc_block_id'),
+      ));
+    $this->assertEquals($result['id'], $check['id']);
+
+    $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
+  }
+
+  /**
    * Check with complete array + custom field.
    *
    * Note that the test is written on purpose without any
@@ -305,6 +364,163 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
   }
+
+  /**
+   * Check searching on custom fields.
+   *
+   * https://issues.civicrm.org/jira/browse/CRM-16036
+   */
+  public function testSearchCustomField() {
+    // create custom group with custom field on event
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    // Search for events having CRM-16036 as the value for this custom
+    // field. This should not return anything.
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+        'custom_' . $ids['custom_field_id'] => 'CRM-16036',
+      ));
+
+    $this->assertEquals(0, $check['count']);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
+   * Test searching on custom fields returning a contact reference.
+   *
+   * https://issues.civicrm.org/jira/browse/CRM-16036
+   */
+  public function testEventGetCustomContactRefFieldCRM16036() {
+    // Create some contact.
+    $test_contact_name = 'Contact, Test';
+    $contact_save_result = $this->callAPISuccess('contact', 'create', array(
+      'sort_name' => $test_contact_name,
+      'contact_type' => 'Individual',
+      'display_name' => $test_contact_name,
+    ));
+    $contact_id = $contact_save_result['id'];
+
+    // I have no clue what this $subfile is about. I just copied it from another
+    // unit test.
+    $subfile = 'ContactRefCustomField';
+    $description = "Demonstrates get with Contact Reference Custom Field.";
+
+    // Create a custom group, and add a custom contact reference field.
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = array(
+      'custom_group_id' => $ids['custom_group_id'],
+      'name' => 'Worker_Lookup',
+      'label' => 'Worker Lookup',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'ContactReference',
+      'weight' => 4,
+      'is_searchable' => 1,
+      'is_active' => 1,
+    );
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+
+    // Create an event, and add the contact as custom value.
+    $params = $this->_params;
+    $params['title'] = "My test event.";
+    $params['start_date'] = "2015-03-14";
+    // Just assume that an event type 1 exists.
+    $params['event_type_id'] = 1;
+    $params['custom_' . $customField['id']] = "$contact_id";
+
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+
+    // Retrieve the activity, search for the contact.
+    $result = $this->callAPIAndDocument($this->_entity, 'get', array(
+      'return.custom_' . $customField['id'] => 1,
+      'custom_' . $customField['id'] => $contact_id,
+    ), __FUNCTION__, __FILE__, $description, $subfile);
+
+    $this->assertEquals($test_contact_name, $result['values'][$result['id']]['custom_' . $customField['id']]);
+    $this->assertEquals($contact_id, $result['values'][$result['id']]['custom_' . $customField['id'] . "_id"], ' in line ' . __LINE__);
+    // Not sure whether I should test for custom_X_1 and custom_X_1_id as well.
+    // (1 being the id of the record in the custom value table)
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+    $this->callAPISuccess('contact', 'delete', array(
+      'id' => $contact_id,
+      'skip_undelete' => TRUE,
+    ));
+  }
+
+  /**
+   * Test searching on custom fields with less than or equal.
+   *
+   * See CRM-17101.
+   */
+  public function testEventGetCustomFieldLte() {
+    // create custom group with custom field on event
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    // Create an event, with a custom value.
+    $params = $this->_params;
+    $params['title'] = "My test event.";
+    $params['start_date'] = "2015-03-14";
+    // Just assume that an event type 1 exists.
+    $params['event_type_id'] = 1;
+    $params['custom_' . $ids['custom_field_id']] = "AAAA";
+
+    $save_result = $this->callApiSuccess($this->_entity, 'create', $params);
+
+    // Retrieve the activity, search for custom field < 'BBBB'
+    $get_result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'custom_' . $ids['custom_field_id'] => array('<=' => 'BBBB'),
+    ));
+
+    // Expect that we find the saved event.
+    $this->assertArrayKeyExists($save_result['id'], $get_result['values']);
+
+    $this->callAPISuccess($this->_entity, 'Delete', array('id' => $save_result['id']));
+  }
+
+  /**
+   * Test searching on custom fields with netsted call with id param.
+   *
+   * Search for an event on a custom field, and perform a chained call
+   * to retrieve it's (non-existing) loc block, using $value-substitution.
+   * This test just checks whether the event is found, because something
+   * happened in CiviCRM 4.6.5 that broke my fix for CRM-16036, causing
+   * CiviCRM to return 0 results.
+   * Of course, CRM-16168 should also be fixed for this test to pass.
+   */
+  public function testEventSearchCustomFieldWithChainedCall() {
+    // Create a custom group, and add a custom contact reference field.
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $custom_field_id = $ids['custom_field_id'];
+
+    // Create an event with a custom value.
+    $params = $this->_params;
+    $params['title'] = "My test event.";
+    $params['start_date'] = "2015-03-14";
+    // Just assume that an event type 1 exists.
+    $params['event_type_id'] = 1;
+    $params['custom_' . $custom_field_id] = "12345";
+
+    $this->callAPISuccess($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+
+    // Retrieve the activity, and chain loc block using $value.
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'custom_' . $custom_field_id => "12345",
+      'api.LocBlock.get' => array("id" => '$value.loc_block_id'),
+    ));
+
+    $this->assertEquals(1, $result['count']);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+    $this->callAPISuccess('event', 'delete', array(
+      'id' => $result['id'],
+      'skip_undelete' => TRUE,
+    ));
+  }
+
 
   /**
    * Test that an event with a price set can be created.
@@ -532,7 +748,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['title']['api.required']);
+    $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 
   /**
@@ -542,7 +758,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('api_action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['title']['api.required']);
+    $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 
   public function testgetfieldsGet() {
@@ -557,6 +773,31 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params = array('action' => 'delete');
     $result = $this->callAPISuccess('event', 'getfields', $params);
     $this->assertEquals(1, $result['values']['id']['api.required']);
+  }
+
+  public function testCreateFromTemplate() {
+    $templateParams = array(
+      'summary' => 'Sign up now to learn the results of this unit test',
+      'description' => 'This event is created from a template, so all the values should be the same as the original ones.',
+      'event_type_id' => 1,
+      'is_public' => 1,
+      'end_date' => '2018-06-25 17:00:00',
+      'is_online_registration' => 1,
+      'registration_start_date' => '2017-06-25 17:00:00',
+      'registration_end_date' => '2018-06-25 17:00:00',
+      'max_participants' => 100,
+      'event_full_text' => 'Sorry! We are already full',
+    );
+    $templateResult = $this->callAPISuccess('Event', 'create', array('is_template' => 1, 'template_title' => 'Test tpl') + $templateParams);
+    $eventResult = $this->callAPISuccess('Event', 'create', array(
+      'template_id' => $templateResult['id'],
+      'title' => 'Clone1',
+      'start_date' => '2018-06-25 16:00:00',
+    ));
+    $eventResult = $this->callAPISuccess('Event', 'getsingle', array('id' => $eventResult['id']));
+    foreach ($templateParams as $param => $value) {
+      $this->assertEquals($value, $eventResult[$param]);
+    }
   }
 
 }

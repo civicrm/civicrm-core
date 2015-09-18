@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
@@ -275,12 +273,9 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Given a list of the importable field keys that the user has selected
-   * set the active fields array to this list
+   * Given a list of the importable field keys that the user has selected set the active fields array to this list.
    *
    * @param array $fieldKeys
-   *
-   * @return void
    */
   public function setActiveFields($fieldKeys) {
     $this->_activeFieldCount = count($fieldKeys);
@@ -343,8 +338,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @param CRM_Core_Session $store
    *
    * @param int $mode
-   *
-   * @return void
    */
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
@@ -387,8 +380,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @param string $fileName
    * @param array $header
    * @param array $data
-   *
-   * @return void
    */
   public static function exportCSV($fileName, $header, $data) {
     $output = array();

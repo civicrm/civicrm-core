@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -73,20 +73,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       foreach (array_keys($addProfileBottom) as $profileNum) {
         self::buildMultipleProfileBottom($this, $profileNum);
       }
-    }
-
-    $this->assign('perm', 0);
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
-    $ufCreate = CRM_ACL_API::group(CRM_Core_Permission::CREATE, NULL, 'civicrm_uf_group', $ufGroups);
-    $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
-    $checkPermission = array(
-      array(
-        'administer CiviCRM',
-        'manage event profiles',
-      ),
-    );
-    if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
-      $this->assign('perm', 1);
     }
 
     $this->assign('addProfileBottomAdd', $this->_addProfileBottomAdd);
@@ -334,11 +320,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     extract(self::getProfileSelectorTypes());
     //CRM-15427
-    $form->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
-    $form->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE, $usedFor);
+    $form->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE, $usedFor);
 
-    $form->addProfileSelector('additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
-    $form->addProfileSelector('additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector('additional_custom_pre_id', ts('Profile for Additional Participants') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE, $usedFor);
+    $form->addProfileSelector('additional_custom_post_id', ts('Profile for Additional Participants') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE, $usedFor);
   }
 
   /**
@@ -359,7 +345,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     extract((is_null($configs)) ? self::getProfileSelectorTypes() : $configs);
     $element = $prefix . "custom_post_id_multiple[$count]";
     $label .= '<br />' . ts('(bottom of page)');
-    $form->addProfileSelector($element, $label, $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE);
+    $form->addProfileSelector($element, $label, $allowCoreTypes, $allowSubTypes, $profileEntities, TRUE, $usedFor);
   }
 
   /**
@@ -373,6 +359,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'allowCoreTypes' => array(),
       'allowSubTypes' => array(),
       'profileEntities' => array(),
+      'usedFor' => array(),
     );
 
     $configs['allowCoreTypes'] = array_merge(array(
@@ -380,6 +367,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         'Individual',
       ), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
+    if (CRM_Core_Permission::check('manage event profiles') && !CRM_Core_Permission::check('administer CiviCRM')) {
+      $configs['usedFor'][] = 'CiviEvent';
+    }
     //CRM-15427
     $id = CRM_Utils_Request::retrieve('id', 'Integer');
     if ($id) {

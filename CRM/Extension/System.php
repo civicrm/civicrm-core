@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -92,17 +92,10 @@ class CRM_Extension_System {
    */
   public function __construct($parameters = array()) {
     $config = CRM_Core_Config::singleton();
-    $configKeys = array(
-      'extensionsDir',
-      'extensionsURL',
-      'resourceBase',
-      'userFrameworkBaseURL',
-    );
-    foreach ($configKeys as $key) {
-      if (!array_key_exists($key, $parameters)) {
-        $parameters[$key] = $config->{$key};
-      }
-    }
+    $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
+    $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
+    $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, $config->resourceBase);
+    $parameters['userFrameworkBaseURL'] = CRM_Utils_Array::value('userFrameworkBaseURL', $parameters, $config->userFrameworkBaseURL);
     if (!array_key_exists('civicrm_root', $parameters)) {
       $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
     }
@@ -247,16 +240,13 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      if (defined('CIVICRM_DSN')) {
-        $cacheGroup = md5(serialize(array('ext', $this->parameters)));
-        $this->cache = new CRM_Utils_Cache_SqlGroup(array(
-          'group' => $cacheGroup,
-          'prefetch' => TRUE,
-        ));
-      }
-      else {
-        $this->cache = new CRM_Utils_Cache_ArrayCache(array());
-      }
+      $cacheGroup = md5(serialize(array('ext', $this->parameters)));
+      // Extension system starts before container. Manage our own cache.
+      $this->cache = CRM_Utils_Cache::create(array(
+        'name' => $cacheGroup,
+        'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+        'prefetch' => TRUE,
+      ));
     }
     return $this->cache;
   }

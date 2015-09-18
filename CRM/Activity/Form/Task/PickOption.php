@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to email a group of contacts
+ * This class provides the functionality to email a group of contacts.
  */
 class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
 
@@ -62,8 +60,6 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     /*
@@ -93,9 +89,6 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->addElement('checkbox', 'with_contact', ts('With Contact'));
@@ -107,9 +100,6 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Activity_Form_Task_PickOption', 'formRule'));
@@ -136,9 +126,6 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // Clear any formRule errors from Email form in case they came back here via Cancel button
@@ -177,7 +164,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
       $urlParams = "_qf_PickOption_display=true&qfKey={$params['qfKey']}";
       $urlRedirect = CRM_Utils_System::url('civicrm/activity/search', $urlParams);
       CRM_Core_Error::statusBounce(
-        ts('It appears you have no contacts with emails from the selected recipients.'),
+        ts('It appears you have no contacts with email addresses from the selected recipients.'),
         $urlRedirect
       );
     }

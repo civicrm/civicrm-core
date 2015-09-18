@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -118,7 +118,7 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
       array(
         'first_name' => substr(sha1(rand()), 0, 7),
@@ -130,7 +130,7 @@ class WebTest_Import_TagTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
     );
 

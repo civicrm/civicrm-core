@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -401,6 +401,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             'price' => json_encode(array($elementName, $priceVal)),
             'data-amount' => $opt[$valueFieldName],
             'data-currency' => $currencyName,
+            'data-price-field-values' => json_encode($customOption),
           );
           if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
@@ -506,7 +507,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             '' => ts('- select -'),
           ) + $selectOption,
           $useRequired && $field->is_required,
-          array('price' => json_encode($priceVal), 'class' => 'crm-select2')
+          array('price' => json_encode($priceVal), 'class' => 'crm-select2', 'data-price-field-values' => json_encode($customOption))
         );
 
         // CRM-6902 - Add "max" option for a price set field
@@ -571,15 +572,22 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @param bool $inactiveNeeded
    *   Include inactive options.
    * @param bool $reset
-   *   Ignore stored values\.
+   *   Discard stored values.
    *
    * @return array
    *   array of options
    */
   public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE) {
     static $options = array();
+    if ($reset) {
+      $options = array();
+      // This would happen if the function was only called to clear the cache.
+      if (empty($fieldId)) {
+        return array();
+      }
+    }
 
-    if ($reset || empty($options[$fieldId])) {
+    if (empty($options[$fieldId])) {
       $values = array();
       CRM_Price_BAO_PriceFieldValue::getValues($fieldId, $values, 'weight', !$inactiveNeeded);
       $options[$fieldId] = $values;

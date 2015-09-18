@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
 
@@ -41,6 +39,9 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
     return 'ParticipantStatusType';
   }
 
+  /**
+   * Build form.
+   */
   public function buildQuickForm() {
     parent::buildQuickForm();
 
@@ -66,9 +67,13 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
     $this->add('text', 'weight', ts('Order'), $attributes['weight'], TRUE);
 
     $this->addSelect('visibility_id', array('label' => ts('Visibility'), 'required' => TRUE));
+
+    $this->assign('id', $this->_id);
   }
 
   /**
+   * Set default values.
+   *
    * @return array
    */
   public function setDefaultValues() {

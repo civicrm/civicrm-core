@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -199,9 +199,11 @@ WHERE      e.id = %1
           $action = 'browse';
         }
 
-        $tabs[$key]['link'] = CRM_Utils_System::url("civicrm/event/manage/{$key}",
-          "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}"
-        );
+        $link = "civicrm/event/manage/{$key}";
+        $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
+
+        $tabs[$key]['link'] = (isset($value['link']) ? $value['link'] :
+          CRM_Utils_System::url($link, $query));
       }
     }
 

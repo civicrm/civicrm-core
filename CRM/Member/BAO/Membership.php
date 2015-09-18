@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -1452,6 +1452,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         // we should not created contribution record for related contacts, CRM-3371
         unset($params['contribution_status_id']);
 
+        //CRM-16857: Do not create multiple line-items for inherited membership through priceset.
+        unset($params['lineItems']);
+        unset($params['line_item']);
+
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           CRM_Member_BAO_Membership::create($params, $relMemIds);
@@ -1849,7 +1853,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         }
         CRM_Member_BAO_MembershipLog::add($logParams);
 
-        if (!empty($contributionRecurID)) {
+        if ($contributionRecurID) {
           CRM_Core_DAO::setFieldValue('CRM_Member_DAO_Membership', $membership->id,
             'contribution_recur_id', $contributionRecurID
           );
@@ -1979,12 +1983,14 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       if (!empty($membershipSource)) {
         $memParams['source'] = $membershipSource;
       }
-      $memParams['contribution_recur_id'] = $contributionRecurID;
-
       $memParams['is_test'] = $is_test;
       $memParams['is_pay_later'] = $isPayLater;
     }
-
+    // Putting this in an IF is precautionary as it seems likely that it would be ignored if empty, but
+    // perhaps shouldn't be?
+    if ($contributionRecurID) {
+      $memParams['contribution_recur_id'] = $contributionRecurID;
+    }
     //CRM-4555
     //if we decided status here and want to skip status
     //calculation in create( ); then need to pass 'skipStatusCal'.
@@ -2027,11 +2033,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $membershipOrg
    * @param int $membershipTypeID
    * @param float $total_amount
+   * @param int $priceSetId
    *
    * @return array
    */
-  public static function getQuickConfigMembershipLineItems($membershipOrg, $membershipTypeID, $total_amount) {
-    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
+  public static function setQuickConfigMembershipParameters($membershipOrg, $membershipTypeID, $total_amount, $priceSetId) {
     $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
 
     // The name of the price field corresponds to the membership_type organization contact.
@@ -2350,6 +2356,7 @@ WHERE      civicrm_membership.is_test = 0";
     $contributionSoftParams = CRM_Utils_Array::value('soft_credit', $params);
     $recordContribution = array(
       'contact_id',
+      'fee_amount',
       'total_amount',
       'receive_date',
       'financial_type_id',
@@ -2415,52 +2422,6 @@ WHERE      civicrm_membership.is_test = 0";
       ));
     }
     return $contribution;
-  }
-
-  /**
-   * Record line items for default membership.
-   * @deprecated
-   *
-   * Use getQuickConfigMembershipLineItems
-   *
-   * @param CRM_Core_Form $qf
-   * @param array $membershipType
-   *   Array with membership type and organization.
-   *
-   * @return int $priceSetId
-   */
-  public static function createLineItems(&$qf, $membershipType) {
-    $qf->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
-    $qf->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-
-    // The name of the price field corresponds to the membership_type organization contact.
-    $editedFieldParams = array(
-      'price_set_id' => $priceSetId,
-      'name' => $membershipType[0],
-    );
-    $editedResults = array();
-    CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
-
-    if (!empty($editedResults)) {
-      unset($qf->_priceSet['fields']);
-      $qf->_priceSet['fields'][$editedResults['id']] = $priceSets['fields'][$editedResults['id']];
-      unset($qf->_priceSet['fields'][$editedResults['id']]['options']);
-      $fid = $editedResults['id'];
-      $editedFieldParams = array(
-        'price_field_id' => $editedResults['id'],
-        'membership_type_id' => $membershipType[1],
-      );
-      $editedResults = array();
-      CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
-      $qf->_priceSet['fields'][$fid]['options'][$editedResults['id']] = $priceSets['fields'][$fid]['options'][$editedResults['id']];
-      if (!empty($qf->_params['total_amount'])) {
-        $qf->_priceSet['fields'][$fid]['options'][$editedResults['id']]['amount'] = $qf->_params['total_amount'];
-      }
-    }
-
-    $fieldID = key($qf->_priceSet['fields']);
-    $qf->_params['price_' . $fieldID] = CRM_Utils_Array::value('id', $editedResults);
-    return $priceSetId;
   }
 
   /**

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,7 +32,6 @@
  * @subpackage API_Member
  */
 
-
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
@@ -50,9 +49,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   protected $_entity;
   protected $_params;
 
-
+  /**
+   * Set up for tests.
+   */
   public function setUp() {
-    // Connect to the database.
     parent::setUp();
     $this->_apiversion = 3;
     $this->_contactID = $this->individualCreate();
@@ -83,6 +83,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Clean up after tests.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
     $this->quickCleanup(array(
         'civicrm_membership',
@@ -211,6 +216,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_membership_get with params not array.
+   *
    * Gets treated as contact_id, memberships expected.
    */
   public function testGetWithParamsMemberShipTypeId() {
@@ -223,14 +229,14 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $membership['id'],
     ));
     $result = $membership['values'][$membership['id']];
-    $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
-    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
-    $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
-    $this->assertEquals($result['join_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
-    $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
+    $this->assertEquals($result['status_id'], $this->_membershipStatusID);
+    $this->assertEquals($result['join_date'], '2009-01-21');
+    $this->assertEquals($result['start_date'], '2009-01-21');
+    $this->assertEquals($result['end_date'], '2009-12-21');
+    $this->assertEquals($result['source'], 'Payment');
+    $this->assertEquals($result['is_override'], 1);
     $this->assertEquals($result['id'], $membership['id']);
   }
 
@@ -262,7 +268,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with complete array + custom field
+   * Check with complete array + custom field.
+   *
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
@@ -299,15 +306,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'Delete', array(
       'id' => $membership['id'],
     ));
-    $this->assertEquals($result['join_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
-    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
-    $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
+    $this->assertEquals($result['join_date'], '2009-01-21');
+    $this->assertEquals($result['contact_id'], $this->_contactID);
+    $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID);
+    $this->assertEquals($result['status_id'], $this->_membershipStatusID);
 
-    $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
-    $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
-    $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['start_date'], '2009-01-21');
+    $this->assertEquals($result['end_date'], '2009-12-21');
+    $this->assertEquals($result['source'], 'Payment');
+    $this->assertEquals($result['is_override'], 1);
   }
 
 
@@ -372,7 +379,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
 
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals($membership['count'], 0, "In line " . __LINE__);
+    $this->assertEquals($membership['count'], 0);
   }
 
   /**
@@ -580,6 +587,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals(1, $result['count']);
 
+    // Delete relationship and assert membership is not inherited
+    $this->callAPISuccess('relationship', 'delete', array('id' => $relationship1['id']));
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(0, $result['count']);
+
     // Tear down - reverse of creation to be safe
     $this->contactDelete($memberContactId[2]);
     $this->contactDelete($memberContactId[1]);
@@ -591,13 +603,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * We are checking for no enotices + only id & end_date returned
+   * We are checking for no e-notices + only id & end_date returned
    */
   public function testMembershipGetWithReturn() {
     $this->contactMembershipCreate($this->_params);
     $result = $this->callAPISuccess('membership', 'get', array('return' => 'end_date'));
     foreach ($result['values'] as $membership) {
-      $this->assertEquals(array('id', 'end_date'), array_keys($membership));
+      $this->assertEquals(array('end_date', 'membership_end_date', 'id'), array_keys($membership));
     }
   }
   ///////////////// civicrm_membership_create methods
@@ -707,6 +719,40 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     ));
     $this->assertEquals("custom string", $check['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+  }
+
+  /**
+   * Search on custom field value.
+   */
+  public function testSearchWithCustomDataCRM16036() {
+    // Create a custom field on membership
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+
+    // Create a new membership, but don't assign anything to the custom field.
+    $params = $this->_params;
+    $result = $this->callAPIAndDocument(
+      $this->_entity,
+      'create',
+      $params,
+      __FUNCTION__,
+      __FILE__,
+      NULL,
+      'SearchWithCustomData');
+
+    // search memberships with CRM-16036 as custom field value.
+    // Since we did not touch the custom field of any membership,
+    // this should not return any results.
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+      'custom_' . $ids['custom_field_id'] => "CRM-16036",
+    ));
+
+    // Cleanup.
+    $this->callAPISuccess($this->_entity, 'delete', array(
+      'id' => $result['id'],
+    ));
+
+    // Assert.
+    $this->assertEquals(0, $check['count']);
   }
 
   /**
@@ -1340,6 +1386,22 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2009-12-21', $result['end_date']);
 
+  }
+
+  /**
+   * Test that all membership types are returned when getoptions is called.
+   *
+   * This test locks in current behaviour where types for all domains are returned. It should possibly be domain
+   * specific but that should only be done in conjunction with adding a hook to allow that to be altered as the
+   * multisite use case expects the master domain to be able to see all sites.
+   *
+   * See CRM-17075.
+   */
+  public function testGetOptionsMembershipTypeID() {
+    $options = $this->callAPISuccess('Membership', 'getoptions', array('field' => 'membership_type_id'));
+    $this->assertEquals('General', array_pop($options['values']));
+    $this->assertEquals('General', array_pop($options['values']));
+    $this->assertEquals(NULL, array_pop($options['values']));
   }
 
 }

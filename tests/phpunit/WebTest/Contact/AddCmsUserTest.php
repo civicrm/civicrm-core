@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -101,7 +101,7 @@ class WebTest_Contact_AddCmsUserTest extends CiviSeleniumTestCase {
     $this->type('street_address-1', '902C El Camino Way SW');
     $this->type('city-1', 'Dumfries');
     $this->type('postal_code-1', '1234');
-    $this->assertTrue($this->isTextPresent('United States'));
+    $this->assertTrue($this->isTextPresent('UNITED STATES'));
     $this->select('state_province-1', 'value=1019');
 
     $this->click('edit-submit');

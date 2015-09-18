@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -35,7 +35,7 @@
       ajax: {
         url: pcpURL,
         data: function(term, page) {
-          return {term: term, page: page};
+          return {term: term, page_num: page};
         },
         results: function(response) {
           return response;

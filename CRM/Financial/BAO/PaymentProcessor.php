@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -267,9 +267,9 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @throws CiviCRM_API3_Exception
    * @return array
    */
-  public static function getAllPaymentProcessors($mode, $reset = FALSE) {
+  public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE) {
 
-    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . ($mode ? 'test' : 'all');
+    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . CRM_Core_Config::domainID();
     if (!$reset) {
       $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
       if (!empty($processors)) {
@@ -279,6 +279,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
     $retrievalParameters = array(
       'is_active' => TRUE,
+      'domain_id' => CRM_Core_Config::domainID(),
       'options' => array('sort' => 'is_default DESC, name'),
       'api.payment_processor_type.getsingle' => 1,
     );
@@ -327,7 +328,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   public static function getPaymentProcessors($capabilities = array(), $ids = FALSE) {
     $mode = NULL;
     $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : array();
-    $processors = $liveProcessors = self::getAllPaymentProcessors('live');
+    $processors = $liveProcessors = self::getAllPaymentProcessors('all');
 
     if (in_array('TestMode', $capabilities)) {
       if ($ids) {
@@ -379,6 +380,25 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
   /**
    * Retrieve payment processor id / info/ object based on component-id.
+   *
+   * @todo function needs revisiting. The whole 'info / obj' thing is an overload. Recommend creating new functions
+   * that are entity specific as there is little shared code specific to obj or info
+   *
+   * Also, it does not accurately derive the processor - for a completed contribution the best place to look is in the
+   * relevant financial_trxn record. For a recurring contribution it is in the contribution_recur table.
+   *
+   * For a membership the relevant contribution_recur should be derived & then resolved as above. The contribution page
+   * is never a reliable place to look as there can be more than one configured. For a pending contribution there is
+   * no way to derive the processor - but hey - what processor? it didn't go through!
+   *
+   * Query for membership might look something like:
+   * SELECT fte.payment_processor_id
+   * FROM civicrm_membership mem
+   * INNER JOIN civicrm_line_item li  ON ( mem.id = li.entity_id AND li.entity_table = 'civicrm_membership')
+   * INNER JOIN civicrm_contribution       con ON ( li.contribution_id = con.id )
+   * LEFT JOIN civicrm_entity_financial_trxn ft ON ft.entity_id = con.id AND ft.entity_table =
+   * 'civicrm_contribution'
+   * LEFT JOIN civicrm_financial_trxn fte ON fte.id = ft.financial_trxn_id
    *
    * @param int $entityID
    * @param string $component
@@ -444,11 +464,17 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
     elseif ($type == 'info') {
       $result = self::getPayment($ppID, $mode);
     }
-    elseif ($type == 'obj') {
-      $payment = self::getPayment($ppID, $mode);
-      $result = Civi\Payment\System::singleton()->getByProcessor($payment);
+    elseif ($type == 'obj' && is_numeric($ppID)) {
+      try {
+        $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $ppID));
+      }
+      catch (API_Exception $e) {
+        // Unable to load the processor because this function uses an unreliable method to derive it.
+        // The function looks to load the payment processor ID from the contribution page, which
+        // can support multiple processors.
+      }
+      $result = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     }
-
     return $result;
   }
 

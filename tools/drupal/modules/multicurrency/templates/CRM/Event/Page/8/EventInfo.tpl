@@ -40,7 +40,7 @@
                     <span class="fn org">{$location.1.name}</span><br />
                 {/if}
                 {$location.1.address.display|nl2br}
-                {if ( $event.is_map && $config->mapAPIKey && ( is_numeric($location.1.address.geo_code_1)  || ( $config->mapGeoCoding && $location.1.address.city AND $location.1.address.state_province ) ) ) }
+                {if ( $event.is_map && $config->mapAPIKey && ( is_numeric($location.1.address.geo_code_1)  || ( $location.1.address.city AND $location.1.address.state_province ) ) ) }
                     <br/><a href="{$mapURL}" title="{ts}Map this Address{/ts}">{ts}Map this Location{/ts}</a>
                 {/if}
                 </td>

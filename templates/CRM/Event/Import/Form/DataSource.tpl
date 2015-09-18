@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -70,6 +70,11 @@
             <td class="label">{$form.onDuplicate.label}</td>
       <td>{$form.onDuplicate.html} {help id="id-onDuplicate"}</td>
         </tr>
+
+   <tr class="crm-import-datasource-form-block-fieldSeparator">
+     <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+     <td>{$form.fieldSeparator.html}</td>
+   </tr>
   <tr class="crm-event-import-uploadfile-form-block-date_format">
             {include file="CRM/Core/Date.tpl"}
   </tr>

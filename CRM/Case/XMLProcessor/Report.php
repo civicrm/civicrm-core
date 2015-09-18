@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
@@ -974,11 +972,28 @@ LIMIT  1
       }
     }
 
+    // Retrieve custom values for cases.
+    $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($caseID, 'Case');
+    $extends = array('case');
+    $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+    $caseCustomFields = array();
+    while (list($gid, $group_values) = each($groupTree)) {
+      while (list($id, $field_values) = each($group_values['fields'])) {
+        if (array_key_exists($id, $customValues)) {
+          $caseCustomFields[$gid]['title'] = $group_values['title'];
+          $caseCustomFields[$gid]['values'][$id] = array(
+            'label' => $field_values['label'],
+            'value' => $customValues[$id],
+          );
+        }
+      }
+    }
     $template->assign('caseRelationships', $caseRelationships);
     $template->assign('caseRoles', $caseRoles);
     $template->assign('otherRelationships', $otherRelationships);
     $template->assign('globalRelationships', $relGlobal);
     $template->assign('globalGroupInfo', $globalGroupInfo);
+    $template->assign('caseCustomFields', $caseCustomFields);
     $contents = self::getCaseReport($clientID,
       $caseID,
       $activitySetName,

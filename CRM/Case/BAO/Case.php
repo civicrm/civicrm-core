@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class contains the functions for Case Management.
- *
  */
 class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
@@ -385,8 +382,6 @@ WHERE civicrm_case.id = %1";
    *   Case id.
    * @param bool $enable
    *   Action.
-   *
-   * @return void
    */
   public static function enableDisableCaseRelationships($caseId, $enable) {
     $contactIds = self::retrieveContactIdsByCaseId($caseId);
@@ -409,8 +404,6 @@ WHERE civicrm_case.id = %1";
    *
    * @param int $activityId
    *   Id of the activity.
-   *
-   * @return void
    */
   public static function deleteCaseActivity($activityId) {
     $case = new CRM_Case_DAO_CaseActivity();
@@ -740,7 +733,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
       $allCases = FALSE;
     }
 
-    $condition = " AND civicrm_case.is_deleted = 0 ";
+    $condition = " AND civicrm_case.is_deleted = 0 AND civicrm_contact.is_deleted <> 1";
 
     if (!$allCases) {
       $condition .= " AND case_relationship.contact_id_b = {$userID} ";
@@ -917,6 +910,7 @@ AND civicrm_case.status_id != $closedId";
       $userID = 'null';
       $all = 1;
       $case_owner = 1;
+      $myGroupByClause = ' GROUP BY civicrm_case.id';
     }
     else {
       $all = 0;
@@ -925,17 +919,19 @@ AND civicrm_case.status_id != $closedId";
       $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
     }
 
+    // FIXME: This query could be a lot more efficient if it used COUNT() instead of returning all rows and then counting them with php
     $query = "
 SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
  case_type_id, case_relationship.contact_id_b
  FROM civicrm_case
+ INNER JOIN civicrm_case_contact cc on cc.case_id = civicrm_case.id
  LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
  LEFT JOIN civicrm_option_group option_group_case_status ON ( option_group_case_status.name = 'case_status' )
  LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
  AND option_group_case_status.id = case_status.option_group_id )
  LEFT JOIN civicrm_relationship case_relationship ON ( case_relationship.case_id  = civicrm_case.id
  AND case_relationship.contact_id_b = {$userID})
- WHERE is_deleted =0
+ WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
 {$myCaseWhereClause} {$myGroupByClause}";
 
     $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
@@ -1444,11 +1440,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param null $attachments
    * @param int $caseId
    *
-   * @return void
+   * @return bool |array
    */
   public static function sendActivityCopy($clientId, $activityId, $contacts, $attachments = NULL, $caseId) {
     if (!$activityId) {
-      return;
+      return FALSE;
     }
 
     $tplParams = $activityInfo = array();
@@ -1926,10 +1922,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $relContactId
    *   Case role assignee contactId.
    * @param int $contactId
-   *
-   * @return void
-   *   on success creates activity and case activity
-   *
    */
   public static function createCaseRoleActivity($caseId, $relationshipId, $relContactId = NULL, $contactId = NULL) {
     if (!$caseId || !$relationshipId || empty($relationshipId)) {
@@ -2785,8 +2777,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Params to be sent to template for sending email.
    * @param array $activityParams
    *   Info of the activity.
-   *
-   * @return void
    */
   public static function buildPermissionLinks(&$tplParams, $activityParams) {
     $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityParams['source_record_id'],
@@ -3350,8 +3340,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    *   Case id.
    * @param int $contactId
    *   Contact id / new client id.
-   *
-   * @return void
    */
   public static function addCaseRelationships($caseId, $contactId) {
     // get the case role / relationships for the case

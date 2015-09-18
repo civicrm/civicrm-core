@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -45,17 +41,28 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
     $this->assignBillingType();
 
-    // @todo - round about way to load it - just load as an object using civi\payment\system::getByProcessor
-    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID, 'unused');
+    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID);
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
     self::addCreditCardJs();
 
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+
+    $this->assign('suppressForm', TRUE);
+    $this->controller->_generateQFKey = FALSE;
   }
 
   public function buildQuickForm() {
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
+  }
+
+  /**
+   * Set default values for the form.
+   */
+  public function setDefaultValues() {
+    $contactID = $this->getContactID();
+    CRM_Core_Payment_Form::setDefaultValues($this, $contactID);
+    return $this->_defaults;
   }
 
   /**

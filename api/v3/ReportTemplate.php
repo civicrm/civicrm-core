@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -34,12 +34,10 @@
 /**
  * Retrieve a report template.
  *
- * FIXME This is a bare-minimum placeholder
- *
  * @param array $params
  *
  * @return array
- *   details of found Option Values
+ *   API result array
  */
 function civicrm_api3_report_template_get($params) {
   require_once 'api/v3/OptionValue.php';
@@ -57,6 +55,7 @@ function civicrm_api3_report_template_get($params) {
  * @param array $params
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_report_template_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -95,7 +94,7 @@ function _civicrm_api3_report_template_create_spec(&$params) {
  * @param array $params
  *
  * @return array
- *   Api result
+ *   API result array
  */
 function civicrm_api3_report_template_delete($params) {
   require_once 'api/v3/OptionValue.php';
@@ -109,7 +108,7 @@ function civicrm_api3_report_template_delete($params) {
  *   Input parameters.
  *
  * @return array
- *   details of found instances
+ *   API result array
  */
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
@@ -177,6 +176,7 @@ function _civicrm_api3_report_template_getrows($params) {
  * @param array $params
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_report_template_getstatistics($params) {
   list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);

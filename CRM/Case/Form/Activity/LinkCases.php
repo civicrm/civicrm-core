@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for OpenCase Activity
- *
+ * This class generates form components for OpenCase Activity.
  */
 class CRM_Case_Form_Activity_LinkCases {
   /**
@@ -70,13 +67,11 @@ class CRM_Case_Form_Activity_LinkCases {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
-   *
+   * Set default values for the form.
    *
    * @param CRM_Core_Form $form
    *
-   * @return void
+   * @return array
    */
   public static function setDefaultValues(&$form) {
     return $defaults = array();
@@ -125,8 +120,6 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @param CRM_Core_Form $form
    * @param array $params
-   *
-   * @return void
    */
   public static function beginPostProcess(&$form, &$params) {
   }
@@ -137,9 +130,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @param CRM_Core_Form $form
    * @param array $params
-   * @param $activity
-   *
-   * @return void
+   * @param CRM_Activity_BAO_Activity $activity
    */
   public static function endPostProcess(&$form, &$params, &$activity) {
     $activityId = $activity->id;

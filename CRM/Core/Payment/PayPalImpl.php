@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,6 +24,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  *
@@ -88,7 +90,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @return bool
    */
   protected function supportsPreApproval() {
-    if ($this->_processorName == ts('PayPal Express')) {
+    if ($this->_processorName == ts('PayPal Express') || $this->_processorName == ts('PayPal Pro')) {
       return TRUE;
     }
     return FALSE;
@@ -124,7 +126,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
    * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   protected function addPaypalExpressCode(&$form) {
     if (empty($form->isBackOffice)) {
@@ -136,6 +138,37 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         $this->_paymentProcessor['url_button'],
         array('class' => 'crm-form-submit')
       );
+    }
+  }
+
+  /**
+   * Can recurring contributions be set against pledges.
+   *
+   * In practice all processors that use the baseIPN function to finish transactions or
+   * call the completetransaction api support this by looking up previous contributions in the
+   * series and, if there is a prior contribution against a pledge, and the pledge is not complete,
+   * adding the new payment to the pledge.
+   *
+   * However, only enabling for processors it has been tested against.
+   *
+   * @return bool
+   */
+  protected function supportsRecurContributionsForPledges() {
+    return TRUE;
+  }
+
+  /**
+   * Default payment instrument validation.
+   *
+   * Implement the usual Luhn algorithm via a static function in the CRM_Core_Payment_Form if it's a credit card
+   * Not a static function, because I need to check for payment_type.
+   *
+   * @param array $values
+   * @param array $errors
+   */
+  public function validatePaymentInstrument($values, &$errors) {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Pro') {
+      CRM_Core_Payment_Form::validateCreditCard($values, $errors);
     }
   }
 
@@ -195,7 +228,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @return array
    */
   public function getPreApprovalDetails($storedDetails) {
-    return $this->getExpressCheckoutDetails($storedDetails['token']);
+    return empty($storedDetails['token']) ? array() : $this->getExpressCheckoutDetails($storedDetails['token']);
   }
 
   /**
@@ -222,22 +255,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     /* Success */
-
-    $params = array();
-    $params['token'] = $result['token'];
-    $params['payer_id'] = $result['payerid'];
-    $params['payer_status'] = $result['payerstatus'];
-    $params['first_name'] = $result['firstname'];
-    $params['middle_name'] = CRM_Utils_Array::value('middlename', $result);
-    $params['last_name'] = $result['lastname'];
-    $params['street_address'] = $result['shiptostreet'];
-    $params['supplemental_address_1'] = CRM_Utils_Array::value('shiptostreet2', $result);
-    $params['city'] = $result['shiptocity'];
-    $params['state_province'] = $result['shiptostate'];
-    $params['postal_code'] = $result['shiptozip'];
-    $params['country'] = $result['shiptocountrycode'];
-
-    return $params;
+    $fieldMap = array(
+      'token' => 'token',
+      'payer_status' => 'payerstatus',
+      'payer_id' => 'payerid',
+      'first_name' => 'firstname',
+      'middle_name' => 'middlename',
+      'last_name' => 'lastname',
+      'street_address' => 'shiptostreet',
+      'supplemental_address_1' => 'shiptostreet2',
+      'city' => 'shiptocity',
+      'postal_code' => 'shiptozip',
+      'state_province' => 'shiptostate',
+      'country' => 'shiptocountrycode',
+    );
+    return $this->mapPaypalParamsToCivicrmParams($fieldMap, $result);
   }
 
   /**
@@ -251,7 +283,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    */
   public function doExpressCheckout(&$params) {
-
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
     if (!empty($params['is_recur'])) {
       return $this->createRecurringPayments($params);
     }
@@ -274,7 +306,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = $this->invokeAPI($args);
 
     if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
+      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
 
     /* Success */
@@ -288,7 +320,13 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     $params['payment_status'] = $result['paymentstatus'];
     $params['pending_reason'] = $result['pendingreason'];
-
+    if (!empty($params['is_recur'])) {
+      // See comment block.
+      $result['payment_status_id'] = array_search('Pending', $statuses);
+    }
+    else {
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+    }
     return $params;
   }
 
@@ -300,7 +338,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   public function createRecurringPayments(&$params) {
     $args = array();
-
+    // @todo this function is riddled with enotices - perhaps use $this->mapPaypalParamsToCivicrmParams($fieldMap, $result)
     $this->initialize($args, 'CreateRecurringPaymentsProfile');
 
     $start_time = strtotime(date('m/d/Y'));
@@ -323,7 +361,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['totalbillingcycles'] = $params['installments'];
     $args['version'] = '56.0';
     $args['profilereference'] = "i={$params['invoiceID']}" .
-      "&m=$component" .
+      "&m=" .
       "&c={$params['contactID']}" .
       "&r={$params['contributionRecurID']}" .
       "&b={$params['contributionID']}" .
@@ -363,6 +401,41 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['signature'] = $this->_paymentProcessor['signature'];
     $args['subject'] = CRM_Utils_Array::value('subject', $this->_paymentProcessor);
     $args['method'] = $method;
+  }
+
+  /**
+   * Process payment - this function wraps around both doTransferPayment and doDirectPayment.
+   *
+   * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
+   * more agnostic.
+   *
+   * Payment processors should set payment_status_id. This function adds some historical defaults ie. the
+   * assumption that if a 'doDirectPayment' processors comes back it completed the transaction & in fact
+   * doTransferCheckout would not traditionally come back.
+   *
+   * doDirectPayment does not do an immediate payment for Authorize.net or Paypal so the default is assumed
+   * to be Pending.
+   *
+   * Once this function is fully rolled out then it will be preferred for processors to throw exceptions than to
+   * return Error objects
+   *
+   * @param array $params
+   *
+   * @param string $component
+   *
+   * @return array
+   *   Result array
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doPayment(&$params, $component = 'contribute') {
+    if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal_Express'
+    && (!empty($params['credit_card_number']) && empty($params['token']))
+    ) {
+      return parent::doPayment($params, $component);
+    }
+    $this->_component = $component;
+    return $this->doExpressCheckout($params);
   }
 
   /**
@@ -447,7 +520,40 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $params['trxn_id'] = CRM_Utils_Array::value('transactionid', $result);
     $params['gross_amount'] = CRM_Utils_Array::value('amt', $result);
+    $params = array_merge($params, $this->doQuery($params));
     return $params;
+  }
+
+  /**
+   * Query payment processor for details about a transaction.
+   *
+   * For paypal see : https://developer.paypal.com/webapps/developer/docs/classic/api/merchant/GetTransactionDetails_API_Operation_NVP/
+   *
+   * @param array $params
+   *   Array of parameters containing one of:
+   *   - trxn_id Id of an individual transaction.
+   *   - processor_id Id of a recurring contribution series as stored in the civicrm_contribution_recur table.
+   *
+   * @return array
+   *   Extra parameters retrieved.
+   *   Any parameters retrievable through this should be documented in the function comments at
+   *   CRM_Core_Payment::doQuery. Currently
+   *   - fee_amount Amount of fee paid
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doQuery($params) {
+    if (empty($params['trxn_id'])) {
+      throw new \Civi\Payment\Exception\PaymentProcessorException('transaction id not set');
+    }
+    $args = array(
+      'TRANSACTIONID' => $params['trxn_id'],
+    );
+    $this->initialize($args, 'GetTransactionDetails');
+    $result = $this->invokeAPI($args);
+    return array(
+      'fee_amount' => $result['feeamt'],
+    );
   }
 
   /**
@@ -639,6 +745,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   - redirect_url (if set the browser will be redirected to this.
    */
   public function doPreApproval(&$params) {
+    if (!isset($params['button']) || !stristr($params['button'], 'express')) {
+      return array();
+    }
+    $this->_component = $params['component'];
     $token = $this->setExpressCheckOut($params);
     return array(
       'pre_approval_parameters' => array('token' => $token),
@@ -918,6 +1028,37 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     return $result;
+  }
+
+  /**
+   * Get array of fields that should be displayed on the payment form.
+   *
+   * @return array
+   * @throws CiviCRM_API3_Exception
+   */
+  public function getPaymentFormFields() {
+    if ($this->_processorName == ts('PayPal Pro')) {
+      return $this->getCreditCardFormFields();
+    }
+    else {
+      return array();
+    }
+  }
+
+  /**
+   * Map the paypal params to CiviCRM params using a field map.
+   *
+   * @param array $fieldMap
+   * @param array $paypalParams
+   *
+   * @return array
+   */
+  protected function mapPaypalParamsToCivicrmParams($fieldMap, $paypalParams) {
+    $params = array();
+    foreach ($fieldMap as $civicrmField => $paypalField) {
+      $params[$civicrmField] = isset($paypalParams[$paypalField]) ? $paypalParams[$paypalField] : NULL;
+    }
+    return $params;
   }
 
 }

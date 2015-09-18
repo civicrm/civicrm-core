@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -39,6 +37,8 @@
 class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
 
   /**
+   * Run page.
+   *
    * @return string
    */
   public function run() {
@@ -73,7 +73,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
   }
 
   /**
-   * AJAX callback to fetch examples
+   * AJAX callback to fetch examples.
    */
   public static function getExampleFile() {
     global $civicrm_root;
@@ -102,11 +102,13 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
   }
 
   /**
-   * Ajax callback to display code docs
+   * Ajax callback to display code docs.
    */
   public static function getDoc() {
-    if (!empty($_GET['entity']) && strpos($_GET['entity'], '.') === FALSE) {
-      $entity = _civicrm_api_get_camel_name($_GET['entity']);
+    // Verify the API handler we're talking to is valid.
+    $entities = civicrm_api3('Entity', 'get');
+    $entity = CRM_Utils_Array::value('entity', $_GET);
+    if (!empty($entity) && in_array($entity, $entities['values']) && strpos($entity, '.') === FALSE) {
       $action = CRM_Utils_Array::value('action', $_GET);
       $doc = self::getDocblock($entity, $action);
       $result = array(
@@ -124,6 +126,8 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
   }
 
   /**
+   * Get documentation block.
+   *
    * @param string $entity
    * @param string|null $action
    * @return array|bool

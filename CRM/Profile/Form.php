@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -134,8 +134,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @var string
    */
   protected $_ctype = NULL;
-
-  protected $_defaults = NULL;
 
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.

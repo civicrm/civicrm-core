@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,19 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to print activity records
+ * This class provides the functionality to print activity records.
  */
 class CRM_Activity_Form_Task_Print extends CRM_Activity_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preprocess();
@@ -66,12 +62,11 @@ class CRM_Activity_Form_Task_Print extends CRM_Activity_Form_Task {
   }
 
   /**
-   * Build the form object - it consists of
+   * Build the form object.
+   *
+   * Consists of
    *    - displaying the QILL (query in local language)
    *    - displaying elements for saving the search
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //
@@ -94,9 +89,6 @@ class CRM_Activity_Form_Task_Print extends CRM_Activity_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // redirect to the main search page after printing is over

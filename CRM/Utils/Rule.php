@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -157,6 +157,19 @@ class CRM_Utils_Rule {
       // allow relative URL's (CRM-15598)
       $url = 'http://' . $_SERVER['HTTP_HOST'] . $url;
     }
+    return (bool) filter_var($url, FILTER_VALIDATE_URL);
+  }
+
+  /**
+   * @param $url
+   *
+   * @return bool
+   */
+  public static function urlish($url) {
+    if (empty($url)) {
+      return TRUE;
+    }
+    $url = Civi::paths()->getUrl($url, 'absolute');
     return (bool) filter_var($url, FILTER_VALIDATE_URL);
   }
 
@@ -705,6 +718,19 @@ class CRM_Utils_Rule {
    */
   public static function fileExists($path) {
     return file_exists($path);
+  }
+
+  /**
+   * Determine whether the value contains a valid reference to a directory.
+   *
+   * Paths stored in the setting system may be absolute -- or may be
+   * relative to the default data directory.
+   *
+   * @param string $path
+   * @return bool
+   */
+  public static function settingPath($path) {
+    return is_dir(Civi::paths()->getPath($path));
   }
 
   /**

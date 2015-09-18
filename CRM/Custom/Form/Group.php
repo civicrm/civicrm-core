@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -58,13 +58,6 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @var array
    */
   protected $_subtypes = array();
-
-  /**
-   * Array of default params.
-   *
-   * @var array
-   */
-  protected $_defaults = array();
 
   /**
    * Set variables up before form is built.

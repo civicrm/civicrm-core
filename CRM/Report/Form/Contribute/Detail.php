@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -282,8 +282,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         'order_bys' => array(
           'financial_type_id' => array('title' => ts('Financial Type')),
           'contribution_status_id' => array('title' => ts('Contribution Status')),
-          'payment_instrument_id' => array('title' => ts('Payment Instrument')),
-          'receive_date' => array('title' => ts('Receive Date')),
+          'payment_instrument_id' => array('title' => ts('Payment Method')),
+          'receive_date' => array('title' => ts('Date Received')),
         ),
         'grouping' => 'contri-fields',
       ),
@@ -841,8 +841,11 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
 
       //convert soft_credit_type_id into label
       if (array_key_exists('civicrm_contribution_soft_soft_credit_type_id', $rows[$rowNum])) {
-        $rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id'] = CRM_Core_OptionGroup::getLabel('soft_credit_type',
-          $row['civicrm_contribution_soft_soft_credit_type_id']);
+        $rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id'] = CRM_Core_PseudoConstant::getLabel(
+          'CRM_Contribute_BAO_ContributionSoft',
+          'soft_credit_type_id',
+          $row['civicrm_contribution_soft_soft_credit_type_id']
+        );
       }
 
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s) for this ') ? TRUE : $entryFound;

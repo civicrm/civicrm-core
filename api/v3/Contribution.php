@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -134,7 +134,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
   $params['skipLineItem'] = array(
     'name' => 'skipLineItem',
     'title' => 'Skip adding line items',
-    'type' => 1,
+    'type' => CRM_Utils_Type::T_BOOLEAN,
     'api.default' => 0,
     'description' => 'Do not add line items by default (if you wish to add your own)',
   );
@@ -351,7 +351,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     throw new Exception('Contribution does not exist');
   }
   $input = $ids = $cvalues = array('receipt_from_email' => $params['receipt_from_email']);
-  $contribution->loadRelatedObjects($input, $ids, FALSE, TRUE);
+  $contribution->loadRelatedObjects($input, $ids, TRUE);
   $contribution->composeMessageArray($input, $ids, $cvalues, FALSE, FALSE);
 }
 
@@ -410,25 +410,28 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
 function civicrm_api3_contribution_completetransaction(&$params) {
 
   $input = $ids = array();
+  if (isset($params['payment_processor_id'])) {
+    $input['payment_processor_id'] = $params['payment_processor_id'];
+  }
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   $contribution->find(TRUE);
   if (!$contribution->id == $params['id']) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
-  try {
-    if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
-      throw new API_Exception('failed to load related objects');
-    }
-    elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
-      throw new API_Exception(ts('Contribution already completed'));
-    }
-    $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
-    $params = _ipn_process_transaction($params, $contribution, $input, $ids);
+
+  if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
+    throw new API_Exception('failed to load related objects');
   }
-  catch(Exception $e) {
-    throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
+  elseif ($contribution->contribution_status_id == CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name')) {
+    throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
+  $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+  if (!empty($params['fee_amount'])) {
+    $input['fee_amount'] = $params['fee_amount'];
+  }
+  $params = _ipn_process_transaction($params, $contribution, $input, $ids);
+
 }
 
 /**
@@ -460,6 +463,16 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
     'description' => '. If not provided this will default to domain mail or contribution page',
     'type' => CRM_Utils_Type::T_STRING,
   );
+  $params['payment_processor_id'] = array(
+    'title' => 'Payment processor ID',
+    'description' => 'Providing this is strongly recommended, as not possible to calculate it accurately always',
+    'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['fee_amount'] = array(
+    'title' => 'Fee charged on transaction',
+    'description' => 'If a fee has been charged then the amount',
+    'type' => CRM_Utils_Type::T_FLOAT,
+  );
 }
 
 /**
@@ -487,7 +500,7 @@ function civicrm_api3_contribution_repeattransaction(&$params) {
   }
   $original_contribution = clone $contribution;
   try {
-    if (!$contribution->loadRelatedObjects($input, $ids, FALSE, TRUE)) {
+    if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
       throw new API_Exception('failed to load related objects');
     }
 
@@ -544,10 +557,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
     $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
     $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
   }
-  // @todo required for base ipn but problematic as api layer handles this
   $transaction = new CRM_Core_Transaction();
-  $ipn = new CRM_Core_Payment_BaseIPN();
-  $ipn->completeTransaction($input, $ids, $objects, $transaction, !empty($contribution->contribution_recur_id));
+  CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, !empty($contribution->contribution_recur_id), $contribution,
+    FALSE, FALSE);
   return $params;
 }
 

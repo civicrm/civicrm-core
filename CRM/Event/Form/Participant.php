@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -814,7 +814,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $errorMsg['financial_type_id'] = ts('Please enter the associated Financial Type');
       }
       if (empty($values['payment_instrument_id'])) {
-        $errorMsg['payment_instrument_id'] = ts('Paid By is a required field.');
+        $errorMsg['payment_instrument_id'] = ts('Payment Method is a required field.');
       }
     }
 

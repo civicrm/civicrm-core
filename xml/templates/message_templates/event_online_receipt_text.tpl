@@ -1,4 +1,4 @@
-Dear {contact.display_name},
+{contact.email_greeting},
 
 {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
 {$event.confirm_email_text}

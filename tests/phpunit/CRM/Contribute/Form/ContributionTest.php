@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -85,6 +85,13 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $paymentProcessor;
 
   /**
+   * Payment processor ID.
+   *
+   * @var int
+   */
+  protected $paymentProcessorID;
+
+  /**
    * Setup function.
    */
   public function setUp() {
@@ -124,8 +131,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ));
 
     $this->products[] = $product1['values'][$product1['id']];
-    $this->paymentProcessor = $this->processorCreate();
-
+    $this->paymentProcessor = $this->dummyProcessorCreate();
+    $processor = $this->paymentProcessor->getPaymentProcessor();
+    $this->paymentProcessorID = $processor['id'];
   }
 
   /**
@@ -176,6 +184,114 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitCreditCardPayPal() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
+    $form->_mode = 'Live';
+    try {
+      $form->testSubmit(array(
+        'total_amount' => 50,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+        'contribution_status_id' => 1,
+        'credit_card_number' => 4444333322221111,
+        'cvv2' => 123,
+        'credit_card_exp_date' => array(
+          'M' => 9,
+          'Y' => 2025,
+        ),
+        'credit_card_type' => 'Visa',
+        'billing_first_name' => 'Junko',
+        'billing_middle_name' => '',
+        'billing_last_name' => 'Adams',
+        'billing_street_address-5' => '790L Lincoln St S',
+        'billing_city-5' => 'Maryknoll',
+        'billing_state_province_id-5' => 1031,
+        'billing_postal_code-5' => 10545,
+        'billing_country_id-5' => 1228,
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+        'installments' => '',
+        'hidden_AdditionalDetail' => 1,
+        'hidden_Premium' => 1,
+        'from_email_address' => '"civi45" <civi45@civicrm.com>',
+        'receipt_date' => '',
+        'receipt_date_time' => '',
+        'payment_processor_id' => $paymentProcessorID,
+        'currency' => 'USD',
+        'source' => '',
+      ), CRM_Core_Action::ADD);
+    }
+    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
+      $this->assertEquals('10544: Transaction cannot be processed. Please use a different payment card.',
+        $e->getMessage());
+    }
+    $this->callAPISuccessGetCount('Contribution', array(
+      'contact_id' => $this->_individualId,
+      'contribution_status_id' => 'Pending',
+    ), 1);
+  }
+
+  /**
+   * Test the submit function on the contribution page.
+   */
+  public function testSubmitCreditCardFee() {
+    $form = new CRM_Contribute_Form_Contribution();
+    print_r($this->paymentProcessor);
+    $this->paymentProcessor->setDoDirectPaymentResult(array('is_error' => 0, 'trxn_id' => 'tx', 'fee_amount' => .08));
+    $form->_mode = 'Live';
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'credit_card_number' => 4444333322221111,
+      'cvv2' => 123,
+      'credit_card_exp_date' => array(
+        'M' => 9,
+        'Y' => 2025,
+      ),
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Junko',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'Adams',
+      'billing_street_address-5' => '790L Lincoln St S',
+      'billing_city-5' => 'Maryknoll',
+      'billing_state_province_id-5' => 1031,
+      'billing_postal_code-5' => 10545,
+      'billing_country_id-5' => 1228,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'installments' => '',
+      'hidden_AdditionalDetail' => 1,
+      'hidden_Premium' => 1,
+      'from_email_address' => '"civi45" <civi45@civicrm.com>',
+      'receipt_date' => '',
+      'receipt_date_time' => '',
+      'payment_processor_id' => $this->paymentProcessorID,
+      'currency' => 'USD',
+      'source' => '',
+    ), CRM_Core_Action::ADD);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+      'contribution_status_id' => 'Completed',
+    ));
+    $this->assertEquals('50', $contribution['total_amount']);
+    $this->assertEquals(.08, $contribution['fee_amount']);
+    $this->assertEquals(49.92, $contribution['net_amount']);
+    $this->assertEquals('tx', $contribution['trxn_id']);
+  }
+
+  /**
    * Test the submit function with an invalid payment.
    *
    * We expect the contribution to be created but left pending. The payment has failed.
@@ -198,7 +314,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
-        'payment_processor_id' => $this->paymentProcessor->id,
+        'payment_processor_id' => $this->paymentProcessorID,
         'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
         'credit_card_number' => '411111111111111',
       ), CRM_Core_Action::ADD,
@@ -238,7 +354,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
-      'payment_processor_id' => $this->paymentProcessor->id,
+      'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
       'credit_card_number' => '411111111111111',
       'billing_city-5' => 'Vancouver',
@@ -267,7 +383,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
-      'payment_processor_id' => $this->paymentProcessor->id,
+      'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
       'credit_card_number' => '411111111111111',
     ), CRM_Core_Action::ADD,
@@ -394,7 +510,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'fulfilled_date' => '',
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
-      'payment_processor_id' => $this->paymentProcessor->id,
+      'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2026),
       'credit_card_number' => '411111111111111',
     ), CRM_Core_Action::ADD,
@@ -504,7 +620,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   protected function getCreditCardParams() {
     return array(
-      'payment_processor_id' => $this->paymentProcessor->id,
+      'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
       'credit_card_number' => '411111111111111',
     );

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -74,7 +74,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
-    $this->select('task', "label=Batch Update via Profile");
+    $this->select('task', "label=Batch update contacts via profile");
     $this->waitForElementPresent('_qf_PickProfile_next');
     $this->waitForElementPresent('uf_group_id');
     $this->select('uf_group_id', "label={$profileTitle}");
@@ -156,7 +156,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
-    $this->select('task', "label=Batch Update via Profile");
+    $this->select('task', "label=Batch update contacts via profile");
     $this->waitForElementPresent('_qf_PickProfile_next');
 
     $this->select('uf_group_id', "label={$profileTitle}");
@@ -335,7 +335,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
-    $this->select('task', "label=Batch Update via Profile");
+    $this->select('task', "label=Batch update contacts via profile");
     $this->waitForElementPresent('_qf_PickProfile_next');
 
     $this->select('uf_group_id', "label={$profileTitle}");

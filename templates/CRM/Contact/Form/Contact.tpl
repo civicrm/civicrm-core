@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -63,7 +63,7 @@
               </td>
               {if $contactId}
                 <td>
-                  <label for="internal_identifier_display">{ts}CiviCRM ID{/ts} {help id="id-internal-id"}</label><br />
+                  <label for="internal_identifier_display">{ts}Contact ID{/ts} {help id="id-internal-id"}</label><br />
                   <input id="internal_identifier_display" type="text" class="crm-form-text six" size="6" readonly="readonly" value="{$contactId}">
                 </td>
               {/if}

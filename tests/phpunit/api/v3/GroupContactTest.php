@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -36,7 +36,16 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_contactId;
   protected $_contactId1;
   protected $_apiversion = 3;
+
+  /**
+   * @var int
+   */
   protected $_groupId1;
+
+  /**
+   * @var int
+   */
+  protected $_groupId2;
 
   /**
    * Set up for group contact tests.
@@ -50,23 +59,20 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $this->_contactId = $this->individualCreate();
 
     $this->_groupId1 = $this->groupCreate();
-    $params = array(
+
+    $this->callAPISuccess('group_contact', 'create', array(
       'contact_id' => $this->_contactId,
       'group_id' => $this->_groupId1,
-    );
+    ));
 
-    $result = $this->callAPISuccess('group_contact', 'create', $params);
-
-    $group = array(
+    $this->_groupId2 = $this->groupCreate(array(
       'name' => 'Test Group 2',
       'domain_id' => 1,
       'title' => 'New Test Group2 Created',
       'description' => 'New Test Group2 Created',
       'is_active' => 1,
       'visibility' => 'User and User Admin Only',
-    );
-
-    $this->_groupId2 = $this->groupCreate($group);
+    ));
 
     $this->_group = array(
       $this->_groupId1 => array(
@@ -159,9 +165,9 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('group_contact', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['not_added'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['added'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['total_count'], 2, "in line " . __LINE__);
+    $this->assertEquals($result['not_added'], 1);
+    $this->assertEquals($result['added'], 1);
+    $this->assertEquals($result['total_count'], 2);
   }
 
   ///////////////// civicrm_group_contact_remove methods
@@ -176,8 +182,8 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['removed'], 1, "in line " . __LINE__);
-    $this->assertEquals($result['total_count'], 1, "in line " . __LINE__);
+    $this->assertEquals($result['removed'], 1);
+    $this->assertEquals($result['total_count'], 1);
   }
 
   public function testDeletePermanent() {
@@ -188,8 +194,51 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
     $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
     $result = $this->callAPISuccess('group_contact', 'get', $params);
-    $this->assertEquals(0, $result['count'], "in line " . __LINE__);
-    $this->assertArrayNotHasKey('id', $result, "in line " . __LINE__);
+    $this->assertEquals(0, $result['count']);
+    $this->assertArrayNotHasKey('id', $result);
+  }
+
+  /**
+   * CRM-16945 duplicate groups are showing up when contacts are hard-added to child groups or smart groups.
+   *
+   * Fix documented in
+   *
+   * Test illustrates this (& ensures once fixed it will stay fixed).
+   */
+  public function testAccurateCountWithSmartGroups() {
+    $childGroupID = $this->groupCreate(array(
+      'name' => 'Child group',
+      'domain_id' => 1,
+      'title' => 'Child group',
+      'description' => 'Child group',
+      'is_active' => 1,
+      'parents' => $this->_groupId1,
+      'visibility' => 'User and User Admin Only',
+    ));
+
+    $params = array(
+      'name' => 'Individuals',
+      'title' => 'Individuals',
+      'is_active' => 1,
+      'parents' => $this->_groupId1,
+      'formValues' => array('contact_type' => 'Goat'),
+    );
+    $smartGroup2 = CRM_Contact_BAO_Group::createSmartGroup($params);
+
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $this->_groupId2));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $smartGroup2->id));
+    $this->callAPISuccess('GroupContact', 'create', array('contact_id' => $this->_contactId, 'status' => 'Added', 'group_id' => $childGroupID));
+    $groups = $this->callAPISuccess('GroupContact', 'get', array('contact_id' => $this->_contactId));
+
+    // Although the contact is actually hard-added to 4 groups the smart groups are conventionally not returned by the api or displayed
+    // on the main part of the groups tab on the contact (which calls the same function. So, 3 groups is an OK number to return.
+    // However, as of writing this test 4 groups are returned (indexed by group_contact_id, but more seriously 3/4 of those have the group id 1
+    // so 2 on them have group ids that do not match the group contact id they have been keyed by.
+    foreach ($groups['values'] as $groupContactID => $groupContactRecord) {
+      $this->assertEquals($groupContactRecord['group_id'], CRM_Core_DAO::singleValueQuery("SELECT group_id FROM civicrm_group_contact WHERE id = $groupContactID"), 'Group contact record mis-returned for id ' . $groupContactID);
+    }
+    $this->assertEquals(3, $groups['count']);
+
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_OptionGroup {
   static $_values = array();
@@ -272,9 +270,6 @@ WHERE  v.option_group_id = g.id
    *
    *
    * @param bool $flip
-   *
-   * @return void
-   *
    */
   public static function lookupValues(&$params, &$names, $flip = FALSE) {
     foreach ($names as $postName => $value) {
@@ -329,6 +324,8 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * @deprecated - use CRM_Core_Pseudoconstant::getLabel
+   *
    * @param string $groupName
    * @param $value
    * @param bool $onlyActiveValue

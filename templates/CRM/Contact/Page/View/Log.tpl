@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -64,6 +64,9 @@
         $('#changeLog .instance_data').crmSnippet({url: url});
       }
       $('#changeLog .instance_data').crmSnippet('refresh');
+    };
+    CRM.incrementChangeLogTab = function() {
+      CRM.tabHeader.updateCount('#tab_log', 1 + CRM.tabHeader.getCount('#tab_log'));
     };
     CRM.reloadChangeLogTab({/literal}"{$instanceUrl}"{literal});
   });

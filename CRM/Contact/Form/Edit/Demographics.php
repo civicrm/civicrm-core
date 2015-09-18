@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for an Demographics object
+ * Form helper class for an Demographics object.
  */
 class CRM_Contact_Form_Edit_Demographics {
 
@@ -43,8 +41,6 @@ class CRM_Contact_Form_Edit_Demographics {
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     $form->addField('gender_id', array('entity' => 'contact', 'type' => 'Radio', 'allowClear' => TRUE));
@@ -61,9 +57,7 @@ class CRM_Contact_Form_Edit_Demographics {
    *
    *
    * @param CRM_Core_Form $form
-   * @param $defaults
-   *
-   * @return void
+   * @param array $defaults
    */
   public static function setDefaultValues(&$form, &$defaults) {
   }

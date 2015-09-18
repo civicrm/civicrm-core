@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -209,7 +209,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'notify_version' => '3.7',
       'custom' => '',
       'payer_status' => 'unverified',
-      'address_country' => 'United States',
+      'address_country' => 'UNITED STATES',
       'address_city' => 'Portland',
       'quantity' => '1',
       'verify_sign' => 'AUyUU3IMAvssa3j4KorlbLnfr.9.AW7GX-sL7Ts1brCHvn13npvO-pqf',
@@ -267,7 +267,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'payer_status' => 'unverified',
       'currency_code' => 'USD',
       'business' => 'mpa@mainepeoplesalliance.org',
-      'address_country' => 'United States',
+      'address_country' => 'UNITED STATES',
       'address_city' => 'Limestone',
       'verify_sign' => 'AXi4DULbes8quzIiq2YNsdTJH5ciPPPzG9PcQvkQg4BjfvWi8aY9GgDb',
       'payer_email' => 'passport45051@yahoo.com',

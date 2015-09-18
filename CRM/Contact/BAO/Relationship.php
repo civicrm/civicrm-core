@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -193,6 +193,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           continue;
         }
 
+        //CRM-16978:check duplicate relationship as per case id.
+        if ($caseId = CRM_Utils_Array::value('case_id', $params)) {
+          $contactFields['case_id'] = $caseId;
+        }
         if (
         self::checkDuplicateRelationship(
           $contactFields,
@@ -698,7 +702,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   public static function disableEnableRelationship($id, $action, $params = array(), $ids = array(), $active = FALSE) {
     $relationship = self::clearCurrentEmployer($id, $action);
 
-    if (CRM_Core_Permission::access('CiviMember')) {
+    if ($id) {
       // create $params array which is required to delete memberships
       // of the related contacts.
       if (empty($params)) {
@@ -1293,6 +1297,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               $mask -= CRM_Core_Action::ENABLE;
               $mask -= CRM_Core_Action::DISABLE;
             }
+            $mask = $mask & $permissionMask;
           }
 
           // Give access to manage case link by copying to MAX_ACTION index temporarily, depending on case permission of user.
@@ -1737,71 +1742,63 @@ WHERE id IN ( {$contacts} )
   }
 
   /**
-   * Return list of permissioned employer for a given contact.
-   *
-   * @param int $contactID
-   *   contact id whose employers.
-   *   are to be found.
-   * @param string $name
-   *   employers sort name.
-   *
-   * @return array
-   *   array of employers.
-   */
-  public static function getPermissionedEmployer($contactID, $name = NULL) {
-    //get the relationship id
-    $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
-      'Employee of', 'id', 'name_a_b'
-    );
-
-    return self::getPermissionedContacts($contactID, $relTypeId, $name);
-  }
-
-
-  /**
    * Function to return list of permissioned contacts for a given contact and relationship type.
    *
    * @param int $contactID
    *   contact id whose permissioned contacts are to be found.
-   * @param string $relTypeId
+   * @param int $relTypeId
    *   one or more relationship type id's.
    * @param string $name
+   * @param string $contactType
    *
    * @return array
    *   Array of contacts
    */
-  public static function getPermissionedContacts($contactID, $relTypeId, $name = NULL) {
+  public static function getPermissionedContacts($contactID, $relTypeId = NULL, $name = NULL, $contactType = NULL) {
     $contacts = array();
+    $args = array(1 => array($contactID, 'Integer'));
+    $relationshipTypeClause = $contactTypeClause = '';
 
     if ($relTypeId) {
-      $query = "
+      // @todo relTypeId is only ever passed in as an int. Change this to reflect that -
+      // probably being overly conservative by not doing so but working on stable release.
+      $relationshipTypeClause = 'AND cr.relationship_type_id IN (%2) ';
+      $args[2] = array($relTypeId, 'String');
+    }
+
+    if ($contactType) {
+      $contactTypeClause = ' AND cr.relationship_type_id = crt.id AND crt.contact_type_b = %3 ';
+      $args[3] = array($contactType, 'String');
+    }
+
+    $query = "
 SELECT cc.id as id, cc.sort_name as name
-FROM civicrm_relationship cr, civicrm_contact cc
+FROM civicrm_relationship cr, civicrm_contact cc, civicrm_relationship_type crt
 WHERE
 cr.contact_id_a         = %1 AND
-cr.relationship_type_id IN (%2) AND
 cr.is_permission_a_b    = 1 AND
 IF(cr.end_date IS NULL, 1, (DATEDIFF( CURDATE( ), cr.end_date ) <= 0)) AND
 cr.is_active = 1 AND
 cc.id = cr.contact_id_b AND
-cc.is_deleted = 0";
+cc.is_deleted = 0
+$relationshipTypeClause
+$contactTypeClause
+";
 
-      if (!empty($name)) {
-        $name = CRM_Utils_Type::escape($name, 'String');
-        $query .= "
+    if (!empty($name)) {
+      $name = CRM_Utils_Type::escape($name, 'String');
+      $query .= "
 AND cc.sort_name LIKE '%$name%'";
-      }
-
-      $args = array(1 => array($contactID, 'Integer'), 2 => array($relTypeId, 'String'));
-      $dao = CRM_Core_DAO::executeQuery($query, $args);
-
-      while ($dao->fetch()) {
-        $contacts[$dao->id] = array(
-          'name' => $dao->name,
-          'value' => $dao->id,
-        );
-      }
     }
+
+    $dao = CRM_Core_DAO::executeQuery($query, $args);
+    while ($dao->fetch()) {
+      $contacts[$dao->id] = array(
+        'name' => $dao->name,
+        'value' => $dao->id,
+      );
+    }
+
     return $contacts;
   }
 
@@ -1975,19 +1972,13 @@ AND cc.sort_name LIKE '%$name%'";
     $contactRelationships = array();
     $params['total'] = 0;
     if (!empty($relationships)) {
-      // get the total relationships
-      if ($params['context'] != 'user') {
-        $params['total'] = count($relationships);
-      }
-      else {
-        // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
-        $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
-          $relationshipStatus,
-          0, 0, 0,
-          NULL, NULL, TRUE
-        );
-        $params['total'] = count($permissionedRelationships);
-      }
+      // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
+      $params['total'] = $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+        $relationshipStatus,
+        0, 1, 0,
+        NULL, NULL,
+        $permissionedContacts
+      );
 
       // format params
       foreach ($relationships as $relationshipId => $values) {

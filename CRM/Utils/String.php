@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -104,6 +104,16 @@ class CRM_Utils_String {
    * @return string
    */
   public static function convertStringToCamel($string) {
+    $map = array(
+      'acl' => 'Acl',
+      'ACL' => 'Acl',
+      'im' => 'Im',
+      'IM' => 'Im',
+    );
+    if (isset($map[$string])) {
+      return $map[$string];
+    }
+
     $fragments = explode('_', $string);
     foreach ($fragments as & $fragment) {
       $fragment = ucfirst($fragment);

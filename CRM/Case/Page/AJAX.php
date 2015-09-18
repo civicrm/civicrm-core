@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -42,7 +42,7 @@ class CRM_Case_Page_AJAX {
    */
   public static function unclosedCases() {
     $params = array(
-      'limit' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10),
+      'limit' => Civi::settings()->get('search_autocomplete_count'),
       'sort_name' => CRM_Utils_Type::escape(CRM_Utils_Array::value('term', $_GET, ''), 'String'),
     );
 
@@ -57,7 +57,7 @@ class CRM_Case_Page_AJAX {
         'id' => $caseId,
         'label' => $details['sort_name'] . ' - ' . $details['case_type'] . ($details['end_date'] ? ' (' . ts('closed') . ')' : ''),
         'label_class' => $details['end_date'] ? 'strikethrough' : '',
-        'description' => array($details['case_subject'] . ' (' . $details['case_status'] . ')'),
+        'description' => array("#$caseId: " . $details['case_subject'] . ' (' . $details['case_status'] . ')'),
         'extra' => $details,
       );
     }

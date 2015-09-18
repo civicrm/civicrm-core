@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                             |
+ | CiviCRM version 4.7                                             |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -155,9 +155,9 @@ class CRM_Financial_BAO_ExportFormat {
       $zip = $config->customFileUploadDir . 'Financial_Transactions_' . date('YmdHis') . '.zip';
       $result = $this->createZip($this->_downloadFile, $zip, TRUE);
       if ($result) {
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename=' . CRM_Utils_File::cleanFileName(basename($zip)));
-        header('Content-Length: ' . filesize($zip));
+        CRM_Utils_System::setHttpHeader('Content-Type', 'application/zip');
+        CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=' . CRM_Utils_File::cleanFileName(basename($zip)));
+        CRM_Utils_System::setHttpHeader('Content-Length', '' . filesize($zip));
         ob_clean();
         flush();
         readfile($config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($zip)));
@@ -166,9 +166,9 @@ class CRM_Financial_BAO_ExportFormat {
       }
     }
     else {
-      header('Content-Type: text/plain');
-      header('Content-Disposition: attachment; filename=' . CRM_Utils_File::cleanFileName(basename($this->_downloadFile[0])));
-      header('Content-Length: ' . filesize($this->_downloadFile[0]));
+      CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain');
+      CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=' . CRM_Utils_File::cleanFileName(basename($this->_downloadFile[0])));
+      CRM_Utils_System::setHttpHeader('Content-Length', '' . filesize($this->_downloadFile[0]));
       ob_clean();
       flush();
       readfile($config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($this->_downloadFile[0])));
@@ -195,7 +195,7 @@ class CRM_Financial_BAO_ExportFormat {
       $paymentInstrument = array_flip(CRM_Contribute_PseudoConstant::paymentInstrument('label'));
       $values['payment_instrument_id'] = array_search($values['payment_instrument_id'], $paymentInstrument);
     }
-    $details = '<p>' . ts('Record:') . ' ' . $values['title'] . '</p><p>' . ts('Description:') . '</p><p>' . ts('Created By:') . " $createdBy" . '</p><p>' . ts('Created Date:') . ' ' . $values['created_date'] . '</p><p>' . ts('Last Modified By:') . ' ' . $modifiedBy . '</p><p>' . ts('Payment Instrument:') . ' ' . $values['payment_instrument_id'] . '</p>';
+    $details = '<p>' . ts('Record:') . ' ' . $values['title'] . '</p><p>' . ts('Description:') . '</p><p>' . ts('Created By:') . " $createdBy" . '</p><p>' . ts('Created Date:') . ' ' . $values['created_date'] . '</p><p>' . ts('Last Modified By:') . ' ' . $modifiedBy . '</p><p>' . ts('Payment Method:') . ' ' . $values['payment_instrument_id'] . '</p>';
     $subject = '';
     if (!empty($values['total'])) {
       $subject .= ts('Total') . '[' . CRM_Utils_Money::format($values['total']) . '],';

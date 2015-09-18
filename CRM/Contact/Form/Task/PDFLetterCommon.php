@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the common functionality for creating PDF letter for
- * one or a group of contact ids.
+ * This class provides the common functionality for creating PDF letter for one or a group of contact ids.
  */
 class CRM_Contact_Form_Task_PDFLetterCommon {
 
@@ -43,8 +40,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * Build all the data structures needed to build the form.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function preProcess(&$form) {
     $messageText = array();
@@ -76,8 +71,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * Build the form object.
    *
    * @var CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     // This form outputs a file so should never be submitted via ajax
@@ -315,10 +308,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * Process the form after the input has been submitted and validated.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);

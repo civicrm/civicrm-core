@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,16 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
   static $_alreadyLoaded = array();
 
   /**
-   * Check to see if we have cache entries for this group
-   * if not, regenerate, else return
+   * Check to see if we have cache entries for this group.
+   *
+   * If not, regenerate, else return.
    *
    * @param $groupIDs
    *   Of group that we are checking against.
@@ -215,7 +214,7 @@ AND    g.refresh_date IS NULL
 
     $returnProperties = array('contact_id');
     foreach ($groupID as $gid) {
-      $params = array(array('group', 'IN', array($gid => 1), 0, 0));
+      $params = array(array('group', 'IN', array($gid), 0, 0));
       // the below call updates the cache table as a byproduct of the query
       CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, FALSE);
     }
@@ -284,8 +283,6 @@ WHERE  id IN ( $groupIDs )
    *   the groupID to delete cache entries, NULL for all groups.
    * @param bool $onceOnly
    *   run the function exactly once for all groups.
-   *
-   * @return void
    */
   public static function remove($groupID = NULL, $onceOnly = TRUE) {
     static $invoked = FALSE;
@@ -434,7 +431,7 @@ WHERE  id = %1
     }
 
     // grab a lock so other processes dont compete and do the same query
-    $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("data.core.group.{$groupID}");
+    $lock = Civi::service('lockManager')->acquire("data.core.group.{$groupID}");
     if (!$lock->isAcquired()) {
       // this can cause inconsistent results since we dont know if the other process
       // will fill up the cache before our calling routine needs it.
@@ -482,6 +479,9 @@ WHERE  id = %1
         $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
         $searchSQL = $customClass->contactIDs();
         $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
+        if (!strstr($searchSQL, 'WHERE')) {
+          $searchSQL .= " WHERE ( 1 ) ";
+        }
         $idName = 'contact_id';
       }
       else {
@@ -588,8 +588,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
 
     if (
       isset($config->smartGroupCacheTimeout) &&
-      is_numeric($config->smartGroupCacheTimeout) &&
-      $config->smartGroupCacheTimeout > 0
+      is_numeric($config->smartGroupCacheTimeout)
     ) {
       return $config->smartGroupCacheTimeout;
     }

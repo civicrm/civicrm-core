@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,31 +29,27 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for CiviMail
+ * This class generates form components for CiviMail.
  */
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
     'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'mailerBatchLimit' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'mailerJobSize' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'mailerJobsMax' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'mailThrottleTime' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'verpSeparator' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
   );
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - CiviMail'));
-    $this->addElement('text', 'verpSeparator', ts('VERP Separator'));
-    $this->addElement('text', 'mailerBatchLimit', ts('Mailer Batch Limit'));
-    $this->addElement('text', 'mailThrottleTime', ts('Mailer Throttle Time'));
-    $this->addElement('text', 'mailerJobSize', ts('Mailer Job Size'));
-    $this->addElement('text', 'mailerJobsMax', ts('Mailer CRON job limit'));
     $check = TRUE;
 
     // redirect to Administer Section After hitting either Save or Cancel button.
@@ -61,10 +57,6 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
 
     $this->addFormRule(array('CRM_Admin_Form_Setting_Mail', 'formRule'));
-    $this->addRule('mailerBatchLimit', ts('Please enter a valid integer.'), 'integer');
-    $this->addRule('mailThrottleTime', ts('Please enter a valid integer.'), 'integer');
-    $this->addRule('mailerJobSize', ts('Please enter a valid integer.'), 'integer');
-    $this->addRule('mailerJobsMax', ts('Please enter a valid integer.'), 'integer');
 
     parent::buildQuickForm($check);
   }

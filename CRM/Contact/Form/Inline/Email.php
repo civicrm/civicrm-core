@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for an Email object
+ * Form helper class for an Email object.
  */
 class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
@@ -79,8 +77,6 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements for an email object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -173,8 +169,6 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -182,6 +176,12 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     // Process / save emails
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['email']['isIdSet'] = TRUE;
+    foreach ($this->_emails as $count => $value) {
+      if (!empty($value['id']) && isset($params['email'][$count])) {
+        $params['email'][$count]['id'] = $value['id'];
+      }
+    }
     CRM_Core_BAO_Block::create('email', $params);
 
     // If contact has no name, set primary email as display name

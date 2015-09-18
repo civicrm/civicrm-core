@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 class CRM_Contribute_BAO_Query {
 
@@ -362,8 +361,9 @@ class CRM_Contribute_BAO_Query {
       case 'contribution_contact_id':
       case (strpos($name, '_amount') !== FALSE):
       case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
+      case 'contribution_campaign_id':
         $qillName = $name;
-        $pseudoExtraParam = NULL;
+        $pseudoExtraParam = array();
         // @todo including names using a switch statement & then using an 'if' to filter them out is ... odd!
         if ((strpos($name, '_amount') !== FALSE) || (strpos($name, '_date') !== FALSE) || in_array($name,
             array(
@@ -374,11 +374,12 @@ class CRM_Contribute_BAO_Query {
               'contribution_check_number',
               'contribution_payment_instrument_id',
               'contribution_contact_id',
+              'contribution_campaign_id',
             )
           )
         ) {
           $name = str_replace('contribution_', '', $name);
-          if (!in_array($name, array('source', 'id', 'contact_id'))) {
+          if (!in_array($name, array('source', 'id', 'contact_id', 'campaign_id'))) {
             $qillName = str_replace('contribution_', '', $qillName);
           }
         }
@@ -517,41 +518,6 @@ class CRM_Contribute_BAO_Query {
           $query->_qill[$grouping][] = ts("NOT Personal Campaign Page Honor Roll");
         }
         $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
-        return;
-
-      case 'contribution_recur_payment_made':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.id", 'IS NOT EMPTY');
-        if ($value) {
-          $query->_qill[$grouping][] = ts("Made payment for the recurring contributions");
-          self::$_contribRecurPayment = 'yes';
-        }
-        else {
-          $query->_qill[$grouping][] = ts("All recurring contributions regardless of payments");
-          self::$_contribRecurPayment = 'no';
-        }
-        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
-        return;
-        
-      case 'contribution_recur_processor_id':
-        $value = "$value";
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(" civicrm_contribution_recur.processor_id", $op, $value, "String");
-        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
-        return;
-        
-      case 'contribution_recur_trxn_id':
-        $value = "$value";
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(" civicrm_contribution_recur.trxn_id", $op, $value, "String");
-        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
-        return;
-        
-      case 'contribution_campaign_id':
-        $campParams = array(
-          'op' => $op,
-          'campaign' => $value,
-          'grouping' => $grouping,
-          'tableName' => 'civicrm_contribution',
-        );
-        CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         return;
 
       case 'contribution_batch_id':
@@ -903,10 +869,7 @@ class CRM_Contribute_BAO_Query {
   /**
    * Add all the elements shared between contribute search and advnaced search.
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildSearchForm(&$form) {
 
@@ -946,17 +909,17 @@ class CRM_Contribute_BAO_Query {
       array('entity' => 'contribution', 'multiple' => 'multiple', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
-    // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
-    $form->add('text', 'contribution_pcp_made_through_id', ts('Personal Campaign Page'), array('class' => 'twenty', 'id' => 'pcp_made_through_id', 'placeholder' => ts('- any -')));
-    // stores the label
-    $form->add('hidden', 'pcp_made_through');
+    $form->add('select',
+      'contribution_pcp_made_through_id',
+      ts('Personal Campaign Page'),
+      CRM_Contribute_PseudoConstant::pcPage(), FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')));
 
-    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status');
+    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
     // Remove status values that are only used for recurring contributions or pledges (In Progress, Overdue).
     unset($statusValues['5'], $statusValues['6']);
-
-    $form->addSelect('contribution_status_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'label' => ts('Contribution Status(s)'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+    $form->add('select', 'contribution_status_id',
+      ts('Contribution Status'), $statusValues,
+      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
     );
 
   // Add fields for thank you and receipt

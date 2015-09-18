@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Main page for viewing activities
- *
+ * Main page for viewing activities,
  */
 class CRM_Activity_Page_Tab extends CRM_Core_Page {
 
   /**
    * Browse all activities for a particular contact.
-   *
-   * @return void
    */
   public function browse() {
     $this->assign('admin', FALSE);
@@ -116,10 +111,9 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
   public function preProcess() {
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -158,8 +152,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
 
   /**
    * Perform actions and display for activities.
-   *
-   * @return void
    */
   public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);

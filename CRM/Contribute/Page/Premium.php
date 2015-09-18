@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying list of Premiums
+ * Page for displaying list of Premiums.
  */
 class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
 
@@ -97,8 +95,6 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @return void
    */
   public function run() {
     // get the requested action
@@ -126,7 +122,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
   }
 
   /**
-   * @return void
+   * Browse function.
    */
   public function browse() {
     // get all custom groups sorted by weight

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,27 +29,22 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the common functionality for sending email to
- * one or a group of contact ids. This class is reused by all the search
- * components in CiviCRM (since they all have send email as a task)
+ * This class provides the common functionality for sending email to one or a group of contact ids.
  */
 class CRM_Contact_Form_Task_LabelCommon {
 
   /**
-   * Create labels (pdf)
+   * Create labels (pdf).
    *
    * @param array $contactRows
-   *   Assciated array of contact data.
+   *   Associated array of contact data.
    * @param string $format
    *   Format in which labels needs to be printed.
    * @param string $fileName
    *   The name of the file to save the label in.
-   *
    */
   public static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');

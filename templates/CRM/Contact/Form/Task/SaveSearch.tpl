@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
   <div class="help">
     <p>{ts}This smart group will stay up-to-date with all contacts who meet the search criteria.{/ts}</p>
     {if !empty($partiallySelected)}
-      <p>{ts}NOTE: Contacts selected on the search results are not relevant here; all contacts that meet the following criteria will be in the group.{/ts}</p>
+      <p>{ts}NOTE: Even if only a few contacts have been selected from the search results, all contacts that meet the following criteria will be in the group.{/ts}</p>
     {/if}
     {if !empty($qill[0])}
     <div id="search-status">

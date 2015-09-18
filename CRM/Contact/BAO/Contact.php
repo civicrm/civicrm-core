@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
@@ -276,6 +275,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @param bool $invokeHooks
    *   If we need to invoke hooks.
    *
+   * @param bool $skipDelete
+   *   Unclear parameter, passed to website create
+   *
    * @todo explain this parameter
    *
    * @throws Exception
@@ -283,7 +285,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *   Created or updated contribution object. We are deprecating returning an error in
    *   favour of exceptions
    */
-  public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE) {
+  public static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE, $skipDelete = FALSE) {
     $contact = NULL;
     if (empty($params['contact_type']) && empty($params['contact_id'])) {
       return $contact;
@@ -303,12 +305,13 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $config = CRM_Core_Config::singleton();
 
     // CRM-6942: set preferred language to the current language if it’s unset (and we’re creating a contact).
-    if (empty($params['contact_id']) && empty($params['preferred_language'])) {
-      $params['preferred_language'] = $config->lcMessages;
-    }
-
-    // CRM-9739: set greeting & addressee if unset and we’re creating a contact.
     if (empty($params['contact_id'])) {
+      // A case could be made for checking isset rather than empty but this is more consistent with previous behaviour.
+      if (empty($params['preferred_language']) && ($language = CRM_Core_I18n::getContactDefaultLanguage()) != FALSE) {
+        $params['preferred_language'] = $language;
+      }
+
+      // CRM-9739: set greeting & addressee if unset and we’re creating a contact.
       foreach (self::$_greetingTypes as $greeting) {
         if (empty($params[$greeting . '_id'])) {
           if ($defaultGreetingTypeId
@@ -362,11 +365,12 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     foreach ($blocks as $name => $value) {
       $contact->$name = $value;
     }
-
-    // Process website(s) if present in params
-    if (!empty($params['website'])) {
-      CRM_Core_BAO_Website::create($params, $contact->id);
+    if (!empty($params['updateBlankLocInfo'])) {
+      $skipDelete = TRUE;
     }
+
+    //add website
+    CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
 
     //get userID from session
     $session = CRM_Core_Session::singleton();
@@ -778,7 +782,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       return FALSE;
     }
     // If trash is disabled in system settings then we always skip
-    if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'contact_undelete', NULL, 1)) {
+    if (!Civi::settings()->get('contact_undelete')) {
       $skipUndelete = TRUE;
     }
 
@@ -1863,16 +1867,15 @@ ORDER BY civicrm_email.is_primary DESC";
       $params['uf_group_id'] = $ufGroupId;
     }
 
-    if ($contactID) {
-      // CRM-10551
-      // If a user has logged in, or accessed via a checksum
-      // Then deliberately 'blanking' a value in the profile should remove it from their record
-      $session = CRM_Core_Session::singleton();
-      $params['updateBlankLocInfo'] = TRUE;
-      if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
-        $params['updateBlankLocInfo'] = FALSE;
-      }
+    // If a user has logged in, or accessed via a checksum
+    // Then deliberately 'blanking' a value in the profile should remove it from their record
+    $session = CRM_Core_Session::singleton();
+    $params['updateBlankLocInfo'] = TRUE;
+    if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
+      $params['updateBlankLocInfo'] = FALSE;
+    }
 
+    if ($contactID) {
       $editHook = TRUE;
       CRM_Utils_Hook::pre('edit', 'Profile', $contactID, $params);
     }
@@ -2138,6 +2141,9 @@ ORDER BY civicrm_email.is_primary DESC";
         }
         elseif ($fieldName == 'email') {
           $data['email'][$loc]['email'] = $value;
+          if (empty($contactID)) {
+            $data['email'][$loc]['is_primary'] = 1;
+          }
         }
         elseif ($fieldName == 'im') {
           if (isset($params[$key . '-provider_id'])) {

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -56,5 +56,6 @@ $output = '
     var ' . $jsonvar . ' = ' . json_encode($data) . ';
 ';
 
+CRM_Core_Page_AJAX::setJsHeaders(60);
 echo $output;
 CRM_Utils_System::civiExit();

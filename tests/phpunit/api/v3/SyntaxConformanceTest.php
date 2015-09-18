@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -240,7 +240,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public static function custom_data_entities() {
     $entities = CRM_Core_BAO_CustomQuery::$extendsMap;
-    $enabledComponents = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components', NULL, array());
+    $enabledComponents = Civi::settings()->get('enable_components');
     $customDataEntities = array();
     $invalidEntities = array('Individual', 'Organization', 'Household');
     $entitiesToFix = array('Case', 'Relationship');
@@ -618,6 +618,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'where_clause',
           'select_tables',
           'where_tables',
+        ),
+      ),
+      'StatusPreference' => array(
+        'break_return' => array(
+          'ignore_severity',
         ),
       ),
     );
@@ -1169,6 +1174,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           }
           else {
             $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
+            // typecast with array to satisfy changes made in CRM-13160
+            if ($entityName == 'MembershipType' && in_array($fieldName, array(
+                'relationship_type_id',
+                'relationship_direction',
+              ))
+            ) {
+              $entity[$fieldName] = (array) $entity[$fieldName];
+            }
           }
           break;
 
@@ -1182,9 +1195,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
               $entity[$fieldName] = (string) $entity2['id'];
             }
             else {
-              $uniqueName = CRM_Utils_Array::value('uniqueName', $specs);
+              $uniqueName = CRM_Utils_Array::value('uniqueName', $specs, $fieldName);
               if (!empty($entity[$fieldName])) {
-                $resetFKTo = array($fieldName => $entity[$fieldName]);
+                $resetFKTo = array($fieldName => $entity[$fieldName], $uniqueName => $entity[$fieldName]);
               }
               $entity[$fieldName] = (string) empty($entity2[$field]) ? CRM_Utils_Array::value($uniqueName, $entity2) : $entity2[$field];
               //todo - there isn't always something set here - & our checking on unset values is limited
@@ -1222,7 +1235,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
                 'sequential' => 1,
               ));
             $optionValue = $optionValue['values'];
-            $options[$optionValue[0]['value']] = 'new option value';
+            $keyColumn = CRM_Utils_Array::value('keyColumn', $specs['pseudoconstant'], 'value');
+            $options[$optionValue[0][$keyColumn]] = 'new option value';
           }
         }
         $entity[$field] = array_rand($options);
@@ -1242,6 +1256,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
       }
 
+      if (!empty($specs['uniqueName'])) {
+        $entity[$specs['uniqueName']] = $entity[$specs['name']];
+      }
+
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $checkParams = array(
         'id' => $entity['id'],
@@ -1254,6 +1272,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       );
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
+
       $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updated\n" . print_r(array(
             'update-params' => $updateParams,
             'update-result' => $update,

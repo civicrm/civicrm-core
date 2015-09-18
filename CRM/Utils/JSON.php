@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -43,7 +43,7 @@ class CRM_Utils_JSON {
    * @param mixed $input
    */
   public static function output($input) {
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo json_encode($input);
     CRM_Utils_System::civiExit();
   }
@@ -70,7 +70,7 @@ class CRM_Utils_JSON {
     $sOutput .= '"iTotalRecords": ' . $iTotal . ', ';
     $sOutput .= '"iTotalDisplayRecords": ' . $iFilteredTotal . ', ';
     $sOutput .= '"aaData": [ ';
-    foreach ($params as $key => $value) {
+    foreach ((array) $params as $key => $value) {
       $addcomma = FALSE;
       $sOutput .= "[";
       foreach ($selectorElements as $element) {

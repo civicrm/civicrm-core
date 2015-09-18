@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -132,13 +132,9 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['created_id']['api.required'] = 1;
   $params['created_id']['api.default'] = 'user_contact_id';
 
-  $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'track_civimail_replies', NULL, FALSE
-  );
+  $params['override_verp']['api.default'] = !CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'track_civimail_replies');
   $params['visibility']['api.default'] = 'Public Pages';
-  $params['dedupe_email']['api.default'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'dedupe_email_default', NULL, FALSE
-  );
+  $params['dedupe_email']['api.default'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME, 'dedupe_email_default');
 
   $params['forward_replies']['api.default'] = FALSE;
   $params['auto_responder']['api.default'] = FALSE;
@@ -591,6 +587,7 @@ function civicrm_api3_mailing_send_test($params) {
         ->where('c.is_opt_out = 0')
         ->where('c.do_not_email = 0')
         ->where('c.is_deceased = 0')
+        ->where('c.is_deleted = 0')
         ->groupBy('e.id')
         ->orderBy(array('e.is_bulkmail DESC', 'e.is_primary DESC'))
         ->toSQL();
@@ -635,7 +632,7 @@ function civicrm_api3_mailing_send_test($params) {
 
   $isComplete = FALSE;
   $config = CRM_Core_Config::singleton();
-  $mailerJobSize = (property_exists($config, 'mailerJobSize')) ? $config->mailerJobSize : NULL;
+  $mailerJobSize = Civi::settings()->get('mailerJobSize');
   while (!$isComplete) {
     // Q: In CRM_Mailing_BAO_Mailing::processQueue(), the three runJobs*()
     // functions are all called. Why does Mailing.send_test only call one?

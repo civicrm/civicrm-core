@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -40,7 +38,6 @@
  * use a POST to jump to a specific page). At some point we should evaluate if we want
  * to use Pager_Jumping instead. We've changed the format to allow navigation by jumping
  * to a page and also First, Prev CURRENT Next Last
- *
  */
 
 require_once 'Pager/Sliding.php';
@@ -131,11 +128,9 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * values.
    *
    * @param array $params
-   *   The set of options needed to initialize the parent.
-   *                             constructor
+   *   The set of options needed to initialize the parent constructor.
    *
-   *
-   * @return void
+   * @return array
    */
   public function initialize(&$params) {
     /* set the mode for the pager to Sliding */

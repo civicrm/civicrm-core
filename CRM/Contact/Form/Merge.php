@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
-require_once 'api/api.php';
-
 /**
- * Class CRM_Contact_Form_Merge
+ * Class CRM_Contact_Form_Merge.
  */
 class CRM_Contact_Form_Merge extends CRM_Core_Form {
   // the id of the contact that tere's a duplicate for; this one will
@@ -269,7 +265,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     $buttons[] = array(
       'type' => 'next',
-      'name' => $this->next ? ts('Merge and Goto Next Pair') : ts('Merge'),
+      'name' => $this->next ? ts('Merge and go to Next Pair') : ts('Merge'),
       'isDefault' => TRUE,
       'icon' => $this->next ? 'circle-triangle-e' : 'check',
     );
@@ -277,7 +273,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     if ($this->next || $this->prev) {
       $buttons[] = array(
         'type' => 'submit',
-        'name' => ts('Merge and Goto Listing'),
+        'name' => ts('Merge and go to Listing'),
       );
       $buttons[] = array(
         'type' => 'done',

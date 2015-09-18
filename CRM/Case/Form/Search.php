@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This file is for Case search
+ * This file is for Case search.
  */
 class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
@@ -64,12 +62,8 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_prefix = 'case_';
 
-  protected $_defaults;
-
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
@@ -167,9 +161,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -214,10 +205,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    *        done.
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
-   *
-   * @param
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_done) {
@@ -248,7 +235,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
@@ -310,10 +297,10 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * add the rules (mainly global rules) for form.
+   * Add the rules (mainly global rules) for form.
+   *
    * All local rules are added near the element
    *
-   * @return void
    * @see valid_date
    */
   public function addRules() {
@@ -326,7 +313,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return void
+   * @return array|bool
    */
   public static function formRule($fields) {
     $errors = array();

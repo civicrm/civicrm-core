@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'PEAR/ErrorStack.php';
@@ -46,7 +44,8 @@ require_once 'Log.php';
  */
 class CRM_Exception extends PEAR_Exception {
   /**
-   * Redefine the exception so message isn't optional
+   * Redefine the exception so message isn't optional.
+   *
    * Supported signatures:
    *  - PEAR_Exception(string $message);
    *  - PEAR_Exception(string $message, int $code);
@@ -169,8 +168,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * which currently use PEAR::raiseError to notify of error messages.
    *
    * @param object $pearError PEAR_Error
-   *
-   * @return void
    */
   public static function handle($pearError) {
 
@@ -307,8 +304,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   The email address to notify of this situation.
    *
    * @throws Exception
-   *
-   * @return void
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
@@ -334,7 +329,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     if (php_sapi_name() == "cli") {
       print ("Sorry. A non-recoverable error has occurred.\n$message \n$code\n$email\n\n");
-      debug_print_backtrace();
+      // Fix for CRM-16899
+      echo static::formatBacktrace(debug_backtrace());
       die("\n");
       // FIXME: Why doesn't this call abend()?
       // Difference: abend() will cleanup transaction and (via civiExit) store session state
@@ -372,16 +368,14 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         $out['backtrace'] = self::parseBacktrace(debug_backtrace());
         $message .= '<p><em>See console for backtrace</em></p>';
       }
-      CRM_Core_Session::setStatus($message, ts('Sorry an Error Occured'), 'error');
+      CRM_Core_Session::setStatus($message, ts('Sorry an error occurred'), 'error');
       CRM_Core_Transaction::forceRollbackIfEnabled();
       CRM_Core_Page_AJAX::returnJsonResponse($out);
     }
 
     $template = CRM_Core_Smarty::singleton();
-
     $template->assign($vars);
-
-    $config->userSystem->outputError($template->fetch($config->fatalErrorTemplate));
+    $config->userSystem->outputError($template->fetch('CRM/common/fatal.tpl'));
 
     self::abend(CRM_Core_Error::FATAL_ERROR);
   }
@@ -394,8 +388,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * something that follows a cleaner separation of concerns.
    *
    * @param Exception $exception
-   *
-   * @return void
    */
   public static function handleUnhandledException($exception) {
     try {
@@ -447,7 +439,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // print to screen
     $template = CRM_Core_Smarty::singleton();
     $template->assign($vars);
-    $content = $template->fetch($config->fatalErrorTemplate);
+    $content = $template->fetch('CRM/common/fatal.tpl');
     if ($config->backtrace) {
       $content = self::formatHtmlException($exception) . $content;
     }
@@ -579,11 +571,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    *
    */
-  public static function debug_log_message($message, $out = FALSE, $comp = '') {
+  public static function debug_log_message($message, $out = FALSE, $comp = '', $priority = NULL) {
     $config = CRM_Core_Config::singleton();
 
     $file_log = self::createDebugLogger($comp);
-    $file_log->log("$message\n");
+    $file_log->log("$message\n", $priority);
 
     $str = '<p/><code>' . htmlspecialchars($message) . '</code>';
     if ($out && CRM_Core_Permission::check('view debug output')) {
@@ -859,7 +851,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param null $redirect
    * @param string $title
-   * @return void
    */
   public static function statusBounce($status, $redirect = NULL, $title = NULL) {
     $session = CRM_Core_Session::singleton();

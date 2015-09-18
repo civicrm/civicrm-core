@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,8 +32,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'HTML/QuickForm/Page.php';
@@ -60,6 +58,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @var string
    */
   protected $_title = NULL;
+
+  /**
+   * The default values for the form.
+   *
+   * @var array
+   */
+  public $_defaults = array();
 
   /**
    * The options passed into this form
@@ -238,8 +243,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Register all the standard rules that most forms potentially use.
-   *
-   * @return void
    */
   public function registerRules() {
     static $rules = array(
@@ -266,6 +269,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'positiveInteger',
       'xssString',
       'fileExists',
+      'settingPath',
       'autocomplete',
       'validContact',
     );
@@ -337,27 +341,35 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Add an element for inputting a month+day (partial date).
+   *
+   * @param string $name
+   * @param string $label
+   * @return HTML_QuickForm_Element
+   */
+  public function addMonthDay($name, $label) {
+    return $this->add('date', $name, $label,
+      CRM_Core_SelectValues::date(NULL, 'M d')
+    );
+  }
+
+  /**
    * called before buildForm. Any pre-processing that
    * needs to be done for buildForm should be done here
    *
-   * This is a virtual function and should be redefined if needed
-   *
-   *
-   * @return void
+   * This is a virtual function and should be redefined if needed.
    */
   public function preProcess() {
   }
 
   /**
-   * called after the form is validated. Any
-   * processing of form state etc should be done in this function.
+   * Called after the form is validated.
+   *
+   * Any processing of form state etc should be done in this function.
    * Typically all processing associated with a form should be done
    * here and relevant state should be stored in the session
    *
    * This is a virtual function and should be redefined if needed
-   *
-   *
-   * @return void
    */
   public function postProcess() {
   }
@@ -399,21 +411,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * This virtual function is used to build the form. It replaces the
-   * buildForm associated with QuickForm_Page. This allows us to put
+   * This virtual function is used to build the form.
+   *
+   * It replaces the buildForm associated with QuickForm_Page. This allows us to put
    * preProcess in front of the actual form building routine
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
   }
 
   /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
+   * This virtual function is used to set the default values of various form elements.
    *
    * @return array|NULL
    *   reference to the array of default values
@@ -423,12 +430,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * This is a virtual function that adds group and global rules to
-   * the form. Keeping it distinct from the form to keep code small
+   * This is a virtual function that adds group and global rules to the form.
+   *
+   * Keeping it distinct from the form to keep code small
    * and localized in the form building code
-   *
-   *
-   * @return void
    */
   public function addRules() {
   }
@@ -445,16 +450,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->validateChainSelectFields();
 
-    $hookErrors = CRM_Utils_Hook::validate(
-      get_class($this),
-      $this->_submitValues,
-      $this->_submitFiles,
-      $this
-    );
-
-    if (!is_array($hookErrors)) {
-      $hookErrors = array();
-    }
+    $hookErrors = array();
 
     CRM_Utils_Hook::validateForm(
       get_class($this),
@@ -534,8 +530,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   displayed. The associate array has 3 fields: 'type', 'name' and 'isDefault'
    *   The base form class will define a bunch of static arrays for commonly used
    *   formats.
-   *
-   * @return void
    */
   public function addButtons($params) {
     $prevnext = $spacing = array();
@@ -730,11 +724,42 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Handle pre approval for processors.
+   *
+   * This fits with the flow where a pre-approval is done and then confirmed in the next stage when confirm is hit.
+   *
+   * This function is shared between contribution & event forms & this is their common class.
+   *
+   * However, this should be seen as an in-progress refactor, the end goal being to also align the
+   * backoffice forms that action payments.
+   *
+   * @param array $params
+   */
+  protected function handlePreApproval(&$params) {
+    try {
+      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+      $params['component'] = 'contribute';
+      $result = $payment->doPreApproval($params);
+      if (empty($result)) {
+        // This could happen, for example, when paypal looks at the button value & decides it is not paypal express.
+        return;
+      }
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      CRM_Core_Error::displaySessionError($e->getMessage());
+      CRM_Utils_System::redirect($params['cancelURL']);
+    }
+
+    $this->set('pre_approval_parameters', $result['pre_approval_parameters']);
+    if (!empty($result['redirect_url'])) {
+      CRM_Utils_System::redirect($result['redirect_url']);
+    }
+  }
+
+  /**
    * Setter function for options.
    *
    * @param mixed $options
-   *
-   * @return void
    */
   public function setOptions($options) {
     $this->_options = $options;
@@ -774,8 +799,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Setter function for Form Action.
    *
    * @param string $action
-   *
-   * @return void
    */
   public function setFormAction($action) {
     $this->_attributes['action'] = $action;
@@ -862,8 +885,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Error Code.
    * @param CRM_Core_DAO $dao
    *   A data access object on which we perform a rollback if non - empty.
-   *
-   * @return void
    */
   public function error($message, $code = NULL, $dao = NULL) {
     if ($dao) {
@@ -882,8 +903,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Name of the variable.
    * @param mixed $value
    *   Value of the variable.
-   *
-   * @return void
    */
   public function set($name, $value) {
     $this->controller->set($name, $value);
@@ -915,8 +934,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param int $action
    *   The mode we want to set the form.
-   *
-   * @return void
    */
   public function setAction($action) {
     $this->_action = $action;
@@ -929,8 +946,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Name of variable.
    * @param mixed $value
    *   Value of variable.
-   *
-   * @return void
    */
   public function assign($var, $value = NULL) {
     self::$_template->assign($var, $value);
@@ -942,9 +957,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $var
    *   Name of variable.
    * @param mixed $value
-   *   Value of varaible.
-   *
-   * @return void
+   *   Value of variable.
    */
   public function assign_by_ref($var, &$value) {
     self::$_template->assign_by_ref($var, $value);
@@ -1093,8 +1106,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Button type for the form after processing.
    * @param string $backType
    * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $buttons = array();
@@ -1391,6 +1402,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (empty($props['multiple'])) {
           $options = array('' => $props['placeholder']) + $options;
         }
+        if (!empty($props['data-api-field']) && (in_array($props['data-api-field'], array('state_province_id', 'county_id')))) {
+          return $this->addChainSelect($name, $props);
+        }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add('select', $name, $label, $options, $required, $props);
 
@@ -1447,7 +1461,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $default
    *   //CRM-15427.
    */
-  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE) {
+  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE, $usedFor = NULL) {
     // Output widget
     // FIXME: Instead of adhoc serialization, use a single json_encode()
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
@@ -1459,6 +1473,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'data-entities' => json_encode($entities),
       //CRM-15427
       'data-default' => $default,
+      'data-usedfor' => json_encode($usedFor),
     ));
   }
 
@@ -1869,7 +1884,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return NULL|int
    */
-  public function getContactID() {
+  protected function setContactID() {
     $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     if (isset($this->_params) && isset($this->_params['select_contact_id'])) {
       $tempID = $this->_params['select_contact_id'];
@@ -1886,12 +1901,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
+      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return (int) $tempID;
     }
 
     $userID = $this->getLoggedInUserContactID();
 
     if (!is_null($tempID) && $tempID === $userID) {
+      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return (int) $userID;
     }
 
@@ -1901,15 +1918,24 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //check for anonymous user.
       $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
       if ($validUser) {
+        CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
+        CRM_Core_Resources::singleton()->addVars('coreForm', array('checksum' => (int) $tempID));
         return $tempID;
       }
     }
     // check if user has permission, CRM-12062
     elseif ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
+      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return $tempID;
     }
-
+    if (is_numeric($userID)) {
+      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $userID));
+    }
     return is_numeric($userID) ? $userID : NULL;
+  }
+
+  public function getContactID() {
+    return $this->setContactID();
   }
 
   /**
