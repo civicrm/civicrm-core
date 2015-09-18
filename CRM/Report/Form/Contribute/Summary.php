@@ -66,7 +66,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'sort_name' => array(
               'title' => ts('Contact Name'),
               'no_repeat' => TRUE,
-            )
+            ),
           )
         ),
         'grouping' => 'contact-fields',
