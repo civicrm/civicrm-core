@@ -37,6 +37,7 @@
 class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
+    'contact_default_language' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'countryLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'customTranslateFunction' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'defaultContactCountry' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
@@ -94,11 +95,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
         );
       }
     }
-    $this->addElement('select', 'contact_default_language', ts('Default Language for users'), array(
-      '*default*' => ts('Use default site language'),
-      'undefined' => ts('Leave undefined'),
-      'current_site_language' => ts('Use language in use at the time'),
-    ));
+    $this->addElement('select', 'contact_default_language', ts('Default Language for users'),
+      CRM_Admin_Form_Setting_Localization::getDefaultLanguageOptions());
 
     $includeCurrency = &$this->addElement('advmultiselect', 'currencyLimit',
       ts('Available Currencies') . ' ', self::getCurrencySymbols(),
@@ -336,6 +334,17 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
         $session->set('lcMessages', $newLocale);
       }
     }
+  }
+
+  /**
+   * @return array
+   */
+  public static function getDefaultLanguageOptions() {
+    return array(
+      '*default*' => ts('Use default site language'),
+      'undefined' => ts('Leave undefined'),
+      'current_site_language' => ts('Use language in use at the time'),
+    );
   }
 
 }
