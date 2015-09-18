@@ -55,14 +55,14 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
       ),
     );
 
-    $this->apiKernel = \Civi\Core\Container::singleton()->get('civi_api_kernel');
+    $this->apiKernel = \Civi::service('civi_api_kernel');
     $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'CustomSearch');
     $this->apiKernel->registerApiProvider($this->adhocProvider);
   }
 
   public function tearDown() {
     parent::tearDown();
-    \Civi\Core\Container::singleton(TRUE);
+    \Civi::reset();
   }
 
   /**

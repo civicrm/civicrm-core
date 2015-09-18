@@ -102,6 +102,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public function upgrade_4_7_alpha1($rev) {
     $this->addTask(ts('Migrate \'on behalf of\' information to module_data'), 'migrateOnBehalfOfInfo');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Migrate Settings to %1', array(1 => $rev)), 'migrateSettings', $rev);
     $this->addTask(ts('Add Getting Started dashlet to %1: SQL', array(1 => $rev)), 'addGettingStartedDashlet', $rev);
   }
 
@@ -118,6 +119,82 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     CRM_Core_BAO_Setting::setItem($newEditor, CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
 
     return $editorID;
+  }
+
+  /**
+   * Migrate any last remaining options from `civicrm_domain.config_backend` to `civicrm_setting`.
+   * Cleanup setting schema.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public function migrateSettings(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP INDEX index_group_name');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting DROP COLUMN group_name');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_setting ADD UNIQUE INDEX index_domain_contact_name (domain_id, contact_id, name)');
+
+    $domainDao = CRM_Core_DAO::executeQuery('SELECT id, config_backend FROM civicrm_domain');
+    while ($domainDao->fetch()) {
+      $settings = CRM_Upgrade_Incremental_php_FourSeven::convertBackendToSettings($domainDao->id, $domainDao->config_backend);
+      CRM_Core_Error::debug_var('convertBackendToSettings', array(
+        'domainId' => $domainDao->id,
+        'backend' => $domainDao->config_backend,
+        'settings' => $settings,
+      ));
+
+      foreach ($settings as $name => $value) {
+        $rowParams = array(
+          1 => array($domainDao->id, 'Positive'),
+          2 => array($name, 'String'),
+          3 => array(serialize($value), 'String'),
+        );
+        $settingId = CRM_Core_DAO::singleValueQuery(
+          'SELECT id FROM civicrm_setting WHERE domain_id = %1 AND name = %2',
+          $rowParams);
+        if (!$settingId) {
+          CRM_Core_DAO::executeQuery(
+            'INSERT INTO civicrm_setting (domain_id, name, value, is_domain) VALUES (%1,%2,%3,1)',
+            $rowParams);
+        }
+      }
+    }
+
+    // TODO Should drop config_backend, but keeping it during alpha/beta cycle in case we miss something.
+    // CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_domain DROP COLUMN config_backend');
+
+    return TRUE;
+  }
+
+  /**
+   * Take a config_backend blob and produce an equivalent list of settings.
+   *
+   * @param int $domainId
+   *   Domain ID.
+   * @param string $config_backend
+   *   Serialized blob.
+   * @return array
+   */
+  public static function convertBackendToSettings($domainId, $config_backend) {
+    if (!$config_backend) {
+      return array();
+    }
+
+    $backend = unserialize($config_backend);
+    if (!$backend) {
+      return array();
+    }
+
+    $mappings = \CRM_Core_Config_MagicMerge::getPropertyMap();
+    $settings = array();
+    foreach ($backend as $propertyName => $propertyValue) {
+      if (isset($mappings[$propertyName][0]) && preg_match('/^setting/', $mappings[$propertyName][0])) {
+        // $mapping format: $propertyName => Array(0 => $type, 1 => $setting|NULL).
+        $settingName = isset($mappings[$propertyName][1]) ? $mappings[$propertyName][1] : $propertyName;
+        $settings[$settingName] = $propertyValue;
+      }
+    }
+
+    return $settings;
   }
 
   /**

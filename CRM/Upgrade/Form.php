@@ -123,7 +123,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     $this->locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
     $smarty = CRM_Core_Smarty::singleton();
-    $smarty->compile_dir = $this->_config->templateCompileDir;
+    //$smarty->compile_dir = $this->_config->templateCompileDir;
     $smarty->assign('multilingual', $this->multilingual);
     $smarty->assign('locales', $this->locales);
 
@@ -722,15 +722,8 @@ SET    version = '$version'
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
 
-    // lets rebuild the config array in case we've made a few changes in the
-    // code base
-    // this also helps us always store the latest version of civi in the DB
-    $params = array();
-    CRM_Core_BAO_ConfigSetting::add($params);
-
-    // CRM-12804 comment-51411 : add any missing settings
-    // at the end of upgrade
-    CRM_Core_BAO_Setting::updateSettingsFromMetaData();
+    // Clear cached metadata.
+    Civi::service('settings_manager')->flush();
 
     // cleanup caches CRM-8739
     $config = CRM_Core_Config::singleton();

@@ -201,11 +201,7 @@ WHERE  id IN ( $idString )
     }
 
     if (!$live) {
-      $days = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'checksum_timeout',
-        NULL,
-        7
-      );
+      $days = Civi::settings()->get('checksum_timeout');
       $live = 24 * $days;
     }
 
@@ -1125,6 +1121,28 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
 
     $smarty = CRM_Core_Smarty::singleton();
     $templateString = $smarty->fetch("string:$templateString");
+  }
+
+  /**
+   * Determine if a contact ID is real/valid.
+   *
+   * @param int $contactId
+   *   The hypothetical contact ID
+   * @return bool
+   */
+  public static function isContactId($contactId) {
+    if ($contactId) {
+      // ensure that this is a valid contact id (for session inconsistency rules)
+      $cid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+        $contactId,
+        'id',
+        'id'
+      );
+      if ($cid) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

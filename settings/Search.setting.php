@@ -40,7 +40,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'search_autocomplete_count',
-    'prefetch' => 0,
     'type' => 'Integer',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
@@ -60,7 +59,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'enable_innodb_fts',
-    'prefetch' => 0,
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 0,
@@ -78,7 +76,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'fts_query_mode',
-    'prefetch' => 0,
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_attributes' => array(
@@ -98,10 +95,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeOrderByClause',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -116,10 +109,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeWildCardInName',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -134,10 +123,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeEmailInName',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -152,13 +137,9 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeNickNameInName',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
-    'default' => 1,
+    'default' => 0,
     'add' => '4.6',
     'title' => 'Include Nickname',
     'is_domain' => 1,
@@ -170,10 +151,6 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'includeAlphabeticalPager',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
@@ -188,13 +165,10 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'smartGroupCacheTimeout',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
-    'quick_form_type' => 'Text',
-    'default' => 1,
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'default' => 5,
     'add' => '4.6',
     'title' => 'Smart group cache timeout',
     'is_domain' => 1,
@@ -206,56 +180,21 @@ return array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
     'name' => 'defaultSearchProfileID',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
     'type' => 'Integer',
-    'quick_form_type' => 'Text',
-    'default' => 1,
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'class' => 'crm-select2',
+    ),
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Admin_Form_Setting_Search::getAvailableProfiles',
+    ),
+    'default' => NULL,
     'add' => '4.6',
     'title' => 'Default Contact Search Profile',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'If set, this will be the default profile used for contact search.',
-    'help_text' => NULL,
-  ),
-  'autocompleteContactSearch' => array(
-    'group_name' => 'Search Preferences',
-    'group' => 'Search Preferences',
-    'name' => 'autocompleteContactSearch',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
-    'type' => 'Integer',
-    'quick_form_type' => 'CheckBox',
-    'default' => 1,
-    'add' => '4.6',
-    'title' => 'Autocomplete Contact Search',
-    'pseudoconstant' => array('optionGroupName' => 'contact_autocomplete_options'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => "Selected fields will be displayed in back-office autocomplete dropdown search results (Quick Search, etc.). Contact Name is always included.",
-    'help_text' => NULL,
-  ),
-  'autocompleteContactReference' => array(
-    'group_name' => 'Search Preferences',
-    'group' => 'Search Preferences',
-    'name' => 'autocompleteContactReference',
-    'prefetch' => 1,
-    // prefetch causes it to be cached in config settings. Usually this is a transitional setting. Some things like urls are permanent. Remove this comment if you have assessed & it should be permanent
-    'config_only' => 1,
-    //@todo - see https://wiki.civicrm.org/confluence/display/CRMDOC/Settings+Reference#SettingsReference-Convertingaconfigobjecttoasetting on removing this deprecated value
-    'type' => 'Integer',
-    'quick_form_type' => 'CheckBox',
-    'default' => 1,
-    'add' => '4.6',
-    'title' => 'Contact Reference Options',
-    'pseudoconstant' => array('optionGroupName' => 'contact_reference_options'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => "Selected fields will be displayed in autocomplete dropdown search results for 'Contact Reference' custom fields. Contact Name is always included. NOTE: You must assign 'access contact reference fields' permission to the anonymous role if you want to use custom contact reference fields in profiles on public pages. For most situations, you should use the 'Limit List to Group' setting when configuring a contact reference field which will be used in public forms to prevent exposing your entire contact list.",
     'help_text' => NULL,
   ),
 );

@@ -26,15 +26,25 @@
  */
 
 /**
- *
- * Config handles all the run time configuration changes that the system needs to deal with.
- * Typically we'll have different values for a user's sandbox, a qa sandbox and a production area.
- * The default values in general, should reflect production values (minimizes chances of screwing up)
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * Class CRM_Utils_Geocode
  */
-class CRM_Report_Config extends CRM_Core_Component_Config {
+class CRM_Utils_Geocode {
+
+  /**
+   * @return string|''
+   *   Class name, or empty.
+   */
+  public static function getProviderClass() {
+    $settings = Civi::settings();
+    if ($settings->get('geoProvider')) {
+      return 'CRM_Utils_Geocode_' . $settings->get('geoProvider');
+    }
+    elseif ($settings->get('mapProvider')) {
+      return 'CRM_Utils_Geocode_' . $settings->get('mapProvider');
+    }
+    else {
+      return '';
+    }
+  }
+
 }

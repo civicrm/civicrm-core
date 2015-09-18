@@ -571,11 +571,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    *
    */
-  public static function debug_log_message($message, $out = FALSE, $comp = '') {
+  public static function debug_log_message($message, $out = FALSE, $comp = '', $priority = NULL) {
     $config = CRM_Core_Config::singleton();
 
     $file_log = self::createDebugLogger($comp);
-    $file_log->log("$message\n");
+    $file_log->log("$message\n", $priority);
 
     $str = '<p/><code>' . htmlspecialchars($message) . '</code>';
     if ($out && CRM_Core_Permission::check('view debug output')) {

@@ -37,6 +37,10 @@
 class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
   protected $_settings = array(
     'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'userFrameworkResourceURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
+    'imageUploadURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
+    'customCSSURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
+    'extensionsURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
   );
 
   /**
@@ -48,10 +52,6 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
       'version' => 3,
     ));
 
-    $this->addElement('text', 'userFrameworkResourceURL', ts('CiviCRM Resource URL'));
-    $this->addElement('text', 'imageUploadURL', ts('Image Upload URL'));
-    $this->addElement('text', 'customCSSURL', ts('Custom css URL'));
-    $this->addElement('text', 'extensionsURL', ts('Extension Resource URL'));
     $this->addYesNo('enableSSL', ts('Force Secure URLs (SSL)'));
     $this->addYesNo('verifySSL', ts('Verify SSL Certs'));
     // FIXME: verifySSL should use $_settings instead of manually adding fields

@@ -181,7 +181,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     );
 
     if (!empty($mailingBackend)) {
-      CRM_Core_BAO_ConfigSetting::formatParams($formValues, $mailingBackend);
+      $formValues = array_merge($mailingBackend, $formValues);
     }
 
     // if password is present, encrypt it

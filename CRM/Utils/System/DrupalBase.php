@@ -160,10 +160,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       $fragment = '#' . $fragment;
     }
 
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
     $separator = $htmlize ? '&amp;' : '&';
@@ -515,6 +511,29 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getUserObject($userID) {
     return user_load($userID);
+  }
+
+  public function parseDrupalSiteName($civicrm_root) {
+    $siteName = NULL;
+    if (strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
+      ) === FALSE
+    ) {
+      $startPos = strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
+      );
+      $endPos = strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR
+      );
+      if ($startPos && $endPos) {
+        // if component is in sites/SITENAME/modules
+        $siteName = substr($civicrm_root,
+          $startPos + 7,
+          $endPos - $startPos - 7
+        );
+      }
+    }
+    return $siteName;
   }
 
 }

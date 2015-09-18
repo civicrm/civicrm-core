@@ -707,10 +707,9 @@ class CRM_Core_PseudoConstant {
   public static function &stateProvince($id = FALSE, $limit = TRUE) {
     if (($id && !CRM_Utils_Array::value($id, self::$stateProvince)) || !self::$stateProvince || !$id) {
       $whereClause = FALSE;
-      $config = CRM_Core_Config::singleton();
       if ($limit) {
         $countryIsoCodes = self::countryIsoCode();
-        $limitCodes = $config->provinceLimit();
+        $limitCodes = CRM_Core_BAO_Country::provinceLimit();
         $limitIds = array();
         foreach ($limitCodes as $code) {
           $limitIds = array_merge($limitIds, array_keys($countryIsoCodes, $code));
@@ -779,9 +778,8 @@ WHERE  id = %1";
       $whereClause = FALSE;
 
       if ($limit) {
-        $config = CRM_Core_Config::singleton();
         $countryIsoCodes = self::countryIsoCode();
-        $limitCodes = $config->provinceLimit();
+        $limitCodes = CRM_Core_BAO_Country::provinceLimit();
         $limitIds = array();
         foreach ($limitCodes as $code) {
           $tmpArray = array_keys($countryIsoCodes, $code);
@@ -836,7 +834,7 @@ WHERE  id = %1";
         // limit the country list to the countries specified in CIVICRM_COUNTRY_LIMIT
         // (ensuring it's a subset of the legal values)
         // K/P: We need to fix this, i dont think it works with new setting files
-        $limitCodes = $config->countryLimit();
+        $limitCodes = CRM_Core_BAO_Country::countryLimit();
         if (!is_array($limitCodes)) {
           $limitCodes = array(
             $config->countryLimit => 1,

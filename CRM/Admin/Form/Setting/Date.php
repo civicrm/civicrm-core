@@ -37,6 +37,11 @@
 class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
 
   public $_settings = array(
+    'dateformatDatetime' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'dateformatFull' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'dateformatPartial' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'dateformatYear' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'dateformatTime' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'weekBegins' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'dateInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'timeInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
@@ -48,12 +53,6 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Date'));
-
-    $this->addElement('text', 'dateformatDatetime', ts('Complete Date and Time'));
-    $this->addElement('text', 'dateformatFull', ts('Complete Date'));
-    $this->addElement('text', 'dateformatPartial', ts('Month and Year'));
-    $this->addElement('text', 'dateformatYear', ts('Year Only'));
-    $this->addElement('text', 'dateformatTime', ts('Time Only'));
 
     parent::buildQuickForm();
   }
