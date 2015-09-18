@@ -466,28 +466,13 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   }
 
   public function groupBy() {
-    $this->_groupBy = "";
-    if (!empty($this->_params['group_bys']) &&
-      is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
-    ) {
-      foreach ($this->_columns as $tableName => $table) {
-        if (array_key_exists('group_bys', $table)) {
-          foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
-              $this->_groupBy[] = $field['dbAlias'];
-            }
-          }
-        }
-      }
+    // We override this function because we use GROUP functions in the
+    // SELECT clause, therefore we have to group by *something*. If the
+    // user doesn't select a column to group by, we should group by participant id.
+    parent::groupBy();
+    if (empty($this->_groupBy)) {
+      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id";
     }
-
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy = "ORDER BY " . implode(', ', $this->_groupBy) .
-        ", {$this->_aliases['civicrm_contact']}.sort_name";
-    }
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id " .
-      $this->_groupBy;
   }
 
   public function postProcess() {
