@@ -465,13 +465,12 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->_whereClauses[] = "{$this->_aliases['civicrm_participant']}.is_test = 0";
   }
 
-  // We override this function because we use GROUP functions in the 
-  // SELECT clause, therefore we have to group by *something*. If the
-  // user doesn't select a column to group by, we should group by 
-  // participant id.
   public function groupBy() {
+    // We override this function because we use GROUP functions in the
+    // SELECT clause, therefore we have to group by *something*. If the
+    // user doesn't select a column to group by, we should group by participant id.
     parent::groupBy();
-    if(empty($this->_groupBy)) {
+    if (empty($this->_groupBy)) {
       $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id";
     }
   }
