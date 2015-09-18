@@ -136,6 +136,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       if (isset($this->_id) && $this->_id) {
         $params = array('id' => $this->_id);
         CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage', $params, $this->_values);
+        CRM_Contribute_BAO_ContributionPage::setValues($this->_id, $this->_values);
       }
       $this->set('values', $this->_values);
     }
