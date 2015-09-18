@@ -289,7 +289,7 @@ class CRM_Utils_Mail_EmailProcessor {
                 $text = $mail->body->text;
               }
               elseif ($mail->body instanceof ezcMailMultipart) {
-                if ($mail->body instanceof ezcMailMultipartReport) {
+               if ($mail->body instanceof ezcMailMultipartReport) {
                   $part = $mail->body->getMachinePart();
                   if ($part instanceof ezcMailDeliveryStatus) {
                     foreach ($part->recipients as $rec) {
@@ -297,12 +297,25 @@ class CRM_Utils_Mail_EmailProcessor {
                         $text = $rec["Diagnostic-Code"];
                         break;
                       }
-                    }
-                    if (empty($text)) {
-                      $text = $part->text;
+                      elseif (isset($rec["Description"])) {
+                        $text = $rec["Description"];
+                        break;
+                      }
+                      // no diagnostic info present - try getting the human readable part
+                      elseif (isset($rec["Status"])) {
+                        $text = $rec["Status"];
+                        $textpart = $mail->body->getReadablePart();
+                        if ($textpart != NULL and isset($textpart->text)) {
+                          $text .= " " . $textpart->text;
+                        }
+                        else {
+                          $text .= " Delivery failed but no diagnostic code or description.";
+                        }
+                        break;
+                      }
                     }
                   }
-                  elseif ($part != NULL) {
+                  elseif ($part != NULL and isset($part->text)) {
                     $text = $part->text;
                   }
                   elseif (($part = $mail->body->getReadablePart()) != NULL) {
@@ -340,7 +353,7 @@ class CRM_Utils_Mail_EmailProcessor {
                           $text = $rec["Description"];
                         }
                         else {
-                          $text = "Delivery to the following recipients failed";
+                          $text = $rec["Status"] . " Delivery to the following recipients failed";
                         }
                         break;
                       }
