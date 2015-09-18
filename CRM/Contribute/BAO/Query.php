@@ -969,7 +969,7 @@ class CRM_Contribute_BAO_Query {
     // Add field to check if payment is made for recurring contribution
     $recurringPaymentOptions = array(
         0 => ts('All recurring contributions'),
-        1 => ts('Made atleast one payment for the recurring contributions'),
+        1 => ts('Made at least one payment for the recurring contributions'),
     );
     $form->addRadio('contribution_recur_payment_made', ts(''), $recurringPaymentOptions);
 

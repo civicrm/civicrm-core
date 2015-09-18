@@ -70,15 +70,6 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     
     $this->setPageTitle(ts('Recurring Contribution record'));
 
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      CRM_Custom_Form_CustomData::preProcess($this);
-      return;
-    }
-
     // Get the contact id
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->assign('contactID', $this->_contactID);
@@ -140,6 +131,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
+      $this->assign('type', 'ContributionRecur');
+      $this->assign('entityId', $this->_id);
+
       CRM_Custom_Form_CustomData::preProcess($this);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
@@ -149,10 +143,6 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
   }
 
   function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
-
     $defaults = $this->_values;
 
     if ($this->_id) {
@@ -217,11 +207,6 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       );
       return;
     }
-    
-    if ($this->_cdType) {
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      return;
-    }
 
     //need to assign custom data type to the template
     $this->assign('customDataType', 'ContributionRecur');
@@ -256,10 +241,24 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       NULL
     );
 
+    // Get contact memberships
+    $contactMembershipsList = $contactMemberships = array();
+    $memParams = array('contact_id' => $this->_contactID);
+    CRM_Member_BAO_Membership::getValues($memParams, $contactMembershipsList, TRUE);
+    if (count($contactMembershipsList) > 0) {
+        foreach ($contactMembershipsList as $memid => $mem) {
+            $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($memid);
+            $contactMemberships[$memid] = $statusANDType[$memid]['membership_type']
+                                .' / '.$statusANDType[$memid]['status']
+                                .' / '.$mem['start_date']
+                                .' / '.$mem['end_date'];
+        }
+    }
+
     if ($this->_action == 1) {
       $memberships = $this->add('select', 'membership_id',
         ts('Membership'),
-        array('' => ts('- select -')) + self::getContactMemberships($this->_contactID),
+        array('' => ts('- select -')) + $contactMemberships,
         FALSE,
         NULL
       );
@@ -303,9 +302,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
 			$this->addElement('checkbox', 'move_recurring_record', ts('Move Recurring Record?'));
 			$this->addElement('checkbox', 'move_existing_contributions', ts('Move Existing Contributions?'));
 			
-			// Get memberships of the contact
-			// This will allow the recur record to be attached to a different membership of the same contact
-			$existingMemberships = array('' => ts('- select -')) + self::getContactMemberships($this->_contactID);
+      // Get memberships of the contact
+      // This will allow the recur record to be attached to a different membership of the same contact
+      $existingMemberships = array('' => ts('- select -')) + $contactMemberships;
       // Remove current membership during move
       if ($existingMemberships[$this->_membershipID]) {
         unset($existingMemberships[$this->_membershipID]);
@@ -439,8 +438,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
 
     // build custom data getFields array
     $customFields = CRM_Core_BAO_CustomField::getFields('ContributionRecur', FALSE, FALSE, NULL, NULL, TRUE);
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
-      $customFields,
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      //$customFields,
       $this->_id,
       'ContributionRecur'
     );
@@ -449,16 +448,20 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     
     // Link the recurring contribution with membership record, if selected
     if ($this->_action == 1 && !empty($formValues['membership_id'])) {
-      $membership = new CRM_Member_DAO_Membership();
-      $membership->id = $formValues['membership_id'];
-      $membership->contribution_recur_id = $contributionRecur->id;
-      $membership->save();
+      civicrm_api3('Membership', 'create', array(
+        'id' => $formValues['membership_id'],
+        'contribution_recur_id' => $contributionRecur->id,
+      ));
     }
 
     // Move the recurring record
     if (isset($submittedValues['move_recurring_record']) && $submittedValues['move_recurring_record'] == 1 ) {
       self::moveRecurringRecord($submittedValues);
     }
+
+    $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
+      "reset=1&cid={$this->_contactID}&selectedChild=contribute-recur"
+    ));
   }
 
   public function displayStatusMessage($messageTitle, $message) {
@@ -470,32 +473,6 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     CRM_Core_Page_AJAX::returnJsonResponse($out);
   }
 
-  public function getContactMemberships($contactId) {
-    $membership = array();
-
-    if (empty($contactId)) {
-      return $membership;
-    }
-
-    $dao = new CRM_Member_DAO_Membership();
-    $dao->contact_id = $contactId;
-    $dao->is_test = 0;
-    $dao->find();
-
-    while ($dao->fetch()) {
-      $membership[$dao->id] = array();
-      //CRM_Core_DAO::storeValues($dao, $membership[$dao->id]);
-
-      $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($dao->id);
-      $membership[$dao->id] = $statusANDType[$dao->id]['membership_type']
-              .' / '.$statusANDType[$dao->id]['status']
-              .' / '.$dao->start_date
-              .' / '.$dao->end_date;
-    }
-
-    return $membership;
-  }
-
   public function moveRecurringRecord($submittedValues) {
     // Move recurring record to another contact
     if (!empty($submittedValues['selected_cid']) && $submittedValues['selected_cid'] != $this->_contactID) {
@@ -503,23 +480,32 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       $selected_cid = $submittedValues['selected_cid'];
 
       // FIXME: Not getting the below value in $submittedValues
-      // So taking the value frmo $_POST
+      // So taking the value from $_POST
       if (isset($_POST['membership_record'])) {
         $membership_record = $_POST['membership_record'];
       }
 
       // Update contact id in civicrm_contribution_recur table
-      $update_recur_sql = "UPDATE civicrm_contribution_recur SET contact_id = %1 WHERE id = %2";
-      $update_recur_params = array(
-        1 =>  array($selected_cid, 'Integer'),
-        2 =>  array($this->_id, 'Integer')
-      );
-      CRM_Core_DAO::executeQuery($update_recur_sql, $update_recur_params);
+      $recurring = new CRM_Contribute_BAO_ContributionRecur();
+      $recurring->$this->_id;
+      if ($recurring->find(TRUE)) {
+          $recurParams = (array) $recurring;
+          $recurParams['contact_id'] = $selected_cid;
+          CRM_Contribute_BAO_ContributionRecur::create($recurParams);
+      }
 
       // Update contact id in civicrm_contribution table, if 'Move Existing Contributions?' is ticked
       if (isset($submittedValues['move_existing_contributions']) && $submittedValues['move_existing_contributions'] == 1) {
-        $update_contribution_sql = "UPDATE civicrm_contribution SET contact_id = %1 WHERE contribution_recur_id = %2";
-        CRM_Core_DAO::executeQuery($update_contribution_sql, $update_recur_params);
+        $contribution = new CRM_Contribute_DAO_Contribution();
+        $contribution->contribution_recur_id = $this->_id;
+        $contribution->find();
+        while ($contribution->fetch()) {
+            $contributionParams = (array) $contribution;
+            $contributionParams['contact_id'] = $selected_cid;
+            // Update contact_id of contributions
+            // related to the recurring contribution
+            CRM_Contribute_BAO_Contribution::create($contributionParams);
+        }
       }
     }
     
@@ -528,15 +514,21 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       if (!empty($this->_membershipID)) {
         $membership = new CRM_Member_DAO_Membership();
         $membership->id = $this->_membershipID;
-        $membership->contribution_recur_id = NULL;
-        $membership->save();
+        if ($membership->find(TRUE)) {
+            $membershipParams = (array) $membership;
+            $membershipParams['contribution_recur_id'] = 'NULL';
+            CRM_Member_BAO_Membership::add($membershipParams);
+        }
       }
 
       // Update contribution_recur_id to the new membership
       $membership = new CRM_Member_DAO_Membership();
-      $membership->id =  $membership_record;
-      $membership->contribution_recur_id = $this->_id;
-      $membership->save();
+      $membership->id = $membership_record;
+      if ($membership->find(TRUE)) {
+          $membershipParams = (array) $membership;
+          $membershipParams['contribution_recur_id'] = $this->_id;
+          CRM_Member_BAO_Membership::add($membershipParams);
+      }
     }
   }
 }

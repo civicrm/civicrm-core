@@ -139,7 +139,7 @@ class CRM_Contribute_Page_ContributionRecurTab extends CRM_Core_Page {
     $params = CRM_Contribute_BAO_ContributionRecur::getRecurContributions($this->_contactId);
 
     // Get all backoffice payment processors
-    $backOfficePaymentProcessors = CRM_Contribute_BAO_ContributionRecur::getBackOfficePaymentProcessors();
+    $backOfficePaymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(array('BackOffice'));
 
     if (!empty($params)) {
       foreach ($params as $ids => $recur) {

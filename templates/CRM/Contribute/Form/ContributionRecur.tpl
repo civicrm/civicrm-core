@@ -38,9 +38,7 @@
   </div>
 </div>  
 {else}
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
+
     <div class="crm-block crm-form-block crm-contribution-form-block">
         <div class="crm-submit-buttons">
             {include file="CRM/common/formButtons.tpl"}
@@ -98,7 +96,7 @@
               <td class="label">{$form.end_date.label}</td>
               <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
             </tr>
-            <tr id="cencelDate" class="crm-contribution-form-block-cancel_date">
+            <tr id="cancelDate" class="crm-contribution-form-block-cancel_date">
               <td class="label">{$form.cancel_date.label}</td>
               <td>{include file="CRM/common/jcalendar.tpl" elementName=cancel_date}</td>
             </tr>
@@ -205,9 +203,9 @@
     {/if}
 
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-{/if}
 
-{if !$cdType}
+
+{if !$customDataType}
 
 {literal}
 <script type="text/javascript">
