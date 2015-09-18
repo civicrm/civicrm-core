@@ -58,16 +58,27 @@ class CRM_Event_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLette
       $event = $event['values'][$participant['event_id']];
 
       // get contact information
+      // Use 'getTokenDetails' so that hook_civicrm_tokenValues is called.
+      $contactId = $participant['contact_id'];
+      $params = array('id' => $contactId);
+      list($contact) = CRM_Utils_Token::getTokenDetails($params,
+        $returnProperties,
+        $skipOnHold,
+        $skipDeceased,
+        NULL,
+        $messageToken,
+        'CRM_Contact_Form_Task_PDFLetterCommon'
+      );
 
       // Create variable $contactId which is used below as well.
       // $contactID not existing caused the error mentioned in
       // https://issues.civicrm.org/jira/browse/CRM-16599?focusedCommentId=77663&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-77663
       $contactId = $participant['contact_id'];
       $params = array('contact_id' => $contactId);
-      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
+      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact[$contactId], TRUE, $messageToken);
       $tokenHtml = CRM_Utils_Token::replaceEntityTokens('event', $event, $tokenHtml, $messageToken);
       $tokenHtml = CRM_Utils_Token::replaceEntityTokens('participant', $participant, $tokenHtml, $messageToken);
-      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact, $categories, TRUE);
+      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact[$contactId], $categories, TRUE);
 
       if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
         $smarty = CRM_Core_Smarty::singleton();
