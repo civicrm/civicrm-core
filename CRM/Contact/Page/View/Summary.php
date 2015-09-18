@@ -341,7 +341,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'class' => 'livePage',
       );
     }
-    
+
     $rest = array(
       'activity' => array(
         'title' => ts('Activities'),

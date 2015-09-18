@@ -176,7 +176,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     $this->_defaults = $defaults;
     return $defaults;
   }
- 
+
   /**
    * Build the form
    *
@@ -249,10 +249,10 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       foreach ($contactMembershipsList as $memid => $mem) {
         $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($memid);
         $contactMemberships[$memid] = $statusANDType[$memid]['membership_type']
-                                 . ' / '.$statusANDType[$memid]['status']
-                                 . ' / '.$mem['start_date']
-                                 . ' / '.$mem['end_date'];
-        }
+                                 . ' / ' . $statusANDType[$memid]['status']
+                                 . ' / ' . $mem['start_date']
+                                 . ' / ' . $mem['end_date'];
+      }
     }
 
     if ($this->_action == 1) {
@@ -339,7 +339,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       )
     );
   }
- 
+
   /**
    * global validation rules for the form
    *
@@ -352,7 +352,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
   public static function formRule($values) {
     $errors = array();
 
-    if (!empty($values['start_date']) && !empty($values['end_date']) ) {
+    if (!empty($values['start_date']) && !empty($values['end_date'])) {
       $start = CRM_Utils_Date::processDate($values['start_date']);
       $end   = CRM_Utils_Date::processDate($values['end_date']);
       if (($end < $start) && ($end != 0)) {
@@ -361,7 +361,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     }
     return $errors;
   }
-   
+
   /**
    * process the form after the input has been submitted and validated
    *
@@ -389,7 +389,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     }
 
     // get the submitted form values.
-    $submittedValues = $this->controller->exportValues($this->_name);  
+    $submittedValues = $this->controller->exportValues($this->_name);
 
     // get the required field value only.
     $formValues = $submittedValues;
@@ -466,7 +466,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
   public function displayStatusMessage($messageTitle, $message) {
     $out = array(
       'status' => 'fatal',
-      'content' => '<div class="messages status no-popup"><div class="icon inform-icon"></div>' . ts( $message ) . '</div>',
+      'content' => '<div class="messages status no-popup"><div class="icon inform-icon"></div>' . ts($message) . '</div>',
     );
     CRM_Core_Session::setStatus($message, ts($messageTitle), 'error');
     CRM_Core_Page_AJAX::returnJsonResponse($out);
