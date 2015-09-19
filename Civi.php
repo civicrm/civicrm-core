@@ -55,6 +55,13 @@ class Civi {
   }
 
   /**
+   * @return \Civi\Core\Lock\LockManager
+   */
+  public static function lockManager() {
+    return \Civi\Core\Container::getBootService('lockManager');
+  }
+
+  /**
    * @return \Psr\Log\LoggerInterface
    */
   public static function log() {
@@ -90,8 +97,9 @@ class Civi {
    * singletons, containers.
    */
   public static function reset() {
-    Civi\Core\Container::singleton(TRUE);
     self::$statics = array();
+    Civi\Core\Container::getBootServices();
+    Civi\Core\Container::singleton(TRUE);
   }
 
   /**
@@ -109,7 +117,7 @@ class Civi {
    * @return \Civi\Core\SettingsBag
    */
   public static function settings($domainID = NULL) {
-    return Civi\Core\Container::singleton()->get('settings_manager')->getBagByDomain($domainID);
+    return \Civi\Core\Container::getBootService('settings_manager')->getBagByDomain($domainID);
   }
 
 }

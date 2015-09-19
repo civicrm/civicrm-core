@@ -2854,7 +2854,7 @@ WHERE  civicrm_mailing_job.id = %1
 
       // check if we are using global locks
       foreach ($lockArray as $lockID) {
-        $cronLock = Civi::service('lockManager')->acquire("worker.mailing.send.{$lockID}");
+        $cronLock = Civi::lockManager()->acquire("worker.mailing.send.{$lockID}");
         if ($cronLock->isAcquired()) {
           $gotCronLock = TRUE;
           break;
