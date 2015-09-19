@@ -86,26 +86,30 @@ class CRM_Core_Config_MagicMerge {
       'doNotResetCache' => array('local'),
       'inCiviCRM' => array('local'),
       'userFrameworkFrontend' => array('local'),
+      'userPermissionTemp' => array('local'),
 
       // "runtime" properties are computed from define()s, $_ENV, etc.
       // See also: CRM_Core_Config_Runtime.
       'dsn' => array('runtime'),
       'initialized' => array('runtime'),
       'userFramework' => array('runtime'),
-      'userFrameworkBaseURL' => array('runtime'),
       'userFrameworkClass' => array('runtime'),
       'userFrameworkDSN' => array('runtime'),
-      'useFrameworkRelativeBase' => array('runtime', 'useFrameworkRelativeBase'),
       'userFrameworkURLVar' => array('runtime'),
-      'userFrameworkVersion' => array('runtime'),
-      'userPermissionClass' => array('runtime'),
-      'userPermissionTemp' => array('runtime'),
-      'userSystem' => array('runtime'),
       'userHookClass' => array('runtime'),
       'cleanURL' => array('runtime'),
       'configAndLogDir' => array('runtime'),
       'templateCompileDir' => array('runtime'),
       'templateDir' => array('runtime'),
+
+      // "boot-svc" properties are critical services needed during init.
+      // See also: Civi\Core\Container::getBootServices().
+      'userSystem' => array('boot-svc'),
+      'userPermissionClass' => array('boot-svc'),
+
+      'userFrameworkBaseURL' => array('user-system', 'getAbsoluteBaseURL'),
+      'userFrameworkVersion' => array('user-system', 'getVersion'),
+      'useFrameworkRelativeBase' => array('user-system', 'getRelativeBaseURL'), // ugh typo.
 
       // "setting" properties are loaded through the setting layer, esp
       // table "civicrm_setting" and global $civicrm_setting.
@@ -239,9 +243,18 @@ class CRM_Core_Config_MagicMerge {
       case 'runtime':
         return $this->getRuntime()->{$name};
 
+      case 'boot-svc':
+        $this->cache[$k] = \Civi\Core\Container::getBootService($name);
+        return $this->cache[$k];
+
       case 'local':
         $this->initLocals();
         return $this->locals[$name];
+
+      case 'user-system':
+        $userSystem = \Civi\Core\Container::getBootService('userSystem');
+        $this->cache[$k] = call_user_func(array($userSystem, $name));
+        return $this->cache[$k];
 
       case 'service':
         return \Civi::service($name);
@@ -271,6 +284,7 @@ class CRM_Core_Config_MagicMerge {
       case 'setting-path':
       case 'setting-url-abs':
       case 'setting-url-rel':
+      case 'user-system':
       case 'runtime':
       case 'callback':
         // In the past, changes to $config were not persisted automatically.
@@ -352,6 +366,7 @@ class CRM_Core_Config_MagicMerge {
         'doNotResetCache' => 0,
         'initialized' => FALSE,
         'userFrameworkFrontend' => FALSE,
+        'userPermissionTemp' => NULL,
       );
     }
   }
