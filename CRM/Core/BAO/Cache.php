@@ -153,7 +153,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     // get a lock so that multiple ajax requests on the same page
     // dont trample on each other
     // CRM-11234
-    $lock = Civi::service('lockManager')->acquire("cache.{$group}_{$path}._{$componentID}");
+    $lock = Civi::lockManager()->acquire("cache.{$group}_{$path}._{$componentID}");
     if (!$lock->isAcquired()) {
       CRM_Core_Error::fatal();
     }

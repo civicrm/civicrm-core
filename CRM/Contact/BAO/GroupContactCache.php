@@ -431,7 +431,7 @@ WHERE  id = %1
     }
 
     // grab a lock so other processes dont compete and do the same query
-    $lock = Civi::service('lockManager')->acquire("data.core.group.{$groupID}");
+    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
     if (!$lock->isAcquired()) {
       // this can cause inconsistent results since we dont know if the other process
       // will fill up the cache before our calling routine needs it.
