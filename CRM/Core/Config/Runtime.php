@@ -67,25 +67,6 @@ class CRM_Core_Config_Runtime {
 
   public $userHookClass;
 
-  public $userPermissionClass;
-
-  /**
-   * Manager for temporary permissions.
-   * @todo move to container
-   *
-   * @var CRM_Core_Permission_Temp
-   */
-  public $userPermissionTemp;
-
-  /**
-   * The connector module for the CMS/UF
-   * @todo Introduce an interface.
-   * @todo move to container
-   *
-   * @var CRM_Utils_System_Base
-   */
-  public $userSystem;
-
   /**
    * Are we generating clean url's and using mod_rewrite
    * @var string
@@ -131,55 +112,18 @@ class CRM_Core_Config_Runtime {
     if (!defined('CIVICRM_UF')) {
       $this->fatal('You need to define CIVICRM_UF in civicrm.settings.php');
     }
-    $this->setUserFramework(CIVICRM_UF);
 
-    $this->templateDir = array(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
+    $this->userFramework = CIVICRM_UF;
+    $this->userFrameworkClass = 'CRM_Utils_System_' . CIVICRM_UF;
+    $this->userHookClass = 'CRM_Utils_Hook_' . CIVICRM_UF;
 
-    if (CRM_Utils_System::isSSL()) {
-      $this->userSystem->mapConfigToSSL();
-    }
-
-    if (isset($this->customPHPPathDir) && $this->customPHPPathDir) {
-      set_include_path($this->customPHPPathDir . PATH_SEPARATOR . get_include_path());
-    }
-
-    $this->initialized = 1;
-  }
-
-  public function setUserFramework($userFramework) {
-    $this->userFramework = $userFramework;
-    $this->userFrameworkClass = 'CRM_Utils_System_' . $userFramework;
-    $this->userHookClass = 'CRM_Utils_Hook_' . $userFramework;
-    $userPermissionClass = 'CRM_Core_Permission_' . $userFramework;
-    $this->userPermissionClass = new $userPermissionClass();
-
-    $class = $this->userFrameworkClass;
-    $this->userSystem = new $class();
-
-    if ($userFramework == 'Joomla') {
+    if (CIVICRM_UF == 'Joomla') {
       $this->userFrameworkURLVar = 'task';
-    }
-
-    if (defined('CIVICRM_UF_BASEURL')) {
-      $this->userFrameworkBaseURL = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
-
-      //format url for language negotiation, CRM-7803
-      $this->userFrameworkBaseURL = CRM_Utils_System::languageNegotiationURL($this->userFrameworkBaseURL);
-
-      if (CRM_Utils_System::isSSL()) {
-        $this->userFrameworkBaseURL = str_replace('http://', 'https://', $this->userFrameworkBaseURL);
-      }
-
-      $base = parse_url($this->userFrameworkBaseURL);
-      $this->useFrameworkRelativeBase = $base['path'];
-      //$this->useFrameworkRelativeBase = empty($base['path']) ? '/' : $base['path'];
     }
 
     if (defined('CIVICRM_UF_DSN')) {
       $this->userFrameworkDSN = CIVICRM_UF_DSN;
     }
-
-    $this->userFrameworkVersion = $this->userSystem->getVersion();
 
     // this is dynamically figured out in the civicrm.settings.php file
     if (defined('CIVICRM_CLEANURL')) {
@@ -188,6 +132,14 @@ class CRM_Core_Config_Runtime {
     else {
       $this->cleanURL = 0;
     }
+
+    $this->templateDir = array(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
+
+    if (isset($this->customPHPPathDir) && $this->customPHPPathDir) {
+      set_include_path($this->customPHPPathDir . PATH_SEPARATOR . get_include_path());
+    }
+
+    $this->initialized = 1;
   }
 
   private function fatal($message) {
@@ -217,6 +169,5 @@ class CRM_Core_Config_Runtime {
     }
     return Civi::$statics[__CLASS__]['id'];
   }
-
 
 }

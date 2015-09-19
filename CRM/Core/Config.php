@@ -389,17 +389,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     return FALSE;
   }
 
-
-  /**
-   * Wrapper function to allow unit tests to switch user framework on the fly.
-   *
-   * @param string $userFramework
-   *   One of 'Drupal', 'Joomla', etc.
-   * @deprecated
-   */
-  public function setUserFramework($userFramework) {
-    $this->getRuntime()->setUserFramework($userFramework);
-  }
   /**
    * Is back office credit card processing enabled for this site - ie are there any installed processors that support
    * it?

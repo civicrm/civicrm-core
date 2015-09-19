@@ -74,11 +74,7 @@ class Civi {
    * @return \Civi\Core\Paths
    */
   public static function paths() {
-    // Paths must be available before container can boot.
-    if (!isset(Civi::$statics[__CLASS__]['paths'])) {
-      Civi::$statics[__CLASS__]['paths'] = new \Civi\Core\Paths();
-    }
-    return Civi::$statics[__CLASS__]['paths'];
+    return \Civi\Core\Container::getBootService('paths');
   }
 
   /**

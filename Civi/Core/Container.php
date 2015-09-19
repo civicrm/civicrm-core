@@ -310,28 +310,52 @@ class Container {
    * @throws \CRM_Core_Exception
    */
   public static function getBootServices() {
-    if (!isset(\Civi::$statics['*boot*'])) {
-      \Civi::$statics['*boot*']['cache.settings'] = array(
+    if (!isset(\Civi::$statics[__CLASS__])) {
+      $bootServices = array();
+      \Civi::$statics[__CLASS__] = &$bootServices;
+
+      $config = \CRM_Core_Config::singleton();
+
+      $class = $config->userFrameworkClass;
+      $userSystem = new $class();
+      $userSystem->initialize();
+
+      $userPermissionClass = 'CRM_Core_Permission_' . $config->userFramework;
+
+      $bootServices['paths'] = array(
+        'class' => 'Civi\Core\Paths',
+        'obj' => new \Civi\Core\Paths(),
+      );
+      $bootServices['userSystem'] = array(
+        'class' => 'CRM_Utils_Cache_Interface',
+        'obj' => $userSystem,
+      );
+      $bootServices['userPermissionClass'] = array(
+        // Ugh, silly name.
+        'class' => 'CRM_Core_Permission_Base',
+        'obj' => new $userPermissionClass(),
+      );
+      $bootServices['cache.settings'] = array(
         'class' => 'CRM_Utils_Cache_Interface',
         'obj' => \CRM_Utils_Cache::create(array(
           'name' => 'settings',
           'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
         )),
       );
-      \Civi::$statics['*boot*']['settings_manager'] = array(
+      $bootServices['settings_manager'] = array(
         'class' => 'Civi\Core\SettingsManager',
-        'obj' => new \Civi\Core\SettingsManager(\Civi::$statics['*boot*']['cache.settings']['obj']),
+        'obj' => new \Civi\Core\SettingsManager($bootServices['cache.settings']['obj']),
       );
-      \Civi::$statics['*boot*']['lockManager'] = array(
+      $bootServices['lockManager'] = array(
         'class' => 'Civi\Core\Lock\LockManager',
         'obj' => self::createLockManager(),
       );
     }
-    return \Civi::$statics['*boot*'];
+    return \Civi::$statics[__CLASS__];
   }
 
   public static function getBootService($name) {
-    return \Civi::$statics['*boot*'][$name]['obj'];
+    return \Civi::$statics[__CLASS__][$name]['obj'];
   }
 
 }
