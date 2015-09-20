@@ -94,8 +94,7 @@ class Civi {
    */
   public static function reset() {
     self::$statics = array();
-    Civi\Core\Container::getBootServices();
-    Civi\Core\Container::singleton(TRUE);
+    Civi\Core\Container::singleton();
   }
 
   /**
