@@ -373,10 +373,10 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       echo 'You need to define CIVICRM_TEMPLATE_COMPILEDIR in civicrm.settings.php';
       exit();
     }
-    $upload_dir    = wp_upload_dir();
+    $upload_dir = wp_upload_dir();
     $settingsDir = $upload_dir[basedir] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
     if (defined('CIVICRM_SETTINGS_PATH')) {
-      CRM_Utils_File::restrictAccessSettings( $settingsDir );
+      CRM_Utils_File::restrictAccessSettings($settingsDir);
     }
     $this->_initDAO();
 

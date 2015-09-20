@@ -89,7 +89,7 @@ function civicrm_main(&$config) {
     );
   }
   elseif ($installType == 'wordpress') {
-    $upload_dir    = wp_upload_dir();
+    $upload_dir = wp_upload_dir();
     $files_dirname = $upload_dir[basedir];
     civicrm_setup($files_dirname);
 
@@ -122,7 +122,7 @@ function civicrm_main(&$config) {
     $configFile = $cmsPath . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . $siteDir . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
   }
   elseif ($installType == 'wordpress') {
-    $configFile = $files_dirname . DIRECTORY_SEPARATOR . 'civicrm'. DIRECTORY_SEPARATOR . 'civicrm.settings.php';
+    $configFile = $files_dirname . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
   }
 
   $string = civicrm_config($config);

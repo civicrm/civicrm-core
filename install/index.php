@@ -105,18 +105,21 @@ CRM_Core_ClassLoader::singleton()->register();
 // Load civicrm database config
 if (isset($_REQUEST['mysql'])) {
   $databaseConfig = $_REQUEST['mysql'];
-} else if ( $installType == 'wordpress' ) {
-  //WP Database Data
-  $database     = DB_NAME;
-  $username     = DB_USER;
-  $password     = DB_PASSWORD;
-  $server       = DB_HOST;
-  $databaseConfig = array(
-    "server"   => $server,
-    "username" => $username,
-    "password" => $password,
-    "database" => $database,
-  );
+}
+else {
+  if ($installType == 'wordpress') {
+    //WP Database Data
+    $database = DB_NAME;
+    $username = DB_USER;
+    $password = DB_PASSWORD;
+    $server = DB_HOST;
+    $databaseConfig = array(
+      "server" => $server,
+      "username" => $username,
+      "password" => $password,
+      "database" => $database,
+    );
+  }
 }
 
 if ($installType == 'drupal') {
@@ -191,7 +194,7 @@ if ($installType == 'drupal') {
 }
 elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
-  $upload_dir      = wp_upload_dir();
+  $upload_dir = wp_upload_dir();
   $files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
   $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
     'civicrm.settings.php'
@@ -508,12 +511,12 @@ class InstallRequirements {
     }
     elseif ($installType == 'wordpress') {
       // make sure that we can write to uploads/civicrm/
-      $upload_dir    = wp_upload_dir();
+      $upload_dir = wp_upload_dir();
       $files_dirname = $upload_dir[basedir] . DIRECTORY_SEPARATOR . 'civicrm';
-      if ( ! file_exists( $files_dirname ) ) {
-        wp_mkdir_p( $files_dirname );
+      if (!file_exists($files_dirname)) {
+        wp_mkdir_p($files_dirname);
       }
-      $writableDirectories = array( $files_dirname, $cmsPath );
+      $writableDirectories = array($files_dirname, $cmsPath);
     }
 
     foreach ($writableDirectories as $dir) {
