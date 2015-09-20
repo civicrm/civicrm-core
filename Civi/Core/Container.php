@@ -29,21 +29,15 @@ class Container {
   const SELF = 'civi_container_factory';
 
   /**
-   * @var ContainerBuilder
-   */
-  private static $singleton;
-
-  /**
    * @param bool $reset
    *   Whether to forcibly rebuild the entire container.
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
   public static function singleton($reset = FALSE) {
-    if ($reset || self::$singleton === NULL) {
-      $c = new self();
-      self::$singleton = $c->loadContainer();
+    if ($reset || !isset(\Civi::$statics[__CLASS__]['container'])) {
+      self::boot(TRUE);
     }
-    return self::$singleton;
+    return \Civi::$statics[__CLASS__]['container'];
   }
 
   /**
@@ -175,7 +169,10 @@ class Container {
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactoryClass('CRM_Utils_Mail')->setFactoryMethod('createMailer');
 
-    foreach (self::getBootServices() as $bootService => $def) {
+    if (empty(\Civi::$statics[__CLASS__]['boot'])) {
+      throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
+    }
+    foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
       $container->setDefinition($bootService, new Definition($def['class'], array($bootService)))
         ->setFactoryClass(__CLASS__)
         ->setFactoryMethod('getBootService');
@@ -305,57 +302,70 @@ class Container {
    *
    * These are services which must be setup *before* the container can operate.
    *
-   * @return array
-   *   Ex: $result['serviceName'] = array('class' => $, 'obj' => $).
+   * @param bool $loadFromDB
    * @throws \CRM_Core_Exception
    */
-  public static function getBootServices() {
-    if (!isset(\Civi::$statics[__CLASS__])) {
-      $bootServices = array();
-      \Civi::$statics[__CLASS__] = &$bootServices;
+  public static function boot($loadFromDB) {
+    $bootServices = array();
+    \Civi::$statics[__CLASS__]['boot'] = &$bootServices;
 
-      $config = \CRM_Core_Config::singleton();
+    $bootServices['runtime'] = array(
+      'class' => 'CRM_Core_Config_Runtime',
+      'obj' => ($runtime = new \CRM_Core_Config_Runtime()),
+    );
+    $runtime->initialize($loadFromDB);
 
-      $class = $config->userFrameworkClass;
-      $userSystem = new $class();
-      $userSystem->initialize();
-
-      $userPermissionClass = 'CRM_Core_Permission_' . $config->userFramework;
-
-      $bootServices['paths'] = array(
-        'class' => 'Civi\Core\Paths',
-        'obj' => new \Civi\Core\Paths(),
-      );
-      $bootServices['userSystem'] = array(
-        'class' => 'CRM_Utils_Cache_Interface',
-        'obj' => $userSystem,
-      );
-      $bootServices['userPermissionClass'] = array(
-        // Ugh, silly name.
-        'class' => 'CRM_Core_Permission_Base',
-        'obj' => new $userPermissionClass(),
-      );
-      $bootServices['cache.settings'] = array(
-        'class' => 'CRM_Utils_Cache_Interface',
-        'obj' => \CRM_Utils_Cache::create(array(
-          'name' => 'settings',
-          'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
-        )),
-      );
-      $bootServices['settings_manager'] = array(
-        'class' => 'Civi\Core\SettingsManager',
-        'obj' => new \Civi\Core\SettingsManager($bootServices['cache.settings']['obj']),
-      );
-      $bootServices['lockManager'] = array(
-        'class' => 'Civi\Core\Lock\LockManager',
-        'obj' => self::createLockManager(),
-      );
+    if ($loadFromDB && $runtime->dsn) {
+      \CRM_Core_DAO::init($runtime->dsn);
     }
-    return \Civi::$statics[__CLASS__];
+
+    $bootServices['paths'] = array(
+      'class' => 'Civi\Core\Paths',
+      'obj' => new \Civi\Core\Paths(),
+    );
+
+    $class = $runtime->userFrameworkClass;
+    $bootServices['userSystem'] = array(
+      'class' => 'CRM_Utils_Cache_Interface',
+      'obj' => ($userSystem = new $class()),
+    );
+    $userSystem->initialize();
+
+    $userPermissionClass = 'CRM_Core_Permission_' . $runtime->userFramework;
+    $bootServices['userPermissionClass'] = array(
+      // Ugh, silly name.
+      'class' => 'CRM_Core_Permission_Base',
+      'obj' => new $userPermissionClass(),
+    );
+
+    $bootServices['cache.settings'] = array(
+      'class' => 'CRM_Utils_Cache_Interface',
+      'obj' => \CRM_Utils_Cache::create(array(
+        'name' => 'settings',
+        'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+      )),
+    );
+
+    $bootServices['settings_manager'] = array(
+      'class' => 'Civi\Core\SettingsManager',
+      'obj' => new \Civi\Core\SettingsManager($bootServices['cache.settings']['obj']),
+    );
+
+    $bootServices['lockManager'] = array(
+      'class' => 'Civi\Core\Lock\LockManager',
+      'obj' => self::createLockManager(),
+    );
+
+    if ($loadFromDB && $runtime->dsn) {
+      \CRM_Extension_System::singleton(TRUE);
+
+      $c = new self();
+      \Civi::$statics[__CLASS__]['container'] = $c->loadContainer();
+    }
   }
 
   public static function getBootService($name) {
-    return \Civi::$statics[__CLASS__][$name]['obj'];
+    return \Civi::$statics[__CLASS__]['boot'][$name]['obj'];
   }
 
 }

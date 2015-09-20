@@ -135,6 +135,7 @@ class CRM_Core_Config_Runtime {
 
     $this->templateDir = array(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
 
+    // FIXME
     if (isset($this->customPHPPathDir) && $this->customPHPPathDir) {
       set_include_path($this->customPHPPathDir . PATH_SEPARATOR . get_include_path());
     }

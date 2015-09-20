@@ -54,7 +54,7 @@ class CRM_Core_Config_MagicMerge {
    */
   private $map;
 
-  private $runtime, $locals, $settings;
+  private $locals, $settings;
 
   private $cache = array();
 
@@ -103,7 +103,7 @@ class CRM_Core_Config_MagicMerge {
       'templateDir' => array('runtime'),
 
       // "boot-svc" properties are critical services needed during init.
-      // See also: Civi\Core\Container::getBootServices().
+      // See also: Civi\Core\Container::getBootService().
       'userSystem' => array('boot-svc'),
       'userPermissionClass' => array('boot-svc'),
 
@@ -241,7 +241,7 @@ class CRM_Core_Config_MagicMerge {
         return $this->cache[$k];
 
       case 'runtime':
-        return $this->getRuntime()->{$name};
+        return \Civi\Core\Container::getBootService('runtime')->{$name};
 
       case 'boot-svc':
         $this->cache[$k] = \Civi\Core\Container::getBootService($name);
@@ -337,16 +337,6 @@ class CRM_Core_Config_MagicMerge {
       default:
         throw new \CRM_Core_Exception("Cannot unset property CRM_Core_Config::\${$k} ($type)");
     }
-  }
-
-  /**
-   * @return CRM_Core_Config_Runtime
-   */
-  protected function getRuntime() {
-    if ($this->runtime === NULL) {
-      $this->runtime = new CRM_Core_Config_Runtime();
-    }
-    return $this->runtime;
   }
 
   /**
