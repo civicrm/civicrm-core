@@ -463,6 +463,7 @@ HTACCESS;
       }
     }
   }
+
   /**
    * Restrict access to civicrm.settings.php (by planting there a restrictive .htaccess file)
    *
