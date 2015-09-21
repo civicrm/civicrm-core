@@ -258,20 +258,26 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return array
    */
-  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = 'view', $resetCache = FALSE) {
+  public static function getAvailableFinancialTypes(&$financialTypes = NULL, $action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
     if (empty($financialTypes)) {
       $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;
     }
+    $actions = array(
+      CRM_Core_Action::VIEW => 'view',
+      CRM_Core_Action::UPDATE => 'edit',
+      CRM_Core_Action::ADD => 'add',
+      CRM_Core_Action::DELETE => 'delete',
+    );
     // check cached value
     if (CRM_Utils_Array::value($action, self::$_availableFinancialTypes) && !$resetCache) {
       $financialTypes = self::$_availableFinancialTypes[$action];
       return self::$_availableFinancialTypes[$action];
     }
     foreach ($financialTypes as $finTypeId => $type) {
-      if (!CRM_Core_Permission::check($action . ' contributions of type ' . $type)) {
+      if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
         unset($financialTypes[$finTypeId]);
       }
     }
@@ -289,17 +295,23 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return array
    */
-  public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = 'view') {
+  public static function getAvailableMembershipTypes(&$membershipTypes = NULL, $action = CRM_Core_Action::VIEW) {
     if (empty($membershipTypes)) {
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
     }
     if (!self::isACLFinancialTypeStatus()) {
       return $membershipTypes;
     }
+    $actions = array(
+      CRM_Core_Action::VIEW => 'view',
+      CRM_Core_Action::UPDATE => 'edit',
+      CRM_Core_Action::ADD => 'add',
+      CRM_Core_Action::DELETE => 'delete',
+    );
     foreach ($membershipTypes as $memTypeId => $type) {
       $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeId, 'financial_type_id');
       $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
-      if (!CRM_Core_Permission::check($action . ' contributions of type ' . $finType)) {
+      if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $finType)) {
         unset($membershipTypes[$memTypeId]);
       }
     }

@@ -426,7 +426,7 @@ SELECT  id, html_type
         );
         // Check permissions for financial type first
         if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-          CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
+          CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $form->_action);
         }
         else {
           $financialTypes = CRM_Contribute_PseudoConstant::financialType();

@@ -278,7 +278,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $this->addSelect('financial_type_id');
     }
     else {
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
       $this->addSelect('financial_type_id', array('context' => 'search', 'options' => $financialTypes));
     }
     // add pay later options

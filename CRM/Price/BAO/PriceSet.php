@@ -470,7 +470,7 @@ WHERE     ct.id = cp.financial_type_id AND
       $query .= " AND s.extends LIKE '%$componentId%' ";
     }
     // Check permissioned financial types
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialType, 'add');
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialType, CRM_Core_Action::ADD);
     if ($financialType) {
       $types = implode(',', array_keys($financialType));
       $query .= ' AND s.financial_type_id IN (' . $types . ') AND v.financial_type_id IN (' . $types . ') ';
