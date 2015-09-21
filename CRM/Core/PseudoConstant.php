@@ -933,14 +933,14 @@ WHERE  id = %1";
    * @return array
    *   array reference of all groups.
    */
-  public static function &allGroup($groupType = NULL, $excludeHidden = TRUE) {
+  public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
 
     if (!self::$group) {
       self::$group = array();
     }
 
-    $groupKey = $groupType ? $groupType : 'null';
+    $groupKey = ($groupType ? $groupType : 'null') . !empty($excludeHidden);
 
     if (!isset(self::$group[$groupKey])) {
       self::$group[$groupKey] = NULL;
