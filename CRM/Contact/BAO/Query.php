@@ -2907,10 +2907,11 @@ class CRM_Contact_BAO_Query {
       if ($statii) {
         $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
       }
-      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
-      $groupClause = "{$gcTable}.group_id $op $groupIds";
+      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] =
+" LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
+      $groupClause = "{$gcTable}.group_id $op {$groupIds}";
       if (strpos($op, 'IN') !== FALSE) {
-        $groupClause = "{$gcTable}.group_id $op ( $groupIds )";
+        $groupClause = "{$gcTable}.group_id $op ( {$groupIds} )";
       }
     }
 
@@ -2926,7 +2927,7 @@ class CRM_Contact_BAO_Query {
 
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
     $this->_qill[$grouping][] = ts("Group(s) %1 %2", array(1 => $qillop, 2 => $qillVal));
-    $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
+    $this->_qill[$grouping][] = ts("Group Status %1", array(1 =>implode(' ' . ts('or') . ' ', $statii)));
     if ($groupClause) {
       $this->_where[$grouping][] = $groupClause;
     }
