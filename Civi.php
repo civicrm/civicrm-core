@@ -55,6 +55,13 @@ class Civi {
   }
 
   /**
+   * @return \Civi\Core\Lock\LockManager
+   */
+  public static function lockManager() {
+    return \Civi\Core\Container::getBootService('lockManager');
+  }
+
+  /**
    * @return \Psr\Log\LoggerInterface
    */
   public static function log() {
@@ -67,11 +74,7 @@ class Civi {
    * @return \Civi\Core\Paths
    */
   public static function paths() {
-    // Paths must be available before container can boot.
-    if (!isset(Civi::$statics[__CLASS__]['paths'])) {
-      Civi::$statics[__CLASS__]['paths'] = new \Civi\Core\Paths();
-    }
-    return Civi::$statics[__CLASS__]['paths'];
+    return \Civi\Core\Container::getBootService('paths');
   }
 
   /**
@@ -90,8 +93,8 @@ class Civi {
    * singletons, containers.
    */
   public static function reset() {
-    Civi\Core\Container::singleton(TRUE);
     self::$statics = array();
+    Civi\Core\Container::singleton();
   }
 
   /**
@@ -109,7 +112,7 @@ class Civi {
    * @return \Civi\Core\SettingsBag
    */
   public static function settings($domainID = NULL) {
-    return Civi\Core\Container::singleton()->get('settings_manager')->getBagByDomain($domainID);
+    return \Civi\Core\Container::getBootService('settings_manager')->getBagByDomain($domainID);
   }
 
 }

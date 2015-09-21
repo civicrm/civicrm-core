@@ -170,6 +170,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param object $pearError PEAR_Error
    */
   public static function handle($pearError) {
+    if (defined('CIVICRM_TEST')) {
+      return self::simpleHandler($pearError);
+    }
 
     // setup smarty with config, session and template location.
     $template = CRM_Core_Smarty::singleton();
