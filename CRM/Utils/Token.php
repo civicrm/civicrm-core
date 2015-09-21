@@ -1189,7 +1189,7 @@ class CRM_Utils_Token {
       // putting a fatal here so we can track if/when this happens
       CRM_Core_Error::fatal();
     }
-
+    // @todo this functions needs unit tests.
     $params = array();
     foreach ($contactIDs as $key => $contactID) {
       $params[] = array(
@@ -1221,7 +1221,14 @@ class CRM_Utils_Token {
         array('display_name', 'checksum', 'contact_id')
       );
       foreach ($fields as $key => $val) {
-        $returnProperties[$val] = 1;
+        // The unavailable fields are not available as tokens, do not have a one-2-one relationship
+        // with contacts and are expensive to resolve.
+        // @todo see CRM-17253 - there are some other fields (e.g note) that should be excluded
+        // and upstream calls to this should populate return properties.
+        $unavailableFields = array('group', 'tag');
+        if (!in_array($val, $unavailableFields)) {
+          $returnProperties[$val] = 1;
+        }
       }
     }
 
