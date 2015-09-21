@@ -662,15 +662,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       //add field for amount to allow an amount to be entered that differs from minimum
       $this->add('text', 'total_amount', ts('Amount'));
     }
-    if (CRM_Core_Action::ADD & $this->_action) {
-      $op = 'add';
-    }
-    elseif (CRM_Core_Action::UPDATE & $this->_action) {
-      $op = 'edit';
-    }
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
-      array('' => ts('- select -')) + CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $op)
+      array('' => ts('- select -')) + CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $this->_action)
     );
 
     $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));

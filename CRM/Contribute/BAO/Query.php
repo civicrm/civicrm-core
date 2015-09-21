@@ -891,7 +891,7 @@ class CRM_Contribute_BAO_Query {
     );
 
     // CRM-13848
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'view');
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::VIEW);
     $form->addSelect('financial_type_id',
       array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => $financialTypes)
     );

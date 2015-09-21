@@ -118,7 +118,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage');
 
     // financial Type
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
     $financialOptions = array(
       'options' => $financialTypes,
     );

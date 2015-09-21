@@ -620,7 +620,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
 
     // Check permissions for financial type first
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $this->_action);
     if (empty($financialTypes)) {
       CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
     }

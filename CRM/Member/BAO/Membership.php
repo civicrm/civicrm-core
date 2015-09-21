@@ -1533,7 +1533,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       $allIDs = implode(',', $membershipTypeIDS);
       $whereClause .= " AND id IN ( $allIDs )";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, 'add');
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
 
     if ($financialTypes) {
       $whereClause .= " AND financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
