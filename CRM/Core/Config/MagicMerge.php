@@ -287,6 +287,7 @@ class CRM_Core_Config_MagicMerge {
       case 'user-system':
       case 'runtime':
       case 'callback':
+      case 'boot-svc':
         // In the past, changes to $config were not persisted automatically.
         $this->cache[$name] = $v;
         return;
