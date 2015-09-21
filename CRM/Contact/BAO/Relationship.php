@@ -1157,7 +1157,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $count = 0, $relationshipId = 0,
     $links = NULL, $permissionMask = NULL,
     $permissionedContact = FALSE,
-    $action = CRM_Core_Action::BROWSE,
     $params = array()
   ) {
     $values = array();
@@ -1231,8 +1230,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       while ($relationship->fetch()) {
         $rid = $relationship->civicrm_relationship_id;
         $cid = $relationship->civicrm_contact_id;
-        if (($action & CRM_Core_Action::BROWSE) &&
-          $permissionedContact &&
+        if ($permissionedContact &&
           (!CRM_Contact_BAO_Contact_Permission::relationship($cid, $contactId))
         ) {
           continue;
