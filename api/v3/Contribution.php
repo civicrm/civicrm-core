@@ -473,6 +473,11 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
     'description' => 'If a fee has been charged then the amount',
     'type' => CRM_Utils_Type::T_FLOAT,
   );
+  $params['trxn_date'] = array(
+    'title' => 'Transaction Date',
+    'description' => 'Date this transaction occurred',
+    'type' => CRM_Utils_Type::T_DATE,
+  );
 }
 
 /**
@@ -547,6 +552,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
 
   if (isset($params['is_email_receipt'])) {
     $input['is_email_receipt'] = $params['is_email_receipt'];
+  }
+  if (!empty($params['trxn_date'])) {
+    $input['trxn_date'] = $params['trxn_date'];
   }
   if (empty($contribution->contribution_page_id)) {
     static $domainFromName;
