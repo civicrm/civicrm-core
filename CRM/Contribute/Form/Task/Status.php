@@ -140,7 +140,7 @@ AND    co.id IN ( $contribIDs )";
       $this->addRule("fee_amount_{$row['contribution_id']}", ts('Please enter a valid amount.'), 'money');
       $defaults["fee_amount_{$row['contribution_id']}"] = 0.0;
 
-      $row['trxn_date'] = &$this->addDate("trxn_date_{$row['contribution_id']}", FALSE,
+      $row['trxn_date'] = $this->addDate("trxn_date_{$row['contribution_id']}", FALSE,
         ts('Receipt Date'), array('formatType' => 'activityDate')
       );
       $defaults["trxn_date_{$row['contribution_id']}"] = $now;
