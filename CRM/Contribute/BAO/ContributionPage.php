@@ -798,6 +798,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    * @return array|string
    */
   public static function formatModuleData($params, $setDefault = FALSE, $module) {
+    global $tsLocale;
     $config = CRM_Core_Config::singleton();
     $json = $jsonDecode = NULL;
     $domain = new CRM_Core_DAO_Domain();
@@ -829,12 +830,12 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
         $jsonDecode += (array) $jsonDecode['default'];
         unset($jsonDecode['default']);
       }
-      elseif (!empty($jsonDecode[$config->lcMessages])) {
+      elseif (!empty($jsonDecode[$tsLocale])) {
         //multilingual state
-        foreach ($jsonDecode[$config->lcMessages] as $column => $value) {
+        foreach ($jsonDecode[$tsLocale] as $column => $value) {
           $jsonDecode[$column] = $value;
         }
-        unset($jsonDecode[$config->lcMessages]);
+        unset($jsonDecode[$tsLocale]);
       }
       return $jsonDecode;
     }

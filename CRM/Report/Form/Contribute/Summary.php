@@ -76,7 +76,15 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => $this->getBasicContactFields(),
+        'fields' => array_merge(
+          $this->getBasicContactFields(),
+          array(
+            'sort_name' => array(
+              'title' => ts('Contact Name'),
+              'no_repeat' => TRUE,
+            ),
+          )
+        ),
         'grouping' => 'contact-fields',
         'group_bys' => array(
           'id' => array('title' => ts('Contact ID')),
