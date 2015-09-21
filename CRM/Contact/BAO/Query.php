@@ -1345,7 +1345,12 @@ class CRM_Contact_BAO_Query {
           $group->id = $groupId;
           $group->find(TRUE);
 
-          if (!isset($group->saved_search_id)) {
+          // CRM-17254 don't retrieve extra fields if contact_id is specifically requested
+          // as this will add load to an intentionally light query.
+          // ideally this code would be removed as it appears to be to support CRM-1203
+          // and passing in the required returnProperties from the url would
+          // make more sense that globally applying the requirements of one form.
+          if (!isset($group->saved_search_id) && $this->_returnProperties != array('contact_id')) {
             $tbName = "`civicrm_group_contact-{$groupId}`";
             $this->_select['group_contact_id'] = "$tbName.id as group_contact_id";
             $this->_element['group_contact_id'] = 1;
