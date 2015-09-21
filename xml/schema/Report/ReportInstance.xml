@@ -134,6 +134,34 @@
     <add>2.2</add>
   </field>
   <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Report Instance Created By</title>
+    <comment>FK to contact table.</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>owner_id</name>
+    <type>int unsigned</type>
+    <title>Report Instance Owned By</title>
+    <comment>FK to contact table.</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>owner_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
     <name>email_subject</name>
     <title>Report Instance email Subject</title>
     <type>varchar</type>
