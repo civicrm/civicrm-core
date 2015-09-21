@@ -191,4 +191,25 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test set up to test calling the query object per GroupContactCache BAO usage.
+   *
+   * CRM-17254 ensure that if only the contact_id is required other fields should
+   * not be appended.
+   */
+  public function testGroupContactCacheAddSearch() {
+    $returnProperties = array('contact_id');
+    $params = array(array('group', 'IN', array(1 => 1), 0, 0));
+
+    $query = new CRM_Contact_BAO_Query(
+      $params, $returnProperties,
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+
+    list($select) = $query->query(FALSE);
+    $this->assertEquals('SELECT contact_a.id as contact_id', $select);
+  }
+
 }
