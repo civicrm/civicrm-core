@@ -2848,91 +2848,114 @@ class CRM_Contact_BAO_Query {
   public function group(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    // Replace pseudo operators from search builder
-    $op = str_replace('EMPTY', 'NULL', $op);
-
     if (count($value) > 1) {
-      if (strpos($op, 'IN') === FALSE && strpos($op, 'NULL') === FALSE) {
-        CRM_Core_Error::fatal(ts("%1 is not a valid operator", array(1 => $op)));
-      }
       $this->_useDistinct = TRUE;
     }
 
-    $groupIds = NULL;
+    // Replace pseudo operators from search builder
+    $op = str_replace('EMPTY', 'NULL', $op);
+
+    $groupNames = CRM_Core_PseudoConstant::group();
+    $groupIds = '';
     $names = array();
-    $isSmart = FALSE;
-    $isNotOp = ($op == 'NOT IN' || $op == '!=');
 
     if ($value) {
-      if (strpos($op, 'IN') === FALSE) {
-        $value = key($value);
-      }
-      else {
-        $value = array_keys($value);
+      $groupIds = implode(',', array_keys($value));
+      foreach ($value as $id => $dontCare) {
+        if (array_key_exists($id, $groupNames) && $dontCare) {
+          $names[] = $groupNames[$id];
+        }
       }
     }
 
     $statii = array();
+    $in = FALSE;
     $gcsValues = &$this->getWhereValues('group_contact_status', $grouping);
     if ($gcsValues &&
       is_array($gcsValues[2])
     ) {
       foreach ($gcsValues[2] as $k => $v) {
         if ($v) {
+          if ($k == 'Added') {
+            $in = TRUE;
+          }
           $statii[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
         }
       }
     }
     else {
       $statii[] = '"Added"';
+      $in = TRUE;
     }
 
     $skipGroup = FALSE;
-    if (!is_array($value) &&
+    if (count($value) == 1 &&
       count($statii) == 1 &&
-      $statii[0] == '"Added"' &&
-      !$isNotOp
+      $statii[0] == '"Added"'
     ) {
-      if (!empty($value) && CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $value, 'saved_search_id')) {
-        $isSmart = TRUE;
+      // check if smart group, if so we can get rid of that one additional
+      // left join
+      $groupIDs = array_keys($value);
+
+      if (!empty($groupIDs[0]) &&
+        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
+          $groupIDs[0],
+          'saved_search_id'
+        )
+      ) {
+        $skipGroup = TRUE;
       }
     }
 
-    $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
-    $isSmart = (!$ssClause) ? FALSE : $isSmart;
-    $groupClause = NULL;
-
-    if (!$isSmart) {
-      $groupIds = implode(',', (array) $value);
+    if (!$skipGroup) {
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
-      if ($statii) {
+      if ($groupIds && ($op == 'IN' || $op == 'NOT IN')) {
+        $joinClause[] = "{$gcTable}.group_id IN ( $groupIds )";
+      }
+      // For NOT IN we join on groups the contact IS in, then exclude them in the where clause
+      if ($statii && $op == 'NOT IN') {
         $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
       }
-      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] =
-" LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
-      $groupClause = "{$gcTable}.group_id $op {$groupIds}";
-      if (strpos($op, 'IN') !== FALSE) {
-        $groupClause = "{$gcTable}.group_id $op ( {$groupIds} )";
+      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
+    }
+
+    if ($op == 'IN') {
+      $qill = ts('In group');
+    }
+    else {
+      $qill = ts('Groups %1', array(1 => $op));
+    }
+    $qill .= ' ' . implode(' ' . ts('or') . ' ', $names);
+
+    $groupClause = NULL;
+
+    if (!$skipGroup) {
+      $groupClause = "{$gcTable}.group_id $op" . ($groupIds ? " ( $groupIds ) " : '');
+      if (!empty($statii) && $groupIds) {
+        $groupClause .= " AND {$gcTable}.status IN (" . implode(', ', $statii) . ")";
+        $qill .= " " . ($op == 'NOT IN' ? ts('WHERE') : ts('AND')) . " " . ts('Group Status') . ' - ' . implode(' ' . ts('or') . ' ', $statii);
+      }
+      // For NOT IN op, params were set in the join
+      if ($op == 'NOT IN') {
+        $groupClause = "{$gcTable}.group_id IS NULL";
       }
     }
 
-    if ($ssClause) {
-      $and = ($op == 'IS NULL') ? 'AND' : 'OR';
-      if ($groupClause) {
-        $groupClause = "( ( $groupClause ) $and ( $ssClause ) )";
-      }
-      else {
-        $groupClause = $ssClause;
+    if ($in) {
+      $ssClause = $this->savedSearch($values);
+      if ($ssClause) {
+        if ($groupClause) {
+          $groupClause = "( ( $groupClause ) OR ( $ssClause ) )";
+        }
+        else {
+          $groupClause = $ssClause;
+        }
       }
     }
 
-    list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
-    $this->_qill[$grouping][] = ts("Group(s) %1 %2", array(1 => $qillop, 2 => $qillVal));
-    $this->_qill[$grouping][] = ts("Group Status %1", array(1 =>implode(' ' . ts('or') . ' ', $statii)));
-    if ($groupClause) {
-      $this->_where[$grouping][] = $groupClause;
-    }
+    $this->_where[$grouping][] = $groupClause;
+    $this->_qill[$grouping][] = $qill;
   }
 
   /**
@@ -2951,53 +2974,68 @@ class CRM_Contact_BAO_Query {
   }
 
   /**
+   * Where / qill clause for smart groups
+   *
+   * @param $values
+   *
+   * @return string|NULL
+   */
+  public function savedSearch(&$values) {
+    list($name, $op, $value, $grouping, $wildcard) = $values;
+    return $this->addGroupContactCache(array_keys((array) $value));
+  }
+
+  /**
    * @param array $groups
    * @param string $tableAlias
    * @param string $joinTable
-   * @param string $op
    *
    * @return null|string
    */
-  public function addGroupContactCache($groups, $tableAlias = NULL, $joinTable = "contact_a", $op) {
-    $isNullOp = (strpos($op, 'NULL') !== FALSE);
-    $groupsIds = $groups;
-    if (!$isNullOp && !$groups) {
-      return NULL;
-    }
-    elseif (strpos($op, 'IN') !== FALSE) {
-      $groups = array($op => $groups);
-    }
-    elseif (is_array($groups) && count($groups)) {
-      $groups = array('IN' => $groups);
-    }
+  public function addGroupContactCache($groups, $tableAlias = NULL, $joinTable = "contact_a") {
+    $config = CRM_Core_Config::singleton();
 
     // Find all the groups that are part of a saved search.
-    $smartGroupClause = self::buildClause("id", $op, $groups, 'Int');
+    $groupIDs = implode(',', $groups);
+    if (empty($groupIDs)) {
+      return NULL;
+    }
+
     $sql = "
 SELECT id, cache_date, saved_search_id, children
 FROM   civicrm_group
-WHERE  $smartGroupClause
+WHERE  id IN ( $groupIDs )
   AND  ( saved_search_id != 0
    OR    saved_search_id IS NOT NULL
    OR    children IS NOT NULL )
 ";
 
     $group = CRM_Core_DAO::executeQuery($sql);
+    $groupsFiltered = array();
 
     while ($group->fetch()) {
+      $groupsFiltered[] = $group->id;
+
       $this->_useDistinct = TRUE;
+
       if (!$this->_smartGroupCache || $group->cache_date == NULL) {
         CRM_Contact_BAO_GroupContactCache::load($group);
       }
     }
 
-    if (!$tableAlias) {
-      $tableAlias = "`civicrm_group_contact_cache_";
-      $tableAlias .= ($isNullOp) ? "a`" : implode(',', (array) $groupsIds) . "`";
+    if (count($groupsFiltered)) {
+      $groupIDsFiltered = implode(',', $groupsFiltered);
+
+      if ($tableAlias == NULL) {
+        $tableAlias = "`civicrm_group_contact_cache_{$groupIDsFiltered}`";
+      }
+
+      $this->_tables[$tableAlias] = $this->_whereTables[$tableAlias] = " LEFT JOIN civicrm_group_contact_cache {$tableAlias} ON {$joinTable}.id = {$tableAlias}.contact_id ";
+
+      return "{$tableAlias}.group_id IN (" . $groupIDsFiltered . ")";
     }
 
-    $this->_tables[$tableAlias] = $this->_whereTables[$tableAlias] = " LEFT JOIN civicrm_group_contact_cache {$tableAlias} ON {$joinTable}.id = {$tableAlias}.contact_id ";
-    return self::buildClause("{$tableAlias}.group_id", $op, $groups, 'Int');
+    return NULL;
   }
 
   /**
@@ -4060,7 +4098,7 @@ WHERE  $smartGroupClause
         implode(",", $targetGroup[2]) . ") ) ";
 
       //add contacts from saved searches
-      $ssWhere = $this->addGroupContactCache($targetGroup[2], "civicrm_relationship_group_contact_cache", "contact_b", $op);
+      $ssWhere = $this->addGroupContactCache($targetGroup[2], "civicrm_relationship_group_contact_cache", "contact_b");
 
       //set the group where clause
       if ($ssWhere) {
