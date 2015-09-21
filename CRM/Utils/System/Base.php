@@ -50,6 +50,12 @@ abstract class CRM_Utils_System_Base {
    */
   var $supports_form_extensions = FALSE;
 
+  public function initialize() {
+    if (\CRM_Utils_System::isSSL()) {
+      $this->mapConfigToSSL();
+    }
+  }
+
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb.
    *
@@ -282,6 +288,33 @@ abstract class CRM_Utils_System_Base {
    */
   public function getDefaultBlockLocation() {
     return 'left';
+  }
+
+  public function getAbsoluteBaseURL() {
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      return FALSE;
+    }
+
+    $url = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
+
+    //format url for language negotiation, CRM-7803
+    $url = $this->languageNegotiationURL($url);
+
+    if (CRM_Utils_System::isSSL()) {
+      $url = str_replace('http://', 'https://', $url);
+    }
+
+    return $url;
+  }
+
+  public function getRelativeBaseURL() {
+    $absoluteBaseURL = $this->getAbsoluteBaseURL();
+    if ($absoluteBaseURL === FALSE) {
+      return FALSE;
+    }
+    $parts = parse_url($absoluteBaseURL);
+    return $parts['path'];
+    //$this->useFrameworkRelativeBase = empty($base['path']) ? '/' : $base['path'];
   }
 
   /**

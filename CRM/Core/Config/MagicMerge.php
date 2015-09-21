@@ -30,8 +30,8 @@
  *
  * Originally, the $config object was based on a single, serialized
  * data object stored in the database. As the needs for settings
- * grew (with robust metadata, system overrides, and extension support),
- * the $config started to store a mix of:
+ * grew (with robust metadata, system overrides, extension support,
+ * and multi-tenancy), the $config started to store a mix of:
  *   (a) canonical config options,
  *   (b) dynamically generated runtime data,
  *   (c) cached data derived from other sources (esp civicrm_setting)
@@ -54,7 +54,7 @@ class CRM_Core_Config_MagicMerge {
    */
   private $map;
 
-  private $runtime, $locals, $settings;
+  private $locals, $settings;
 
   private $cache = array();
 
@@ -82,8 +82,40 @@ class CRM_Core_Config_MagicMerge {
     // If $foreignName is omitted/null, then it's assumed to match the $propertyName.
     // Other parameters may be specified, depending on the type.
     return array(
+      // "local" properties are unique to each instance of CRM_Core_Config (each request).
+      'doNotResetCache' => array('local'),
+      'inCiviCRM' => array('local'),
+      'userFrameworkFrontend' => array('local'),
+      'userPermissionTemp' => array('local'),
+
+      // "runtime" properties are computed from define()s, $_ENV, etc.
+      // See also: CRM_Core_Config_Runtime.
+      'dsn' => array('runtime'),
+      'initialized' => array('runtime'),
+      'userFramework' => array('runtime'),
+      'userFrameworkClass' => array('runtime'),
+      'userFrameworkDSN' => array('runtime'),
+      'userFrameworkURLVar' => array('runtime'),
+      'userHookClass' => array('runtime'),
+      'cleanURL' => array('runtime'),
+      'configAndLogDir' => array('runtime'),
+      'templateCompileDir' => array('runtime'),
+      'templateDir' => array('runtime'),
+
+      // "boot-svc" properties are critical services needed during init.
+      // See also: Civi\Core\Container::getBootService().
+      'userSystem' => array('boot-svc'),
+      'userPermissionClass' => array('boot-svc'),
+
+      'userFrameworkBaseURL' => array('user-system', 'getAbsoluteBaseURL'),
+      'userFrameworkVersion' => array('user-system', 'getVersion'),
+      'useFrameworkRelativeBase' => array('user-system', 'getRelativeBaseURL'), // ugh typo.
+
+      // "setting" properties are loaded through the setting layer, esp
+      // table "civicrm_setting" and global $civicrm_setting.
+      // See also: Civi::settings().
       'backtrace' => array('setting'),
-      'contact_default_language' => array('contact_default_language'),
+      'contact_default_language' => array('setting'),
       'countryLimit' => array('setting'),
       'dashboardCacheTimeout' => array('setting'),
       'dateInputFormat' => array('setting'),
@@ -144,28 +176,8 @@ class CRM_Core_Config_MagicMerge {
       'wpBasePage' => array('setting'),
       'wpLoadPhp' => array('setting'),
 
-      'doNotResetCache' => array('local'),
-      'inCiviCRM' => array('local'),
-      'userFrameworkFrontend' => array('local'),
-
-      'dsn' => array('runtime'),
-      'initialized' => array('runtime'),
-      'userFramework' => array('runtime'),
-      'userFrameworkBaseURL' => array('runtime'),
-      'userFrameworkClass' => array('runtime'),
-      'userFrameworkDSN' => array('runtime'),
-      'useFrameworkRelativeBase' => array('runtime', 'useFrameworkRelativeBase'),
-      'userFrameworkURLVar' => array('runtime'),
-      'userFrameworkVersion' => array('runtime'),
-      'userPermissionClass' => array('runtime'),
-      'userPermissionTemp' => array('runtime'),
-      'userSystem' => array('runtime'),
-      'userHookClass' => array('runtime'),
-      'cleanURL' => array('runtime'),
-      'configAndLogDir' => array('runtime'),
-      'templateCompileDir' => array('runtime'),
-      'templateDir' => array('runtime'),
-
+      // "setting-path" properties are settings with special filtering
+      // to return normalized file paths.
       'customFileUploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
       'customPHPPathDir' => array('setting-path'),
       'customTemplateDir' => array('setting-path'),
@@ -173,12 +185,15 @@ class CRM_Core_Config_MagicMerge {
       'imageUploadDir' => array('setting-path', NULL, array('mkdir')),
       'uploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
 
+      // "setting-url-*" properties are settings with special filtering
+      // to return normalized URLs (in either absolute or relative format).
       'customCSSURL' => array('setting-url-abs'),
       'extensionsURL' => array('setting-url-abs'),
       'imageUploadURL' => array('setting-url-abs'),
       'resourceBase' => array('setting-url-rel', 'userFrameworkResourceURL'),
       'userFrameworkResourceURL' => array('setting-url-abs'),
 
+      // "callback" properties are generated on-demand by calling a function.
       'geocodeMethod' => array('callback', 'CRM_Utils_Geocode', 'getProviderClass'),
       'defaultCurrencySymbol' => array('callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'),
     );
@@ -226,11 +241,20 @@ class CRM_Core_Config_MagicMerge {
         return $this->cache[$k];
 
       case 'runtime':
-        return $this->getRuntime()->{$name};
+        return \Civi\Core\Container::getBootService('runtime')->{$name};
+
+      case 'boot-svc':
+        $this->cache[$k] = \Civi\Core\Container::getBootService($name);
+        return $this->cache[$k];
 
       case 'local':
         $this->initLocals();
         return $this->locals[$name];
+
+      case 'user-system':
+        $userSystem = \Civi\Core\Container::getBootService('userSystem');
+        $this->cache[$k] = call_user_func(array($userSystem, $name));
+        return $this->cache[$k];
 
       case 'service':
         return \Civi::service($name);
@@ -260,8 +284,10 @@ class CRM_Core_Config_MagicMerge {
       case 'setting-path':
       case 'setting-url-abs':
       case 'setting-url-rel':
+      case 'user-system':
       case 'runtime':
       case 'callback':
+      case 'boot-svc':
         // In the past, changes to $config were not persisted automatically.
         $this->cache[$name] = $v;
         return;
@@ -315,16 +341,6 @@ class CRM_Core_Config_MagicMerge {
   }
 
   /**
-   * @return CRM_Core_Config_Runtime
-   */
-  protected function getRuntime() {
-    if ($this->runtime === NULL) {
-      $this->runtime = new CRM_Core_Config_Runtime();
-    }
-    return $this->runtime;
-  }
-
-  /**
    * @return \Civi\Core\SettingsBag
    */
   protected function getSettings() {
@@ -341,6 +357,7 @@ class CRM_Core_Config_MagicMerge {
         'doNotResetCache' => 0,
         'initialized' => FALSE,
         'userFrameworkFrontend' => FALSE,
+        'userPermissionTemp' => NULL,
       );
     }
   }
