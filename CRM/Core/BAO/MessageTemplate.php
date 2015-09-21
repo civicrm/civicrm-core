@@ -431,6 +431,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
           $returnProperties[$name] = 1;
         }
       }
+
+      // @todo CRM-17253 don't resolve contact details if there are no tokens
+      // effectively comment out this next (performance-expensive) line
+      // but unfortunately testing is a bit think on the ground to that needs to
+      // be added.
       list($contact) = CRM_Utils_Token::getTokenDetails($contactParams,
         $returnProperties,
         FALSE, FALSE, NULL,
