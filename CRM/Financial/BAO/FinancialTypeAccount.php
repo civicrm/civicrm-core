@@ -225,8 +225,9 @@ WHERE cog.name = 'payment_instrument' ";
    */
   public static function createDefaultFinancialAccounts($financialType) {
     $titles = array();
-    $financialAccountTypeID = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
-    $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
+    $financialAccountTypeID = CRM_Core_OptionGroup::values('financial_account_type', FALSE, FALSE, FALSE, NULL, 'name');
+    $accountRelationship    = CRM_Core_OptionGroup::values('account_relationship', FALSE, FALSE, FALSE, NULL, 'name');
+
     $relationships = array(
       array_search('Accounts Receivable Account is', $accountRelationship) => array_search('Asset', $financialAccountTypeID),
       array_search('Expense Account is', $accountRelationship) => array_search('Expenses', $financialAccountTypeID),
