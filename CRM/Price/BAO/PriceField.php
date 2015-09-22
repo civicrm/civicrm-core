@@ -592,7 +592,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         if (isset($priceFieldValues['financial_type_id']) && array_key_exists($priceFieldValues['financial_type_id'], $taxRates)) {
           $options[$fieldId][$priceFieldId]['tax_rate'] = $taxRates[$priceFieldValues['financial_type_id']];
           $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceFieldValues['amount'], $options[$fieldId][$priceFieldId]['tax_rate']);
-          $options[$fieldId][$priceFieldId]['tax_amount'] = round($taxAmount['tax_amount'], 2);
+          $options[$fieldId][$priceFieldId]['tax_amount'] = $taxAmount['tax_amount'];
         }
       }
     }
