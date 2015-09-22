@@ -155,7 +155,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     $errors = array();
     $fieldSelected = FALSE;
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
-      if (!empty($fields["where_$count"]) || ($self->_defaults['is_reserved'] && !empty($self->_defaults["where_$count"]))) {
+      if (!empty($fields["where_$count"]) || (isset($self->_defaults['is_reserved']) && !empty($self->_defaults["where_$count"]))) {
         $fieldSelected = TRUE;
         break;
       }
