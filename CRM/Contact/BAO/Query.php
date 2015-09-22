@@ -1351,8 +1351,8 @@ class CRM_Contact_BAO_Query {
           // and passing in the required returnProperties from the url would
           // make more sense that globally applying the requirements of one form.
           if (!isset($group->saved_search_id) && $this->_returnProperties != array('contact_id')) {
-            $tbName = "`civicrm_group_contact-{$groupId}`";
-            $this->_select['group_contact_id'] = "$tbName.id as group_contact_id";
+            $tbName = "`civicrm_group_contact`";
+            $this->_select['group_contact_id'] = "$tbName.contact_id as group_contact_id";
             $this->_element['group_contact_id'] = 1;
             $this->_select['status'] = "$tbName.status as status";
             $this->_element['status'] = 1;
