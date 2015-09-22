@@ -1331,6 +1331,13 @@ class CRM_Contact_BAO_Query {
     }
     else {
       if (!empty($this->_paramLookup['group'])) {
+
+        list($name, $op, $value, $grouping, $wildcard) = $this->_paramLookup['group'][0];
+
+        if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $this->_paramLookup['group'][0][1] = key($value);
+        }
+
         // make sure there is only one element
         // this is used when we are running under smog and need to know
         // how the contact was added (CRM-1203)
@@ -2777,8 +2784,18 @@ class CRM_Contact_BAO_Query {
   public function group(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
+    // If the $value is in OK (operator as key) array format we need to extract the key as operator and value first
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
+
     // Replace pseudo operators from search builder
     $op = str_replace('EMPTY', 'NULL', $op);
+
+    if (strpos($op, 'NULL')) {
+      $value = NULL;
+    }
 
     if (count($value) > 1) {
       if (strpos($op, 'IN') === FALSE && strpos($op, 'NULL') === FALSE) {
