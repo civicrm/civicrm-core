@@ -301,19 +301,18 @@ WHERE cpse.id IS NOT NULL {$where}";
     while ($lineItem->fetch()) {
       $lineItem->label = $newLabel;
       $lineItem->save();
-    }
-
-    // update amount and fee level in civicrm_contribution and civicrm_participant
-    $prevLabel = CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -';
-    $newLabel = CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -';
-    $params = array(1 => array($prevLabel, 'String'), 2 => array($newLabel, 'String'));
-    $query = CRM_Core_DAO::executeQuery("SELECT `id` as `contributionId` FROM `civicrm_contribution` WHERE `amount_level` LIKE '%{$prevLabel}%'");
-    while ($query->fetch()) {
-      CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution` SET `amount_level` = REPLACE(amount_level, %1, %2) WHERE id = {$query->contributionId}", $params);
-      $participantIds = CRM_Event_BAO_Participant::getParticipantIds($query->contributionId);
-      foreach ($participantIds as $key => $id) {
-        if (!empty($id)) {
-          CRM_Core_DAO::executeQuery("UPDATE `civicrm_participant` SET `fee_level` = REPLACE(fee_level, %1, %2) WHERE id = {$id}", $params);
+      // update amount and fee level in civicrm_contribution and civicrm_participant
+      $params = array(
+        1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -', 'String'),
+        2 => array(CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -', 'String'),
+      );
+      if (!empty($lineItem->contribution_id)) {
+        CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution` SET `amount_level` = REPLACE(amount_level, %1, %2) WHERE id = {$lineItem->contribution_id}", $params);
+        $participantIds = CRM_Event_BAO_Participant::getParticipantIds($lineItem->contribution_id);
+        foreach ($participantIds as $key => $id) {
+          if (!empty($id)) {
+            CRM_Core_DAO::executeQuery("UPDATE `civicrm_participant` SET `fee_level` = REPLACE(fee_level, %1, %2) WHERE id = {$id}", $params);
+          }
         }
       }
     }
