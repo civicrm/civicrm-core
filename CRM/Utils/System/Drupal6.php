@@ -194,7 +194,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
           );
         }
         else {
-          $errors[$emailName] = ts('This email %1 is already registered. Please select another email.',
+          $errors[$emailName] = ts('This email %1 already has an account associated with it. Please select another email.',
             array(1 => $email)
           );
         }
