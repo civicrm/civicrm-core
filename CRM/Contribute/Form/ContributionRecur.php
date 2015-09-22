@@ -385,7 +385,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$this->_contactID}&selectedChild=contribute-recur"
       ));
-      return;
+      return NULL;
     }
 
     // get the submitted form values.
