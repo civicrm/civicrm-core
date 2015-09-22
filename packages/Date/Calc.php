@@ -668,34 +668,6 @@ class Date_Calc
     }
 
     // }}}
-    // {{{ getMonthFromFullname()
-
-    /**
-     * Returns the numeric month from the month name or an abreviation
-     *
-     * Both August and Aug would return 8.
-     *
-     * @param string $month  the name of the month to examine.
-     *                        Case insensitive.
-     *
-     * @return integer  the month's number
-     *
-     * @access public
-     * @static
-     */
-    function getMonthFromFullName($month)
-    {
-        $month = strtolower($month);
-        $months = Date_Calc::getMonthNames();
-        while(list($id, $name) = each($months)) {
-            if (ereg($month, strtolower($name))) {
-                return $id;
-            }
-        }
-        return 0;
-    }
-
-    // }}}
     // {{{ getMonthNames()
 
     /**

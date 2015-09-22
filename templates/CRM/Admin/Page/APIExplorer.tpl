@@ -162,7 +162,7 @@
       <label for="api-entity">{ts}Entity{/ts}:</label>
       <select class="crm-form-select big required" id="api-entity" name="entity">
         <option value="" selected="selected">{ts}Choose{/ts}...</option>
-        {crmAPI entity="Entity" action="get" var="entities" version=3}
+        {crmAPI entity="Entity" var="entities"}
         {foreach from=$entities.values item=entity}
           <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
             {$entity}

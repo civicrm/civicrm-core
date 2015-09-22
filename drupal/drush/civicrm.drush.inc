@@ -684,6 +684,12 @@ function drush_civicrm_upgrade_db_validate() {
 function drush_civicrm_upgrade_db() {
   if (class_exists('CRM_Upgrade_Headless')) {
     // Note: CRM_Upgrade_Headless introduced in 4.2 -- at the same time as class auto-loading
+    $codeVer = CRM_Utils_System::version();
+    $dbVer = CRM_Core_BAO_Domain::version();
+    if (version_compare($codeVer, $dbVer) == 0) {
+      drush_print(dt("You are already upgraded to CiviCRM @version", array('@version' => $codeVer)));
+      return TRUE;
+    }
     $upgradeHeadless = new CRM_Upgrade_Headless();
     // FIXME Exception handling?
     $result = $upgradeHeadless->run();

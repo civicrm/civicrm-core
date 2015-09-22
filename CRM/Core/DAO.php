@@ -2252,6 +2252,8 @@ SELECT contact_id
   }
 
   /**
+   * Get SQL where clause for SQL filter syntax input parameters.
+   *
    * SQL version of api function to assign filters to the DAO based on the syntax
    * $field => array('IN' => array(4,6,9))
    * OR
@@ -2272,20 +2274,11 @@ SELECT contact_id
    *
    * @throws Exception
    *
-   * @todo a better solution would be for the query object to apply these filters based on the
-   *  api supported format (but we don't want to risk breakage in alpha stage & query class is scary
-   * @todo @time of writing only IN & NOT IN are supported for the array style syntax (as test is
-   *  required to extend further & it may be the comments per above should be implemented. It may be
-   *  preferable to not double-banger the return context next refactor of this - but keeping the attention
-   *  in one place has some advantages as we try to extend this format
-   *
    * @return NULL|string|array
    *   a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
    *   depending on whether it is supported as yet
    */
   public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
-    // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
-    // support for other syntaxes is discussed in ticket but being put off for now
     foreach ($filter as $operator => $criteria) {
       if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {

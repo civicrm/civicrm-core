@@ -64,20 +64,6 @@
                   <div class="description">{$element.help_post}</div>
                 {/if}
               </div>
-
-                {if !empty($extends) && $extends eq "Membership"}
-                  <div id="allow_auto_renew">
-                    <div class='crm-section auto-renew'>
-                      <div class='label'></div>
-                      <div class ='content'>
-                        {if isset($form.auto_renew) }
-                          {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
-                        {/if}
-                      </div>
-                    </div>
-                  </div>
-                {/if}
-                <div class="clear"></div>
             {else}
 
                 {assign var="element_name" value="price_"|cat:$field_id}
@@ -114,9 +100,21 @@
                   {/if}
                   {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
                 </div>
-                <div class="clear"></div>
 
             {/if}
+              {if !empty($extends) && $extends eq "Membership" && $element.html_type != 'Text'}
+                <div id="allow_auto_renew">
+                  <div class='crm-section auto-renew'>
+                    <div class='label'></div>
+                    <div class ='content'>
+                      {if isset($form.auto_renew) }
+                        {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
+                      {/if}
+                    </div>
+                  </div>
+                </div>
+              {/if}
+              <div class="clear"></div>
           </div>
         {/if}
     {/foreach}
