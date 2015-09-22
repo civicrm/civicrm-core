@@ -150,7 +150,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
         )->fetchField();
         if ((bool) $uid) {
           $resetUrl = $config->userFrameworkBaseURL . 'user/password';
-          $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
+          $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
             array(1 => $params['mail'], 2 => $resetUrl)
           );
         }

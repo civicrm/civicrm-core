@@ -508,7 +508,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
       elseif (email_exists($params['mail'])) {
         $resetUrl = $config->userFrameworkBaseURL . 'wp-login.php?action=lostpassword';
-        $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
+        $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
           array(1 => $params['mail'], 2 => $resetUrl)
         );
       }
