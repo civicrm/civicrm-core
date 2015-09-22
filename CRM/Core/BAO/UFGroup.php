@@ -715,8 +715,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @param int $userID
    *   The user id that we are actually editing.
-   * @param string $title
-   *   The title of the group we are interested in.
+   * @param string $name
+   *   The machine-name of the group we are interested in.
    * @param bool $register
    * @param int $action
    *   The action of the form.
@@ -725,7 +725,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return bool
    *   true if form is valid
    */
-  public static function isValid($userID, $title, $register = FALSE, $action = NULL) {
+  public static function isValid($userID, $name, $register = FALSE, $action = NULL) {
     if ($register) {
       $controller = new CRM_Core_Controller_Simple('CRM_Profile_Form_Dynamic',
         ts('Dynamic Form Creator'),
@@ -740,7 +740,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       // make sure we have a valid group
       $group = new CRM_Core_DAO_UFGroup();
 
-      $group->title = $title;
+      $group->name = $name;
 
       if ($group->find(TRUE) && $userID) {
         $controller = new CRM_Core_Controller_Simple('CRM_Profile_Form_Dynamic', ts('Dynamic Form Creator'), $action);
