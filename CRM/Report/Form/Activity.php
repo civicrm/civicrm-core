@@ -470,7 +470,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   /**
-   * Build where clause
+   * Build where clause.
    *
    * @param string $recordType
    */

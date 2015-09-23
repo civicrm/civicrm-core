@@ -17,8 +17,6 @@ packages/PHPUnit
 packages/PhpDocumentor
 packages/SymfonyComponents
 packages/amavisd-new
-settings_location.php
-drupal
 WordPress
 joomla
 tests
@@ -26,6 +24,5 @@ tools
 xml
 distmaker
 .svn
-bin/setup.sh
 bin/setup.php4.sh
 bin/setup.bat 

@@ -952,7 +952,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Setter for $_force.
    *
-   * @param $isForce
+   * @param bool $isForce
    */
   public function setForce($isForce) {
     $this->_force = $isForce;
@@ -1462,7 +1462,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * The rule ensures that fields selected in group_by if any) should only be the ones
    * present in display/select fields criteria;
-   * note: works if and only if custom field selected in group_by.
+   * note: works if and only if any custom field selected in group_by.
    *
    * @param array $fields
    * @param array $ignoreFields

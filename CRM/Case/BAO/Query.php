@@ -670,17 +670,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);
 
-<<<<<<< HEAD
-    $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
-    foreach ($caseTypes as $id => $name) {
-      $form->addElement('checkbox', "case_type_id[$id]", NULL, $name);
-    }
-
-    $statuses = CRM_Case_PseudoConstant::caseStatus('label', FALSE);
-    foreach ($statuses as $id => $name) {
-      $form->addElement('checkbox', "case_status_id[$id]", NULL, $name);
-    }
-=======
     $form->add('select', 'case_type_id',
       ts('Case Type'),
       CRM_Case_PseudoConstant::caseType('title', FALSE),
@@ -692,7 +681,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
       CRM_Case_PseudoConstant::caseStatus('label', FALSE),
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
     );
->>>>>>> 7d2a14447d9049e82a6e676071bce7c6070c98de
 
     CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);
