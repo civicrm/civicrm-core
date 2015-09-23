@@ -141,10 +141,10 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
   public function upgrade_4_6_6($rev) {
     // CRM-16846 - This sql file may have been previously skipped. Conditionally run it again if it doesn't appear to have run before.
     if (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_state_province WHERE abbreviation = '100' AND country_id = 1193")) {
-      $this->addTask('Update Slovenian municipalities', 'runSql', '4.6.alpha3');
+      $this->addTask('Update Slovenian municipalities', 'task_4_6_x_runOnlySql', '4.6.alpha3');
     }
     // CRM-16846 - This sql file may have been previously skipped. No harm in running it again because it's just UPDATE statements.
-    $this->addTask('State-province update from 4.4.7', 'runSql', '4.4.7');
+    $this->addTask('State-province update from 4.4.7', 'task_4_6_x_runOnlySql', '4.4.7');
 
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
   }
