@@ -112,7 +112,6 @@ class CRM_Core_I18n_SchemaStructure_4_7_alpha1 {
           'thankyou_title' => "varchar(255)",
           'thankyou_text' => "text",
           'thankyou_footer' => "text",
-          'for_organization' => "text",
           'receipt_from_name' => "varchar(255)",
           'receipt_text' => "text",
           'footer_text' => "text",
