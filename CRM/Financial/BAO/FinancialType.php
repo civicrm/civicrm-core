@@ -352,7 +352,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
         $column = "membership_type_id";
       }
       if (!empty($whereClauses)) {
-        $whereClauses = ' AND ';
+        $whereClauses .= ' AND ';
       }
       if (empty($types)) {
         $whereClauses .= " civicrm_{$component}.{$column} IN (0)";
