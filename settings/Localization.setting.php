@@ -372,7 +372,7 @@ return array(
     'type' => 'Array',
     'quick_form_type' => 'MonthDay',
     'html_type' => 'MonthDay',
-    'default' => ',',
+    'default' => array('M' => 1, 'd' => 1),
     'title' => 'Fiscal Year Start',
     'description' => '',
   ),
