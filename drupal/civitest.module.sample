@@ -1,0 +1,2041 @@
+<?php
+
+function civitest_civicrm_pre( $op, $objectName, $objectId, &$objectRef ) {
+  // Sample implementation of pre hook on line item row create. Available as of 4.1 beta3
+  if ( $objectName == 'LineItem' && $op == 'create' ) {
+    //if text type field and quantity is greater than 5, let's apply a discount
+    if ( $objectRef['html_type'] == 'Text' &&
+      $objectRef['qty'] > 5 ) {
+
+      //5% discount
+      $discount = 1 - 0.05;
+
+      $objectRef['unit_price'] = $objectRef['unit_price'] * $discount;
+      $objectRef['line_total'] = $objectRef['line_total'] * $discount;
+
+      //we would also need to update the total amount
+      //we know the table impacted with $objectRef['entity_table']
+      //and the contrib/event id with $objectRef['entity_id']
+    }
+  }
+}
+
+function civitest_civicrm_post( $op, $objectName, $objectId, &$objectRef ) {
+  // only interested in the profile object and create operation for now
+  if ( $objectName != 'Profile' || ( $op != 'create' && $op != 'edit' ) ) {
+    // send it to custom hook
+    return false;
+  }
+
+  // send an email to the user and cc administrator
+  // with a welcome message
+  civicrm_initialize( true );
+
+  require_once 'CRM/Utils/Mail.php';
+
+  $params         = array( );
+  $fromName       = 'My Org Administrator';
+  $fromEmail      = 'info@example.org';
+  $params['from'] = '"' . $fromName . '" <' . $fromEmail . '>';
+
+  $params['toEmail']     = $objectRef['email-1'];
+  $params['toName']      = "{$objectRef['first_name']} {$objectRef['last_name']}";
+  $params['subject']     = "Thank you for supporting My Org";
+  $params['cc']          = 'myorg@example.org';
+  $objectValues          = print_r( $objectRef, true );
+  $params['text'] = "
+Dear $toName:
+
+Thank you for your show of support. The details u signed up with are:
+
+$objectValues
+
+Regards
+
+My Org Team
+";
+
+  CRM_Utils_Mail::send( $params );
+}
+
+function civitest_civicrm_custom( $op, $groupID, $entityID, &$params ) {
+  if ( $op != 'create' && $op != 'edit' ) {
+    return;
+  }
+
+  // this is the custom group i am interested in updating when the row is updated
+  if ( $groupID != 1 ) {
+    return;
+  }
+
+  $tableName = CRM_Core_DAO::getFieldValue( 'CRM_Core_DAO_CustomGroup',
+               $groupID,
+               'table_name' );
+  $sql = "
+UPDATE $tableName
+SET    random_code_data_3 = 23
+WHERE  entity_id = $entityID
+";
+  CRM_Core_DAO::executeQuery( $sql,
+    CRM_Core_DAO::$_nullArray );
+}
+
+/**
+ * Get the permissioned where clause for the user
+ *
+ * @param int $type the type of permission needed
+ * @param  array $tables (reference ) add the tables that are needed for the select clause
+ * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+ * @param int    $contactID the contactID for whom the check is made
+ *
+ * @return string the group where clause for this user
+ * @access public
+ */
+function civitest_civicrm_aclWhereClause( $type, &$tables, &$whereTables, &$contactID, &$where ) {
+  if ( ! $contactID ) {
+    return;
+  }
+
+  $permissionTable = 'civicrm_value_permission';
+  $regionTable     = 'civicrm_value_region';
+  $fields          = array( 'electorate' => 'Integer',
+                     'province'   => 'Integer',
+                     'branch'     => 'Integer' );
+
+  // get all the values from the permission table for this contact
+  $keys = implode( ', ', array_keys( $fields ) );
+  $sql = "
+SELECT $keys
+FROM   {$permissionTable}
+WHERE  entity_id = $contactID
+";
+  $dao = CRM_Core_DAO::executeQuery( $sql );
+  if ( ! $dao->fetch( ) ) {
+    return;
+  }
+
+  $tables[$regionTable] = $whereTables[$regionTable] =
+    "LEFT JOIN {$regionTable} regionTable ON contact_a.id = regionTable.entity_id";
+
+  $clauses = array( );
+  foreach( $fields as $field => $fieldType ) {
+    if ( ! empty( $dao->$field ) ) {
+      if ( strpos( CRM_Core_DAO::VALUE_SEPARATOR, $dao->$field ) !== false ) {
+        $value = substr( $dao->$field, 1, -1 );
+        $values = explode( CRM_Core_DAO::VALUE_SEPARATOR, $value );
+        foreach ( $values as $v ) {
+          $clauses[] = "regionTable.{$field} = $v";
+        }
+      } else {
+        if ( $fieldType == 'String' ) {
+          $clauses[] = "regionTable.{$field} = '{$dao->$field}'";
+        } else {
+          $clauses[] = "regionTable.{$field} = {$dao->$field}";
+        }
+      }
+    }
+  }
+
+  if ( ! empty( $clauses ) ) {
+    if ( ! empty( $where )  ) {
+      $where .= ' AND (' . implode( ' OR ', $clauses ) . ')';
+    } else {
+      $where .= ' (' . implode( ' OR ', $clauses ) . ')';
+    }
+  }
+}
+
+function civitest_civicrm_dashboard( $contactID, &$contentPlacement ) {
+  // REPLACE Activity Listing with custom content
+  $contentPlacement = 3;
+  return array( 'Custom Content' => "Here is some custom content: $contactID",
+    'Custom Table' => "
+<table>
+<tr><th>Contact Name</th><th>Date</th></tr>
+<tr><td>Foo</td><td>Bar</td></tr>
+<tr><td>Goo</td><td>Tar</td></tr>
+</table>
+",
+  );
+}
+
+function civitest_civicrm_buildAmount(
+  $pageType,
+  &$form,
+  &$amount
+) {
+  //sample to modify priceset fee
+  $priceSetId = $form->get( 'priceSetId' );
+  if ( !empty( $priceSetId ) ) {
+    $feeBlock =& $amount;
+
+    // if you use this in sample data, u'll see changes in
+    // contrib page id = 1, event page id = 1 and
+    // contrib page id = 2 (which is a membership page
+
+    if (!is_array( $feeBlock ) || empty( $feeBlock ) ) {
+      return;
+    }
+
+    //in case of event we get eventId,
+    //so lets apply hook for eventId = 1
+    if ( $pageType == 'event' && $form->_eventId != 1 ) {
+      return;
+    }
+
+    //in case of contrbution
+    //for online case we get page id so we could apply for specific
+    if ( $pageType == 'contribution' ) {
+      if ( !in_array(
+          get_class( $form ),
+          array( 'CRM_Contribute_Form_Contribution', 'CRM_Contribute_Form_Contribution_Main')
+          )
+      ) {
+        return;
+      }
+    }
+
+    if ($pageType == 'membership') {
+      // give a discount of 20% to everyone
+      foreach ( $feeBlock as &$fee ) {
+        if ( !is_array( $fee['options'] ) ) {
+          continue;
+        }
+        foreach ( $fee['options'] as &$option ) {
+          //for sample lets modify first option from all fields.
+          $option['amount']  = $option['amount'] * 0.8;
+          $option['label']  .= ' - ' . ts( 'Get a 20% discount since you know this hook' );
+        }
+      }
+    } else {
+      // unconditionally modify the first option to be a $100 fee
+      // to show our power!
+      foreach ( $feeBlock as &$fee ) {
+        if ( !is_array( $fee['options'] ) ) {
+          continue;
+        }
+        foreach ( $fee['options'] as &$option ) {
+          // lets modify first option from all fields.
+          $option['amount'] = 100;
+          $option['label']  = ts( 'Power of hooks' );
+          break;
+        }
+      }
+    }
+  }
+}
+
+function civitest_civicrm_aclGroup( $type, $contactID, $tableName, &$allGroups, &$currentGroups ) {
+  // only process saved search
+  if ( $tableName != 'civicrm_saved_search' ) {
+    return;
+  }
+
+  hrd_initialize( );
+
+  $currentGroups = $allGroups;
+
+  if ( ! CRM_Core_Permission::check( 'access secure contacts' ) ) {
+    unset( $currentGroups[HRD_SECURE_GROUP_ID] );
+  }
+
+  $currentGroups = array_keys( $currentGroups );
+}
+
+function civitest_civicrm_tabs( &$tabs, $contactID ) {
+
+  // unset the contribition tab
+  unset( $tabs[1] );
+
+  // lets rename the contribution tab with a differnt name and put it last
+  // this is just a demo, in the real world, you would create a url which would
+  // return an html snippet etc
+  $url = CRM_Utils_System::url( 'civicrm/contact/view/contribution',
+         "reset=1&snippet=1&force=1&cid=$contactID" );
+  $tabs[] = array( 'id'    => 'mySupercoolTab',
+            'url'   => $url,
+            'title' => 'Contribution Tab Renamed',
+            'weight' => 300 );
+}
+
+function civitest_civicrm_enableDisable( $recordBAO, $recordID, $isActive ) {
+  // create an activity for enable/disable relationship type
+  if ( $recordBAO == 'CRM_Contact_BAO_RelationshipType' ) {
+    $session = CRM_Core_Session::singleton( );
+    $uid     = $session->get('userID');
+    if( $uid ) {
+      $params = array( 'activity_type_id'   => 1,
+                'source_contact_id'  => $uid,
+                'status_id'          => 2,
+                'activity_date_time' => date('YmdHis')
+      );
+      if( $isActive ) {
+        $params['subject'] = ts('Enabled relationship type.');
+      } else {
+        $params['subject'] = ts('Disabled relationship type.');
+      }
+      civicrm_api('activity', 'create', $params);
+    }
+  }
+}
+
+function civitest_civicrm_tokens( &$tokens ) {
+  $tokens['contribution'] =
+    array(
+      'contribution.amount'                    => 'Amount of contribution',
+      'contribution.date'                      => 'Date of contribution',
+      'contribution.total_last_year'           => 'Total amount contributed last year',
+      'contribution.date_of_first'             => 'Date of first contribution',
+      'contribution.largest_this_year'         => 'Largest this Year Contribution Amount',
+      'contribution.date_of_largest_this_year' => 'Largest this Year Contribution Date',
+      'contribution.average'                   => 'Average Contribution Amount',
+      'contribution.largest'                   => 'Largest Contribution' );
+}
+
+function civitest_civicrm_tokenValues( &$values,
+  &$contactIDs,
+  $dontCare,
+  $tokens,
+  $context ) {
+  if ( is_array( $contactIDs ) ) {
+    $contactIDString = implode( ',', array_values( $contactIDs ) );
+  }
+
+  $query = "
+SELECT sum( total_amount ) as total_amount,
+       contact_id,
+       max( receive_date ) as receive_date
+FROM   civicrm_contribution
+WHERE  contact_id IN ( $contactIDString )
+AND    is_test = 0
+GROUP BY contact_id
+";
+
+  $dao = CRM_Core_DAO::executeQuery( $query );
+  while ( $dao->fetch( ) ) {
+    if ( ! array_key_exists( $dao->contact_id, $values ) ) {
+      $values[$dao->contact_id] = array( );
+    }
+    $values[$dao->contact_id]['contribution.amount'] = $dao->total_amount;
+    $values[$dao->contact_id]['contribution.date'  ] = $dao->receive_date;
+  }
+}
+
+// example of token that does not depend on contactID
+// and using the new format
+function civitest_civicrm_tokenValues( &$values,
+  &$contactIDs,
+  $dontCare,
+  $tokens,
+  $context ) {
+  if ( isset( $tokens['views'] ) ) {
+    static $_cache = null;
+
+    if ( ! $_cache ) {
+      $_cache = array( );
+      foreach( $tokens['views'] as $token ) {
+        $_cache[$token] = CALL_YOUR_OWN_FUNCTION_TO_RENDER_THIS_VIEW( $token );
+      }
+    }
+
+    foreach( $contactIDs as $cid ) {
+      foreach( $tokens['views'] as $token ) {
+        $values[$cid]["views.{$token}"] = $_cache[$token];
+      }
+    }
+  }
+}
+
+function civitest_civicrm_pageRun( &$page ) {
+  // You can assign variables to the template using:
+  // $page->assign( 'varName', $varValue );
+  // in your template, {$varName} will output the contents of $varValue
+  // you should customize your template if doing so
+
+  $page->assign( 'varName', 'This is a variable assigned by the hook' );
+}
+
+/*
+ * The hook_nodeapi implementation to set the node title to that of event title.
+ * Could also be used set the title to anything we want.
+ *
+ */
+function civicrm_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+  if ($op == 'load' && $node->type == 'event') {
+    $node->title = civicrm_cck_event_field_values('title', $node->field_title[0]['value']);
+  }
+}
+
+/*
+ * The function to pull out event data from civicrm for cck fields related to event.
+ *
+ */
+function civicrm_cck_event_field_values($field, $index = null) {
+  static $eventInfo;
+  if ( ! $eventInfo ) {
+    if ( ! civicrm_initialize( ) ) {
+      return;
+    }
+    $params    = array( );
+    $eventInfo = civicrm_api('event', 'get', $params );
+  }
+
+  if ( strpos($_GET['q'], 'edit') ||
+    strpos($_GET['q'], 'add')  ) {
+    $isAppend = true;
+  }
+  if ( isset( $index ) ) {
+    $isAppend = false;
+  }
+
+  $retArray = array( );
+  switch( $field ) {
+    case 'when':
+      foreach ( $eventInfo as $info ) {
+        $str = "{$info['start_date']} >  through > {$info['end_date']}";
+        $retArray[] = $isAppend ? ("{$info['title']}:: " . $str) : $str;
+      }
+      break;
+
+    case 'location':
+      foreach ( $eventInfo as $info ) {
+        $params = array( 'entity_id' => $info['id'],'entity_table' => 'civicrm_event');
+        require_once 'CRM/Core/BAO/Location.php';
+        $values['location'] = CRM_Core_BAO_Location::getValues( $params, true );
+        $str = $values['location']['address'][1]['display'];
+        $retArray[] = $isAppend ? ("{$info['title']}:: " . $str) : $str;
+      }
+      break;
+
+    case 'register_link':
+      foreach ( $eventInfo as $info ) {
+        $str = '<a href="' .
+          CRM_Utils_System::url( 'civicrm/event/register',
+            "id={$info['id']}&reset=1", true ) .
+          '">&raquo; Register Now</a>';
+        $retArray[] = $isAppend ? ("{$info['title']}:: " . $str) : $str;
+      }
+      break;
+
+    case 'feeblock' :
+      require_once 'CRM/Core/BAO/Discount.php';
+      require_once 'CRM/Core/OptionGroup.php';
+      foreach ( $eventInfo as $info ) {
+        $discountId = CRM_Core_BAO_Discount::findSet( $info['id'], 'civicrm_event' );
+        if ( $discountId ) {
+          CRM_Core_OptionGroup::getAssoc( CRM_Core_DAO::getFieldValue( 'CRM_Order_DAO_Discount',
+              $discountId, 'option_group_id' ),
+            $feeBlock, true, 'id' );
+        } else {
+          CRM_Core_OptionGroup::getAssoc( "civicrm_event.amount.{$info['id']}", $feeBlock, true );
+        }
+
+        $feeLabels = array();
+        foreach ( $feeBlock as $block ) {
+          $feeLabels[] = $block['label'] . "  $" . $block['value'];
+        }
+        $str  = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . implode($feeLabels, '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+        $retArray[] = $isAppend ? ("{$info['title']}:: " . $str) : $str;
+      }
+      break;
+
+    default:
+      foreach ( $eventInfo as $info ) {
+        if ( isset($info[$field]) ) {
+          $str = $info[$field];
+          $retArray[] = $isAppend ? ("{$info['title']}:: " . $str) : $str;
+        }
+      }
+  }
+  return empty($retArray) ? array() : isset($index) ? $retArray[$index] : $retArray;
+}
+
+function civitest_civicrm_customFieldOptions( $fieldID, &$options ) {
+  if ( $fieldID == 1 ) {
+    $options['Rocks'] = t( 'Hooks Rock' );
+    unset( $options['Edu'] );
+  } else if ( $fieldID == 2 ) {
+    $options['H'] = t(' Hook me' );
+    unset( $options['S'] );
+  }
+}
+
+/**
+ * The hook_searchTasks is implemented to display the list of actions allowed after doing a search
+ * More examples are shown to call this hook
+ *
+ * @param string $$objectType specifies the component
+ * @param array  $tasks       the list of actions
+ *
+ * @access public
+ */
+function civitest_civicrm_searchTasks( $objectType, &$tasks ) {
+  if ( $objectType == 'contact' ) {
+    $tasks[100] = array( 'title'  => t( 'Contact Hook Action Task' ),
+                  'class'  => 'CRM_Contact_Form_Task_HookSample',
+                  'result' => false );
+  }
+  if ( $objectType == 'contribution' ) {
+    $tasks[102] = array( 'title'  => t( 'Contribution Hook Action Task' ),
+                  'class'  => 'CRM_Contribute_Form_Task_SearchTaskHookSample',
+                  'result' => false );
+  }
+  if ( $objectType == 'membership' ) {
+    $tasks[103] = array( 'title'  => t( 'Member Hook Action Task' ),
+                  'class'  => 'CRM_Member_Form_Task_SearchTaskHookSample',
+                  'result' => false );
+  }
+  if ( $objectType == 'pledge' ) {
+    $tasks[104] = array( 'title'  => t( 'Pledge Hook Action Task' ),
+                  'class'  => 'CRM_Pledge_Form_Task_SearchTaskHookSample',
+                  'result' => false );
+  }
+  if ( $objectType == 'event' ) {
+    $tasks[105] = array( 'title'  => t( 'Event Hook Action Task' ),
+                  'class'  => 'CRM_Event_Form_Task_SearchTaskHookSample',
+                  'result' => false );
+  }
+  if ( $objectType == 'case' ) {
+    $tasks[106] = array( 'title'  => t( 'Case Hook Action Task' ),
+                  'class'  => 'CRM_Case_Form_Task_SearchTaskHookSample',
+                  'result' => false );
+  }
+  if ( $objectType == 'grant' ) {
+    $tasks[107] = array( 'title'  => t( 'Grant Hook Action Task' ),
+                  'class'  => 'CRM_Grant_Form_Task_SearchTaskHookSample',
+                  'result' => false );
+  }
+  if ( $objectType == 'activity' ) {
+    $tasks[108] = array( 'title'  => t( 'Activity Hook Action Task' ),
+                  'class'  => 'CRM_Activity_Form_Task_SearchTaskHookSample',
+                  'result' => false );
+  }
+}
+
+function civitest_civicrm_validateForm( $formName, &$fields, &$files, &$form, &$errors ) {
+  // sample implementation
+  if ( $formName == 'CRM_Contact_Form_Contact' ) {
+    // ensure that external identifier is present and valid
+    $externalID = CRM_Utils_Array::value( 'external_identifier', $fields );
+    if ( ! $externalID ) {
+      $errors['external_identifier'] = ts( 'External Identifier is a required field' );
+    } else {
+      require_once "CRM/Utils/Rule.php";
+      if ( ! CRM_Utils_Rule::integer( $externalID ) ) {
+        $errors['external_identifier'] = ts( 'External Identifier is not an integer' );
+      }
+    }
+  }
+  return;
+
+}
+
+function civitest_civicrm_pageRun( &$page ) {
+  // we are only interested in profile pages with gid = 1 and have a valid contact id
+  if ( $page->getVar( '_name' ) != 'CRM_Profile_Page_View' ||
+    $page->getVar( '_gid' ) != 1 ||
+    ! CRM_Utils_Rule::positiveInteger( $page->getVar( '_id' ) ) ) {
+    return;
+  }
+
+  // get all relationships of
+  require_once 'CRM/Contact/BAO/Relationship.php';
+  $relationships = CRM_Contact_BAO_Relationship::getRelationship( $page->getVar( '_id' ) );
+
+  // if you want to filter and display only certain relationship, you can do so before assigninng to
+  // smarty. Do a CRM_Core_Error::debug( $relationships ) to see all the fields
+  $page->assign( 'relationships', $relationships );
+
+  // in addition to this, you also need to customize: templates/CRM/Profile/Page/View.tpl
+  // check: http://wiki.civicrm.org/confluence/display/CRMDOC/Customize+Built-in,+Profile,+Contribution+and+Event+Registration+Screens
+  // some sample tpl code is included here, modify as needed
+  /**
+     {if $relationships}
+     <table>
+     <tr>
+     <th>Name</th>
+     <th>Relation</th>
+     <th>Country</th>
+     </tr>
+     {foreach from=$relationships item=relation}
+     <tr>
+     <td>{$relation.name}</td>
+     <td>{$relation.relation}</td>
+     <td>{$relation.country}</td>
+     </tr>
+     {/foreach}
+     </table>
+     {/if}
+  **/
+
+}
+
+function civitest_civicrm_eventDiscount( &$form, &$params ) {
+  require_once 'CRM/Utils/Money.php';
+
+  // we only are interested in event id 1
+  if ( $form->getVar( '_eventId' ) != 1 ) {
+    return;
+  }
+
+  $numParticipants = 0;
+  foreach ( $params as $key => $value ) {
+    if ( isset( $params[$key]['amount'] ) &&
+      $params[$key]['amount'] > 0 ) {
+      $numParticipants++;
+    }
+  }
+
+  // Set discount rule (Example: if more than 1 participant, 5% additional discount per paying participant, upto a max of 50%)
+  if ( $numParticipants > 1 ) {
+    $discountPercentage = $numParticipants * 5;
+
+    if ( $discountPercentage > 50 ) {
+      $discountPercentage = 50;
+    }
+
+    $totalDiscount = 0;
+    foreach ( $params as $key => $value ) {
+      if ( CRM_Utils_Array::value( 'amount', $params[$key] ) > 0 ) {
+        $discount = round( ( $params[$key]['amount'] * $discountPercentage ) / 100.0 );
+        $totalDiscount += $discount;
+        $params[$key]['discountAmount']  = $discount;
+        $discountDisplay = CRM_Utils_Money::format( $discount, null, null );
+        // Set discount info added to participant.fee_level and contribution.amount_level
+        $params[$key]['discountMessage'] = " (discount: $discountDisplay)";
+      }
+    }
+
+    $totalDiscountDisplay = CRM_Utils_Money::format( $totalDiscount, null, null );
+    // Set the message to show on confirmation page, thank-you page and receipt
+    $params[0]['discount'] =
+      array( 'message' => "a discount of $totalDiscountDisplay has been applied to the total amount",
+        'applied' => true );
+  }
+}
+
+
+/**
+ * buildForm hook sample
+ *
+ * we want the custom date to be today's date. custom_3 is marriage date
+ * in the sample data
+ */
+function civitest_civicrm_buildForm( $formName, &$form ) {
+
+  if ( $formName == 'CRM_Contact_Form_Contact' ) {
+    $defaults['custom_3_-1'] = date('m/d/Y');
+    $form->setDefaults( $defaults );
+  }
+
+  // enable tracking feature
+  if ( ( $formName == 'CRM_Contribute_Form_Contribution_Main' ||
+      $formName == 'CRM_Contribute_Form_Contribution_Confirm' ||
+      $formName == 'CRM_Contribute_Form_Contribution_ThankYou' ) &&
+    $form->getVar( '_id' ) == 1 ) { // use  CONTRIBUTION PAGE ID here
+    // use the custom field ID and custom field label here
+    $trackingFields = array( 'custom_4' => 'Campaign',
+                      'custom_5' => 'Appeal',
+                      'custom_6' => 'Fund' );
+    $form->assign( 'trackingFields', $trackingFields );
+  }
+
+}
+
+/**
+ * buildForm hook that would allow contacts to renew only existing memberships.
+ */
+function civitest_civicrm_buildForm( $formName, &$form ) {
+  if ( $formName == 'CRM_Contribute_Form_Contribution_Main' ) {
+    if ( is_array( $form->_membershipBlock ) ) {
+      //get logged in contact
+      $session   = CRM_Core_Session::singleton();
+      $contactID = $session->get('userID');
+
+      //check for existing membership
+      $query = "SELECT membership_type_id
+                      FROM civicrm_membership
+                      WHERE membership_type_id IN ( {$form->_membershipBlock['membership_types']} )
+                         AND civicrm_membership.contact_id = {$contactID}";
+      $dao = CRM_Core_DAO::executeQuery( $query );
+
+      $membershipTypeID = null;
+      while ( $dao->fetch( ) ) {
+        $membershipTypeID = $dao->membership_type_id;
+      }
+
+      if ( $membershipTypeID ) {
+        $form->freeze(array('selectMembership'));
+        $defaults['selectMembership'] = $membershipTypeID;
+        $form->setDefaults( $defaults );
+      }
+    }
+  }
+}
+
+function civitest_civicrm_mailingGroups( &$form, &$groups, &$mailings ) {
+  unset( $groups[4] );
+  $mailings[1] = 'This Mailing does not exist';
+}
+
+function _civitest_discountHelper( $eventID, $discountCode ) {
+  $sql = "
+SELECT v.id as id, v.value as value, v.weight as weight
+FROM   civicrm_option_value v,
+       civicrm_option_group g
+WHERE  v.option_group_id = g.id
+AND    v.name = %1
+AND    g.name = %2
+
+";
+  $params = array( 1 => array( $discountCode              , 'String' ),
+            2 => array( "event_discount_{$eventID}", 'String' ) );
+  $dao = CRM_Core_DAO::executeQuery( $sql, $params );
+  if ( $dao->fetch( ) ) {
+    // ensure discountPercent is a valid numeric number <= 100
+    if ( $dao->value &&
+      is_numeric( $dao->value ) &&
+      $dao->value >= 0 &&
+      $dao->value <= 100 &&
+      is_numeric( $dao->weight ) ) {
+      return array( $dao->id, $dao->value, $dao->weight );
+    }
+  }
+  return array( null, null, null );
+
+}
+
+function civitest_civicrm_buildForm( $formName, &$form ) {
+  if ( $formName == 'CRM_Event_Form_Registration_Register' &&
+    $form->getVar( '_eventId' ) == 3 ) {
+    $form->addElement( 'text', 'discountCode', ts( 'Discount Code' ) );
+    // in template use
+    // {$form.discountCode.label}&nbsp;{$form.discountCode.html}
+
+    // also assign to template
+    $template = CRM_Core_Smarty::singleton( );
+    $beginHookFormElements = $template->get_template_vars( 'beginHookFormElements' );
+    if ( ! $beginHookFormElements ) {
+      $beginHookFormElements = array( );
+    }
+    $beginHookFormElements[] = 'discountCode';
+    $form->assign( 'beginHookFormElements', $beginHookFormElements );
+
+    $discountCode = CRM_Utils_Request::retrieve( 'discountCode', 'String', $form, false, null, $_REQUEST );
+    if ( $discountCode ) {
+      $defaults = array( 'discountCode' => $discountCode );
+      $form->setDefaults( $defaults );
+    }
+  }
+}
+
+/*
+ * Give random discounts for event signup.
+ *
+ * Warning : while implementing this hook, another post process hook
+ *         : also need implementing to make sure code is only used for
+ *         : the number of times that's allowed to.
+ */
+function civitest_civicrm_buildAmount( $pageType,
+  &$form,
+  &$amount ) {
+
+  $eventID = $form->getVar( '_eventId' );
+  if ( $pageType != 'event' ||
+    $eventID != 3 ) {
+    return;
+  }
+
+  $discountCode = CRM_Utils_Request::retrieve( 'discountCode', 'String', $form, false, null, $_REQUEST );
+  if ( ! $discountCode ) {
+    return;
+  }
+
+  list( $discountID, $discountPercent, $discountNumber ) = _civitest_discountHelper( $eventID, $discountCode );
+  if ( $discountNumber <= 0 ) {
+    // no more discount left
+    return;
+  }
+
+  foreach ( $amount as $amountId => $amountInfo ) {
+    $amount[$amountId]['value'] = $amount[$amountId]['value'] -
+      ceil($amount[$amountId]['value'] * $discountPercent / 100);
+    $amount[$amountId]['label'] = $amount[$amountId]['label'] .
+      "\t - with {$discountPercent}% discount";
+  }
+}
+
+/*
+ * The hook updates the random code used with event signup.
+ */
+function civitest_civicrm_postProcess( $class, &$form ) {
+  $eventID = $form->getVar( '_eventId' );
+  if ( ! is_a($form, 'CRM_Event_Form_Registration_Confirm') ||
+    $eventID != 3 ) {
+    return;
+  }
+
+  $discountCode = CRM_Utils_Request::retrieve( 'discountCode', 'String', $form, false, null, $_REQUEST );
+  if ( ! $discountCode ) {
+    return;
+  }
+
+  list( $discountID, $discountPercent, $discountNumber ) = _civitest_discountHelper( $eventID, $discountCode );
+  if ( ! $discountID ||
+    $discountNumber <= 0 ||
+    $discountNumber == 123456789 ) {
+    return;
+  }
+
+  $query = "
+UPDATE civicrm_option_value v
+SET    v.weight = v.weight - 1
+WHERE  v.id = %1
+AND    v.weight > 0
+";
+  $params = array( 1 => array( $discountID, 'Integer' ) );
+
+  CRM_Core_DAO::executeQuery( $query, $params );
+}
+
+/**
+ * Sample hook to add more actions for Create New
+ */
+function civitest_civicrm_links( $op, $objectName, $objectId, &$links, &$mask ) {
+  if ( $op == 'create.new.shorcuts' ) {
+    // add link to create new profile
+    $links[] = array( 'url'   => '/civicrm/admin/uf/group?action=add&reset=1',
+               'title' => ts('New Profile'),
+               'ref'   => 'new-profile');
+  }
+}
+
+function civitest_civicrm_membershipTypeValues( &$form, &$membershipTypeValues ) {
+  $membershipTypeValues[1]['name']        = 'General (50% discount)';
+  $membershipTypeValues[1]['minimum_fee'] = '50.00';
+
+  $membershipTypeValues[2]['name']        = 'Student (50% discount)';
+  $membershipTypeValues[2]['minimum_fee'] = '25.00';
+}
+
+function civitest_civicrm_summary( $contactID, &$content, &$contentPlacement ) {
+  // REPLACE default Contact Summary with your customized content
+  $contentPlacement = 3;
+  $content = "
+<table>
+<tr><th>Hook Data</th></tr>
+<tr><td>Data 1</td></tr>
+<tr><td>Data 2</td></tr>
+</table>
+";
+
+}
+
+function civitest_civicrm_contactListQuery( &$query, $name, $context, $id ) {
+  // This example limits contacts in my contact reference field lookup to a specific group
+
+  // Connect the hook to your Contact Reference custom field using the field ID (field id is 4 in this case)
+  if ( $context == 'customfield' &&
+    $id == 4 ) {
+    // Now construct the query to select only the contacts we want
+    // The query must return two columns - contact sort_name, and contact id
+    $query = "
+SELECT c.sort_name, c.id
+FROM civicrm_contact c, civicrm_group_contact cg
+WHERE c.sort_name LIKE '$name%'
+AND   cg.group_id IN ( 4 )
+AND   cg.contact_id = c.id
+AND   cg.status = 'Added'
+ORDER BY c.sort_name ";
+  }
+
+}
+
+/**
+ * Hook implementation for altering payment parameters before talking to a payment processor back end.
+ *
+ * @param string $paymentObj
+ *    instance of payment class of the payment processor invoked (e.g., 'CRM_Core_Payment_Dummy')
+ * @param array &$rawParams
+ *    array of params as passed to to the processor
+ * @params array  &$cookedParams
+ *     params after the processor code has translated them into its own key/value pairs
+ * @return void
+ */
+function civitest_civicrm_alterPaymentProcessorParams($paymentObj,
+  &$rawParams,
+  &$cookedParams) {
+
+  if ($paymentObj->class_name == Payment_Dummy ) {
+    $employer   = empty($rawParams['custom_1']) ? '' : $rawParams['custom_1'];
+    $occupation = empty($rawParams['custom_2']) ? '' : $rawParams['custom_2'];
+    $cookedParams['custom'] = "$employer|$occupation";
+
+  }
+  else if ($paymentObj->class_name == Payment_AuthorizeNet) {
+    //Actual translation for one application:
+    //Employer > Ship to Country (x_ship_to_country)
+    //Occupation > Company (x_company)
+    //Solicitor > Ship-to First Name (x_ship_to_first_name)
+    //Event > Ship-to Last Name (x_ship_to_last_name)
+    //Other > Ship-to Company (x_ship_to_company)
+
+    $cookedParams['x_ship_to_country']   = $rawParams['custom_1'];
+    $cookedParams['x_company']           = $rawParams['custom_2'];
+    $cookedParams['x_ship_to_last_name'] = $rawParams['accountingCode']; //for now
+    $country_info = da_core_fetch_country_data_by_crm_id($rawParams['country-1']);
+    $cookedParams['x_ship_to_company']   = $country_info['iso_code'];
+  }
+   elseif ($paymentObj->billing_mode == 2) {
+
+    // Express  Checkout
+    $cookedParams['desc']   = $rawParams['eventName'];
+    $cookedParams['custom'] = $rawParams['eventId'];
+  }
+}
+
+function civitest_civicrm_customFieldOptions($fieldID, &$options, $detailedFormat = false ) {
+  if ( $fieldID == 1 || $fieldID == 2 ) {
+    if ( $detailedFormat ) {
+      $options['fake_id_1'] = array( 'id'    => 'fake_id_1',
+                              'value' => 'XXX',
+                              'label' => 'XXX' );
+      $options['fake_id_2'] = array( 'id'    => 'fake_id_2',
+                              'value' => 'YYY',
+                              'label' => 'YYY' );
+    } else {
+      $options['XXX'] = 'XXX';
+      $options['YYY'] = 'YYY';
+    }
+  }
+}
+
+function civitest_civicrm_config( &$config ) {
+  $civitestRoot = dirname( __FILE__ ) . DIRECTORY_SEPARATOR;
+
+  // fix php include path
+  $include_path = $civitestRoot . PATH_SEPARATOR . get_include_path( );
+  set_include_path( $include_path );
+
+  // fix template path
+  $templateDir = $civitestRoot . 'templates' . DIRECTORY_SEPARATOR;
+  $template = CRM_Core_Smarty::singleton( );
+  array_unshift( $template->template_dir, $templateDir );
+}
+
+function custom_ts( $string, $params = array( ) ) {
+  $string = str_replace( 'Participant', 'Delegate', $string );
+
+  static $i18n = null;
+  if ( ! $i18n ) {
+    $i18n = CRM_Core_I18n::singleton();
+  }
+  return $i18n->crm_translate( $string, $params );
+}
+
+/**
+ * You want a contribution page with exactly one amount and you
+ * you want to set all the values fixed and not give the user
+ * any choice
+ */
+function civitest_civicrm_buildForm( $formName, &$form ) {
+  if ( $formName == 'CRM_Contribute_Form_Contribution_Main' &&
+    $form->getVar( '_id' ) == 1 ) {
+    // 358 is the "option value id" of the only  value in the amount table,
+    // you can get this id, by doing a view source on the HTML
+    $defaults = array( 'amount'   => 358,
+                'is_recur' => 1,
+                'frequency_interval' => 1,
+                'frequency_unit' => 'month',
+                'installments' => 12 );
+    $form->setDefaults( $defaults );
+
+    // also freeze these elements
+    $elementNames = array_keys( $defaults );
+    foreach ( $elementNames as $element ) {
+      $elm =& $form->getElement( $element );
+      $elm->freeze( );
+    }
+  }
+}
+
+function civitest_civicrm_caseSummary($caseID) {
+  /* Quick way to test what some results look like.
+     return array('some_unique_id' => array( 'label' => ts('Some Date'),
+     'value' => '2009-02-11',
+     ),
+     'some_other_id' => array( 'label' => ts('Some String'),
+     'value' => ts('Coconuts'),
+     ),
+     );
+  */
+
+  /*
+    For styling put this in css/extras.css:
+
+    #caseSummary {display: table;}
+    #modrtw {display: table-row; border: 1px solid #999999; width: 200px;}
+    #mcstat {display: table-row; border: 1px solid #999999; border-left: 0; width: 200px;}
+    #caseSummary label {display: table-cell;}
+    #caseSummary div {display: table-cell; padding-left: 5px; padding-right: 5px;}
+  */
+
+  // More realistic example, but will return nothing unless you have these activities in your database.
+  // TIP: Put these queries into methods in a custom class. You will likely want to re-use them elsewhere, such as in a CiviReport.
+
+  // This query finds the earliest date of return to modified duties in a workplace disability case.
+  $params = array( 1 => array( $caseID, 'Integer' ) );
+  $sql = "SELECT min(activity_date_time) as mindate
+FROM civicrm_activity a
+INNER JOIN civicrm_case_activity ca on a.id=ca.activity_id
+LEFT OUTER JOIN civicrm_option_group og on og.name='activity_type'
+LEFT OUTER JOIN civicrm_option_value ov on
+(og.id=ov.option_group_id AND ov.name='Return to modified duties')
+WHERE ca.case_id=%1
+AND ov.value=a.activity_type_id
+LIMIT 1";
+  $modrtw = CRM_Core_DAO::singleValueQuery( $sql, $params );
+
+  // This query returns the current status of the medical consent as determined by
+  // the presence or absence of related activities.
+  $sql = "SELECT CASE WHEN count(received.case_id) > 0 THEN 'Received'
+WHEN count(sent.case_id) > 0 AND DATEDIFF(CURRENT_TIMESTAMP, sent.activity_date_time) > 14 THEN 'Overdue'
+WHEN count(sent.case_id) > 0 THEN 'Sent'
+ELSE 'Not Sent'
+END
+FROM
+(SELECT ca.case_id, a1.activity_date_time FROM civicrm_activity a1
+INNER JOIN civicrm_case_activity ca on a1.id=ca.activity_id
+LEFT OUTER JOIN civicrm_option_group og on og.name='activity_type'
+LEFT OUTER JOIN civicrm_option_value ov on
+(og.id=ov.option_group_id AND ov.name='Send Consent Letter')
+WHERE ca.case_id=%1
+AND ov.value=a1.activity_type_id
+LIMIT 1
+) AS sent
+
+LEFT OUTER JOIN
+
+(SELECT ca2.case_id FROM civicrm_activity a2
+INNER JOIN civicrm_case_activity ca2 on a2.id=ca2.activity_id
+LEFT OUTER JOIN civicrm_option_group og2 on og2.name='activity_type'
+LEFT OUTER JOIN civicrm_option_value ov2 on
+(og2.id=ov2.option_group_id AND ov2.name='File Received Consent')
+WHERE ca2.case_id=%1
+AND ov2.value=a2.activity_type_id
+LIMIT 1
+) AS received
+ON received.case_id=sent.case_id";
+
+  $mcstat = CRM_Core_DAO::singleValueQuery( $sql, $params );
+
+  return array('modrtw' => array( 'label' => ts('Mod RTW:'),
+                         'value' => $modrtw,
+    ),
+    'mcstat' => array( 'label' => ts('Consent Status:'),
+              'value' => ts($mcstat),
+    ),
+  );
+}
+
+function civitest_civicrm_optionValues( &$values, $name ) {
+  if ( $name == 'activity_status' ) {
+    unset( $values[5] );
+  } else if ( $name == 'case_activity_type' ) {
+    unset( $values['standard_timeline'] );
+  }
+}
+
+/**
+ * use the mail alter hook to inject raffle ticket numbers for participants
+ * this is not complete, IMO and i'd also store the raffle ticket numbers in a
+ * DB table to be on the safe side
+ */
+function civitest_civicrm_alterMailParams( &$params ) {
+
+  if ( $params['groupName'] == 'msg_tpl_workflow_event' &&
+    $params['valueName'] == 'event_online_receipt' ) {
+
+    $smarty =  CRM_Core_Smarty::singleton( );
+    $values =& $smarty->get_template_vars( );
+    $vars = array( 'lineItem', 'participantID', 'contactID' );
+    foreach ( $vars as $varName ) {
+      $$varName = CRM_Utils_Array::value( $varName, $values, null );
+    }
+
+    // return if no lineitems in event registration
+    if ( ! $lineItem ||
+      ! is_array( $lineItem ) ) {
+      return;
+    }
+
+    // check for price field. the raffle id is 1 (in my test case)
+    define( 'RAFFLE_PRICE_FIELD_ID', 1 );
+    foreach ( $lineItem as $priceSet => $itemValues ) {
+      foreach ( $itemValues as $itemID => $itemValue ) {
+        if ( $itemValue['price_field_id'] != RAFFLE_PRICE_FIELD_ID ) {
+          continue;
+        }
+
+        $rafflePrefix = "{$contactID}_{$participantID}_";
+        $raffleString = array( );
+        $raffleCount  = 0;
+        switch ( $itemValue['label'] ) {
+          case 'One':
+            $raffleCount = 1;
+            break;
+
+          case 'Five':
+            $raffleCount = 5;
+            break;
+
+          case 'Ten':
+            $raffleCount = 10;
+            break;
+
+        }
+        for ( $i = 1 ; $i <= $raffleCount; $i++ ) {
+          $raffleString[] = $rafflePrefix . $i;
+        }
+        if ( ! empty( $raffleString ) ) {
+          $raffleString = implode( ', ', $raffleString );
+          $params['text'] .= "
+
+===========================================================
+Event Raffle Ticket Numbers
+===========================================================
+
+Thank you for buying raffle tickets.  Your ticket numbers are:$raffleString. Good luck!
+
+";
+          $htmlSnippet = "
+<center>
+ <table width=\"620\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" id=\"crm-event_receipt\" style=\"font-family: Arial, Verdana, sans-serif; text-align: left;\">
+
+  <tr>
+   <td>
+    <table style=\"border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;\">
+     <tr>
+      <th colspan=\"2\" style=\"text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;\">
+       Event Raffle Ticket Numbers      </th>
+     </tr>
+     <tr>
+      <td colspan=\"2\" style=\"padding: 4px; border-bottom: 1px solid #999;\">
+       Thank you for buying raffle tickets.  Your ticket numbers are:$raffleString. Good luck!
+      </td>
+     </tr>
+    </table>
+   </td>
+  </tr>
+ </table>
+</center>
+
+</body>
+";
+
+          $params['html'] = str_replace( "</body>",
+                            $htmlSnippet,
+                            $params['html'] );
+        }
+      }
+    }
+  }
+}
+
+function civitest_civicrm_navigationMenu( &$params ) {
+
+  //  Get the maximum key of $params
+  $maxKey = ( max( array_keys($params) ) );
+
+  $params[$maxKey+1] = array (
+    'attributes' => array (
+      'label'      => 'Custom Menu Entry',
+      'name'       => 'Custom Menu Entry',
+      'url'        => null,
+      'permission' => null,
+      'operator'   => null,
+      'separator'  => null,
+      'parentID'   => null,
+      'navID'      => $maxKey+1,
+      'active'     => 1
+    ),
+    'child' =>  array (
+      '1' => array (
+        'attributes' => array (
+          'label'      => 'Custom Child Menu',
+          'name'       => 'Custom Child Menu',
+          'url'        => 'http://www.testlink.com',
+          'permission' => 'access CiviContribute
+',
+          'operator'   => null,
+          'separator'  => 1,
+          'parentID'   => $maxKey+1,
+          'navID'      => 1,
+          'active'     => 1
+        ),
+        'child' => null
+      ) ) );
+}
+
+/**
+ * This hook allows modification of the data used to perform merging of duplicates.
+ * @param string $type the type of data being passed (cidRefs|eidRefs|relTables|sqls)
+ * @param array $data  the data, which depends on the value of $type:
+ *      'relTables':
+ *          an array of tables used for asking user which elements to merge,
+ *          as used at civicrm/contact/merge; each table in the array has this format:
+ *                'rel_table_UNIQUE-TABLE-NICKNAME' => array(
+ *                    'title'  => ts('TITLE'),
+ *                    'tables' => array('TABLE-NAME' [, ...]),
+ *                    'url'    => CRM_Utils_System::url(PATH, QUERY),
+ *                )
+ *      'sqls':
+ *          a one-dimensional array of SQL statements to be run in the final merge operation;
+ *          These SQL statements are run within a single transaction.
+ *      'cidRefs':
+ *          an array of tables and their fields referencing civicrm_contact.contact_id explicitely;
+ *          each table in the array has this format:
+ *                'TABLE-NAME' => array('COLUMN-NAME' [, ...])
+ *      'eidRefs':
+ *          an array of tables and their fields referencing civicrm_contact.contact_id with entity_id;
+ *          each table in the array has this format:
+ *                'TABLE-NAME' => array('entity_table-COLUMN-NAME' => 'entity_id-COLUMN-NAME')
+ *      'batch':
+ *          an array of migration info that will be transfered from other-contact to main-contact during a
+ *          batch merge process. fields_in_conflict could be modified / resolved here.
+ * @param int $mainId  contact_id of the contact that survives the merge (only when $type == 'sqls')
+ * @param int $otherId contact_id of the contact that will be absorbed and deleted (only when $type == 'sqls')
+ * @param array $tables when $type is "sqls", an array of tables as it may have been handed to the calling function
+ *
+ * @access public
+ */
+
+function civitest_civicrm_merge ( $type, &$data, $mainId = NULL, $otherId = NULL, $tables = NULL ) {
+
+  switch ($type) {
+    case 'relTables':
+      // Allow user to decide whether or not to merge records in `civitest_foo` table
+      $data['rel_table_foo'] = array(
+        'title'  => ts('Foos'),                 // Title as shown to user for this type of data
+        'tables' => array('civitest_foo'),      // Name of database table holding these records
+        'url'    => CRM_Utils_System::url('civicrm/civitest/foo', 'action=browse&cid=$cid'),
+        // URL to view this data for this contact,
+        // in this case using CiviCRM's native URL utility
+        // NOTE: '$cid' will be replaced with correct
+        // CiviCRM contact ID.
+      );
+      break;
+
+    case 'cidRefs':
+      // Add references to civitest_foo.contact_id, and civitest_foo.foo_id, both of which
+      // are foreign keys to civicrm_contact.id.  By adding this to $data, records in this
+      // table will be automatically included in the merge.
+      $data['civitest_foo'] = array('contact_id', 'foo_id');
+      break;
+
+    case 'eidRefs':
+      // Add references to civitest_bar table, which is keyed to civicrm_contact.id
+      // using `bar_entity_id` column, when `entity_table` is equal to 'civicrm_contact'. By
+      // adding this to $data, records in this table will be automatically included in
+      // the merge.
+      $data['civitest_bar'] = array('entity_table' => 'bar_entity_id');
+      break;
+
+    case 'sqls':
+      // Note that this hook can be called twice with $type = 'sqls': once with $tables
+      // and once without. In our case, SQL statements related to table `civicrm_foo`
+      // will be listed in $data when $tables is set; SQL statements related to table
+      // `civicrm_bar` will be listed in $data when $tables is NOT set.  The deciding
+      // factor here is that `civicrm_foo` was referenced above as part of the 'relTables'
+      // data, whereas `civicrm_bar` was not.
+      if ($tables) {
+        // Nothing to do in our case. In some cases, you might want to find and
+        // modify existing SQL statements in $data.
+      } else {
+        // Nothing to do in our case. In some cases, you might want to find and
+        // modify existing SQL statements in $data.
+      }
+      break;
+
+    case 'batch':
+      // $data is an array of migration info that will be transfered from other-contact to main-contact during a
+      // batch merge process. fields_in_conflict could be modified / resolved here.
+      // $data['fields_in_conflict'] could be looked into and filled with proper values which will help
+      // resolve conflict & allow batch merge process to run without any problems / conflicts.
+      break;
+
+    case 'flip':
+      // implement complex biasing decisions on which contact to keep or merge into.
+      // In example below we bias to contact with max contributions
+      $doSwap = FALSE;
+      $query  = "SELECT count(*) FROM civicrm_contribution WHERE contact_id = %1";
+      $SrcCount = CRM_Core_DAO::singleValueQuery($query, array(1 => array($data['srcID'], 'Integer')));
+      $dstCount = CRM_Core_DAO::singleValueQuery($query, array(1 => array($data['dstID'], 'Integer')));
+      if ($SrcCount > $dstCount) {
+        // keep contact with max contributions as destination (contact to be retained)
+        $doSwap = TRUE;
+      }
+      // we 'll add some more logic here to decide biasing
+
+      if ($doSwap) {
+        $tempID = $data['srcID'];
+        $data['srcID'] = $data['dstID'];
+        $data['dstID'] = $tempID;
+      }
+      $data['auto_flip'] = FALSE;
+      break;
+
+  }
+}
+
+/**
+ * This hook provides a way to override the default privacy behavior for notes.
+ * $node['privacy'] is an integer, by default either 0 meaning no privacy, or 1
+ * meaning the note is displayed to author only.
+ * @param array $note (reference) Associative array of values for this note
+ */
+function civitest_civicrm_notePrivacy (&$note) {
+
+  /* CiviCRM will check for existence of $note['notePrivacy_hidden'].
+   *
+   * If this value is not set, CiviCRM will show or display the note
+   * based on the default, which is to count a note as private if it has
+   * any non-zero value in $note['privacy'], and then to display private
+   * notes only to the note author.
+   *
+   * If this value is set, CiviCRM will hide the note if the value is
+   * TRUE, and display the note if the value is FALSE.
+   */
+
+  if ($note['privacy']) {
+    if ($my_business_rules_say_so) {
+      $note['notePrivacy_hidden'] = TRUE;
+    } else {
+      $note['notePrivacy_hidden'] = FALSE;
+    }
+  }
+}
+
+/* a ready to use module is available at  http://github.com/tttp/civi_export */
+function civitest_civicrm_export( $exportTempTable, $headerRows, $sqlColumns, $exportMode ) {
+  $writeHeader = true;
+  $offset = 0;
+  $limit  = 200;
+
+  $query = "
+SELECT *
+FROM   $exportTempTable
+";
+  require_once 'CRM/Core/Report/Excel.php';
+  while ( 1 ) {
+    $limitQuery = $query . "
+LIMIT $offset, $limit
+";
+    $dao = CRM_Core_DAO::executeQuery( $limitQuery );
+
+    if ( $dao->N <= 0 ) {
+      break;
+    }
+
+    $componentDetails = array( );
+    while ( $dao->fetch( ) ) {
+      $row = array( );
+
+      foreach ( $sqlColumns as $column => $dontCare ) {
+        $row[$column] = $dao->$column;
+      }
+
+      $componentDetails[] = $row;
+    }
+    CRM_Core_Report_Excel::writeHTMLFile( "Export_Records", $headerRows,
+      $componentDetails, null, $writeHeader );
+    $writeHeader = false;
+    $offset += $limit;
+  }
+
+  CRM_Utils_System::civiExit( );
+}
+
+
+/*
+ * import hook allows you to interact with the import data post process
+ * this example retrieves a special column (tag_import) with pipe-separated tags and
+ * create/tags the imported contact record to a predefined tagset (id=296)
+ */
+
+function civitest_civicrm_import( $object, $usage, &$objectRef, $params ) {
+
+  if ( $object != 'Contact' &&
+    $usage  != 'process' ) {
+    return;
+  }
+
+  //during import, accept special tag_import column for processing
+  $cType           = $objectRef->_contactType;
+  $dupeType        = $objectRef->_onDuplicate;
+  $contactID       = $params['contactID'];
+  $importID        = $params['importID'];
+  $importTempTable = $params['importTempTable'];
+  $fields          = $params['fields'];
+
+  require_once 'CRM/Core/DAO.php';
+  $sqlTags = "SELECT tag_import
+        FROM $importTempTable
+        WHERE _id = $importID;";
+  $taglist = CRM_Core_DAO::singleValueQuery( $sqlTags );
+
+  if ( $taglist ) {
+
+    require_once 'api/api.php';
+    require_once 'CRM/Core/BAO/EntityTag.php';
+
+    $keywords = array();
+    $keywords = explode( '|', $taglist );
+
+    foreach ( $keywords as $keyword ) {
+      $params = array( 'name' => $keyword, 'parent_id' => '296', 'version' => 3 ); //import tags to tagset with id 296
+
+      //lookup tag; create new if nonexist
+      $tag = civicrm_api( 'Tag', 'get', $params );
+      if ( civicrm_error( $tag ) ) {
+        $tag = civicrm_api( 'Tag', 'create', $params );
+        $tagid = $tag['id'];
+      } else {
+        $tagid = $tag['id'];
+      }
+
+      //only add tag to contact if not already present
+      $entityTags = CRM_Core_BAO_EntityTag::getTag($contactID);
+      if ( !in_array($tagid, $entityTags) ) {
+        $entityParams = array( 'tag_id' => $tagid, 'contact_id' => $contactID, 'version' => 3 );
+        $entityTag = civicrm_api( 'EntityTag', 'create', $entityParams );
+      }
+    }
+  }
+}
+
+/**
+ *  alterAPIPermissions() hook allows you to change the permissions checked when doing API 3 calls.
+ */
+function civitest_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions)
+{
+  // skip permission checks for contact/create calls
+  // (but keep the ones for email, address, etc./create calls)
+  // note: unsetting the below would require the default ‘access CiviCRM’ permission
+  $permissions['contact']['create'] = array();
+
+  // enforce ‘view all contacts’ check for contact/get, but do not test ‘access CiviCRM’
+  $permissions['contact']['get'] = array('view all contacts');
+
+  // add a new permission requirement for your own custom API call
+  // (if all you want to enforce is ‘access CiviCRM’ you can skip the below altogether)
+  $permissions['foo']['get'] = array('access CiviCRM', 'get all foos');
+
+  // allow everyone to get info for a given event; also – another way to skip permissions
+  if ($entity == 'event' and $action == 'get' and $params['title'] == 'CiviCon 2038') {
+    $params['check_permissions'] = false;
+  }
+}
+
+/**
+ *This hook allows User to customize the actions on contact summary page .
+ *where contribution,note,and rel are some key to action in $actions array.
+ */
+
+function civitest_civicrm_summaryActions( &$actions, $contactID = NULL ) {
+  $customizeActions = array('contribution', 'note', 'rel');
+  foreach( $actions as $key => $value ) {
+    if ( in_array( $key, $customizeActions ) ) {
+      unset( $actions[$key] );
+    }
+  }
+}
+
+function civitest_civicrm_searchColumns( $objectName, &$headers,  &$values, &$selector ) {
+
+  if ( $objectName == 'Contact' ) {
+    // Lets move a few header around, and overwrite stuff we dont need
+
+    // move email to postal slot
+    $headers[5] = $headers[7];
+
+    // move phone to country slot
+    $headers[6] = $headers[8];
+
+    // lets change the title of the last two columns to fields we need
+    $headers[7]['name'] = 'Source';
+    unset( $headers[7]['sort'] );
+
+    $headers[8]['name'] = 'Job Title';
+    unset( $headers[8]['sort'] );
+
+    foreach ( $values as $id => $value ) {
+      $result = civicrm_api( 'Contact', 'GetSingle',
+                array( 'version' => 3,
+                  'id' => $value['contact_id'],
+                  'return.contact_source' => 1,
+                  'return.job_title' => 1 ) );
+
+      // store this value so it gets passed to the template
+      $values[$id]['source'] = $result['contact_source'];
+      $values[$id]['job_title'] = $result['job_title'];
+    }
+
+    // remember to modify CRM/Contact/Form/Selector.tpl to see the changes
+  }
+
+  if ( $objectName == 'Contribute' ) {
+    // rename type to total amount
+    foreach ( $headers as $id => $header ) {
+      if ( $header['name'] == 'Type' ) {
+        $headers[$id]['name'] = 'Total';
+        unset( $headers[$id]['sort'] );
+      }
+    }
+
+    foreach ( $values as $id => $value ) {
+      $sql = "
+                                                                                                              SELECT SUM(total_amount)
+                                                                                                              FROM   civicrm_contribution
+                                                                                                              WHERE  contact_id = %1
+                                                                                                              ";
+      $values[$id]['total'] = CRM_Core_DAO::singleValueQuery( $sql,
+                              array( 1 => array( $value['contact_id'],
+                                        'Integer' ) ) );
+      // this is cheating, but allows us NOT to modify the template
+      // override the values that we are not using
+      $values[$id]['financial_type'] = $values[$id]['total'];
+    }
+  }
+
+}
+
+/*
+ * Implements hook_civicrm_buildStateProvinceForCountry().
+ *
+ * Reorder the dublin states so that Dublin is at the top and dublin sub
+ * states are ordered nicely.
+ */
+function civitest_civicrm_buildStateProvinceForCountry( $countryID, &$states ) {
+  // First separate out the Dublin options.
+  $topStates = array();
+  foreach ($states as $key => $value) {
+    if (preg_match('/Dublin/', $value)) {
+      $topStates[$key] = $value;
+    } else {
+      $otherStates[$key] = $value;
+    }
+  }
+  ksort($topStates);
+  $states = $topStates + $otherStates;
+}
+
+function civitest_civicrm_dupeQuery( $obj, $type, &$data ) {
+  //don't run these during user account/contact creation
+  if( $obj->noRules || $type != 'table')
+    return;
+
+  if ( $obj->name=='My Dedupe Rule Group Name' ) {
+    //first unset existing queries
+    $data = array();
+
+    //now set threshold to match our revised rule
+    $obj->threshold = 5;
+
+    if ( empty($obj->params) ) {
+      //set new query when doing an internal dedupe (finding duplicate contacts)
+      $data['civicrm_contact.last_name.5'] = "
+SELECT t1.id id1, t2.id id2, 5 weight
+FROM   civicrm_contact t1
+INNER JOIN civicrm_contact t2 ON ( t1.first_name = t2.first_name AND
+                                   t1.last_name = t2.last_name AND
+                                 IFNULL(t1.middle_name,0) = IFNULL(t2.middle_name,0) AND
+                                 IFNULL(t1.suffix_id,0) = IFNULL(t2.suffix_id,0) )
+INNER JOIN civicrm_address a1 on t1.id=a1.contact_id
+INNER JOIN civicrm_address a2 on t2.id=a2.contact_id AND
+                                 a1.postal_code = a2.postal_code AND
+                                 a1.street_address = a2.street_address
+WHERE t1.contact_type = 'Individual'
+  AND t2.contact_type = 'Individual'
+  AND t1.id < t2.id
+  AND t1.last_name IS NOT NULL
+  AND t1.first_name IS NOT NULL
+  AND a1.postal_code IS NOT NULL
+  AND a1.street_address IS NOT NULL
+";
+    }
+  }
+
+  // ============= ANOTHER USE CASE =========
+  if ($type == 'supportedFields' && !empty($data)) {
+    // This makes a new custom rule appear in UI
+    $data['Individual']['civicrm_contact']['custom_initial_last_email']    = "Custom: Initial AND Last Name AND Email";
+  }
+
+  if ($type == 'dedupeIndexes' && !empty($data)) {
+    // since we don't want any index to be created for our new custom rule:
+    foreach ($data['civicrm_contact'] as $key => $val) {
+      if (in_array($val, array('custom_initial_last_email'))) {
+        unset($data['civicrm_contact'][$key]);
+      }
+    }
+  }
+
+  // This is how one could add the custom rule query:
+  if ($type == 'table' && !empty($data)) {
+    foreach ($data as $key => &$query) {
+      list($table, $col, $wt) = explode('.', $key);
+      if ($table == 'civicrm_contact' && $col == 'custom_initial_last_email') {
+        $data[$key] = "
+          SELECT t1.id id1, t2.id id2, $wt weight
+          FROM civicrm_contact t1
+          INNER JOIN civicrm_email em1 ON t1.id = em1.contact_id
+          JOIN ( SELECT cc.id, cc.first_name, cc.last_name, cc.contact_type, em2.email
+              FROM civicrm_contact cc
+              INNER JOIN civicrm_email em2 ON cc.id = em2.contact_id ) t2 ON SUBSTR(t1.first_name, 1, 1) = SUBSTR(t2.first_name, 1, 1) AND
+          t1.last_name = t2.last_name AND
+          em1.email = t2.email
+          WHERE t1.contact_type = 'Individual' AND
+          t2.contact_type = 'Individual' AND
+          t1.id < t2.id AND
+          t1.first_name IS NOT NULL AND
+          t1.last_name  IS NOT NULL AND
+          em1.email IS NOT NULL";
+      }
+    }
+  }
+
+}
+
+/**
+ * Hook implementations to get the display name of the
+ * shared address field
+ *
+ */
+
+/*
+ * Define the hook name
+ */
+function civitest_civicrm_tokens( &$tokens ) {
+  $tokens['sharedAddress'] = array( 'sharedAddress.orgName' => 'Shared Address Name' );
+}
+
+
+/*
+ * Retrieve the values for the org names if this contact ID is linked
+ * to another address via the shared addres scheme (which uses a pointer in
+ * the civicrm_address table: master_id to point to the real address
+ */
+function civitest_civicrm_tokenValues( &$values, &$contactIDs ) {
+  if ( is_array( $contactIDs ) ) {
+    $contactIDString = ' ( ' . implode( ',', array_values( $contactIDs ) ) . ' ) ';
+    $single = false;
+  } else {
+    $contactIDString = "( $contactIDs )";
+    $single = true;
+  }
+
+  $query = "
+SELECT     slave.id as contact_id, master.display_name as org_name
+FROM       civicrm_contact master
+INNER JOIN civicrm_address addressMaster ON addressMaster.contact_id = master.id
+INNER JOIN civicrm_address addressSlave ON addressSlave.master_id = addressMaster.id
+INNER JOIN civicrm_contact slave  ON addressSlave.contact_id = slave.id
+WHERE      slave.id IN $contactIDString
+";
+
+  $dao = CRM_Core_DAO::executeQuery( $query );
+  while ( $dao->fetch( ) ) {
+    if ( empty( $dao->org_name ) ) {
+      continue;
+    }
+
+    if ( $single ) {
+      $value =& $values;
+    } else {
+      if ( ! array_key_exists( $dao->contact_id, $values ) ) {
+        $values[$dao->contact_id] = array( );
+      }
+      $value =& $values[$dao->contact_id];
+    }
+
+    $value['sharedAddress.orgName'] = $dao->org_name;
+  }
+}
+
+
+function civitest_civicrm_emailProcessorContact( $email, $contactID, &$result ) {
+  require_once 'CRM/Utils/Mail/Incoming.php';
+
+  // first split the email into name and domain
+  // really simple, definitely wrong implementation
+  list( $mailName, $mailDomain ) = CRM_Utils_System::explode( '@', $email, 2 );
+
+  // we are doing all our checks based on mailDomain, so if empty
+  // return and let EmailProcessor do its own thing
+  if ( empty( $mailDomain ) ) {
+    return;
+  }
+
+  define( 'FILE_TO_ORG_ALWAYS_TAG', 'MyTag1' );
+  $orgID = _civitest_find_org_with_tag( FILE_TO_ORG_ALWAYS_TAG, $mailDomain );
+  if ( $orgID ) {
+    $result = array( 'contactID' => $orgID,
+              'action'    => CRM_Utils_Mail_Incoming::EMAILPROCESSOR_OVERRIDE );
+    return;
+  }
+
+  // if we already have a match, we will
+  // return and let EmailProcessor do its own thing
+  if ( $contactID ) {
+    return;
+  }
+
+  // Orgs with this tag will have same-domain emails filed on them only if it
+  // passes through the ALWAYS tag check without finding a match, AND it does
+  // not match an individual.
+  define( 'FILE_TO_ORG_INDIVIDUAL_UNMATCHED_TAG', 'MyTag2' );
+  $orgID = _civitest_find_org_with_tag( FILE_TO_ORG_INDIVIDUAL_UNMATCHED_TAG, $mailDomain );
+  if ( $orgID ) {
+    $result = array( 'contactID' => $orgID,
+              'action'    => CRM_Utils_Mail_Incoming::EMAILPROCESSOR_OVERRIDE );
+    return;
+  }
+
+  $result = array( 'action'    => CRM_Utils_Mail_Incoming::EMAILPROCESSOR_CREATE_INDIVIDUAL );
+
+  return;
+}
+
+function _civitest_find_org_with_tag( $tagName, $emailDomain ) {
+  $sql = "
+SELECT     o.id
+FROM       civicrm_contact o
+INNER JOIN civicrm_entity_tag et ON ( et.entity_table = 'civicrm_contact' AND et.entity_id = o.id )
+INNER JOIN civicrm_tag         t ON ( et.tag_id = t.id )
+INNER JOIN civicrm_email       e ON ( e.contact_id = o.id )
+WHERE      t.name = %1
+AND        e.email LIKE %2
+";
+
+  $params = array( 1 => array( $tagName         , 'String' ),
+            2 => array( "%{$emailDomain}", 'String' ) );
+  return CRM_Core_DAO::singleValueQuery( $sql, $params );
+}
+
+/**
+ * From the forum topic: http://forum.civicrm.org/index.php/topic,22430.0.html
+ * This has come up a few times and i felt compelled to investigate and scratch the itch.
+ * Here is a sample implementation of the ACL hook that suppresses profiles in the my account page
+ * Note that none of the roles involved can have the global profile view or edit permssion
+ * since those permissions trump the ACL. Also for sanity sake, these profiles
+ * should probably be restricted only to the My Account scenario:
+ */
+function civitest_civicrm_aclGroup( $type, $contactID, $tableName, &$allGroups, &$currentGroups ) {
+  if ( $tableName != 'civicrm_uf_group' ) {
+    return;
+  }
+
+  global $user;
+  $userRoles = $user->roles;
+
+  // based on the above value, choose which profile
+  // to retain for this user
+  // role name => profile name
+  $allProfiles = array( 'member'    => 'Member Profile',
+                 'supporter' => 'Supporter Profile',
+                 'major'     => 'Major Donor Profile',
+                 'real big'  => 'Real Big Donor Profile'
+  );
+
+  // first find the ids of all the profiles
+  $profileIDs = array( );
+  foreach ( $allProfiles as $roleName => $profileName ) {
+    $profileIDs[$profileName] = array_search( $profileName, $allGroups );
+  }
+
+  foreach ( $allProfiles as $roleName => $profileName ) {
+    if ( array_search( $roleName, $userRoles ) !== false ) {
+      unset( $profileIDs[$profileName] );
+    }
+  }
+
+  $currentGroups = array_diff( array_keys  ( $allGroups ),
+                   array_values( $profileIDs ) );
+}
+
+/**
+ * An optimized version to speed up the contact autocomplete for large DB's
+ * does not obey the settings from the UI. Does name check followed by email
+ * if needed. Adds email + city to output if they exist
+ */
+function civitest_civicrm_contactListQuery( &$query, $name, $context, $id ) {
+  // if other params are passed, the return without any changes
+  if ( $_GET['context'] != 'navigation' ) {
+    return;
+  }
+
+  // we are ignoring limit currently
+  //create temp table for storing result set
+  $randomNum = md5( uniqid( ) );
+  $quickSearchTempTable = "civicrm_temp_quick_search_{$randomNum}";
+  $sql = "CREATE TEMPORARY TABLE {$quickSearchTempTable} (
+            contact_id int unsigned,
+            data varchar(255),
+            PRIMARY KEY ( contact_id )
+        ) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
+        ";
+
+  CRM_Core_DAO::executeQuery( $sql );
+
+  // find the match from contact table
+  $sql = "
+        SELECT id, sort_name
+        FROM civicrm_contact
+        WHERE sort_name LIKE '$name%'
+        AND is_deleted = 0
+        ORDER BY sort_name LIMIT 0, 10";
+
+  $dao = CRM_Core_DAO::executeQuery( $sql );
+  $result = array();
+  while ( $dao->fetch() ) {
+    $result[$dao->id] = $dao->sort_name;
+  }
+
+  // if matches found less than 10, try to match from email table
+  if ( $dao->N < 10 ) {
+    // find the match from email table
+    $sql = "
+            SELECT contact_id, email
+            FROM civicrm_email
+            WHERE email LIKE '$name%'
+            ORDER BY email LIMIT 0, 10";
+
+    $dao = CRM_Core_DAO::executeQuery( $sql );
+    while ( $dao->fetch() ) {
+      if ( !array_key_exists( $dao->contact_id, $result ) ) {
+        $result[$dao->contact_id] = $dao->email;
+      }
+    }
+  }
+
+  // find email addresses, cities for these contacts
+  $ids = array();
+  foreach($result as $id => $value) { $ids[] = $id; }
+  $ids = implode(", ", $ids);
+  $sql = "
+        SELECT civicrm_contact.id, civicrm_email.email, civicrm_address.city
+        FROM civicrm_contact, civicrm_email, civicrm_address
+        WHERE civicrm_contact.id = civicrm_email.contact_id
+        AND civicrm_contact.id = civicrm_address.contact_id
+        AND civicrm_email.is_primary = 1
+        AND civicrm_address.is_primary = 1
+        AND civicrm_contact.id IN ( $ids )";
+  $dao = CRM_Core_DAO::executeQuery( $sql );
+  while($dao->fetch()) {
+    $result[$dao->id] .= " :: ".$dao->email." :: ".$dao->city;
+  }
+
+  // insert into temp table
+  if ( !empty( $result ) ) {
+    foreach( $result as $cid => $value ) {
+      $value = addslashes($value);
+      $insertSQL[] = "( {$cid}, '{$value}' )";
+    }
+    $insertValues = implode( ',', $insertSQL );
+    $sql = "INSERT INTO {$quickSearchTempTable}
+                (contact_id, data )
+                VALUES
+                {$insertValues}
+                ";
+    CRM_Core_DAO::executeQuery( $sql );
+  }
+
+  // return final query
+  $query = "SELECT data, contact_id as id
+        FROM {$quickSearchTempTable}";
+
+}
+
+function civitest_civicrm_alterContent( &$content,
+  $context,
+  $tplName,
+  &$object ) {
+  // u can modify the content programmatically
+  // similar to as described in this blog post
+  // http://civicrm.org/blogs/dave-greenberg/now-its-easier-add-custom-behaviors-templates
+}
+
+// this example has been contributed by graylin kim from NYSS
+function civitest_civicrm_triggerInfo(&$triggers, $tableName=NULL) {
+  $triggers[] = array(
+    'table' => 'civicrm_contact',
+    'event' => array('update', 'insert'),
+    'when'  => 'after',
+    'variables' => "
+            DECLARE norm_first_name VARCHAR(255);
+            DECLARE norm_middle_name VARCHAR(255);
+            DECLARE norm_last_name VARCHAR(255);
+            DECLARE norm_household_name VARCHAR(255);
+            DECLARE norm_organization_name VARCHAR(255);",
+    'sql' => "
+            SET norm_first_name = BB_NORMALIZE(NEW.first_name);
+            SET norm_middle_name = BB_NORMALIZE(NEW.middle_name);
+            SET norm_last_name = BB_NORMALIZE(NEW.last_name);
+            SET norm_household_name = BB_NORMALIZE(NEW.household_name);
+            SET norm_organization_name = BB_NORMALIZE(NEW.organization_name);
+
+            INSERT INTO shadow_contact
+            (contact_id, first_name, middle_name, last_name, suffix_id, birth_date, gender_id, contact_type, household_name, organization_name)
+            VALUES (NEW.id, norm_first_name, norm_middle_name, norm_last_name, NEW.suffix_id, NEW.birth_date, NEW.gender_id, NEW.contact_type, norm_household_name, norm_organization_name)
+            ON DUPLICATE KEY UPDATE
+            first_name=norm_first_name,
+            middle_name=norm_middle_name,
+            last_name=norm_last_name,
+            suffix_id=NEW.suffix_id,
+            birth_date=NEW.birth_date,
+            gender_id=NEW.gender_id,
+            contact_type=NEW.contact_type,
+            household_name=norm_household_name,
+            organization_name=norm_organization_name;"
+  );
+
+  $triggers[] = array(
+    'table' => 'civicrm_address',
+    'event' => array('update','insert'),
+    'when'  => 'after',
+    'variables' => "
+            DECLARE norm_supplemental_address_1 VARCHAR(255);
+            DECLARE norm_supplemental_address_2 VARCHAR(255);
+            DECLARE norm_street_address VARCHAR(255);
+            DECLARE norm_postal_code VARCHAR(255);
+            DECLARE norm_city VARCHAR(255);",
+    'sql' => "
+            SET norm_supplemental_address_1 = BB_NORMALIZE_ADDR(NEW.supplemental_address_1);
+            SET norm_supplemental_address_2 = BB_NORMALIZE_ADDR(NEW.supplemental_address_2);
+            SET norm_street_address = BB_NORMALIZE_ADDR(NEW.street_address);
+            SET norm_postal_code = IFNULL(NEW.postal_code,'');
+            SET norm_city = IFNULL(NEW.city,'');
+
+            INSERT INTO shadow_address
+                        (address_id, contact_id, street_address, postal_code, city, country_id, state_province_id, supplemental_address_1, supplemental_address_2)
+                 VALUES (NEW.id, NEW.contact_id, norm_street_address, norm_postal_code, norm_city, NEW.country_id, NEW.state_province_id, norm_supplemental_address_1, norm_supplemental_address_2)
+                 ON DUPLICATE KEY UPDATE
+                        street_address=norm_street_address,
+                        postal_code=norm_postal_code,
+                        city=norm_city,
+                        country_id=NEW.country_id,
+                        state_province_id=NEW.state_province_id,
+                        supplemental_address_1=norm_supplemental_address_1,
+                        supplemental_address_2=norm_supplemental_address_2;"
+  );
+
+  $triggers[] = array(
+    'table' => 'civicrm_contact',
+    'event' => 'delete',
+    'when'  => 'after',
+    'sql'   => 'DELETE FROM shadow_contact WHERE contact_id=OLD.id;'
+  );
+
+  $triggers[] = array(
+    'table' => 'civicrm_address',
+    'event' => 'delete',
+    'when'  => 'after',
+    'sql'   => 'DELETE FROM shadow_address WHERE address_id=OLD.id;'
+  );
+}
+
+function civitest_civicrm_alterReportVar($varType, &$var, &$form) {
+  $formName = get_class($form);
+  if ( $formName == 'CRM_Report_Form_Campaign_SurveyDetails' ) {
+    if ( $varType == 'columns' ) {
+      $var['civicrm_contribution'] =
+        array(
+          'dao' => 'CRM_Contribute_DAO_Contribution',
+          'fields' =>
+          array(
+            'receive_date' =>
+            array('title' => ts('last contribution date'),
+            ),
+            'total_amount' =>
+            array('title' => ts('last contri Amount'),
+            ),
+          ),
+          'grouping' => 'survey-activity-fields',
+        );
+    } else if ( $varType == 'sql' ) {
+      $params = $form->getVar( '_params' );
+      if ( CRM_Utils_Array::value('receive_date', $params['fields']) || CRM_Utils_Array::value('total_amount', $params['fields']) ) {
+        $var->_from .= "LEFT JOIN civicrm_contribution {$form->_aliases['civicrm_contribution']} ON ({$form->_aliases['civicrm_contribution']}.id = (select id from civicrm_contribution con where con.contact_id = {$form->_aliases['civicrm_contact']}.id ORDER BY con.receive_date DESC LIMIT 1 ))\n";
+      }
+    }
+  }
+}
+
+function civitest_civicrm_alterBarcode(&$data, $type, $context ) {
+  if ($type == 'barcode' && $context == 'name_badge') {
+    // change the encoding of barcode
+    $data['current_value'] = $data['event_id'] . '-' . $data['participant_id'] . '-' . $data['contact_id'];
+  }
+}
+
+function civitest_civicrm_unsubscribeGroups( $op, $mailingId, $contactId, &$groups, &$baseGroups ) {
+  // do the below for even mailing ids only
+  // in a real implementation, you will have some logic to restrict what mailings
+  // you want to handle the unsub via a different patch
+  // this hook basically redirects you to a custom unsubscribe page
+  // thanx to parvez @ veda consulting for this example
+  if ($op == 'unsubscribe' && $mailingId % 2 == 0) {
+    $oConfig                 = CRM_Core_Config::singleton();
+    $sUnsubscribeRedirectUrl = $oConfig->unsubscribe_redirect_url;
+    if ( !empty( $sUnsubscribeRedirectUrl ) ) {
+      CRM_Utils_System::redirect( $sUnsubscribeRedirectUrl );
+    } else {
+      CRM_Core_Error::statusBounce( 'Unsubscribe URL has not been set.' );
+    }
+    CRM_Utils_System::civiExit();
+  }
+}
+
+function civitest_civicrm_tabset($tabsetName, &$tabs, $context) {
+  //check if the tab set is Event manage
+  if ($tabsetName == 'civicrm/event/manage') {
+    if (!empty($context)) {
+      $eventID = $context['event_id'];
+      $url = CRM_Utils_System::url( 'civicrm/event/manage/volunteer',
+        "reset=1&snippet=5&force=1&id=$eventID&action=update&component=event" );
+    //add a new Volunteer tab along with url
+     $tab['volunteer'] = array(
+        'title' => ts('Volunteers'),
+        'link' => $url,
+        'valid' => 1,
+        'active' => 1,
+        'current' => false,
+      );
+    }
+    else {
+      $tab['volunteer'] = array(
+      'title' => ts('Volunteers'),
+        'url' => 'civicrm/event/manage/volunteer',
+      );
+    }
+
+  //Insert this tab into position 4
+
+  $tabs = array_merge(
+      array_slice($tabs, 0, 4),
+      $tab,
+      array_slice($tabs, 4)
+    );
+  }
+}
+
+function civitest_civicrm_dashboard_defaults($availableDashlets, &$defaultDashlets){
+  $contactID = CRM_Core_Session::singleton()->get('userID');
+  $defaultDashlets[] = array(
+    'dashboard_id' => 3,
+    'is_active' => 1,
+    'column_no' => 1,
+    'contact_id' => $contactID,
+  );
+}

@@ -1,0 +1,23 @@
+{
+  "name": "select2",
+  "main": [
+    "select2.js",
+    "select2.css",
+    "select2.png",
+    "select2x2.png",
+    "select2-spinner.gif"
+  ],
+  "dependencies": {
+    "jquery": ">= 1.7.1"
+  },
+  "homepage": "https://github.com/colemanw/select2",
+  "_release": "8bcec8afd1",
+  "_resolution": {
+    "type": "branch",
+    "branch": "stable/3.5",
+    "commit": "8bcec8afd14a35807ae8582a1d9c45280370376a"
+  },
+  "_source": "git://github.com/colemanw/select2.git",
+  "_target": "stable/3.5",
+  "_originalSource": "colemanw/select2"
+}

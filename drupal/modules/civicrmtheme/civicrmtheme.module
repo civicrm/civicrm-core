@@ -1,0 +1,137 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
+ */
+
+/**
+ * Get all available themes.
+ */
+function civicrmtheme_list_themes() {
+  $theme_list = array();
+  // Get current list of themes.
+  $themes = system_rebuild_theme_data();
+  uasort($themes, 'system_sort_modules_by_info_name');
+
+  foreach ($themes as & $theme) {
+    if (!empty($theme->info['hidden'])) {
+      continue;
+    }
+    $theme_list[$theme->name] = $theme->info['name'];
+  }
+
+  return $theme_list;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function civicrmtheme_form_system_themes_admin_form_alter(&$form, $form_state) {
+  // Define a fieldset for civicrm theme setting section
+  $form['admin_theme']['civicrm'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('CiviCRM'),
+    '#collapsible' => TRUE,
+    '#description' => t('Choose theme for CiviCRM.'),
+  );
+
+  $theme_list = civicrmtheme_list_themes();
+
+  $form['admin_theme']['civicrm']['civicrm_admin'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      0 => t('Default theme')) + $theme_list,
+    '#title' => t('CiviCRM Administration theme'),
+    '#description' => t('Choose theme for CiviCRM administration/backend pages.'),
+    '#default_value' => variable_get('civicrmtheme_theme_admin', 0),
+  );
+
+  $form['admin_theme']['civicrm']['civicrm_public'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      0 => t('Default theme')) + $theme_list,
+    '#title' => t('CiviCRM Public theme'),
+    '#description' => t('Choose theme for CiviCRM frontend pages.'),
+    '#default_value' => variable_get('civicrmtheme_theme_public', 0),
+  );
+
+  // Add extra submit
+  $form['#submit'][] = 'civicrmtheme_system_themes_admin_form_submit';
+  $form['admin_theme']['actions']['#weight'] = 10;
+}
+
+/**
+ * Process system_themes_form extra submit.
+ */
+function civicrmtheme_system_themes_admin_form_submit($form, &$form_state) {
+  variable_set('civicrmtheme_theme_admin', $form_state['values']['civicrm_admin']);
+  variable_set('civicrmtheme_theme_public', $form_state['values']['civicrm_public']);
+}
+
+/**
+ * Implementation of hook_custom_theme().
+ */
+function civicrmtheme_custom_theme() {
+  if (arg(0) != 'civicrm') {
+    return;
+  }
+  if (arg(1) == 'upgrade') {
+    return;
+  }
+
+  $admin_theme = variable_get('civicrmtheme_theme_admin', 0);
+  $public_theme = variable_get('civicrmtheme_theme_public', 0);
+
+  if ((!$admin_theme && !$public_theme) || !civicrm_initialize()) {
+    return;
+  }
+
+  // Get the menu items.
+  $args = explode('?', $_GET['q']);
+  $path = $args[0];
+
+  // Get the menu for above URL.
+  $item = CRM_Core_Menu::get($path);
+
+  // Check for public pages
+  // If public page and civicrm public theme is set, apply civicrm public theme
+  if (CRM_Utils_Array::value('is_public', $item)) {
+    if ($public_theme) {
+      return $public_theme;
+    }
+  }
+  elseif ($admin_theme) {
+    // If admin page and civicrm admin theme is set, apply civicrm admin theme
+    return $admin_theme;
+  }
+}
+

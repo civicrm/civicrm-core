@@ -1,0 +1,57 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
+ */
+
+/**
+ * Implementation of hook_enable().
+ *
+ */
+function civicrm_engage_enable() {
+  db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_engage'");
+  $url = url('admin/config/civicrm/civicrm_engage');
+  drupal_set_message(t('CiviCRM Engage must be <a href="@url">configured</a> before it will work properly.', array('@url' => $url)));
+}
+
+/**
+ * Fix the Participant Role field in the Update Event Invite Responses 
+ **/
+function civicrm_engage_update_7001() {
+  civicrm_initialize();
+  $sql = "UPDATE civicrm_uf_field SET field_name = 'participant_role' WHERE ".
+    "field_name = 'participant_role_id' AND uf_group_id IN (SELECT id FROM ".
+    "civicrm_uf_group WHERE name = 'update_event_invite_responses') ";
+
+  CRM_Core_DAO::executeQuery($sql);
+
+}

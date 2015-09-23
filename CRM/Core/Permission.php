@@ -844,6 +844,7 @@ class CRM_Core_Permission {
       ),
     );
 
+
     return $permissions;
   }
 

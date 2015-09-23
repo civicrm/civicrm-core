@@ -1,0 +1,478 @@
+<?php
+
+/**
+ * Implemetation of hook_menu, retrieve conatacts from civicrm for
+ * autocomplete widget.
+ */
+function civicrm_contact_ref_menu() {
+  $items = array();
+  $items['civicrm_contact_ref/autocomplete'] = array(
+    'title' => t('Contacts'),
+    'page callback' => 'civicrm_contact_ref_autocomplete_value',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implemetation of hook_field_info
+ */
+function civicrm_contact_ref_field_info() {
+  return array(
+    'civicrm_contact_ref_contact' =>
+    array(
+      'label' => t('CiviCRM Contact'),
+      'description' => t('Reference a CiviCRM contact.'),
+      'default_widget' => 'options_select',
+      'default_formatter' => 'civicrm_contact_ref_link',
+      'property_type' => 'integer', // note that this property is used by entity.module
+    ),
+  );
+}
+
+/**
+ * Implemetation of hook_field_widget_info
+ */
+function civicrm_contact_ref_field_widget_info() {
+  return array(
+    'civicrm_contact_ref_autocomplete' =>
+    array(
+      'label' => t('Autocomplete text field'),
+      'field types' => array('civicrm_contact_ref_contact'),
+      'settings' => array(
+        'size' => 60,
+        'autocomplete_path' => 'civicrm_contact_ref/autocomplete',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implemetation of hook_field_widget_info_alter
+ */
+function civicrm_contact_ref_field_widget_info_alter(&$info) {
+  $info['options_select']['field types'][] = 'civicrm_contact_ref_contact';
+  $info['options_buttons']['field types'][] = 'civicrm_contact_ref_contact';
+}
+
+/**
+ * Implements hook_options_list().
+ */
+function civicrm_contact_ref_options_list($field) {
+  $function = !empty($field['settings']['options_list_callback']) ? $field['settings']['options_list_callback'] : 'civicrm_contact_ref_allowed_values';
+  return $function($field);
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function civicrm_contact_ref_field_is_empty($item, $field) {
+  return empty($item['contact_id']) ? TRUE : FALSE;
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function civicrm_contact_ref_field_formatter_info() {
+  return array(
+    'civicrm_contact_ref_link' => array(
+      'label' => t('Title (link)'),
+      'field types' => array('civicrm_contact_ref_contact'),
+    ),
+    'civicrm_contact_ref_plain' => array(
+      'label' => t('Title (plain)'),
+      'field types' => array('civicrm_contact_ref_contact'),
+    ),
+    'civicrm_contact_ref_raw' => array(
+      'label' => t('CID (raw)'),
+      'field types' => array('civicrm_contact_ref_contact'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view()
+ */
+function civicrm_contact_ref_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  // Terms whose tid is 'autocreate' do not exist
+  // yet and $item['taxonomy_term'] is not set. Theme such terms as
+  // just their name.
+
+  switch ($display['type']) {
+    case 'civicrm_contact_ref_link':
+      foreach ($items as $delta => $item) {
+        if (isset($item['contact_id']) && is_numeric($item['contact_id'])) {
+          $title = _civicrm_contact_ref_titles($item['contact_id']);
+          $element[$delta] = array(
+            '#markup' => l($title,
+              'civicrm/contact/view',
+              array(
+                'query' =>
+                array(
+                  'reset' => 1,
+                  'cid' => "{$item['contact_id']}",
+                ),
+              )
+            ),
+          );
+        }
+      }
+      break;
+
+    case 'civicrm_contact_ref_plain':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          '#markup' => _civicrm_contact_ref_titles($item['contact_id']),
+        );
+      }
+      break;
+
+    case 'civicrm_contact_ref_raw':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          '#markup' => $item['contact_id'],
+        );
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Returns the set of valid civicrm contacts
+ *
+ * @param $field
+ *   The field definition.
+ *
+ * @return
+ *   The array of valid contacts.
+ */
+function civicrm_contact_ref_allowed_values($field) {
+  $references = _civicrm_contact_ref_potential_references($field);
+
+  $options = array();
+  foreach ($references as $key => $value) {
+    // Views theming runs check_plain (htmlentities) on the values.
+    // We reverse that with html_entity_decode.
+    $options[$key] = html_entity_decode(strip_tags($value['rendered']));
+  }
+  return $options;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function civicrm_contact_ref_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $defaultValues = array();
+  foreach ($items as $item) {
+    $sort_name = _civicrm_contact_ref_titles($item['contact_id'], 'sort_name');
+    $defaultValues[] = "$sort_name [cid:{$item['contact_id']}]";
+  }
+
+  $element += array(
+    '#type' => 'textfield',
+    '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'] . '/' . $field['field_name'],
+    '#size' => $instance['widget']['settings']['size'],
+    '#maxlength' => 1024,
+    '#default_value' => empty($defaultValues[$delta]) ? '' : $defaultValues[$delta],
+    '#element_validate' => array('civicrm_contact_ref_autocomplete_validate'),
+  );
+
+  return array('contact_id' => $element);
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function civicrm_contact_ref_field_widget_error($element, $error, $form, &$form_state) {
+  form_error($element, $error['message']);
+}
+
+/**
+ * Implements hook_field_settings_form().
+ */
+function civicrm_contact_ref_field_settings_form($field, $instance, $has_data) {
+
+  if (!civicrm_initialize()) {
+    return;
+  }
+
+  $settings = $field['settings'];
+
+  require_once 'CRM/Contact/BAO/ContactType.php';
+  $contactTypes = CRM_Contact_BAO_ContactType::basicTypePairs();
+  $form = array();
+  $form['allowed_values'] = array(
+    '#tree' => TRUE,
+  );
+  foreach ($contactTypes as $name => $label) {
+    $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($name);
+    $form['allowed_values'][$name] = array(
+      '#type' => 'checkboxes',
+      '#title' => ts('CiviCRM Contact Type %1', array(1 => $label)),
+      '#options' => CRM_Utils_Array::crmArrayMerge(array($name => $label), $subTypes),
+      '#default_value' => isset($settings['allowed_values']) ? $settings['allowed_values'][$name] : array(),
+      '#weight' => 1,
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Form element validate handler for civicrm contact autocomplete element.
+ */
+function civicrm_contact_ref_autocomplete_validate($element, &$form_state) {
+
+  $field     = field_info_field($element['#field_name']);
+  $field_key = $element['#columns'][0];
+  $delta     = $element['#delta'];
+  $value     = $element['#value'];
+
+  $cid = NULL;
+  if (!empty($value)) {
+    preg_match('/^(?:\s*|(.*) )?\[\s*cid\s*:\s*(\d+)\s*\]$/', $value, $matches);
+    if (!empty($matches)) {
+      // Explicit [cid:n].
+      $cid = $matches[2];
+    }
+    else {
+      // No explicit cid.
+      $cids = _civicrm_contact_ref_potential_references($field, $value, TRUE);
+      if (empty($cids)) {
+        form_error($element, t('%name: found no valid post with that title.', array('%name' => $element['#title'])));
+      }
+      else {
+        // TODO:
+        // the best thing would be to present the user with an additional form,
+        // allowing the user to choose between valid candidates with the same title
+        // ATM, we pick the first matching candidate...
+        $cid = array_shift(array_keys($cids));
+      }
+    }
+  }
+
+  form_set_value($element, $cid, $form_state);
+}
+
+/*
+ * Function to provide values for autocomplete civicrm contact
+ * element, depend upon entered string.
+ */
+function civicrm_contact_ref_autocomplete_value($field_name, $string = '') {
+  if (!civicrm_initialize()) {
+    return;
+  }
+
+  $field = field_info_field($field_name);;
+  $matches = array();
+
+  $references = _civicrm_contact_ref_potential_references($field, $string);
+  foreach ($references as $id => $row) {
+    // Add a class wrapper for a few required CSS overrides.
+    $matches["{$row['title']} [cid:{$id}]"] = '<div class="reference-autocomplete">' . $row['rendered'] . '</div>';
+  }
+  drupal_json_output($matches);
+}
+
+/**
+ * Fetch an array of all candidate referenced nodes.
+ *
+ * This info is used in various places (aloowed values, autocomplete results,
+ * input validation...). Some of them only need the nids, others nid + titles,
+ * others yet nid + titles + rendered row (for display in widgets).
+ * The array we return contains all the potentially needed information, and lets
+ * consumers use the parts they actually need.
+ *
+ * @param $field
+ *   The field description.
+ * @param $string
+ *   Optional string to filter titles on (used by autocomplete)
+ * @param $exact_string
+ *   Optional: should the title filter be an exact match.
+ *
+ * @return
+ *   An array of valid nodes in the form:
+ *   array(
+ *     nid => array(
+ *       'title' => The node title,
+ *       'rendered' => The text to display in widgets (can be HTML)
+ *     ),
+ *     ...
+ *   )
+ */
+function _civicrm_contact_ref_potential_references($field, $string = '', $exact_string = FALSE) {
+  static $results = array();
+
+  $references = _civicrm_contact_ref_potential_references_standard($field, $string, $exact_string);
+
+  // Store the results.
+  $results[$field['field_name']][$string][$exact_string] = $references;
+
+  return $results[$field['field_name']][$string][$exact_string];
+}
+
+/**
+ * Helper function for _civicrm_contact_ref_potential_references():
+ * referenceable nodes defined by content types.
+ */
+function _civicrm_contact_ref_potential_references_standard($field, $string = '', $exact_string = FALSE, $limit = '10') {
+  $args = $whereClause = $contactTypes = $contactSubTypes = array();
+
+  if (!civicrm_initialize()) {
+    return;
+  }
+
+  require_once 'CRM/Contact/BAO/ContactType.php';
+  $basicTypes = CRM_Contact_BAO_ContactType::basicTypePairs();
+
+  foreach ($basicTypes as $name => $label) {
+    if (isset($field['settings']['allowed_values']) && is_array($field['settings']['allowed_values'][$name])) {
+      $contactNames = array_filter($field['settings']['allowed_values'][$name]);
+      if (!empty($contactNames)) {
+        if (in_array($name, $contactNames)) {
+          $contactTypes[] = $name;
+        }
+        else {
+          $contactSubTypes = array_merge($contactSubTypes, array_keys($contactNames));
+        }
+      }
+    }
+  }
+
+  if (!empty($contactTypes)) {
+    $contactTypes = implode("','", $contactTypes);
+    $whereClause[] = "contact_type IN ( '{$contactTypes}' )";
+  }
+
+  if (!empty($contactSubTypes)) {
+    $contactSubTypes = implode("','", $contactSubTypes);
+    $whereClause[] = "contact_sub_type IN ( '{$contactSubTypes}' )";
+  }
+
+  $whereClause = empty($whereClause) ? '' : '(' . implode(' OR ', $whereClause) . ') AND';
+  $related_clause = "";
+
+  if (isset($string)) {
+    if ($exact_string) {
+      $string_clause = " AND sort_name = %1";
+      $args[] = $string;
+    }
+    else {
+      $string_clause = " AND sort_name LIKE %1";
+      $args[] = "%%" . $string . "%";
+    }
+  }
+
+  $q = "
+    SELECT sort_name, id
+    FROM civicrm_contact
+    WHERE $whereClause
+    sort_name IS NOT NULL
+    AND sort_name NOT LIKE ''
+    AND sort_name NOT LIKE '<Last>%%'
+    AND sort_name NOT LIKE '%@%%'
+    AND sort_name NOT LIKE '--%%'
+    AND sort_name NOT LIKE '- -%%'
+    AND sort_name NOT LIKE ',%%'
+    AND sort_name NOT LIKE '..%%'
+    AND is_deleted = 0
+    " . $string_clause . " LIMIT $limit";
+  $params = array(1 => array($args[0], "String"));
+  $dao = CRM_Core_DAO::executeQuery($q, $params);
+
+  $references = array();
+  while ($dao->fetch()) {
+    $references[$dao->id] = array(
+      'title' => $dao->sort_name,
+      'rendered' => $dao->sort_name,
+    );
+  }
+
+  return $references;
+}
+
+/**
+ * Helper function for formatters.
+ *
+ * Store node titles collected in the current request.
+ *
+ * @param int $cid
+ * @param string $field
+ * @return string|null
+ */
+function _civicrm_contact_ref_titles($cid, $field = 'display_name') {
+  if (!civicrm_initialize() || !$cid) {
+    return NULL;
+  }
+  static $titles = array();
+
+  if (!isset($titles["{$cid}_{$field}"])) {
+    $q = "
+SELECT {$field}
+FROM   civicrm_contact
+WHERE  id = %1";
+    $params = array(1 => array($cid, "Integer"));
+    $dao = CRM_Core_DAO::executeQuery($q, $params);
+
+    $titles["{$cid}_{$field}"] = $dao->fetch() ? $dao->$field : '';
+  }
+  return $titles["{$cid}_{$field}"];
+}
+
+/**
+ * Implements hook_field_views_data() to allow for views relationships
+ */
+function civicrm_contact_ref_field_views_data($field) {
+  $data = field_views_field_default_views_data($field);
+  $storage = $field['storage']['details']['sql'];
+
+  foreach ($storage as $age => $table_data) {
+    $table = key($table_data);
+    $columns = current($table_data);
+    $id_column = $columns['contact_id'];
+    if (isset($data[$table])) {
+      // Relationship.
+      $data[$table][$id_column]['relationship'] = array(
+        'handler' => 'views_handler_relationship',
+        'base' => 'civicrm_contact',
+        'base field' => 'id',
+        'field' => $id_column,
+        'label' => $field['field_name'],
+        'field_name' => $field['field_name'],
+      );
+    }
+  }
+
+  return $data;
+}
+
+/**
+ * Implements hook_civicrm_merge().
+ * Update field data to reflect new cids when contacts are merged.
+ */
+function civicrm_contact_ref_civicrm_merge($type, $data, $new_id = NULL, $old_id = NULL, $tables = NULL) {
+  $updated = FALSE;
+  if (!empty($new_id) && !empty($old_id) && $type == 'sqls' && $tables === FALSE) {
+    // Update contact reference field data
+    $db = db_query("SELECT field_name FROM {field_config} WHERE module = 'civicrm_contact_ref'");
+    foreach ($db as $table) {
+      $result = db_update("field_data_{$table->field_name}")
+        ->fields(array("{$table->field_name}_contact_id" => $new_id))
+        ->condition("{$table->field_name}_contact_id", $old_id)
+        ->execute();
+      if ($result) {
+        $updated = TRUE;
+      }
+    }
+  }
+  if ($updated) {
+    cache_clear_all('*', 'cache_field', TRUE);
+    cache_clear_all('*', 'cache_page', TRUE);
+  }
+}

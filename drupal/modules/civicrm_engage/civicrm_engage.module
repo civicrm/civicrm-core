@@ -1,0 +1,252 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
+ */
+
+define('CIVICRM_ENGAGE_CG_DEMOGRAPHICS_NAME', 'Demographics');
+define('CIVICRM_ENGAGE_DEMOGRAPHICS_PREFIX', 'demographics_');
+define('CIVICRM_ENGAGE_DEMOGRAPHICS_TITLE', 'Demographics');
+function _civicrm_engage_getCustomGroupID($customGroupName) {
+  require_once 'CRM/Utils/Type.php';
+  $customGroupName = CRM_Utils_Type::escape($customGroupName, 'String');
+  return CRM_Core_DAO::getFieldValue("CRM_Core_DAO_CustomGroup", $customGroupName, 'id', 'name');
+}
+
+function civicrm_engage_civicrm_buildForm($formName, &$form) {
+  if ($formName == 'CRM_Contact_Form_Contact' || $formName == 'CRM_Contact_Form_Inline_Demographics') {
+    $cgID = _civicrm_engage_getCustomGroupID(CIVICRM_ENGAGE_CG_DEMOGRAPHICS_NAME);
+    if (empty($cgID)) {
+      return;
+    }
+    $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Individual',
+      $form,
+      $form->getVar('_contactId'),
+      $cgID,
+      NULL, NULL
+    );
+
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $form);
+
+    if (isset($groupTree) && is_array($groupTree)) {
+      $defaults = array();
+      CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults);
+      $form->setDefaults($defaults);
+
+      CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, CIVICRM_ENGAGE_DEMOGRAPHICS_PREFIX);
+    }
+  }
+}
+
+function civicrm_engage_civicrm_alterReportVar($varType, &$var, &$form) {
+  $formName = get_class($form);
+  if ( $formName == 'CRM_Report_Form_Campaign_SurveyDetails' ) {
+    if ( $varType == 'columns' ) {
+      $var['civicrm_contribution'] =
+        array(
+              'dao' => 'CRM_Contribute_DAO_Contribution',
+              'fields' =>
+              array(
+                    'receive_date' =>
+                    array('title' => ts('Latest Contribution Date'),
+                          ),
+                    'total_amount' =>
+                    array('title' => ts('Latest Contribution Amount'),
+                          ),
+                    ),
+              'grouping' => 'survey-activity-fields',
+              );
+    } else if ( $varType == 'sql' ) {
+      $params = $form->getVar( '_params' );
+      if ( CRM_Utils_Array::value('receive_date', $params['fields']) || CRM_Utils_Array::value('total_amount', $params['fields']) ) {
+        $var->_from .= "
+LEFT JOIN civicrm_contribution {$form->_aliases['civicrm_contribution']} ON ({$form->_aliases['civicrm_contribution']}.id = (select id from civicrm_contribution con where con.contact_id = {$form->_aliases['civicrm_contact']}.id ORDER BY con.receive_date DESC LIMIT 1 ))\n";
+      }
+    }
+  }
+}
+
+function civicrm_engage_civicrm_postProcess($class, &$form) {
+  if (is_a($form, 'CRM_Contact_Form_Contact') || is_a($form, 'CRM_Contact_Form_Inline_Demographics')) {
+    if (array_key_exists('_qf_Contact_refresh_dedupe', $form->_submitValues)) {
+      // don't execute when checking for duplicates - it fails (CRM-8994)
+      return;
+    }
+    else {
+      $cgID = _civicrm_engage_getCustomGroupID(CIVICRM_ENGAGE_CG_DEMOGRAPHICS_NAME);
+      if (empty($cgID)) {
+        return;
+      }
+      $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Individual',
+        $form,
+        $form->getVar('_contactId'),
+        $cgID,
+        NULL, NULL
+      );
+
+      // we should use simplified formatted groupTree
+      $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $form);
+
+      if (isset($groupTree) && is_array($groupTree)) {
+        require_once 'CRM/Core/BAO/CustomValueTable.php';
+        $params = $form->controller->exportValues($form->getVar('_name'));
+        CRM_Core_BAO_CustomValueTable::postProcess($params,
+          $groupTree[$cgID]['fields'],
+          'civicrm_contact',
+          $form->getVar('_contactId'),
+          'Individual'
+        );
+      }
+    }
+  }
+}
+
+ /** The big picture is:
+ * set our custom demographics group of fields to be a
+ * tab; hide the tab; shove the fields into the core
+ * Demographics display.
+ **/
+
+ /**
+ * Alter the page as displayed on the contact summary
+ * and inline demographics. This is the function where we
+ * stick the custom demographics fields into the core
+ * demographics displayed. It goes with the custom
+ * Demographics.tpl file we are shipping.
+ **/
+function civicrm_engage_civicrm_pageRun(&$page) {
+  if ($page->getVar('_name') == 'CRM_Contact_Page_View_Summary' ||
+    $page->getVar('_name') == 'CRM_Contact_Page_Inline_Demographics') {
+    $cgID = _civicrm_engage_getCustomGroupID(CIVICRM_ENGAGE_CG_DEMOGRAPHICS_NAME);
+    if (empty($cgID)) {
+      return;
+    }
+    $contactId = $page->getVar('_contactId');
+    if(empty($contactId)) {
+      $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE, NULL, $_REQUEST);
+    }
+    $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Individual',
+      $page,
+      $contactId,
+      $cgID,
+      NULL, NULL
+    );
+
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($page,
+      $groupTree,
+      FALSE, NULL,
+      CIVICRM_ENGAGE_DEMOGRAPHICS_PREFIX
+    );
+
+    $cgID = _civicrm_engage_getCustomGroupID(CIVICRM_ENGAGE_CG_DEMOGRAPHICS_NAME);
+    $page->assign('demographics_custom_group_id', $cgID);
+  }
+}
+
+/**
+ * Hide the custom demographics tab because we are handling
+ * the custom demographics fields inline in the
+ * civicrm_engage_civicrm_pageRun() function.
+ **/
+function civicrm_engage_civicrm_tabs(&$tabs, $contactID) {
+  foreach ($tabs as $tabID => $tabValue) {
+    if ($tabValue['title'] == CIVICRM_ENGAGE_DEMOGRAPHICS_TITLE) {
+      unset($tabs[$tabID]);
+    }
+  }
+}
+
+function civicrm_engage_civicrm_config(&$config) {
+  $engageRoot = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+
+  // fix php include path
+  $include_path = $engageRoot . PATH_SEPARATOR . get_include_path();
+  set_include_path($include_path);
+
+  // fix template path
+  $templateDir = $engageRoot . 'templates' . DIRECTORY_SEPARATOR;
+  $template = CRM_Core_Smarty::singleton();
+  if (is_array($template->template_dir)) {
+    $template->template_dir = array_merge(array($templateDir),
+      $template->template_dir
+    );
+  }
+  else {
+    $template->template_dir = array($templateDir, $template->template_dir);
+  }
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function civicrm_engage_permission() {
+  return array(
+    'access civiengage settings' =>
+    array('title' => t('Access CiviCRM engage setting'),
+      'description' => t('Access CiviCRM engage setting.'),
+    ),
+  );
+}
+
+function civicrm_engage_menu() {
+
+  $items['admin/config/civicrm/civicrm_engage'] = array(
+    'title' => t('Civicrm engage settings'),
+    'description' => t('CiviCRM Engage Configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('civicrm_engage_admin_settings'),
+    'access arguments' => array('access civiengage settings'),
+    'file' => 'civicrm_engage.admin.inc',
+  );
+  $items['admin/config/civicrm/civicrm_engage/settings'] = array(
+    'title' => t('Civicrm engage settings'),
+    'description' => t('CiviCRM Engage Configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('civicrm_engage_admin_settings'),
+    'access arguments' => array('access civiengage settings'),
+    'file' => 'civicrm_engage.admin.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/config/civicrm/civicrm_engage/load-data'] = array(
+    'title' => t('Civicrm engage load default data'),
+    'description' => t('CiviCRM Engage Load Data'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('civicrm_engage_admin_load_data'),
+    'access arguments' => array('access civiengage settings'),
+    'file' => 'civicrm_engage.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+
