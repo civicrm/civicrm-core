@@ -231,23 +231,35 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
    *   TRUE for success
    */
   public static function migrateOnBehalfOfInfo(CRM_Queue_TaskContext $ctx) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
 
+    // fetch onBehalf entry in UFJoin table
     $ufGroupDAO = new CRM_Core_DAO_UFJoin();
     $ufGroupDAO->module = 'OnBehalf';
     $ufGroupDAO->find(TRUE);
 
-    $query = "SELECT cp.*, uj.id as join_id
-   FROM civicrm_contribution_page cp
-    INNER JOIN civicrm_uf_join uj ON uj.entity_id = cp.id AND uj.module = 'OnBehalf'";
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $forOrgColums = array();
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      foreach ($locales as $locale) {
+        $forOrgColums[] = "for_organization_{$locale}";
+      }
+    }
+    else {
+      $forOrgColums[] = "for_organization";
+    }
+
+    $query = "
+      SELECT " . implode(", ", $forOrgColums) . ", uj.id as join_id, uj.uf_group_id as uf_group_id
+      FROM civicrm_contribution_page cp
+       INNER JOIN civicrm_uf_join uj ON uj.entity_id = cp.id AND uj.module = 'OnBehalf'";
+    $dao = CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
 
     if ($dao->N) {
-      $domain = new CRM_Core_DAO_Domain();
-      $domain->find(TRUE);
       while ($dao->fetch()) {
         $onBehalfParams['on_behalf'] = array('is_for_organization' => $dao->is_for_organization);
         if ($domain->locales) {
-          $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
           foreach ($locales as $locale) {
             $for_organization = "for_organization_{$locale}";
             $onBehalfParams['on_behalf'] += array(
@@ -267,6 +279,7 @@ FROM `civicrm_dashboard_contact` WHERE 1 GROUP BY contact_id";
         $ufJoinParam = array(
           'id' => $dao->join_id,
           'module' => 'on_behalf',
+          'uf_group_id' => $dao->uf_group_id,
           'module_data' => json_encode($onBehalfParams),
         );
         CRM_Core_BAO_UFJoin::create($ufJoinParam);
