@@ -93,6 +93,28 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the import parser updates when a new external identifier is set.
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWithUpdateWithNewExternalIdentifier() {
+    $originalValues = array(
+      'first_name' => 'Bill',
+      'last_name' => 'Gates',
+      'email' => 'bill.gates@microsoft.com',
+      'nick_name' => 'Billy-boy',
+    );
+    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $result = $this->callAPISuccessGetSingle('Contact', $originalValues);
+    $originalValues['nick_name'] = 'Old Bill';
+    $originalValues['external_identifier'] = 'windows';
+    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $originalValues['id'] = $result['id'];
+    $this->assertEquals('Old Bill', $this->callAPISuccessGetValue('Contact', array('id' => $result['id'], 'return' => 'nick_name')));
+    $this->callAPISuccessGetSingle('Contact', $originalValues);
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
