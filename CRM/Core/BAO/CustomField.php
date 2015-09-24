@@ -1265,19 +1265,22 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Select State/Province':
       case 'Multi-Select State/Province':
-        $display = NULL;
-        $option = CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE);
-        foreach ((array) $value as $data) {
-          $display .= $display ? ', ' . $option[$data] : $option[$data];
-        }
-        break;
-
       case 'Select Country':
       case 'Multi-Select Country':
-        $countries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
+        if (strstr($html_type, 'State/Province')) {
+          $option = CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE);
+        }
+        else {
+          $option = CRM_Core_PseudoConstant::country(FALSE, FALSE);
+        }
+        // process multi-select state/country field values
+        if (!is_array($value)) {
+          $value = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+        }
+
         $display = NULL;
-        foreach ((array) $value as $countryID) {
-          $display .= $display ? ', ' . $countries[$countryID] : $countries[$countryID];
+        foreach ($value as $data) {
+          $display .= ($display && !empty($option[$data])) ? ', ' . $option[$data] : $option[$data];
         }
         break;
 
