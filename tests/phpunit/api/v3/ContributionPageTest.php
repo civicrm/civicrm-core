@@ -531,7 +531,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'name' => 'membership_amount',
         'label' => 'Membership Amount',
         'amount' => 1,
-        'financial_type_id' => 1,
+        'financial_type_id' => 'Donation',
         'format.only_id' => TRUE,
         'membership_type_id' => $membershipTypeID,
         'price_field_id' => $priceField['id'],
@@ -565,6 +565,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'price_set_id' => $priceSetID,
           'price_field_id' => $priceField['id'],
           'label' => 'Long Haired Goat',
+          'financial_type_id' => 'Donation',
           'amount' => 20,
         )
       );
@@ -572,6 +573,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'price_set_id' => $priceSetID,
           'price_field_id' => $priceField['id'],
           'label' => 'Shoe-eating Goat',
+          'financial_type_id' => 'Donation',
           'amount' => 10,
         )
       );
