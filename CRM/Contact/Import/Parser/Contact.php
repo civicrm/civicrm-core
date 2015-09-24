@@ -547,7 +547,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           foreach ($matchedIDs as $contactId) {
             if ($params['id'] == $contactId) {
               $contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_type');
-
               if ($formatted['contact_type'] == $contactType) {
                 //validation of subtype for update mode
                 //CRM-5125
@@ -1623,7 +1622,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
     $dupeCheck = FALSE;
-
     $newContact = NULL;
 
     if (is_null($contactId) && ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK)) {
@@ -1993,7 +1991,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       }
     }
 
-    if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) && array_key_exists($customFieldID, $customFields) &&
+    if (!empty($key) && ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) && array_key_exists($customFieldID, $customFields) &&
       !array_key_exists($customFieldID, $addressCustomFields)
     ) {
       // @todo calling api functions directly is not supported
