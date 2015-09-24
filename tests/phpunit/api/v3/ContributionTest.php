@@ -1669,6 +1669,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'price_field_id' => $priceField['id'],
         'label' => 'Long Haired Goat',
         'amount' => 20,
+        'financial_type_id' => 'Donation',
         'membership_type_id' => $membershipTypeID,
         'membership_num_terms' => 1,
       )
@@ -1679,6 +1680,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'price_field_id' => $priceField['id'],
         'label' => 'Shoe-eating Goat',
         'amount' => 10,
+        'financial_type_id' => 'Donation',
         'membership_type_id' => $membershipTypeID,
         'membership_num_terms' => 2,
       )

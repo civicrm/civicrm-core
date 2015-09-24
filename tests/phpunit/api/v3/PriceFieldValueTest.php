@@ -80,6 +80,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'name' => 'rye grass',
       'label' => 'juicy and healthy',
       'amount' => 1,
+      'financial_type_id' => 1,
     );
 
     $membershipOrgId = $this->organizationCreate(NULL);
