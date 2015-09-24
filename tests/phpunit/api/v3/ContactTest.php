@@ -112,6 +112,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test civicrm_contact_create.
+   *
+   * Verify that preferred language can be set.
+   */
+  public function testAddCreateIndividualWithPreferredLanguage() {
+    $params = array(
+      'first_name' => 'abc1',
+      'contact_type' => 'Individual',
+      'last_name' => 'xyz1',
+      'preferred_language' => 'es_ES',
+    );
+
+    $contact = $this->callAPISuccess('contact', 'create', $params);
+    $this->getAndCheck($params, $contact['id'], 'Contact');
+  }
+
+  /**
    * Test civicrm_contact_create with sub-types.
    *
    * Verify that sub-types are created successfully and not deleted by subsequent updates.
