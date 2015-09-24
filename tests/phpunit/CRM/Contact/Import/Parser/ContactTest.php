@@ -131,4 +131,5 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $parser->init();
     $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values));
   }
+
 }
