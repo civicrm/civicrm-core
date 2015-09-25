@@ -3126,7 +3126,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4673, 1211, "65", "Phitsanulok"),
 (4674, 1211, "54", "Phrae"),
 (4675, 1211, "14", "Phra Nakhon Si Ayutthaya"),
-(4676, 1211, "83", "Phaket"),
+(4676, 1211, "83", "Phuket"),
 (4677, 1211, "25", "Prachin Buri"),
 (4678, 1211, "77", "Prachuap Khiri Khan"),
 (4679, 1211, "85", "Ranong"),
