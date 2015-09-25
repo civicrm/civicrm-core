@@ -1815,7 +1815,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         if ($results) {
           $groupInfo['id'] = $results['id'];
           $groupInfo['title'] = $results['title'];
-          $params = array(array('group', 'IN', array($groupInfo['id'] => 1), 0, 0));
+          $params = array(array('group', '=', $groupInfo['id'], 0, 0));
           $return = array('contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
           list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
 
