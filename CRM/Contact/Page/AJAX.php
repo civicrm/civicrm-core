@@ -219,62 +219,42 @@ class CRM_Contact_Page_AJAX {
     CRM_Utils_JSON::output($output);
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public static function relationship() {
-    $relType = CRM_Utils_Request::retrieve('rel_type', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $relType = CRM_Utils_Request::retrieve('rel_type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
     $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
-    $relationshipID = CRM_Utils_Request::retrieve('rel_id', 'Positive', CRM_Core_DAO::$_nullObject); // this used only to determine add or update mode
+    $originalCid = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject);
+    $relationshipID = CRM_Utils_Request::retrieve('rel_id', 'Positive', CRM_Core_DAO::$_nullObject);
     $caseID = CRM_Utils_Request::retrieve('case_id', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
 
-    // check if there are multiple clients for this case, if so then we need create
-    // relationship and also activities for each contacts
-
-    // get case client list
-    $clientList = CRM_Case_BAO_Case::getCaseClients($caseID);
+    if (!CRM_Case_BAO_Case::accessCase($caseID)) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     $ret = array('is_error' => 0);
 
-    foreach ($clientList as $sourceContactID) {
-      $relationParams = array(
-        'relationship_type_id' => $relType . '_a_b',
-        'contact_check' => array($relContactID => 1),
-        'is_active' => 1,
+    list($relTypeId, $b, $a) = explode('_', $relType);
+
+    if ($relationshipID && $originalCid) {
+      CRM_Case_BAO_Case::endCaseRole($caseID, $a, $originalCid, $relTypeId);
+    }
+
+    $clientList = CRM_Case_BAO_Case::getCaseClients($caseID);
+
+    // Loop through multiple case clients
+    foreach ($clientList as $i => $sourceContactID) {
+      $result = civicrm_api3('relationship', 'create', array(
         'case_id' => $caseID,
-        'start_date' => date("Ymd"),
-      );
-
-      $relationIds = array('contact' => $sourceContactID);
-
-      // check if we are editing/updating existing relationship
-      if ($relationshipID && $relationshipID != 'null') {
-        // here we need to retrieve appropriate relationshipID based on client id and relationship type id
-        $caseRelationships = new CRM_Contact_DAO_Relationship();
-        $caseRelationships->case_id = $caseID;
-        $caseRelationships->relationship_type_id = $relType;
-        $caseRelationships->contact_id_a = $sourceContactID;
-        $caseRelationships->find();
-
-        while ($caseRelationships->fetch()) {
-          $relationIds['relationship'] = $caseRelationships->id;
-          $relationIds['contactTarget'] = $relContactID;
-        }
-        $caseRelationships->free();
-      }
-
-      // create new or update existing relationship
-      $return = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationParams, $relationIds);
-
-      if (!empty($return[4][0])) {
-        $relationshipID = $return[4][0];
-
-        //create an activity for case role assignment.CRM-4480
-        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $relationshipID, $relContactID);
-      }
-      else {
-        $ret = array(
-          'is_error' => 1,
-          'error_message' => ts('The relationship type definition for the case role is not valid for the client and / or staff contact types. You can review and edit relationship types at <a href="%1">Administer >> Option Lists >> Relationship Types</a>.',
-            array(1 => CRM_Utils_System::url('civicrm/admin/reltype', 'reset=1'))),
-        );
+        'relationship_type_id' => $relTypeId,
+        "contact_id_$a" => $relContactID,
+        "contact_id_$b" => $sourceContactID,
+        'start_date' => 'now',
+      ));
+      // Save activity only for the primary (first) client
+      if ($i == 0 && empty($result['is_error'])) {
+        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID);
       }
     }
 
