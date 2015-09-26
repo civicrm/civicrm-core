@@ -369,13 +369,9 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo);
     $this->assign('globalGroupInfo', $globalGroupInfo);
 
-    // List of relationship types
-    $baoRel = new CRM_Contact_BAO_Relationship();
-    $relType = $baoRel->getRelationType('Individual');
-    $roleTypes = array();
-    foreach ($relType as $k => $v) {
-      $roleTypes[substr($k, 0, strpos($k, '_'))] = $v;
-    }
+
+    // List relationship types for adding an arbitrary new role to the case
+    $roleTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactID);
     $this->add('select', 'role_type', ts('Relationship Type'), array('' => ts('- select type -')) + $roleTypes, FALSE, array('class' => 'crm-select2 twenty'));
 
     $hookCaseSummary = CRM_Utils_Hook::caseSummary($this->_caseID);
