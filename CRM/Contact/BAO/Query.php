@@ -1538,7 +1538,7 @@ class CRM_Contact_BAO_Query {
         elseif ($id == 'participant_relative') {
           $fromRange = 'participant_register_date_low';
           $toRange = 'participant_register_date_high';
-        } 
+        }
         elseif ($id == 'case_from_relative') {
           $fromRange = 'case_from_start_date_low';
           $toRange = 'case_from_start_date_high';
