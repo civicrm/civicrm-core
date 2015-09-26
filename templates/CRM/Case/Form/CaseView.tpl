@@ -46,7 +46,7 @@
             <span class="icon ui-icon-circle-plus"></span>
           </a>
           <div id="addClientDialog" class="hiddenElement">
-            <input name="add_client_id" placeholder="{ts}- select contact -{/ts}" class="huge" />
+            <input name="add_client_id" placeholder="{ts}- select contact -{/ts}" class="huge" data-api-params='{ldelim}"params": {ldelim}"contact_type": "{$contactType}"{rdelim}{rdelim}' />
           </div>
           {if $hasRelatedCases}
             <div class="crm-block relatedCases-link"><a class="crm-hover-button crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>

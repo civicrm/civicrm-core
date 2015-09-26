@@ -83,6 +83,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     $this->assign('caseID', $this->_caseID);
     $this->assign('contactID', $this->_contactID);
+    $this->assign('contactType', CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type'));
 
     //validate case id.
     $this->_userCases = array();
