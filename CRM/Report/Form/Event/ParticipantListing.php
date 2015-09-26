@@ -157,21 +157,9 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
         ),
       ),
-      'civicrm_address' => array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'fields' => array(
-          'street_address' => NULL,
-          'city' => NULL,
-          'postal_code' => NULL,
-          'state_province_id' => array(
-            'title' => ts('State/Province'),
-          ),
-          'country_id' => array(
-            'title' => ts('Country'),
-          ),
-        ),
-        'grouping' => 'contact-fields',
-      ),
+    );
+    $this->_columns += $this->getAddressColumns();
+    $this->_columns += array(
       'civicrm_participant' => array(
         'dao' => 'CRM_Event_DAO_Participant',
         'fields' => array(
@@ -619,28 +607,9 @@ ORDER BY  cv.label
   }
 
   public function postProcess() {
-
-    // get ready with post process params
-    $this->beginPostProcess();
-
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
-    // build query
-    $sql = $this->buildQuery(TRUE);
-
-    // build array of result based on column headers. This method also allows
-    // modifying column headers before using it to build result set i.e $rows.
-    $rows = array();
-    $this->buildRows($sql, $rows);
-
-    // format result set.
-    $this->formatDisplay($rows);
-
-    // assign variables to templates
-    $this->doTemplateAssignment($rows);
-
-    // do print / pdf / instance stuff if needed
-    $this->endPostProcess($rows);
+    parent::postProcess();
   }
 
   /**
@@ -763,24 +732,6 @@ ORDER BY  cv.label
         $entryFound = TRUE;
       }
 
-      // Handle country id
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        $countryId = $row['civicrm_address_country_id'];
-        if ($countryId) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($countryId, TRUE);
-        }
-        $entryFound = TRUE;
-      }
-
-      // Handle state/province id
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        $provinceId = $row['civicrm_address_state_province_id'];
-        if ($provinceId) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($provinceId, TRUE);
-        }
-        $entryFound = TRUE;
-      }
-
       // Handle employer id
       if (array_key_exists('civicrm_contact_employer_id', $row)) {
         $employerId = $row['civicrm_contact_employer_id'];
@@ -816,6 +767,7 @@ ORDER BY  cv.label
         }
         $entryFound = TRUE;
       }
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'event/ParticipantListing', 'List all participant(s) for this ') ? TRUE : $entryFound;
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
