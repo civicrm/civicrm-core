@@ -305,6 +305,27 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
   }
 
   /**
+   * Assert that $expectedSubjects (and no other subjects) were sent.
+   *
+   * @param array $expectedSubjects
+   *   Array(string $subj).
+   */
+  public function assertSubjects($expectedSubjects) {
+    $subjects = array();
+    foreach ($this->getAllMessages('ezc') as $message) {
+      /** @var ezcMail $message */
+      $subjects[] = $message->subject;
+    }
+    sort($subjects);
+    sort($expectedSubjects);
+    $this->_ut->assertEquals(
+      $expectedSubjects,
+      $subjects,
+      "Incorrect subjects: " . print_r(array('expected' => $expectedSubjects, 'actual' => $subjects), TRUE)
+    );
+  }
+
+  /**
    * Remove any sent messages from the log.
    */
   public function clearMessages() {

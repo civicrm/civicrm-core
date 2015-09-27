@@ -183,6 +183,7 @@ class Container {
       'resources' => 'CRM_Core_Resources',
       'httpClient' => 'CRM_Utils_HttpClient',
       'cache.default' => 'CRM_Utils_Cache',
+      'i18n' => 'CRM_Core_I18n',
       // Maybe? 'config' => 'CRM_Core_Config',
       // Maybe? 'smarty' => 'CRM_Core_Smarty',
     );
@@ -191,6 +192,18 @@ class Container {
         $class
       ))
         ->setFactoryClass($class)->setFactoryMethod('singleton');
+    }
+
+    $container->setDefinition('civi_token_compat', new Definition(
+      'Civi\Token\TokenCompatSubscriber',
+      array()
+    ))->addTag('kernel.event_subscriber');
+
+    foreach (array('Activity', 'Contribute', 'Event', 'Member') as $comp) {
+      $container->setDefinition("crm_" . strtolower($comp) . "_tokens", new Definition(
+        "CRM_{$comp}_Tokens",
+        array()
+      ))->addTag('kernel.event_subscriber');
     }
 
     \CRM_Utils_Hook::container($container);
@@ -207,7 +220,7 @@ class Container {
 
   /**
    * @param ContainerInterface $container
-   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
   public function createEventDispatcher($container) {
     $dispatcher = new ContainerAwareEventDispatcher($container);
@@ -222,6 +235,13 @@ class Container {
       'CRM_Core_LegacyErrorHandler',
       'handleException',
     ));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Activity_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contact_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByPage', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Contribute_ActionMapping_ByType', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Event_ActionMapping', 'onRegisterActionMappings'));
+    $dispatcher->addListener(\Civi\ActionSchedule\Events::MAPPINGS, array('CRM_Member_ActionMapping', 'onRegisterActionMappings'));
+
     return $dispatcher;
   }
 
