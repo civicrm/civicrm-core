@@ -109,15 +109,11 @@ if (isset($_REQUEST['mysql'])) {
 else {
   if ($installType == 'wordpress') {
     //WP Database Data
-    $database = DB_NAME;
-    $username = DB_USER;
-    $password = DB_PASSWORD;
-    $server = DB_HOST;
     $databaseConfig = array(
-      "server" => $server,
-      "username" => $username,
-      "password" => $password,
-      "database" => $database,
+      "server" => DB_HOST,
+      "username" => DB_USER,
+      "password" => DB_PASSWORD,
+      "database" => DB_NAME,
     );
   }
 }
