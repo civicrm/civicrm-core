@@ -252,11 +252,11 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     }
   }
 
-  public function save() {
+  public function save($hook = TRUE) {
     // first build the computed fields
     $this->buildClause();
 
-    parent::save();
+    parent::save($hook);
   }
 
   /**
