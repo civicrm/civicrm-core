@@ -608,7 +608,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       '{domain.name}', // domain token
       '{activity.activity_type}', // action-scheduler token
     ));
-    $manyTokensExpected = 'test-member@example.com;;Female;;Female;;Second Domain;;Phone Call';
+    // Note: The behavior of domain-tokens on a scheduled reminder is undefined. All we
+    // can really do is check that it has something.
+    $manyTokensExpected = 'test-member@example.com;;Female;;Female;;[a-zA-Z0-9 ]+;;Phone Call';
 
     // In this example, we use a lot of tokens cutting across multiple components..
     $cases[0] = array(
