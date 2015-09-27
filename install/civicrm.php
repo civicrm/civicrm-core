@@ -90,9 +90,9 @@ function civicrm_main(&$config) {
   }
   elseif ($installType == 'wordpress') {
     $upload_dir = wp_upload_dir();
-    $files_dirname = $upload_dir[basedir];
+    $files_dirname = $upload_dir['basedir'];
     civicrm_setup($files_dirname);
-    $settingsDir = $upload_dir[basedir] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
+    $settingsDir = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
     if (defined('CIVICRM_SETTINGS_PATH')) {
       CRM_Utils_File::restrictAccessSettings($settingsDir);
     }
