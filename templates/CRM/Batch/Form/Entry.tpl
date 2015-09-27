@@ -29,8 +29,7 @@
   </div>
   {if $batchAmountMismatch}
     <div class="status message status-warning">
-      <div
-        class="icon ui-icon-alert"></div> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
+      <i class="fa fa-exclamation-triangle"></i> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
     </div>
     <div class="crm-button crm-button_qf_Entry_upload_force-save">
       {$form._qf_Entry_upload_force.html}
@@ -125,10 +124,10 @@ CRM.$(function($) {
   $('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
-    }; 
+    };
     $($form).ajaxSubmit(options);
   });
- 
+
  $('input[id*="primary_contact_"]').change(function() {
  var temp = this.id.split('_');
    var ROWID = temp[3];
@@ -509,7 +508,7 @@ if (CRM.batch.type_id == 3){
 function setPledgeAmount(form, pledgeID) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');
   var dataUrl = CRM.url('civicrm/ajax/pledgeAmount');
-  if (pledgeID) { 
+  if (pledgeID) {
     cj.post(dataUrl, {pid: pledgeID}, function (data) {
     cj('#field_' + rowID + '_financial_type').val(data.financial_type_id).change();
     cj('#field_' + rowID + '_total_amount').val(data.amount).change();
@@ -518,7 +517,7 @@ function setPledgeAmount(form, pledgeID) {
   }
   else {
     cj('#field_' + rowID + '_total_amount').val('').change();
-    cj('#field_' + rowID + '_financial_type').val('').change(); 
+    cj('#field_' + rowID + '_financial_type').val('').change();
     cj('#field_' + rowID + '_total_amount').removeAttr('readonly');
   }
 }

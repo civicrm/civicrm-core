@@ -2201,6 +2201,10 @@ input.crm-form-entityref {
   background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
 
+.crm-container .fa.icon-red {
+  color: #8A1F11;
+}
+
 .crm-container .inform-icon {
   background-position: -16px -144px;
   margin-right: 5px;

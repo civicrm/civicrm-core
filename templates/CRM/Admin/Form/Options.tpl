@@ -79,7 +79,7 @@
         <tr class="crm-admin-options-form-block-value">
           <td class="label">{$form.value.label}</td>
           <td>{$form.value.html}<br />
-              <span class="description"><div class="icon ui-icon-alert"></div>{ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
+              <span class="description"><i class="fa fa-exclamation-triangle"></i> {ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
           </td>
         </tr>
       {/if}
