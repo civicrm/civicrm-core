@@ -46,7 +46,7 @@
     @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
   </style>
 {/if}
-<div class="messages status no-popup">  <i class="fa fa-exclamation-triangle icon-red"></i>
+<div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red"></i>
  <span class="status-fatal">{ts}Sorry but we are not able to provide this at the moment.{/ts}</span>
     <div class="crm-section crm-error-message">{$message}</div>
     {if $error.message && $message != $error.message}
