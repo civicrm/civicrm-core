@@ -208,9 +208,12 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       return;
     }
 
+    $allowedRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactID);
+
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header')
-      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js', 2, 'html-header');
+      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js', 2, 'html-header')
+      ->addVars('relationshipTypes', CRM_Contact_Form_Relationship::getRelationshipTypeMetadata($allowedRelationshipTypes));
 
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($this->_caseType, 'CaseRoles');
@@ -369,10 +372,14 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo);
     $this->assign('globalGroupInfo', $globalGroupInfo);
 
-
     // List relationship types for adding an arbitrary new role to the case
-    $roleTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactID);
-    $this->add('select', 'role_type', ts('Relationship Type'), array('' => ts('- select type -')) + $roleTypes, FALSE, array('class' => 'crm-select2 twenty'));
+    $this->add('select',
+      'role_type',
+      ts('Relationship Type'),
+      array('' => ts('- select type -')) + $allowedRelationshipTypes,
+      FALSE,
+      array('class' => 'crm-select2 twenty', 'data-select-params' => '{"allowClear": false}')
+    );
 
     $hookCaseSummary = CRM_Utils_Hook::caseSummary($this->_caseID);
     if (is_array($hookCaseSummary)) {

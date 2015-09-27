@@ -152,7 +152,7 @@
           <div>{$form.role_type.label}</div>
           <div>{$form.role_type.html}</div><br />
           <div><label for="add_role_contact_id">{ts}Assign To{/ts}:</label></div>
-          <div><input name="add_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
+          <div><input name="add_role_contact_id" placeholder="{ts}- first select relationship type -{/ts}" class="huge" /></div>
         </div>
       {/if}
   
@@ -188,7 +188,7 @@
       {/literal}
   
       <div id="deleteCaseRoleDialog" class="hiddenElement">
-        {ts}Are you sure you want to delete this case role?{/ts}
+        {ts}Are you sure you want to end this relationship?{/ts}
       </div>
   
    </div><!-- /.crm-accordion-body -->
