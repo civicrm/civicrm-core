@@ -42,7 +42,14 @@
 
     function save() {
       $row.closest('table').block();
-      CRM.api3(info.entity, info.action, {id: info.id, is_active: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
+      var params = {id: info.id};
+      if (info.action == 'setvalue') {
+        params.field = 'is_active';
+        params.value = enabled ? 0 : 1;
+      } else {
+        params.is_active = enabled ? 0 : 1;
+      }
+      CRM.api3(info.entity, info.action, params, {success: successMsg}).done(refresh);
     }
 
     function checkResponse(e, response) {
