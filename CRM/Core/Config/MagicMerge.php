@@ -85,6 +85,7 @@ class CRM_Core_Config_MagicMerge {
       // "local" properties are unique to each instance of CRM_Core_Config (each request).
       'doNotResetCache' => array('local'),
       'inCiviCRM' => array('local'),
+      'keyDisable' => array('local'),
       'userFrameworkFrontend' => array('local'),
       'userPermissionTemp' => array('local'),
 
@@ -355,6 +356,7 @@ class CRM_Core_Config_MagicMerge {
       $this->locals = array(
         'inCiviCRM' => FALSE,
         'doNotResetCache' => 0,
+        'keyDisable' => FALSE,
         'initialized' => FALSE,
         'userFrameworkFrontend' => FALSE,
         'userPermissionTemp' => NULL,
