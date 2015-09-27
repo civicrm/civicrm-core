@@ -544,6 +544,10 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $config = CRM_Core_Config::singleton();
     }
 
+    if (property_exists($mailing, 'language') && $mailing->language && $mailing->language != 'en_US') {
+      $swapLang = CRM_Utils_AutoClean::swap('global://dbLocale?getter', 'call://i18n/setLocale', $mailing->language);
+    }
+
     $job_date = CRM_Utils_Date::isoToMysql($this->scheduled_date);
     $fields = array();
 
