@@ -410,7 +410,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $config = CRM_Core_Config::singleton(TRUE, TRUE); // ugh, performance
 
     // when running unit tests, use mockup user framework
-    $this->hookClass = CRM_Utils_Hook::singleton(TRUE);
+    $this->hookClass = CRM_Utils_Hook::singleton();
 
     // Make sure the DB connection is setup properly
     $config->userSystem->setMySQLTimeZone();

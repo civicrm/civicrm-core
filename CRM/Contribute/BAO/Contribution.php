@@ -1171,12 +1171,14 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
     $nextYear = $year + 1;
 
     if ($config->fiscalYearStart) {
-      if ($config->fiscalYearStart['M'] < 10) {
-        $config->fiscalYearStart['M'] = '0' . $config->fiscalYearStart['M'];
+      $newFiscalYearStart = $config->fiscalYearStart;
+      if ($newFiscalYearStart['M'] < 10) {
+        $newFiscalYearStart['M'] = '0' . $newFiscalYearStart['M'];
       }
-      if ($config->fiscalYearStart['d'] < 10) {
-        $config->fiscalYearStart['d'] = '0' . $config->fiscalYearStart['d'];
+      if ($newFiscalYearStart['d'] < 10) {
+        $newFiscalYearStart['d'] = '0' . $newFiscalYearStart['d'];
       }
+      $config->fiscalYearStart = $newFiscalYearStart;
       $monthDay = $config->fiscalYearStart['M'] . $config->fiscalYearStart['d'];
     }
     else {
