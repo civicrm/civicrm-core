@@ -784,6 +784,7 @@ class CRM_Core_Permission {
         $prefix . ts('view debug output'),
         ts('View results of debug and backtrace'),
       ),
+
       'view all notes' => array(
         $prefix . ts('view all notes'),
         ts("View notes (for visible contacts) even if they're marked admin only"),

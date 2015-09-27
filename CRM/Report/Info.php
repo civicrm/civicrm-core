@@ -99,6 +99,10 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
         ts('administer Reports'),
         ts('Manage report templates'),
       ),
+      'view report sql' => array(
+        ts('view report sql'),
+        ts('View sql used in CiviReports'),
+      ),
     );
 
     if (!$descriptions) {
