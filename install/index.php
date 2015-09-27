@@ -508,7 +508,7 @@ class InstallRequirements {
     elseif ($installType == 'wordpress') {
       // make sure that we can write to uploads/civicrm/
       $upload_dir = wp_upload_dir();
-      $files_dirname = $upload_dir[basedir] . DIRECTORY_SEPARATOR . 'civicrm';
+      $files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
       if (!file_exists($files_dirname)) {
         wp_mkdir_p($files_dirname);
       }
