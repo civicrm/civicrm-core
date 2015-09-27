@@ -377,6 +377,7 @@ class Container {
     );
 
     if ($loadFromDB && $runtime->dsn) {
+      \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
 
       $c = new self();
