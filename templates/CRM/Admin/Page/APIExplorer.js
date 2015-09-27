@@ -527,7 +527,7 @@
         .addClass('crm-error')
         .css('width', '82%')
         .attr('title', msg)
-        .before('<i class="fa fa-exclamation-triangle icon-red" title="'+msg+'"></i> ')
+        .before('<i class="crm-i fa-exclamation-triangle crm-i-red" title="'+msg+'"></i> ')
         .tooltip();
     }
   }

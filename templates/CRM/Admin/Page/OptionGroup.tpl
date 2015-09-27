@@ -29,7 +29,7 @@
 {else}
 <div id="help">
     {ts}CiviCRM stores configurable choices for various drop-down fields as 'option groups'. You can click <strong>Options</strong> to view the available choices.{/ts}
-    <p><i class="fa fa-exclamation-triangle"></i> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
+    <p><i class="crm-i fa-exclamation-triangle"></i> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
 </div>
 {/if}
 
