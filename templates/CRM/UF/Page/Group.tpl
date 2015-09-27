@@ -83,7 +83,7 @@
             <tbody>
             {foreach from=$rows item=row}
             {if !$row.is_reserved }
-              <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
+              <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td class="crmf-title crm-editable">{$row.title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
