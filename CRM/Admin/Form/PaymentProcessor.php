@@ -315,7 +315,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if (!$dao->find(TRUE)) {
       return $defaults;
     }
-
+    // CRM-16621
+    CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($dao->password);
     CRM_Core_DAO::storeValues($dao, $defaults);
 
     // now get testID
@@ -325,7 +326,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $testDAO->domain_id = $domainID;
     if ($testDAO->find(TRUE)) {
       $this->_testID = $testDAO->id;
-
+      // CRM-16621
+      CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($testDAO->password);
       foreach ($this->_fields as $field) {
         $testName = "test_{$field['name']}";
         $defaults[$testName] = $testDAO->{$field['name']};
@@ -394,7 +396,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         $dao->{$field['name']} = 'null';
       }
     }
-
+    // CRM-16621
+    CRM_Financial_BAO_PaymentProcessor::encryptDecryptPass($dao->password, 'encrypt');
     // also copy meta fields from the info DAO
     $dao->is_recur = $this->_ppDAO->is_recur;
     $dao->billing_mode = $this->_ppDAO->billing_mode;
