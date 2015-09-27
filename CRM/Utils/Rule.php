@@ -761,10 +761,7 @@ class CRM_Utils_Rule {
       $value = $actualElementValue;
     }
 
-    if ($value && !is_numeric($value)) {
-      return FALSE;
-    }
-    return TRUE;
+    return CRM_Utils_Rule::positiveInteger($value);
   }
 
   /**

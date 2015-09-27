@@ -175,10 +175,11 @@ class CRM_Utils_Type {
       case 'StateProvince':
         if (is_array($data)) {
           $valid = TRUE;
-          foreach ($data as $item) {
+          foreach ($data as &$item) {
             if (!CRM_Utils_Rule::positiveInteger($item)) {
               $valid = FALSE;
             }
+            $item = (int) $item;
           }
           if ($valid) {
             return $data;
@@ -241,7 +242,7 @@ class CRM_Utils_Type {
         }
 
         if (CRM_Utils_Rule::validContact($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
@@ -286,7 +287,7 @@ class CRM_Utils_Type {
 
       case 'Positive':
         if (CRM_Utils_Rule::positiveInteger($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
