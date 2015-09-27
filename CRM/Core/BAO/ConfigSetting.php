@@ -343,17 +343,11 @@ class CRM_Core_BAO_ConfigSetting {
    * @param array $enabledComponents
    */
   public static function setEnabledComponents($enabledComponents) {
-    $config = CRM_Core_Config::singleton();
-
-    // fix the config object
-    $config->enableComponents = $enabledComponents;
+    // fix the config object. update db.
+    Civi::settings()->set('enable_components', $enabledComponents);
 
     // also force reset of component array
     CRM_Core_Component::getEnabledComponents(TRUE);
-
-    // update DB
-    CRM_Core_BAO_Setting::setItem($enabledComponents,
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enable_components');
   }
 
   /**
