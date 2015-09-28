@@ -43,7 +43,7 @@
             <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if not $smarty.foreach.clients.last}, &nbsp; {/if}
           {/foreach}
           <a href="#addClientDialog" class="crm-hover-button case-miniform" title="{ts}Add Client{/ts}" data-key="{crmKey name='civicrm/case/ajax/addclient'}">
-            <span class="icon ui-icon-circle-plus"></span>
+            <i class="crm-i fa-user-plus"></i>
           </a>
           <div id="addClientDialog" class="hiddenElement">
             <input name="add_client_id" placeholder="{ts}- select contact -{/ts}" class="huge" data-api-params='{ldelim}"params": {ldelim}"contact_type": "{$contactType}"{rdelim}{rdelim}' />
@@ -83,13 +83,13 @@
         <span class="crm-case-summary-label">{ts}Subject{/ts}:</span>&nbsp;{$caseDetails.case_subject}
       </td>
       <td class="crm-case-caseview-case_type label">
-        <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><span class="icon ui-icon-pencil"></span></a>
+        <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><i class="crm-i fa-pencil"></i></a>
       </td>
       <td class="crm-case-caseview-case_status label">
-        <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><span class="icon ui-icon-pencil"></span></a>
+        <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><i class="crm-i fa-pencil"></i></a>
       </td>
       <td class="crm-case-caseview-case_start_date label">
-        <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><span class="icon ui-icon-pencil"></span></a>
+        <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><i class="crm-i fa-pencil"></i></a>
       </td>
       <td class="crm-case-caseview-{$caseID} label">
         <span class="crm-case-summary-label">{ts}ID{/ts}:</span>&nbsp;{$caseID}
@@ -117,11 +117,11 @@
     <div>
       <p>
         {if $hasAccessToAllCases}
-          <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><span class="icon ui-icon-print"></span> {ts}Print Report{/ts}</a>
+          <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><i class="crm-i fa-print"></i> {ts}Print Report{/ts}</a>
         {/if}
 
         {if $mergeCases}
-          <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><span class="icon ui-icon-copy"></span>{ts}Merge Case{/ts}</a>
+          <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><i class="crm-i fa-compress"></i> {ts}Merge Case{/ts}</a>
           {$form._qf_CaseView_next_merge_case.html}
           <span id="mergeCasesDialog" class="hiddenElement">
             {$form.merge_case_id.html}
@@ -129,7 +129,7 @@
         {/if}
 
         {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
-          <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon ui-icon-person"></span> {ts}Assign to Another Client{/ts}</a>
+          <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><i class="crm-i fa-user"></i> {ts}Assign to Another Client{/ts}</a>
         {/if}
       </p>
     </div>
@@ -146,7 +146,7 @@
 
       {if $hasAccessToAllCases}
         <div class="crm-submit-buttons">
-          <a class="button case-miniform" href="#addCaseRoleDialog" data-key="{crmKey name='civicrm/ajax/relation'}" rel="#caseRoles-selector-{$caseID}"><div class="icon ui-icon-circle-plus"></div>{ts}Add new role{/ts}</a>
+          <a class="button case-miniform" href="#addCaseRoleDialog" data-key="{crmKey name='civicrm/ajax/relation'}" rel="#caseRoles-selector-{$caseID}"><i class="crm-i fa-plus-circle"></i> {ts}Add new role{/ts}</a>
         </div>
         <div id="addCaseRoleDialog" class="hiddenElement">
           <div>{$form.role_type.label}</div>
@@ -229,7 +229,7 @@
   {if !empty($globalGroupInfo.id)}
     <div class="crm-submit-buttons">
       <a class="button case-miniform" href="#addMembersToGroupDialog" rel="#globalRelationships-selector-{$caseId}" data-group_id="{$globalGroupInfo.id}">
-        <div class="icon ui-icon-circle-plus"></div>{ts 1=$globalGroupInfo.title}Add members to %1{/ts}
+        <i class="crm-i fa-plus-circle"></i> {ts 1=$globalGroupInfo.title}Add members to %1{/ts}
       </a>
     </div>
     <div id="addMembersToGroupDialog" class="hiddenElement">

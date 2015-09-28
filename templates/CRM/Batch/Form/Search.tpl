@@ -38,7 +38,7 @@
   </table>
 </div>
 <div class="crm-submit-buttons">
-  <a accesskey="N" href="{crmURL p='civicrm/batch/add' q='reset=1&action=add'}" id="newBatch" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}New Data Entry Batch{/ts}</span></a><br/>
+  <a accesskey="N" href="{crmURL p='civicrm/batch/add' q='reset=1&action=add'}" id="newBatch" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}New Data Entry Batch{/ts}</span></a><br/>
 </div>
 <table class="crm-batch-selector">
   <thead>
