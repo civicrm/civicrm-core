@@ -269,7 +269,7 @@ class CRM_Financial_Page_AJAX {
    *
    * @return string
    */
-  public static function getFinancialTransactionsList($return = FALSE) {
+  public static function getFinancialTransactionsList() {
     $sortMapper = array(
       0 => '',
       1 => '',
