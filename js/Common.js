@@ -874,7 +874,19 @@ if (!CRM.vars) CRM.vars = {};
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
       $('table.crm-sortable', e.target).DataTable();
-      $('table.crm-ajax-table', e.target).crmAjaxTable();
+      $('table.crm-ajax-table', e.target).each(function() {
+        var
+          $table = $(this),
+          $accordion = $table.closest('.crm-accordion-wrapper.collapsed, .crm-collapsible.collapsed');
+        // For tables hidden by collapsed accordions, wait.
+        if ($accordion.length) {
+          $accordion.one('crmAccordion:open', function() {
+            $table.crmAjaxTable();
+          });
+        } else {
+          $table.crmAjaxTable();
+        }
+      });
       if ($("input:radio[name=radio_ts]").size() == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }
@@ -1351,13 +1363,15 @@ if (!CRM.vars) CRM.vars = {};
       })
       // Handle accordions
       .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+        var action = 'open';
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);
         }
         else {
           $(this).next().css('display', 'block').slideUp(200);
+          action = 'close';
         }
-        $(this).parent().toggleClass('collapsed');
+        $(this).parent().toggleClass('collapsed').trigger('crmAccordion:' + action);
         e.preventDefault();
       });
 
@@ -1370,13 +1384,15 @@ if (!CRM.vars) CRM.vars = {};
    */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
+      var action = 'open';
       if ($(this).hasClass('collapsed')) {
         $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
       }
       else {
         $('.crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
+        action = 'close';
       }
-      $(this).toggleClass('collapsed');
+      $(this).toggleClass('collapsed').trigger('crmAccordion:' + action);
     });
   };
 
