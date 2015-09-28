@@ -647,6 +647,8 @@ class CRM_Core_Resources {
       if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css')) {
         $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
       }
+      // crm-i.css added ahead of other styles so it can be overridden by FA.
+      $this->addStyleFile('civicrm', 'css/crm-i.css', -101, $region);
     }
     return $this;
   }

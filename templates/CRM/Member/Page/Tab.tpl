@@ -50,9 +50,9 @@
         </div>
 
         <div class="action-link">
-            <a accesskey="N" href="{$newURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Membership{/ts}</span></a>
+            <a accesskey="N" href="{$newURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Membership{/ts}</span></a>
             {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Submit Credit Card Membership{/ts}</span></a><br /><br />
+                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Membership{/ts}</span></a><br /><br />
             {else}
                 <br/ ><br/ >
             {/if}

@@ -61,7 +61,7 @@
               {/section}
             </tbody>
           </table>
-          &nbsp;&nbsp;&nbsp;<a class="action-item crm-hover-button buildStringOverrideRow" href="#"><span class="icon ui-icon-circle-plus"></span> {ts}Add row{/ts}</a>
+          &nbsp;&nbsp;&nbsp;<a class="action-item crm-hover-button buildStringOverrideRow" href="#"><i class="crm-i fa-plus-circle"></i> {ts}Add row{/ts}</a>
         </td>
       </tr>
     </table>
