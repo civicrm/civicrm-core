@@ -380,7 +380,7 @@ class CRM_Utils_Check_Security {
     $config = CRM_Core_Config::singleton();
 
     list ($heuristicBaseUrl, $ignore) = explode($filePathMarker, $config->imageUploadURL);
-    list ($ignore, $heuristicSuffix) = explode($filePathMarker, str_replace('\\', '/', $targetDir));
+    list ($ignore, $heuristicSuffix) = array_pad(explode($filePathMarker, str_replace('\\', '/', $targetDir), 2), 2, null);
     return $heuristicBaseUrl . $filePathMarker . $heuristicSuffix;
   }
 
