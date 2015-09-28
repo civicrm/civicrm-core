@@ -929,47 +929,6 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Return relative path.
-   *
-   * @todo make this a method of $config->userSystem (i.e. UF classes) rather than a static function
-   *
-   * @param string $absolutePath
-   *   Absolute path.
-   *
-   * @return string
-   *   Relative url of uploaded image
-   */
-  public static function getRelativePath($absolutePath) {
-    $relativePath = NULL;
-    $config = CRM_Core_Config::singleton();
-    if ($config->userFramework == 'Joomla') {
-      $userFrameworkBaseURL = trim(str_replace('/administrator/', '', $config->userFrameworkBaseURL));
-      $customFileUploadDirectory = strstr(str_replace('\\', '/', $absolutePath), '/media');
-      $relativePath = $userFrameworkBaseURL . $customFileUploadDirectory;
-    }
-    elseif ($config->userSystem->is_drupal == '1') {
-      //ideally we would do a bigger re-factoring & move the getRelativePath onto the UF class
-      $rootPath = $config->userSystem->cmsRootPath();
-      $baseUrl = $config->userFrameworkBaseURL;
-
-      //format url for language negotiation, CRM-7135
-      $baseUrl = CRM_Utils_System::languageNegotiationURL($baseUrl, FALSE, TRUE);
-
-      $relativePath = str_replace("{$rootPath}/",
-        $baseUrl,
-        str_replace('\\', '/', $absolutePath)
-      );
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      $userFrameworkBaseURL = trim(str_replace('/wp-admin/', '', $config->userFrameworkBaseURL));
-      $customFileUploadDirectory = strstr(str_replace('\\', '/', $absolutePath), '/wp-content/');
-      $relativePath = $userFrameworkBaseURL . $customFileUploadDirectory;
-    }
-
-    return $relativePath;
-  }
-
-  /**
    * Return proportional height and width of the image.
    *
    * @param int $imageWidth
