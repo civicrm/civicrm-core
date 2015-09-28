@@ -95,6 +95,24 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '24',
       ),
     ),
+    //  Include static groups 3 and 5 in legacy format
+    array(
+      'fv' => array('group' => array('3' => 1, '5' => 1)),
+      'id' => array(
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+      ),
+    ),
     //  Include tag 7
     array(
       'fv' => array('tag' => '7'),
@@ -111,7 +129,7 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     ),
     //  Include tag 9
     array(
-      'fv' => array('tag' => '9'),
+      'fv' => array('tag' => array('9' => 1)),
       'id' => array(
         '10',
         '12',
