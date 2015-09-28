@@ -177,8 +177,10 @@ CRM.$(function($) {
           $(nRow).addClass(cl).attr({id: 'row_' + id, 'data-id': id, 'data-entity': 'group'});
           //$('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-title" />');
           $('td:eq(1)', nRow).addClass('right');
-          $('td:eq(3)', nRow).wrapInner('<div class="crm-editable crmf-description" data-type="textarea" />');
-          $('td:eq(5)', nRow).wrapInner('<div class="crm-editable crmf-visibility" data-type="select" />');
+          if (CRM.checkPerm('edit groups')) {
+            $('td:eq(3)', nRow).wrapInner('<div class="crm-editable crmf-description" data-type="textarea" />');
+            $('td:eq(5)', nRow).wrapInner('<div class="crm-editable crmf-visibility" data-type="select" />');
+          }
           if (parentsOnly) {
             if ($(nRow).hasClass('crm-group-parent')) {
               $(nRow).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
