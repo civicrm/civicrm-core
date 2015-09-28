@@ -264,9 +264,6 @@ class CRM_Financial_Page_AJAX {
   /**
    * Get output of financial transactions.
    *
-   * @param bool $return
-   *   Return result. This parameter allows the output to be unit tested.
-   *
    * @return string
    */
   public static function getFinancialTransactionsList() {
