@@ -2006,7 +2006,7 @@ class CRM_Contact_BAO_Query {
         $where = "civicrm_address.state_province_id";
       }
 
-      $this->_where[$grouping][] = self::buildClause($where, $op, $value, 'Positive');
+      $this->_where[$grouping][] = self::buildClause($where, $op, $value);
       list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_Address', "state_province_id", $value, $op);
       $this->_qill[$grouping][] = ts("State %1 %2", array(1 => $qillop, 2 => $qillVal));
     }
