@@ -1,0 +1,12 @@
+/* Direct copy of .fa from font-awesome.css
+This is separate to avoid conflict with a site theme's implementation of FA.  It
+is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
+.crm-i {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+}

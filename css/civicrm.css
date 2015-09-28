@@ -1781,6 +1781,15 @@ input.crm-form-entityref {
   float: right;
 }
 
+.crm-container a.crm-event-feed-link {
+  margin: 0 1ex;
+  color: #52534D;
+}
+
+.crm-container a.crm-event-feed-link:hover {
+  color: #2786c2;
+}
+
 .crm-container table.criteria-group {
   margin-bottom: .1em;
 }
@@ -2210,18 +2219,6 @@ input.crm-form-entityref {
 }
 
 /* Font Awesome */
-
-/* Direct copy of .fa from font-awesome.css
-This is separate to avoid conflict with a site theme's implementation of FA. */
-.crm-i {
-  display: inline-block;
-  font: normal normal normal 14px/1 FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transform: translate(0, 0);
-}
 
 .crm-i.crm-i-red {
   color: #8A1F11;
