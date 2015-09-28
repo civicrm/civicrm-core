@@ -1626,6 +1626,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $params['non_deductible_amount'] = $this->calculateNonDeductibleAmount($params, $formValues);
 
+      // we are already handling note below, so to avoid duplicate notes against $contribution
+      if (!empty($params['note']) && !empty($submittedValues['note'])) {
+        unset($params['note']);
+      }
       $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
       // process associated membership / participant, CRM-4395
@@ -1667,7 +1671,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    if ($contribution->id && isset($submittedValues['note'])) {
+    if ($contribution->id && !empty($submittedValues['note'])) {
       CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
 
