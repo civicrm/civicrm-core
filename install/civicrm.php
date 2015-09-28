@@ -92,10 +92,6 @@ function civicrm_main(&$config) {
     $upload_dir = wp_upload_dir();
     $files_dirname = $upload_dir['basedir'];
     civicrm_setup($files_dirname);
-    $settingsDir = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
-    if (defined('CIVICRM_SETTINGS_PATH')) {
-      CRM_Utils_File::restrictAccessSettings($settingsDir);
-    }
   }
 
   $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
