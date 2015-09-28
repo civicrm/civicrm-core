@@ -69,7 +69,7 @@
     </div>
   {/if}
   <div class="action-link">
-    {crmButton q="action=add&reset=1" id="newLocationType" icon="circle-plus"}{ts}Add Option{/ts}{/crmButton}
-    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+    {crmButton q="action=add&reset=1" id="newLocationType" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
   </div>
 {/if}

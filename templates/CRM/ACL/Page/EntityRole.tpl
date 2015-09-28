@@ -67,7 +67,7 @@
 
         {if $action ne 1 and $action ne 2}
       <div class="crm-submit-buttons">
-            {crmButton q="action=add&reset=1" id="newACL"  icon="circle-plus"}{ts}Add Role Assignment{/ts}{/crmButton}
+            {crmButton q="action=add&reset=1" id="newACL"  icon="plus-circle"}{ts}Add Role Assignment{/ts}{/crmButton}
         </div>
         {/if}
 </div>

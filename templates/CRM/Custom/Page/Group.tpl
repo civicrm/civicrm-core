@@ -70,7 +70,7 @@
 
         {if NOT ($action eq 1 or $action eq 2) }
         <div class="action-link">
-        {crmButton p='civicrm/admin/custom/group' q="action=add&reset=1" id="newCustomDataGroup"  icon="circle-plus"}{ts}Add Set of Custom Fields{/ts}{/crmButton}
+        {crmButton p='civicrm/admin/custom/group' q="action=add&reset=1" id="newCustomDataGroup"  icon="plus-circle"}{ts}Add Set of Custom Fields{/ts}{/crmButton}
         </div>
         {/if}
 
@@ -87,4 +87,3 @@
        {/if}
     {/if}
 {/if}
-
