@@ -102,6 +102,18 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Opportunity for the payment processor to override the entire form build.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @return bool
+   *   Should form building stop at this point?
+   */
+  public function buildForm(&$form) {
+    return FALSE;
+  }
+
+  /**
    * Log payment notification message to forensic system log.
    *
    * @todo move to factory class \Civi\Payment\System (or similar)
