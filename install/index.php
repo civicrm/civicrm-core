@@ -512,7 +512,7 @@ class InstallRequirements {
       if (!file_exists($files_dirname)) {
         wp_mkdir_p($files_dirname);
       }
-      $writableDirectories = array($files_dirname, $cmsPath);
+      $writableDirectories = array($files_dirname);
     }
 
     foreach ($writableDirectories as $dir) {
