@@ -292,13 +292,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * User doesn't support get By ID because the user id is actually the CMS user ID & is not part of
    *   CiviCRM - so can only be tested through UserTest - not SyntaxConformanceTest.
    *
+   * Entity doesn't support get By ID because it simply gives the result of string Entites in CiviCRM
+   *
    * @param bool $sequential
    *
    * @return array
    *   Entities that cannot be retrieved by ID
    */
   public static function toBeSkipped_getByID($sequential = FALSE) {
-    return array('MailingContact', 'User');
+    return array('MailingContact', 'User', 'Attachment', 'Entity');
   }
 
   /**
@@ -891,11 +893,17 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param string $entityName
    */
   public function testSqlOperators($entityName) {
-    $baoString = _civicrm_api3_get_BAO($entityName);
-    if (empty($baoString)) {
-      $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
+    $toBeIgnored = array_merge($this->toBeImplemented['get'],
+      $this->deprecatedAPI,
+      $this->toBeSkipped_get(TRUE),
+      $this->toBeSkipped_getByID()
+    );
+    if (in_array($entityName, $toBeIgnored)) {
       return;
     }
+
+    $baoString = _civicrm_api3_get_BAO($entityName);
+
     $entities = $this->callAPISuccess($entityName, 'get', array('options' => array('limit' => 0), 'return' => 'id'));
     $entities = array_keys($entities['values']);
     $totalEntities = count($entities);
