@@ -46,11 +46,11 @@
             {ts 1=$docLink}This process may change your database structure and values. In case of emergency you may need to revert to a backup. For more detailed information, refer to the %1.{/ts}</p>
         <input type="hidden" name="action" value="begin" />
         <button type="submit" class="crm-button" name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" >
-          <span class="icon ui-icon-check"></span>
+          <i class="crm-i fa-rocket"></i>
           {ts}Upgrade Now{/ts}
         </button>&nbsp;&nbsp;
         <a class="button cancel crm-form-submit" href="{$cancelURL}">
-          <span class="icon ui-icon-close"></span>
+          <i class="crm-i fa-times"></i>
           {ts}Cancel{/ts}
         </a>
     </form>
@@ -61,7 +61,7 @@
       <div class="bold" style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
-          {ts 1='https://civicrm.org/membership' 2='https://civicrm.org/contribute'}The CiviCRM Core Team has been hard at work and is proud to release 4.6, the first major update of 2015. Though it is packed with enhancements and continues to mature the leading open source CRM for nonprofits worldwide, it does come with a cost to produce, maintain and improve upon. Without funding from organizations like yours, future releases are at risk of never being realized. We invite you to enjoy the improvements in 4.6 and ask that you <a href="%1" target="_blank">support CiviCRM by becoming a member</a> or by <a href="%2" target="_blank">making a donation</a>. ~ Dave Greenberg, Co-Founder{/ts} 
+          {ts 1='https://civicrm.org/membership' 2='https://civicrm.org/contribute'}The CiviCRM Core Team has been hard at work and is proud to release 4.6, the first major update of 2015. Though it is packed with enhancements and continues to mature the leading open source CRM for nonprofits worldwide, it does come with a cost to produce, maintain and improve upon. Without funding from organizations like yours, future releases are at risk of never being realized. We invite you to enjoy the improvements in 4.6 and ask that you <a href="%1" target="_blank">support CiviCRM by becoming a member</a> or by <a href="%2" target="_blank">making a donation</a>. ~ Dave Greenberg, Co-Founder{/ts}
         </p>
         <p>
           {ts 1='https://civicrm.org/register-site'}Not ready for a membership yet? You can still help us learn how to improve CiviCRM by <a href="%1" target="_blank">registering your site</a>.{/ts}

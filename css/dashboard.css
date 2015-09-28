@@ -177,8 +177,9 @@
   width: auto;
 }
 
-#crm-container .portlet-header .ui-icon {
+#crm-container .portlet-header .crm-i {
   float: right;
+  color: #52534D;
 }
 
 #crm-container .portlet-content {
