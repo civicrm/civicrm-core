@@ -71,7 +71,7 @@
     {/strip}
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-      {crmButton q="action=add&reset=1" id="newManagePremium"  icon="circle-plus"}{ts}Add Premium{/ts}{/crmButton}
+      {crmButton q="action=add&reset=1" id="newManagePremium"  icon="plus-circle"}{ts}Add Premium{/ts}{/crmButton}
         </div>
     {/if}
 </div>

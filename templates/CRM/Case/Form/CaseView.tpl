@@ -32,7 +32,7 @@
     {include file="CRM/Case/Form/ViewRelatedCases.tpl"}
   {* Main case view *}
   {else}
-  
+
   <h3>{ts}Summary{/ts}</h3>
   <table class="report crm-entity case-summary" data-entity="case" data-id="{$caseID}" data-cid="{$contactID}">
     {if $multiClient}
@@ -119,7 +119,7 @@
         {if $hasAccessToAllCases}
           <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><span class="icon ui-icon-print"></span> {ts}Print Report{/ts}</a>
         {/if}
-  
+
         {if $mergeCases}
           <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><span class="icon ui-icon-copy"></span>{ts}Merge Case{/ts}</a>
           {$form._qf_CaseView_next_merge_case.html}
@@ -127,7 +127,7 @@
             {$form.merge_case_id.html}
           </span>
         {/if}
-  
+
         {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
           <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon ui-icon-person"></span> {ts}Assign to Another Client{/ts}</a>
         {/if}
@@ -143,7 +143,7 @@
       {ts}Roles{/ts}
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
-  
+
       {if $hasAccessToAllCases}
         <div class="crm-submit-buttons">
           <a class="button case-miniform" href="#addCaseRoleDialog" data-key="{crmKey name='civicrm/ajax/relation'}" rel="#caseRoles-selector-{$caseID}"><div class="icon ui-icon-circle-plus"></div>{ts}Add new role{/ts}</a>
@@ -155,12 +155,12 @@
           <div><input name="add_role_contact_id" placeholder="{ts}- first select relationship type -{/ts}" class="huge" /></div>
         </div>
       {/if}
-  
+
       <div id="editCaseRoleDialog" class="hiddenElement">
         <div><label for="edit_role_contact_id">{ts}Change To{/ts}:</label></div>
         <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
-  
+
       <table id="caseRoles-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
         <thead>
           <tr>
@@ -186,11 +186,11 @@
           })(CRM.$);
         </script>
       {/literal}
-  
+
       <div id="deleteCaseRoleDialog" class="hiddenElement">
         {ts}Are you sure you want to end this relationship?{/ts}
       </div>
-  
+
    </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
 
@@ -201,7 +201,7 @@
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
       <div class="crm-submit-buttons">
-        {crmButton p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`" icon="circle-plus"}{ts}Add client relationship{/ts}{/crmButton}
+        {crmButton p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`" icon="plus-circle"}{ts}Add client relationship{/ts}{/crmButton}
       </div>
       <table id="clientRelationships-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
         <thead>
@@ -320,4 +320,3 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 {/if} {* view related cases if end *}
 </div>
-

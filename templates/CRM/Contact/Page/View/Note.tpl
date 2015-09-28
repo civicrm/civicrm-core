@@ -38,7 +38,7 @@
             {/if}
           </table>
           <div class="crm-submit-buttons">
-            {crmButton class="cancel" icon="close" p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}{ts}Done{/ts}{/crmButton}
+            {crmButton class="cancel" icon="times" p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}{ts}Done{/ts}{/crmButton}
           </div>
 
         {if $comments}

@@ -158,8 +158,8 @@
       {/literal}
 
       <div class="action-link">
-          {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="circle-plus"}{ts}Add Option{/ts}{/crmButton}
-          {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+          {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+          {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="times"}{ts}Done{/ts}{/crmButton}
       </div>
     </div>
   </div>

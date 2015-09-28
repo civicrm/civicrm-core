@@ -36,8 +36,8 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newJob"  icon="circle-plus"}{ts}Add New Scheduled Job{/ts}{/crmButton}
-          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog"  icon="zoomin"}{ts}View Log (all jobs){/ts}{/crmButton}
+          {crmButton q="action=add&reset=1" id="newJob"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog" icon="list-alt"}{ts}View Log (all jobs){/ts}{/crmButton}
         </div>
       {/if}
 

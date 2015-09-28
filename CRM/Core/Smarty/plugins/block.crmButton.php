@@ -58,5 +58,5 @@ function smarty_block_crmButton($params, $text, &$smarty) {
   // All other params are treated as html attributes
   CRM_Utils_Array::remove($params, 'icon', 'p', 'q', 'a', 'f', 'h', 'fb', 'fe');
   $attributes = CRM_Utils_String::htmlAttributes($params);
-  return "<a $attributes><span><span class='icon ui-icon-$icon'></span> $text</span></a>";
+  return "<a $attributes><span><span class='crm-i fa-$icon'></span> $text</span></a>";
 }

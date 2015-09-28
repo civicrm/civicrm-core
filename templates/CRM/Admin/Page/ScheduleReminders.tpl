@@ -55,7 +55,7 @@
     {else}
       {assign var='urlParams' value="action=add&reset=1"}
     {/if}
-    {crmButton p=$link q=$urlParams id="newScheduleReminder"  icon="circle-plus"}{ts}Add Reminder{/ts}{/crmButton}
+    {crmButton p=$link q=$urlParams id="newScheduleReminder"  icon="plus-circle"}{ts}Add Reminder{/ts}{/crmButton}
   </div>
 {/if}
 {/if}
