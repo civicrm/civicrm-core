@@ -152,6 +152,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   protected $_modeValue;
 
   /**
+   * Declare entity reference fields as they will need to be converted to using 'IN'.
+   *
+   * @var array
+   */
+  protected $entityReferenceFields = array('membership_type_id');
+
+  /**
    * Name of the selector to use.
    */
   static $_selectorName = 'CRM_Contact_Selector';
@@ -560,7 +567,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues = $this->controller->exportValues($this->_name);
 
       $this->normalizeFormValues();
-      $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+      $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
       $this->_returnProperties = &$this->returnProperties();
 
       // also get the uf group id directly from the post value
@@ -578,7 +585,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
     else {
       $this->_formValues = $this->get('formValues');
-      $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+      $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
       $this->_returnProperties = &$this->returnProperties();
       if (!empty($this->_ufGroupID)) {
         $this->set('id', $this->_ufGroupID);
