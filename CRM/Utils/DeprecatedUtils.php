@@ -1428,6 +1428,10 @@ function _civicrm_api3_deprecated_contact_check_params(
   }
 
   if ($dupeCheck) {
+    // @todo switch to using api version by uncommenting these lines & removing following 11.
+    // Any change here is too scary for a stable release.
+    // $dupes = civicrm_api3('Contact', 'duplicatecheck', (array('match' => $params, 'dedupe_rule_id' => $dedupeRuleGroupID)));
+    // $ids = $dupes['count'] ? implode(',', array_keys($dupes['values'])) : NULL;
     // check for record already existing
     require_once 'CRM/Dedupe/Finder.php';
     $dedupeParams = CRM_Dedupe_Finder::formatParams($params, $params['contact_type']);
