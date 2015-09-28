@@ -68,6 +68,6 @@
 
   {/if}
   <div class="action-link">
-    {crmButton p='civicrm/admin/sms/provider' q="action=add&reset=1" icon="circle-plus"}{ts}Add SMS Provider{/ts}{/crmButton}
+    {crmButton p='civicrm/admin/sms/provider' q="action=add&reset=1" icon="plus-circle"}{ts}Add SMS Provider{/ts}{/crmButton}
   </div>
 {/if}

@@ -72,18 +72,18 @@
   </div><!-- /.crm-accordion-wrapper -->
   <div>
     Show / Hide columns:
-    <input type='checkbox' id ='steet-address' class='toggle-vis' data-column-main="7" data-column-dupe="8" >  
+    <input type='checkbox' id ='steet-address' class='toggle-vis' data-column-main="7" data-column-dupe="8" >
         <label for="steet-address">{ts}Street Address{/ts}&nbsp;</label>
-    <input type='checkbox' id ='post-code' class='toggle-vis' data-column-main="9" data-column-dupe="10" >  
+    <input type='checkbox' id ='post-code' class='toggle-vis' data-column-main="9" data-column-dupe="10" >
         <label for="post-code">{ts}Post Code{/ts}&nbsp;</label>
-    <input type='checkbox' id ='conflicts' class='toggle-vis' data-column-main="11"  >  
+    <input type='checkbox' id ='conflicts' class='toggle-vis' data-column-main="11"  >
         <label for="conflicts">{ts}Conflicts{/ts}&nbsp; </label>
-    <input type='checkbox' id ='threshold' class='toggle-vis' data-column-main="12"  >  
+    <input type='checkbox' id ='threshold' class='toggle-vis' data-column-main="12"  >
         <label for="threshold">{ts}Threshold{/ts}&nbsp;</label>
   </div><br/>
   <span id="dupePairs_length_selection">
     <input type='checkbox' id ='crm-dedupe-display-selection' name="display-selection">
-    <label for="display-selection">{ts}Within Selections{/ts}&nbsp;</label>  
+    <label for="display-selection">{ts}Within Selections{/ts}&nbsp;</label>
   </span>
 
   <table id="dupePairs"
@@ -96,7 +96,7 @@
     data-order='[]',
     data-column-defs='{literal}[{"targets": [0,1,3,13], "orderable":false}, {"targets": [7,8,9,10,11,12], "visible":false}]{/literal}'>
     <thead>
-      <tr class="columnheader"> 
+      <tr class="columnheader">
         <th data-data="is_selected_input" class="crm-dedupe-selection"><input type="checkbox" value="0" name="pnid_all" class="crm-dedupe-select-all"></th>
         <th data-data="src_image"    class="crm-empty">&nbsp;</th>
         <th data-data="src"          class="crm-contact">{ts}Contact{/ts} 1</th>
@@ -135,7 +135,7 @@
 </div>
 
 {if $context eq 'search'}
-   {crmButton href=$backURL icon="close"}{ts}Done{/ts}{/crmButton}
+   {crmButton href=$backURL icon="times"}{ts}Done{/ts}{/crmButton}
 {elseif $context eq 'conflicts'}
    {if call_user_func(array('CRM_Core_Permission','check'), 'force merge duplicate contacts')}
      {if $gid}
@@ -234,7 +234,7 @@
         }
         CRM.$('table#dupePairs').DataTable().ajax.url(reloadUrl).draw();
       });
-    
+
       $('#dupePairs_length_selection').appendTo('#dupePairs_length');
 
       // apply selected class on click of a row
@@ -283,7 +283,7 @@
       $('input.toggle-vis').on('click', function (e) {
         var column = table.column( $(this).attr('data-column-main') );
         column.visible( ! column.visible() );
-  
+
         // nowrap to conflicts column is applied only during initial rendering
         // for show / hide clicks we need to set it explicitly
         var col = CRM.$('table#dupePairs thead th.crm-contact-conflicts').index() + 1;
@@ -296,14 +296,14 @@
           column.visible( ! column.visible() );
         }
       });
-      
+
       // keep the conflicts checkbox checked when context is "conflicts"
       if(context == 'conflicts') {
-        $('#conflicts').attr('checked', true);  
+        $('#conflicts').attr('checked', true);
         var column = table.column( $('#conflicts').attr('data-column-main') );
         column.visible( ! column.visible() );
       }
-  
+
       // on click of flip link of a row
       $('#dupePairs tbody').on('click', 'tr .crm-dedupe-flip', function(e) {
         e.stopPropagation();
@@ -324,7 +324,7 @@
           $('input.crm-dedupe-select', $elTr).prop('checked', $elTr.hasClass('crm-row-selected'));
         });
       });
-  
+
       $(".crm-dedupe-flip-selections").on('click', function(e) {
         var ids = [];
         $('.crm-row-selected').each(function() {
@@ -365,14 +365,14 @@
       });
       var is_selected = CRM.$('.crm-dedupe-select-all').prop('checked') ? 1 : 0;
     }
-  
+
     var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
     var rgid = {/literal}"{$rgid}"{literal};
     var gid = {/literal}"{$gid}"{literal};
-  
+
     rgid = rgid.length > 0 ? rgid : 0;
     gid  = gid.length > 0 ? gid : 0;
-    
+
     CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected}, function (data) {
       // nothing to do for now
     }, 'json');
