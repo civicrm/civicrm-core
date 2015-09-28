@@ -325,7 +325,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
-    $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
     $this->_returnProperties = &$this->returnProperties();
     parent::postProcess();
   }
@@ -370,7 +370,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'contribution_status',
       'contribution_status_id',
       'contribution_source',
-      'membership_type_id',
       'membership_status_id',
       'participant_status_id',
       'contribution_trxn_id',
