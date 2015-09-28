@@ -575,10 +575,6 @@ abstract class CRM_Utils_System_Base {
       $tempURL = str_replace("/administrator/", "/", $baseURL);
       $filesURL = $tempURL . "media/civicrm/";
     }
-    elseif ($config->userFramework == 'WordPress') {
-      //for standalone no need of sites/defaults directory
-      $filesURL = $baseURL . "wp-content/plugins/files/civicrm/";
-    }
     elseif ($this->is_drupal) {
       $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
       if ($siteName) {
