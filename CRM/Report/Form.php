@@ -1409,7 +1409,9 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->addElement('submit', $this->_csvButtonName, $label);
     }
 
-    if (CRM_Core_Permission::check('administer Reports') &&
+    // CRM-16274 Determine if user has 'edit all contacts' or equivalent
+    $permission = CRM_Core_Permission::getPermission();
+    if ($permission == CRM_Core_Permission::EDIT &&
       $this->_add2groupSupported
     ) {
       $this->addElement('select', 'groups', ts('Group'),
