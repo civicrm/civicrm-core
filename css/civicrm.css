@@ -2178,6 +2178,14 @@ input.crm-form-entityref {
   padding-left: 18px;
 }
 
+.crm-container .crm-button.button-crm-i {
+  padding: 2px 0 1px 5px;
+}
+
+.crm-container .crm-button.button-crm-i input {
+  padding-left: 0;
+}
+
 .crm-container .crm-button-icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
   height: 16px;

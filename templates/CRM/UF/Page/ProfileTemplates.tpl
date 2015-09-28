@@ -36,7 +36,7 @@
       </div>
       <hr>
       <input type="text" class="crm-form-text" placeholder="{ts}Search Fields{/ts}" />
-      <a class="crm-designer-palette-clear-search crm-hover-button" href="#" style="visibility:hidden" title="{ts}Clear search{/ts}"><span class="icon ui-icon-close"></span></a>
+      <a class="crm-designer-palette-clear-search crm-hover-button" href="#" style="visibility:hidden" title="{ts}Clear search{/ts}"><i class="crm-i fa-times"></i></a>
       <div class="crm-designer-palette-controls">
         <a href="#" class="crm-designer-palette-toggle" rel="open_all">{ts}Open All{/ts}</a>&nbsp; |&nbsp;
         <a href="#" class="crm-designer-palette-toggle" rel="close_all">{ts}Close All{/ts}</a>
