@@ -224,4 +224,17 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->assertTrue(empty($newValues['relationship_direction']));
   }
 
+  /**
+   * Test that membership type getlist returns an array of enabled membership types.
+   */
+  public function testMembershipTypeGetList() {
+    $this->membershipTypeCreate();
+    $this->membershipTypeCreate(array('name' => 'cheap-skates'));
+    $this->membershipTypeCreate(array('name' => 'disabled cheap-skates', 'is_active' => 0));
+    $result = $this->callAPISuccess('MembershipType', 'getlist', array());
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals('cheap-skates', $result['values'][0]['label']);
+    $this->assertEquals('General', $result['values'][1]['label']);
+  }
+
 }
