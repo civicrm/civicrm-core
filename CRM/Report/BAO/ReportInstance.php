@@ -160,6 +160,12 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       unset($params['is_navigation']);
     }
 
+    $viewMode = !empty($params['view_mode']) ? $params['view_mode'] : FALSE;
+    if ($viewMode) {
+      // Do not save to the DB - it's saved in the url.
+      unset($params['view_mode']);
+    }
+
     // add to dashboard
     $dashletParams = array();
     if (!empty($params['addToDashboard'])) {
@@ -185,7 +191,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       if (empty($params['id']) && empty($params['instance_id']) && !empty($navigationParams['id'])) {
         unset($navigationParams['id']);
       }
-      $navigationParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1";
+      $navigationParams['url'] = "civicrm/report/instance/{$instance->id}" . ($viewMode == 'view' ? '?reset=1&force=1' : '?reset=1&output=criteria');
       $navigation = CRM_Core_BAO_Navigation::add($navigationParams);
 
       if (!empty($navigationParams['is_active'])) {
