@@ -182,7 +182,7 @@ class CRM_Core_Config_MagicMerge {
       'customFileUploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
       'customPHPPathDir' => array('setting-path'),
       'customTemplateDir' => array('setting-path'),
-      'extensionsDir' => array('setting-path'),
+      'extensionsDir' => array('setting-path', NULL, array('mkdir')),
       'imageUploadDir' => array('setting-path', NULL, array('mkdir')),
       'uploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
 
