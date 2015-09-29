@@ -513,7 +513,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       }
 
       // lets always do a force if reset is found in the url.
-      if (!empty($_REQUEST['reset'])) {
+      // Hey why not? see CRM-17225 for more about this. The use of reset to be force is historical for reasons stated
+      // in the comment line above these 2.
+      if (!empty($_REQUEST['reset']) && CRM_Utils_Request::retrieve('output', 'String') != 'criteria'
+          && CRM_Utils_Request::retrieve('output', 'String') != 'save') {
         $this->_force = 1;
       }
 
