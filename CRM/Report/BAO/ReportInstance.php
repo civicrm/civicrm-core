@@ -160,6 +160,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       unset($params['parent_id']);
       unset($params['is_navigation']);
     }
+    $viewMode = $params['view_mode'];
+    // Do not save to the DB - it's saved in the url.
+    unset($params['view_mode']);
 
     $viewMode = !empty($params['view_mode']) ? $params['view_mode'] : FALSE;
     if ($viewMode) {
