@@ -157,7 +157,7 @@ function civicrm_api3_setting_getoptions($params) {
   // but it's tightly coupled to DAO/field. However, if you really need to support
   // more pseudoconstant types, then probably best to refactor it. For now, KISS.
   if (!empty($pseudoconstant['callback'])) {
-    $values = Civi\Core\Resolver::singleton()->call($pseudoconstant['callback'], array());
+    $values = Civi::call($pseudoconstant['callback'], array());
     return civicrm_api3_create_success($values, $params, 'Setting', 'getoptions');
   }
 

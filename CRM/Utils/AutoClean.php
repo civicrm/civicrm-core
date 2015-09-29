@@ -92,7 +92,7 @@ class CRM_Utils_AutoClean {
   }
 
   public function __destruct() {
-    \Civi\Core\Resolver::singleton()->call($this->callback, $this->args);
+    \Civi::call($this->callback, $this->args);
   }
 
 }
