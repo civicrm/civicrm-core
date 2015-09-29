@@ -123,7 +123,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'is_multiple',
     );
     foreach ($fields as $field) {
-      if (isset($params[$field])) {
+      if (isset($params[$field]) || $field == 'is_multiple') {
         $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
       }
     }
