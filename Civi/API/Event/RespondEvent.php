@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Event;
 
+/**
+ * Class RespondEvent
+ * @package Civi\API\Event
+ */
 class RespondEvent extends Event {
   /**
    * @var mixed
    */
   private $response;
 
-  function __construct($apiProvider, $apiRequest, $response) {
+  /**
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   *   The API provider responsible for executing the request.
+   * @param array $apiRequest
+   *   The full description of the API request.
+   * @param mixed $response
+   *   The response to return to the client.
+   * @param \Civi\API\Kernel $apiKernel
+   *   The kernel which fired the event.
+   */
+  public function __construct($apiProvider, $apiRequest, $response, $apiKernel) {
     $this->response = $response;
-    parent::__construct($apiProvider, $apiRequest);
+    parent::__construct($apiProvider, $apiRequest, $apiKernel);
   }
 
   /**
@@ -47,8 +61,10 @@ class RespondEvent extends Event {
 
   /**
    * @param mixed $response
+   *   The response to return to the client.
    */
   public function setResponse($response) {
     $this->response = $response;
   }
+
 }

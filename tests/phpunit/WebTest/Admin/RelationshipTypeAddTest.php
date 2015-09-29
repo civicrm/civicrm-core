@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Admin_RelationshipTypeAddTest
+ */
 class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testRelationshipTypeAdd() {
+  public function testRelationshipTypeAdd() {
 
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -70,11 +74,11 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
       'Contact Type B' => 'Individual',
     );
     foreach ($data as $param => $val) {
-      $this->assertElementContainsText('option11', $val, "Could not able to save $param");
+      $this->assertElementContainsText("xpath=//table[@class='display dataTable no-footer']", $val, "Could not able to save $param");
     }
   }
 
-  function testRelationshipTypeAddValidateFormRules() {
+  public function testRelationshipTypeAddValidateFormRules() {
 
     $this->webtestLogin();
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -95,7 +99,7 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
     $this->type('description', $description);
 
     $this->click('_qf_RelationshipType_next-bottom');
-    $this->waitForText("xpath=//*[@id='RelationshipType']/div[2]/table/tbody/tr[1]/td[2]/label[@class='error']", 'This field is required.');
+    $this->waitForText("xpath=//*[@id='RelationshipType']/div[2]/table/tbody/tr[1]/td[2]/label[@class='crm-inline-error']", 'This field is required.');
 
     //enter the relationship type values.
     $labelAB = 'Test Relationship Type A - B - DUPLICATE TO BE' . rand();
@@ -118,5 +122,5 @@ class WebTest_Admin_RelationshipTypeAddTest extends CiviSeleniumTestCase {
 
     $this->waitForText('crm-notification-container', 'Label already exists in Database.');
   }
-}
 
+}

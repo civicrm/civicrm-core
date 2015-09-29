@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,9 +25,6 @@
 *}
 
 {* this template is used for adding/editing activities for a case. *}
-{if $cdType }
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 <div class="crm-block crm-form-block crm-case-activity-form-block">
 
   {if $action neq 8 and $action  neq 32768 }
@@ -58,13 +55,13 @@
     {* Block for change status, case type and start date. *}
     {if $activityTypeFile EQ 'ChangeCaseStatus'
     || $activityTypeFile EQ 'ChangeCaseType'
+    || $activityTypeFile EQ 'LinkCases'
     || $activityTypeFile EQ 'ChangeCaseStartDate'}
       {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
       <tr class="crm-case-activity-form-block-details">
-        <td class="label">{ts}Notes{/ts}</td>
+        <td class="label">{ts}Details{/ts}</td>
         <td class="view-value">
-          {* If using plain textarea, assign class=huge to make input large enough. *}
-          {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+          {$form.details.html}
         </td>
       </tr>
       {* Added Activity Details accordion tab *}
@@ -75,13 +72,16 @@
               {ts}Activity Details{/ts}
             </div><!-- /.crm-accordion-header -->
             <div class="crm-accordion-body">
+    {else}
+      <tr class="crm-case-activity-form-block-activity-details">
+        <td colspan="2">
     {/if}
     {* End block for change status, case type and start date. *}
             <table class="form-layout-compressed">
               <tbody>
                 <tr id="with-clients" class="crm-case-activity-form-block-client_name">
                   <td class="label font-size12pt">{ts}Client{/ts}</td>
-                  <td class="view-value">	
+                  <td class="view-value">
                     <span class="font-size12pt">
                       {foreach from=$client_names item=client name=clients key=id}
                         {foreach from=$client_names.$id item=client1}
@@ -99,7 +99,7 @@
                 </tr>
 
                 {if $action eq 1 or $action eq 2}
-                  <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
+                  <tr class="crm-case-activity-form-block-target_contact_id hiddenElement" id="with-contacts-widget">
                     <td class="label font-size10pt">{ts}With Contact{/ts}</td>
                     <td class="view-value">
                       {$form.target_contact_id.html}
@@ -127,7 +127,7 @@
                   <td>{$form.assignee_contact_id.html}
                     {if $activityAssigneeNotification}
                       <br />
-                      <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+                      <span class="description"><span class="icon ui-icon-mail-closed"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
                     {/if}
                   </td>
                 </tr>
@@ -155,6 +155,14 @@
                   <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
                 {/if}
               </tr>
+              {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
+              <tr class="crm-case-activity-form-block-details">
+                <td class="label">{ts}Notes{/ts}</td>
+                <td class="view-value">
+                  {$form.details.html}
+                </td>
+              </tr>
+              {/if}
               <tr>
                 <td colspan="2"><div id="customData"></div></td>
               </tr>
@@ -162,8 +170,7 @@
                 <tr class="crm-case-activity-form-block-details">
                   <td class="label">{$form.details.label}</td>
                   <td class="view-value">
-                  {* If using plain textarea, assign class=huge to make input large enough. *}
-                    {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+                    {$form.details.html}
                   </td>
                 </tr>
               {/if}
@@ -226,51 +233,25 @@
     {/if}
   <tr class="crm-case-activity-form-block-schedule_followup">
     <td colspan="2">
-
-      <div id="follow-up" class="crm-accordion-wrapper collapsed">
-        <div class="crm-accordion-header">
-          {ts}Schedule Follow-up{/ts}
-        </div><!-- /.crm-accordion-header -->
-        <div class="crm-accordion-body">
-
-          <table class="form-layout-compressed">
-            <tr class="crm-case-activity-form-block-followup_activity_type_id">
-              <td class="label">{ts}Schedule Follow-up Activity{/ts}</td>
-              <td>{$form.followup_activity_type_id.html}&nbsp;&nbsp;{ts}on{/ts}
-              {include file="CRM/common/jcalendar.tpl" elementName=followup_date}
-              </td>
-            </tr>
-            <tr class="crm-case-activity-form-block-followup_activity_subject">
-              <td class="label">{$form.followup_activity_subject.label}</td>
-              <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
-            </tr>
-	    <tr>
-              <td class="label">
-                {$form.followup_assignee_contact_id.label}
-                {edit}
-                {/edit}
-              </td>
-              <td>
-                {$form.followup_assignee_contact_id.html}
-              </td>
-            </tr>
-          </table>
-        </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+    {include file="CRM/Activity/Form/FollowUp.tpl" type="case-"}
     </td>
   </tr>
   {* Suppress activity status and priority for changes to status, case type and start date. PostProc will force status to completed. *}
     {if $activityTypeFile NEQ 'ChangeCaseStatus'
     && $activityTypeFile NEQ 'ChangeCaseType'
     && $activityTypeFile NEQ 'ChangeCaseStartDate'}
-    <table class="form-layout-compressed">
-      <tr class="crm-case-activity-form-block-status_id">
-        <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
+      <tr>
+        <td colspan="2">
+          <table class="form-layout-compressed">
+            <tr class="crm-case-activity-form-block-status_id">
+              <td class="label">{$form.status_id.label}</td><td class="view-value">{$form.status_id.html}</td>
+            </tr>
+            <tr class="crm-case-activity-form-block-priority_id">
+              <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
+            </tr>
+          </table>
+        </td>
       </tr>
-      <tr class="crm-case-activity-form-block-priority_id">
-        <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
-      </tr>
-    </table>
     {/if}
     {if $form.tag.html}
     <tr class="crm-case-activity-form-block-tag">
@@ -280,7 +261,7 @@
       </td>
     </tr>
     {/if}
-  <tr class="crm-case-activity-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td></tr>
+  <tr class="crm-case-activity-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td></tr>
   </table>
 
   {/if}
@@ -317,16 +298,13 @@
   </script>
   {/if}
 
-  {* include jscript to warn if unsaved form field changes *}
-  {include file="CRM/common/formNavigate.tpl"}
-
   {if $action eq 2 or $action eq 1}
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-        cj('.crm-with-contact').click(function(){
-          cj('#with-contacts-widget').toggle();
-          cj('#with-clients').toggle();
+        $('.crm-with-contact').click(function() {
+          $('#with-contacts-widget').toggle();
+          $('#with-clients').toggle();
           return false;
         });
       });
@@ -334,4 +312,3 @@
     {/literal}
   {/if}
 </div>
-{/if} {* end of main if block*}

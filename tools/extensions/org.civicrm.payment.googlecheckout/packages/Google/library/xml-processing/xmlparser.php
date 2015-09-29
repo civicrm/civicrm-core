@@ -20,20 +20,20 @@
 
 
 /* This uses SAX parser to convert XML data into PHP associative arrays
- * When invoking the constructor with the input data, strip out the first XML line 
- * 
+ * When invoking the constructor with the input data, strip out the first XML line
+ *
  * Member field Description:
- * $params: This stores the XML data. The attributes and contents of XML tags 
+ * $params: This stores the XML data. The attributes and contents of XML tags
  * can be accessed as follows
- * 
+ *
  * <addresses>
  *  <anonymous-address id="123"> <test>data 1 </test>
  *  </anonymous-address>
  *  <anonymous-address id="456"> <test>data 2 </test>
  *  </anonymous-address>
  * </addresses>
- * 
- * print_r($this->params) will return 
+ *
+ * print_r($this->params) will return
  Array
 (
     [addresses] => Array
@@ -65,9 +65,13 @@
         )
 
 )
-  * XmlParser returns an empty params array if it encounters 
-  * any error during parsing 
+  * XmlParser returns an empty params array if it encounters
+  * any error during parsing
   */
+
+/**
+ * Class XmlParser
+ */
 class XmlParser {
 
   // Stores the object representation of XML data
@@ -78,6 +82,9 @@ class XmlParser {
   /* Constructor for the class
     * Takes in XML data as input( do not include the <xml> tag
     */
+  /**
+   * @param $input
+   */
   function XmlParser($input) {
     $xmlp = xml_parser_create();
     xml_parse_into_struct($xmlp, $input, $vals, $index);
@@ -87,13 +94,23 @@ class XmlParser {
   }
 
   /* Returns true if a given variable represents an associative array */
+  /**
+   * @param $var
+   *
+   * @return bool
+   */
   function is_associative_array($var) {
     return is_array($var) && !is_numeric(implode('', array_keys($var)));
   }
 
-  /* Converts the output of SAX parser into a PHP associative array similar to the 
+  /* Converts the output of SAX parser into a PHP associative array similar to the
     * DOM parser output
     */
+  /**
+   * @param $vals
+   *
+   * @return array
+   */
   function UpdateRecursive($vals) {
     $this->global_index++;
     //Reached end of array
@@ -158,11 +175,17 @@ class XmlParser {
   }
 
   /* Returns the root of the XML data */
+  /**
+   * @return string
+   */
   function GetRoot() {
     return $this->root;
   }
 
   /* Returns the array representing the XML data */
+  /**
+   * @return array
+   */
   function GetData() {
     return $this->params;
   }

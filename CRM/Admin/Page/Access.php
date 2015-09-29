@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,22 +23,24 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * Dashboard page for managing Access Control
+ * Dashboard page for managing Access Control.
+ *
  * For initial version, this page only contains static links - so this class is empty for now.
  */
 class CRM_Admin_Page_Access extends CRM_Core_Page {
-  function run() {
+  /**
+   * @return string
+   */
+  public function run() {
     $config = CRM_Core_Config::singleton();
 
     switch ($config->userFramework) {
@@ -52,7 +54,7 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
 
       case 'Joomla':
         //condition based on Joomla version; <= 2.5 uses modal window; >= 3.0 uses full page with return value
-        if( version_compare(JVERSION, '3.0', 'lt') ) {
+        if (version_compare(JVERSION, '3.0', 'lt')) {
           JHTML::_('behavior.modal');
           $url = $config->userFrameworkBaseURL . 'index.php?option=com_config&view=component&component=com_civicrm&tmpl=component';
           $jparams = 'rel="{handler: \'iframe\', size: {x: 875, y: 550}, onClose: function() {}}" class="modal"';
@@ -76,5 +78,5 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
     }
     return parent::run();
   }
-}
 
+}

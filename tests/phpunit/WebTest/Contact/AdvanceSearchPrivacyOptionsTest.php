@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_AdvanceSearchPrivacyOptionsTest
+ */
 class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testSearchForPrivacyOptions() {
+  public function testSearchForPrivacyOptions() {
     $this->webtestLogin();
 
     $privacyOptions = array(
@@ -121,7 +125,13 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     $this->assertTrue($assertCheck, 'Do not trade / sms assertion failed using criteria(include , AND )');
   }
 
-  function _addPrivacyCriteria($inEx, $privacyOptions, $privacyOperator, $allPrivacyOptions) {
+  /**
+   * @param $inEx
+   * @param $privacyOptions
+   * @param $privacyOperator
+   * @param $allPrivacyOptions
+   */
+  public function _addPrivacyCriteria($inEx, $privacyOptions, $privacyOperator, $allPrivacyOptions) {
     $inExId = ($inEx == 'include') ? 'CIVICRM_QFID_2_privacy_toggle' : 'CIVICRM_QFID_1_privacy_toggle';
     $this->click($inExId);
     $this->select('privacy_operator', "{$privacyOperator}");
@@ -144,7 +154,13 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     }
   }
 
-  function _searchSortNameCriteria($firstName, $lastName) {
+  /**
+   * @param string $firstName
+   * @param string $lastName
+   *
+   * @return bool
+   */
+  public function _searchSortNameCriteria($firstName, $lastName) {
     //type in the criteria
     $this->type("sort_name", "{$lastName}, {$firstName}");
 
@@ -156,7 +172,12 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     return $this->isElementPresent("xpath=//div[@class='crm-search-results']/table/tbody/tr/td[3]/a[text()='{$lastName}, {$firstName}']");
   }
 
-  function getOptionVal($privacyOption) {
+  /**
+   * @param $privacyOption
+   *
+   * @return string
+   */
+  public function getOptionVal($privacyOption) {
     if ($privacyOption == 'do_not_phone') {
       $privacyOptionVal = 'Do not phone';
     }
@@ -175,7 +196,12 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     return $privacyOptionVal;
   }
 
-  function _addIndividual($firstName, $lastName, $options) {
+  /**
+   * @param string $firstName
+   * @param string $lastName
+   * @param $options
+   */
+  public function _addIndividual($firstName, $lastName, $options) {
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
@@ -202,5 +228,5 @@ class WebTest_Contact_AdvanceSearchPrivacyOptionsTest extends CiviSeleniumTestCa
     $this->waitForText('crm-notification-container', "{$firstName} {$lastName} has been created.");
 
   }
-}
 
+}

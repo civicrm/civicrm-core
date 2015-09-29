@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,22 +28,30 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 
 require_once 'CRM/Contact/Form/Search/Custom/Base.php';
+
+/**
+ * Class org_civicrm_search_basic
+ */
 class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_BaseimplementsCRM_Contact_Form_Search_Interface {
 
   protected $_query;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->normalize();
-    $this->_columns = array(ts('') => 'contact_type',
-      ts('') => 'contact_sub_type',
+    $this->_columns = array(
+      '' => 'contact_type',
+      '' => 'contact_sub_type',
       ts('Name') => 'sort_name',
       ts('Address') => 'street_address',
       ts('City') => 'city',
@@ -95,8 +103,15 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     return;
   }
 
+  /**
+   * @param CRM_Core_Form $form
+   */
   function buildForm(&$form) {
-    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
+
+    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
+    // this is loaded onto then replace with something like '__' & test
+    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
+    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
     $form->add('select', 'contact_type', ts('Find...'), $contactTypes);
 
     // add select for groups
@@ -113,10 +128,21 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     $form->assign('elements', array('sort_name', 'contact_type', 'group', 'tag'));
   }
 
+  /**
+   * @return CRM_Contact_DAO_Contact
+   */
   function count() {
     return $this->_query->searchQuery(0, 0, NULL, TRUE);
   }
 
+  /**
+   * @param int $offset
+   * @param int $rowCount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   *
+   * @return CRM_Contact_DAO_Contact
+   */
   function all($offset = 0, $rowCount = 0, $sort = NULL,
     $includeContactIDs = FALSE
   ) {
@@ -126,10 +152,18 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     return $this->_query->_fromClause;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     if ($whereClause = $this->_query->whereClause()) {
       return $whereClause;
@@ -137,6 +171,9 @@ class org_civicrm_search_basic extends CRM_Contact_Form_Search_Custom_Baseimplem
     return ' (1) ';
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Basic.tpl';
   }

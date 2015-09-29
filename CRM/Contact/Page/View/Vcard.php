@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,37 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 require_once 'Contact/Vcard/Build.php';
 
 /**
- * vCard export class
- *
+ * vCard export class.
  */
 class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
 
   /**
-   * Heart of the vCard data assignment process. The runner gets all the meta
-   * data for the contact and calls the writeVcard method to output the vCard
-   * to the user.
+   * Heart of the vCard data assignment process.
    *
-   * @return void
+   * The runner gets all the metadata for the contact and calls the writeVcard method to output the vCard
+   * to the user.
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
-    $params   = array();
+    $params = array();
     $defaults = array();
-    $ids      = array();
+    $ids = array();
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
@@ -111,9 +107,9 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         if (!empty($location['supplemental_address_2'])) {
           $extend .= ', ' . $location['supplemental_address_2'];
         }
-        $street   = CRM_Utils_Array::value('street_address', $location);
+        $street = CRM_Utils_Array::value('street_address', $location);
         $locality = CRM_Utils_Array::value('city', $location);
-        $region   = NULL;
+        $region = NULL;
         if (!empty($location['state_province_id'])) {
           $region = $stateProvices[CRM_Utils_Array::value('state_province_id', $location)];
         }
@@ -168,5 +164,5 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
     $vcard->send($filename . '.vcf', 'attachment', 'utf-8');
     CRM_Utils_System::civiExit();
   }
-}
 
+}

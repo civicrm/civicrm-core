@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,7 +39,7 @@
     <th class="right">{ts}Amount{/ts}&nbsp;&nbsp;</th>
     <th>{ts}Source{/ts}</th>
     <th>{ts}Fee Amount{/ts}</th>
-    <th>{ts}Paid By{/ts}</th>
+    <th>{ts}Payment Method{/ts}</th>
     <th>{ts}Check{/ts} #</th>
     <th>{ts}Transaction ID{/ts}</th>
     <th>{ts}Transaction Date{/ts}</th>

@@ -1,12 +1,19 @@
 <?php
+
+/**
+ * Class CRM_Utils_Number
+ */
 class CRM_Utils_Number {
   /**
-   * Create a random number with a given precision
+   * Create a random number with a given precision.
    *
-   * @param array $precision (int $significantDigits, int $postDecimalDigits)
+   * @param array $precision
+   *   (int $significantDigits, int $postDecimalDigits).
+   *
+   * @return float
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */
-  static function createRandomDecimal($precision) {
+  public static function createRandomDecimal($precision) {
     list ($sigFigs, $decFigs) = $precision;
     $rand = rand(0, pow(10, $sigFigs) - 1);
     return $rand / pow(10, $decFigs);
@@ -18,11 +25,12 @@ class CRM_Utils_Number {
    * and/or move the decimal place.
    *
    * @param int|float $keyValue
-   * @param array $precision (int $significantDigits, int $postDecimalDigits)
+   * @param array $precision
+   *   (int $significantDigits, int $postDecimalDigits).
    * @return float
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */
-  static function createTruncatedDecimal($keyValue, $precision) {
+  public static function createTruncatedDecimal($keyValue, $precision) {
     list ($sigFigs, $decFigs) = $precision;
     $sign = ($keyValue < 0) ? '-1' : 1;
     $val = str_replace('.', '', abs($keyValue)); // ex: -123.456 ==> 123456
@@ -37,4 +45,38 @@ class CRM_Utils_Number {
       return $sign * $val;
     }
   }
+
+  /**
+   * Some kind of numbery-looky-printy thing.
+   */
+  public static function formatUnitSize($size, $checkForPostMax = FALSE) {
+    if ($size) {
+      $last = strtolower($size{strlen($size) - 1});
+      switch ($last) {
+        // The 'G' modifier is available since PHP 5.1.0
+
+        case 'g':
+          $size *= 1024;
+        case 'm':
+          $size *= 1024;
+        case 'k':
+          $size *= 1024;
+      }
+
+      if ($checkForPostMax) {
+        $maxImportFileSize = self::formatUnitSize(ini_get('upload_max_filesize'));
+        $postMaxSize = self::formatUnitSize(ini_get('post_max_size'));
+        if ($maxImportFileSize > $postMaxSize && $postMaxSize == $size) {
+          CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
+        }
+        //respect php.ini upload_max_filesize
+        if ($size > $maxImportFileSize && $size !== $postMaxSize) {
+          $size = $maxImportFileSize;
+          CRM_Core_Session::setStatus(ts("Note: Please verify your configuration for Maximum File Size (in MB) <a href='%1'>Administrator >> System Settings >> Misc</a>. It should support 'upload_max_size' as defined in PHP.ini.Please check with your system administrator.", array(1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1'))), ts("Warning"), "alert");
+        }
+      }
+      return $size;
+    }
+  }
+
 }

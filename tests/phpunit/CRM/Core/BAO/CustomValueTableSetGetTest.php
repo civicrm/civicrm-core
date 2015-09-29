@@ -2,24 +2,20 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
-class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'Custom Value Table BAO setValues and getValues',
-      'description' => 'Test setValues and getValues Core_BAO_CustomValueTable methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+/**
+ * Class CRM_Core_BAO_CustomValueTableSetGetTest
+ */
+class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
+
+  public function setUp() {
     parent::setUp();
   }
 
-  /*
-     * Test setValues() and GetValues() methods with custom Date field
-     *
-     */
-  function testSetGetValuesDate() {
+  /**
+   * Test setValues() and GetValues() methods with custom Date field
+   */
+  public function testSetGetValuesDate() {
     $params = array();
     $contactID = Contact::createIndividual();
 
@@ -72,16 +68,17 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     );
 
     $errorScope = CRM_Core_TemporaryErrorScope::useException();
-    $message = null;
+    $message = NULL;
     try {
       $result = CRM_Core_BAO_CustomValueTable::setValues($params);
-    } catch ( Exception $e ) {
+    }
+    catch (Exception $e) {
       $message = $e->getMessage();
     }
     $errorScope = NULL;
 
     // Check that an exception has been thrown
-    $this->assertNotNull( $message, 'Verify than an exception is thrown when bad date is passed' );
+    $this->assertNotNull($message, 'Verify than an exception is thrown when bad date is passed');
 
     $params = array(
       'entityID' => $contactID,
@@ -114,11 +111,10 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     Contact::delete($contactID);
   }
 
-  /*
-     * Test setValues() and getValues() methods with custom field YesNo(Boolean) Radio
-     *
-     */
-  function testSetGetValuesYesNoRadio() {
+  /**
+   * Test setValues() and getValues() methods with custom field YesNo(Boolean) Radio
+   */
+  public function testSetGetValuesYesNoRadio() {
     $params = array();
     $contactID = Contact::createIndividual();
 
@@ -165,7 +161,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'Verify that the boolean value is stored for contact ' . $contactID
     );
 
-
     // Now set YesNo radio to an invalid boolean value and try to reset
     $badYesNo = '20';
     $params = array(
@@ -174,16 +169,17 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     );
 
     $errorScope = CRM_Core_TemporaryErrorScope::useException();
-    $message = null;
+    $message = NULL;
     try {
       $result = CRM_Core_BAO_CustomValueTable::setValues($params);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       $message = $e->getMessage();
     }
     $errorScope = NULL;
 
     // Check that an exception has been thrown
-    $this->assertNotNull( $message, 'Verify than an exception is thrown when bad boolean is passed' );
+    $this->assertNotNull($message, 'Verify than an exception is thrown when bad boolean is passed');
 
     $params = array(
       'entityID' => $contactID,
@@ -200,5 +196,5 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     Custom::deleteGroup($customGroup);
     Contact::delete($contactID);
   }
-}
 
+}

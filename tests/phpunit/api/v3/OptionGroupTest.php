@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2014                                |
+| Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -23,16 +23,21 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_OptionGroupTest
+ */
 class api_v3_OptionGroupTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   protected $_entity = 'OptionGroup';
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_params = array(
       'name' => 'our test Option Group',
       'is_reserved' => 1,
@@ -40,57 +45,70 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {}
-  /*
-  * Good to test option group as a representative on the Camel Case
-  */
-
+  /**
+   * Good to test option group as a representative on the Camel Case.
+   */
   public function testGetOptionGroupGetFields() {
     $result = $this->callAPISuccess('option_group', 'getfields', array());
-    $this->assertFalse(empty($result['values']), 'In line ' . __LINE__);
+    $this->assertFalse(empty($result['values']));
   }
+
   public function testGetOptionGroupGetFieldsCreateAction() {
     $result = $this->callAPISuccess('option_group', 'getfields', array('action' => 'create'));
-    $this->assertFalse(empty($result['values']), 'In line ' . __LINE__);
+    $this->assertFalse(empty($result['values']));
     $this->assertEquals($result['values']['name']['api.unique'], 1);
   }
 
   public function testGetOptionGroupByID() {
     $result = $this->callAPISuccess('option_group', 'get', array('id' => 1));
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $result['id']);
   }
 
   public function testGetOptionGroupByName() {
     $params = array('name' => 'preferred_communication_method');
     $result = $this->callAPIAndDocument('option_group', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $result['id']);
   }
 
   public function testGetOptionGroup() {
     $result = $this->callAPISuccess('option_group', 'get', array());
-    $this->assertGreaterThan(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertGreaterThan(1, $result['count']);
   }
 
   public function testGetOptionDoesNotExist() {
     $result = $this->callAPISuccess('option_group', 'get', array('name' => 'FSIGUBSFGOMUUBSFGMOOUUBSFGMOOBUFSGMOOIIB'));
-    $this->assertEquals(0, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $result['count']);
   }
+
   public function testGetOptionCreateSuccess() {
-    $params = array('sequential' => 1, 'name' => 'civicrm_event.amount.560', 'is_reserved' => 1, 'is_active' => 1, 'api.OptionValue.create' => array('label' => 'workshop', 'value' => 35, 'is_default' => 1, 'is_active' => 1, 'format.only_id' => 1));
+    $params = array(
+      'sequential' => 1,
+      'name' => 'civicrm_event.amount.560',
+      'is_reserved' => 1,
+      'is_active' => 1,
+      'api.OptionValue.create' => array(
+        'label' => 'workshop',
+        'value' => 35,
+        'is_default' => 1,
+        'is_active' => 1,
+        'format.only_id' => 1,
+      ),
+    );
     $result = $this->callAPIAndDocument('OptionGroup', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals('civicrm_event.amount.560', $result['values'][0]['name'], 'In line ' . __LINE__);
-    $this->assertTrue(is_integer($result['values'][0]['api.OptionValue.create']));
+    $this->assertEquals('civicrm_event.amount.560', $result['values'][0]['name']);
+    $this->assertTrue(is_int($result['values'][0]['api.OptionValue.create']));
     $this->assertGreaterThan(0, $result['values'][0]['api.OptionValue.create']);
     $this->callAPISuccess('OptionGroup', 'delete', array('id' => $result['id']));
   }
-  /*
-   * Test the error message when a failure is due to a key duplication issue
-   */
 
+  /**
+   * Test the error message when a failure is due to a key duplication issue.
+   */
   public function testGetOptionCreateFailOnDuplicate() {
-    $params = array(      'sequential' => 1,
+    $params = array(
+      'sequential' => 1,
       'name' => 'civicrm_dup entry',
       'is_reserved' => 1,
       'is_active' => 1,
@@ -100,20 +118,22 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
     $this->callAPISuccess('OptionGroup', 'delete', array('id' => $result1['id']));
   }
 
-  /*
+  /**
    * Test that transaction is completely rolled back on fail.
-   * Also check error returned
+   *
+   * Check error returned.
    */
-
   public function testGetOptionCreateFailRollback() {
     $countFirst = $this->callAPISuccess('OptionGroup', 'getcount', array(
-               'options' => array('limit' => 5000),
+        'options' => array('limit' => 5000),
       )
     );
-    $params = array(      'sequential' => 1,
+    $params = array(
+      'sequential' => 1,
       'name' => 'civicrm_rolback_test',
       'is_reserved' => 1,
       'is_active' => 1,
+      'is_transactional' => 'nest', // executing within useTransactional() test case
       'api.OptionValue.create' => array(
         'label' => 'invalid entry',
         'value' => 35,
@@ -124,7 +144,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIFailure('OptionGroup', 'create', $params);
     $countAfter = $this->callAPISuccess('OptionGroup', 'getcount', array(
-               'options' => array('limit' => 5000),
+        'options' => array('limit' => 5000),
       )
     );
     $this->assertEquals($countFirst, $countAfter,
@@ -133,7 +153,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * success test for updating an existing Option Group
+   * Success test for updating an existing Option Group.
    */
   public function testCreateUpdateOptionGroup() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -143,11 +163,11 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * success test for deleting an existing Option Group
+   * Success test for deleting an existing Option Group.
    */
   public function testDeleteOptionGroup() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->callAPIAndDocument('OptionGroup', 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
   }
-}
 
+}

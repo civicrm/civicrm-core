@@ -1,7 +1,7 @@
 /* CiviCRM Print Media Stylesheet */
 
 /* Hide any buttons or other form items when printing*/
-#crm-container .buttons, #crm-container .crm-submit-buttons, #crm-container .crm-actions-ribbon, #crm-container .form-submit {
+#crm-container .buttons, #crm-container .crm-submit-buttons, #crm-container .crm-actions-ribbon, #crm-container .crm-form-submit {
      display: none;
 }
 

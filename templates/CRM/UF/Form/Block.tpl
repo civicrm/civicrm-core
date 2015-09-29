@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,13 +66,13 @@
       {elseif $n}
         {* Show explanatory text for field if not in 'view' or 'preview' modes *}
         {if $field.help_pre && $action neq 4 && $action neq 1028}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-pre" id="helprow-{$n}">
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
         {if $field.options_per_line != 0}
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
-            <div class="label option-label">{$form.$n.label}</div>
+            <div class="label option-label">{if $prefix}{$form.$prefix.$n.label}{else}{$form.$n.label}{/if}</div>
             <div class="content 3">
               {assign var="count" value="1"}
               {strip}
@@ -80,11 +80,16 @@
                 <tr>
                 {* sort by fails for option per line. Added a variable to iterate through the element array*}
                   {assign var="index" value="1"}
-                  {foreach name=outer key=key item=item from=$form.$n}
+                  {if $prefix}
+                    {assign var="formElement" value=$form.$prefix.$n}
+                  {else}
+                    {assign var="formElement" value=$form.$n}
+                  {/if}
+                  {foreach name=outer key=key item=item from=$formElement}
                     {if $index < 10}
                       {assign var="index" value=`$index+1`}
                     {else}
-                      <td class="labels font-light">{$form.$n.$key.html}</td>
+                      <td class="labels font-light">{$formElement.$key.html}</td>
                       {if $count == $field.options_per_line}
                       </tr>
                       <tr>
@@ -109,9 +114,6 @@
               {if $n|substr:0:3 eq 'im-'}
                 {assign var="provider" value=$n|cat:"-provider_id"}
                 {$form.$provider.html}&nbsp;
-              {elseif $n|substr:0:4 eq 'url-'}
-                {assign var="websiteType" value=$n|cat:"-website_type_id"}
-                {$form.$websiteType.html}&nbsp;
               {/if}
 
               {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
@@ -130,7 +132,14 @@
                   &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
-                {if $prefix}{$form.$prefix.$n.html}{else}{$form.$n.html}{/if}
+                {if $prefix}
+                  {if $n eq 'organization_name' && !empty($form.onbehalfof_id)}
+                    {$form.onbehalfof_id.html}
+                  {/if}
+                  {$form.$prefix.$n.html}
+		{else}
+		  {$form.$n.html}
+		{/if}
               {/if}
 
             {*CRM-4564*}
@@ -145,7 +154,7 @@
         {/if}
         {* Show explanatory text for field if not in 'view' or 'preview' modes *}
         {if $field.help_post && $action neq 4 && $action neq 1028}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-post" id="helprow-{$n}">
             <div class="content description">{$field.help_post}</div>
           </div>
         {/if}
@@ -174,8 +183,8 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    cj('#selector tr:even').addClass('odd-row ');
-    cj('#selector tr:odd ').addClass('even-row');
+    $('#selector tr:even').addClass('odd-row');
+    $('#selector tr:odd ').addClass('even-row');
   });
 </script>
 {/literal}

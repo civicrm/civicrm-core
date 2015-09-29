@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,22 +22,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Financial_FinancialBatchExport
+ */
 class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testAddFinancialBatch() {
+  public function testAddFinancialBatch() {
     // Log in using webtestLogin() method
     $this->webtestLogin('admin');
     $this->openCiviPage("financial/batch", "reset=1&action=add", '_qf_FinancialBatch_next-botttom');
     $setTitle = 'Batch ' . substr(sha1(rand()), 0, 7) . date('Y-m-d');
-    $setDescription  = 'Test Batch Creation';
+    $setDescription = 'Test Batch Creation';
     $setPaymentInstrument = 'Credit Card';
     $numberOfTrxn = '10'; // can be 10, 25, 50, 100
     $totalAmt = '1000';
@@ -53,7 +57,16 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->_testExportBatch($setTitle, $batchId, $exportFormat);
   }
 
-  function _testAddBatch($setTitle, $setDescription, $setPaymentInstrument, $numberOfTrxn, $totalAmt) {
+  /**
+   * @param $setTitle
+   * @param $setDescription
+   * @param $setPaymentInstrument
+   * @param $numberOfTrxn
+   * @param $totalAmt
+   *
+   * @return null
+   */
+  public function _testAddBatch($setTitle, $setDescription, $setPaymentInstrument, $numberOfTrxn, $totalAmt) {
     // Enter Optional Constraints
     $this->type('title', $setTitle);
     $this->type('description', $setDescription);
@@ -83,8 +96,11 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     return $batchId;
   }
 
-  function _testAssignBatch($numberOfTrxn) {
-    $this->select( "xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn" );
+  /**
+   * @param $numberOfTrxn
+   */
+  public function _testAssignBatch($numberOfTrxn) {
+    $this->select("xpath=//div[@id='crm-transaction-selector-assign_length']/label/select[@name='crm-transaction-selector-assign_length']", "value=$numberOfTrxn");
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
     // Sleep should never be used for wait for anything to load from the server
     // Justification for this instance: FIXME
@@ -95,7 +111,12 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
-  function _testExportBatch($setTitle, $batchId, $exportFormat) {
+  /**
+   * @param $setTitle
+   * @param int $batchId
+   * @param $exportFormat
+   */
+  public function _testExportBatch($setTitle, $batchId, $exportFormat) {
     $this->openCiviPage("financial/batch", "reset=1&action=export&id=$batchId");
     if ($exportFormat == 'CSV') {
       $this->click("xpath=//form[@id='FinancialBatch']/div[2]/table[@class='form-layout']/tbody/tr/td/input[2]");
@@ -113,8 +134,9 @@ class WebTest_Financial_FinancialBatchExport extends CiviSeleniumTestCase {
     $this->clickLink("xpath=//div[@id='recently-viewed']/ul/li[1]/a", "_qf_Activity_cancel-bottom");
     $this->webtestVerifyTabularData(
       array(
-        'Current Attachment(s)' => 'Financial_Transactions_'
+        'Current Attachment(s)' => 'Financial_Transactions_',
       )
     );
   }
+
 }

@@ -9,9 +9,13 @@
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
 {capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
+{capture assign=tdfirstStyle}style="width: 180px; padding-bottom: 15px;"{/capture}
+{capture assign=tdStyle}style="width: 100px;"{/capture}
+{capture assign=participantTotal}style="margin: 0.5em 0 0.5em;padding: 0.5em;background-color: #999999;font-weight: bold;color: #FAFAFA;border-radius: 2px;"{/capture}
+
 
 <center>
- <table width="500" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+ <table width="700" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -21,7 +25,7 @@
 
   <tr>
    <td>
-  <p>Dear {contact.display_name},</p>
+  <p>{contact.email_greeting},</p>
 
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
@@ -35,15 +39,12 @@
     {if $isOnWaitlist}
      <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
      {if $isPrimary}
-       <p>{ts}If space becomes available you will receive an email with
-a link to a web page where you can complete your registration.{/ts}</p>
+       <p>{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}</p>
      {/if}
     {elseif $isRequireApproval}
      <p>{ts}Your registration has been submitted.{/ts}</p>
      {if $isPrimary}
-      <p>{ts}Once your registration has been reviewed, you will receive
-an email with a link to a web page where you can complete the
-registration process.{/ts}</p>
+      <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
     {elseif $is_pay_later && !$isAmountzero && !$isAdditionalParticipant}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
@@ -55,7 +56,7 @@ registration process.{/ts}</p>
   </tr>
   <tr>
    <td>
-    <table width="500" style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
+    <table width="700" style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
      <tr>
       <th {$headerStyle}>
        {ts}Event Information and Location{/ts}
@@ -158,8 +159,8 @@ registration process.{/ts}</p>
        {/if}
       {/foreach}
      {/if}
-	 
-     {if $event.is_public} 
+
+     {if $event.is_public}
       <tr>
        <td colspan="2" {$valueStyle}>
         {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
@@ -167,7 +168,7 @@ registration process.{/ts}</p>
        </td>
       </tr>
      {/if}
-	 
+
     {if $event.is_share}
         <tr>
             <td colspan="2" {$valueStyle}>
@@ -215,31 +216,81 @@ registration process.{/ts}</p>
              <th>{ts}Item{/ts}</th>
              <th>{ts}Qty{/ts}</th>
              <th>{ts}Each{/ts}</th>
+             {if $dataArray}
+              <th>{ts}SubTotal{/ts}</th>
+              <th>{ts}Tax Rate{/ts}</th>
+              <th>{ts}Tax Amount{/ts}</th>
+             {/if}
              <th>{ts}Total{/ts}</th>
        {if  $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
             </tr>
             {foreach from=$value item=line}
              <tr>
-              <td>
+              <td {$tdfirstStyle}>
               {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
               </td>
-              <td>
+              <td {$tdStyle} align="middle">
                {$line.qty}
               </td>
-              <td>
+              <td {$tdStyle}>
                {$line.unit_price|crmMoney:$currency}
               </td>
-              <td>
-               {$line.line_total|crmMoney:$currency}
+              {if $dataArray}
+               <td {$tdStyle}>
+                {$line.unit_price*$line.qty|crmMoney}
+               </td>
+               {if $line.tax_rate != "" || $line.tax_amount != ""}
+                <td {$tdStyle}>
+                 {$line.tax_rate|string_format:"%.2f"}%
+                </td>
+                <td {$tdStyle}>
+                 {$line.tax_amount|crmMoney}
+                </td>
+               {else}
+                <td></td>
+                <td></td>
+               {/if}
+              {/if}
+              <td {$tdStyle}>
+               {$line.line_total+$line.tax_amount|crmMoney:$currency}
               </td>
-        {if $pricesetFieldsCount }<td>{$line.participant_count}</td> {/if}
+        {if $pricesetFieldsCount }<td {$tdStyle}>{$line.participant_count}</td> {/if}
              </tr>
             {/foreach}
+            {if $individual}
+              <tr {$participantTotal}>
+                <td colspan=3>{ts}Participant Total{/ts}</td>
+                <td  colspan=2>{$individual.$priceset.totalAmtWithTax-$individual.$priceset.totalTaxAmt|crmMoney}</td>
+                <td  colspan=1>{$individual.$priceset.totalTaxAmt|crmMoney}</td>
+                <td  colspan=2>{$individual.$priceset.totalAmtWithTax|crmMoney}</td>
+              </tr>
+            {/if}
            </table>
           </td>
          </tr>
         {/if}
        {/foreach}
+       {if $dataArray}
+        <tr>
+         <td {$labelStyle}>
+          {ts} Amount Before Tax: {/ts}
+         </td>
+         <td {$valueStyle}>
+          {$totalAmount-$totalTaxAmount|crmMoney}
+         </td>
+        </tr>
+        {foreach from=$dataArray item=value key=priceset}
+         <tr>
+          {if $priceset || $priceset == 0}
+           <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
+           <td>&nbsp;{$value|crmMoney:$currency}</td>
+          {else}
+           <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
+           <td>&nbsp;{$value|crmMoney:$currency}</td>
+          {/if}
+         </tr>
+        {/foreach}
+       {/if}
       {/if}
 
       {if $amounts && !$lineItem}
@@ -252,6 +303,16 @@ registration process.{/ts}</p>
        {/foreach}
       {/if}
 
+    {if $totalTaxAmount}
+       <tr>
+        <td {$labelStyle}>
+         {ts}Total Tax Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+         {$totalTaxAmount|crmMoney:$currency}
+        </td>
+       </tr>
+      {/if}
       {if $isPrimary}
        <tr>
         <td {$labelStyle}>
@@ -349,7 +410,7 @@ registration process.{/ts}</p>
         </tr>
        {/if}
 
-       {if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+       {if $contributeMode ne 'notify' and !$isAmountzero and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and !$isOnWaitlist and !$isRequireApproval}
         <tr>
          <th {$headerStyle}>
           {ts}Billing Name and Address{/ts}

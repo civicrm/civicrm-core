@@ -1,8 +1,14 @@
 <?php
 
+/**
+ * Class test_extension_manager_reporttest
+ */
 class test_extension_manager_reporttest extends CRM_Core_Report {
-  function __construct() {
-    $logging        = new CRM_Logging_Schema;
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
+    $logging        = new CRM_Logging_Schema();
     $this->tables[] = 'civicrm_contact';
     $this->tables   = array_merge($this->tables, array_keys($logging->customDataLogTables()));
     $this->tables[] = 'civicrm_email';
@@ -20,7 +26,7 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
     parent::__construct();
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $layout = CRM_Utils_Request::retrieve('layout', 'String', $this);
     $this->assign('layout', $layout);
 
@@ -37,6 +43,9 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
     }
   }
 
+  /**
+   * @return string
+   */
   protected function whoWhomWhenSql() {
     return "
             SELECT who.id who_id, who.display_name who_name, whom.id whom_id, whom.display_name whom_name, l.is_deleted
@@ -46,4 +55,5 @@ class test_extension_manager_reporttest extends CRM_Core_Report {
             WHERE log_action = 'Update' AND log_conn_id = %1 AND log_date = %2 ORDER BY log_date DESC LIMIT 1
         ";
   }
+
 }

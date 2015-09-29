@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,23 +23,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This class generates form components for custom data
+ * This class generates form components for custom data.
  *
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
@@ -51,22 +48,21 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   protected $_tableId;
 
   /**
-   * entity type of the table id
+   * Entity type of the table id
    *
    * @var string
    */
   protected $_entityType;
 
   /**
-   * entity sub type of the table id
+   * Entity sub type of the table id
    *
    * @var string
-   * @access protected
    */
   protected $_entitySubType;
 
   /**
-   * the group tree data
+   * The group tree data
    *
    * @var array
    */
@@ -94,29 +90,22 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   protected $_groupCollapseDisplay;
 
   /**
-   * custom group id
+   * Custom group id
    *
    * @int
-   * @access public
    */
   public $_groupID;
 
   public $_multiRecordDisplay;
 
   public $_copyValueId;
+
   /**
-   * pre processing work done here.
+   * Pre processing work done here.
    *
-   * gets session variables for table name, id of entity in table, type of entity and stores them.
-   *
-   * @param
-   *
-   * @return void
-   *
-   * @access public
-   *
+   * Gets session variables for table name, id of entity in table, type of entity and stores them.
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
     $this->assign('cdType', FALSE);
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
@@ -127,7 +116,11 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       // NOTE : group id is not stored in session from within CRM_Custom_Form_CustomData::preProcess func
       // this is due to some condition inside it which restricts it from saving in session
       // so doing this for multi record edit action
-      CRM_Custom_Form_CustomData::preProcess($this);
+      $entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
+      if (!empty($entityId)) {
+        $subType = CRM_Contact_BAO_Contact::getContactSubType($entityId, ',');
+      }
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, NULL, NULL, $entityId);
       if ($this->_multiRecordDisplay) {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
         $this->_tableID = $this->_entityId;
@@ -163,7 +156,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       for ($i = 0; $i <= $_POST['hidden_custom_group_count'][$this->_groupID]; $i++) {
-        CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, $i);
+        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_contactSubType, $i);
         CRM_Custom_Form_CustomData::buildQuickForm($this);
         CRM_Custom_Form_CustomData::setDefaultValues($this);
       }
@@ -171,10 +164,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
@@ -186,11 +176,11 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         );
         if ($isMultiple) {
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
-          $saveButtonName = $this->_copyValueId ? 'Save a Copy': 'Save';
+          $saveButtonName = $this->_copyValueId ? ts('Save a Copy') : ts('Save');
           $this->addButtons(array(
               array(
                 'type' => 'upload',
-                'name' => ts('%1', array(1 => $saveButtonName)),
+                'name' => $saveButtonName,
                 'isDefault' => TRUE,
               ),
               array(
@@ -230,13 +220,13 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
       if ($this->_copyValueId) {
         // cached tree is fetched
@@ -289,17 +279,12 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
   /**
    * Process the user submitted custom data values.
-   *
-   * @access public
-   *
-   * @return void
    */
   public function postProcess() {
     // Get the form values and groupTree
     $params = $this->controller->exportValues($this->_name);
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
-      $this->_groupTree[$this->_groupID]['fields'],
       'civicrm_contact',
       $this->_tableID,
       $this->_entityType
@@ -309,9 +294,22 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     $cgcount += 1;
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
-      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/cd/edit', "reset=1&type={$this->_contactType}&groupID={$this->_groupID}&entityID={$this->_tableID}&cgcount={$cgcount}&multiRecordDisplay=single&mode=add"));
+      CRM_Core_Session::singleton()
+        ->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/cd/edit', "reset=1&type={$this->_contactType}&groupID={$this->_groupID}&entityID={$this->_tableID}&cgcount={$cgcount}&multiRecordDisplay=single&mode=add"));
     }
+
+    // Add entry in the log table
+    CRM_Core_BAO_Log::register($this->_tableID,
+      'civicrm_contact',
+      $this->_tableID
+    );
+
+    if (CRM_Core_Resources::isAjaxMode()) {
+      $this->ajaxResponse += CRM_Contact_Form_Inline::renderFooter($this->_tableID);
+    }
+
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
   }
+
 }

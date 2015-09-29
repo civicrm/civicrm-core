@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,8 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-content-block crm-contribution-view-form-block">
-<h3>{ts}View Contribution{/ts}</h3>
-
 <div class="action-link">
   <div class="crm-submit-buttons">
     {if call_user_func(array('CRM_Core_Permission','check'), 'edit contributions')}
@@ -34,7 +32,7 @@
         {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
       {/if}
       <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span>
-          <div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
+          <div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
       </a>
     {/if}
     {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute')}
@@ -47,6 +45,22 @@
       </a>
     {/if}
     {include file="CRM/common/formButtons.tpl" location="top"}
+    {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
+    {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
+    {if $invoicing}
+      <div class="css_right">
+        <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+          <div class="icon ui-icon-print"></div>
+        {if $contribution_status != 'Refunded' && $contribution_status != 'Cancelled' }
+          {ts}Print Invoice{/ts}</a>
+        {else}
+          {ts}Print Invoice and Credit Note{/ts}</a>
+        {/if}
+        <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
+          <div class="icon ui-icon-mail-closed"></div>
+          {ts}Email Invoice{/ts}</a>
+      </div>
+    {/if}
   </div>
 </div>
 <table class="crm-info-panel">
@@ -79,6 +93,12 @@
           {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
         {/if}
       </td>
+    </tr>
+  {/if}
+  {if $invoicing && $tax_amount}
+    <tr>
+      <td class="label">{ts}Total Tax Amount{/ts}</td>
+      <td>{$tax_amount|crmMoney:$currency}</td>
     </tr>
   {/if}
   {if $non_deductible_amount}
@@ -129,8 +149,8 @@
     {/if}
   {/if}
   <tr>
-    <td class="label">{ts}Paid By{/ts}</td>
-    <td>{$payment_instrument}</td>
+    <td class="label">{ts}Payment Method{/ts}</td>
+    <td>{$payment_instrument}{if $payment_processor_name} ({$payment_processor_name}){/if}</td>
   </tr>
 
   {if $payment_instrument eq 'Check'|ts}
@@ -295,7 +315,7 @@
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
     {/if}
     <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span><div
-          class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+          class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span></a>
   {/if}
   {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute')}
     {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}

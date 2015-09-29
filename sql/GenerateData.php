@@ -1,34 +1,34 @@
 <?php
-/*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
-*/
+/**
+ * +--------------------------------------------------------------------+
+ * | CiviCRM version 4.7                                                |
+ * +--------------------------------------------------------------------+
+ * | Copyright CiviCRM LLC (c) 2004-2015                                |
+ * +--------------------------------------------------------------------+
+ * | This file is a part of CiviCRM.                                    |
+ * |                                                                    |
+ * | CiviCRM is free software; you can copy, modify, and distribute it  |
+ * | under the terms of the GNU Affero General Public License           |
+ * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ * |                                                                    |
+ * | CiviCRM is distributed in the hope that it will be useful, but     |
+ * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ * | See the GNU Affero General Public License for more details.        |
+ * |                                                                    |
+ * | You should have received a copy of the GNU Affero General Public   |
+ * | License and the CiviCRM Licensing Exception along                  |
+ * | with this program; if not, contact CiviCRM LLC                     |
+ * | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ * | GNU Affero General Public License or the licensing of CiviCRM,     |
+ * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ * +--------------------------------------------------------------------+
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -93,6 +93,10 @@ require_once '../civicrm.config.php';
 // autoload
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
+
+/**
+ * Class CRM_GCD
+ */
 class CRM_GCD {
 
   /**
@@ -100,27 +104,27 @@ class CRM_GCD {
    */
 
   // Set ADD_TO_DB = FALSE to do a dry run
-  CONST ADD_TO_DB = TRUE;
+  const ADD_TO_DB = TRUE;
 
-  CONST DATA_FILENAME = "sample_data.xml";
-  CONST NUM_DOMAIN = 1;
-  CONST NUM_CONTACT = 200;
-  CONST INDIVIDUAL_PERCENT = 80;
-  CONST HOUSEHOLD_PERCENT = 10;
-  CONST ORGANIZATION_PERCENT = 10;
-  CONST NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
-  CONST NUM_ACTIVITY = 150;
+  const DATA_FILENAME = "sample_data.xml";
+  const NUM_DOMAIN = 1;
+  const NUM_CONTACT = 200;
+  const INDIVIDUAL_PERCENT = 80;
+  const HOUSEHOLD_PERCENT = 10;
+  const ORGANIZATION_PERCENT = 10;
+  const NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
+  const NUM_ACTIVITY = 150;
 
   // Location types from the table crm_location_type
-  CONST HOME = 1;
-  CONST WORK = 2;
-  CONST MAIN = 3;
-  CONST OTHER = 4;
+  const HOME = 1;
+  const WORK = 2;
+  const MAIN = 3;
+  const OTHER = 4;
 
   /**
    * Class constructor
    */
-  function __construct() {
+  public function __construct() {
     // initialize all the vars
     $this->numIndividual = self::INDIVIDUAL_PERCENT * self::NUM_CONTACT / 100;
     $this->numHousehold = self::HOUSEHOLD_PERCENT * self::NUM_CONTACT / 100;
@@ -128,7 +132,7 @@ class CRM_GCD {
     $this->numStrictIndividual = $this->numIndividual - ($this->numHousehold * self::NUM_INDIVIDUAL_PER_HOUSEHOLD);
 
     // Parse data file
-    foreach((array) simplexml_load_file(self::DATA_FILENAME) as $key => $val) {
+    foreach ((array) simplexml_load_file(self::DATA_FILENAME) as $key => $val) {
       $val = (array) $val;
       $this->sampleData[$key] = (array) $val['item'];
     }
@@ -143,6 +147,7 @@ class CRM_GCD {
   /**
    * Public wrapper for calling private "add" functions
    * Provides user feedback
+   * @param $itemName
    */
   public function generate($itemName) {
     echo "Generating $itemName\n";
@@ -206,13 +211,13 @@ class CRM_GCD {
     1 => array(
       1 => 'Mrs.',
       2 => 'Ms.',
-      4 => 'Dr.'
+      4 => 'Dr.',
     ),
     // Male
     2 => array(
       3 => 'Mr.',
       4 => 'Dr.',
-    )
+    ),
   );
   private $suffix = array(1 => 'Jr.', 2 => 'Sr.', 3 => 'II', 4 => 'III');
   private $gender = array(1 => 'female', 2 => 'male');
@@ -256,9 +261,14 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   *********************************/
+   ********************************
+   * @param int $size
+   * @return string
+   */
 
-  // get a randomly generated string
+  /**
+   * get a randomly generated string
+   */
   private function randomString($size = 32) {
     $string = "";
 
@@ -275,6 +285,9 @@ class CRM_GCD {
     return $string;
   }
 
+  /**
+   * @return string
+   */
   private function randomChar() {
     return chr(mt_rand(65, 90));
   }
@@ -295,20 +308,35 @@ class CRM_GCD {
     }
     if (!$items) {
       echo "Error: no items found for '$key'\n";
-      return;
+      return FALSE;
     }
     return $items[mt_rand(0, count($items) - 1)];
   }
 
+  /**
+   * @param $items
+   *
+   * @return mixed
+   */
   private function randomIndex($items) {
     return $this->randomItem(array_keys($items));
   }
 
+  /**
+   * @param $items
+   *
+   * @return array
+   */
   private function randomKeyValue($items) {
     $key = $this->randomIndex($items);
     return array($key, $items[$key]);
   }
 
+  /**
+   * @param $chance
+   *
+   * @return int
+   */
   private function probability($chance) {
     if (mt_rand(0, 100) < ($chance * 100)) {
       return 1;
@@ -332,7 +360,7 @@ class CRM_GCD {
    *   and today
    *
    * @param  int $startDate Start Date in Unix timestamp
-   * @param  int $endDate   End Date in Unix timestamp
+   * @param  int $endDate End Date in Unix timestamp
    * @access private
    *
    * @return string randomly generated date in the format "Ymd"
@@ -366,6 +394,9 @@ class CRM_GCD {
 
   /**
    * Automatically manage the is_primary field by tracking which contacts have each item
+   * @param $cid
+   * @param $type
+   * @return int
    */
   private function isPrimary($cid, $type) {
     if (empty($this->location[$type][$cid])) {
@@ -378,6 +409,9 @@ class CRM_GCD {
   /**
    * Execute a query unless we are doing a dry run
    * Note: this wrapper should not be used for SELECT queries
+   * @param $query
+   * @param array $params
+   * @return \CRM_Core_DAO
    */
   private function _query($query, $params = array()) {
     if (self::ADD_TO_DB) {
@@ -387,6 +421,7 @@ class CRM_GCD {
 
   /**
    * Call dao insert method unless we are doing a dry run
+   * @param $dao
    */
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
@@ -400,6 +435,7 @@ class CRM_GCD {
 
   /**
    * Call dao update method unless we are doing a dry run
+   * @param $dao
    */
   private function _update(&$dao) {
     if (self::ADD_TO_DB) {
@@ -413,6 +449,8 @@ class CRM_GCD {
 
   /**
    * Add core DAO object
+   * @param $type
+   * @param $params
    */
   private function _addDAO($type, $params) {
     $daoName = "CRM_Core_DAO_$type";
@@ -428,6 +466,8 @@ class CRM_GCD {
 
   /**
    * Fetch contact type based on stored mapping
+   * @param $id
+   * @return string $type
    */
   private function getContactType($id) {
     foreach (array('Individual', 'Household', 'Organization') as $type) {
@@ -457,6 +497,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return string
+   */
   public function randomName() {
     $first_name = $this->randomItem(($this->probability(.5) ? 'fe' : '') . 'male_name');
     $middle_name = ucfirst($this->randomChar());
@@ -805,6 +848,8 @@ class CRM_GCD {
    *
    * @param $cid int: contact id
    * @param $masterContactId int: set if this is a shared address
+   *
+   * @return array
    */
   private function _addAddress($cid, $masterContactId = NULL) {
 
@@ -837,7 +882,6 @@ class CRM_GCD {
 
       $params['street_address'] = $params['street_number'] . $params['street_number_suffix'] . " " . $params['street_name'] . " " . $params['street_type'] . " " . $params['street_number_postdirectional'];
 
-
       if ($params['location_type_id'] == self::MAIN) {
         $params['supplemental_address_1'] = $this->randomItem('supplemental_addresses_1');
       }
@@ -850,7 +894,7 @@ class CRM_GCD {
         $params['postal_code'],
         $params['geo_code_1'],
         $params['geo_code_2'],
-      ) = $this->getZipCodeInfo();
+        ) = $this->getZipCodeInfo();
 
       $this->_addDAO('Address', $params);
       $params['state'] = $this->states[$params['state_province_id']];
@@ -862,6 +906,8 @@ class CRM_GCD {
    * Add a phone number for a contact
    *
    * @param $cid int: contact id
+   *
+   * @return array
    */
   private function _addPhone($cid) {
     $area = $this->probability(.5) ? '' : mt_rand(201, 899);
@@ -882,6 +928,10 @@ class CRM_GCD {
    * Add an email for a contact
    *
    * @param $cid int: contact id
+   * @param $email
+   * @param $locationType
+   *
+   * @return array
    */
   private function _addEmail($cid, $email, $locationType) {
     $params = array(
@@ -899,9 +949,11 @@ class CRM_GCD {
    *
    * @param $cid int: contact id
    * @param $name str: contact name
+   *
+   * @return array
    */
   private function _addWebsite($cid, $name) {
-    $part = array_pad(split(' ', strtolower($name)), 3, '');
+    $part = array_pad(explode(' ', strtolower($name)), 3, '');
     if (count($part) > 3) {
       // Abbreviate the place name if it's two words
       $domain = $part[0][0] . $part[1][0] . $part[2] . $part[3];
@@ -912,9 +964,11 @@ class CRM_GCD {
         case 1:
           $domain = $part[0] . $part[1] . $part[2];
           break;
+
         case 2:
           $domain = $part[0] . $part[1];
           break;
+
         case 3:
           $domain = $part[0] . $part[2];
           break;
@@ -933,8 +987,11 @@ class CRM_GCD {
   /**
    * Create an email address based on a person's name
    * Using common naming patterns
+   *
    * @param $contact obj: individual contact record
    * @param $domain str: supply a domain (i.e. for a work address)
+   *
+   * @return string
    */
   private function _individualEmail($contact, $domain = NULL) {
     $first = $contact->first_name;
@@ -947,18 +1004,23 @@ class CRM_GCD {
       case 1:
         $email = $first . $last;
         break;
+
       case 2:
         $email = "$last.$first";
         break;
+
       case 3:
         $email = $last . $f;
         break;
+
       case 4:
         $email = $first . $l;
         break;
+
       case 5:
         $email = "$last.$m$first";
         break;
+
       case 6:
         $email = "$f$m$last";
         break;
@@ -1037,7 +1099,6 @@ class CRM_GCD {
       $groupContact->contact_id = $this->Individual[$i];
       // always add members
       $groupContact->status = 'Added';
-
 
       $subscriptionHistory = new CRM_Contact_DAO_SubscriptionHistory();
       $subscriptionHistory->contact_id = $groupContact->contact_id;
@@ -1141,12 +1202,12 @@ class CRM_GCD {
       }
       for ($i = 0; $i < self::NUM_ACTIVITY; $i++) {
         $activityDAO = new CRM_Activity_DAO_Activity();
-        $activityTypeID = mt_rand(7, 10);
+        $activityId = CRM_Core_OptionGroup::values('activity_type', NULL, NULL, NULL, ' AND v.name IN ("Tell A Friend", "Pledge Acknowledgment")');
+        $activityTypeID = array_rand($activityId);
         $activity = CRM_Core_PseudoConstant::activityType();
         $activityDAO->activity_type_id = $activityTypeID;
         $activityDAO->subject = "Subject for $activity[$activityTypeID]";
         $activityDAO->activity_date_time = $this->randomDate();
-        $activityDAO->duration = mt_rand(1, 6);
         $activityDAO->status_id = 2;
         $this->_insert($activityDAO);
 
@@ -1156,26 +1217,21 @@ class CRM_GCD {
         $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $this->_insert($activityContactDAO);
 
-        if (in_array($activityTypeID, array(6, 9))) {
+        if ($activityTypeID == 9) {
           $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
           $activityContactDAO->activity_id = $activityDAO->id;
           $activityContactDAO->contact_id = mt_rand(1, 101);
           $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Targets', $activityContacts);
           $this->_insert($activityContactDAO);
         }
-
-        if ($activityTypeID == 7) {
-          $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
-          $activityContactDAO->activity_id = $activityDAO->id;
-          $activityContactDAO->contact_id = mt_rand(1, 101);
-          $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-          $this->_insert($activityContactDAO);
-        }
       }
     }
   }
 
-  function getZipCodeInfo() {
+  /**
+   * @return array
+   */
+  public function getZipCodeInfo() {
 
     if (!$this->stateMap) {
       $query = 'SELECT id, name, abbreviation from civicrm_state_province where country_id = 1228';
@@ -1206,7 +1262,12 @@ class CRM_GCD {
     }
   }
 
-  static function getLatLong($zipCode) {
+  /**
+   * @param $zipCode
+   *
+   * @return array
+   */
+  public static function getLatLong($zipCode) {
     $query = "http://maps.google.com/maps?q=$zipCode&output=js";
     $userAgent = "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0";
 
@@ -1310,16 +1371,16 @@ VALUES
         }
         $dateFactor = ($count * ($YearFactor) * ($YearFactor) * ($YearFactor));
         $startDate = date('Y-m-d', mktime(0, 0, 0,
-            date('m'),
-            (date('d') - ($dateFactor)),
-            (date('Y') - ($YearFactor))
-          ));
+          date('m'),
+          (date('d') - ($dateFactor)),
+          (date('Y') - ($YearFactor))
+        ));
         $partOfDate = explode('-', $startDate);
         $endDate = date('Y-m-d', mktime(0, 0, 0,
-            $partOfDate[1],
-            ($partOfDate[2] - 1),
-            ($partOfDate[0] + ($YearFactor))
-          ));
+          $partOfDate[1],
+          ($partOfDate[2] - 1),
+          ($partOfDate[0] + ($YearFactor))
+        ));
 
         $membership .= "( {$randomContacts[$count]}, {$membershipTypeId}, '{$startDate}', '{$startDate}', '{$endDate}', '{$source}', {$membershipStatusId})";
         $activity .= "( {$activitySourceId}, 7, '{$membershipTypeName}', '{$startDate} 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 2 )";
@@ -1351,7 +1412,12 @@ VALUES
     $this->_query($activityContact);
   }
 
-  static function repairDate($date) {
+  /**
+   * @param $date
+   *
+   * @return string
+   */
+  public static function repairDate($date) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
     return strtr($date, $dropArray);
   }
@@ -1640,9 +1706,9 @@ VALUES
   private function addPCP() {
     $query = "
 INSERT INTO `civicrm_pcp`
-    (contact_id, status_id, title, intro_text, page_text, donate_link_text, page_id, page_type, is_thermometer, is_honor_roll, goal_amount, currency, is_active, pcp_block_id)
+    (contact_id, status_id, title, intro_text, page_text, donate_link_text, page_id, page_type, is_thermometer, is_honor_roll, goal_amount, currency, is_active, pcp_block_id, is_notify)
 VALUES
-    ({$this->Individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"http://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 'contribute', 1, 1, 5000.00, 'USD', 1, 1);
+    ({$this->Individual[3]}, 2, 'My Personal Civi Fundraiser', 'I''m on a mission to get all my friends and family to help support my favorite open-source civic sector CRM.', '<p>Friends and family - please help build much needed infrastructure for the civic sector by supporting my personal campaign!</p>\r\n<p><a href=\"http://civicrm.org\">You can learn more about CiviCRM here</a>.</p>\r\n<p>Then click the <strong>Contribute Now</strong> button to go to our easy-to-use online contribution form.</p>', 'Contribute Now', 1, 'contribute', 1, 1, 5000.00, 'USD', 1, 1, 1);
 ";
     $this->_query($query);
   }
@@ -1758,8 +1824,8 @@ VALUES
   }
 
   private function addContributionLineItem() {
-    $query = " INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
-SELECT 'civicrm_contribution', cc.id, cpf.id as price_field, cpfv.label, 1, cc.total_amount, cc.total_amount line_total, 0, cpfv.id as price_field_value, cpfv.financial_type_id
+    $query = " INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, contribution_id, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
+SELECT 'civicrm_contribution', cc.id, cc.id contribution_id, cpf.id as price_field, cpfv.label, 1, cc.total_amount, cc.total_amount line_total, 0, cpfv.id as price_field_value, cpfv.financial_type_id
 FROM civicrm_contribution cc
 LEFT JOIN civicrm_price_set cps ON cps.name = 'default_contribution_amount'
 LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cps.id
@@ -1792,9 +1858,13 @@ WHERE cefa.account_relationship = 1";
     $this->addFinancialItem($result);
   }
 
+  /**
+   * @param $result
+   * @param null $financialAccountId
+   */
   private function addFinancialItem($result, $financialAccountId = NULL) {
     $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
-    while($result->fetch()){
+    while ($result->fetch()) {
       $trxnParams = array(
         'trxn_date' => CRM_Utils_Date::processDate($result->receive_date),
         'total_amount' => $result->total_amount,
@@ -1802,9 +1872,9 @@ WHERE cefa.account_relationship = 1";
         'status_id' => 1,
         'trxn_id' => $result->trxn_id,
         'contribution_id' => $result->contribution_id,
-        'to_financial_account_id' => $result->payment_instrument_id ? $financialAccountId[$result->payment_instrument_id] : $defaultFinancialAccount,
+        'to_financial_account_id' => empty($financialAccountId[$result->payment_instrument_id]) ? $defaultFinancialAccount : $financialAccountId[$result->payment_instrument_id],
         'payment_instrument_id' => $result->payment_instrument_id,
-        'check_number' => $result->check_number
+        'check_number' => $result->check_number,
       );
       $trxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
       $financialItem = array(
@@ -1816,17 +1886,18 @@ WHERE cefa.account_relationship = 1";
         'contact_id' => $result->contact_id,
         'entity_table' => 'civicrm_line_item',
         'description' => $result->label,
-        'financial_account_id' => $result->financial_account_id
+        'financial_account_id' => $result->financial_account_id,
       );
       $trxnId['id'] = $trxn->id;
-      CRM_Financial_BAO_FinancialItem::create($financialItem, null, $trxnId);
-  }
+      CRM_Financial_BAO_FinancialItem::create($financialItem, NULL, $trxnId);
+    }
   }
 
   private function addLineItemParticipants() {
     $participant = new CRM_Event_DAO_Participant();
-    $participant->query("INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
-SELECT 'civicrm_participant',cp.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as line_total, 0, cpfv.id, cpfv.financial_type_id FROM civicrm_participant cp LEFT JOIN civicrm_price_set_entity cpe ON cpe.entity_id = cp.event_id LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cpe.price_set_id LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = cpf.id WHERE cpfv.label = cp.fee_level");
+    $participant->query("INSERT INTO civicrm_line_item (`entity_table`, `entity_id`, contribution_id, `price_field_id`, `label`, `qty`, `unit_price`, `line_total`, `participant_count`, `price_field_value_id`, `financial_type_id`)
+SELECT 'civicrm_participant', cp.id, cpp.contribution_id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as line_total, 0, cpfv.id, cpfv.financial_type_id FROM civicrm_participant cp LEFT JOIN civicrm_participant_payment cpp ON cpp.participant_id = cp.id
+LEFT JOIN civicrm_price_set_entity cpe ON cpe.entity_id = cp.event_id LEFT JOIN civicrm_price_field cpf ON cpf.price_set_id = cpe.price_set_id LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = cpf.id WHERE cpfv.label = cp.fee_level");
   }
 
   private function addMembershipPayment() {
@@ -1846,8 +1917,8 @@ WHERE cc.id > $maxContribution;";
 
     $this->_query($sql);
 
-    $sql = "INSERT INTO civicrm_line_item (entity_table, entity_id, price_field_value_id, price_field_id, label, qty, unit_price, line_total, financial_type_id)
-SELECT  'civicrm_contribution', cmp.contribution_id, cpfv.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as unit_price, cpfv.financial_type_id FROM `civicrm_membership` cm
+    $sql = "INSERT INTO civicrm_line_item (entity_table, entity_id, contribution_id, price_field_value_id, price_field_id, label, qty, unit_price, line_total, financial_type_id)
+SELECT 'civicrm_membership', cm.id, cmp.contribution_id, cpfv.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amount, cpfv.amount as unit_price, cpfv.financial_type_id FROM `civicrm_membership` cm
 LEFT JOIN civicrm_membership_payment cmp ON cmp.membership_id = cm.id
 LEFT JOIN civicrm_price_field_value cpfv ON cpfv.membership_type_id = cm.membership_type_id
 LEFT JOIN civicrm_price_field cpf ON cpf.id = cpfv.price_field_id
@@ -1867,7 +1938,7 @@ AND    a.source_record_id = c.id
 AND    a.details = 'Membership Payment'
 ";
     $this->_query($sql);
-}
+  }
 
   private function addParticipantPayment() {
     $maxContribution = CRM_Core_DAO::singleValueQuery("select max(id) from civicrm_contribution");
@@ -1900,12 +1971,21 @@ AND    a.details = 'Participant Payment'
 ";
     $this->_query($sql);
   }
+
 }
 
+/**
+ * @param null $str
+ *
+ * @return bool
+ */
 function user_access($str = NULL) {
   return TRUE;
 }
 
+/**
+ * @return array
+ */
 function module_list() {
   return array();
 }

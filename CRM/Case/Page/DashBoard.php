@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This page is for Case Dashboard
+ * This page is for Case Dashboard.
  */
 class CRM_Case_Page_DashBoard extends CRM_Core_Page {
 
   public $useLivePageJS = TRUE;
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
-   * the contact and calls the appropriate type of page to view.
+   * Heart of the viewing process.
    *
-   * @return void
-   * @access public
-   *
+   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
-  function preProcess() {
+  public function preProcess() {
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
@@ -87,10 +82,15 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
     ) {
       $this->assign('newClient', TRUE);
     }
-    $summary  = CRM_Case_BAO_Case::getCasesSummary($allCases, $userID);
+    $summary = CRM_Case_BAO_Case::getCasesSummary($allCases, $userID);
     $upcoming = CRM_Case_BAO_Case::getCases($allCases, $userID, 'upcoming');
-    $recent   = CRM_Case_BAO_Case::getCases($allCases, $userID, 'recent');
+    $recent = CRM_Case_BAO_Case::getCases($allCases, $userID, 'recent');
 
+    foreach ($upcoming as $key => $value) {
+      if (strtotime($value['case_scheduled_activity_date']) < time()) {
+        $upcoming[$key]['activity_status'] = 'status-overdue';
+      }
+    }
     $this->assign('casesSummary', $summary);
     if (!empty($upcoming)) {
       $this->assign('upcomingCases', $upcoming);
@@ -101,16 +101,15 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     return parent::run();
   }
-}
 
+}

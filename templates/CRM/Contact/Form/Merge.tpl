@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,34 +28,46 @@
 {ts}Click <strong>Merge</strong> to move data from the Duplicate Contact on the left into the Main Contact. In addition to the contact data (address, phone, email...), you may choose to move all or some of the related activity records (groups, contributions, memberships, etc.).{/ts} {help id="intro"}
 </div>
 
-<div class="crm-submit-buttons">{if $prev}<a href="{$prev}" class="button"><span>{ts}<< Prev{/ts}</span></a>{/if}{include file="CRM/common/formButtons.tpl" location="top"}{if $next}<a href="{$next}" class="button"><span>{ts}Next >>{/ts}</span></a>{/if}</div>
-
-<div class="action-link">
-      <a href="{$flip}">&raquo; {ts}Flip between original and duplicate contacts.{/ts}</a>
+<div class="crm-submit-buttons">
+  {include file="CRM/common/formButtons.tpl" location="top"}
+  {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><span class="icon ui-icon-triangle-1-w"></span> {ts}Previous{/ts}</a>{/if}
+  {if $next}<a href="{$next}" class="crm-hover-button action-item">{ts}Next{/ts} <span class="icon ui-icon-triangle-1-e"></span></a>{/if}
 </div>
 
 <div class="action-link">
-       <a id='notDuplicate' href="#" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}' );return false;">&raquo; {ts}Mark this pair as not a duplicate.{/ts}</a>
+  <a href="{$flip}" class="action-item crm-hover-button">
+    <span class="icon ui-icon-shuffle"></span>
+    {ts}Flip between original and duplicate contacts.{/ts}
+  </a>
 </div>
 
-<table>
+<div class="action-link">
+  <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">
+    <span class="icon ui-icon-circle-close"></span>
+    {ts}Mark this pair as not a duplicate.{/ts}
+  </a>
+</div>
+
+<table class="row-highlight">
   <tr class="columnheader">
     <th>&nbsp;</th>
-    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}&nbsp;<em>{$other_contact_subtype}</em></a> ({ts}duplicate{/ts})</th>
+    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}</a> ({ts}duplicate{/ts})</th>
     <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
-    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name}&nbsp;<em>{$main_contact_subtype}</em></a></th>
+    <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name}</a></th>
   </tr>
   {foreach from=$rows item=row key=field}
      <tr class="{cycle values="odd-row,even-row"}">
         <td>{$row.title}</td>
         <td>
-           {if !is_array($row.other)}
-               {$row.other}
-           {else}
-               {$row.other.fileName}
-           {/if}
+          {if !is_array($row.other)}
+            {$row.other}
+          {elseif $row.other.fileName}
+            {$row.other.fileName}
+          {else}
+            {', '|implode:$row.other}
+          {/if}
         </td>
-        <td style='white-space: nowrap'>{if $form.$field}=={$form.$field.html}==&gt;{/if}</td>
+        <td style='white-space: nowrap'>{if $form.$field}=={$form.$field.html|crmAddClass:"select-row"}==&gt;{/if}</td>
         <td>
             {if $row.title|substr:0:5 == "Email"   OR
                 $row.title|substr:0:7 == "Address" OR
@@ -100,8 +112,10 @@
             <span id="main_{$blockName}_{$blockId}">
               {if !is_array($row.main)}
                 {$row.main}
-              {else}
+              {elseif $row.main.fileName}
                 {$row.main.fileName}
+              {else}
+                {', '|implode:$row.main}
               {/if}
             </span>
         </td>
@@ -111,11 +125,11 @@
   {foreach from=$rel_tables item=params key=paramName}
     {if $paramName eq 'move_rel_table_users'}
       <tr class="{cycle values="even-row,odd-row"}">
-      <th>{ts}Move related...{/ts}</th><td>{if $otherUfId}<a target="_blank" href="{$params.other_url}">{$otherUfName}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html}==&gt;{else}<td style='white-space: nowrap'></td>{/if}</td><td>{if $mainUfId}<a target="_blank" href="{$params.main_url}">{$mainUfName}</a>{/if}</td>
+      <td><strong>{ts}Move related...{/ts}</strong></td><td>{if $otherUfId}<a target="_blank" href="{$params.other_url}">{$otherUfName}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;{else}<td style='white-space: nowrap'></td>{/if}</td><td>{if $mainUfId}<a target="_blank" href="{$params.main_url}">{$mainUfName}</a>{/if}</td>
     </tr>
     {else}
     <tr class="{cycle values="even-row,odd-row"}">
-      <th>{ts}Move related...{/ts}</th><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
+      <td><strong>{ts}Move related...{/ts}</strong></td><td><a href="{$params.other_url}">{$params.title}</a></td><td style='white-space: nowrap'>=={$form.$paramName.html|crmAddClass:"select-row"}==&gt;</td><td><a href="{$params.main_url}">{$params.title}</a>{if $form.operation.$paramName.add.html}&nbsp;{$form.operation.$paramName.add.html}{/if}</td>
     </tr>
     {/if}
   {/foreach}
@@ -131,21 +145,19 @@
 The user record associated with the duplicate contact will not be deleted, but will be un-linked from the associated contact record (which will be deleted).
 You will need to manually delete that user (click on the link to open Drupal User account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong></p>
     {/if}
-    {if $other_contact_subtype}
-      <p><strong>The duplicate contact (the one that will be deleted) is a <em>{$other_contact_subtype}</em>. Any data related to this will be lost forever (there is no undo) if you complete the merge.</strong></p>
-    {/if}
 </div>
 
-<div class="crm-submit-buttons">{if $prev}<a href="{$prev}" class="button"><span>{ts}<< Prev{/ts}</span></a>{/if}{include file="CRM/common/formButtons.tpl" location="bottom"}{if $next}<a href="{$next}" class="button"><span>{ts}Next >>{/ts}</span></a>{/if}</div>
+<div class="crm-submit-buttons">
+  {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 
 {literal}
 <script type="text/javascript">
 
-cj(document).ready(function(){
-    cj('table td input.form-checkbox').each(function() {
+  CRM.$(function($) {
+    $('table td input.form-checkbox').each(function() {
        var ele = null;
-       var element = cj(this).attr('id').split('_',3);
+       var element = $(this).attr('id').split('_',3);
 
        switch ( element['1'] ) {
            case 'addressee':
@@ -159,13 +171,13 @@ cj(document).ready(function(){
        }
 
        if( ele ) {
-          cj(this).on('click', function() {
-            var val = cj(this).prop('checked');
-            cj('input' + ele + ', input' + ele + '_custom').prop('checked', val);
+          $(this).on('click', function() {
+            var val = $(this).prop('checked');
+            $('input' + ele + ', input' + ele + '_custom').prop('checked', val);
           });
        }
     });
-});
+  });
 
 </script>
 {/literal}

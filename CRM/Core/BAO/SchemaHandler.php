@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,17 +41,17 @@
  * structure, similar to what is used in GenCode.php
  *
  * $table = array(
-    'name'       => TABLE_NAME,
+ * 'name'       => TABLE_NAME,
  *                'attributes' => ATTRIBUTES,
  *                'fields'     => array(
  *                                      array(
-    'name'          => FIELD_NAME,
+ * 'name'          => FIELD_NAME,
  *                                             'type'          => FIELD_SQL_TYPE,
- // can be field, index, constraint
+ * // can be field, index, constraint
  *                                             'class'         => FIELD_CLASS_TYPE,
  *                                             'primary'       => BOOLEAN,
  *                                             'required'      => BOOLEAN,
- *                                             'searchable'    => true,
+ *                                             'searchable'    => TRUE,
  *                                             'fk_table_name' => FOREIGN_KEY_TABLE_NAME,
  *                                             'fk_field_name' => FOREIGN_KEY_FIELD_NAME,
  *                                             'comment'       => COMMENT,
@@ -62,17 +62,15 @@
 class CRM_Core_BAO_SchemaHandler {
 
   /**
-   * Function for creating a civiCRM-table
+   * Create a CiviCRM-table
    *
-   * @param  String  $tableName        name of the table to be created.
-   * @param  Array   $tableAttributes  array containing atrributes for the table that needs to be created
+   * @param array $params
    *
-   * @return true if successfully created, false otherwise
+   * @return bool
+   *   TRUE if successfully created, FALSE otherwise
    *
-   * @static
-   * @access public
    */
-  static function createTable(&$params) {
+  public static function createTable(&$params) {
     $sql = self::buildTableSQL($params);
     // do not i18n-rewrite
     $dao = CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
@@ -81,8 +79,8 @@ class CRM_Core_BAO_SchemaHandler {
     $config = CRM_Core_Config::singleton();
     if ($config->logging) {
       // logging support
-      $logging = new CRM_Logging_Schema;
-      $logging->fixSchemaDifferencesFor($params['name'], null, FALSE);
+      $logging = new CRM_Logging_Schema();
+      $logging->fixSchemaDifferencesFor($params['name'], NULL, FALSE);
     }
 
     // always do a trigger rebuild for this table
@@ -91,7 +89,12 @@ class CRM_Core_BAO_SchemaHandler {
     return TRUE;
   }
 
-  static function buildTableSQL(&$params) {
+  /**
+   * @param array $params
+   *
+   * @return string
+   */
+  public static function buildTableSQL(&$params) {
     $sql = "CREATE TABLE {$params['name']} (";
     if (isset($params['fields']) &&
       is_array($params['fields'])
@@ -121,7 +124,14 @@ class CRM_Core_BAO_SchemaHandler {
     return $sql;
   }
 
-  static function buildFieldSQL(&$params, $separator, $prefix) {
+  /**
+   * @param array $params
+   * @param $separator
+   * @param $prefix
+   *
+   * @return string
+   */
+  public static function buildFieldSQL(&$params, $separator, $prefix) {
     $sql = '';
     $sql .= $separator;
     $sql .= str_repeat(' ', 8);
@@ -149,7 +159,14 @@ class CRM_Core_BAO_SchemaHandler {
     return $sql;
   }
 
-  static function buildPrimaryKeySQL(&$params, $separator, $prefix) {
+  /**
+   * @param array $params
+   * @param $separator
+   * @param $prefix
+   *
+   * @return NULL|string
+   */
+  public static function buildPrimaryKeySQL(&$params, $separator, $prefix) {
     $sql = NULL;
     if (!empty($params['primary'])) {
       $sql .= $separator;
@@ -160,7 +177,15 @@ class CRM_Core_BAO_SchemaHandler {
     return $sql;
   }
 
-  static function buildSearchIndexSQL(&$params, $separator, $prefix, $indexExist = FALSE) {
+  /**
+   * @param array $params
+   * @param $separator
+   * @param $prefix
+   * @param bool $indexExist
+   *
+   * @return NULL|string
+   */
+  public static function buildSearchIndexSQL(&$params, $separator, $prefix, $indexExist = FALSE) {
     $sql = NULL;
 
     // dont index blob
@@ -185,7 +210,14 @@ class CRM_Core_BAO_SchemaHandler {
     return $sql;
   }
 
-  static function buildIndexSQL(&$params, $separator, $prefix) {
+  /**
+   * @param array $params
+   * @param $separator
+   * @param $prefix
+   *
+   * @return string
+   */
+  public static function buildIndexSQL(&$params, $separator, $prefix) {
     $sql = '';
     $sql .= $separator;
     $sql .= str_repeat(' ', 8);
@@ -211,7 +243,13 @@ class CRM_Core_BAO_SchemaHandler {
     return $sql;
   }
 
-  static function changeFKConstraint($tableName, $fkTableName) {
+  /**
+   * @param string $tableName
+   * @param string $fkTableName
+   *
+   * @return bool
+   */
+  public static function changeFKConstraint($tableName, $fkTableName) {
     $fkName = "{$tableName}_entity_id";
     if (strlen($fkName) >= 48) {
       $fkName = substr($fkName, 0, 32) . "_" . substr(md5($fkName), 0, 16);
@@ -233,7 +271,15 @@ ALTER TABLE {$tableName}
     return TRUE;
   }
 
-  static function buildForeignKeySQL(&$params, $separator, $prefix, $tableName) {
+  /**
+   * @param array $params
+   * @param $separator
+   * @param $prefix
+   * @param string $tableName
+   *
+   * @return NULL|string
+   */
+  public static function buildForeignKeySQL(&$params, $separator, $prefix, $tableName) {
     $sql = NULL;
     if (!empty($params['fk_table_name']) && !empty($params['fk_field_name'])) {
       $sql .= $separator;
@@ -250,7 +296,14 @@ ALTER TABLE {$tableName}
     return $sql;
   }
 
-  static function alterFieldSQL(&$params, $indexExist = FALSE, $triggerRebuild = TRUE) {
+  /**
+   * @param array $params
+   * @param bool $indexExist
+   * @param bool $triggerRebuild
+   *
+   * @return bool
+   */
+  public static function alterFieldSQL(&$params, $indexExist = FALSE, $triggerRebuild = TRUE) {
     $sql = str_repeat(' ', 8);
     $sql .= "ALTER TABLE {$params['table_name']}";
 
@@ -293,14 +346,16 @@ ALTER TABLE {$tableName}
 
     $config = CRM_Core_Config::singleton();
     if ($config->logging) {
-      // logging support: if we’re adding a column (but only then!) make sure the potential relevant log table gets a column as well
-      if ($params['operation'] == 'add') {
-        $logging = new CRM_Logging_Schema;
-        $logging->fixSchemaDifferencesFor($params['table_name'], array('ADD' => array($params['name'])), FALSE);
+      // CRM-16717 not sure why this was originally limited to add.
+      // For example custom tables can have field length changes - which need to flow through to logging.
+      // Are there any modifies we DON'T was to call this function for (& shouldn't it be clever enough to cope?)
+      if ($params['operation'] == 'add' || $params['operation'] == 'modify') {
+        $logging = new CRM_Logging_Schema();
+        $logging->fixSchemaDifferencesFor($params['table_name'], array(trim($prefix) => array($params['name'])), FALSE);
       }
     }
 
-    if($triggerRebuild) {
+    if ($triggerRebuild) {
       CRM_Core_DAO::triggerRebuild($params['table_name']);
     }
 
@@ -308,26 +363,30 @@ ALTER TABLE {$tableName}
   }
 
   /**
-   * Function to delete a civiCRM-table
+   * Delete a CiviCRM-table
    *
-   * @param  String  $tableName   name of the table to be created.
-   *
-   * @return true if successfully deleted, false otherwise
-   *
-   * @static
-   * @access public
+   * @param string $tableName
+   *   Name of the table to be created.
    */
-  static function dropTable($tableName) {
+  public static function dropTable($tableName) {
     $sql = "DROP TABLE $tableName";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
 
-  static function dropColumn($tableName, $columnName) {
+  /**
+   * @param string $tableName
+   * @param string $columnName
+   */
+  public static function dropColumn($tableName, $columnName) {
     $sql = "ALTER TABLE $tableName DROP COLUMN $columnName";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
 
-  static function changeUniqueToIndex($tableName, $dropUnique = TRUE) {
+  /**
+   * @param string $tableName
+   * @param bool $dropUnique
+   */
+  public static function changeUniqueToIndex($tableName, $dropUnique = TRUE) {
     if ($dropUnique) {
       $sql = "ALTER TABLE $tableName
 DROP INDEX `unique_entity_id` ,
@@ -341,12 +400,15 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
     $dao = CRM_Core_DAO::executeQuery($sql);
   }
 
-  static function createIndexes(&$tables, $createIndexPrefix = 'index', $substrLenghts = array(
-    )) {
+  /**
+   * @param $tables
+   * @param string $createIndexPrefix
+   * @param array $substrLenghts
+   */
+  public static function createIndexes(&$tables, $createIndexPrefix = 'index', $substrLenghts = array()) {
     $queries = array();
-
-        require_once 'CRM/Core/DAO/Domain.php';
-    $domain = new CRM_Core_DAO_Domain;
+    require_once 'CRM/Core/DAO/Domain.php';
+    $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -372,7 +434,12 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
         $lengthName = isset($substrLenghts[$table][$field]) ? "_{$substrLenghts[$table][$field]}" : '';
         $lengthSize = isset($substrLenghts[$table][$field]) ? "({$substrLenghts[$table][$field]})" : '';
 
-        $names = array("index_{$field}{$lengthName}", "FK_{$table}_{$field}{$lengthName}", "UI_{$field}{$lengthName}", "{$createIndexPrefix}_{$field}{$lengthName}");
+        $names = array(
+          "index_{$field}{$lengthName}",
+          "FK_{$table}_{$field}{$lengthName}",
+          "UI_{$field}{$lengthName}",
+          "{$createIndexPrefix}_{$field}{$lengthName}",
+        );
 
         // skip to the next $field if one of the above $names exists; handle multilingual for CRM-4126
         foreach ($names as $name) {
@@ -396,20 +463,29 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
     }
 
     // run the queries without i18n-rewriting
-    $dao = new CRM_Core_DAO;
+    $dao = new CRM_Core_DAO();
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
     }
   }
 
-  static function alterFieldLength($customFieldID, $tableName, $columnName, $length) {
+  /**
+   * @param int $customFieldID
+   * @param string $tableName
+   * @param string $columnName
+   * @param $length
+   *
+   * @throws Exception
+   */
+  public static function alterFieldLength($customFieldID, $tableName, $columnName, $length) {
     // first update the custom field tables
     $sql = "
 UPDATE civicrm_custom_field
 SET    text_length = %1
 WHERE  id = %2
 ";
-    $params = array(1 => array($length, 'Integer'),
+    $params = array(
+      1 => array($length, 'Integer'),
       2 => array($customFieldID, 'Integer'),
     );
     CRM_Core_DAO::executeQuery($sql, $params);
@@ -441,13 +517,13 @@ MODIFY      {$columnName} varchar( $length )
     }
     else {
       CRM_Core_Error::fatal(ts('Could Not Find Custom Field Details for %1, %2, %3',
-          array(
-            1 => $tableName,
-            2 => $columnName,
-            3 => $customFieldID
-          )
-        ));
+        array(
+          1 => $tableName,
+          2 => $columnName,
+          3 => $customFieldID,
+        )
+      ));
     }
   }
-}
 
+}

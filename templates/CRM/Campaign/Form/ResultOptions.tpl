@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,7 +51,7 @@
         <th> {ts}Label{/ts}</th>
         <th> {ts}Value{/ts}</th>
   <th> {ts}Recontact Interval{/ts}</th>
-        <th> {ts}Weight{/ts}</th>
+        <th> {ts}Order{/ts}</th>
     </tr>
 
   {section name=rowLoop start=1 loop=12}
@@ -88,8 +88,8 @@
 </tr>
 
 <script type="text/javascript">
-    var showRows   = new Array({$showBlocks});
-    var hideBlocks = new Array({$hideBlocks});
+    var showRows   = [{$showBlocks}];
+    var hideBlocks = [{$hideBlocks}];
     var rowcounter = 0;
     var surveyId   = {if $surveyId}{$surveyId}{else}''{/if};
 
@@ -163,7 +163,7 @@
       }, "json" );
   }
 
-    cj(document).ready( function( ) {
+    CRM.$(function($) {
         showOptionSelect( );
     });
 

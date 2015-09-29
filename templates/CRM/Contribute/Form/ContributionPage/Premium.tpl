@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,9 +67,7 @@
             </td>
             <td class="html-adjust">{$form.premiums_intro_text.html}<br/>
             <span class="description">
-              {ts}Enter content for the introductory message. This will be displayed below the Premiums section title.
-                You may include HTML formatting tags. You can also include images, as long as they are already
-                uploaded to a server - reference them using complete URLs.{/ts}
+              {ts}Enter content for the introductory message. This will be displayed below the Premiums section title. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server - reference them using complete URLs.{/ts}
             </span>
             </td>
           </tr>
@@ -79,9 +77,7 @@
             </td>
             <td class="html-adjust">{$form.premiums_contact_email.html}<br/>
             <span class="description">
-              {ts}This email address is included in automated contribution receipts if the contributor has selected
-                a premium. It should be an appropriate contact mailbox for inquiries about premium
-                fulfillment/shipping.{/ts}
+              {ts}This email address is included in automated contribution receipts if the contributor has selected a premium. It should be an appropriate contact mailbox for inquiries about premium fulfillment/shipping.{/ts}
             </span>
             </td>
           </tr>
@@ -91,9 +87,7 @@
             </td>
             <td class="html-adjust">{$form.premiums_contact_phone.html}<br/>
             <span class="description">
-              {ts}This phone number is included in automated contribution receipts if the contributor has selected
-                a premium. It should be an appropriate phone number for inquiries about premium
-                fulfillment/shipping.{/ts}
+              {ts}This phone number is included in automated contribution receipts if the contributor has selected a premium. It should be an appropriate phone number for inquiries about premium fulfillment/shipping.{/ts}
             </span>
             </td>
           </tr>
@@ -109,7 +103,7 @@
           </tr>
           <tr class="crm-contribution-contributionpage-premium-form-block-premiums_nothankyou_label">
             <td class="label">
-              {$form.premiums_nothankyou_label.label}<span class="marker"> *</span>
+              {$form.premiums_nothankyou_label.label}<span class="crm-marker"> *</span>
             </td>
             <td class="html-adjust">{$form.premiums_nothankyou_label.html}<br/>
               <span class="description">{ts}You can change the text for the 'No thank-you' radio button.{/ts}</span>
@@ -143,13 +137,13 @@
   CRM.$(function($) {
 
     // bind click event to premiums_active checkbox
-    cj('#premiums_active').click(function () {
+    $('#premiums_active').click(function () {
       premiumBlock();
     });
 
     // hide premium setting if premium block is not enabled
-    if (!cj('#premiums_active').prop('checked')) {
-      cj('#premiumSettings').hide();
+    if (!$('#premiums_active').prop('checked')) {
+      $('#premiumSettings').hide();
     }
   });
 
@@ -166,6 +160,3 @@
 
   {/literal}
 </script>
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}

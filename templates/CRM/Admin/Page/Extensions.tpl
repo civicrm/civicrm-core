@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,6 @@
     {include file="CRM/Admin/Page/Extensions/About.tpl"}
 
     {include file="CRM/common/enableDisableApi.tpl"}
-    {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
 
     <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
@@ -85,8 +84,8 @@
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-          cj('.collapsed').click( function( ) {
-              var currentObj = cj( this );
+          $('.collapsed').click( function( ) {
+              var currentObj = $( this );
               if ( currentObj.hasClass( 'expanded') ) {
                   currentObj.removeClass( 'expanded' );
                   currentObj.parent( ).parent( ).next( ).hide( );
@@ -109,9 +108,9 @@
     {literal}
 
     CRM.$(function($) {
-      var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
-      cj("#mainTabContainer").tabs({active: tabIndex});
-      cj(".crm-tab-button").addClass("ui-corner-bottom");
+      var tabIndex = $('#tab_' + selectedTab).prevAll().length;
+      $("#mainTabContainer").tabs({active: tabIndex});
+      $(".crm-tab-button").addClass("ui-corner-bottom");
     });
     {/literal}
     </script>
@@ -120,7 +119,7 @@
     {literal}
     <script type="text/javascript">
     CRM.$(function($) {
-      cj('.crm-extensions-refresh').click(function(event){
+      $('.crm-extensions-refresh').click(function(event){
         event.stopPropagation();
         CRM.alert('', '{/literal}{ts escape="js"}Refreshing...{/ts}{literal}', 'crm-msg-loading', {expires: 0});
         CRM.api('Extension', 'refresh', {}, {

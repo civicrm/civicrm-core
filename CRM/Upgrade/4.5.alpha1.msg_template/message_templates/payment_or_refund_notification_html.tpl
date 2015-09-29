@@ -71,26 +71,26 @@
     </tr>
     <tr>
       <td {$labelStyle}>
-	{ts}{if $component eq 'event'}Total Fees{/if}{/ts}
+  {ts}{if $component eq 'event'}Total Fees{/if}{/ts}
       </td>
       <td {$valueStyle}>
-	{$totalAmount|crmMoney}
+  {$totalAmount|crmMoney}
       </td>
       </tr>
       <tr>
       <td {$labelStyle}>
-	{ts}This Payment Amount{/ts}
+  {ts}This Payment Amount{/ts}
       </td>
       <td {$valueStyle}>
-	{$paymentAmount|crmMoney}
+  {$paymentAmount|crmMoney}
       </td>
       </tr>
      <tr>
       <td {$labelStyle}>
-	{ts}Balance Owed{/ts}
+  {ts}Balance Owed{/ts}
       </td>
        <td {$valueStyle}>
-	{$amountOwed|crmMoney}
+  {$amountOwed|crmMoney}
       </td> {* This will be zero after final payment. *}
      </tr>
      <tr> <td {$emptyBlockStyle}></td>
@@ -98,7 +98,7 @@
       {if $paymentsComplete}
       <tr>
       <td colspan='2' {$valueStyle}>
-	{ts}Thank-you. This completes your payment for {if $component eq 'event'}{$event.event_title}{/if}.{/ts}
+  {ts}Thank-you. This completes your payment for {if $component eq 'event'}{$event.event_title}{/if}.{/ts}
       </td>
      </tr>
       {/if}
@@ -106,17 +106,17 @@
   {if $receive_date}
     <tr>
       <td {$labelStyle}>
-	{ts}Transaction Date{/ts}
+  {ts}Transaction Date{/ts}
       </td>
       <td {$valueStyle}>
-	{$receive_date|crmDate}
+  {$receive_date|crmDate}
       </td>
     </tr>
   {/if}
   {if $trxn_id}
     <tr>
       <td {$labelStyle}>
-	{ts}Transaction #{/ts}
+  {ts}Transaction #{/ts}
       </td>
       <td {$valueStyle}>
         {$trxn_id}
@@ -148,117 +148,117 @@
   </tr>
     <tr>
       <td>
-	<table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-	  {if $contributeMode eq 'direct' and !$isAmountzero}
+  <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
+    {if $contributeMode eq 'direct' and !$isAmountzero}
           <tr>
             <th {$headerStyle}>
-	      {ts}Billing Name and Address{/ts}
+        {ts}Billing Name and Address{/ts}
             </th>
           </tr>
           <tr>
             <td colspan="2" {$valueStyle}>
-	      {$billingName}<br />
-	      {$address|nl2br}
+        {$billingName}<br />
+        {$address|nl2br}
             </td>
           </tr>
-	  {/if}
-	  {if $contributeMode eq'direct' and !$isAmountzero}
+    {/if}
+    {if $contributeMode eq'direct' and !$isAmountzero}
           <tr>
             <th {$headerStyle}>
-	      {ts}Credit Card Information{/ts}
+        {ts}Credit Card Information{/ts}
             </th>
           </tr>
           <tr>
             <td colspan="2" {$valueStyle}>
-	      {$credit_card_type}<br />
-	      {$credit_card_number}<br />
-	      {ts}Expires:{/ts} {$credit_card_exp_date|truncate:7:''|crmDate}
+        {$credit_card_type}<br />
+        {$credit_card_number}<br />
+        {ts}Expires:{/ts} {$credit_card_exp_date|truncate:7:''|crmDate}
             </td>
           </tr>
-	  {/if}
-	  {if $component eq 'event'}
-	  <tr>
-	    <th {$headerStyle}>
-	      {ts}Event Information and Location{/ts}
-	    </th>
-	  </tr>
-	  <tr>
-	    <td colspan="2" {$valueStyle}>
- 	      {$event.event_title}<br />
-	      {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
-	    </td>
-	  </tr>
+    {/if}
+    {if $component eq 'event'}
+    <tr>
+      <th {$headerStyle}>
+        {ts}Event Information and Location{/ts}
+      </th>
+    </tr>
+    <tr>
+      <td colspan="2" {$valueStyle}>
+         {$event.event_title}<br />
+        {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
+      </td>
+    </tr>
 
-	  {if $event.participant_role neq 'Attendee' and $defaultRole}
-	  <tr>
-	    <td {$labelStyle}>
-	      {ts}Participant Role{/ts}
-	    </td>
-	    <td {$valueStyle}>
-	      {$event.participant_role}
-	    </td>
-	  </tr>
-	  {/if}
+    {if $event.participant_role neq 'Attendee' and $defaultRole}
+    <tr>
+      <td {$labelStyle}>
+        {ts}Participant Role{/ts}
+      </td>
+      <td {$valueStyle}>
+        {$event.participant_role}
+      </td>
+    </tr>
+    {/if}
 
-	  {if $isShowLocation}
-	  <tr>
-	    <td colspan="2" {$valueStyle}>
-	      {if $location.address.1.name}
-	      {$location.address.1.name}<br />
-	      {/if}
-	      {if $location.address.1.street_address}
-	      {$location.address.1.street_address}<br />
-	      {/if}
-	      {if $location.address.1.supplemental_address_1}
-	      {$location.address.1.supplemental_address_1}<br />
-	      {/if}
-	      {if $location.address.1.supplemental_address_2}
-	      {$location.address.1.supplemental_address_2}<br />
-	      {/if}
-	      {if $location.address.1.city}
-	      {$location.address.1.city} {$location.address.1.postal_code}{if $location.address.1.postal_code_suffix} - {$location.address.1.postal_code_suffix}{/if}<br />
-	      {/if}
-	    </td>
-	  </tr>
-	  {/if}
+    {if $isShowLocation}
+    <tr>
+      <td colspan="2" {$valueStyle}>
+        {if $location.address.1.name}
+        {$location.address.1.name}<br />
+        {/if}
+        {if $location.address.1.street_address}
+        {$location.address.1.street_address}<br />
+        {/if}
+        {if $location.address.1.supplemental_address_1}
+        {$location.address.1.supplemental_address_1}<br />
+        {/if}
+        {if $location.address.1.supplemental_address_2}
+        {$location.address.1.supplemental_address_2}<br />
+        {/if}
+        {if $location.address.1.city}
+        {$location.address.1.city} {$location.address.1.postal_code}{if $location.address.1.postal_code_suffix} - {$location.address.1.postal_code_suffix}{/if}<br />
+        {/if}
+      </td>
+    </tr>
+    {/if}
 
-	  {if $location.phone.1.phone || $location.email.1.email}
-	  <tr>
-	    <td colspan="2" {$labelStyle}>
-	      {ts}Event Contacts:{/ts}
-	    </td>
-	  </tr>
-	  {foreach from=$location.phone item=phone}
-	  {if $phone.phone}
+    {if $location.phone.1.phone || $location.email.1.email}
+    <tr>
+      <td colspan="2" {$labelStyle}>
+        {ts}Event Contacts:{/ts}
+      </td>
+    </tr>
+    {foreach from=$location.phone item=phone}
+    {if $phone.phone}
           <tr>
             <td {$labelStyle}>
-	      {if $phone.phone_type}
-	      {$phone.phone_type_display}
-	      {else}
-	      {ts}Phone{/ts}
-	      {/if}
+        {if $phone.phone_type}
+        {$phone.phone_type_display}
+        {else}
+        {ts}Phone{/ts}
+        {/if}
             </td>
             <td {$valueStyle}>
-	      {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
+        {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
             </td>
           </tr>
-	  {/if}
-	  {/foreach}
-	  {foreach from=$location.email item=eventEmail}
-	  {if $eventEmail.email}
+    {/if}
+    {/foreach}
+    {foreach from=$location.email item=eventEmail}
+    {if $eventEmail.email}
           <tr>
             <td {$labelStyle}>
-	      {ts}Email{/ts}
+        {ts}Email{/ts}
             </td>
             <td {$valueStyle}>
-	      {$eventEmail.email}
+        {$eventEmail.email}
             </td>
           </tr>
-	  {/if}
-	  {/foreach}
-	  {/if} {*phone block close*}
-	  {/if}
-	</table>
+    {/if}
+    {/foreach}
+    {/if} {*phone block close*}
+    {/if}
+  </table>
       </td>
     </tr>
 

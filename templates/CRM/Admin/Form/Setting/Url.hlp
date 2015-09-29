@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
 {/htxt}
 {htxt id='id-verify_ssl'}
 <p>{ts}This setting will verify the SSL certificates received when making secure HTTPS connections to payment processors.{/ts}</p>
-<p>{ts}For example, in order to process a payment through Authorize.net, CiviCRM must make a request to https://secure.authorize.net/gateway/transact.dll. Using https to connect to secure.authorize.net insures that the connection is encrypted, but it's possible that CiviCRM is actually connecting to an attacker and the attacker is connecting to secure.authorize.net.{/ts}</p>
+<p>{ts}For example, in order to process a payment through Authorize.net, CiviCRM must make a request to https://secure2.authorize.net/gateway/transact.dll. Using https to connect to secure2.authorize.net insures that the connection is encrypted, but it's possible that CiviCRM is actually connecting to an attacker and the attacker is connecting to secure2.authorize.net.{/ts}</p>
 <p>{ts}Verifying the SSL certificate helps confirm that CiviCRM is securely communicating directly to payment processors.{/ts}</p>
 {/htxt}
 
@@ -84,4 +84,27 @@
 {/htxt}
 {htxt id='id-css_url'}
 <p>{ts}You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.{/ts}</p>
+{/htxt}
+
+{htxt id='id-url_vars'}
+{ts}URL Variables{/ts}
+  <table>
+    <tbody>
+    <tr>
+      <td><tt>[cms.root]</tt></td>
+      <td><tt>{crmResURL ext='cms.root'}</tt></td>
+    </tr>
+    <tr>
+      <td><tt>[civicrm.root]</tt></td>
+      <td><tt>{crmResURL ext='civicrm.root'}</tt></td>
+    </tr>
+    <tr>
+      <td><tt>[civicrm.files]</tt></td>
+      <td><tt>{crmResURL ext='civicrm.files'}</tt></td>
+    </tr>
+    </tbody>
+  </table>
+  <p>
+    {ts}These variables are computed automatically using <tt>civicrm.settings.php</tt> and its options, such as <tt>CIVICRM_TEMPLATE_COMPILEDIR</tt>.{/ts}
+  </p>
 {/htxt}

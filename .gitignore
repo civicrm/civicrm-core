@@ -1,5 +1,6 @@
 *~
 *.bak
+bower_components
 CRM/ACL/DAO
 CRM/Activity/DAO
 CRM/Auction/DAO
@@ -78,8 +79,11 @@ CRM/Core/DAO/PriceField.php
 CRM/Core/DAO/PriceSet.php
 CRM/Core/DAO/PriceSetEntity.php
 CRM/Core/DAO/PrintLabel.php
+CRM/Core/DAO/RecurringEntity.php
 CRM/Core/DAO/Setting.php
 CRM/Core/DAO/StateProvince.php
+CRM/Core/DAO/StatusPreference.php
+CRM/Core/DAO/SystemLog.php
 CRM/Core/DAO/Tag.php
 CRM/Core/DAO/Timezone.php
 CRM/Core/DAO/UFField.php
@@ -90,6 +94,7 @@ CRM/Core/DAO/Website.php
 CRM/Core/DAO/WordReplacement.php
 CRM/Core/DAO/Worldregion.php
 CRM/Core/I18n/SchemaStructure.php
+CRM/Cxn/DAO
 CRM/Dedupe/DAO
 CRM/Event/Cart/DAO
 CRM/Event/DAO
@@ -111,6 +116,7 @@ civicrm-version.php
 civicrm-version.txt
 civicrm.config.php
 install/langs.php
+node_modules
 packages/.channels
 packages/.depdb
 packages/.depdblock
@@ -122,6 +128,7 @@ packages/doc
 packages/temp
 packages/test
 settings_location.php
+sql/case_sample.mysql
 sql/civicrm.mysql
 sql/civicrm_acl.??_??.mysql
 sql/civicrm_acl.mysql
@@ -141,7 +148,9 @@ drupal/
 WordPress
 joomla
 packages/
+tests/output
 tests/phpunit/CiviTest/civicrm.settings.local.php
+tests/phpunit/CiviTest/truncate.xml
 tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html
@@ -151,3 +160,4 @@ vendor
 civicrm.settings.php
 sql/dummy_processor.mysql
 distmaker/distmaker.conf
+distmaker/out

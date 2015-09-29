@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,11 +39,11 @@
 class CRM_Mailing_Page_Preview extends CRM_Core_Page {
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */
-  function run() {
+  public function run() {
 
     $session = CRM_Core_Session::singleton();
 
@@ -92,14 +92,14 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
     );
 
     if ($type == 'html') {
-      header('Content-Type: text/html; charset=utf-8');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'text/html; charset=utf-8');
       print $mime->getHTMLBody();
     }
     else {
-      header('Content-Type: text/plain; charset=utf-8');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain; charset=utf-8');
       print $mime->getTXTBody();
     }
     CRM_Utils_System::civiExit();
   }
-}
 
+}

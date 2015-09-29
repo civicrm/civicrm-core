@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -34,7 +34,7 @@
   {elseif $action eq 16384}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-      {ts 1=$formatName}Are you sure you would like to make a copy of the Label Format titled<strong>%1</strong>?{/ts}
+      {ts 1=$formatName}Are you sure you would like to make a copy of the Label Format titled <strong>%1</strong>?{/ts}
     </div>
   {else}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

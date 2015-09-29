@@ -25,29 +25,59 @@
     return this.each(function() {
       // Hide the existing <SELECT> and instead construct a ProfileSelector view.
       // Keep them synchronized.
-      var select = this;
+      var matchingUfGroups,
+        $select = $(this).hide().addClass('rendered');
 
-      var matchingUfGroups;
+      var validTypesId = [];
+      var usedByFilter = null;
       if (options.groupTypeFilter) {
         matchingUfGroups = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
-            return ufGroupModel.checkGroupType(options.groupTypeFilter);
+            //CRM-16915 - filter with module used by the profile
+            if (!$.isEmptyObject(options.usedByFilter)) {
+              usedByFilter = options.usedByFilter;
+            }
+            return ufGroupModel.checkGroupType(options.groupTypeFilter, options.allowAllSubtypes, usedByFilter);
           }
         });
       } else {
         matchingUfGroups = ufGroupCollection;
       }
 
+      //CRM-15427 check for valid subtypes raise a warning if not valid
+      if (options.allowAllSubtypes && $.isEmptyObject(validTypesId)) {
+        validTypes = ufGroupCollection.subcollection({
+          filter: function(ufGroupModel) {
+            return ufGroupModel.checkGroupType(options.groupTypeFilter);
+          }
+        });
+        _.each(validTypes.models, function(validTypesattr) {
+          validTypesId.push(validTypesattr.id);
+        });
+      }
+      if (!$.isEmptyObject(validTypesId) && $.inArray($select.val(), validTypesId) == -1) {
+        var civiComponent;
+        if (options.groupTypeFilter.indexOf('Membership') !== -1) {
+          civiComponent = 'Membership';
+        }
+        else if (options.groupTypeFilter.indexOf('Participant') !== -1) {
+          civiComponent = 'Event';
+        }
+        else {
+          civiComponent = 'Contribution';
+        }
+        CRM.alert(ts('The selected profile is using a custom field which is not assigned to the "%1" being configured.', {1: civiComponent}), ts('Warning'));
+      }
       var view = new CRM.ProfileSelector.View({
-        ufGroupId: $(select).val(),
+        ufGroupId: $select.val(),
         ufGroupCollection: matchingUfGroups,
         ufEntities: options.entities
       });
       view.on('change:ufGroupId', function() {
-        $(select).val(view.getUfGroupId()).change();
+        $select.val(view.getUfGroupId()).change();
       });
       view.render();
-      $(select).after(view.el);
+      $select.after(view.el);
       setTimeout(function() {
         view.doPreview();
       }, 100);
@@ -55,10 +85,13 @@
   };
 
   $('#crm-container').on('crmLoad', function() {
-    $('.crm-profile-selector:not(.rendered)', this).addClass('rendered').each(function() {
+    $('.crm-profile-selector:not(.rendered)', this).each(function() {
       $(this).crmProfileSelector({
-        groupTypeFilter: $(this).attr('data-group-type'),
-        entities: $(this).data('entities')
+        groupTypeFilter: $(this).data('groupType'),
+        entities: $(this).data('entities'),
+        //CRM-15427
+        allowAllSubtypes: $(this).data('default'),
+        usedByFilter: $(this).data('usedfor')
       });
     });
   });

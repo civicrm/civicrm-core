@@ -1,0 +1,126 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="name"}
+  <p>
+    {ts}Assign a unique name to each of your mailings. Select a naming convention that will help keep your mailings organized and easy to find when you want to review and compare mailing results. For example, if you do a monthly general-interest newsletter - you might use the following naming convention:{/ts}
+  </p><p>
+  <strong>{ts}General Monthly Newsletter: 200709{/ts}</strong>
+</p>
+{/htxt}
+
+{htxt id ="from_email"}
+  <p>{ts}Select the "FROM" Email Address for this mailing from the dropdown list. Available email addresses are configurable by users with Administer CiviCRM permission. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
+{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+  {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
+  <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
+{else}
+  {ts}Contact your site administrator if you need to use a "FROM" Email Address which is not in the dropdown list.{/ts}
+{/if}
+{/htxt}
+
+{htxt id="html"}
+  <p>{ts}You can choose to send BOTH an <strong>HTML</strong> and a plain <strong>TEXT</strong> version of your mailing, OR you can send a <strong>TEXT</strong> version only.{/ts}</p>
+  <p>{ts}If you create only an <strong>HTML</strong> version, CiviMail will automatically create a <strong>TEXT</strong> version for your recipients who have chosen NOT to receive HTML email.{/ts}</p>
+  <h1>{ts}Required Elements{/ts}</h1>
+  <p>{ts}CiviMail email messages must include an <strong>opt-out</strong> link ("Opt out via web page"), and the <strong>postal address</strong> of your organization. These elements help reduce the chances of your email being categorized as SPAM. They can be included in the main message body OR in a re-usable <strong>message footer</strong>. Refer to the online documentation for details on how to include required links and contact information as well as sample messages.{/ts} {docURL page="Sample CiviMail Messages" resource="wiki"}</p>
+{/htxt}
+
+{htxt id="text"}
+  <p>{ts}You can send your email as a simple text-only message, as an HTML formatted message, or both. Text-only messages are sufficient for most email communication - and some recipients may prefer not to receive HTML formatted messages.{/ts}</p>
+  <p>{ts}HTML messages have more visual impact, allow you to include images, and may be more readable if you are including links to website pages. However, different email programs may interpret HTML formats differently - so use this option cautiously unless you have a template format that has been tested with different web and desktop email programs.{/ts}</p>
+{/htxt}
+
+{htxt id="header"}
+  <p>{ts}You may choose to include a pre-configured Header block above your message.{/ts}</p>
+{/htxt}
+
+{htxt id="footer"}
+  <p>{ts}You may choose to include a pre-configured Footer block below your message. This is a good place to include the required unsubscribe, opt-out and postal address tokens.{/ts}</p>
+{/htxt}
+
+{htxt id="dedupe_email"}
+  <p>{ts}Multiple people -- such as spouses, parents, or children -- may sometimes share the same email address.{/ts}</p>
+  <p>{ts}To send only one message to the shared address, enable this option. Mail-merge tokens will be filled for only one person.{/ts}</p>
+  <p>{ts}To send separate messages for each person, disable this option. Mail-merge tokens will be filled separately for each person.{/ts}</p>
+{/htxt}
+
+{htxt id="visibility"}
+  <p>
+    {ts}This option controls who can view the contents of this email on your website. The link can be included by inserting the "Mailing permalink" token (place it in a link when composing in HTML mode).{/ts}
+  </p><p>
+    {ts}The options for mailing visibility are:{/ts}
+  </p>
+  <ul>
+    <li>
+      {ts}"Public Pages" will make the content of this mailing viewable everyone who has the permission "view public CiviMail content". Note that even people who did not receive the mailing would be able to find it via search engines.{/ts}
+    </li>
+    <li>
+      {ts}"User and User Admin Only" means that only users that received the mailing or administrators can view this email on your website; users must be logged in to view the message.{/ts}
+    </li>
+  </ul>
+{/htxt}
+
+{htxt id="test"}
+  <p>{ts}It's a good idea to test your mailing by sending it to yourself and/or a selected group of people in your organization.{/ts}</p>
+  <p>{ts}Things to check in a test mailing:{/ts}</p>
+  <ul>
+    <li>{ts}Verify the content and formatting looks consistent across various email clients.{/ts}</li>
+    <li>{ts}If you are using mail-merge tokens, check that they have been replaced with expected values.{/ts}</li>
+    <li>{ts}Click on each included link to make sure they go to the expected web pages.{/ts}</li>
+  </ul>
+{/htxt}
+
+{htxt id="url_tracking"}
+  <p>
+    {ts}Track the number of times recipients click each link in this mailing.{/ts}
+  </p><p>
+    {ts}NOTE: When this feature is enabled, all links in the message body will be automatically re-written to route through your CiviCRM server prior to redirecting to the target page.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="open_tracking"}
+  <p>
+    {ts}Track the number of times recipients open this mailing in their email software.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="override_verp"}
+  <p>
+    {ts}Recipients' replies are sent to a CiviMail specific address instead of the sender's address so they can be stored within CiviCRM.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="auto_responder"}
+  <p>
+    {ts}If a recipient replies to this mailing, send an automated reply using the selected message.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="forward_replies"}
+  <p>
+    {ts}If a recipient replies to this mailing, forward the reply to the FROM Email address specified for the mailing.{/ts}
+  </p>
+{/htxt}

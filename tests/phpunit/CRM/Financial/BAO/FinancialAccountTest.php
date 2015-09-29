@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,32 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Financial_BAO_FinancialAccountTest
+ */
 class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
-  function get_info() {
-    return array(
-      'name' => 'FinancialAccount BAOs',
-      'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->organizationCreate();
   }
 
-  function teardown() {
+  public function teardown() {
     $this->financialAccountDelete('Donations');
   }
 
   /**
-   * check method add()
+   * Check method add()
    */
-  function testAdd() {
+  public function testAdd() {
     $params = array(
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -69,9 +64,9 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method retrive()
+   * Check method retrive()
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $params = array(
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -86,9 +81,9 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method setIsActive()
+   * Check method setIsActive()
    */
-  function testSetIsActive() {
+  public function testSetIsActive() {
     $params = array(
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -110,9 +105,9 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
-  function testdel() {
+  public function testdel() {
     $params = array(
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -128,9 +123,9 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method getAccountingCode()
+   * Check method getAccountingCode()
    */
-  function testGetAccountingCode() {
+  public function testGetAccountingCode() {
     $params = array(
       'name' => 'Donations',
       'is_active' => 1,
@@ -142,6 +137,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $financialAccountid = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', 'Donations', 'id', 'name');
     CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountid, 'accounting_code', '4800');
     $accountingCode = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialType->id);
-    $this->assertEquals( $accountingCode, 4800, 'Verify accounting code.');
+    $this->assertEquals($accountingCode, 4800, 'Verify accounting code.');
   }
+
 }

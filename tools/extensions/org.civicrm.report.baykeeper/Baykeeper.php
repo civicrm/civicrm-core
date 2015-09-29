@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -38,6 +38,10 @@ require_once 'CRM/Contribute/PseudoConstant.php';
 require_once 'CRM/Core/OptionGroup.php';
 require_once 'CRM/Event/BAO/Participant.php';
 require_once 'CRM/Contact/BAO/Contact.php';
+
+/**
+ * Class CRM_Report_Form_Contribute_Baykeeper
+ */
 class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
   protected $_addressField = FALSE;
 
@@ -47,6 +51,9 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
 
   protected $_customGroupExtends = array('Contact', 'Contribution');
 
+  /**
+   *
+   */
   function __construct() {
     $this->_columns = array('civicrm_contact' =>
       array('dao' => 'CRM_Contact_DAO_Contact',
@@ -329,7 +336,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
                         } else {
                             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
                         }
-						*/
+            */
 
 
             // only include statistics columns if set
@@ -400,43 +407,43 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
 
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-              $contribJoin JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} 
+              $contribJoin JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
-              $contribJoin JOIN (SELECT c.id, IF(COUNT(oc.id) = 0, 0, 1) AS ordinality FROM civicrm_contribution c LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date GROUP BY c.id) {$this->_aliases['civicrm_contribution_ordinality']} 
+              $contribJoin JOIN (SELECT c.id, IF(COUNT(oc.id) = 0, 0, 1) AS ordinality FROM civicrm_contribution c LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date GROUP BY c.id) {$this->_aliases['civicrm_contribution_ordinality']}
                       ON {$this->_aliases['civicrm_contribution_ordinality']}.id = {$this->_aliases['civicrm_contribution']}.id
-			  LEFT JOIN  civicrm_note {$this->_aliases['civicrm_note']} 
+        LEFT JOIN  civicrm_note {$this->_aliases['civicrm_note']}
                       ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_note']}.contact_id AND
-						  {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_note']}.entity_id )
-              LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']} 
-                      ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND 
+              {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_note']}.entity_id )
+              LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
+                      ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                          {$this->_aliases['civicrm_phone']}.is_primary = 1)
               LEFT  JOIN civicrm_contact {$alias_employer}
-                         ON {$this->_aliases['civicrm_contact']}.employer_id = 
-                            {$alias_employer}.id 
-              LEFT JOIN civicrm_contribution_soft {$this->_aliases['civicrm_contribution_soft']} 
-                         ON {$this->_aliases['civicrm_contribution_soft']}.contribution_id = 
+                         ON {$this->_aliases['civicrm_contact']}.employer_id =
+                            {$alias_employer}.id
+              LEFT JOIN civicrm_contribution_soft {$this->_aliases['civicrm_contribution_soft']}
+                         ON {$this->_aliases['civicrm_contribution_soft']}.contribution_id =
                             {$this->_aliases['civicrm_contribution']}.id
               LEFT  JOIN civicrm_contact {$alias_creditor}
-                         ON {$this->_aliases['civicrm_contribution_soft']}.contact_id = 
-                            {$alias_creditor}.id 
-			  LEFT  JOIN civicrm_contact {$this->_aliases['civicrm_contact_hon_mem']} 
-			  			 ON {$this->_aliases['civicrm_contribution']}.honor_contact_id = {$this->_aliases['civicrm_contact_hon_mem']}.id
-						 ";
+                         ON {$this->_aliases['civicrm_contribution_soft']}.contact_id =
+                            {$alias_creditor}.id
+        LEFT  JOIN civicrm_contact {$this->_aliases['civicrm_contact_hon_mem']}
+               ON {$this->_aliases['civicrm_contribution']}.honor_contact_id = {$this->_aliases['civicrm_contact_hon_mem']}.id
+             ";
     // add group - concatenated
     $this->_from .= " LEFT JOIN civicrm_group_contact gc ON {$this->_aliases['civicrm_contact']}.id = gc.contact_id  AND gc.status = 'Added'
                       LEFT JOIN civicrm_group {$this->_aliases['civicrm_group_field']} ON {$this->_aliases['civicrm_group_field']}.id = gc.group_id ";
 
     if ($this->_addressField OR (!empty($this->_params['state_province_id_value']) OR !empty($this->_params['country_id_value']))) {
       $this->_from .= "
-            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} 
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND 
+            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
                       {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
 
     if ($this->_emailField) {
-      $this->_from .= " 
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} 
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND 
+      $this->_from .= "
+            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
+                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
                       {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
   }
@@ -449,6 +456,11 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_contribution']}.receive_date ";
   }
 
+  /**
+   * @param $rows
+   *
+   * @return array
+   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
     // because the query returns groups, the amount is multiplied by the number of groups a contact is in
@@ -470,13 +482,13 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
 
 
       /*
-			$statistics['counts']['amount']    = array( 'value' => $dao->amount,
+      $statistics['counts']['amount']    = array( 'value' => $dao->amount,
                                                         'title' => 'Total Amount',
                                                         'type'  => CRM_Utils_Type::T_MONEY );
             $statistics['counts']['avg']       = array( 'value' => $dao->avg,
                                                         'title' => 'Average',
                                                         'type'  => CRM_Utils_Type::T_MONEY );
-			*/
+      */
     }
 
     return $statistics;
@@ -488,6 +500,9 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  /**
+   * @param $rows
+   */
   function alterDisplay(&$rows) {
 
     require_once 'CRM/Contribute/BAO/Contribution/Utils.php';

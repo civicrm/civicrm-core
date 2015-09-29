@@ -16,25 +16,28 @@
  * limitations under the License.
  */
 
-/* This is the response handler code that will be invoked every time
-  * a notification or request is sent by the Google Server
-  *
-  * To allow this code to receive responses, the url for this file
-  * must be set on the seller page under Settings->Integration as the
-  * "API Callback URL'
-  * Order processing commands can be sent automatically by placing these
-  * commands appropriately
-  *
-  * To use this code for merchant-calculated feedback, this url must be
-  * set also as the merchant-calculations-url when the cart is posted
-  * Depending on your calculations for shipping, taxes, coupons and gift
-  * certificates update parts of the code as required
-  *
-  */
-
-
+/**
+ * Response handler code.
+ *
+ * This will be invoked every time a notification or request is sent by the Google Server.
+ *
+ * To allow this code to receive responses, the url for this file
+ * must be set on the seller page under Settings->Integration as the
+ * "API Callback URL'
+ * Order processing commands can be sent automatically by placing these
+ * commands appropriately
+ *
+ * To use this code for merchant-calculated feedback, this url must be
+ * set also as the merchant-calculations-url when the cart is posted
+ * Depending on your calculations for shipping, taxes, coupons and gift
+ * certificates update parts of the code as required.
+ */
 
 define('GOOGLE_DEBUG_PP', 0);
+
+/**
+ * Class CRM_Core_Payment_GoogleIPN.
+ */
 class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
@@ -42,18 +45,25 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
   /**
-   * mode of operation: live or test
+   * Mode of operation: live or test
    *
    * @var object
    */
   protected $_mode = NULL;
 
-  static function retrieve($name, $type, $object, $abort = TRUE) {
+  /**
+   * @param string $name
+   * @param $type
+   * @param $object
+   * @param bool $abort
+   *
+   * @return mixed
+   */
+  public static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {
       CRM_Core_Error::debug_log_message("Could not find an entry for $name");
@@ -73,13 +83,16 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_GoogleIPN
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
     parent::__construct();
 
     $this->_mode = $mode;
@@ -89,13 +102,16 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml   $dataRoot    response send by google in xml format
-   * @param array $privateData contains the name value pair of <merchant-private-data>
+   * @param xml $dataRoot
+   *   Response send by google in xml format.
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
    *
-   * @return void
+   * @param string $component
    *
+   * @return bool
    */
-  function newOrderNotify($dataRoot, $privateData, $component) {
+  public function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();
 
     $input['component'] = strtolower($component);
@@ -105,9 +121,9 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
     $ids['contributionRecur'] = $ids['contributionPage'] = NULL;
     if ($input['component'] == "event") {
-      $ids['event']       = self::retrieve('eventID', 'Integer', $privateData, TRUE);
+      $ids['event'] = self::retrieve('eventID', 'Integer', $privateData, TRUE);
       $ids['participant'] = self::retrieve('participantID', 'Integer', $privateData, TRUE);
-      $ids['membership']  = NULL;
+      $ids['membership'] = NULL;
     }
     else {
       $ids['membership'] = self::retrieve('membershipID', 'Integer', $privateData, FALSE);
@@ -133,7 +149,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     if ($ids['contributionRecur']) {
       if ($objects['contributionRecur']->invoice_id == $dataRoot['serial-number']) {
         CRM_Core_Error::debug_log_message("The new order notification already handled: {$dataRoot['serial-number']}.");
-        return;
+        return FALSE;
       }
       else {
         $transaction = new CRM_Core_Transaction();
@@ -157,7 +173,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
           // create a contribution and then get it processed
           $contribution = new CRM_Contribute_DAO_Contribution();
           $contribution->contact_id = $ids['contact'];
-          $contribution->financial_type_id  = $objects['contributionType']->id;
+          $contribution->financial_type_id = $objects['contributionType']->id;
           $contribution->contribution_page_id = $objects['contribution']->contribution_page_id;
           $contribution->contribution_recur_id = $ids['contributionRecur'];
           $contribution->receive_date = date('YmdHis');
@@ -180,8 +196,8 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     $contribution = &$objects['contribution'];
 
     if ($contribution->invoice_id != $input['invoice']) {
-      CRM_Core_Error::debug_log_message("Invoice values dont match between database and IPN request");
-      return;
+      CRM_Core_Error::debug_log_message("Invoice values don't match between database and IPN request");
+      return FALSE;
     }
 
     // lets replace invoice-id with google-order-number because thats what is common and unique
@@ -192,7 +208,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
     if ($contribution->total_amount != $input['amount']) {
       CRM_Core_Error::debug_log_message("Amount values dont match between database and IPN request");
-      return;
+      return FALSE;
     }
 
     if (!$this->getInput($input, $ids, $dataRoot)) {
@@ -204,12 +220,12 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     // check if contribution is already completed, if so we ignore this ipn
     if ($contribution->contribution_status_id == 1) {
       CRM_Core_Error::debug_log_message("returning since contribution has already been handled");
-      return;
+      return FALSE;
     }
     else {
       /* Since trxn_id hasn't got any use here,
-             * lets make use of it by passing the eventID/membershipTypeID to next level.
-             * And change trxn_id to google-order-number before finishing db update */
+       * lets make use of it by passing the eventID/membershipTypeID to next level.
+       * And change trxn_id to google-order-number before finishing db update */
 
       if (!empty($ids['event'])) {
         $contribution->trxn_id = $ids['event'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['participant'];
@@ -219,7 +235,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
       }
     }
 
-    // CRM_Core_Error::debug_var( 'c', $contribution );
     $contribution->save();
     $transaction->commit();
 
@@ -229,13 +244,17 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when the state(CHARGED, CANCELLED..) changes for an order
    *
-   * @param string $status      status of the transaction send by google
-   * @param array  $privateData contains the name value pair of <merchant-private-data>
+   * @param string $status
+   *   Status of the transaction send by google.
+   * @param $dataRoot
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
    *
-   * @return void
+   * @param string $component
    *
+   * @return bool
    */
-  function orderStateChange($status, $dataRoot, $privateData, $component) {
+  public function orderStateChange($status, $dataRoot, $privateData, $component) {
     $input = $objects = $ids = array();
     $input['component'] = strtolower($component);
 
@@ -248,14 +267,14 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
     if (!$contribution->find(TRUE)) {
       CRM_Core_Error::debug_log_message("orderStateChange: Could not find contribution record with invoice id: $serial");
-      return;
+      return FALSE;
     }
 
     // Google sends the charged notification twice.
     // So to make sure, code is not executed again.
     if ($contribution->contribution_status_id == 1) {
       CRM_Core_Error::debug_log_message("Contribution already handled (ContributionID = {$contribution->id}).");
-      return;
+      return FALSE;
     }
 
     // make sure invoice is set to serial no for recurring payments, to avoid violating uniqueness
@@ -277,12 +296,15 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
       $ids['related_contact'] = NULL;
       $ids['onbehalf_dupe_alert'] = NULL;
       if ($contribution->trxn_id) {
-      list($ids['membership'], $ids['related_contact'], $ids['onbehalf_dupe_alert']) = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        $contribution->trxn_id
-      );
+        list($ids['membership'], $ids['related_contact'], $ids['onbehalf_dupe_alert']) = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+          $contribution->trxn_id
+        );
       }
       foreach (array(
-        'membership', 'related_contact', 'onbehalf_dupe_alert') as $fld) {
+                 'membership',
+                 'related_contact',
+                 'onbehalf_dupe_alert',
+               ) as $fld) {
         if (!is_numeric($ids[$fld])) {
           unset($ids[$fld]);
         }
@@ -300,7 +322,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
     $transaction = new CRM_Core_Transaction();
 
-    // CRM_Core_Error::debug_var( 'c', $contribution );
     if ($status == 'PAYMENT_DECLINED' ||
       $status == 'CANCELLED_BY_GOOGLE' ||
       $status == 'CANCELLED'
@@ -308,11 +329,11 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
       return $this->failed($objects, $transaction);
     }
 
-    $input['amount']     = $contribution->total_amount;
+    $input['amount'] = $contribution->total_amount;
     $input['fee_amount'] = NULL;
     $input['net_amount'] = NULL;
-    $input['trxn_id']    = $ids['contributionRecur'] ? $serial : $dataRoot['google-order-number']['VALUE'];
-    $input['is_test']    = $contribution->is_test;
+    $input['trxn_id'] = $ids['contributionRecur'] ? $serial : $dataRoot['google-order-number']['VALUE'];
+    $input['is_test'] = $contribution->is_test;
 
     $recur = NULL;
     if ($ids['contributionRecur']) {
@@ -323,10 +344,15 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     $this->completeRecur($input, $ids, $objects);
   }
 
-  function completeRecur($input, $ids, $objects) {
+  /**
+   * @param $input
+   * @param $ids
+   * @param $objects
+   */
+  public function completeRecur($input, $ids, $objects) {
     if ($ids['contributionRecur']) {
-      $recur               = &$objects['contributionRecur'];
-      $contributionCount   = CRM_Core_DAO::singleValueQuery("
+      $recur = &$objects['contributionRecur'];
+      $contributionCount = CRM_Core_DAO::singleValueQuery("
 SELECT count(*)
 FROM   civicrm_contribution
 WHERE  contribution_recur_id = {$ids['contributionRecur']}
@@ -372,14 +398,19 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   }
 
   /**
-   * singleton function used to manage this object
+   * @deprecated
+   * Payment processor singletons removed - this is an IPN so left but probably can go
+   * Singleton function used to manage this object
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
+   *
+   * @param $component
+   * @param $paymentProcessor
    *
    * @return object
-   * @static
    */
-  static function &singleton($mode, $component, &$paymentProcessor) {
+  public static function &singleton($mode, $component, &$paymentProcessor) {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Core_Payment_GoogleIPN($mode, $paymentProcessor);
     }
@@ -389,12 +420,12 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * The function retrieves the amount the contribution is for, based on the order-no google sends
    *
-   * @param int $orderNo <order-total> send by google
+   * @param int $orderNo
+   *   <order-total> send by google.
    *
    * @return amount
-   * @access public
    */
-  function getAmount($orderNo) {
+  public function getAmount($orderNo) {
     $contribution = new CRM_Contribute_DAO_Contribution();
     $contribution->invoice_id = $orderNo;
     if (!$contribution->find(TRUE)) {
@@ -408,15 +439,20 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * The function returns the component(Event/Contribute..), given the google-order-no and merchant-private-data
    *
-   * @param xml     $xml_response   response send by google in xml format
-   * @param array   $privateData    contains the name value pair of <merchant-private-data>
-   * @param int     $orderNo        <order-total> send by google
-   * @param string  $root           root of xml-response
+   * @param array $privateData
+   *   Contains the name value pair of <merchant-private-data>.
+   * @param int $orderNo
+   *   <order-total> send by google.
+   * @param string $root
+   *   Root of xml-response.
    *
-   * @return array context of this call (test, module, payment processor id)
-   * @static
+   * @param $response
+   * @param $serial
+   * @internal param \xml $xml_response response send by google in xml format
+   * @return array
+   *   context of this call (test, module, payment processor id)
    */
-  function getContext($privateData, $orderNo, $root, $response, $serial) {
+  public function getContext($privateData, $orderNo, $root, $response, $serial) {
     $contributionID = CRM_Utils_Array::value('contributionID', $privateData);
     $contribution = new CRM_Contribute_DAO_Contribution();
     if ($root == 'new-order-notification') {
@@ -455,8 +491,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
         $ids['event'] = $privateData['eventID'];
       }
       else {
-        list($ids['event'], $ids['participant']) =
-          explode(CRM_Core_DAO::VALUE_SEPARATOR, $contribution->trxn_id);
+        list($ids['event'], $ids['participant']) = explode(CRM_Core_DAO::VALUE_SEPARATOR, $contribution->trxn_id);
       }
     }
 
@@ -482,8 +517,9 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * This method is handles the response that will be invoked (from extern/googleNotify) every time
    * a notification or request is sent by the Google Server.
    *
+   * @param string $xml_response
    */
-  static function main($xml_response) {
+  public static function main($xml_response) {
     require_once 'Google/library/googleresponse.php';
     require_once 'Google/library/googlerequest.php';
     require_once 'Google/library/googlemerchantcalculations.php';
@@ -509,15 +545,16 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
     // lets retrieve the private-data & order-no
     $privateData = NULL;
     if (array_key_exists('shopping-cart', $data[$root])) {
-    $privateData = $data[$root]['shopping-cart']['merchant-private-data']['VALUE'];
+      $privateData = $data[$root]['shopping-cart']['merchant-private-data']['VALUE'];
     }
     if (empty($privateData) && array_key_exists('order-summary', $data[$root])
-        && array_key_exists('shopping-cart', $data[$root]['order-summary'])) {
+      && array_key_exists('shopping-cart', $data[$root]['order-summary'])
+    ) {
       $privateData = $data[$root]['order-summary']['shopping-cart']['merchant-private-data']['VALUE'];
     }
     $privateData = $privateData ? self::stringToArray($privateData) : '';
-    $orderNo     = $data[$root]['google-order-number']['VALUE'];
-    $serial      = $data[$root]['serial-number'];
+    $orderNo = $data[$root]['google-order-number']['VALUE'];
+    $serial = $data[$root]['serial-number'];
 
     // a dummy object to call get context and a parent function inside it.
     $ipn = new CRM_Core_Payment_GoogleIPN('live', $dummyProcessor);
@@ -549,66 +586,63 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
       case "merchant-calculation-callback":
         break;
 
-      case "new-order-notification": {
-          $response->SendAck($serial, FALSE);
-          $ipn->newOrderNotify($data[$root], $privateData, $module);
-          break;
+      case "new-order-notification":
+        $response->SendAck($serial, FALSE);
+        $ipn->newOrderNotify($data[$root], $privateData, $module);
+        break;
+
+      case "order-state-change-notification":
+        $response->SendAck($serial, FALSE);
+        $new_financial_state = $data[$root]['new-financial-order-state']['VALUE'];
+        $new_fulfillment_order = $data[$root]['new-fulfillment-order-state']['VALUE'];
+
+        switch ($new_financial_state) {
+          case 'CHARGEABLE':
+            break;
+
+          case 'CHARGED':
+          case 'PAYMENT_DECLINED':
+          case 'CANCELLED':
+          case 'CANCELLED_BY_GOOGLE':
+            $ipn->orderStateChange($new_financial_state, $data[$root], $privateData, $module);
+            break;
+
+          case 'REVIEWING':
+          case 'CHARGING':
+            break;
+
+          default:
+            break;
         }
+        break;
 
-      case "order-state-change-notification": {
-          $response->SendAck($serial, FALSE);
-          $new_financial_state = $data[$root]['new-financial-order-state']['VALUE'];
-          $new_fulfillment_order = $data[$root]['new-fulfillment-order-state']['VALUE'];
+      case "authorization-amount-notification":
+        $response->SendAck($serial, FALSE);
+        $new_financial_state = $data[$root]['order-summary']['financial-order-state']['VALUE'];
+        $new_fulfillment_order = $data[$root]['order-summary']['fulfillment-order-state']['VALUE'];
 
-          switch ($new_financial_state) {
-            case 'CHARGEABLE':
-              break;
+        switch ($new_financial_state) {
+          case 'CHARGEABLE':
+            // For google-handled subscriptions chargeorder needn't be initiated,
+            // assuming auto-charging is turned on.
+            //$request->SendProcessOrder($data[$root]['google-order-number']['VALUE']);
+            //$request->SendChargeOrder($data[$root]['google-order-number']['VALUE'],'');
+            break;
 
-            case 'CHARGED':
-            case 'PAYMENT_DECLINED':
-            case 'CANCELLED':
-            case 'CANCELLED_BY_GOOGLE':
-              $ipn->orderStateChange($new_financial_state, $data[$root], $privateData, $module);
-              break;
+          case 'CHARGED':
+          case 'PAYMENT_DECLINED':
+          case 'CANCELLED':
+            break;
 
-            case 'REVIEWING':
-            case 'CHARGING':
-              break;
+          case 'REVIEWING':
+          case 'CHARGING':
+          case 'CANCELLED_BY_GOOGLE':
+            break;
 
-            default:
-              break;
-          }
-          break;
+          default:
+            break;
         }
-
-      case "authorization-amount-notification": {
-          $response->SendAck($serial, FALSE);
-          $new_financial_state = $data[$root]['order-summary']['financial-order-state']['VALUE'];
-          $new_fulfillment_order = $data[$root]['order-summary']['fulfillment-order-state']['VALUE'];
-
-          switch ($new_financial_state) {
-            case 'CHARGEABLE':
-              // For google-handled subscriptions chargeorder needn't be initiated,
-              // assuming auto-charging is turned on.
-              //$request->SendProcessOrder($data[$root]['google-order-number']['VALUE']);
-              //$request->SendChargeOrder($data[$root]['google-order-number']['VALUE'],'');
-              break;
-
-            case 'CHARGED':
-            case 'PAYMENT_DECLINED':
-            case 'CANCELLED':
-              break;
-
-            case 'REVIEWING':
-            case 'CHARGING':
-            case 'CANCELLED_BY_GOOGLE':
-              break;
-
-            default:
-              break;
-          }
-          break;
-        }
+        break;
 
       case "charge-amount-notification":
       case "chargeback-amount-notification":
@@ -622,7 +656,14 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
     }
   }
 
-  function getInput(&$input, &$ids, $dataRoot) {
+  /**
+   * @param $input
+   * @param $ids
+   * @param $dataRoot
+   *
+   * @return bool
+   */
+  public function getInput(&$input, &$ids, $dataRoot) {
     if (!$this->getBillingID($ids)) {
       return FALSE;
     }
@@ -641,7 +682,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
 
     foreach ($lookup as $name => $googleName) {
       if (array_key_exists($googleName, $dataRoot['buyer-billing-address'])) {
-      $value = $dataRoot['buyer-billing-address'][$googleName]['VALUE'];
+        $value = $dataRoot['buyer-billing-address'][$googleName]['VALUE'];
       }
       $input[$name] = $value ? $value : NULL;
     }
@@ -652,7 +693,7 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    * Converts the comma separated name-value pairs in <merchant-private-data>
    * to an array of name-value pairs.
    */
-  static function stringToArray($str) {
+  public static function stringToArray($str) {
     $vars = $labels = array();
     $labels = explode(',', $str);
     foreach ($labels as $label) {
@@ -661,5 +702,5 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
     }
     return $vars;
   }
-}
 
+}

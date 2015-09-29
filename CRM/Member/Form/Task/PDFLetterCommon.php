@@ -7,20 +7,25 @@
 class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    * @todo this is horrible copy & paste code because there is so much risk of breakage
    * in fixing the existing pdfLetter classes to be suitably generic
-   * @access public
+   *
+   * @param CRM_Core_Form $form
+   * @param $membershipIDs
+   * @param $skipOnHold
+   * @param $skipDeceased
+   * @param $contactIDs
    *
    * @return void
    */
-  static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
+  public static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
 
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) =
-      self::processMessageTemplate($form);
+    list($formValues, $categories, $html_message, $messageToken, $returnProperties)
+      = self::processMessageTemplate($form);
 
-    $html =
-      self::generateHTML(
+    $html
+      = self::generateHTML(
         $membershipIDs,
         $returnProperties,
         $skipOnHold,
@@ -37,18 +42,21 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
 
     CRM_Utils_System::civiExit(1);
   }
-  //end of function
 
   /**
-   * generate htmlfor pdf letters
-   * @param unknown_type $membershipIDs
-   * @param unknown_type $returnProperties
-   * @param unknown_type $skipOnHold
-   * @param unknown_type $skipDeceased
+   * Generate htmlfor pdf letters.
+   *
+   * @param array $membershipIDs
+   * @param array $returnProperties
+   * @param bool $skipOnHold
+   * @param bool $skipDeceased
    * @param unknown_type $messageToken
+   * @param $html_message
+   * @param $categories
+   *
    * @return unknown
    */
-  static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
+  public static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
 
     foreach ($membershipIDs as $membershipID) {
@@ -57,7 +65,7 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
       $contactId = $membership['contact_id'];
       $params = array('contact_id' => $contactId);
       //getTokenDetails is much like calling the api contact.get function - but - with some minor
-      // special handlings. It preceeds the existance of the api
+      // special handlings. It precedes the existence of the api
       list($contacts) = CRM_Utils_Token::getTokenDetails(
         $params,
         $returnProperties,
@@ -78,5 +86,5 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
     }
     return $html;
   }
-}
 
+}

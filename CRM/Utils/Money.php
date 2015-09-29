@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,7 +40,7 @@ class CRM_Utils_Money {
   static $_currencySymbols = NULL;
 
   /**
-   * format a monetary string
+   * Format a monetary string.
    *
    * Format a monetary string basing on the amount provided,
    * ISO currency code provided and a format string consisting of:
@@ -49,16 +49,21 @@ class CRM_Utils_Money {
    * %C - the currency ISO code (e.g., 'USD') if provided
    * %c - the currency symbol (e.g., '$') if available
    *
-   * @param float  $amount      the monetary amount to display (1234.56)
-   * @param string $currency    the three-letter ISO currency code ('USD')
-   * @param string $format      the desired currency format
-   * @param string $valueFormat the desired monetary value display format (e.g. '%!i')
+   * @param float $amount
+   *   The monetary amount to display (1234.56).
+   * @param string $currency
+   *   The three-letter ISO currency code ('USD').
+   * @param string $format
+   *   The desired currency format.
+   * @param bool $onlyNumber
+   * @param string $valueFormat
+   *   The desired monetary value display format (e.g. '%!i').
    *
-   * @return string  formatted monetary string
+   * @return string
+   *   formatted monetary string
    *
-   * @static
    */
-  static function format($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE, $valueFormat = NULL) {
+  public static function format($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE, $valueFormat = NULL) {
 
     if (CRM_Utils_System::isNull($amount)) {
       return '';
@@ -69,11 +74,11 @@ class CRM_Utils_Money {
     if (!$format) {
       $format = $config->moneyformat;
     }
-    
+
     if (!$valueFormat) {
       $valueFormat = $config->moneyvalueformat;
     }
-     
+
     if ($onlyNumber) {
       // money_format() exists only in certain PHP install (CRM-650)
       if (is_numeric($amount) and function_exists('money_format')) {
@@ -83,7 +88,10 @@ class CRM_Utils_Money {
     }
 
     if (!self::$_currencySymbols) {
-      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('keyColumn' => 'name', 'labelColumn' => 'symbol'));
+      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
+          'keyColumn' => 'name',
+          'labelColumn' => 'symbol',
+        ));
     }
 
     if (!$currency) {
@@ -118,5 +126,5 @@ class CRM_Utils_Money {
     );
     return strtr($format, $replacements);
   }
-}
 
+}

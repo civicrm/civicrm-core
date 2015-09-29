@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,10 +26,10 @@
 
 <div class="crm-block crm-form-block crm-miscellaneous-form-block">
 
-    <p>You are requesting to unsubscribe this Email address:</p>
+    <p>{ts}You are requesting to opt out this email address from all mailing lists:{/ts}</p>
     <h3>{$email_masked}</h3>
 
-    <p>If this is not your Email address, there is no need to do anything. You have <i><b>not</b></i> been added to any mailing lists. If this is your Email address and you <i><b>wish to opt out</b></i> please enter your Email address below for verification purposes:</p>
+    <p>{ts}If this is not your email address, there is no need to do anything. You have <i><b>not</b></i> been added to any mailing lists. If this is your email address and you <i><b>wish to opt out</b></i> please enter your email address below for verification purposes:{/ts}</p>
 
     <table class="form-layout">
       <tbody>

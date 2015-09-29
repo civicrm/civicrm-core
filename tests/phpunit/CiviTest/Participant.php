@@ -1,11 +1,19 @@
 <?php
+
+/**
+ * Class Participant
+ */
 class Participant extends PHPUnit_Framework_Testcase {
   /**
-   * Helper function to create a Participant
+   * Helper function to create a Participant.
    *
-   * @return $participant id of created Participant
+   * @param int $contactId
+   * @param int $eventId
+   *
+   * @return int
+   *   id of created Participant
    */
-  static function create($contactId, $eventId) {
+  public static function create($contactId, $eventId) {
     $params = array(
       'send_receipt' => 1,
       'is_test' => 0,
@@ -24,13 +32,15 @@ class Participant extends PHPUnit_Framework_Testcase {
   }
 
   /**
-   * Helper function to delete a participant
+   * Helper function to delete a participant.
    *
-   * @param  int  $participantID   id of the participant to delete
-   * @return boolean true if participant deleted, false otherwise
+   * @param int $participantId
+   * @return bool
+   *   true if participant deleted, false otherwise
    */
-  static function delete($participantId) {
+  public static function delete($participantId) {
     require_once 'CRM/Event/BAO/Participant.php';
     return CRM_Event_BAO_Participant::deleteParticipant($participantId);
   }
+
 }

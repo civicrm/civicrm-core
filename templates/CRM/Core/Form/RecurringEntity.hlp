@@ -1,0 +1,79 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{capture assign='entityType'}{$params.entityType|lower}{/capture}
+
+{htxt id="id-repeats-title"}
+  {ts}Repeats{/ts}
+{/htxt}
+{htxt id="id-repeats"}
+  {ts 1=$entityType}Access the drop-down menus here to select how frequently your %1 occurs.{/ts}
+  {ts 1=$entityType}Example: You would select options "1 month", if your %1 occurs every month.{/ts}
+{/htxt}
+
+{htxt id="id-repeats-on-title"}
+  {ts}Repeats on{/ts}
+{/htxt}
+{htxt id="id-repeats-on"}
+  {ts 1=$entityType}You can choose to select your %1 to repeat on weekdays, weekends or any combination of day of the week.{/ts}<br/>
+  {ts 1=$entityType}Example: You can select Monday, Wednesday and Friday for your %1 to occur on alternate weekdays.{/ts}
+{/htxt}
+
+{htxt id="id-repeats-by-month-title"}
+  {ts}Repeats by day of the month{/ts}
+{/htxt}
+{htxt id="id-repeats-by-month"}
+  {ts}Options given here are days of a month from 1 - 31{/ts}<br/>
+  {ts 1=$entityType}Example: If your %1 repeats 8th of every month then you would select 8.{/ts}
+{/htxt}
+
+{htxt id="id-repeats-by-week-title"}
+  {ts}Repeats by day of the week{/ts}
+{/htxt}
+{htxt id="id-repeats-by-week"}
+  {ts 1=$entityType}You can choose to select %1 occurring every third Friday, last Monday, fourth Wednesday of the month and various other combinations given in the dropdown.{/ts}
+{/htxt}
+
+{htxt id="id-ends-after-title"}
+  {ts}Ends{/ts}
+{/htxt}
+{htxt id="id-ends-after"}
+  {ts 1=$entityType}Use this field to limit/end the repetition of the %1.{/ts}<br/>
+  {ts 1=$entityType}Example: If you want to repeat an %1 6 times, then set 6 as a value for this field.{/ts}
+{/htxt}
+
+{htxt id="id-ends-on-title"}
+  {ts}Ends{/ts}
+{/htxt}
+{htxt id="id-ends-on"}
+  {ts}Choose a specific date to limit/end the repetition.{/ts}
+{/htxt}
+
+{htxt id="id-exclude-date-title"}
+  {ts}Exclude Date(s){/ts}
+{/htxt}
+{htxt id="id-exclude-date"}
+  {ts}This field enables you to alter certain sessions, skip holidays, or create gaps in the sequence for other reasons.{/ts}
+{/htxt}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,23 +23,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * form helper class for address section
+ * Form helper class for address section.
  */
 class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
   /**
-   * location block no
+   * Location block no
    */
   private $_locBlockNo;
 
@@ -49,34 +47,36 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   public $_parseStreetAddress;
 
   /**
-   * store address values
+   * Store address values
    */
   public $_values;
 
   /**
-   * form action
+   * Form action
    */
   public $_action;
 
   /**
-   * address id
+   * Address id
    */
   public $_addressId;
 
   /**
+   * Class constructor.
+   *
    * Since we are using same class / code to generate multiple instances
    * of address block, we need to generate unique form name for each,
-   * hence calling parent contructor
+   * hence calling parent constructor
    */
-  function __construct() {
+  public function __construct() {
     $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
     $name = "Address_{$locBlockNo}";
 
-    parent::__construct(null, CRM_Core_Action::NONE, 'post', $name);
+    parent::__construct(NULL, CRM_Core_Action::NONE, 'post', $name);
   }
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -120,10 +120,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for an address object
-   *
-   * @return void
-   * @access public
+   * Build the form object elements for an address object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -131,10 +128,9 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -157,28 +153,11 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
       $defaults['address'][$this->_locBlockNo] = $address;
     }
 
-    $values = $defaults['address'][$this->_locBlockNo];
-
-    CRM_Contact_Form_Edit_Address::fixStateSelect($this,
-      "address[$this->_locBlockNo][country_id]",
-      "address[$this->_locBlockNo][state_province_id]",
-      "address[$this->_locBlockNo][county_id]",
-      CRM_Utils_Array::value('country_id',
-        $values, $config->defaultContactCountry
-      ),
-      CRM_Utils_Array::value('state_province_id',
-        $values, $config->defaultContactStateProvince
-      )
-    );
-
     return $defaults;
   }
 
   /**
-   * process the form
-   *
-   * @return void
-   * @access public
+   * Process the form.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -205,4 +184,5 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     $this->ajaxResponse['addressId'] = $address[0]->id;
     $this->response();
   }
+
 }

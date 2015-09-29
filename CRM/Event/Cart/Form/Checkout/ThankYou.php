@@ -1,9 +1,13 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Form_Checkout_ThankYou
+ */
 class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
   public $line_items = NULL;
   public $sub_total = 0;
 
-  function buildLineItems() {
+  public function buildLineItems() {
     foreach ($this->cart->events_in_carts as $event_in_cart) {
       $event_in_cart->load_location();
     }
@@ -38,7 +42,7 @@ class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
     $this->assign('line_items', $this->line_items);
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $defaults = array();
     $ids = array();
     $template_params_to_copy = array(
@@ -70,10 +74,10 @@ class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
     //$this->assign( 'site_contact', "" );
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->event_cart_id = $this->get('last_event_cart_id');
     $this->loadCart();
     //$this->loadParticipants( );
   }
-}
 
+}

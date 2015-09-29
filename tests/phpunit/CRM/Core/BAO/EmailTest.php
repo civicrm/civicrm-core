@@ -1,25 +1,21 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
-class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'Email BAOs',
-      'description' => 'Test all Core_BAO_Email methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+/**
+ * Class CRM_Core_BAO_EmailTest
+ */
+class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
+  public function setUp() {
     parent::setUp();
 
-    $this->quickCleanup( array( 'civicrm_contact', 'civicrm_email' ) );
+    $this->quickCleanup(array('civicrm_contact', 'civicrm_email'));
   }
 
   /**
-   * add() method (create and update modes)
+   * Add() method (create and update modes)
    */
-  function testAdd() {
+  public function testAdd() {
     $contactId = Contact::createIndividual();
 
     $params = array();
@@ -57,9 +53,9 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   }
 
   /**
-   * holdEmail() method (set and reset on_hold condition)
+   * HoldEmail() method (set and reset on_hold condition)
    */
-  function testHoldEmail() {
+  public function testHoldEmail() {
     $contactId = Contact::createIndividual();
 
     $params = array();
@@ -130,9 +126,9 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   }
 
   /**
-   * allEmails() method - get all emails for our contact, with primary email first
+   * AllEmails() method - get all emails for our contact, with primary email first
    */
-  function testAllEmails() {
+  public function testAllEmails() {
     $contactParams = array(
       'first_name' => 'Alan',
       'last_name' => 'Smith',
@@ -154,5 +150,5 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
 
     Contact::delete($contactId);
   }
-}
 
+}

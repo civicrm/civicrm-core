@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2008                 |
  +--------------------------------------------------------------------+
@@ -27,7 +27,14 @@
 
 require_once ('bin/cli.php');
 require_once 'CRM/Core/BAO/Tag.php';
+
+/**
+ * Class tagsImporter
+ */
 class tagsImporter extends civicrm_cli {
+  /**
+   * constructor
+   */
   function __construct() {
     parent::__construct();
     if (sizeof($this->args) != 1) {
@@ -53,6 +60,11 @@ class tagsImporter extends civicrm_cli {
     return;
   }
 
+  /**
+   * @param $param
+   *
+   * @return mixed
+   */
   function addTag($param) {
     if (array_key_exists($param['name'], $this->tags)) {
       echo "\n- exists already: " . $param['name'];
@@ -76,6 +88,11 @@ class tagsImporter extends civicrm_cli {
   }
 
   /* return a params as expected */
+  /**
+   * @param $data
+   *
+   * @return mixed
+   */
   function convertLine($data) {
     /*
     [0] => parent tag name

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,9 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting pledge *}
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{elseif $showAdditionalInfo and $formType }
+{if $showAdditionalInfo and $formType }
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 {if !$email and $action neq 8 and $context neq 'standalone'}
@@ -35,18 +33,13 @@
         <p>{ts}You will not be able to send an acknowledgment for this pledge because there is no email address recorded for this contact. If you want a acknowledgment to be sent when this pledge is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the pledge.{/ts}</p>
 </div>
 {/if}
-{if $action EQ 1}
-    <h3>{ts}New Pledge{/ts}</h3>
-{elseif $action EQ 2}
-    <h3>{ts}Edit Pledge{/ts}</h3>
+{if $action EQ 2}
     {* Check if current Total Pledge Amount is different from original pledge amount. *}
     {math equation="x / y" x=$amount y=$installments format="%.2f" assign="currentInstallment"}
     {* Check if current Total Pledge Amount is different from original pledge amount. *}
     {if $currentInstallment NEQ $eachPaymentAmount}
       {assign var=originalPledgeAmount value=`$installments*$eachPaymentAmount`}
     {/if}
-{elseif $action EQ 8}
-    <h3>{ts}Delete Pledge{/ts}</h3>
 {/if}
 <div class="crm-block crm-form-block crm-pledge-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -59,9 +52,6 @@
    {else}
       <table class="form-layout-compressed">
         {if $context eq 'standalone'}
-          {if !$email and $outBound_option != 2}
-            {assign var='profileCreateCallback' value=1 }
-          {/if}
           <tr class="crm-pledge-form-contact-id">
             <td class="label">{$form.contact_id.label}</td>
             <td>{$form.contact_id.html}</td>
@@ -117,7 +107,7 @@
                 <span class="description">{ts 1=$email}Automatically email an acknowledgment of this pledge to %1?{/ts}</span></td></tr>
             {/if}
       {elseif $context eq 'standalone' and $outBound_option != 2 }
-                <tr id="acknowledgment-receipt" style="display:none;"><td class="label">{$form.is_acknowledge.label}</td><td>{$form.is_acknowledge.html} <span class="description">{ts}Automatically email an acknowledgment of this pledge to {/ts}<span id="email-address"></span>?</span></td></tr>
+                <tr id="acknowledgment-receipt" style="display:none;"><td class="label">{$form.is_acknowledge.label}</td><td>{$form.is_acknowledge.html} <span class="description">{ts 1='<span id="email-address"></span>'}Automatically email an acknowledgment of this pledge to %1?{/ts}</span></td></tr>
         {/if}
         <tr id="fromEmail" style="display:none;">
             <td class="label">{$form.from_email_address.label}</td>
@@ -204,16 +194,13 @@ function loadPanes( id ) {
      <script type="text/javascript">
 
      function verify( ) {
-       var element = document.getElementsByName("is_acknowledge");
-        if ( element[0].checked ) {
+        if (cj('#is_acknowledge').is(':checked')) {
             var emailAddress = '{/literal}{$email}{literal}';
       if ( !emailAddress ) {
       var emailAddress = cj('#email-address').html();
       }
-      var message = '{/literal}{ts 1="'+emailAddress+'"}Click OK to save this Pledge record AND send an acknowledgment to %1 now{/ts}{literal}.';
-            if (!confirm( message) ) {
-                return false;
-            }
+      var message = '{/literal}{ts escape="js" 1="%1"}Click OK to save this Pledge record AND send an acknowledgment to %1 now.{/ts}{literal}';
+         return confirm(ts(message, {1: emailAddress}));
         }
      }
 
@@ -245,35 +232,25 @@ function loadPanes( id ) {
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
     CRM.$(function($) {
-        cj("#contact_1").blur( function( ) {
-            checkEmail( );
-        });
-        checkEmail( );
-  showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true);
-  showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );
-    });
-    function checkEmail( ) {
-        var contactID = cj("input[name='contact_select_id[1]']").val();
-        if ( contactID ) {
-            var postUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' h=0}{literal}";
-            cj.post( postUrl, {contact_id: contactID},
-                function ( response ) {
-                    if ( response ) {
-                        cj("#acknowledgment-receipt").show( );
-                        cj("#email-address").html( response );
-                    } else {
-                        cj("#acknowledgment-receipt").hide( );
-                    }
-                }
-            );
-        } else {
-    cj("#acknowledgment-receipt").hide( );
-  }
-    }
+      var $form = $("form.{/literal}{$form.formClass}{literal}");
+      $("#contact_id", $form).change(checkEmail);
+      checkEmail( );
 
-    function profileCreateCallback( blockNo ) {
-        checkEmail( );
-    }
+      function checkEmail( ) {
+        var data = $("#contact_id", $form).select2('data');
+        if (data && data.extra && data.extra.email && data.extra.email.length) {
+          $("#acknowledgment-receipt", $form).show();
+          $("#email-address", $form).html(data.extra.email);
+        }
+        else {
+          $("#acknowledgment-receipt", $form).hide();
+        }
+      }
+
+      showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true);
+      showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );
+    });
+
     {/literal}
     {/if}
 </script>
@@ -296,9 +273,5 @@ function loadPanes( id ) {
     invert              = 0
 }
 {/if}
-
-   {* include jscript to warn if unsaved form field changes *}
-   {include file="CRM/common/formNavigate.tpl"}
-
 {/if}
 {* closing of main custom data if *}

@@ -1,0 +1,14 @@
+<div class="crm-block" ng-form="apprForm" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="{title: ts('Status')}">
+      {{mailingFields.approval_status_id.optionsMap[mailing.approval_status_id] || ts('Unreviewed')}}
+    </div>
+    <div crm-ui-field="{name: 'apprForm.approval_note', title: ts('Note')}">
+      <textarea
+        crm-ui-id="apprForm.approval_note"
+        name="approval_note"
+        ng-model="mailing.approval_note"
+        ></textarea>
+    </div>
+  </div>
+</div>

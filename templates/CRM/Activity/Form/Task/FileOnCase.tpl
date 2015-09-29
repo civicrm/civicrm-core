@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,8 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form crm-form-block crm-file-on-case-form-block">
-<div id="help">
-   File on Case
+<div class="help">
+   {ts}File on Case{/ts}
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout-compressed">
@@ -46,10 +46,14 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  var $form = $("#{/literal}{$form.formName}{literal}");
+  var $form = $("form.{/literal}{$form.formClass}{literal}");
   $('input[name=unclosed_case_id]', $form).crmSelect2({
     placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
     minimumInputLength: 1,
+    formatResult: CRM.utils.formatSelect2Result,
+    formatSelection: function(row) {
+      return row.label;
+    },
     ajax: {
       url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
       data: function(term) {

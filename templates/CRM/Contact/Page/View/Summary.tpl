@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,8 +27,6 @@
 {if $action eq 2}
   {include file="CRM/Contact/Form/Contact.tpl"}
 {else}
-
-  {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
 
   <div class="crm-summary-contactname-block crm-inline-edit-container">
     <div class="crm-summary-block" id="contactname-block">
@@ -59,7 +57,7 @@
             <li>
               {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
               <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
-              <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
+              <span><div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
               </a>
             </li>
           {/if}
@@ -101,7 +99,7 @@
             {assign var='viewParams' value=$urlParams|cat:"&cid=$nextContactID"}
             <li class="crm-next-action">
               <a href="{crmURL p='civicrm/contact/view' q=$viewParams}" class="view button" title="{$nextContactName}">
-                <span title="{$nextContactName}"><div class="icon next-icon"></div>{ts}Next{/ts}</span>
+                <span title="{$nextContactName}"><div class="icon ui-icon-carat-1-e"></div>{ts}Next{/ts}</span>
               </a>
             </li>
           {/if}
@@ -109,7 +107,7 @@
             {assign var='viewParams' value=$urlParams|cat:"&cid=$prevContactID"}
             <li class="crm-previous-action">
               <a href="{crmURL p='civicrm/contact/view' q=$viewParams}" class="view button" title="{$prevContactName}">
-                <span title="{$prevContactName}"><div class="icon previous-icon"></div>{ts}Previous{/ts}</span>
+                <span title="{$prevContactName}"><div class="icon ui-icon-carat-1-w"></div>{ts}Previous{/ts}</span>
               </a>
             </li>
           {/if}
@@ -139,8 +137,8 @@
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title}">
-              <span> </span> {$tabValue.title}
-              <em>{$tabValue.count}</em>
+              {$tabValue.title}
+              {if empty($tabValue.hideCount)}<em>{$tabValue.count}</em>{/if}
             </a>
           </li>
         {/foreach}
@@ -187,7 +185,7 @@
                     </div>
                     <div class="crm-summary-row">
                       <div class="crm-label">
-                        {ts}CiviCRM ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
+                        {ts}Contact ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
                       </div>
                       <div class="crm-content">
                         <span class="crm-contact-contact_id">{$contactId}</span>
@@ -339,6 +337,3 @@ CRM.$(function($) {
 });
 </script>
 {/literal}
-
-{* jQuery validate *}
-{include file="CRM/Form/validate.tpl" form=0}

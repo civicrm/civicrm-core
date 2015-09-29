@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,51 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This class generates form components for DedupeRules
- *
+ * This class generates form components for DedupeRules.
  */
 class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
-   * defined defaults
-   *
+   * Pre processing.
    */
-  public $_defaults;
-
-  /**
-   * Function to pre processing
-   *
-   * @return void
-   * @access public
-   */
-  function preProcess() {
+  public function preProcess() {
     $this->rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this, FALSE, 0);
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
 
-    $groupList = CRM_Core_PseudoConstant::group();
-    $groupList[''] = ts('- All Contacts -');
-    asort($groupList);
+    $groupList = array('' => ts('- All Contacts -')) + CRM_Core_PseudoConstant::nestedGroup();
 
-    $this->add('select', 'group_id', ts('Select Group'), $groupList);
+    $this->add('select', 'group_id', ts('Select Group'), $groupList, FALSE, array('class' => 'crm-select2 huge'));
     $this->addButtons(array(
         array(
           'type' => 'next',
@@ -77,22 +60,20 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
         //hack to support cancel button functionality
         array(
           'type' => 'submit',
+          'class' => 'cancel',
+          'icon' => 'close',
           'name' => ts('Cancel'),
         ),
       )
     );
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     $values = $this->exportValues();
@@ -110,5 +91,5 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
     CRM_Utils_System::redirect($url);
   }
-}
 
+}

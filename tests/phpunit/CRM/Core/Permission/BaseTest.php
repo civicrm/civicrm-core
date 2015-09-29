@@ -2,10 +2,14 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 
+/**
+ * Class CRM_Core_Permission_BaseTest
+ */
 class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
 
   /**
-   * @return array (0 => input to translatePermission, 1 => expected output from translatePermission)
+   * @return array
+   *   (0 => input to translatePermission, 1 => expected output from translatePermission)
    */
   public function translateData() {
     $cases = array();
@@ -24,8 +28,10 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider translateData
-   * @param string $input the name of a permission which should be translated
-   * @param string $expected the name of an actual permission (based on translation matrix for "runtime")
+   * @param string $input
+   *   The name of a permission which should be translated.
+   * @param string $expected
+   *   The name of an actual permission (based on translation matrix for "runtime").
    */
   public function testTranslate($input, $expected) {
     $perm = new CRM_Core_Permission_Base();
@@ -36,4 +42,5 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
     ));
     $this->assertEquals($expected, $actual);
   }
+
 }

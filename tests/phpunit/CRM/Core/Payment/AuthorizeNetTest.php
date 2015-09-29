@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,85 +23,71 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/AuthorizeNet.php';
 
+/**
+ * Class CRM_Core_Payment_AuthorizeNetTest
+ */
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'Authorize.net processing',
-      'description' => 'Test Authorize.ne methods.',
-      'group' => 'Payment Processor Tests',
-    );
-  }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
-    $this->paymentProcessor = new AuthorizeNet();
-    $this->processorParams = $this->paymentProcessor->create();
+    $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
 
-    $paymentProcessor = array(
-      'user_name' => $this->processorParams->user_name,
-      'password' => $this->processorParams->password,
-      'url_recur' => $this->processorParams->url_recur,
-      'signature' => '',
-    );
-
-    $this->processor = new CRM_Core_Payment_AuthorizeNet('Contribute', $paymentProcessor);
+    $this->processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
     $this->_financialTypeId = 1;
 
     // for some strange unknown reason, in batch mode this value gets set to null
     // so crude hack here to avoid an exception and hence an error
-    $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array( );
+    $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array();
   }
 
-  function tearDown() {
-    $this->paymentProcessor->delete($this->processorParams->id);
+  public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
 
   /**
-   * create a single post dated payment as a recurring transaction.
+   * Create a single post dated payment as a recurring transaction.
    *
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
-  function testCreateSingleNowDated() {
-    $firstName  = 'John_' .  substr(sha1(rand()), 0, 7);
-    $lastName   = 'Smith_' . substr(sha1(rand()), 0, 7);
+  public function testCreateSingleNowDated() {
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
-    $contactId  = $this->individualCreate($nameParams);
+    $contactId = $this->individualCreate($nameParams);
 
     $invoiceID = sha1(rand());
-    $amount    = rand(100, 1000) . '.00';
+    $amount = rand(100, 1000) . '.00';
 
     $contributionRecurParams = array(
       'contact_id' => $contactId,
-      'amount'     => $amount,
-      'currency'   => 'USD',
+      'amount' => $amount,
+      'currency' => 'USD',
       'frequency_unit' => 'week',
       'frequency_interval' => 1,
       'installments' => 2,
-      'start_date'   => date('Ymd'),
-      'create_date'  => date('Ymd'),
-      'invoice_id'   => $invoiceID,
+      'start_date' => date('Ymd'),
+      'create_date' => date('Ymd'),
+      'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
     );
     $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams);
 
     $contributionParams = array(
-      'contact_id'   => $contactId,
-      'financial_type_id'   => $this->_financialTypeId,
+      'contact_id' => $contactId,
+      'financial_type_id' => $this->_financialTypeId,
       'receive_date' => date('Ymd'),
       'total_amount' => $amount,
-      'invoice_id'   => $invoiceID,
-      'currency'     => 'USD',
+      'invoice_id' => $invoiceID,
+      'currency' => 'USD',
       'contribution_recur_id' => $recur->id,
-      'is_test'      => 1,
+      'is_test' => 1,
       'contribution_status_id' => 2,
     );
     $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
@@ -133,7 +119,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => date('Ymd'),
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
@@ -180,7 +166,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
-    $result = $this->processor->doDirectPayment($params);
+    $this->processor->doPayment($params);
     // turn verifySSL on
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
 
@@ -197,43 +183,43 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   /**
-   * create a single post dated payment as a recurring transaction
+   * Create a single post dated payment as a recurring transaction.
    */
-  function testCreateSinglePostDated() {
+  public function testCreateSinglePostDated() {
     $start_date = date('Ymd', strtotime("+ 1 week"));
 
-    $firstName  = 'John_' .  substr(sha1(rand()), 0, 7);
-    $lastName   = 'Smith_' . substr(sha1(rand()), 0, 7);
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
-    $contactId  = $this->individualCreate($nameParams);
+    $contactId = $this->individualCreate($nameParams);
 
     $ids = array('contribution' => NULL);
     $invoiceID = sha1(rand());
-    $amount    = rand(100, 1000) . '.00';
+    $amount = rand(100, 1000) . '.00';
 
     $contributionRecurParams = array(
       'contact_id' => $contactId,
-      'amount'     => $amount,
-      'currency'   => 'USD',
+      'amount' => $amount,
+      'currency' => 'USD',
       'frequency_unit' => 'month',
       'frequency_interval' => 1,
       'installments' => 3,
-      'start_date'   => $start_date,
-      'create_date'  => date('Ymd'),
-      'invoice_id'   => $invoiceID,
+      'start_date' => $start_date,
+      'create_date' => date('Ymd'),
+      'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
     );
     $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams, $ids);
 
     $contributionParams = array(
-      'contact_id'   => $contactId,
-      'financial_type_id'   => $this->_financialTypeId,
+      'contact_id' => $contactId,
+      'financial_type_id' => $this->_financialTypeId,
       'receive_date' => $start_date,
       'total_amount' => $amount,
-      'invoice_id'   => $invoiceID,
-      'currency'     => 'USD',
+      'invoice_id' => $invoiceID,
+      'currency' => 'USD',
       'contribution_recur_id' => $recur->id,
       'is_test' => 1,
       'contribution_status_id' => 2,
@@ -268,7 +254,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => $start_date,
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
@@ -321,7 +307,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
-    $result = $this->processor->doDirectPayment($params);
+    $result = $this->processor->doPayment($params);
     // turn verifySSL on
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
 
@@ -336,4 +322,5 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
   }
+
 }

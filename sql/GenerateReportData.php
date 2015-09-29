@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -111,39 +111,43 @@ require_once 'CRM/Contact/DAO/Relationship.php';
 require_once 'CRM/Event/DAO/Participant.php';
 require_once 'CRM/Contribute/DAO/ContributionSoft.php';
 require_once 'CRM/Member/DAO/MembershipPayment.php';
+
+/**
+ * Class CRM_GCD
+ */
 class CRM_GCD {
 
   /*******************************************************
    * constants
    *******************************************************/
-  CONST DATA_FILENAME = "sample_data.xml";
-  CONST NUM_DOMAIN = 1;
-  CONST NUM_CONTACT = 5000;
-  CONST NUM_CONTRIBUTION = 2000;
-  CONST NUM_MEMBERSHIP = 2000;
-  CONST NUM_PARTICIPANT = 2000;
-  CONST INDIVIDUAL_PERCENT = 75;
-  CONST HOUSEHOLD_PERCENT = 15;
-  CONST ORGANIZATION_PERCENT = 10;
-  CONST NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
-  CONST NUM_ACTIVITY = 150;
+  const DATA_FILENAME = "sample_data.xml";
+  const NUM_DOMAIN = 1;
+  const NUM_CONTACT = 5000;
+  const NUM_CONTRIBUTION = 2000;
+  const NUM_MEMBERSHIP = 2000;
+  const NUM_PARTICIPANT = 2000;
+  const INDIVIDUAL_PERCENT = 75;
+  const HOUSEHOLD_PERCENT = 15;
+  const ORGANIZATION_PERCENT = 10;
+  const NUM_INDIVIDUAL_PER_HOUSEHOLD = 4;
+  const NUM_ACTIVITY = 150;
 
   // relationship types from the table crm_relationship_type
-  CONST CHILD_OF = 1;
-  CONST SPOUSE_OF = 2;
-  CONST SIBLING_OF = 3;
-  CONST HEAD_OF_HOUSEHOLD = 6;
-  CONST MEMBER_OF_HOUSEHOLD = 7;
+  const CHILD_OF = 1;
+  const SPOUSE_OF = 2;
+  const SIBLING_OF = 3;
+  const HEAD_OF_HOUSEHOLD = 6;
+  const MEMBER_OF_HOUSEHOLD = 7;
 
 
   // location types from the table crm_location_type
-  CONST HOME = 1;
-  CONST WORK = 2;
-  CONST MAIN = 3;
-  CONST OTHER = 4;
-  CONST ADD_TO_DB = TRUE;
+  const HOME = 1;
+  const WORK = 2;
+  const MAIN = 3;
+  const OTHER = 4;
+  const ADD_TO_DB = TRUE;
   //const ADD_TO_DB=FALSE;
-  CONST DEBUG_LEVEL = 1;
+  const DEBUG_LEVEL = 1;
 
   /*********************************
    * private members
@@ -236,7 +240,10 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   *********************************/
+   ********************************
+   * @param int $size
+   * @return string
+   */
 
   // get a randomly generated string
   private function _getRandomString($size = 32) {
@@ -255,24 +262,43 @@ class CRM_GCD {
     return $string;
   }
 
+  /**
+   * @return string
+   */
   private function _getRandomChar() {
     return chr(mt_rand(65, 90));
   }
 
+  /**
+   * @return int
+   */
   private function getRandomBoolean() {
     return mt_rand(0, 1);
   }
 
+  /**
+   * @param $array1
+   *
+   * @return mixed
+   */
   private function _getRandomElement(&$array1) {
     return $array1[mt_rand(1, count($array1)) - 1];
   }
 
+  /**
+   * @param $array1
+   *
+   * @return int
+   */
   private function _getRandomIndex(&$array1) {
     return mt_rand(1, count($array1));
   }
 
 
   // country state city combo
+  /**
+   * @return array
+   */
   private function _getRandomCSC() {
     $array1 = array();
 
@@ -347,6 +373,9 @@ class CRM_GCD {
 
 
   // insert data into db's
+  /**
+   * @param $dao
+   */
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->insert()) {
@@ -358,6 +387,9 @@ class CRM_GCD {
   }
 
   // update data into db's
+  /**
+   * @param $dao
+   */
   private function _update($dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->update()) {
@@ -523,6 +555,11 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $id
+   *
+   * @return string
+   */
   public function getContactType($id) {
     if (in_array($id, $this->individual)) {
       return 'Individual';
@@ -613,6 +650,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return string
+   */
   public function randomName() {
     $prefix      = $this->_getRandomIndex($this->prefix);
     $first_name  = ucfirst($this->_getRandomElement($this->firstName));
@@ -861,6 +901,12 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param bool $domain
+   * @param bool $isPrimary
+   */
   private function _addLocation($locationTypeId, $contactId, $domain = FALSE, $isPrimary = TRUE) {
     $this->_addAddress($locationTypeId, $contactId, $isPrimary);
 
@@ -882,6 +928,13 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addAddress($locationTypeId, $contactId, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     $addressDAO = new CRM_Core_DAO_Address();
 
@@ -910,11 +963,24 @@ class CRM_GCD {
     $this->_insert($addressDAO);
   }
 
+  /**
+   * @param $sortName
+   *
+   * @return mixed
+   */
   private function _sortNameToEmail($sortName) {
     $email = preg_replace("([^a-zA-Z0-9_-]*)", "", $sortName);
     return $email;
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param $phoneType
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addPhone($locationTypeId, $contactId, $phoneType, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     if ($contactId % 3) {
       $phone = new CRM_Core_DAO_Phone();
@@ -927,6 +993,14 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @param $locationTypeId
+   * @param $contactId
+   * @param $sortName
+   * @param bool $isPrimary
+   * @param null $locationBlockID
+   * @param int $offset
+   */
   private function _addEmail($locationTypeId, $contactId, $sortName, $isPrimary = FALSE, $locationBlockID = NULL, $offset = 1) {
     if ($contactId % 2) {
       $email = new CRM_Core_DAO_Email();
@@ -1160,6 +1234,9 @@ class CRM_GCD {
     }
   }
 
+  /**
+   * @return array
+   */
   static function getZipCodeInfo() {
     $stateID = mt_rand(1000, 5132);
     $offset = mt_rand(1, 4132);
@@ -1174,6 +1251,11 @@ class CRM_GCD {
     return array();
   }
 
+  /**
+   * @param $zipCode
+   *
+   * @return array
+   */
   static function getLatLong($zipCode) {
     $query = "http://maps.google.com/maps?q=$zipCode&output=js";
     $userAgent = "Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0";
@@ -1297,6 +1379,11 @@ VALUES
     CRM_Core_DAO::executeQuery($activity, CRM_Core_DAO::$_nullArray);
   }
 
+  /**
+   * @param $date
+   *
+   * @return string
+   */
   static function repairDate($date) {
     $dropArray = array('-' => '', ':' => '', ' ' => '');
     return strtr($date, $dropArray);
@@ -1603,10 +1690,18 @@ VALUES
   }
 }
 
+/**
+ * @param null $str
+ *
+ * @return bool
+ */
 function user_access($str = NULL) {
   return TRUE;
 }
 
+/**
+ * @return array
+ */
 function module_list() {
   return array();
 }

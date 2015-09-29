@@ -1,0 +1,32 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+-->
+<div class="crm-block"  ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group" ng-controller="EmailBodyCtrl">
+    <div crm-ui-field="{name: 'subform.header_id', title: ts('Mailing Header'), help: hs('header')}">
+      <select
+        crm-ui-id="subform.header_id"
+        name="header_id"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true, allowClear: true}"
+        ng-change="checkTokens(mailing, '*')"
+        ng-model="mailing.header_id"
+        ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Header'} | orderBy:'name'">
+        <option value=""></option>
+      </select>
+    </div>
+    <div crm-ui-field="{name: 'subform.footer_id', title: ts('Mailing Footer'), help: hs('footer')}">
+      <select
+        crm-ui-id="subform.footer_id"
+        name="footer_id"
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth : true, allowClear: true}"
+        ng-change="checkTokens(mailing, '*')"
+        ng-model="mailing.footer_id"
+        ng-options="mc.id as mc.name for mc in crmMailingConst.headerfooterList | filter:{component_type: 'Footer'} | orderBy:'name'">
+        <option value=""></option>
+      </select>
+    </div>
+  </div>
+</div>

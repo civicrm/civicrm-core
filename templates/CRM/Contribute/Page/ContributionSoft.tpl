@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,18 +25,20 @@
 *}
 {if $softCreditRows}
 {strip}
-<table class="form-layout-compressed">
-    <tr>
-        <th class="contriTotalLeft">{ts}Total Soft Credits{/ts} - {$softCreditTotals.amount|crmMoney:$softCreditTotals.currency}</th>
-        <th class="right" width="10px"> &nbsp; </th>
-        <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credits{/ts} - {$softCreditTotals.avg|crmMoney:$softCreditTotals.currency}</th>
-    </tr>
-</table> 
-<p></p>
+{if $context neq 'membership'}
+    <table class="form-layout-compressed">
+        <tr>
+            <th class="contriTotalLeft">{ts}Total Soft Credits{/ts} - {$softCreditTotals.amount|crmMoney:$softCreditTotals.currency}</th>
+            <th class="right" width="10px"> &nbsp; </th>
+            <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credits{/ts} - {$softCreditTotals.avg|crmMoney:$softCreditTotals.currency}</th>
+        </tr>
+    </table>
+    <p></p>
+{/if}
 
 <table class="selector row-highlight">
     <tr class="columnheader">
-        <th scope="col">{ts}Contributor{/ts}</th> 
+        <th scope="col">{ts}Contributor{/ts}</th>
         <th scope="col">{ts}Amount{/ts}</th>
         <th scope="col">{ts}Type{/ts}</th>
         <th scope="col">{ts}Financial Type{/ts}</th>

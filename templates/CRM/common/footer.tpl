@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,14 +29,15 @@
 {/if}
 
 <div class="crm-footer" id="civicrm-footer">
-  {include file="CRM/common/version.tpl" assign=version}
+  {crmVersion assign=version}
   {ts 1=$version}Powered by CiviCRM %1.{/ts}
-  {if !empty($newer_civicrm_version)}
-    <span class="status">{ts 1=$newer_civicrm_version}A newer version (%1){/ts}
-    <a href="http://civicrm.org/download">{ts}is available for download{/ts}</a>.</span>
+  {if !empty($statusSeverity)}
+    <span class="status{if $statusSeverity gt 2} crm-error{else} crm-ok{/if}">
+      <a href="{crmURL p='civicrm/a/#/status'}">{$footer_status_message}</a>
+    </span>
   {/if}
   {ts 1='http://www.gnu.org/licenses/agpl-3.0.html'}CiviCRM is openly available under the <a href='%1'>GNU AGPL License</a>.{/ts}<br/>
-  <a href="http://civicrm.org/download">{ts}Download CiviCRM.{/ts}</a> &nbsp; &nbsp;
+  <a href="https://civicrm.org/download">{ts}Download CiviCRM.{/ts}</a> &nbsp; &nbsp;
   <a href="http://issues.civicrm.org/jira/browse/CRM?report=com.atlassian.jira.plugin.system.project:roadmap-panel">{ts}View issues and report bugs.{/ts}</a> &nbsp; &nbsp;
   {docURL page="" text="Online documentation."}
 </div>

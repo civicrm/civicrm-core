@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Campaign_MembershipTest
+ */
 class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testCreateCampaign() {
+  public function testCreateCampaign() {
     $this->webtestLogin('admin');
 
     // Create new group
@@ -49,6 +53,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("group_id");
 
     // add to group
+    $this->waitForElementPresent("group_id");
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
     $this->waitForElementPresent('link=Remove');
@@ -86,9 +91,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->type("description", "This is a test campaign");
 
     // include groups for the campaign
-    $this->addSelection("includeGroups-f", "label=$groupName");
-    $this->click("//option[@value=4]");
-    $this->click("add");
+    $this->multiselect2("includeGroups", array("$groupName", "Advisory Board"));
 
     // fill the end date for campaign
     $this->webtestFillDate("end_date", "+1 year");
@@ -101,14 +104,17 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->waitForText('crm-notification-container', "Campaign $title");
-
-    $this->waitForElementPresent("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
-    $id = (int) $this->getText("//div[@id='campaignList']/div[@class='dataTables_wrapper']/table/tbody/tr/td[text()='{$campaignTitle}']/../td[1]");
+    $this->waitForElementPresent("//div[@id='campaignList']/div/table[@class='campaigns dataTable no-footer']/tbody//tr//td/div[contains(text(),'{$campaignTitle}')]/../../td[1]");
+    $id = (int) $this->getText("//div[@id='campaignList']/div/table[@class='campaigns dataTable no-footer']/tbody//tr//td/div[contains(text(),'{$campaignTitle}')]/../../td[1]");
     $this->memberAddTest($campaignTitle, $id);
   }
 
-  function memberAddTest($campaignTitle, $id) {
-    //Add new memebershipType
+  /**
+   * @param $campaignTitle
+   * @param int $id
+   */
+  public function memberAddTest($campaignTitle, $id) {
+    //Add new membershipType
     $memTypeParams = $this->webtestAddMembershipType();
 
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
@@ -157,10 +163,10 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     );
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]//span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     $this->webtestVerifyTabularData(array('Campaign' => $campaignTitle));
   }
-}
 
+}

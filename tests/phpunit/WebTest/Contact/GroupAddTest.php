@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,16 +22,20 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contact_GroupAddTest
+ */
 class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testGroupAdd() {
+  public function testGroupAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload-bottom');
@@ -70,14 +74,10 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $params['name']);
     $this->click('_qf_Search_refresh');
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]");
-    $createdBy = $this->getText("xpath=//table[@id='crm-group-selector']/tbody/tr/td[3]/a");
-    $this->click("xpath=//table[@id='crm-group-selector']/tbody/tr/td[7]/span/a[2]");
-    $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table[2]/tbody/tr/td[2]/select");
-
-    //assert created by in the edit page
-    $this->assertTrue($this->isElementPresent(
-      "xpath=//form[@id='Edit']/div[2]/div/table/tbody/tr[2]/td[contains(text(), '{$createdBy}')]"));
+    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]");
+    $createdBy = $this->getText("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[3]/a");
+    $this->click("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td[7]/span/a[2]");
+    $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/table/tbody/tr[2]/td[contains(text(), '{$createdBy}')]");
     $this->openCiviPage('group', 'reset=1');
 
     //search groups using created by
@@ -87,16 +87,16 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     //show maximum no. of groups on first result set page
     //as many groups can be created by same creator
     //and checking is done on first result set page
-    $this->waitForVisible('crm-group-selector_processing');
-    $this->select("xpath=//select[@name='crm-group-selector_length']", '100');
-    $this->waitForVisible('crm-group-selector_processing');
+    $this->waitForVisible("xpath=//table[@class='crm-group-selector no-footer dataTable']");
+    $this->select("xpath=//div[@class='dataTables_length']/label/select", '100');
+    $this->waitForVisible("xpath=//table[@class='crm-group-selector no-footer dataTable']");
 
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]");
-    $this->assertTrue($this->isElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '{$params['name']}')]/following-sibling::td[2]/a[text()='{$createdBy}']"));
+    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]");
+    $this->click("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
+    $this->waitForElementPresent("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody/tr/td/span[contains(text(), '{$params['name']}')]/../following-sibling::td[2]/a[text()='{$createdBy}']");
 
     //check link of the contact who created the group
-    $this->click("xpath=//table[@id='crm-group-selector']/tbody//tr/td[1][contains(.,'{$params['name']}')]/following-sibling::td[2]/a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//table[@class='crm-group-selector no-footer dataTable']/tbody//tr/td[1]/span[contains(text(),'{$params['name']}')]/../following-sibling::td[2]/a", "css=div.crm-summary-display_name", FALSE);
     $name = explode(',', $createdBy);
     $name1 = isset($name[1]) ? trim($name[1]) : NULL;
     $name0 = trim($name[0]);
@@ -104,7 +104,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText("css=div.crm-summary-display_name", $displayName);
   }
 
-  function testGroupReserved() {
+  public function testGroupReserved() {
     $this->webtestLogin('admin');
 
     $this->openCiviPage('group/add', 'reset=1', '_qf_Edit_upload-bottom');
@@ -139,11 +139,10 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->click("is_reserved");
 
     // Clicking save.
-    $this->click("_qf_Edit_upload");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("_qf_Edit_upload");
 
     // Is status message correct?
-    $this->assertTrue($this->isTextPresent("The Group '{$params['name']}' has been saved."));
+    $this->waitForText('crm-notification-container', "The Group '{$params['name']}' has been saved.");
 
     // Create a new role w/o reserved group permissions
     $role = 'role' . substr(sha1(rand()), 0, 7);
@@ -151,8 +150,7 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("edit-add");
     $this->type("edit-name", $role);
-    $this->click("edit-add");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("edit-add", NULL);
 
     $this->open($this->sboxPath . "admin/people/permissions/roles");
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[1][text()='{$role}']");
@@ -183,7 +181,12 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->_roleDelete($role);
   }
 
-  function _testCreateUser($roleid) {
+  /**
+   * @param int $roleid
+   *
+   * @return string
+   */
+  public function _testCreateUser($roleid) {
     $this->open($this->sboxPath . "admin/people/create");
 
     $this->waitForElementPresent("edit-submit");
@@ -216,7 +219,10 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     return $name;
   }
 
-  function _roleDelete($role) {
+  /**
+   * @param $role
+   */
+  public function _roleDelete($role) {
     $this->waitForElementPresent("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->click("xpath=//table[@id='user-roles']/tbody//tr/td[text()='{$role}']/..//td/a[text()='edit role']");
     $this->waitForElementPresent('edit-delete');
@@ -225,4 +231,52 @@ class WebTest_Contact_GroupAddTest extends CiviSeleniumTestCase {
     $this->click("edit-submit");
     $this->waitForTextPresent("The role has been deleted.");
   }
+
+  /**
+   * Webtest for add contact to group (CRM-15108)
+   */
+  public function testAddContactToGroup() {
+    $this->webtestLogin();
+    $this->openCiviPage("contact/add", "reset=1&ct=Individual");
+    $this->waitForElementPresent('_qf_Contact_upload_view-bottom');
+
+    //Create contact.
+    $group = "Advisory Board";
+    $firstName = "Adams" . substr(sha1(rand()), 0, 4);
+    $lastName = substr(sha1(rand()), 0, 4);
+    $email = "{$lastName}.{$firstName}@example.org";
+    $this->type('first_name', $firstName);
+    $this->type('last_name', $lastName);
+    $this->type('email_1_email', "{$firstName}.{$lastName}@example.com");
+    $this->click('_qf_Contact_upload_view-bottom');
+    $this->waitForText('crm-notification-container', "Contact Saved");
+
+    $this->openCiviPage('group', 'reset=1');
+    $this->waitForElementPresent("xpath=//a/span[text()='Add Group']");
+    $this->waitForElementPresent("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/span[contains(text(), '{$group}')]");
+    $this->click("xpath=//table[@id='DataTables_Table_0']/tbody//tr/td[1]/span[text()='{$group}']/../../td[7]/span[1]/a[1]");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("xpath=//form[@id='Basic']/div[2]/a/span");
+    $this->waitForElementPresent("_qf_Basic_refresh");
+    $this->type('sort_name', $firstName);
+    $this->click('_qf_Basic_refresh');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("_qf_Basic_next_action");
+
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']"));
+    $this->click("xpath=//table/tbody//tr/td[1]/input[@type='checkbox']");
+    $this->click('_qf_Basic_next_action');
+    $this->waitForElementPresent("_qf_AddToGroup_back-bottom");
+    $this->click('_qf_AddToGroup_next-bottom');
+    $this->waitForText('crm-notification-container', "1 contact added to group");
+
+    $this->openCiviPage('contact/search', 'reset=1');
+    $this->waitForElementPresent("_qf_Basic_refresh");
+    $this->type('sort_name', $firstName);
+    $this->select('group', "Advisory Board");
+    $this->click('_qf_Basic_refresh');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody//tr/td[3]/a[text()='{$lastName}, {$firstName}']"));
+  }
+
 }

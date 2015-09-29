@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,27 +23,20 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{capture assign=wikiLink}{docURL page="Setting up a SMS Provider for CiviSMS" text="(How to add a SMS Provider)" resource="wiki"}{/capture}
-<div id="help">
-    {ts}You can configure one or more SMS Providers for your CiviCRM installation. To learn more about the procedure to install SMS extension and Provider, refer{/ts} {$wikiLink}
-</div>
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/SMS/Form/Provider.tpl"}
 {else}
+  {capture assign=wikiLink}{docURL page="Setting up a SMS Provider for CiviSMS" text="(How to add a SMS Provider)" resource="wiki"}{/capture}
+  <div id="help">
+    {ts}You can configure one or more SMS Providers for your CiviCRM installation. To learn more about the procedure to install SMS extension and Provider, refer{/ts} {$wikiLink}
+  </div>
 
   {if $rows}
 
-      {if $action ne 1 and $action ne 2}
-        <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newProvider" class="button"><span><div class="icon add-icon"></div>{ts}Add New Provider{/ts}</span></a>
-       </div>
-      {/if}
-
-<div id="ltype">
+  <div id="ltype">
     {strip}
         {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
         <br/><table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Provider Details{/ts}</th>
@@ -66,15 +59,15 @@
         {/foreach}
         </table>
     {/strip}
-</div>
-{elseif $action ne 1}
+  </div>
+  {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {ts}There are no providers configured.{/ts}
-     </div>
-     <div class="action-link">
-       <a href="{crmURL p='civicrm/admin/sms/provider' q="action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts}Add SMS Provider{/ts}</span></a>
+        {ts}None found.{/ts}
      </div>
 
-{/if}
+  {/if}
+  <div class="action-link">
+    {crmButton p='civicrm/admin/sms/provider' q="action=add&reset=1" icon="circle-plus"}{ts}Add SMS Provider{/ts}{/crmButton}
+  </div>
 {/if}

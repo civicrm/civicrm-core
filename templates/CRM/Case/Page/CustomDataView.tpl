@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* include wysiwyg related files*}
-{if !$includeWysiwygEditor}
-  {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
-{/if}
 {* Custom Data view mode*}
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {foreach from=$customValues item=cd_edit key=cvID}
@@ -69,9 +65,7 @@
         </table>
       {/foreach}
       <div>
-        <a href="{crmURL p="civicrm/case/cd/edit" q="cgcount=1&action=update&reset=1&type=Case&entityID=$caseID&groupID=$customGroupId&cid=$contactID&subType=$caseTypeID"}" class="button">
-          <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
-        </a>
+        {crmButton p="civicrm/case/cd/edit" q="cgcount=1&action=update&reset=1&type=Case&entityID=$caseID&groupID=$customGroupId&cid=$contactID&subType=$caseTypeID" icon="pencil"}{ts}Edit{/ts}{/crmButton}
       </div>
       <br/>
       <div class="clear"></div>
@@ -81,36 +75,3 @@
   {/foreach}
 {/foreach}
 <div id="case_custom_edit"></div>
-
-{*currently delete is available only for tab custom data*}
-{if $groupId}
-<script type="text/javascript">
-  {literal}
-  function hideStatus(valueID, groupID) {
-    cj('#statusmessg_' + groupID + '_' + valueID).hide( );
-  }
-
-  function showDelete(valueID, elementID, groupID, contactID) {
-    var confirmMsg = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal} &nbsp; <a href="#" onclick="deleteCustomValue( ' + valueID + ',\'' + elementID + '\',' + groupID + ',' + contactID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatus( ' + valueID + ', ' +  groupID + ' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a>';
-    cj('tr#statusmessg_' + groupID + '_' + valueID).show( ).children().find('span').html( confirmMsg );
-  }
-
-  function deleteCustomValue( valueID, elementID, groupID, contactID ) {
-    var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
-    var request = cj.ajax({
-      type: "POST",
-      data:  "valueID=" + valueID + "&groupID=" + groupID +"&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
-      url: postUrl,
-      success: function(html){
-        cj('#'+ elementID).hide();
-        hideStatus(valueID, groupID);
-        var element = cj( '.ui-tabs-nav #tab_custom_' + groupID + ' a' );
-        cj(element).html(cj(element).attr('title') + ' ('+ html+') ');
-      }
-    });
-    CRM.status({success: '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}'}, request);
-  }
-  {/literal}
-</script>
-{/if}
-

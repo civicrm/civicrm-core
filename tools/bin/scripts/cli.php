@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2008                 |
  +--------------------------------------------------------------------+
@@ -35,6 +35,10 @@
  */
 $include_path = "../packages/:" . get_include_path();
 set_include_path($include_path);
+
+/**
+ * Class civicrm_CLI
+ */
 class civicrm_CLI {
 
   /**
@@ -77,6 +81,10 @@ class civicrm_CLI {
     $this->authenticate($user, $pass);
   }
 
+  /**
+   * @param $user
+   * @param $pass
+   */
   function authenticate($user, $pass) {
     session_start();
     require_once 'CRM/Core/Config.php';

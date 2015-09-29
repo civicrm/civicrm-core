@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,26 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
-class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'FinancialTrxn BAOs',
-      'description' => 'Test all CRM_Core_BAO_ContributionTrxn methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+/**
+ * Class CRM_Core_BAO_FinancialTrxnTest
+ */
+class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * check method create()
+   * Check method create()
    */
-  function testCreate() {
-    $contactId          = $this->individualCreate();
+  public function testCreate() {
+    $contactId = $this->individualCreate();
     $financialTypeId = 1;
-    $contributionId     = $this->contributionCreate($contactId, $financialTypeId);
-    $params             = array(
+    $this->contributionCreate(array('contact_id' => $contactId), $financialTypeId);
+    $params = array(
       'contribution_id' => $financialTypeId,
       'to_financial_account_id' => 1,
       'trxn_date' => 20091021184930,
@@ -66,6 +62,5 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
     $this->assertEquals($result, 10, 'Verify financial trxn total_amount.');
   }
+
 }
-
-

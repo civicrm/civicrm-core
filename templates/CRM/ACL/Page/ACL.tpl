@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {capture assign=erURL}{crmURL p='civicrm/acl/entityrole' q='reset=1'}{/capture}
 {capture assign=rolesURL}{crmURL p='civicrm/admin/options/acl_role' q='reset=1'}{/capture}
-{capture assign=docLink}{docURL page='user/initial-set-up/access-control' text='Access Control Documentation'}{/capture}
+{capture assign=docLink}{docURL page='user/current/initial-set-up/permissions-and-access-control/' text='Access Control Documentation'}{/capture}
 
 
 {if $action eq 1 or $action eq 2 or $action eq 8}
@@ -74,11 +74,10 @@
 
         {if $action ne 1 and $action ne 2}
           <div class="action-link">
-            <a href="{crmURL q="action=add&reset=1"}" id="newACL" class="button"><span><div class="icon add-icon"></div>{ts}Add ACL{/ts}</span></a>
+            {crmButton q="action=add&reset=1" id="newACL"  icon="circle-plus"}{ts}Add ACL{/ts}{/crmButton}
           </div>
         {/if}
       </div>
-      {include file="CRM/common/crmeditable.tpl"}
     {else}
       <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-/* This class is used to create the merchant callback results  
+/* This class is used to create the merchant callback results
   * when a merchant-calculated-feedback structure is received
   *
   * Multiple results are generated depending on the possible
@@ -31,10 +31,16 @@ class GoogleMerchantCalculations {
     $this->results_arr = array();
   }
 
+  /**
+   * @param $results
+   */
   function AddResult($results) {
     $this->results_arr[] = $results;
   }
 
+  /**
+   * @return string
+   */
   function GetXML() {
     require_once ('xml-processing/xmlbuilder.php');
 

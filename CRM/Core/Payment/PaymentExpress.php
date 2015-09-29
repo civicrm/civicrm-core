@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -21,7 +21,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 
 /*
@@ -32,8 +32,12 @@
  * Grateful acknowledgements go to Donald Lobo for invaluable assistance
  * in creating this payment processor module
  */
+
+/**
+ * Class CRM_Core_Payment_PaymentExpress
+ */
 class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
-  CONST CHARSET = 'iso-8859-1';
+  const CHARSET = 'iso-8859-1';
 
   protected $_mode = NULL;
 
@@ -42,18 +46,20 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param string $mode the mode of operation: live or test
+   * @param string $mode
+   *   The mode of operation: live or test.
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \CRM_Core_Payment_PaymentExpress
    */
-  function __construct($mode, &$paymentProcessor) {
+  public function __construct($mode, &$paymentProcessor) {
 
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
@@ -61,23 +67,14 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   }
 
   /**
-   * singleton function used to manage this object
+   * This function checks to see if we have the right config values.
    *
-   * @param string $mode the mode of operation: live or test
+   * @internal param string $mode the mode we are operating in (live or test)
    *
-   * @return object
-   * @static
-   *
+   * @return string
+   *   the error message if any
    */
-  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
-    $processorName = $paymentProcessor['name'];
-    if (self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new CRM_Core_Payment_PaymentExpress($mode, $paymentProcessor);
-    }
-    return self::$_singleton[$processorName];
-  }
-
-  function checkConfig() {
+  public function checkConfig() {
     $config = CRM_Core_Config::singleton();
 
     $error = array();
@@ -98,32 +95,26 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     }
   }
 
-  function setExpressCheckOut(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  function getExpressCheckoutDetails($token) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  function doExpressCheckout(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
-  }
-
-  function doDirectPayment(&$params) {
+  /**
+   * This function collects all the information from a web/api form and invokes
+   * the relevant payment processor specific functions to perform the transaction
+   *
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   */
+  public function doDirectPayment(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
   /**
-   * Main transaction function
+   * Main transaction function.
    *
-   * @param array $params  name value pair of contribution data
+   * @param array $params
+   *   Name value pair of contribution data.
    *
-   * @return void
-   * @access public
-   *
+   * @param $component
    */
-  function doTransferCheckout(&$params, $component) {
+  public function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);
     $config = CRM_Core_Config::singleton();
     if ($component != 'contribute' && $component != 'event') {
@@ -145,19 +136,18 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       );
     }
 
-
     /*
-         * Build the private data string to pass to DPS, which they will give back to us with the
-         *
-         * transaction result.  We are building this as a comma-separated list so as to avoid long URLs.
-         *
-         * Parameters passed: a=contactID, b=contributionID,c=contributionTypeID,d=invoiceID,e=membershipID,f=participantID,g=eventID
-         */
+     * Build the private data string to pass to DPS, which they will give back to us with the
+     *
+     * transaction result.  We are building this as a comma-separated list so as to avoid long URLs.
+     *
+     * Parameters passed: a=contactID, b=contributionID,c=contributionTypeID,d=invoiceID,e=membershipID,f=participantID,g=eventID
+     */
 
     $privateData = "a={$params['contactID']},b={$params['contributionID']},c={$params['contributionTypeID']},d={$params['invoiceID']}";
 
     if ($component == 'event') {
-    $merchantRef = substr($params['contactID'] . "-" . $params['contributionID'] . " " . substr($params['description'], 27, 20), 0, 24);
+      $merchantRef = substr($params['contactID'] . "-" . $params['contributionID'] . " " . substr($params['description'], 27, 20), 0, 24);
       $privateData .= ",f={$params['participantID']},g={$params['eventID']}";
     }
     elseif ($component == 'contribute') {
@@ -175,7 +165,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       'MerchantReference' => $merchantRef,
       'TxnData1' => $params['qfKey'],
       'TxnData2' => $privateData,
-      'TxnData3' => $component . ",".$this->_paymentProcessor['id'],
+      'TxnData3' => $component . "," . $this->_paymentProcessor['id'],
       'TxnType' => 'Purchase',
       // Leave this empty for now, causes an error with DPS if we populate it
       'TxnId' => '',
@@ -186,9 +176,8 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $dpsParams);
 
     /*
-         *  determine whether method is pxaccess or pxpay by whether signature (mac key) is defined
-         */
-
+     *  determine whether method is pxaccess or pxpay by whether signature (mac key) is defined
+     */
 
     if (empty($this->_paymentProcessor['signature'])) {
       /*
@@ -227,7 +216,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     }
     else {
       $processortype = "pxaccess";
-      require_once ('PaymentExpress/pxaccess.inc.php');
+      require_once 'PaymentExpress/pxaccess.inc.php';
       // URL
       $PxAccess_Url = $this->_paymentProcessor['url_site'];
       // User ID
@@ -252,5 +241,5 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       CRM_Utils_System::redirect($request_string);
     }
   }
-}
 
+}

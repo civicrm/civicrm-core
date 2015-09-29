@@ -4,19 +4,23 @@
  * Generate configuration files
  */
 class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
-  function run() {
+  public function run() {
     $this->generateTemplateVersion();
 
     $this->setupCms();
   }
 
-  function generateTemplateVersion() {
+  public function generateTemplateVersion() {
     file_put_contents($this->config->tplCodePath . "/CRM/common/version.tpl", $this->config->db_version);
   }
 
-  function setupCms() {
+  public function setupCms() {
     if (!in_array($this->config->cms, array(
-      'drupal', 'joomla', 'wordpress'))) {
+      'drupal',
+      'drupal8',
+      'joomla',
+      'wordpress',
+    ))) {
       echo "Config file for '{$this->config->cms}' not known.";
       exit();
     }
@@ -25,7 +29,8 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
       if ($configTemplate) {
         echo "Generating civicrm.config.php\n";
         copy($configTemplate, '../civicrm.config.php');
-      } else {
+      }
+      else {
         throw new Exception("Failed to locate template for civicrm.config.php");
       }
     }
@@ -38,16 +43,24 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
   }
 
   /**
-   * @param string $cms "drupal"|"wordpress"
-   * @return null|string path to config template
+   * @param string $cms
+   *   "drupal"|"wordpress".
+   * @return null|string
+   *   path to config template
    */
   public function findConfigTemplate($cms) {
     $candidates = array();
     switch ($cms) {
       case 'drupal':
         $candidates[] = "../drupal/civicrm.config.php.drupal";
-        $candidates[] =  "../../drupal/civicrm.config.php.drupal";
+        $candidates[] = "../../drupal/civicrm.config.php.drupal";
         break;
+
+      case 'drupal8':
+        $candidates[] = "../../modules/civicrm/civicrm.config.php.drupal";
+        $candidates[] = "../../../modules/civicrm/civicrm.config.php.drupal";
+        break;
+
       case 'wordpress':
         $candidates[] = "../../civicrm.config.php.wordpress";
         $candidates[] = "../WordPress/civicrm.config.php.wordpress";
@@ -62,4 +75,5 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
     }
     return NULL;
   }
+
 }

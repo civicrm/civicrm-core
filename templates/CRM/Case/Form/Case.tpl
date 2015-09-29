@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,10 +28,6 @@
          2. Each activity type file can include its case fields in its own template, so that they will be included during activity edit.
 *}
 <div class="crm-block crm-form-block crm-case-form-block">
-
-{if $cdType }
-   {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 
 {if $action neq 8 && $action neq 32768}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -76,7 +72,7 @@
 {if $form.activity_details.html}
     <tr class="crm-case-form-block-activity_details">
         <td class="label">{$form.activity_details.label}{help id="id-details" activityTypeFile=$activityTypeFile file="CRM/Case/Form/Case.hlp"}</td>
-        <td class="view-value">{if $defaultWysiwygEditor eq 0}{$form.activity_details.html|crmStripAlternatives|crmAddClass:huge40}{else}{$form.activity_details.html|crmStripAlternatives}{/if}</td>
+        <td class="view-value">{$form.activity_details.html|crmStripAlternatives}</td>
     </tr>
 {/if}
 
@@ -123,7 +119,7 @@
     </td>
 </tr>
 
-<tr class="crm-case-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='case'}</td></tr>
+<tr class="crm-case-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='case'}</td></tr>
 
 </table>
 {/if}
@@ -133,8 +129,8 @@
     {include file="CRM/common/customData.tpl"}
     {literal}
       <script type="text/javascript">
-      cj(document).ready(function() {
-           var customDataSubType = cj('#case_type_id').val();
+      CRM.$(function($) {
+           var customDataSubType = $('#case_type_id').val();
            if ( customDataSubType ) {
               CRM.buildCustomData( {/literal}'{$customDataType}'{literal}, customDataSubType );
            } else {
@@ -147,7 +143,4 @@
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-{/if}
 </div>

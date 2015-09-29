@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,70 +23,68 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * Class for activity task actions
- *
+ * Class for activity task actions.
  */
 class CRM_Activity_Form_Task extends CRM_Core_Form {
 
   /**
-   * the task being performed
+   * The task being performed.
    *
    * @var int
    */
   protected $_task;
 
   /**
-   * The additional clause that we restrict the search with
+   * The additional clause that we restrict the search with.
    *
    * @var string
    */
   protected $_componentClause = NULL;
 
   /**
-   * The array that holds all the component ids
+   * The array that holds all the component ids.
    *
    * @var array
    */
   protected $_componentIds;
 
   /**
-   * The array that holds all the contact ids
+   * The array that holds all the contact ids.
    *
    * @var array
    */
   public $_contactIds;
 
   /**
-   * The array that holds all the member ids
+   * The array that holds all the member ids.
    *
    * @var array
    */
   public $_activityHolderIds;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @param
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     self::preProcessCommon($this);
   }
 
-  static function preProcessCommon(&$form, $useTable = FALSE) {
+  /**
+   * Common pre-process function.
+   *
+   * @param CRM_Core_Form $form
+   * @param bool $useTable
+   */
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
     $form->_activityHolderIds = array();
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
@@ -110,13 +108,27 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
       );
       $query->_distinctComponentClause = '( civicrm_activity.id )';
       $query->_groupByComponentClause = " GROUP BY civicrm_activity.id ";
-      $result = $query->searchQuery(0, 0, NULL);
+
+      // CRM-12675
+      $activityClause = NULL;
+
+      $components = CRM_Core_Component::getNames();
+      $componentClause = array();
+      foreach ($components as $componentID => $componentName) {
+        if (!CRM_Core_Permission::check("access $componentName")) {
+          $componentClause[] = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
+        }
+      }
+      if (!empty($componentClause)) {
+        $activityClause = implode(' AND ', $componentClause);
+      }
+      $result = $query->searchQuery(0, 0, NULL, FALSE, FALSE, FALSE, FALSE, FALSE, $activityClause);
 
       while ($result->fetch()) {
-        if(!empty($result->activity_id)) {
-        $ids[] = $result->activity_id;
+        if (!empty($result->activity_id)) {
+          $ids[] = $result->activity_id;
+        }
       }
-    }
     }
 
     if (!empty($ids)) {
@@ -140,8 +152,8 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-          $urlParams
-        ));
+        $urlParams
+      ));
     }
   }
 
@@ -168,16 +180,17 @@ WHERE  activity_id IN ( $IDs ) AND
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
+   * Simple shell that derived classes can call to add buttons to
    * the form with a customized title for the main Submit
    *
-   * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
-   *
-   * @return void
-   * @access public
+   * @param string $title
+   *   Title of the main button.
+   * @param string $nextType
+   *   Button type for the form after processing.
+   * @param string $backType
+   * @param bool $submitOnce
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
+  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(
         array(
           'type' => $nextType,
@@ -191,5 +204,5 @@ WHERE  activity_id IN ( $IDs ) AND
       )
     );
   }
-}
 
+}

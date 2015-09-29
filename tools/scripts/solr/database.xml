@@ -1,4 +1,4 @@
- 
+
 <add>
   <doc>
     <field name="id">1</field>
@@ -199,7 +199,7 @@
     <field name="first_name">Amar</field>
     <field name="last_name">Jameson</field>
     <field name="middle_name">R</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
     <field name="street_address">E 503D Pine Way W</field>
     <field name="supplemental_address_1">Receiving</field>
     <field name="city">Cary</field>
@@ -272,7 +272,7 @@
     <field name="first_name">Sandy</field>
     <field name="last_name">Jameson</field>
     <field name="middle_name">A</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
     <field name="street_address">SW 639Y Dowlen Way S</field>
     <field name="supplemental_address_1">C/o PO Plus</field>
     <field name="city">Mallie</field>
@@ -705,7 +705,7 @@
     <field name="first_name">Sheila</field>
     <field name="last_name">Łąchowski</field>
     <field name="middle_name">C</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
     <field name="city">Leonard</field>
     <field name="postal_code">48367</field>
     <field name="county">Alameda</field>
@@ -923,7 +923,7 @@
     <field name="first_name">Bill</field>
     <field name="last_name">Adams</field>
     <field name="middle_name">P</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
     <field name="street_address">SW 822O Main Way NW</field>
     <field name="supplemental_address_1">Urgent</field>
     <field name="city">Cortlandt Manor</field>
@@ -1561,7 +1561,7 @@
     <field name="first_name">Peter</field>
     <field name="last_name">Jones</field>
     <field name="middle_name">I</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
   </doc>
   <doc>
     <field name="id">50</field>
@@ -1571,7 +1571,7 @@
     <field name="first_name">Paula</field>
     <field name="last_name">Adams</field>
     <field name="middle_name">C</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
   </doc>
   <doc>
     <field name="id">51</field>
@@ -2111,7 +2111,7 @@
     <field name="first_name">Raymond</field>
     <field name="last_name">Smith</field>
     <field name="middle_name">P</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
     <field name="street_address">N 364N Cadell Ln W</field>
     <field name="supplemental_address_1">Community Relations</field>
     <field name="city">Calumet</field>
@@ -2373,7 +2373,7 @@
     <field name="first_name">Bill</field>
     <field name="last_name">Grant</field>
     <field name="middle_name">Z</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
   </doc>
   <doc>
     <field name="id">76</field>
@@ -2447,7 +2447,7 @@
     <field name="display_name">Red Cross  </field>
     <field name="contact_type">Organization</field>
     <field name="organization_name">Red Cross  </field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
     <field name="street_address">N 520C States Blvd W</field>
     <field name="supplemental_address_1">C/o PO Plus</field>
     <field name="city">El Paso</field>
@@ -2691,7 +2691,7 @@
     <field name="display_name">Sheila Jameson's home</field>
     <field name="contact_type">Household</field>
     <field name="household_name">Sheila Jameson's home</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
     <field name="street_address">NE 959I Main Pl N</field>
     <field name="supplemental_address_1">Attn: Development</field>
     <field name="city">Evansville</field>
@@ -2818,7 +2818,7 @@
     <field name="first_name">Brzęczysław</field>
     <field name="last_name">Reynolds</field>
     <field name="middle_name">X</field>
-    <field name="note_body">Contact the Commisioner of Charities</field>
+    <field name="note_body">Contact the Commissioner of Charities</field>
     <field name="street_address">SW 279B Cadell Ave SE</field>
     <field name="supplemental_address_1">Donor Relations</field>
     <field name="city">Vienna</field>

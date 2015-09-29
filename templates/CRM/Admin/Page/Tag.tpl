@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,9 +38,9 @@
         {if !($action eq 1 and $action eq 2)}
             <div class="crm-submit-buttons">
               <div class="action-link">
-                    <a href="{crmURL q="action=add&reset=1"}" id="newTag" class="button"><span><div class="icon add-icon"></div>{ts}Add Tag{/ts}</span></a>
+                    {crmButton q="action=add&reset=1" id="newTag"  icon="circle-plus"}{ts}Add Tag{/ts}{/crmButton}
                     {if $adminTagSet}
-                        <a href="{crmURL q="action=add&reset=1&tagset=1"}" id="newTagSet" class="button"><span><div class="icon add-icon"></div>{ts}Add Tag Set{/ts}</span></a>
+                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="circle-plus"}{ts}Add Tag Set{/ts}{/crmButton}
                     {/if}
                 </div>
             </div>
@@ -81,9 +81,9 @@
         {if !($action eq 1 and $action eq 2)}
             <div class="crm-submit-buttons">
                 <div class="action-link">
-                    <a href="{crmURL q="action=add&reset=1"}" id="newTag" class="button"><span><div class="icon add-icon"></div>{ts}Add Tag{/ts}</span></a>
+                    {crmButton q="action=add&reset=1" id="newTag"  icon="circle-plus"}{ts}Add Tag{/ts}{/crmButton}
                     {if $adminTagSet}
-                        <a href="{crmURL q="action=add&reset=1&tagset=1"}" id="newTagSet" class="button"><span><div class="icon add-icon"></div>{ts}Add Tag Set{/ts}</span></a>
+                        {crmButton q="action=add&reset=1&tagset=1" id="newTagSet"  icon="circle-plus"}{ts}Add Tag Set{/ts}{/crmButton}
                     {/if}
                 </div>
             </div>
@@ -144,13 +144,12 @@ CRM.$(function($) {
       .on('crmConfirm:yes', function() {
         var toId = $("input[name=select_merge_tag]", this).val();
         if (!toId) {
-          $("input[name=select_merge_tag]", this).crmError(ts('Select a tag'));
+          $("input[name=select_merge_tag]", this).crmError('{/literal}{ts escape='js'}Select a tag{/ts}{literal}');
           return false;
         }
-        /* send synchronous request so that disabling any actions for slow servers*/
         var postUrl = {/literal}"{crmURL p='civicrm/ajax/mergeTags' h=0 }"{literal};
         var data = {fromId: tag.id, toId: toId, key:{/literal}"{crmKey name='civicrm/ajax/mergeTags'}"{literal}};
-        cj.ajax({
+        $.ajax({
           type: "POST",
           url: postUrl,
           data: data,
@@ -169,4 +168,3 @@ CRM.$(function($) {
 {/literal}
 
 {/if}
-{include file="CRM/common/crmeditable.tpl"}

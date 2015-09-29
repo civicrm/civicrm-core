@@ -25,7 +25,7 @@ class CiviSeleniumSettings {
   var $password = 'demo';
 
   var $adminUsername = 'USERNAME';
-  
+
   var $adminPassword = 'PASSWORD';
 
   var $adminApiKey = NULL; // civicrm_contact.api_key for admin
@@ -43,6 +43,12 @@ class CiviSeleniumSettings {
   var $timeout = 30;
 
   /**
+   * @var array
+   * @see CiviSeleniumTestCase::setCookies
+   */
+  var $cookies = array();
+
+  /**
    * @var int|NULL seconds to wait for SeleniumRC to become available
    *
    * If you have custom scripts which launch Selenium and PHPUnit in tandem, then
@@ -54,6 +60,12 @@ class CiviSeleniumSettings {
 
   function __construct() {
     $this->fullSandboxPath = $this->sandboxURL . $this->sandboxPATH;
+    // $this->cookies[] = array(
+    //   'name' => 'mycookie',
+    //   'value' => 'myvalue',
+    //   'path' => '/',
+    //   'max_age' => 24*60*60,
+    // );;
   }
 
 }

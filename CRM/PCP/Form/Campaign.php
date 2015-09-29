@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -64,7 +64,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     parent::preProcess();
   }
 
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $dafaults = array();
     $dao = new CRM_PCP_DAO_PCP();
 
@@ -86,6 +86,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $defaults['is_active'] = 1;
       $defaults['is_honor_roll'] = 1;
       $defaults['is_thermometer'] = 1;
+      $defaults['is_notify'] = 1;
     }
 
     $this->_contactID = CRM_Utils_Array::value('contact_id', $defaults);
@@ -95,10 +96,9 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->add('text', 'pcp_title', ts('Title'), NULL, TRUE);
@@ -121,14 +121,30 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     $attrib = array('rows' => 8, 'cols' => 60);
-    $this->add('textarea', 'page_text', ts('Your Message'), null, false );
+    $this->add('textarea', 'page_text', ts('Your Message'), NULL, FALSE);
 
     $maxAttachments = 1;
     CRM_Core_BAO_File::buildAttachment($this, 'civicrm_pcp', $this->_pageId, $maxAttachments);
 
     $this->addElement('checkbox', 'is_thermometer', ts('Progress Bar'));
     $this->addElement('checkbox', 'is_honor_roll', ts('Honor Roll'), NULL);
+    if ($this->_pageId) {
+      $params = array('id' => $this->_pageId);
+      CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
+      $owner_notification_option = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
+    }
+    else {
+      $owner_notification_option = CRM_PCP_BAO_PCP::getOwnerNotificationId($this->controller->get('component_page_id'), $this->_component ? $this->_component : 'contribute');
+    }
+    if ($owner_notification_option == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name')) {
+      $this->assign('owner_notification_option', TRUE);
+      $this->addElement('checkbox', 'is_notify', ts('Notify me via email when someone donates to my page'), NULL);
+    }
+
     $this->addElement('checkbox', 'is_active', ts('Active'));
+    if ($this->_context == 'dashboard') {
+      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/pcp', 'reset=1'));
+    }
 
     $this->addButtons(
       array(
@@ -147,17 +163,19 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param $self
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   *
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     if ($fields['goal_amount'] <= 0) {
       $errors['goal_amount'] = ts('Goal Amount should be a numeric value greater than zero.');
@@ -165,25 +183,18 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     if (strlen($fields['donate_link_text']) >= 64) {
       $errors['donate_link_text'] = ts('Button Text must be less than 64 characters.');
     }
-    if (isset($files['attachFile_1']) && !empty($files['attachFile_1']['tmp_name'])) {
-      list($width, $height) = getimagesize($files['attachFile_1']['tmp_name']);
-      if ($width > 360 || $height > 360) {
-        $errors['attachFile_1'] = ts('Your picture or image file cannot be larger than 360 x 360 pixels in size.') . ' ' . ts("The dimensions of the image you have selected are %1 x %2.", array(1 => $width, 2 => $height)) . ' ' . ts('Please shrink or crop the file or find another smaller image and try again.');
-      }
-    }
     return $errors;
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
   public function postProcess() {
-    $params  = $this->controller->exportValues( $this->_name );
-    $checkBoxes = array('is_thermometer', 'is_honor_roll', 'is_active');
+    $params = $this->controller->exportValues($this->_name);
+    $checkBoxes = array('is_thermometer', 'is_honor_roll', 'is_active', 'is_notify');
 
     foreach ($checkBoxes as $key) {
       if (!isset($params[$key])) {
@@ -203,9 +214,9 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     // since we are allowing html input from the user
     // we also need to purify it, so lets clean it up
-    $htmlFields = array( 'intro_text', 'page_text', 'title' );
-    foreach ( $htmlFields as $field ) {
-      if ( ! empty($params[$field]) ) {
+    $htmlFields = array('intro_text', 'page_text', 'title');
+    foreach ($htmlFields as $field) {
+      if (!empty($params[$field])) {
         $params[$field] = CRM_Utils_String::purifyHTML($params[$field]);
       }
     }
@@ -233,7 +244,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     $pcp = CRM_PCP_BAO_PCP::add($params, FALSE);
 
-
     // add attachments as needed
     CRM_Core_BAO_File::formatAttachment($params,
       $params,
@@ -245,7 +255,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     $statusId = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcp->id, 'status_id');
 
     //send notification of PCP create/update.
-    $pcpParams    = array('entity_table' => $entity_table, 'entity_id' => $pcp->page_id);
+    $pcpParams = array('entity_table' => $entity_table, 'entity_id' => $pcp->page_id);
     $notifyParams = array();
     $notifyStatus = "";
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $pcpParams, $notifyParams, array('notify_email'));
@@ -272,7 +282,6 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $this->assign('supporterUrl', $supporterUrl);
       $supporterName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $pcp->contact_id, 'display_name');
       $this->assign('supporterName', $supporterName);
-
 
       if ($this->_component == 'contribute') {
         $pageUrl = CRM_Utils_System::url('civicrm/contribute/transact',
@@ -351,8 +360,8 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     CRM_Core_Session::setStatus(ts("Your Personal Campaign Page has been %1 %2 %3",
-        array(1 => $pageStatus, 2 => $approvalMessage, 3 => $notifyStatus)
-      ), '', 'info');
+      array(1 => $pageStatus, 2 => $approvalMessage, 3 => $notifyStatus)
+    ), '', 'info');
     if (!$this->_pageId) {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/pcp/info', "reset=1&id={$pcp->id}&ap={$anonymousPCP}"));
     }
@@ -360,5 +369,5 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/pcp', 'reset=1'));
     }
   }
-}
 
+}

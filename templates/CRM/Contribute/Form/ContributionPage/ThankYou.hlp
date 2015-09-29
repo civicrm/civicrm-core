@@ -1,0 +1,107 @@
+{*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id_thank-title"}
+  {ts}Thank-you and Receipting{/ts}
+{/htxt}
+{htxt id="id_thank"}
+  <p>{ts}Use this form to configure the thank-you message and receipting options for this online contribution page. Contributors will see a thank-you page whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor - and can add a custom message to that receipt.{/ts}</p>
+{/htxt}
+
+{htxt id="id_thankyou-title-title"}
+  {ts}Thank-you Page Title{/ts}
+{/htxt}
+{htxt id="id_thankyou-title"}
+  <p>{ts}This title will be displayed at the top of the thank-you / transaction confirmation page.{/ts}</p>
+{/htxt}
+
+{htxt id="id_thankyou-text-title"}
+  {ts}Thank-you Message{/ts}
+{/htxt}
+{htxt id="id_thankyou-text"}
+  <p>{ts}Enter text (and optional HTML layout) for the thank-you block that will appear at the top of the Thank-you page.{/ts}</p>
+{/htxt}
+
+{htxt id="id_footer-text-title"}
+  {ts}Thank-you Page Footer{/ts}
+{/htxt}
+{htxt id="id_footer-text"}
+  <p>{ts}Enter link(s) and/or text that you want to appear at the bottom of the thank-you page. You can use this content area to encourage contributors to visit a tell-a-friend page or take some other action.{/ts}<p>
+  <p>{ts}NOTE: Social media links will be automatically included if you have enabled 'Social media sharing' for this page (see the 'Title' tab).{/ts}</p>
+{/htxt}
+
+{capture assign=msgUrl}{crmURL p='civicrm/admin/messageTemplates' q="reset=1"}{/capture}
+{htxt id="id_is-email-receipt-title"}
+  {ts}Automatic Receipting{/ts}
+{/htxt}
+{htxt id="id_is-email-receipt"}
+  <p>{ts}Check this box if you want an electronic receipt to be sent automatically to the contributor's email address.{/ts}</p>
+  <p>{ts 1=$msgUrl}The "Contributions - Receipt (on-line)" System Workflow Message Template provides content and formatting for the receipt.
+  You can modify it from <a href="%1">Administer > Communications > Message Templates > System Workflow Messages</a>. You can also provide
+  specific messaging for contributions received via this contribution page using the "Receipt Message" field below.{/ts}</p>
+{/htxt}
+
+{htxt id="id_receipt-from-name-title"}
+  {ts}Name of Receipt Sender{/ts}
+{/htxt}
+{htxt id="id_receipt-from-name"}
+  <p>{ts}Enter the FROM name to be used in receipt emails.{/ts}</p>
+{/htxt}
+
+{htxt id="id_receipt-from-email-title"}
+  {ts}Email Address of Receipt Sender{/ts}
+{/htxt}
+{htxt id="id_receipt-from-email"}
+  <p>{ts}Enter the FROM email address to be used in receipt emails.{/ts}</p>
+{/htxt}
+
+{htxt id="id_receipt-text-title"}
+  {ts}Additional Receipt Message{/ts}
+{/htxt}
+{htxt id="id_receipt-text"}
+  <p>{ts}Enter a message you want included at the beginning of emailed receipts. This message will be inserted at the top of the "Contributions - Receipt (on-line)" System Workflow Message.{/ts}</p>
+  <p>{ts}IMPORTANT: Keep in mind that this message will be included in ALL of the following types of receipts related to this online contribution page{/ts}:
+    <ul>
+      <li>{ts}One-time online contributions{/ts}</li>
+      <li>{ts}Recurring online contributions (if enabled for this page){/ts}</li>
+      <li>{ts}Automatically renewing membership payments (if enabled for this page){/ts}</li>
+    </ul>
+  </p>
+  <p>{ts}NOTE: The text entered here will be used for both TEXT and HTML versions of receipt emails so we do not recommend including HTML tags / formatting here.{/ts}</p>
+{/htxt}
+
+{htxt id="id_receipt-cc-title"}
+  {ts}CC Receipts{/ts}
+{/htxt}
+{htxt id="id_receipt-cc"}
+  <p>{ts}If you want member(s) of your organization to receive a carbon copy of each emailed receipt, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}</p>
+{/htxt}
+
+{htxt id="id_receipt-bcc-title"}
+  {ts}BCC Receipts{/ts}
+{/htxt}
+{htxt id="id_receipt-bcc"}
+  <p>{ts}If you want member(s) of your organization to receive a BLIND carbon copy of each emailed receipt, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org).{/ts}</p>
+{/htxt}

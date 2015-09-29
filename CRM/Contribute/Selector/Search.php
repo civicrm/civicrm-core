@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
@@ -45,22 +43,19 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * This defines two actions- View and Edit.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * we use desc to remind us what that column is, name is used in the tpl
+   * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
-   * @static
    */
   static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
-   * @static
    */
   static $_properties = array(
     'contact_id',
@@ -90,51 +85,45 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   );
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * what context are we being invoked from
+   * What context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_context = NULL;
 
   /**
-   * what component context are we being invoked from
+   * What component context are we being invoked from
    *
-   * @access protected
    * @var string
    */
   protected $_compContext = NULL;
 
   /**
-   * queryParams is the array returned by exportValues called on
+   * QueryParams is the array returned by exportValues called on
    * the HTML_QuickForm_Controller for that page.
    *
    * @var array
-   * @access protected
    */
   public $_queryParams;
 
   /**
-   * represent the type of selector
+   * Represent the type of selector
    *
    * @var int
-   * @access protected
    */
   protected $_action;
 
@@ -155,32 +144,39 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   protected $_includeSoftCredits = FALSE;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
-   * @param array $queryParams array of parameters for query
-   * @param int   $action - action of search basic or advanced.
-   * @param string   $contributionClause if the caller wants to further restrict the search (used in contributions)
-   * @param boolean $single are we dealing only with one contact?
-   * @param int     $limit  how many contributions do we want returned
+   * @param array $queryParams
+   *   Array of parameters for query.
+   * @param \const|int $action - action of search basic or advanced.
+   * @param string $contributionClause
+   *   If the caller wants to further restrict the search (used in contributions).
+   * @param bool $single
+   *   Are we dealing only with one contact?.
+   * @param int $limit
+   *   How many contributions do we want returned.
    *
-   * @return CRM_Contact_Selector
-   * @access public
+   * @param string $context
+   * @param null $compContext
+   *
+   * @return \CRM_Contribute_Selector_Search
    */
-  function __construct(&$queryParams,
-    $action             = CRM_Core_Action::NONE,
+  public function __construct(
+    &$queryParams,
+    $action = CRM_Core_Action::NONE,
     $contributionClause = NULL,
-    $single             = FALSE,
-    $limit              = NULL,
-    $context            = 'search',
-    $compContext        = NULL
+    $single = FALSE,
+    $limit = NULL,
+    $context = 'search',
+    $compContext = NULL
   ) {
 
     // submitted form values
     $this->_queryParams = &$queryParams;
 
-    $this->_single      = $single;
-    $this->_limit       = $limit;
-    $this->_context     = $context;
+    $this->_single = $single;
+    $this->_limit = $limit;
+    $this->_context = $context;
     $this->_compContext = $compContext;
 
     $this->_contributionClause = $contributionClause;
@@ -201,12 +197,12 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     if ($this->_includeSoftCredits) {
       $this->_query->_rowCountClause = " count(civicrm_contribution.id)";
       $this->_query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
-    } else {
+    }
+    else {
       $this->_query->_distinctComponentClause = " civicrm_contribution.id";
       $this->_query->_groupByComponentClause = " GROUP BY civicrm_contribution.id ";
     }
   }
-  //end of constructor
 
   /**
    * This method returns the links that are given for each search row.
@@ -215,11 +211,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * - View
    * - Edit
    *
-   * @return array
-   * @access public
+   * @param int $componentId
+   * @param null $componentAction
+   * @param null $key
+   * @param null $compContext
    *
+   * @return array
    */
-  static function &links($componentId = NULL, $componentAction = NULL, $key = NULL, $compContext = NULL) {
+  public static function &links($componentId = NULL, $componentAction = NULL, $key = NULL, $compContext = NULL) {
     $extraParams = NULL;
     if ($componentId) {
       $extraParams = "&compId={$componentId}&compAction={$componentAction}";
@@ -255,15 +254,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     }
     return self::$_links;
   }
-  //end of function
 
   /**
-   * getter for array of the parameters required for creating pager.
+   * Getter for array of the parameters required for creating pager.
    *
-   * @param
-   * @access public
+   * @param $action
+   * @param array $params
    */
-  function getPagerParams($action, &$params) {
+  public function getPagerParams($action, &$params) {
     $params['status'] = ts('Contribution') . ' %%StatusMessage%%';
     $params['csvString'] = NULL;
     if ($this->_limit) {
@@ -276,17 +274,16 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }
-  //end of function
 
   /**
    * Returns total number of rows for the query.
    *
-   * @param
+   * @param string $action
    *
-   * @return int Total number of rows
-   * @access public
+   * @return int
+   *   Total number of rows
    */
-  function getTotalCount($action) {
+  public function getTotalCount($action) {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE,
@@ -296,17 +293,23 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * returns all the rows in the given offset and rowCount
+   * Returns all the rows in the given offset and rowCount.
    *
-   * @param enum   $action   the action being performed
-   * @param int    $offset   the row number to start from
-   * @param int    $rowCount the number of rows to return
-   * @param string $sort     the sql string that describes the sort order
-   * @param enum   $output   what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param int $offset
+   *   The row number to start from.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string $sort
+   *   The sql string that describes the sort order.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return int   the total number of rows for this action
+   * @return int
+   *   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
+  public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     if ($this->_includeSoftCredits) {
       // especial sort order when rows include soft credits
       $sort = "civicrm_contribution.receive_date DESC, civicrm_contribution.id, civicrm_contribution_soft.id";
@@ -333,9 +336,9 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $qfKey = $this->_key;
     $componentId = $componentContext = NULL;
     if ($this->_context != 'contribute') {
-      $qfKey            = CRM_Utils_Request::retrieve('key', 'String', CRM_Core_DAO::$_nullObject);
-      $componentId      = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject);
-      $componentAction  = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
+      $qfKey = CRM_Utils_Request::retrieve('key', 'String', CRM_Core_DAO::$_nullObject);
+      $componentId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject);
+      $componentAction = CRM_Utils_Request::retrieve('action', 'String', CRM_Core_DAO::$_nullObject);
       $componentContext = CRM_Utils_Request::retrieve('compContext', 'String', CRM_Core_DAO::$_nullObject);
 
       if (!$componentContext &&
@@ -354,7 +357,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
-    While ($result->fetch()) {
+    while ($result->fetch()) {
       $row = array();
       // the columns we are interested in
       foreach (self::$_properties as $property) {
@@ -405,8 +408,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
         $result->contribution_id
       );
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
       if (!empty($row['amount_level'])) {
@@ -420,26 +422,23 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   *
-   * @return array   $qill         which contains an array of strings
-   * @access public
+   * @inheritDoc
    */
-
-  // the current internationalisation is bad, but should more or less work
-  // for most of "European" languages
   public function getQILL() {
     return $this->_query->qill();
   }
 
   /**
-   * returns the column headers as an array of tuples:
+   * Returns the column headers as an array of tuples:
    * (name, sortName (key to the sort array))
    *
-   * @param string $action the action being performed
-   * @param enum   $output what should the result set include (web/email/csv)
+   * @param string $action
+   *   The action being performed.
+   * @param string $output
+   *   What should the result set include (web/email/csv).
    *
-   * @return array the column headers that need to be displayed
-   * @access public
+   * @return array
+   *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     self::$_columnHeaders = array(
@@ -450,25 +449,25 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       ),
     );
     if ($this->_includeSoftCredits) {
-      self::$_columnHeaders = 
-        array_merge(
-          self::$_columnHeaders, 
+      self::$_columnHeaders
+        = array_merge(
+          self::$_columnHeaders,
           array(
             array(
               'name' => ts('Soft Credit Amount'),
               'sort' => 'contribution_soft_credit_amount',
               'direction' => CRM_Utils_Sort::DONTCARE,
-            )
+            ),
           )
         );
     }
-    self::$_columnHeaders = 
-      array_merge(
-        self::$_columnHeaders, 
+    self::$_columnHeaders
+      = array_merge(
+        self::$_columnHeaders,
         array(
           array(
             'name' => ts('Type'),
-            'sort'      => 'financial_type_id',
+            'sort' => 'financial_type',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(
@@ -488,7 +487,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           ),
           array(
             'name' => ts('Status'),
-            'sort' => 'contribution_status_id',
+            'sort' => 'contribution_status',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
           array(
@@ -510,53 +509,63 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
     }
     if ($this->_includeSoftCredits) {
-      self::$_columnHeaders = 
-        array_merge(
-          self::$_columnHeaders, 
+      self::$_columnHeaders = array_merge(
+        self::$_columnHeaders,
+        array(
           array(
-            array(
-              'name' => ts('Soft Credit For'),
-              'sort' => 'contribution_soft_credit_name',
-              'direction' => CRM_Utils_Sort::DONTCARE,
-            ),
-            array(
-              'name' => ts('Soft Credit Type'),
-              'sort' => 'contribution_soft_credit_type',
-              'direction' => CRM_Utils_Sort::ASCENDING,
-            ),
-          )
-        );
+            'name' => ts('Soft Credit For'),
+            'sort' => 'contribution_soft_credit_name',
+            'direction' => CRM_Utils_Sort::DONTCARE,
+          ),
+          array(
+            'name' => ts('Soft Credit Type'),
+            'sort' => 'contribution_soft_credit_type',
+            'direction' => CRM_Utils_Sort::ASCENDING,
+          ),
+        )
+      );
     }
-    self::$_columnHeaders = 
-      array_merge(
+    self::$_columnHeaders
+      = array_merge(
         self::$_columnHeaders, array(
-          array('desc' => ts('Actions'))
+          array('desc' => ts('Actions')),
         )
       );
     return self::$_columnHeaders;
   }
 
-  function alphabetQuery() {
+  /**
+   * @return mixed
+   */
+  public function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
-  function &getQuery() {
+  /**
+   * @return string
+   */
+  public function &getQuery() {
     return $this->_query;
   }
 
   /**
-   * name of export file.
+   * Name of export file.
    *
-   * @param string $output type of output
+   * @param string $output
+   *   Type of output.
    *
-   * @return string name of the file
+   * @return string
+   *   name of the file
    */
-  function getExportFileName($output = 'csv') {
+  public function getExportFileName($output = 'csv') {
     return ts('CiviCRM Contribution Search');
   }
 
-  function getSummary() {
+  /**
+   * @return mixed
+   */
+  public function getSummary() {
     return $this->_query->summaryContribution($this->_context);
   }
-}
 
+}

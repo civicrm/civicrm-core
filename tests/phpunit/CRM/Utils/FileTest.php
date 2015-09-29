@@ -1,7 +1,11 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class CRM_Utils_FileTest
+ */
 class CRM_Utils_FileTest extends CiviUnitTestCase {
-  function testIsChildPath() {
+  public function testIsChildPath() {
     $testCases = array();
     $testCases[] = array('/ab/cd/ef', '/ab/cd', FALSE);
     $testCases[] = array('/ab/cd', '/ab/cd/ef', TRUE);
@@ -15,4 +19,5 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       ));
     }
   }
+
 }

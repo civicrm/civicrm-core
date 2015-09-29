@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@
     <tr>
       <td>{ts}Phone{/ts}&nbsp;
       {if $actualBlockCount lt 5 }
-        <span id="add-more-phone" title="{ts}click to add more{/ts}"><a class="crm-link-action add-more-inline">{ts}add{/ts}</a></span>
+        <span id="add-more-phone" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
       {/if}
       </td>
       <td>{ts}Phone Location{/ts}</td>
@@ -53,7 +53,7 @@
         <td align="center" class="crm-phone-is_primary">{$form.phone.$blockId.is_primary.1.html}</td>
         <td>
           {if $blockId gt 1}
-            <a class="crm-delete-inline crm-link-action" title="{ts}delete phone block{/ts}">{ts}delete{/ts}</a>
+            <a class="crm-delete-inline crm-hover-button\" href="#" title="{ts}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
           {/if}
         </td>
     </tr>

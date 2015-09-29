@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 {* Financial search component. *}
 <div id="enableDisableStatusMsg" class="crm-container" style="display:none"></div>
 <div class="crm-submit-buttons">
-  <a accesskey="N" href="{crmURL p='civicrm/financial/batch' q="reset=1&action=add&context=$batchStatus"}" id="newBatch" class="button"><span><div class="icon add-icon"></div>{ts}New Accounting Batch{/ts}</span></a>
+  <a accesskey="N" href="{crmURL p='civicrm/financial/batch' q="reset=1&action=add&context=$batchStatus"}" id="newBatch" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}New Accounting Batch{/ts}</span></a>
 </div>
 <div class="crm-form-block crm-search-form-block">
   <div class="crm-accordion-wrapper crm-activity_search-accordion">
@@ -50,12 +50,12 @@
   </div>
 </div>
 <div class="form-layout-compressed">{$form.batch_update.html}&nbsp;{$form.submit.html}</div><br/>
-<table id="crm-batch-selector" class="row-highlight">
+<table id="crm-batch-selector-{$batchStatus}" class="row-highlight">
   <thead>
     <tr>
       <th class="crm-batch-checkbox">{$form.toggleSelect.html}</th>
       <th class="crm-batch-name">{ts}Batch Name{/ts}</th>
-      <th class="crm-batch-payment_instrument">{ts}Payment Instrument{/ts}</th>
+      <th class="crm-batch-payment_instrument">{ts}Payment Method{/ts}</th>
       <th class="crm-batch-item_count">{ts}Item Count{/ts}</th>
       <th class="crm-batch-total">{ts}Total Amount{/ts}</th>
       <th class="crm-batch-status">{ts}Status{/ts}</th>
@@ -91,7 +91,7 @@ CRM.$(function($) {
     var ZeroRecordText = {/literal}'<div class="status messages">{ts escape="js"}No Accounting Batches match your search criteria.{/ts}</div>'{literal};
     var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/batchlist" h=0 q="snippet=4&context=financialBatch"}'{literal};
 
-    batchSelector = $('#crm-batch-selector').dataTable({
+    batchSelector = $('#crm-batch-selector-{/literal}{$batchStatus}{literal}').dataTable({
       "bFilter" : false,
       "bAutoWidth" : false,
       "aaSorting" : [],
@@ -137,7 +137,7 @@ CRM.$(function($) {
           }
         });
         checkedRows = [];
-        $("#crm-batch-selector input.select-row:checked").each(function() {
+        $("#crm-batch-selector-{/literal}{$batchStatus}{literal} input.select-row:checked").each(function() {
           checkedRows.push('#' + $(this).attr('id'));
         });
       },
@@ -149,7 +149,8 @@ CRM.$(function($) {
         return nRow;
       },
       "fnDrawCallback": function(oSettings) {
-        $('.crm-editable', '#crm-batch-selector').crmEditable();
+        // FIXME: trigger crmLoad and crmEditable would happen automatically
+        $('.crm-editable', '#crm-batch-selector-{/literal}{$batchStatus}{literal}').crmEditable();
         $("#toggleSelect").prop('checked', false);
         if (checkedRows.length) {
           $(checkedRows.join(',')).prop('checked', true).change();

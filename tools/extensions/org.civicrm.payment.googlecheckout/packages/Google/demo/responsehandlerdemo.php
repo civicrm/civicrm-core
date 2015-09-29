@@ -83,7 +83,7 @@ $status = $response->HttpAuthentication($headers);
 /* Commands to send the various order processing APIs
    * Send charge order : $response->SendChargeOrder($data[$root]
    *    ['google-order-number']['VALUE'], <amount>, $message_log);
-   * Send proces order : $response->SendProcessOrder($data[$root]
+   * Send process order : $response->SendProcessOrder($data[$root]
    *    ['google-order-number']['VALUE'], $message_log);
    * Send deliver order: $response->SendDeliverOrder($data[$root]
    *    ['google-order-number']['VALUE'], <carrier>, <tracking-number>,
@@ -270,7 +270,11 @@ switch ($root) {
      Examples of this are "anonymous-address", "merchant-code-string"
      from the merchant-calculations-callback API
   */
-                      function get_arr_result($child_node) {
+/**
+ * @param $child_node
+ *
+ * @return array
+ */function get_arr_result($child_node) {
                         $result = array();
                         if (isset($child_node)) {
                           if (is_associative_array($child_node)) {
@@ -286,7 +290,11 @@ switch ($root) {
                       }
 
                       /* Returns true if a given variable represents an associative array */
-                      function is_associative_array($var) {
+/**
+ * @param $var
+ *
+ * @return bool
+ */function is_associative_array($var) {
                         return is_array($var) && !is_numeric(implode('', array_keys($var)));
                       }
 

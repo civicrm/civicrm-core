@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,24 +24,24 @@
  +--------------------------------------------------------------------+
 *}
 {htxt id="contrib-profile-title"}
-  {ts}Contributer Profiles{/ts}
+  {ts}Contributor Profiles{/ts}
 {/htxt}
 {htxt id="contrib-profile"}
 <p>
-  {ts}If you want collect additional information from contributors, you will need to configure one or two CiviCRM Profiles - which are collections of standard or custom fields. You may need to information about the person (e.g. name and address if these are not already required by your payment processor, interest in subscribing to a newsletter or volunteering). You might also want to collect information specific to this contribution (e.g. target one or several projects or funds to support with this contribution).{/ts}
+  {ts}If you want collect additional information from contributors, you can include one or two CiviCRM Profiles - which are collections of standard or custom fields - in this contribution page. For example, you may need to collect information about the person (e.g. name and address if these are not already required by your payment processor, interest in subscribing to a newsletter or volunteering). You might also want to collect information specific to this contribution (e.g. target one or several projects or funds to support with this contribution).{/ts}
 </p>
 <p>
-  {ts}If you haven't already configured custom fields and a profile for this, you can save this screen without selecting a Profile, complete the steps below and then return to <strong>Manage Contribution Page</strong> and select your new profile.{/ts}
+  {ts}Your site may already have profile(s) which were previously created for this purpose, in which case you can re-use them for any number of online contribution pages.{/ts}
+  {ts}If you haven't already configured custom fields and a profile to collect data you need for this form, you can create them here using the steps below.{/ts}
 </p>
 <ol>
-  <li>{ts}Create a custom field group which is 'Used for' <strong>Contacts</strong> or <strong>Contributions</strong> depending on what type of information you're collecting.{/ts}</li>
-  <li>{ts}Add your field(s) this custom field group.{/ts}</li>
-  <li>{ts}Create a profile (e.g. 'Contribution Information').{/ts}</li>
-  <li>{ts}Add your custom field(s) to this profile as profile fields.{/ts}</li>
-  <li>{ts}Return to this screen (<strong>Administer CiviCRM &raquo; CiviContribute &raquo; Manage Contribution Pages &raquo; Configure &raquo; Include Profiles</strong>) and select your profile.{/ts}</li>
+  <li>{ts}Create a new profile by clicking the 'Create' button next to 'Include Profile' field below. Name your new profile (e.g. 'Contribution Information').{/ts}</li>
+  <li>{ts}Add any existing fields needed by dragging them into the profile form builder.{/ts}</li>
+  <li>{ts}If you need to create new custom fields, you can also do that within the profile editor. Then add the new custom field(s) to this profile by dragging them into the form builder.{/ts}</li>
+  <li>{ts}Save your profile to return to this screen. You can preview it from here by clicking the Preview (microsope) button.{/ts}</li>
 </ol>
 {capture assign=docLinkCustom}{docURL page="user/organising-your-data/custom-fields" text="custom fields"}{/capture}
-{capture assign=docLinkProfile}{docURL page="user/the-user-interface/profiles" text="profiles"}{/capture}
+{capture assign=docLinkProfile}{docURL page="user/organising-your-data/profiles" text="profiles"}{/capture}
 <p>
   {ts 1=$docLinkCustom 2=$docLinkProfile}Refer to the online documentation for more details on creating %1 and %2.{/ts}
 </p>

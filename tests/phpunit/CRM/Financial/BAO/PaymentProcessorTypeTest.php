@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,30 +23,25 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CRM/Financial/DAO/FinancialAccount.php';
 require_once 'CRM/Financial/BAO/FinancialAccount.php';
 require_once 'CRM/Financial/BAO/FinancialTypeAccount.php';
 
+/**
+ * Class CRM_Financial_BAO_PaymentProcessorTypeTest
+ */
 class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
-  function get_info() {
-    return array(
-      'name'        => 'PaymentProcessorType BAOs',
-      'description' => 'Test all Contribute_BAO_Contribution methods.',
-      'group'       => 'CiviCRM BAO Tests',
-    );
-  }
-
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * check method create()
+   * Check method create()
    */
-  function testCreate() {
+  public function testCreate() {
     $params = array(
       'name' => 'Test_Payment_Processor',
       'title' => 'Test Payment Processor',
@@ -60,13 +55,13 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'name',
       'Database check on added payment processor type record.'
     );
-    $this->assertEquals( $result, 'Test Payment Processor', 'Verify Payment Processor Type');
+    $this->assertEquals($result, 'Test Payment Processor', 'Verify Payment Processor Type');
   }
 
   /**
-   * check method retrieve()
+   * Check method retrieve()
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     $params = array(
       'name' => 'Test_Retrieve_Payment_Processor',
       'title' => 'Test Retrieve Payment Processor',
@@ -75,13 +70,13 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $defaults = array();
     CRM_Financial_BAO_PaymentProcessorType::create($params);
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
-    $this->assertEquals( $result->name, 'Test_Retrieve_Payment_Processor', 'Verify Payment Processor Type');
+    $this->assertEquals($result->name, 'Test_Retrieve_Payment_Processor', 'Verify Payment Processor Type');
   }
 
   /**
-   * check method setIsActive()
+   * Check method setIsActive()
    */
-  function testSetIsActive() {
+  public function testSetIsActive() {
     $params = array(
       'name' => 'Test_Set_Payment_Processor',
       'title' => 'Test Set Payment Processor',
@@ -104,9 +99,9 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method getDefault()
+   * Check method getDefault()
    */
-  function testGetDefault() {
+  public function testGetDefault() {
     $params = array('is_default' => 1);
     $defaults = array();
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
@@ -116,9 +111,9 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * check method del()
+   * Check method del()
    */
-  function testDel() {
+  public function testDel() {
     $params = array(
       'name' => 'Test_Del_Payment_Processor',
       'title' => 'Test Del Payment Processor',
@@ -134,4 +129,5 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }
+
 }

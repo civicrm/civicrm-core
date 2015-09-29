@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,11 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $context EQ 'Search'}
     {include file="CRM/common/pager.tpl" location="top"}
-{/if}
 
-{capture assign=iconURL}<img src="{$config->resourceBase}i/TreePlus.gif" alt="{ts}open section{/ts}"/>{/capture}
-{ts 1=$iconURL}Click %1 to view pledge payments.{/ts}
+<p class="description">
+  {ts}Click arrow to view pledge payments.{/ts}
+</p>
 {strip}
 <table class="selector row-highlight">
     <thead class="sticky">
@@ -61,16 +60,16 @@
                 {if ! $single }
                     &nbsp;{$row.contact_type}<br/>
                 {/if}
-                <span id="{$row.pledge_id}_show">
+                <span id="{$row.pledge_id}_show" title="{ts}Show payments{/ts}">
                     <a href="#" onclick="cj('#paymentDetails{$row.pledge_id},#minus{$row.pledge_id}_hide,#{$row.pledge_id}_hide').show();
                         buildPaymentDetails('{$row.pledge_id}','{$row.contact_id}');
                         cj('#{$row.pledge_id}_show').hide();
-                        return false;"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}open section{/ts}"/></a>
+                        return false;"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="&gt;"/></a>
                 </span>
-                <span id="minus{$row.pledge_id}_hide">
+                <span id="minus{$row.pledge_id}_hide" title="{ts}Hide payments{/ts}">
                     <a href="#" onclick="cj('#paymentDetails{$row.pledge_id},#{$row.pledge_id}_hide,#minus{$row.pledge_id}_hide').hide();
                             cj('#{$row.pledge_id}_show').show();
-                            return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}open section{/ts}"/></a>
+                            return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="^"/></a>
                 </span>
             </td>
             {if ! $single }
@@ -106,29 +105,19 @@
 </table>
 {/strip}
 
-{if $context EQ 'Search'}
     {include file="CRM/common/pager.tpl" location="bottom"}
-{/if}
 
 {* Build pledge payment details*}
 {literal}
 <script type="text/javascript">
-
-    function buildPaymentDetails( pledgeId, contactId )
-    {
-        var dataUrl = {/literal}"{crmURL p='civicrm/pledge/payment' h=0 q="action=browse&snippet=4&context=`$context`&pledgeId="}"{literal} + pledgeId + '&cid=' + contactId;
-
-        cj.ajax({
-                url     : dataUrl,
-                dataType: "html",
-                timeout : 5000, //Time in milliseconds
-                success : function( data ){
-                            cj( '#paymentDetails' + pledgeId ).html( data ).trigger('crmLoad');
-                          },
-                error   : function( XMLHttpRequest, textStatus, errorThrown ) {
-                            console.error( 'Error: '+ textStatus );
-                          }
-             });
-    }
+  (function($) {
+    // FIXME global function
+    window.buildPaymentDetails = function(pledgeId, contactId) {
+      var dataUrl = {/literal}"{crmURL p='civicrm/pledge/payment' h=0 q="action=browse&snippet=4&context=`$context`&pledgeId="}"{literal} + pledgeId + '&cid=' + contactId;
+      $('#paymentDetails' + pledgeId).load(dataUrl, function() {
+        $(this).trigger('crmLoad');
+      });
+    };
+  })(CRM.$);
 </script>
 {/literal}

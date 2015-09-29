@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,11 +31,15 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * Class api_v3_JobTest
+ */
 class api_v3_JobTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
@@ -43,8 +47,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public $_entity = 'Job';
   public $_params = array();
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
     $this->_params = array(
       'sequential' => 1,
       'name' => 'API_Test_Job',
@@ -57,27 +62,22 @@ class api_v3_JobTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
-    $this->quickCleanup(array('civicrm_job'));
-    CRM_Utils_Hook::singleton()->reset();
-    parent::tearDown();
-  }
-
   /**
-   * check with no name
+   * Check with no name.
    */
-  function testCreateWithoutName() {
+  public function testCreateWithoutName() {
     $params = array(
-      'is_active' => 1,    );
-    $result = $this->callAPIFailure('job', 'create', $params,
+      'is_active' => 1,
+    );
+    $this->callAPIFailure('job', 'create', $params,
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
   }
 
   /**
-   * create job with an invalid "run_frequency" value
+   * Create job with an invalid "run_frequency" value.
    */
-  function testCreateWithInvalidFrequency() {
+  public function testCreateWithInvalidFrequency() {
     $params = array(
       'sequential' => 1,
       'name' => 'API_Test_Job',
@@ -92,11 +92,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * create job
+   * Create job.
    */
-  function testCreate() {
+  public function testCreate() {
     $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['values'][0]['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($result['values'][0]['id']);
 
     // mutate $params to match expected return value
     unset($this->_params['sequential']);
@@ -105,24 +105,24 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with empty array
+   * Check with empty array.
    */
-  function testDeleteEmpty() {
+  public function testDeleteEmpty() {
     $params = array();
     $result = $this->callAPIFailure('job', 'delete', $params);
   }
 
   /**
-   * check with No array
+   * Check with No array.
    */
-  function testDeleteParamsNotArray() {
+  public function testDeleteParamsNotArray() {
     $result = $this->callAPIFailure('job', 'delete', 'string');
   }
 
   /**
-   * check if required fields are not passed
+   * Check if required fields are not passed.
    */
-  function testDeleteWithoutRequired() {
+  public function testDeleteWithoutRequired() {
     $params = array(
       'name' => 'API_Test_PP',
       'title' => 'API Test Payment Processor',
@@ -134,41 +134,45 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * check with incorrect required fields
+   * Check with incorrect required fields.
    */
-  function testDeleteWithIncorrectData() {
+  public function testDeleteWithIncorrectData() {
     $params = array(
-      'id' => 'abcd',    );
+      'id' => 'abcd',
+    );
     $result = $this->callAPIFailure('job', 'delete', $params);
   }
 
   /**
-   * check job delete
+   * Check job delete.
    */
-  function testDelete() {
+  public function testDelete() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
-    $params = array('id' => $createResult['id'],);
+    $params = array('id' => $createResult['id']);
     $result = $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPIDeleted($this->_entity, $createResult['id']);
   }
 
   /**
-
-  public function testCallUpdateGreetingMissingParams() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1));
-    $this->assertEquals('Mandatory key(s) missing from params array: ct', $result['error_message']);
-  }
-
-  public function testCallUpdateGreetingIncorrectParams() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1, 'ct' => 'djkfhdskjfhds'));
-    $this->assertEquals('ct `djkfhdskjfhds` is not valid.', $result['error_message']);
-  }
-/*
- * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
- */
+   *
+   * public function testCallUpdateGreetingMissingParams() {
+   * $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1));
+   * $this->assertEquals('Mandatory key(s) missing from params array: ct', $result['error_message']);
+   * }
+   *
+   * public function testCallUpdateGreetingIncorrectParams() {
+   * $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 1, 'ct' => 'djkfhdskjfhds'));
+   * $this->assertEquals('ct `djkfhdskjfhds` is not valid.', $result['error_message']);
+   * }
+   * /*
+   * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
+   */
   public function testCallUpdateGreetingSuccess() {
-    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => 'postal_greeting', 'ct' => 'Individual'));
-   }
+    $result = $this->callAPISuccess($this->_entity, 'update_greeting', array(
+      'gt' => 'postal_greeting',
+      'ct' => 'Individual',
+    ));
+  }
 
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
     $gt = 'postal_greeting,email_greeting,addressee';
@@ -176,11 +180,105 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
   }
 
+  /**
+   * Test the call reminder success sends more than 25 reminders & is not incorrectly limited.
+   *
+   * Note that this particular test sends the reminders to the additional recipients only
+   * as no real reminder person is configured
+   *
+   * Also note that this is testing a 'job' api so is in this class rather than scheduled_reminder - which
+   * seems a cleaner place to build up a collection of scheduled reminder testing functions. However, it seems
+   * that the api itself would need to be moved to the scheduled_reminder fn to do that  with the job wrapper being respected for legacy functions
+   */
+  public function testCallSendReminderSuccessMoreThanDefaultLimit() {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $this->membershipStatusCreate();
+    $createTotal = 30;
+    for ($i = 1; $i <= $createTotal; $i++) {
+      $contactID = $this->individualCreate();
+      $groupID = $this->groupCreate(array('name' => $i, 'title' => $i));
+      $result = $this->callAPISuccess('action_schedule', 'create', array(
+        'title' => " job $i",
+        'subject' => "job $i",
+        'entity_value' => $membershipTypeID,
+        'mapping_id' => 4,
+        'start_action_date' => 'membership_join_date',
+        'start_action_offset' => 0,
+        'start_action_condition' => 'before',
+        'start_action_unit' => 'hour',
+        'group_id' => $groupID,
+        'limit_to' => FALSE,
+      ));
+      $this->callAPISuccess('group_contact', 'create', array(
+        'contact_id' => $contactID,
+        'status' => 'Added',
+        'group_id' => $groupID,
+      ));
+    }
+    $result = $this->callAPISuccess('job', 'send_reminder', array());
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals($successfulCronCount, $createTotal);
+  }
+
+  /**
+   * Test scheduled reminders respect limit to (since above identified addition_to handling issue).
+   *
+   * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
+   * & check that only the chosen one got the reminder
+   */
+  public function testCallSendReminderLimitTo() {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $this->membershipStatusCreate();
+    $createTotal = 3;
+    $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
+    for ($i = 1; $i <= $createTotal; $i++) {
+      $contactID = $this->individualCreate();
+      if ($i == 2) {
+        $theChosenOneID = $contactID;
+      }
+      if ($i < 3) {
+        $this->callAPISuccess('group_contact', 'create', array(
+          'contact_id' => $contactID,
+          'status' => 'Added',
+          'group_id' => $groupID,
+        ));
+      }
+      if ($i > 1) {
+        $this->callAPISuccess('membership', 'create', array(
+            'contact_id' => $contactID,
+            'membership_type_id' => $membershipTypeID,
+            'join_date' => '+ 1 hour',
+          )
+        );
+      }
+    }
+    $result = $this->callAPISuccess('action_schedule', 'create', array(
+      'title' => " remind all Texans",
+      'subject' => "drawling renewal",
+      'entity_value' => $membershipTypeID,
+      'mapping_id' => 4,
+      'start_action_date' => 'membership_join_date',
+      'start_action_offset' => 0,
+      'start_action_condition' => 'before',
+      'start_action_unit' => 'hour',
+      'group_id' => $groupID,
+      'limit_to' => TRUE,
+    ));
+    $result = $this->callAPISuccess('job', 'send_reminder', array());
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals($successfulCronCount, 1);
+    $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
+    $this->assertEquals($sentToID, $theChosenOneID);
+  }
+
   public function testCallDisableExpiredRelationships() {
     $individualID = $this->individualCreate();
     $orgID = $this->organizationCreate();
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', array($this, 'hookPreRelationship'));
-    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array('return' => 'id', 'name_a_b' => 'Employee of'));
+    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array(
+      'return' => 'id',
+      'name_a_b' => 'Employee of',
+    ));
     $result = $this->callAPISuccess('relationship', 'create', array(
       'relationship_type_id' => $relationshipTypeID,
       'contact_id_a' => $individualID,
@@ -197,16 +295,22 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->contactDelete($orgID);
   }
 
-  function hookPreRelationship($op, $objectName, $id, &$params ) {
-    if($op == 'delete') {
+  /**
+   * @param $op
+   * @param string $objectName
+   * @param int $id
+   * @param array $params
+   */
+  public function hookPreRelationship($op, $objectName, $id, &$params) {
+    if ($op == 'delete') {
       return;
     }
-    if($params['is_active']) {
+    if ($params['is_active']) {
       $params['description'] = 'Hooked';
     }
     else {
       $params['description'] = 'Go Go you good thing';
     }
   }
-}
 
+}

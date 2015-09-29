@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -72,7 +72,7 @@
   <script type="text/javascript">
     var totalPages = {/literal}{$pager->_totalPages}{literal};
     CRM.$(function($) {
-      cj("#crm-container .crm-pager input.form-submit").click(function () {
+      $("#crm-container .crm-pager input.crm-form-submit").click(function () {
         submitPagerData(this);
       });
     });

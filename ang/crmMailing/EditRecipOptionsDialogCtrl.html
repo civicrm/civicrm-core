@@ -1,0 +1,44 @@
+<div ng-controller="EditRecipOptionsDialogCtrl" class="crmMailing">
+  <div class="crm-block" ng-form="editRecipOptionsForm" crm-ui-id-scope>
+    <div class="crm-group">
+
+      <div crm-ui-field="{title: ts('Dedupe by email'), help: hs('dedupe_email')}" crm-layout="checkbox">
+        <input
+          type='checkbox'
+          ng-model='model.mailing.dedupe_email'
+          ng-true-value="'1'"
+          ng-false-value="'0'"
+          />
+      </div>
+
+      <div crm-ui-field="{name: 'editRecipOptionsForm.location_type_id', title: ts('Location Type')}">
+        <select
+          crm-ui-id="editRecipOptionsForm.location_type_id"
+          crm-ui-select="{dropdownAutoWidth : true}"
+          name="location_type_id"
+          ng-model="model.mailing.location_type_id"
+          required
+          >
+
+          <option value="">{{ts('Automatic')}}</option>
+          <option ng-repeat="locType in model.fields.location_type_id.options"
+                  ng-value="locType.key">{{locType.value}}</option>
+        </select>
+      </div>
+
+      <div crm-ui-field="{name: 'editRecipOptionsForm.email_selection_method', title: ts('Selection Method')}">
+        <select
+          crm-ui-id="editRecipOptionsForm.email_selection_method"
+          crm-ui-select=""
+          name="email_selection_method"
+          ng-model="model.mailing.email_selection_method"
+          required
+          >
+          <option ng-repeat="selMet in model.fields.email_selection_method.options"
+                  ng-value="selMet.key">{{selMet.value}}</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+</div>

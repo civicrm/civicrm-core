@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,6 +38,12 @@
  */
 class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
+  /**
+   * @param int $compID
+   * @param null $grouping
+   *
+   * @return array
+   */
   public static function &info($compID = NULL, $grouping = NULL) {
     $all = CRM_Utils_Request::retrieve('all', 'Boolean', CRM_Core_DAO::$_nullObject,
       FALSE, NULL, 'GET'
@@ -48,7 +53,8 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
     if ($compID) {
       if ($compID == 99) {
         $compClause = " AND v.component_id IS NULL ";
-      } else {
+      }
+      else {
         $compClause = " AND v.component_id = {$compID} ";
       }
     }
@@ -78,8 +84,8 @@ LEFT  JOIN civicrm_component comp
     }
     $sql .= " ORDER BY  v.weight ";
 
-    $dao    = CRM_Core_DAO::executeQuery($sql);
-    $rows   = array();
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $rows = array();
     $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
       if ($dao->component_name != 'Contact' && $dao->component_name != $dao->grouping &&
@@ -87,8 +93,8 @@ LEFT  JOIN civicrm_component comp
       ) {
         continue;
       }
-      $rows[$dao->component_name][$dao->value]['title'] = $dao->label;
-      $rows[$dao->component_name][$dao->value]['description'] = $dao->description;
+      $rows[$dao->component_name][$dao->value]['title'] = ts($dao->label);
+      $rows[$dao->component_name][$dao->value]['description'] = ts($dao->description);
       $rows[$dao->component_name][$dao->value]['url'] = CRM_Utils_System::url('civicrm/report/' . trim($dao->value, '/'), 'reset=1');
       if ($dao->instance_id) {
         $rows[$dao->component_name][$dao->value]['instanceUrl'] = CRM_Utils_System::url('civicrm/report/list',
@@ -101,11 +107,11 @@ LEFT  JOIN civicrm_component comp
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
+   * Run this page (figure out the action needed and perform it).
    *
    * @return void
    */
-  function run() {
+  public function run() {
     $compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);
     $grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
     $rows = self::info($compID, $grouping);
@@ -113,5 +119,5 @@ LEFT  JOIN civicrm_component comp
 
     return parent::run();
   }
-}
 
+}

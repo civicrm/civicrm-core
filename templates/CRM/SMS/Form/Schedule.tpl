@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,29 +66,21 @@
 </div><!-- /.crm-accordion-wrapper -->
 {/if}
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-
 </div>
 
 <script type="text/javascript">
-{if $preview}
-{/if}
-
 {literal}
-CRM.$(function($) {
-   cj('#start_date_display').change( function( ) { 
-       if ( cj(this).val( ) ) {
-          cj('#now').prop('checked', false );
-       }
-   });
-   cj('#now').change( function( ) { 
-       if ( cj('#now').prop('checked', true ) ) {
-          cj('#start_date_display').val( '' );
-          cj('#start_date').val( '' );
-          cj('#start_date_time').val( '' );
-       }
-   });
-});
+  CRM.$(function($) {
+    $('#start_date_display').change(function() {
+      $('#now').prop('checked', !$(this).val());
+    });
+    $('#now').change(function() {
+      if ($(this).prop('checked')) {
+        $('#start_date_display, #start_date, #start_date_time').val('');
+      } else {
+        $('#start_date_display').focus();
+      }
+    });
+  });
 {/literal}
 </script>

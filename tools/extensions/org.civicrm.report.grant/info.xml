@@ -22,6 +22,6 @@
   <comments>For support, please contact project team on the forums. (http://forum.civicrm.org)</comments>
   <typeInfo>
     <reportUrl>grant/summary</reportUrl>
-    <component>CiviGrant</component>      
+    <component>CiviGrant</component>
   </typeInfo>
 </extension>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,31 +23,34 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 // we should consider moving these to the settings table
 // before the 4.1 release
 define('EMAIL_ACTIVITY_TYPE_ID', NULL);
 define('MAIL_BATCH_SIZE', 50);
+
+/**
+ * Class CRM_Utils_Mail_EmailProcessor.
+ */
 class CRM_Utils_Mail_EmailProcessor {
 
   /**
    * Process the default mailbox (ie. that is used by civiMail for the bounce)
    *
-   * @return boolean always returns true (for the api). at a later stage we should
-   *                 fix this to return true on success / false on failure etc
+   * @return bool
+   *   Always returns true (for the api). at a later stage we should
+   *   fix this to return true on success / false on failure etc.
    */
-  static function processBounces() {
-    $dao             = new CRM_Core_DAO_MailSettings;
-    $dao->domain_id  = CRM_Core_Config::domainID();
+  public static function processBounces() {
+    $dao = new CRM_Core_DAO_MailSettings();
+    $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = TRUE;
     $dao->find();
 
@@ -60,14 +63,14 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Delete old files from a given directory (recursively)
+   * Delete old files from a given directory (recursively).
    *
-   * @param string $dir  directory to cleanup
-   * @param int    $age  files older than this many seconds will be deleted (default: 60 days)
-   *
-   * @return void
+   * @param string $dir
+   *   Directory to cleanup.
+   * @param int $age
+   *   Files older than this many seconds will be deleted (default: 60 days).
    */
-  static function cleanupDir($dir, $age = 5184000) {
+  public static function cleanupDir($dir, $age = 5184000) {
     // return early if we can’t read/write the dir
     if (!is_writable($dir) or !is_readable($dir) or !is_dir($dir)) {
       return;
@@ -89,13 +92,11 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce)
-   *
-   * @return void
+   * Process the mailboxes that aren't default (ie. that aren't used by civiMail for the bounce).
    */
-  static function processActivities() {
-    $dao             = new CRM_Core_DAO_MailSettings;
-    $dao->domain_id  = CRM_Core_Config::domainID();
+  public static function processActivities() {
+    $dao = new CRM_Core_DAO_MailSettings();
+    $dao->domain_id = CRM_Core_Config::domainID();
     $dao->is_default = FALSE;
     $dao->find();
     $found = FALSE;
@@ -110,14 +111,12 @@ class CRM_Utils_Mail_EmailProcessor {
   }
 
   /**
-   * Process the mailbox for all the settings from civicrm_mail_settings
+   * Process the mailbox for all the settings from civicrm_mail_settings.
    *
-   * @param string $civiMail  if true, processing is done in CiviMail context, or Activities otherwise.
-   *
-   * @return void
+   * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
    */
-  static function process($civiMail = TRUE) {
-    $dao = new CRM_Core_DAO_MailSettings;
+  public static function process($civiMail = TRUE) {
+    $dao = new CRM_Core_DAO_MailSettings();
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
 
@@ -126,28 +125,32 @@ class CRM_Utils_Mail_EmailProcessor {
     }
   }
 
-  static function _process($civiMail, $dao) {
+  /**
+   * @param $civiMail
+   * @param CRM_Core_DAO $dao
+   *
+   * @throws Exception
+   */
+  public static function _process($civiMail, $dao) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;
 
-    $emailActivityTypeId =
-      (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ?
-      EMAIL_ACTIVITY_TYPE_ID :
-      CRM_Core_OptionGroup::getValue(
+    $emailActivityTypeId
+      = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID) ? EMAIL_ACTIVITY_TYPE_ID : CRM_Core_OptionGroup::getValue(
         'activity_type',
-      'Inbound Email',
-      'name'
-    );
+        'Inbound Email',
+        'name'
+      );
 
     if (!$emailActivityTypeId) {
       CRM_Core_Error::fatal(ts('Could not find a valid Activity Type ID for Inbound Email'));
     }
 
-    $config            = CRM_Core_Config::singleton();
-    $verpSeperator     = preg_quote($config->verpSeparator);
+    $config = CRM_Core_Config::singleton();
+    $verpSeperator = preg_quote($config->verpSeparator);
     $twoDigitStringMin = $verpSeperator . '(\d+)' . $verpSeperator . '(\d+)';
-    $twoDigitString    = $twoDigitStringMin . $verpSeperator;
-    $threeDigitString  = $twoDigitString . '(\d+)' . $verpSeperator;
+    $twoDigitString = $twoDigitStringMin . $verpSeperator;
+    $threeDigitString = $twoDigitString . '(\d+)' . $verpSeperator;
 
     // FIXME: legacy regexen to handle CiviCRM 2.1 address patterns, with domain id and possible VERP part
     $commonRegex = '/^' . preg_quote($dao->localpart) . '(b|bounce|c|confirm|o|optOut|r|reply|re|e|resubscribe|u|unsubscribe)' . $threeDigitString . '([0-9a-f]{16})(-.*)?@' . preg_quote($dao->domain) . '$/';
@@ -160,19 +163,19 @@ class CRM_Utils_Mail_EmailProcessor {
     $rpRegex = '/Return-Path: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
 
     // a regex for finding bound info X-Header
-    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/';
+    $rpXheaderRegex = '/X-CiviMail-Bounce: ' . preg_quote($dao->localpart) . '(b)' . $twoDigitString . '([0-9a-f]{16})@' . preg_quote($dao->domain) . '/i';
+    // CiviMail in regex and Civimail in header !!!
 
     // retrieve the emails
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
     }
-    catch(Exception$e) {
-      $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server .'<p>';
+    catch (Exception$e) {
+      $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server . '<p>';
       $message .= ts('Error message: ');
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
       CRM_Core_Error::fatal($message);
     }
-
 
     // process fifty at a time, CRM-4002
     while ($mails = $store->fetchNext(MAIL_BATCH_SIZE)) {
@@ -210,6 +213,21 @@ class CRM_Utils_Mail_EmailProcessor {
           if (!$matches and preg_match($rpXheaderRegex, $mail->generateBody(), $matches)) {
             list($match, $action, $job, $queue, $hash) = $matches;
           }
+          // With Mandrilla, the X-CiviMail-Bounce header is produced by generateBody
+          // is base64 encoded
+          // Check all parts
+          if (!$matches) {
+            $all_parts = $mail->fetchParts();
+            foreach ($all_parts as $k_part => $v_part) {
+              if ($v_part instanceof ezcMailFile) {
+                $p_file = $v_part->__get('fileName');
+                $c_file = file_get_contents($p_file);
+                if (preg_match($rpXheaderRegex, $c_file, $matches)) {
+                  list($match, $action, $job, $queue, $hash) = $matches;
+                }
+              }
+            }
+          }
 
           // if all else fails, check Delivered-To for possible pattern
           if (!$matches and preg_match($regex, $mail->getHeader('Delivered-To'), $matches)) {
@@ -220,7 +238,14 @@ class CRM_Utils_Mail_EmailProcessor {
         // preseve backward compatibility
         if ($usedfor == 0 || !$civiMail) {
           // if its the activities that needs to be processed ..
-          $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
+          try {
+            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
+          }
+          catch (Exception $e) {
+            echo $e->getMessage();
+            $store->markIgnored($key);
+            continue;
+          }
 
           require_once 'CRM/Utils/DeprecatedUtils.php';
           $params = _civicrm_api3_deprecated_activity_buildmailparams($mailParams, $emailActivityTypeId);
@@ -263,7 +288,40 @@ class CRM_Utils_Mail_EmailProcessor {
                 $text = $mail->body->text;
               }
               elseif ($mail->body instanceof ezcMailMultipart) {
-                if ($mail->body instanceof ezcMailMultipartRelated) {
+                if ($mail->body instanceof ezcMailMultipartReport) {
+                  $part = $mail->body->getMachinePart();
+                  if ($part instanceof ezcMailDeliveryStatus) {
+                    foreach ($part->recipients as $rec) {
+                      if (isset($rec["Diagnostic-Code"])) {
+                        $text = $rec["Diagnostic-Code"];
+                        break;
+                      }
+                      elseif (isset($rec["Description"])) {
+                        $text = $rec["Description"];
+                        break;
+                      }
+                      // no diagnostic info present - try getting the human readable part
+                      elseif (isset($rec["Status"])) {
+                        $text = $rec["Status"];
+                        $textpart = $mail->body->getReadablePart();
+                        if ($textpart != NULL and isset($textpart->text)) {
+                          $text .= " " . $textpart->text;
+                        }
+                        else {
+                          $text .= " Delivery failed but no diagnostic code or description.";
+                        }
+                        break;
+                      }
+                    }
+                  }
+                  elseif ($part != NULL and isset($part->text)) {
+                    $text = $part->text;
+                  }
+                  elseif (($part = $mail->body->getReadablePart()) != NULL) {
+                    $text = $part->text;
+                  }
+                }
+                elseif ($mail->body instanceof ezcMailMultipartRelated) {
                   foreach ($mail->body->getRelatedParts() as $part) {
                     if (isset($part->subType) and $part->subType == 'plain') {
                       $text = $part->text;
@@ -282,7 +340,7 @@ class CRM_Utils_Mail_EmailProcessor {
               }
 
               if (
-                $text == NULL &&
+                empty($text) &&
                 $mail->subject == "Delivery Status Notification (Failure)"
               ) {
                 // Exchange error - CRM-9361
@@ -290,7 +348,12 @@ class CRM_Utils_Mail_EmailProcessor {
                   if ($part instanceof ezcMailDeliveryStatus) {
                     foreach ($part->recipients as $rec) {
                       if ($rec["Status"] == "5.1.1") {
-                        $text = "Delivery to the following recipients failed";
+                        if (isset($rec["Description"])) {
+                          $text = $rec["Description"];
+                        }
+                        else {
+                          $text = $rec["Status"] . " Delivery to the following recipients failed";
+                        }
                         break;
                       }
                     }
@@ -405,5 +468,5 @@ class CRM_Utils_Mail_EmailProcessor {
       $store->expunge();
     }
   }
-}
 
+}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,6 @@
 *}
 {* View existing membership record. *}
 <div class="crm-block crm-content-block crm-membership-view-form-block">
-    <h3>{ts}View Membership{/ts}</h3>
     <div class="crm-submit-buttons">
         {* Check permissions and make sure this is not an inherited membership (edit and delete not allowed for inherited memberships) *}
         {if ! $owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships') }
@@ -33,7 +32,7 @@
       {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
       {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/membership' q=$urlParams}" accesskey="e" id="crm-membership-edit-button-top"><span><div class="icon edit-icon"></div> {ts}Edit{/ts}</span></a>
+            <a class="button" href="{crmURL p='civicrm/contact/view/membership' q=$urlParams}" accesskey="e" id="crm-membership-edit-button-top"><span><div class="icon ui-icon-pencil"></div> {ts}Edit{/ts}</span></a>
         {/if}
         {if ! $owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviMember')}
             {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}
@@ -65,7 +64,17 @@
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
     {if $accessContribution and $rows.0.contribution_id}
-        {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+        <div class="crm-accordion-wrapper">
+              <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+              <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+        </div>
+    {/if}
+
+    {if $softCredit}
+        <div class="crm-accordion-wrapper">
+            <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+            <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
+        </div>
     {/if}
 
     {if $has_related}
@@ -79,7 +88,7 @@
           {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
             {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
           {/if}
-          <a class="button" href="{crmURL p='civicrm/contact/view/membership' q=$urlParams}" accesskey="e" id="crm-membership-edit-button-bottom"><span><div class="icon edit-icon"></div> {ts}Edit{/ts}</span></a>
+          <a class="button" href="{crmURL p='civicrm/contact/view/membership' q=$urlParams}" accesskey="e" id="crm-membership-edit-button-bottom"><span><div class="icon ui-icon-pencil"></div> {ts}Edit{/ts}</span></a>
         {/if}
         {if ! $owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviMember')}
           {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}

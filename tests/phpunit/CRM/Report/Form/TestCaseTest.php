@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviReportTestCase.php';
 
@@ -38,7 +38,7 @@ require_once 'CiviTest/CiviReportTestCase.php';
  * @package CiviCRM
  */
 class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
-  static $_tablesToTruncate = array(
+  protected $_tablesToTruncate = array(
     'civicrm_contact',
     'civicrm_email',
     'civicrm_phone',
@@ -46,6 +46,9 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     'civicrm_contribution',
   );
 
+  /**
+   * @return array
+   */
   public function dataProvider() {
     $testCaseA = array(
       'CRM_Report_Form_Contribute_Detail',
@@ -77,6 +80,9 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     );
   }
 
+  /**
+   * @return array
+   */
   public function badDataProvider() {
     return array(
       // This test-case is bad because the dataset-ascii.sql does not match the
@@ -123,13 +129,13 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     );
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
     $this->foreignKeyChecksOff();
-    $this->quickCleanup(self::$_tablesToTruncate);
+    $this->quickCleanup($this->_tablesToTruncate);
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp1');
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp2');
@@ -138,6 +144,11 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
 
   /**
    * @dataProvider dataProvider
+   * @param $reportClass
+   * @param $inputParams
+   * @param $dataSet
+   * @param $expectedOutputCsvFile
+   * @throws \Exception
    */
   public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
     $config = CRM_Core_Config::singleton();
@@ -153,6 +164,11 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   /**
    * @expectedException PHPUnit_Framework_AssertionFailedError
    * @dataProvider badDataProvider
+   * @param $reportClass
+   * @param $inputParams
+   * @param $dataSet
+   * @param $expectedOutputCsvFile
+   * @throws \Exception
    */
   public function testBadReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
     $config = CRM_Core_Config::singleton();
@@ -164,4 +180,5 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
+
 }

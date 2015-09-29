@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -76,6 +76,7 @@
   {/if}
 
   {if $contactSmartGroupSettings neq 3}
+    <div class="spacer" style="height: 1.5em;"></div>
     <div class="accordion ui-accordion ui-widget ui-helper-reset">
       <div class="crm-accordion-wrapper crm-ajax-accordion crm-smartgroup-accordion {if $contactSmartGroupSettings eq 1}collapsed{/if}">
         <div class="crm-accordion-header" id="crm-contact_smartgroup" contact_id="{$contactId}">
@@ -83,7 +84,7 @@
         </div>
         <!-- /.crm-accordion-header -->
         <div class="crm-accordion-body">
-          <div class="crm-contact_smartgroup"></div>
+          <div class="crm-contact_smartgroup" style="min-height: 3em;"></div>
         </div>
         <!-- /.crm-accordion-body -->
       </div>
@@ -151,8 +152,8 @@
               </a>
             </td>
             <td class="status-removed">{ts 1=$row.out_method}Removed (by %1){/ts}</td>
-            <td>{$row.date_added|crmDate}</td>
-            <td>{$row.out_date|crmDate}</td>
+            <td data-order="{$row.date_added}">{$row.date_added|crmDate}</td>
+            <td data-order="{$row.out_date}">{$row.out_date|crmDate}</td>
             <td>{if $permission EQ 'edit'}
                 <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
                   {ts}Rejoin Group{/ts}</a>
@@ -172,11 +173,10 @@
   CRM.$(function($) {
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes() {
-      var id = $(this).attr('id');
+      var $el = $(this).parent().find('div.crm-contact_smartgroup');
       var contactId = $(this).attr('contact_id');
-      if (!$('div.' + id).html()) {
-        var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
-        $('div.' + id).html(loading).load(CRM.url('civicrm/contact/view/smartgroup', {snippet: 4, cid: contactId}));
+      if (!$el.html()) {
+        CRM.loadPage(CRM.url('civicrm/contact/view/smartgroup', {cid: contactId}), {target: $el});
       }
     }
     // bind first click of accordion header to load crm-accordion-body with snippet

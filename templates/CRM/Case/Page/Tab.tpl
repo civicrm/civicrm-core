@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
       <div class="icon inform-icon"></div>&nbsp;
          <strong>{ts}Oops, It looks like there are no active case types.{/ts}</strong>
            {if call_user_func(array('CRM_Core_Permission','check'), ' administer CiviCase')}
-             {capture assign=adminCaseTypeURL}{crmURL p='civicrm/admin/options/case_type' q='reset=1'}
+             {capture assign=adminCaseTypeURL}{crmURL p='civicrm/a/#/caseType'}
        {/capture}
              {ts 1=$adminCaseTypeURL 2=$adminCaseStatusURL}Enable <a href='%1'>case types</a>.{/ts}
            {/if}
@@ -60,7 +60,7 @@
           call_user_func(array('CRM_Core_Permission','check'), 'add cases') ) AND
         $allowToAddNewCase}
         <div class="action-link">
-        <a accesskey="N" href="{$newCaseURL}" class="button"><span><div class="icon add-icon"></div> {ts}Add Case{/ts}</span></a>
+        <a accesskey="N" href="{$newCaseURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div> {ts}Add Case{/ts}</span></a>
         </div>
     {/if}
 

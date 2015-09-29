@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,26 +23,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
  * This class generates form components for Message templates
  * used by membership, contributions, event registrations, etc.
- *
  */
 class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   // which (and whether) mailing workflow this template belongs to
   protected $_workflow_id = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'add'
@@ -55,12 +52,9 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
+   *
    * The default values are retrieved from the database.
-   *
-   * @access public
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
@@ -76,8 +70,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       //set the context for redirection after form submit or cancel
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/messageTemplates',
-          'selectedChild=user&reset=1'
-        ));
+        'selectedChild=user&reset=1'
+      ));
     }
 
     // FIXME: we need to fix the Cancel button here as we don’t know whether it’s a workflow template in buildQuickForm()
@@ -110,10 +104,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
 
@@ -140,11 +131,14 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       return;
     }
 
-    $breadCrumb = array(array('title' => ts('Message Templates'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('Message Templates'),
         'url' => CRM_Utils_System::url('civicrm/admin/messageTemplates',
           'action=browse&reset=1'
         ),
-      ));
+      ),
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->applyFilter('__ALL__', 'trim');
@@ -160,10 +154,6 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
-    $this->add('textarea', 'msg_text', ts('Text Message'),
-      "cols=50 rows=6"
-    );
-
     // if not a system message use a wysiwyg editor, CRM-5971
     if ($this->_id &&
       CRM_Core_DAO::getFieldValue('CRM_Core_DAO_MessageTemplate',
@@ -176,17 +166,23 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       );
     }
     else {
-      $this->addWysiwyg('msg_html', ts('HTML Message'),
+      $this->add('wysiwyg', 'msg_html', ts('HTML Message'),
         array(
-          'cols' => '80', 'rows' => '8',
+          'cols' => '80',
+          'rows' => '8',
           'onkeyup' => "return verify(this)",
         )
       );
     }
 
+    $this->add('textarea', 'msg_text', ts('Text Message'),
+      "cols=50 rows=6"
+    );
+
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
       array(
-        'null' => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
+        'null' => ts('- default -'),
+      ) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -198,11 +194,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -238,5 +230,5 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       }
     }
   }
-}
 
+}

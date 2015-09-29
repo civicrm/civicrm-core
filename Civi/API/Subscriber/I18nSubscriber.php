@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,33 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Subscriber;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class I18nSubscriber
+ * @package Civi\API\Subscriber
+ */
 class I18nSubscriber implements EventSubscriberInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
-      Events::PREPARE => array('onApiPrepare', Events::W_MIDDLE)
+      Events::PREPARE => array('onApiPrepare', Events::W_MIDDLE),
     );
   }
 
+  /**
+   * @param \Civi\API\Event\Event $event
+   *   API preparation event.
+   *
+   * @throws \API_Exception
+   */
   public function onApiPrepare(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();
 
@@ -49,6 +63,8 @@ class I18nSubscriber implements EventSubscriberInterface {
    * Sets the tsLocale and dbLocale for multi-lingual sites.
    * Some code duplication from CRM/Core/BAO/ConfigSetting.php retrieve()
    * to avoid regressions from refactoring.
+   * @param $lcMessagesRequest
+   * @throws \API_Exception
    */
   public function setLocale($lcMessagesRequest) {
     // We must validate whether the locale is valid, otherwise setting a bad
@@ -91,4 +107,5 @@ class I18nSubscriber implements EventSubscriberInterface {
       }
     }
   }
+
 }

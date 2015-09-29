@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,9 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing a tag (admin)  *}
-<h3>{if $action eq 1}{ts}New Tag {if $isTagSet}Set{/if}{/ts}{elseif $action eq 2}{ts}Edit Tag {if $isTagSet}Set{/if}{/ts}{else}{ts}Delete Tag {if $isTagSet}Set{/if}{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-tag-form-block">
-    {if $action eq 1 or $action eq 2 }
+  {if $action eq 1 or $action eq 2 }
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
        <tr class="crm-tag-form-block-label">
@@ -39,18 +38,18 @@
        </tr>
          {if $form.parent_id.html}
        <tr class="crm-tag-form-block-parent_id">
-     <td class="label">{$form.parent_id.label}</td>
-          <td>{$form.parent_id.html}</td>
+         <td class="label">{$form.parent_id.label}</td>
+         <td>{$form.parent_id.html}</td>
        </tr>
    {/if}
        <tr class="crm-tag-form-block-used_for">
           <td class="label">{$form.used_for.label}</td>
-    <td>{$form.used_for.html} <br />
-          <span class="description">
-                 {if $is_parent}{ts}You can change the types of records which this tag can be used for by editing the 'Parent' tag.{/ts}
-                  {else}{ts}What types of record(s) can this tag be used for?{/ts}
-                  {/if}
-              </span>
+          <td>{$form.used_for.html} <br />
+            <span class="description">
+              {if $is_parent}{ts}You can change the types of records which this tag can be used for by editing the 'Parent' tag.{/ts}
+              {else}{ts}What types of record(s) can this tag be used for?{/ts}
+              {/if}
+            </span>
           </td>
         </tr>
         <tr class="crm-tag-form-block-is_reserved">
@@ -58,6 +57,13 @@
            <td>{$form.is_reserved.html} <br /><span class="description">{ts}Reserved tags can not be deleted. Users with 'administer reserved tags' permission can set or unset the reserved flag. You must uncheck 'Reserved' (and delete any child tags) before you can delete a tag.{/ts}
            </td>
         </tr>
+        {if ! $isTagSet} {* Tagsets are not selectable by definition, so exclude this field for tagsets *}
+          <tr class="crm-tag-form-block-is_slectable">
+             <td class="label">{$form.is_selectable.label}</td>
+             <td>{$form.is_selectable.html}<br /><span class="description">{ts}Defines if you can select this tag.{/ts}
+             </td>
+          </tr>
+        {/if}
     </table>
         {if $parent_tags|@count > 0}
         <table class="form-layout-compressed">

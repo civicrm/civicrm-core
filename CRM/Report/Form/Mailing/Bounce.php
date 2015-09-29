@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -44,7 +43,12 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   // just a toggle we use to build the from
   protected $_mailingidField = FALSE;
 
-  protected $_customGroupExtends = array('Contact', 'Individual', 'Household', 'Organization');
+  protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Household',
+    'Organization',
+  );
 
   protected $_charts = array(
     '' => 'Tabular',
@@ -52,7 +56,11 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
-  function __construct() {
+  /**
+   */
+  /**
+   */
+  public function __construct() {
     $this->_columns = array();
 
     $this->_columns['civicrm_contact'] = array(
@@ -62,8 +70,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
           'title' => ts('Contact ID'),
           'required' => TRUE,
         ),
-        'sort_name' =>
-        array(
+        'sort_name' => array(
           'title' => ts('Contact Name'),
           'required' => TRUE,
         ),
@@ -81,10 +88,12 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
           'no_display' => TRUE,
         ),
       ),
-      'order_bys' =>
-      array(
-        'sort_name' =>
-        array('title' => ts('Contact Name'), 'default' => TRUE, 'default_order' => 'ASC'),
+      'order_bys' => array(
+        'sort_name' => array(
+          'title' => ts('Contact Name'),
+          'default' => TRUE,
+          'default_order' => 'ASC',
+        ),
       ),
       'grouping' => 'contact-fields',
     );
@@ -113,10 +122,8 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
           'operator' => 'like',
         ),
       ),
-      'order_bys' =>
-      array(
-        'mailing_name' =>
-        array(
+      'order_bys' => array(
+        'mailing_name' => array(
           'name' => 'name',
           'title' => ts('Mailing'),
         ),
@@ -131,10 +138,8 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
           'title' => ts('Bounce Reason'),
         ),
       ),
-      'order_bys' =>
-      array(
-        'bounce_reason' =>
-        array('title' => ts('Bounce Reason')),
+      'order_bys' => array(
+        'bounce_reason' => array('title' => ts('Bounce Reason')),
       ),
       'grouping' => 'mailing-fields',
     );
@@ -157,10 +162,8 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
           'operator' => 'like',
         ),
       ),
-      'order_bys' =>
-      array(
-        'bounce_name' =>
-        array(
+      'order_bys' => array(
+        'bounce_name' => array(
           'name' => 'name',
           'title' => ts('Bounce Type'),
         ),
@@ -177,10 +180,8 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
           'required' => TRUE,
         ),
       ),
-      'order_bys' =>
-      array(
-        'email' =>
-        array('title' => ts('Email'), 'default_order' => 'ASC'),
+      'order_bys' => array(
+        'email' => array('title' => ts('Email'), 'default_order' => 'ASC'),
       ),
       'grouping' => 'contact-fields',
     );
@@ -191,37 +192,26 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       'grouping' => 'contact-fields',
     );
 
-    $this->_columns['civicrm_group'] = array(
-      'dao' => 'CRM_Contact_DAO_Group',
-      'alias' => 'cgroup',
-      'filters' => array(
-        'gid' => array(
-          'name' => 'group_id',
-          'title' => ts('Group'),
-          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'group' => TRUE,
-          'options' => CRM_Core_PseudoConstant::group(),
-        ),
-      ),
-    );
-
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->assign('chartSupported', TRUE);
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (!empty($field['required']) ||
+            !empty($this->_params['fields'][$fieldName])
+          ) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
@@ -238,7 +228,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       }
     }
 
-
     if (!empty($this->_params['charts'])) {
       $select[] = "COUNT({$this->_aliases['civicrm_mailing_event_bounce']}.id) as civicrm_mailing_bounce_count";
       $this->_columnHeaders["civicrm_mailing_bounce_count"]['title'] = ts('Bounce Count');
@@ -247,12 +236,19 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  static function formRule($fields, $files, $self) {
+  /**
+   * @param $fields
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   */
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
     // LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
@@ -282,12 +278,12 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     parent::where();
     $this->_where .= " AND {$this->_aliases['civicrm_mailing']}.sms_provider_id IS NULL";
   }
 
-  function groupBy() {
+  public function groupBy() {
     if (!empty($this->_params['charts'])) {
       $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_mailing']}.id";
     }
@@ -296,7 +292,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     $this->beginPostProcess();
 
     // get the acl clauses built before we assemble the query
@@ -312,12 +308,16 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
-  function buildChart(&$rows) {
+  /**
+   * @param $rows
+   */
+  public function buildChart(&$rows) {
     if (empty($rows)) {
       return;
     }
 
-    $chartInfo = array('legend' => ts('Mail Bounce Report'),
+    $chartInfo = array(
+      'legend' => ts('Mail Bounce Report'),
       'xname' => ts('Mailing'),
       'yname' => ts('Bounce'),
       'xLabelAngle' => 20,
@@ -332,7 +332,10 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     $this->assign('chartType', $this->_params['charts']);
   }
 
-  function bounce_type() {
+  /**
+   * @return array
+   */
+  public function bounce_type() {
 
     $data = array('' => '--Please Select--');
 
@@ -347,8 +350,16 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     return $data;
   }
 
-  function alterDisplay(&$rows) {
-    // custom code to alter rows
+  /**
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
+   */
+  public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
@@ -372,5 +383,5 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       }
     }
   }
-}
 
+}

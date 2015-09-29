@@ -41,7 +41,7 @@ var cases = [
 ];
 
 _.each(cases, function(caseDetails, caseIndex) {
-  test("#"+caseIndex+": With group_type="+caseDetails.group_type, function() {
+  test("#" + caseIndex + ": With group_type=" + caseDetails.group_type, function() {
     var ufGroupModel = new CRM.UF.UFGroupModel({
       group_type: caseDetails.group_type
     });

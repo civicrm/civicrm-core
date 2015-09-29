@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,22 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* template for adding form elements for soft credit form*}
-{if $honor_block_is_active}
-  {crmRegion name="contribution-soft-credit-block"}
-    <legend>{$honor_block_title}</legend>
-    <div class="crm-section honor_block_text-section">
-      {$honor_block_text}
-    </div>
-    {if $form.soft_credit_type_id.html}
-      <div class="crm-section {$form.soft_credit_type_id.name}-section">
-        <div class="content" >
-          {$form.soft_credit_type_id.html}
-          <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
-        </div>
-      </div>
-    {/if}
-  {/crmRegion}
-{else}
 <table class="form-layout-compressed crm-soft-credit-block">
   {section name='i' start=1 loop=$rowCount}
     {assign var='rowNumber' value=$smarty.section.i.index}
@@ -59,15 +43,15 @@
   {/section}
   <tr>
     <td>
-      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon add-icon"></span> {ts}another soft credit{/ts}</a>
+      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon ui-icon-circle-plus"></span> {ts}another soft credit{/ts}</a>
     </td>
   </tr>
 </table>
-{/if}
+
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var $form = $("#{/literal}{$form.formName}{literal}");
+    var $form = $("form.{/literal}{$form.formClass}{literal}");
     $('#showPCP, #showSoftCredit').click(function(){
       return showHideSoftCreditAndPCP();
     });
@@ -89,29 +73,6 @@
       return false;
     });
 
-    // FIXME: This could be much simpler as an entityRef field but pcp doesn't have a searchable api :(
-    var pcpURL = CRM.url('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1');
-    $('#pcp_made_through_id').crmSelect2({
-      placeholder: {/literal}'{ts escape="js"}- select -{/ts}'{literal},
-      minimumInputLength: 1,
-      ajax: {
-        url: pcpURL,
-        data: function(term) {
-          return {term: term};
-        },
-        results: function(response) {
-          return {results: response};
-        }
-      },
-      initSelection: function(el, callback) {
-        callback({id: $(el).val(), text: $('[name=pcp_made_through]', $form).val()});
-      }
-    })
-      // This is just a cheap trick to store the name in case of a formrule error
-      .on('change', function() {
-        //$('[name=pcp_made_through]', $form).val($(this).select2('data').text || '');
-      });
-
     $('.crm-soft-credit-block tr span').each(function () {
       if ($(this).hasClass('crm-error')) {
         $(this).parents('tr').show();
@@ -125,13 +86,13 @@
       return false;
     });
 
-    $('input[name^="soft_credit_contact["]').change(function(){
-      var rowNum = $(this).prop('id').replace('soft_credit_contact_','');
+    $('input[name^="soft_credit_contact_"]').on('change', function(){
+      var rowNum = $(this).prop('id').replace('soft_credit_contact_id_','');
       var totalAmount = $('#total_amount').val();
       //assign total amount as default soft credit amount
       $('#soft_credit_amount_'+ rowNum).val(totalAmount);
       var thousandMarker = {/literal}{$config->monetaryThousandSeparator|json_encode}{literal};
-      $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
+      $('#soft_credit_type_'+ rowNum).select2('val', $('#sct_default_id').val());
       totalAmount = Number(totalAmount.replace(thousandMarker,''));
       if (rowNum > 1) {
         var scAmount = Number($('#soft_credit_amount_'+ (rowNum - 1)).val().replace(thousandMarker,''));

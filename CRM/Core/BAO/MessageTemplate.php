@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,34 +23,32 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Core_BAO_MessageTemplate.
+ */
 class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Core_BAO_MessageTemplate object
-   * @access public
-   * @static
+   * @return CRM_Core_BAO_MessageTemplate
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->copyValues($params);
     if ($messageTemplates->find(TRUE)) {
@@ -61,29 +59,30 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
-   * @static
+   * @return Object
+   *   DAO object on success, NULL otherwise
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_MessageTemplate', $id, 'is_active', $is_active);
   }
 
   /**
-   * function to add the Message Templates
+   * Add the Message Templates.
    *
-   * @param array $params reference array contains the values submitted by the form
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
    *
-   * @access public
-   * @static
    *
    * @return object
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MessageTemplate', CRM_Utils_Array::value('id', $params), $params);
 
@@ -96,14 +95,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * function to delete the Message Templates
+   * Delete the Message Templates.
    *
-   * @access public
-   * @static
-   *
-   * @return object
+   * @param int $messageTemplatesID
    */
-  static function del($messageTemplatesID) {
+  public static function del($messageTemplatesID) {
     // make sure messageTemplatesID is an integer
     if (!CRM_Utils_Rule::positiveInteger($messageTemplatesID)) {
       CRM_Core_Error::fatal(ts('Invalid Message template'));
@@ -124,18 +120,19 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * function to get the Message Templates
+   * Get the Message Templates.
    *
-   * @access public
-   * @static
+   *
+   * @param bool $all
    *
    * @return object
    */
-  static function getMessageTemplates($all = TRUE) {
+  public static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {
     $msgTpls = array();
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->is_active = 1;
+    $messageTemplates->is_sms = $isSMS;
 
     if (!$all) {
       $messageTemplates->workflow_id = 'NULL';
@@ -148,18 +145,26 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     return $msgTpls;
   }
 
-  static function sendReminder($contactId, $email, $messageTemplateID, $from) {
+  /**
+   * @param int $contactId
+   * @param $email
+   * @param int $messageTemplateID
+   * @param $from
+   *
+   * @return bool|NULL
+   */
+  public static function sendReminder($contactId, $email, $messageTemplateID, $from) {
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->id = $messageTemplateID;
 
-    $domain     = CRM_Core_BAO_Domain::getDomain();
-    $result     = NULL;
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    $result = NULL;
     $hookTokens = array();
 
     if ($messageTemplates->find(TRUE)) {
-      $body_text    = $messageTemplates->msg_text;
-      $body_html    = $messageTemplates->msg_html;
+      $body_text = $messageTemplates->msg_text;
+      $body_html = $messageTemplates->msg_html;
       $body_subject = $messageTemplates->msg_subject;
       if (!$body_text) {
         $body_text = CRM_Utils_String::htmlToText($body_html);
@@ -179,8 +184,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
       // get tokens to be replaced
       $tokens = array_merge(CRM_Utils_Token::getTokens($body_text),
-                            CRM_Utils_Token::getTokens($body_html),
-                            CRM_Utils_Token::getTokens($body_subject));
+        CRM_Utils_Token::getTokens($body_html),
+        CRM_Utils_Token::getTokens($body_subject));
 
       // get replacement text for these tokens
       $returnProperties = array("preferred_mail_format" => 1);
@@ -190,11 +195,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         }
       }
       list($details) = CRM_Utils_Token::getTokenDetails(array($contactId),
-                                                        $returnProperties,
-                                                        null, null, false,
-                                                        $tokens,
-                                                        'CRM_Core_BAO_MessageTemplate');
-      $contact = reset( $details );
+        $returnProperties,
+        NULL, NULL, FALSE,
+        $tokens,
+        'CRM_Core_BAO_MessageTemplate');
+      $contact = reset($details);
 
       // call token hook
       $hookTokens = array();
@@ -207,10 +212,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         $bodyType = "body_{$value}";
         if ($$bodyType) {
           CRM_Utils_Token::replaceGreetingTokens($$bodyType, NULL, $contact['contact_id']);
-          $$bodyType = CRM_Utils_Token::replaceDomainTokens($$bodyType, $domain, true, $tokens, true);
-          $$bodyType = CRM_Utils_Token::replaceContactTokens($$bodyType, $contact, false, $tokens, false, true);
-          $$bodyType = CRM_Utils_Token::replaceComponentTokens($$bodyType, $contact, $tokens, true);
-          $$bodyType = CRM_Utils_Token::replaceHookTokens($$bodyType, $contact , $categories, true);
+          $$bodyType = CRM_Utils_Token::replaceDomainTokens($$bodyType, $domain, TRUE, $tokens, TRUE);
+          $$bodyType = CRM_Utils_Token::replaceContactTokens($$bodyType, $contact, FALSE, $tokens, FALSE, TRUE);
+          $$bodyType = CRM_Utils_Token::replaceComponentTokens($$bodyType, $contact, $tokens, TRUE);
+          $$bodyType = CRM_Utils_Token::replaceHookTokens($$bodyType, $contact, $categories, TRUE);
         }
       }
       $html = $body_html;
@@ -218,15 +223,17 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
       $smarty = CRM_Core_Smarty::singleton();
       foreach (array(
-        'text', 'html') as $elem) {
+                 'text',
+                 'html',
+               ) as $elem) {
         $$elem = $smarty->fetch("string:{$$elem}");
       }
 
       // do replacements in message subject
-      $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, false, $tokens);
-      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, true, $tokens);
-      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens, true);
-      $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, true);
+      $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, FALSE, $tokens);
+      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $tokens);
+      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens, TRUE);
+      $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, TRUE);
 
       $messageSubject = $smarty->fetch("string:{$messageSubject}");
 
@@ -246,7 +253,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
       if ($html && ($contact['preferred_mail_format'] == 'HTML' ||
           $contact['preferred_mail_format'] == 'Both'
-        )) {
+        )
+      ) {
         $mailParams['html'] = $html;
       }
 
@@ -259,14 +267,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * Revert a message template to its default subject+text+HTML state
+   * Revert a message template to its default subject+text+HTML state.
    *
-   * @param integer id  id of the template
-   *
-   * @return void
+   * @param int $id id of the template
    */
-  static function revert($id) {
-    $diverted = new self;
+  public static function revert($id) {
+    $diverted = new CRM_Core_BAO_MessageTemplate();
     $diverted->id = (int) $id;
     $diverted->find(1);
 
@@ -274,7 +280,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       CRM_Core_Error::fatal(ts('Did not find a message template with id of %1.', array(1 => $id)));
     }
 
-    $orig              = new self;
+    $orig = new CRM_Core_BAO_MessageTemplate();
     $orig->workflow_id = $diverted->workflow_id;
     $orig->is_reserved = 1;
     $orig->find(1);
@@ -291,13 +297,15 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
-   * Send an email from the specified template based on an array of params
+   * Send an email from the specified template based on an array of params.
    *
-   * @param array $params  a string-keyed array of function params, see function body for details
+   * @param array $params
+   *   A string-keyed array of function params, see function body for details.
    *
-   * @return array  of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
+   * @return array
+   *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
    */
-  static function sendTemplate($params) {
+  public static function sendTemplate($params) {
     $defaults = array(
       // option group name of the template
       'groupName' => NULL,
@@ -362,14 +370,17 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         CRM_Core_Error::fatal(ts('No such message template: id=%1.', array(1 => $params['messageTemplateID'])));
       }
       else {
-        CRM_Core_Error::fatal(ts('No such message template: option group %1, option value %2.', array(1 => $params['groupName'], 2 => $params['valueName'])));
+        CRM_Core_Error::fatal(ts('No such message template: option group %1, option value %2.', array(
+              1 => $params['groupName'],
+              2 => $params['valueName'],
+            )));
       }
     }
 
     $subject = $dao->subject;
-    $text    = $dao->text;
-    $html    = $dao->html;
-    $format  = $dao->format;
+    $text = $dao->text;
+    $html = $dao->html;
+    $format = $dao->format;
     $dao->free();
 
     // add the test banner (if requested)
@@ -383,18 +394,18 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $testDao->fetch();
 
       $subject = $testDao->subject . $subject;
-      $text    = $testDao->text . $text;
-      $html    = preg_replace('/<body(.*)$/im', "<body\\1\n{$testDao->html}", $html);
+      $text = $testDao->text . $text;
+      $html = preg_replace('/<body(.*)$/im', "<body\\1\n{$testDao->html}", $html);
       $testDao->free();
     }
 
     // replace tokens in the three elements (in subject as if it was the text body)
-    $domain             = CRM_Core_BAO_Domain::getDomain();
-    $hookTokens         = array();
-    $mailing            = new CRM_Mailing_BAO_Mailing;
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    $hookTokens = array();
+    $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->body_text = $text;
     $mailing->body_html = $html;
-    $tokens             = $mailing->getTokens();
+    $tokens = $mailing->getTokens();
     CRM_Utils_Hook::tokens($hookTokens);
     $categories = array_keys($hookTokens);
 
@@ -426,14 +437,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
 
     $subject = CRM_Utils_Token::replaceDomainTokens($subject, $domain, FALSE, $tokens['text'], TRUE);
-    $text    = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text'], TRUE);
-    $html    = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html'], TRUE);
+    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text'], TRUE);
+    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html'], TRUE);
 
     if ($contactID) {
       $subject = CRM_Utils_Token::replaceContactTokens($subject, $contact, FALSE, $tokens['text'], FALSE, TRUE);
-      $text    = CRM_Utils_Token::replaceContactTokens($text, $contact, FALSE, $tokens['text'], FALSE, TRUE);
-      $html    = CRM_Utils_Token::replaceContactTokens($html, $contact, FALSE, $tokens['html'], FALSE, TRUE);
-
+      $text = CRM_Utils_Token::replaceContactTokens($text, $contact, FALSE, $tokens['text'], FALSE, TRUE);
+      $html = CRM_Utils_Token::replaceContactTokens($html, $contact, FALSE, $tokens['html'], FALSE, TRUE);
 
       $contactArray = array($contactID => $contact);
       CRM_Utils_Hook::tokenValues($contactArray,
@@ -446,22 +456,23 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $contact = $contactArray[$contactID];
 
       $subject = CRM_Utils_Token::replaceHookTokens($subject, $contact, $categories, TRUE);
-      $text    = CRM_Utils_Token::replaceHookTokens($text, $contact, $categories, TRUE);
-      $html    = CRM_Utils_Token::replaceHookTokens($html, $contact, $categories, TRUE);
+      $text = CRM_Utils_Token::replaceHookTokens($text, $contact, $categories, TRUE);
+      $html = CRM_Utils_Token::replaceHookTokens($html, $contact, $categories, TRUE);
     }
 
     // strip whitespace from ends and turn into a single line
     $subject = "{strip}$subject{/strip}";
 
     // parse the three elements with Smarty
-
-
     $smarty = CRM_Core_Smarty::singleton();
     foreach ($params['tplParams'] as $name => $value) {
       $smarty->assign($name, $value);
     }
     foreach (array(
-      'subject', 'text', 'html') as $elem) {
+               'subject',
+               'text',
+               'html',
+             ) as $elem) {
       $$elem = $smarty->fetch("string:{$$elem}");
     }
 
@@ -470,8 +481,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
     // create the params array
     $params['subject'] = $subject;
-    $params['text']    = $text;
-    $params['html']    = $html;
+    $params['text'] = $text;
+    $params['html'] = $html;
 
     if ($params['toEmail']) {
       $contactParams = array(array('email', 'LIKE', $params['toEmail'], 0, 1));
@@ -488,6 +499,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
 
       $config = CRM_Core_Config::singleton();
+      if (isset($params['isEmailPdf']) && $params['isEmailPdf'] == 1) {
+        $pdfHtml = CRM_Contribute_BAO_ContributionPage::addInvoicePdfToEmail($params['contributionId'], $params['contactId']);
+        if (empty($params['attachments'])) {
+          $params['attachments'] = array();
+        }
+        $params['attachments'][] = CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $format);
+      }
       $pdf_filename = '';
       if ($config->doNotAttachPDFReceipt &&
         $params['PDFFilename'] &&
@@ -497,6 +515,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
           $params['attachments'] = array();
         }
         $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $format);
+        if (isset($params['tplParams']['email_comment'])) {
+          $params['html'] = $params['tplParams']['email_comment'];
+          $params['text'] = strip_tags($params['tplParams']['email_comment']);
+        }
       }
 
       $sent = CRM_Utils_Mail::send($params);
@@ -508,4 +530,5 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
     return array($sent, $subject, $text, $html);
   }
+
 }

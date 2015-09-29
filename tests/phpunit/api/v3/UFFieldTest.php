@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -57,12 +57,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       )
     );
 
-    $op = new PHPUnit_Extensions_Database_Operation_Insert;
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute(
       $this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
+      $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
     );
-    $this->_sethtmlGlobals();
 
     $this->callAPISuccess('uf_field', 'getfields', array('cache_clear' => 1));
 
@@ -80,7 +79,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     );
   }
 
-  function tearDown() {
+  public function tearDown() {
     $this->quickCleanup(
       array(
         'civicrm_group',
@@ -93,7 +92,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * create / updating field
+   * Create / updating field
    */
   public function testCreateUFField() {
     $params = $this->_params; // copy
@@ -111,10 +110,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     $this->callAPIFailure('uf_field', 'create', $params);
   }
 
-  function testCreateUFFieldWithWrongParams() {
+  public function testCreateUFFieldWithWrongParams() {
     $this->callAPIFailure('uf_field', 'create', array('field_name' => 'test field'));
     $this->callAPIFailure('uf_field', 'create', array('label' => 'name-less field'));
   }
+
   /**
    * Create a field with 'weight=1' and then a second with 'weight=1'. The second field
    * winds up with weight=1, and the first field gets bumped to 'weight=2'.
@@ -140,7 +140,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * deleting field
+   * Deleting field.
    */
   public function testDeleteUFField() {
     $ufField = $this->callAPISuccess('uf_field', 'create', $this->_params);
@@ -157,7 +157,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * create / updating field
+   * Create / updating field
    */
   public function testReplaceUFFields() {
     $baseFields = array();
@@ -196,6 +196,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       'uf_group_id' => $this->_ufGroupId,
       'option.autoweight' => FALSE,
       'values' => $baseFields,
+      'check_permissions' => TRUE,
     );
 
     $result = $this->callAPIAndDocument('uf_field', 'replace', $params, __FUNCTION__, __FILE__);
@@ -216,4 +217,44 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       }
     }
   }
+
+  /**
+   * Check Profile API permission without ACL.
+   */
+  public function testProfilesWithoutACL() {
+    $this->createLoggedInUser();
+    $baseFields[] = array(
+      'field_name' => 'first_name',
+      'field_type' => 'Contact',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 3,
+      'label' => 'Test First Name',
+      'is_searchable' => 1,
+      'is_active' => 1,
+    );
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $params = array(
+      'uf_group_id' => $this->_ufGroupId,
+      'option.autoweight' => FALSE,
+      'values' => $baseFields,
+      'check_permissions' => TRUE,
+    );
+    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
+    $result = $this->callAPIFailure('uf_field', 'replace', $params);
+  }
+
+  /**
+   * Check Profile ACL for API permission.
+   */
+  public function testACLPermissionforProfiles() {
+    $this->createLoggedInUser();
+    $this->_permissionedGroup = $this->groupCreate(array(
+      'title' => 'Edit Profiles',
+      'is_active' => 1,
+      'name' => 'edit-profiles',
+    ));
+    $this->setupACL(TRUE);
+    $this->testReplaceUFFields();
+  }
+
 }

@@ -17,10 +17,10 @@
  */
 
 /* This class is used to create items to be added to the shopping cart
-  * Invoke a separate instance of this class for each item to be 
-  * added to the cart.  
+  * Invoke a separate instance of this class for each item to be
+  * added to the cart.
   * Required fields are the item name, description, quantity and price
-  * The private-data and tax-selector for each item can be set in the 
+  * The private-data and tax-selector for each item can be set in the
   * constructor call or using individual Set functions
   */
 class GoogleItem {
@@ -32,6 +32,16 @@ class GoogleItem {
   var $quantity;
   var $merchant_private_data;
   var $tax_table_selector;
+
+  /**
+   * @param $name
+   * @param $desc
+   * @param $qty
+   * @param $price
+   * @param string $money
+   * @param string $private_data
+   * @param string $tax_selector
+   */
   function GoogleItem($name, $desc, $qty, $price, $money = "USD",
     $private_data = "", $tax_selector = ""
   ) {
@@ -44,10 +54,16 @@ class GoogleItem {
     $this->tax_table_selector = $tax_selector;
   }
 
+  /**
+   * @param $private_data
+   */
   function SetMerchantPrivateData($private_data) {
     $this->merchant_private_data = $private_data;
   }
 
+  /**
+   * @param $tax_selector
+   */
   function SetTaxTableSelector($tax_selector) {
     $this->tax_table_selector = $tax_selector;
   }

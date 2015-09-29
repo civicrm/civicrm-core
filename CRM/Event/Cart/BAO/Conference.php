@@ -1,8 +1,17 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_BAO_Conference
+ */
 class CRM_Event_Cart_BAO_Conference {
-  //XXX assumes we don't allow a contact to register for the same conference more than once
-  //XXX flattens the object tree for convenient templating
-  static function get_participant_sessions($main_event_participant_id) {
+  /**
+   * XXX assumes we don't allow a contact to register for the same conference more than once
+   * XXX flattens the object tree for convenient templating
+   * @param int $main_event_participant_id
+   *
+   * @return array|null
+   */
+  public static function get_participant_sessions($main_event_participant_id) {
     $sql = <<<EOS
 SELECT sub_event.* FROM civicrm_participant main_participant
     JOIN civicrm_event sub_event ON sub_event.parent_event_id = main_participant.event_id
@@ -19,8 +28,8 @@ SELECT sub_event.* FROM civicrm_participant main_participant
       slot.weight,
       sub_event.start_date
 EOS;
-    $sql_args        = array(1 => array($main_event_participant_id, 'Integer'));
-    $dao             = CRM_Core_DAO::executeQuery($sql, $sql_args);
+    $sql_args = array(1 => array($main_event_participant_id, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $sql_args);
     $smarty_sessions = array();
     while ($dao->fetch()) {
       $smarty_sessions[] = get_object_vars($dao);
@@ -30,5 +39,5 @@ EOS;
     }
     return $smarty_sessions;
   }
-}
 
+}

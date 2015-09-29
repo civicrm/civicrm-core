@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,18 +23,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Mailing_Form_Optout extends CRM_Core_Form {
 
-  function preProcess() {
+  public function preProcess() {
 
     $this->_type = 'optout';
 
@@ -63,41 +63,40 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     $this->_email = $email;
   }
 
-  function buildQuickForm() {
-
+  public function buildQuickForm() {
+    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
     CRM_Utils_System::setTitle(ts('Please Confirm Your Opt Out'));
 
-    $this->add('text', 'email_confirm', ts('Verify Email address to opt out:'));
-    $this->addRule('email_confirm', ts('Email address required to opt out'), 'required');
+    $this->add('text', 'email_confirm', ts('Verify email address to opt out:'));
+    $this->addRule('email_confirm', ts('Email address is required to opt out.'), 'required');
 
     $buttons = array(
       array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
+        'type' => 'next',
+        'name' => 'Opt Out',
+        'isDefault' => TRUE,
       ),
       array(
-        'type' => 'next',
-        'name' => 'Unsubscribe',
-        'isDefault' => TRUE,
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
       ),
     );
 
     $this->addButtons($buttons);
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     $values = $this->exportValues();
 
     // check if EmailTyped matches Email address
     $result = CRM_Utils_String::compareStr($this->_email, $values['email_confirm'], TRUE);
 
-
     $job_id = $this->_job_id;
     $queue_id = $this->_queue_id;
     $hash = $this->_hash;
 
-    $confirmURL = CRM_Utils_System::url("civicrm/mailing/{$this->_type}","reset=1&jid={$job_id}&qid={$queue_id}&h={$hash}&confirm=1");
+    $confirmURL = CRM_Utils_System::url("civicrm/mailing/{$this->_type}", "reset=1&jid={$job_id}&qid={$queue_id}&h={$hash}&confirm=1");
     $this->assign('confirmURL', $confirmURL);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($confirmURL);
@@ -112,20 +111,18 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
         array(1 => $values['email_confirm'])
       );
 
-      CRM_Core_Session::setStatus( $statusMsg, '', 'success' );
+      CRM_Core_Session::setStatus($statusMsg, '', 'success');
     }
-    else if ($result == FALSE) {
+    elseif ($result == FALSE) {
       // Email address not verified
 
-      $statusMsg = ts('Email: %1 you have entered does not match the Email address associated with this opt out',
+      $statusMsg = ts('The email address: %1 you have entered does not match the email associated with this opt out request.',
         array(1 => $values['email_confirm'])
       );
 
-    CRM_Core_Session::setStatus( $statusMsg, '', 'fail' );
-
+      CRM_Core_Session::setStatus($statusMsg, '', 'fail');
     }
 
   }
+
 }
-
-

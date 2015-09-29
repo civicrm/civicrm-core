@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,24 +22,29 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Pledge_StandaloneAddTest
+ */
 class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
 
   protected function setUp() {
     parent::setUp();
   }
 
-  function testStandalonePledgeAdd() {
+  /**
+   * @return array
+   */
+  public function testStandalonePledgeAdd() {
     $this->webtestLogin();
 
     $this->openCiviPage('pledge/add', 'reset=1&context=standalone', '_qf_Pledge_upload');
 
     // create new contact using dialog
-    $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
-    $lastName = 'An' . substr(sha1(rand()), 0, 7);
-    $this->webtestNewDialogContact($firstName, $lastName, $firstName . '@example.com');
+    $contact = $this->createDialogContact();
 
     $this->type('amount', '100');
     $this->type('installments', '10');
@@ -49,7 +54,6 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('acknowledge_date', 'now');
 
     $this->select('contribution_page_id', 'value=3');
-
 
     //PaymentReminders
     $this->click('PaymentReminders');
@@ -71,7 +75,7 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
     $pledgeDate = date('F jS, Y', strtotime('now'));
 
     $this->webtestVerifyTabularData(array(
-        'Pledge By' => $firstName . ' ' . $lastName,
+        'Pledge By' => $contact['display_name'],
         'Total Pledge Amount' => '$ 100.00',
         'To be paid in' => '10 installments of $ 10.00 every 1 week(s)',
         'Payments are due on the' => '2 day of the period',
@@ -83,9 +87,13 @@ class WebTest_Pledge_StandaloneAddTest extends CiviSeleniumTestCase {
         'Send additional reminders' => '4 days after the last one sent',
       )
     );
-    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@class='view-content']//table//tbody/tr[1]/td[10]/span/a[text()='View']", FALSE);
+    $this->clickLink('_qf_PledgeView_next-bottom', "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a", FALSE);
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
+    $this->waitForAjaxContent();
     $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span/a");
-    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment (Check, Cash, EFT ...)']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[1]/span[2]/a");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table//tbody/tr[2]/td[2]/table/tbody/tr[2]/td[8]/a[text()='Record Payment']");
+    return $contact;
   }
-}
 
+}

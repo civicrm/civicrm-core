@@ -21,6 +21,7 @@
 
   <tr>
    <td>
+    <p>{contact.email_greeting}</p>
 
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
@@ -29,15 +30,12 @@
     {if $isOnWaitlist}
      <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
      {if $isPrimary}
-       <p>{ts}If space becomes available you will receive an email with
-a link to a web page where you can complete your registration.{/ts}</p>
+       <p>{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}</p>
      {/if}
     {elseif $isRequireApproval}
      <p>{ts}Your registration has been submitted.{/ts}</p>
      {if $isPrimary}
-      <p>{ts}Once your registration has been reviewed, you will receive
-an email with a link to a web page where you can complete the
-registration process.{/ts}</p>
+      <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
     {elseif $is_pay_later}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
@@ -130,8 +128,8 @@ registration process.{/ts}</p>
        {/if}
       {/foreach}
      {/if}
-	 
-     {if $event.is_public} 
+
+     {if $event.is_public}
       <tr>
        <td colspan="2" {$valueStyle}>
         {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
@@ -139,7 +137,7 @@ registration process.{/ts}</p>
        </td>
       </tr>
      {/if}
-	 
+
      {if $email}
       <tr>
        <th {$headerStyle}>
@@ -181,6 +179,11 @@ registration process.{/ts}</p>
              <th>{ts}Item{/ts}</th>
              <th>{ts}Qty{/ts}</th>
              <th>{ts}Each{/ts}</th>
+             {if $dataArray}
+              <th>{ts}SubTotal{/ts}</th>
+              <th>{ts}Tax Rate{/ts}</th>
+              <th>{ts}Tax Amount{/ts}</th>
+             {/if}
              <th>{ts}Total{/ts}</th>
        {if $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
             </tr>
@@ -195,8 +198,24 @@ registration process.{/ts}</p>
               <td>
                {$line.unit_price|crmMoney}
               </td>
+              {if $dataArray}
+               <td>
+                {$line.unit_price*$line.qty|crmMoney}
+               </td>
+               {if $line.tax_rate != "" || $line.tax_amount != ""}
+                <td>
+                 {$line.tax_rate|string_format:"%.2f"}%
+                </td>
+                <td>
+                 {$line.tax_amount|crmMoney}
+                </td>
+               {else}
+                <td></td>
+                <td></td>
+               {/if}
+              {/if}
               <td>
-               {$line.line_total|crmMoney}
+               {$line.line_total+$line.tax_amount|crmMoney}
               </td>
         {if  $pricesetFieldsCount }
         <td>
@@ -210,6 +229,27 @@ registration process.{/ts}</p>
          </tr>
         {/if}
        {/foreach}
+       {if $dataArray}
+        <tr>
+         <td {$labelStyle}>
+          {ts}Amount Before Tax:{/ts}
+         </td>
+         <td {$valueStyle}>
+          {$totalAmount-$totalTaxAmount|crmMoney}
+         </td>
+        </tr>
+        {foreach from=$dataArray item=value key=priceset}
+          <tr>
+           {if $priceset || $priceset == 0}
+            <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
+            <td>&nbsp;{$value|crmMoney:$currency}</td>
+           {else}
+            <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
+            <td>&nbsp;{$value|crmMoney:$currency}</td>
+           {/if}
+          </tr>
+        {/foreach}
+       {/if}
       {/if}
 
       {if $amount && !$lineItem}
@@ -220,6 +260,16 @@ registration process.{/ts}</p>
          </td>
         </tr>
        {/foreach}
+      {/if}
+      {if $totalTaxAmount}
+       <tr>
+        <td {$labelStyle}>
+         {ts}Total Tax Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+         {$totalTaxAmount|crmMoney:$currency}
+        </td>
+       </tr>
       {/if}
       {if $isPrimary}
        <tr>

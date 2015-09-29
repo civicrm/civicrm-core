@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
@@ -31,28 +31,19 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * Test class for CRM_PCP_BAO_PCPTest BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'PCP BAOs',
-      'description' => 'Test all PCP_BAO_PCP methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
   }
 
-  function testAddPCPBlock() {
+  public function testAddPCPBlock() {
 
     $params = $this->pcpBlockParams();
     $pcpBlock = CRM_PCP_BAO_PCP::add($params, TRUE);
@@ -72,7 +63,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCPBlock', $delParams );
   }
 
-  function testAddPCP() {
+  public function testAddPCP() {
     $blockParams = $this->pcpBlockParams();
     $pcpBlock = CRM_PCP_BAO_PCP::add($blockParams, TRUE);
 
@@ -99,7 +90,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCP', $delParams );
   }
 
-  function testAddPCPNoStatus() {
+  public function testAddPCPNoStatus() {
     $blockParams = $this->pcpBlockParams();
     $pcpBlock = CRM_PCP_BAO_PCP::add($blockParams, TRUE);
 
@@ -127,24 +118,23 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCP', $delParams );
   }
 
-  function testDeletePCP() {
+  public function testDeletePCP() {
 
-    $pcp   = CRM_Core_DAO::createTestObject('CRM_PCP_DAO_PCP');
+    $pcp = CRM_Core_DAO::createTestObject('CRM_PCP_DAO_PCP');
     $pcpId = $pcp->id;
-    $del   = CRM_PCP_BAO_PCP::deleteById($pcpId);
+    $del = CRM_PCP_BAO_PCP::deleteById($pcpId);
     $this->assertDBRowNotExist('CRM_PCP_DAO_PCP', $pcpId,
       'Database check PCP deleted successfully.'
     );
   }
 
   /**
-   * function to build params
-   *
+   * Build params.
    */
   private function pcpBlockParams() {
-    $contribPage        = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
-    $contribPageId      = $contribPage->id;
-    $supporterProfile   = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
+    $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
+    $contribPageId = $contribPage->id;
+    $supporterProfile = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
     $supporterProfileId = $supporterProfile->id;
 
     $params = array(
@@ -163,13 +153,12 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   }
 
   /**
-   * function to build params
-   *
+   * Build params.
    */
   private function pcpParams() {
-    $contact       = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
-    $contactId     = $contact->id;
-    $contribPage   = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
+    $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
+    $contactId = $contact->id;
+    $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
     $contribPageId = $contribPage->id;
 
     $params = array(
@@ -192,9 +181,8 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  protected function tearDown() {}
-}
+  protected function tearDown() {
+  }
 
+}

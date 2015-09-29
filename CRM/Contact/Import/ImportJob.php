@@ -1,15 +1,15 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2009.                                       |
+ | Version 3, 19 November 2009 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -23,18 +23,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This class acts like a psuedo-BAO for transient import job tables
+ * This class acts like a psuedo-BAO for transient import job tables.
  */
 class CRM_Contact_Import_ImportJob {
 
@@ -73,6 +71,13 @@ class CRM_Contact_Import_ImportJob {
 
   protected $_parser;
 
+  /**
+   * @param null $tableName
+   * @param null $createSql
+   * @param bool $createTable
+   *
+   * @throws Exception
+   */
   public function __construct($tableName = NULL, $createSql = NULL, $createTable = FALSE) {
     $dao = new CRM_Core_DAO();
     $db = $dao->getDatabaseConnection();
@@ -111,13 +116,24 @@ class CRM_Contact_Import_ImportJob {
       'mapperRelatedContactImProvider',
       'mapperRelatedContactWebsiteType',
     );
-    foreach ($properties as $property) $this->{"_$property"} = array();
+    foreach ($properties as $property) {
+      $this->{"_$property"} = array();
+    }
   }
 
+  /**
+   * @return null|string
+   */
   public function getTableName() {
     return $this->_tableName;
   }
 
+  /**
+   * @param bool $dropIfComplete
+   *
+   * @return bool
+   * @throws Exception
+   */
   public function isComplete($dropIfComplete = TRUE) {
     if (!$this->_statusFieldName) {
       CRM_Core_Error::fatal("Could not get name of the import status field");
@@ -135,6 +151,9 @@ class CRM_Contact_Import_ImportJob {
     return TRUE;
   }
 
+  /**
+   * @param array $params
+   */
   public function setJobParams(&$params) {
     foreach ($params as $param => $value) {
       $fldName = "_$param";
@@ -142,12 +161,16 @@ class CRM_Contact_Import_ImportJob {
     }
   }
 
+  /**
+   * @param CRM_Core_Form $form
+   * @param int $timeout
+   */
   public function runImport(&$form, $timeout = 55) {
-    $mapper        = $this->_mapper;
-    $mapperFields  = array();
-    $phoneTypes    = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders   = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $websiteTypes  = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $mapper = $this->_mapper;
+    $mapperFields = array();
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
     $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     //initialize mapper perperty value.
@@ -167,7 +190,9 @@ class CRM_Contact_Import_ImportJob {
 
     foreach ($mapper as $key => $value) {
       //set respective mapper value to null.
-      foreach (array_values($mapperPeroperties) as $perpertyVal)$$perpertyVal = NULL;
+      foreach (array_values($mapperPeroperties) as $perpertyVal) {
+        $$perpertyVal = NULL;
+      }
 
       $fldName = CRM_Utils_Array::value(0, $mapper[$key]);
       $header = array($this->_mapFields[$fldName]);
@@ -199,9 +224,9 @@ class CRM_Contact_Import_ImportJob {
       }
 
       $fldNameParts = explode('_', $fldName, 3);
-      $id           = $fldNameParts[0];
-      $first        = isset($fldNameParts[1]) ? $fldNameParts[1] : NULL;
-      $second       = isset($fldNameParts[2]) ? $fldNameParts[2] : NULL;
+      $id = $fldNameParts[0];
+      $first = isset($fldNameParts[1]) ? $fldNameParts[1] : NULL;
+      $second = isset($fldNameParts[2]) ? $fldNameParts[2] : NULL;
       if (($first == 'a' && $second == 'b') ||
         ($first == 'b' && $second == 'a')
       ) {
@@ -307,11 +332,22 @@ class CRM_Contact_Import_ImportJob {
     }
   }
 
+  /**
+   * @param $form
+   */
   public function setFormVariables($form) {
     $this->_parser->set($form, CRM_Import_Parser::MODE_IMPORT);
   }
 
-  private function _addImportedContactsToNewGroup($contactIds,
+  /**
+   * @param $contactIds
+   * @param string $newGroupName
+   * @param $newGroupDesc
+   *
+   * @return array|bool
+   */
+  private function _addImportedContactsToNewGroup(
+    $contactIds,
     $newGroupName, $newGroupDesc
   ) {
 
@@ -357,7 +393,15 @@ class CRM_Contact_Import_ImportJob {
     return FALSE;
   }
 
-  private function _tagImportedContactsWithNewTag($contactIds,
+  /**
+   * @param $contactIds
+   * @param string $newTagName
+   * @param $newTagDesc
+   *
+   * @return array|bool
+   */
+  private function _tagImportedContactsWithNewTag(
+    $contactIds,
     $newTagName, $newTagDesc
   ) {
 
@@ -406,10 +450,13 @@ class CRM_Contact_Import_ImportJob {
     return FALSE;
   }
 
+  /**
+   * @return array
+   */
   public static function getIncompleteImportTables() {
-    $dao      = new CRM_Core_DAO();
+    $dao = new CRM_Core_DAO();
     $database = $dao->database();
-    $query    = "SELECT   TABLE_NAME FROM INFORMATION_SCHEMA
+    $query = "SELECT   TABLE_NAME FROM INFORMATION_SCHEMA
                   WHERE    TABLE_SCHEMA = ? AND
                            TABLE_NAME LIKE 'civicrm_import_job_%'
                   ORDER BY TABLE_NAME";
@@ -422,5 +469,5 @@ class CRM_Contact_Import_ImportJob {
     }
     return $incompleteImportTables;
   }
-}
 
+}

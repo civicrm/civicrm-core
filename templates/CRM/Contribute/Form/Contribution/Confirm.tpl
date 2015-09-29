@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,7 +54,7 @@
 
     {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="confirmContribution"}
 
-    {if $amount GT 0 OR $minimum_fee GT 0 OR ( $priceSetID and $lineItem ) }
+    {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
     <div class="crm-group amount_display-group">
        {if !$useForMember}
         <div class="header-dark">
@@ -79,8 +79,11 @@
                     {$membership_name} {ts}Membership{/ts}: <strong>{$minimum_fee|crmMoney}</strong>
                 {/if}
               {else}
-                {if $amount }
-                    {ts}Total Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
+                {if $totalTaxAmount }
+                     {ts}Total Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
+                {/if}
+		{if $amount}
+                    {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if} : <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
                 {else}
                     {$membership_name} {ts}Membership{/ts}: <strong>{$minimum_fee|crmMoney}</strong>
                 {/if}
@@ -88,18 +91,26 @@
                 {/if}
 
             {if $is_recur}
-                {if $membershipBlock} {* Auto-renew membership confirmation *}
+                {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
 {crmRegion name="contribution-confirm-recur-membership"}
                     <br />
                     <strong>{ts 1=$frequency_interval 2=$frequency_unit}I want this membership to be renewed automatically every %1 %2(s).{/ts}</strong></p>
-                    <div class="description crm-auto-renew-cancel-info">({ts}Your initial membership fee will be processed once you complete the confirmation step. You will be able to cancel the auto-renwal option by visiting the web page link that will be included in your receipt.{/ts})</div>
+                    <div class="description crm-auto-renew-cancel-info">({ts}Your initial membership fee will be processed once you complete the confirmation step. You will be able to cancel the auto-renewal option by visiting the web page link that will be included in your receipt.{/ts})</div>
 {/crmRegion}
                 {else}
 {crmRegion name="contribution-confirm-recur"}
                     {if $installments}
-                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}I want to contribute this amount every %1 %2(s) for %3 installments.{/ts}</strong></p>
+                      {if $frequency_interval > 1}
+                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}I want to contribute this amount every %1 %2s for %3 installments.{/ts}</strong></p>
+                      {else}
+                        <p><strong>{ts 1=$frequency_unit 2=$installments}I want to contribute this amount every %1 for %2 installments.{/ts}</strong></p>
+                      {/if}
                     {else}
-                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}I want to contribute this amount every %1 %2(s).{/ts}</strong></p>
+                      {if $frequency_interval > 1}
+                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}I want to contribute this amount every %1 %2s.{/ts}</strong></p>
+                      {else}
+                        <p><strong>{ts 1=$frequency_unit }I want to contribute this amount every %1.{/ts}</strong></p>
+                      {/if}
                     {/if}
                     <p>{ts}Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt.{/ts}</p>
 {/crmRegion}
@@ -122,7 +133,14 @@
     </div>
     {/if}
 
-    {if $honor_block_is_active}
+
+    {if $onbehalfProfile|@count}
+      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
+         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+      </div>
+    {/if}
+
+    {if $honoreeProfileFields|@count}
         <div class="crm-group honor_block-group">
             <div class="header-dark">
                 {$soft_credit_type}
@@ -130,7 +148,7 @@
             <div class="display-block">
                 <div class="label-left crm-section honoree_profile-section">
                     <strong>{$honorName}</strong></br>
-                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
+                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
                 </div>
             </div>
          </div>
@@ -168,19 +186,8 @@
     </div>
     {/if}
 
-    {if $onbehalfProfile}
-      <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
-         <div class="crm-section organization_email-section">
-            <div class="label">{ts}Organization Email{/ts}</div>
-            <div class="content">{$onBehalfEmail}</div>
-            <div class="clear"></div>
-         </div>
-      </div>
-    {/if}
-
-    {if ( $contributeMode ne 'notify' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
-        {if $contributeMode ne 'notify' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
+    {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
+        {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
           {if $billingName or $address}
             <div class="crm-group billing_name_address-group">
                 <div class="header-dark">
@@ -279,7 +286,7 @@
                 <td class="description">{ts}Click the Google Checkout button to continue.{/ts}</td>
             </tr>
             <tr>
-                <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span></td>
+                <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</span></td>
             </tr>
         </table>
         </fieldset>

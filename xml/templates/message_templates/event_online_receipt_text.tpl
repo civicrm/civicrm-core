@@ -1,4 +1,4 @@
-Dear {contact.display_name},
+{contact.email_greeting},
 
 {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
 {$event.confirm_email_text}
@@ -14,8 +14,7 @@ Thank you for your participation.  This letter is a confirmation that your regis
 {ts}You have been added to the WAIT LIST for this event.{/ts}
 
 {if $isPrimary}
-{ts}If space becomes available you will receive an email with
-a link to a web page where you can complete your registration.{/ts}
+{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
 {/if}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
@@ -25,9 +24,7 @@ a link to a web page where you can complete your registration.{/ts}
 {ts}Your registration has been submitted.{/ts}
 
 {if $isPrimary}
-{ts}Once your registration has been reviewed, you will receive
-an email with a link to a web page where you can complete the
-registration process.{/ts}
+{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}
 
 {/if}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
@@ -105,7 +102,7 @@ registration process.{/ts}
 {ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
 {/if}
 
-{if $event.is_public} 
+{if $event.is_public}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
 {ts}Download iCalendar File:{/ts} {$icalFeed}
 {/if}
@@ -129,26 +126,52 @@ You were registered by: {$payer.name}
 
 {/if}
 {/if}
------------------------------------------------------------{if $pricesetFieldsCount }--------------------{/if}
+-----------------------------------------------------------{if $pricesetFieldsCount }-----------------------------------------------------{/if}
 
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_qty}{ts}Qty{/ts}{/capture}
 {capture assign=ts_each}{ts}Each{/ts}{/capture}
+{if $dataArray}
+{capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
+{capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
+{capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
+{/if}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
 {if $pricesetFieldsCount }{capture assign=ts_participant_total}{ts}Total Participants{/ts}{/capture}{/if}
-{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {$ts_total|string_format:"%10s"} {$ts_participant_total|string_format:"%10s"}
------------------------------------------------------------{if $pricesetFieldsCount }--------------------{/if}
+{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $dataArray} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"} {$ts_participant_total|string_format:"%10s"}
+-----------------------------------------------------------{if $pricesetFieldsCount }-----------------------------------------------------{/if}
 
 {foreach from=$value item=line}
 {if $pricesetFieldsCount }{capture assign=ts_participant_count}{$line.participant_count}{/capture}{/if}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:$currency|string_format:"%10s"} {$line.line_total|crmMoney:$currency|string_format:"%10s"}{$ts_participant_count|string_format:"%10s"}
+{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:$currency|string_format:"%10s"} {if $dataArray} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate != "" || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}  {/if} {$line.line_total+$line.tax_amount|crmMoney:$currency|string_format:"%10s"}{$ts_participant_count|string_format:"%10s"}
 {/foreach}
+----------------------------------------------------------------------------------------------------------------
+{if $individual}{ts}Participant Total{/ts} {$individual.$priceset.totalAmtWithTax-$individual.$priceset.totalTaxAmt|crmMoney:$currency|string_format:"%29s"} {$individual.$priceset.totalTaxAmt|crmMoney:$currency|string_format:"%33s"} {$individual.$priceset.totalAmtWithTax|crmMoney:$currency|string_format:"%12s"}{/if}
+{/if}
+{""|string_format:"%120s"}
+{/foreach}
+{""|string_format:"%120s"}
+
+{if $dataArray}
+{ts}Amount before Tax{/ts}: {$totalAmount-$totalTaxAmount|crmMoney:$currency}
+
+{foreach from=$dataArray item=value key=priceset}
+{if $priceset || $priceset == 0}
+{$taxTerm} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
+{else}
+{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
 {/if}
 {/foreach}
 {/if}
+{/if}
+
 {if $amounts && !$lineItem}
 {foreach from=$amounts item=amnt key=level}{$amnt.amount|crmMoney:$currency} {$amnt.label}
 {/foreach}
+{/if}
+
+{if $totalTaxAmount}
+{ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
 {/if}
 {if $isPrimary }
 
@@ -190,7 +213,7 @@ You were registered by: {$payer.name}
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+{if $contributeMode ne 'notify' and !$isAmountzero and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and !$isOnWaitlist and !$isRequireApproval}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 

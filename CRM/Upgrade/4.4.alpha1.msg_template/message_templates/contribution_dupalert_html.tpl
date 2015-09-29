@@ -22,8 +22,7 @@
   <tr>
    <td>
     <p>{ts}A contribution / membership signup was made on behalf of the organization listed below.{/ts}</p>
-    <p>{ts}The information provided matched multiple existing database records based on the configured
-Duplicate Matching Rules for your site.{/ts}</p>
+    <p>{ts}The information provided matched multiple existing database records based on the configured Duplicate Matching Rules for your site.{/ts}</p>
    </td>
   </tr>
   <tr>
@@ -47,7 +46,7 @@ Duplicate Matching Rules for your site.{/ts}</p>
      </tr>
      <tr>
       <td {$labelStyle}>
-       {ts}Organization Contact Id{/ts}
+       {ts}Organization Contact ID{/ts}
       </td>
       <td {$valueStyle}>
        {$onBehalfID}
@@ -58,9 +57,7 @@ Duplicate Matching Rules for your site.{/ts}</p>
   </tr>
   <tr>
    <td>
-    <p>{ts}If you think this may be a duplicate contact which should be merged with an existing record -
-Go to "Contacts >> Find and Merge Duplicate Contacts". Use the strict
-rule for Organizations to find the potential duplicates and merge them if appropriate.{/ts}</p>
+    <p>{ts}If you think this may be a duplicate contact which should be merged with an existing record - Go to "Contacts >> Find and Merge Duplicate Contacts". Use the strict rule for Organizations to find the potential duplicates and merge them if appropriate.{/ts}</p>
    </td>
   </tr>
   {if $receiptMessage}

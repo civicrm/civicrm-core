@@ -17,7 +17,8 @@ require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';
 
 $config = CRM_Core_Config::singleton();
-
+$log = new CRM_Utils_SystemLogger();
+$log->alert('payment_notification processor_name=Payment_Express', $_REQUEST);
 /*
  * Get the password from the Payment Processor's table based on the DPS user id
  * being passed back from the server
@@ -34,9 +35,9 @@ $params = array(1 => array($_GET['userid'], 'String'));
 
 $dpsSettings = CRM_Core_DAO::executeQuery($query, $params);
 while ($dpsSettings->fetch()) {
-  $dpsUrl    = $dpsSettings->url_site;
-  $dpsUser   = $dpsSettings->user_name;
-  $dpsKey    = $dpsSettings->password;
+  $dpsUrl = $dpsSettings->url_site;
+  $dpsUser = $dpsSettings->user_name;
+  $dpsKey = $dpsSettings->password;
   $dpsMacKey = $dpsSettings->signature;
 }
 

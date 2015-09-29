@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,26 @@
 *}
 <div class="crm-block crm-form-block crm-{$formName}-block">
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-    <table class="form-layout">
+    {if $formName == "Contribute_Preferences" }
+      <table class = "form-layout">
+        <tr class="crm-miscellaneous-form-block-cvv-backoffice-required">
+          <td class="label">{$form.cvv_backoffice_required.label}</td>
+          <td>
+            {$form.cvv_backoffice_required.html}<br />
+            <p class="description">{ts}{$cvv_backoffice_required_description}{/ts}</p>
+          </td>
+        </tr>
+        {if $formName == "Contribute_Preferences" }
+          <tr class="crm-preferences-form-block-invoicing">
+            <td class="label">{$form.invoicing.label}</td>
+            <td>
+              {$form.invoicing.html}
+            </td>
+          </tr>
+        {/if}
+      </table>
+    {/if}
+    <table class="form-layout" id="invoicing_blocks">
         {foreach from=$fields item=field key=fieldName}
             {assign var=n value=$fieldName}
             {if $form.$n}
@@ -54,3 +73,27 @@
 
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
+{if $formName == "Contribute_Preferences"}
+  {literal}
+    <script type="text/javascript">
+      cj(document).ready(function() {
+        if (document.getElementById("invoicing").checked) {
+          cj("#invoicing_blocks").show();
+        }
+        else {
+          cj("#invoicing_blocks").hide();
+        }
+      });
+      cj(function () {
+        cj("input[type=checkbox]").click(function() {
+          if (cj("#invoicing").is(":checked")) {
+            cj("#invoicing_blocks").show();
+          }
+          else {
+            cj("#invoicing_blocks").hide();
+          }
+        });
+      });
+    </script>
+  {/literal}
+{/if}

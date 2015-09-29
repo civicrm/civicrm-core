@@ -51,7 +51,7 @@
       'discover': '6011[0-9]{12}',
       'jcb': '(?:3[0-9]{15}|(2131|1800)[0-9]{11})',
       'unionpay': '62(?:[0-9]{14}|[0-9]{17})'
-    }
+    };
 
     var card_values = {
       'mastercard': 'MasterCard',
@@ -62,7 +62,7 @@
       'discover': 'Discover',
       'jcb': 'JCB',
       'unionpay': 'UnionPay'
-    }
+    };
 
     $.each(card_types, function(key, pattern) {
       if (ccnumber.match('^' + pattern + '$')) {
@@ -76,7 +76,4 @@
 
   civicrm_billingblock_creditcard_helper();
 
-  $(function() {
-    $('#billing-payment-block').on('crmFormLoad', civicrm_billingblock_creditcard_helper);
-  });
 })(CRM.$);

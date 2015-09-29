@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,33 +23,27 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This class generates form components for Relationship Type
- *
+ * This class generates form components for Relationship Type.
  */
 class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Relationship Type'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-
       return;
     }
 
@@ -79,11 +73,13 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     // add select for contact type
     $contactTypeA = &$this->add('select', 'contact_types_a', ts('Contact Type A') . ' ',
       array(
-        '' => ts('All Contacts')) + $contactTypes
+        '' => ts('All Contacts'),
+      ) + $contactTypes
     );
     $contactTypeB = &$this->add('select', 'contact_types_b', ts('Contact Type B') . ' ',
       array(
-        '' => ts('All Contacts')) + $contactTypes
+        '' => ts('All Contacts'),
+      ) + $contactTypes
     );
 
     $isActive = &$this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -92,15 +88,23 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     if ($this->_id &&
       CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $this->_id, 'is_reserved')
     ) {
-      foreach (array('contactTypeA', 'contactTypeB', 'isActive') as $field)$$field->freeze();
+      foreach (array('contactTypeA', 'contactTypeB', 'isActive') as $field) {
+        $$field->freeze();
+      }
     }
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
     }
+
+    $this->assign('relationship_type_id', $this->_id);
+
   }
 
-  function setDefaultValues() {
+  /**
+   * @return array
+   */
+  public function setDefaultValues() {
     if ($this->_action != CRM_Core_Action::DELETE &&
       isset($this->_id)
     ) {
@@ -125,11 +129,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -168,6 +168,5 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The Relationship Type has been saved.'), ts('Saved'), 'success');
     }
   }
-  //end of function
-}
 
+}

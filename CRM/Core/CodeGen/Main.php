@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Class CRM_Core_CodeGen_Main
+ */
 class CRM_Core_CodeGen_Main {
   var $buildVersion;
   var $db_version;
@@ -22,7 +25,18 @@ class CRM_Core_CodeGen_Main {
    */
   var $digest;
 
-  function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
+  /**
+   * @param $CoreDAOCodePath
+   * @param $sqlCodePath
+   * @param $phpCodePath
+   * @param $tplCodePath
+   * @param $smartyPluginDirs
+   * @param $argCms
+   * @param $argVersion
+   * @param $schemaPath
+   * @param $digestPath
+   */
+  public function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
     $this->phpCodePath = $phpCodePath;
@@ -33,11 +47,11 @@ class CRM_Core_CodeGen_Main {
     // default cms is 'drupal', if not specified
     $this->cms = isset($argCms) ? strtolower($argCms) : 'drupal';
 
-    CRM_Core_CodeGen_Util_Template::$smartyPluginDirs = $smartyPluginDirs;
+    CRM_Core_CodeGen_Util_Smarty::singleton()->setPluginDirs($smartyPluginDirs);
 
-    $versionFile        = "version.xml";
-    $versionXML         = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
-    $this->db_version         = $versionXML->version_no;
+    $versionFile = "version.xml";
+    $versionXML = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
+    $this->db_version = $versionXML->version_no;
     $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
     if (isset($argVersion)) {
       // change the version to that explicitly passed, if any
@@ -48,10 +62,9 @@ class CRM_Core_CodeGen_Main {
   }
 
   /**
-   * Automatically generate a variety of files
-   *
+   * Automatically generate a variety of files.
    */
-  function main() {
+  public function main() {
     if (!empty($this->digestPath) && file_exists($this->digestPath) && $this->hasExpectedFiles()) {
       if ($this->getDigest() === file_get_contents($this->digestPath)) {
         echo "GenCode has previously executed. To force execution, please (a) omit CIVICRM_GENCODE_DIGEST\n";
@@ -62,7 +75,7 @@ class CRM_Core_CodeGen_Main {
       unlink($this->digestPath);
     }
 
-    echo "\ncivicrm_domain.version := ". $this->db_version . "\n\n";
+    echo "\ncivicrm_domain.version := " . $this->db_version . "\n\n";
     if ($this->buildVersion < 1.1) {
       echo "The Database is not compatible for this version";
       exit();
@@ -91,7 +104,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     }
   }
 
-  function runAllTasks() {
+  public function runAllTasks() {
     // TODO: This configuration can be manipulated dynamically.
     $components = $this->getTasks();
     foreach ($components as $component) {
@@ -100,7 +113,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       if (is_a($task, 'CRM_Core_CodeGen_ITask')) {
         $task->setConfig($this);
         $task->run();
-      } else {
+      }
+      else {
         echo "Bad news: we tried to run a codegen task of an unrecognized type: {$component}\n";
         exit();
       }
@@ -108,7 +122,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   /**
-   * @return array of class names; each class implements CRM_Core_CodeGen_ITask
+   * @return array
+   *   Array of class names; each class implements CRM_Core_CodeGen_ITask
    */
   public function getTasks() {
     $components = array(
@@ -116,7 +131,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       'CRM_Core_CodeGen_Reflection',
       'CRM_Core_CodeGen_Schema',
       'CRM_Core_CodeGen_DAO',
-      'CRM_Core_CodeGen_Test',
+      //'CRM_Core_CodeGen_Test',
       'CRM_Core_CodeGen_I18n',
     );
     return $components;
@@ -128,7 +143,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
    *
    * @return string
    */
-  function getDigest() {
+  public function getDigest() {
     if ($this->digest === NULL) {
       $srcDir = CRM_Core_CodeGen_Util_File::findCoreSourceDir();
       $files = CRM_Core_CodeGen_Util_File::findManyFiles(array(
@@ -156,14 +171,20 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     return $this->digest;
   }
 
-  function getExpectedFiles() {
+  /**
+   * @return array
+   */
+  public function getExpectedFiles() {
     return array(
       $this->sqlCodePath . '/civicrm.mysql',
       $this->phpCodePath . '/CRM/Contact/DAO/Contact.php',
     );
   }
 
-  function hasExpectedFiles() {
+  /**
+   * @return bool
+   */
+  public function hasExpectedFiles() {
     foreach ($this->getExpectedFiles() as $file) {
       if (!file_exists($file)) {
         return FALSE;
@@ -171,4 +192,5 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     }
     return TRUE;
   }
+
 }

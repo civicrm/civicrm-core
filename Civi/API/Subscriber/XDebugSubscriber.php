@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,20 +23,32 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Subscriber;
+
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Class XDebugSubscriber
+ * @package Civi\API\Subscriber
+ */
 class XDebugSubscriber implements EventSubscriberInterface {
+  /**
+   * @return array
+   */
   public static function getSubscribedEvents() {
     return array(
       Events::RESPOND => array('onApiRespond', Events::W_LATE),
     );
   }
 
-  function onApiRespond(\Civi\API\Event\RespondEvent $event) {
+  /**
+   * @param \Civi\API\Event\RespondEvent $event
+   *   API response event.
+   */
+  public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
     $result = $event->getResponse();
     if (function_exists('xdebug_time_index')
@@ -50,4 +62,5 @@ class XDebugSubscriber implements EventSubscriberInterface {
       $event->setResponse($result);
     }
   }
+
 }

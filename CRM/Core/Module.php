@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A module is any software package that participates in the hook
@@ -31,7 +31,7 @@
  * a Joomla Plugin.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -47,24 +47,47 @@ class CRM_Core_Module {
    */
   public $is_active;
 
+  /**
+   * @param string $name
+   * @param $is_active
+   */
   public function __construct($name, $is_active) {
     $this->name = $name;
     $this->is_active = $is_active;
   }
 
   /**
-   * Get a list of all known modules
+   * Get a list of all known modules.
    */
   public static function getAll($fresh = FALSE) {
     static $result;
     if ($fresh || !is_array($result)) {
       $result = CRM_Extension_System::singleton()->getMapper()->getModules();
+      $result[] = new CRM_Core_Module('civicrm', TRUE); // pseudo-module for core
 
       $config = CRM_Core_Config::singleton();
-      if (is_callable(array($config->userSystem, 'getModules'))) {
-        $result = array_merge($result, $config->userSystem->getModules());
-      }
+      $result = array_merge($result, $config->userSystem->getModules());
     }
     return $result;
   }
+
+  /**
+   * Get the status for each module.
+   *
+   * @param array $modules
+   *   Array(CRM_Core_Module).
+   * @return array
+   *   Array(string $moduleName => string $statusCode).
+   * @see CRM_Extension_Manager::STATUS_INSTALLED
+   * @see CRM_Extension_Manager::STATUS_DISABLED
+   */
+  public static function collectStatuses($modules) {
+    $statuses = array();
+    foreach ($modules as $module) {
+      $statuses[$module->name] = $module->is_active ? CRM_Extension_Manager::STATUS_INSTALLED : CRM_Extension_Manager::STATUS_DISABLED;
+
+    }
+    return $statuses;
+  }
+
 }

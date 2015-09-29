@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,38 +23,36 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
   /**
-   * takes an associative array and creates an instance object
+   * Takes an associative array and creates an instance object.
    *
    * the function extract all the params it needs to initialize the create a
    * instance object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object CRM_Report_DAO_ReportInstance object
-   * @access public
-   * @static
+   * @return CRM_Report_DAO_ReportInstance
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $instance = new CRM_Report_DAO_ReportInstance();
     if (empty($params)) {
       return NULL;
     }
 
-    $config = CRM_Core_Config::singleton();
-    $params['domain_id'] = CRM_Core_Config::domainID();
+    $instanceID = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('instance_id', $params));
 
     // convert roles array to string
     if (isset($params['grouprole']) && is_array($params['grouprole'])) {
@@ -68,13 +65,9 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       );
     }
 
-    if (!isset($params['id'])) {
+    if (!$instanceID || !isset($params['id'])) {
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-    }
-
-    $instanceID = CRM_Utils_Array::value('id', $params);
-    if (!empty($params['instance_id'])) {
-      $instanceID = CRM_Utils_Array::value('instance_id', $params);
+      $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
     }
 
     if ($instanceID) {
@@ -87,7 +80,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);
 
-    if ($config->userFramework == 'Joomla') {
+    if (CRM_Core_Config::singleton()->userFramework == 'Joomla') {
       $instance->permission = 'null';
     }
 
@@ -100,12 +93,14 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       $instance->id = $instanceID;
     }
 
-    if (! $instanceID) {
+    if (!$instanceID) {
       if ($reportID = CRM_Utils_Array::value('report_id', $params)) {
         $instance->report_id = $reportID;
-      } else if ($instanceID) {
+      }
+      elseif ($instanceID) {
         $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl($instanceID);
-      } else {
+      }
+      else {
         // just take it from current url
         $instance->report_id = CRM_Report_Utils_Report::getValueFromUrl();
       }
@@ -123,23 +118,22 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   }
 
   /**
-   * Function to create instance
+   * Create instance.
    * takes an associative array and creates a instance object and does any related work like permissioning, adding to dashboard etc.
    *
    * This function is invoked from within the web form layer and also from the api layer
    *
-   * @param array   $params      (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object CRM_Report_BAO_ReportInstance object
-   * @access public
-   * @static
+   * @return CRM_Report_BAO_ReportInstance
    */
-  static function &create(&$params) {
+  public static function &create(&$params) {
     if (isset($params['report_header'])) {
-      $params['header']    = CRM_Utils_Array::value('report_header',$params);
+      $params['header'] = CRM_Utils_Array::value('report_header', $params);
     }
     if (isset($params['report_footer'])) {
-      $params['footer']    = CRM_Utils_Array::value('report_footer',$params);
+      $params['footer'] = CRM_Utils_Array::value('report_footer', $params);
     }
 
     // build navigation parameters
@@ -151,7 +145,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
       $navigationParams['permission'] = array();
       $navigationParams['label'] = $params['title'];
-      $navigationParams['name']  = $params['title'];
+      $navigationParams['name'] = $params['title'];
 
       $navigationParams['current_parent_id'] = CRM_Utils_Array::value('parent_id', $navigationParams);
       $navigationParams['parent_id'] = CRM_Utils_Array::value('parent_id', $params);
@@ -191,7 +185,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       if (empty($params['id']) && empty($params['instance_id']) && !empty($navigationParams['id'])) {
         unset($navigationParams['id']);
       }
-      $navigationParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1";
+      $navigationParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1";
       $navigation = CRM_Core_BAO_Navigation::add($navigationParams);
 
       if (!empty($navigationParams['is_active'])) {
@@ -209,14 +203,18 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     // add to dashlet
     if (!empty($dashletParams)) {
       $section = 2;
-      $chart  = '';
+      $chart = '';
       if (!empty($params['charts'])) {
         $section = 1;
-        $chart   = "&charts=" . $params['charts'];
+        $chart = "&charts=" . $params['charts'];
       }
-
-      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashlet";
-      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}&reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen";
+      $limitResult = NULL;
+      if (!empty($params['row_count'])) {
+        $limitResult = '&rowCount=' . $params['row_count'];
+      }
+      $dashletParams['name'] = "report/{$instance->id}";
+      $dashletParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}&snippet=5{$chart}&context=dashlet" . $limitResult;
+      $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}&snippet=5{$chart}&context=dashletFullscreen" . $limitResult;
       $dashletParams['instanceURL'] = "civicrm/report/instance/{$instance->id}";
       CRM_Core_BAO_Dashboard::addDashlet($dashletParams);
     }
@@ -226,19 +224,26 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   }
 
   /**
-   * Delete the instance of the Report
+   * Delete the instance of the Report.
    *
-   * @return $results no of deleted Instance on success, false otherwise
-   * @access public
+   * @param int $id
    *
+   * @return mixed
+   *   $results no of deleted Instance on success, false otherwise
    */
-  static function del($id = NULL) {
+  public static function del($id = NULL) {
     $dao = new CRM_Report_DAO_ReportInstance();
     $dao->id = $id;
     return $dao->delete();
   }
 
-  static function retrieve($params, &$defaults) {
+  /**
+   * @param array $params
+   * @param $defaults
+   *
+   * @return CRM_Report_DAO_ReportInstance|null
+   */
+  public static function retrieve($params, &$defaults) {
     $instance = new CRM_Report_DAO_ReportInstance();
     $instance->copyValues($params);
 
@@ -249,4 +254,5 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
     return NULL;
   }
+
 }

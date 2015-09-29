@@ -1,8 +1,8 @@
-{*
+﻿{*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -71,15 +71,21 @@
   {ts}Allow Shared Email{/ts}
 {/htxt}
 {htxt id="id-allow_same_email"}
-<p>{ts}Check this box to allow a user to register multiple participants using the same email address. If you want additional participants to be registered <strong>without requiring an email address to be entered for each person</strong> - check the "Register multiple participants" option, AND include a profile in this registration form which <strong>includes First Name and Last Name fields</strong>.{/ts}</p>
-<p>{ts}You will also need to set the default supervised duplicate contact matching rule for Individuals to one that includes First Name and Last Name fields (Contacts &raquo; Find and Merge Duplicate Contacts).{/ts}</p>
+<p>{ts}Check this box to allow a user to register multiple participants using the same email address. Alternatively, if you want additional participants to be registered <strong>without requiring an email address to be entered for each person</strong> - check the "Register multiple participants" option, AND include a profile in this registration form which <strong>includes First Name and Last Name fields</strong>.{/ts}</p>
+{/htxt}
+
+{htxt id="id-dedupe_rule_group_id-title"}
+  {ts}Duplicate Matching Rule{/ts}
+{/htxt}
+{htxt id="id-dedupe_rule_group_id"}
+<p>{ts}By default, your event will use the Unsupervised duplicate matching rule to match participants in anonymous registrations with existing individuals. You may select another rule to use for this event instead. Make sure that your included profile(s) contain the fields needed by your matching rule.{/ts}</p>
 {/htxt}
 
 {htxt id="id-requires_approval-title"}
   {ts}Require Approval{/ts}
 {/htxt}
 {htxt id="id-requires_approval"}
-{ts}Check this box to require administrative approval for all the participants who self-register, prior to being able to complete the registration process. Participants will be placed in 'Awaiting Approval' status. You can review and approve participants from 'Find Participants' - select the 'Change Participant Status' task. Approved participants will move to 'Pending from approval' status, and will be sent an email with a link to complete their registration (including paying event fees - if any). {/ts}
+{ts}Check this box to require administrative approval for all the participants who self-register, prior to being able to complete the registration process. Participants will be placed in 'Awaiting Approval' status. You can review and approve participants from 'Find Participants' - select the 'Participant status - change' task. Approved participants will move to 'Pending from approval' status, and will be sent an email with a link to complete their registration (including paying event fees - if any). {/ts}
 {/htxt}
 
 {htxt id="id-expiration_time-title"}

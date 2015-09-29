@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.5                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2014                                |
+   | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -25,13 +25,18 @@
   */
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
+
+/**
+ * Class WebTest_Contribute_OnBehalfOfOrganization
+ */
 class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
   protected $pageno = '';
+
   protected function setUp() {
     parent::setUp();
   }
 
-  function testOnBehalfOfOrganization() {
+  public function testOnBehalfOfOrganization() {
     $this->webtestLogin();
 
     // create new individual
@@ -49,8 +54,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->webtestAddContact($firstName, $lastName, $email);
     $cid = $this->urlArg('cid');
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 100;
@@ -107,7 +112,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->_testUserWithMoreThanOneRelationship($pageId, $cid, $pageTitle);
   }
 
-  function testOnBehalfOfOrganizationWithMembershipData() {
+  public function testOnBehalfOfOrganizationWithMembershipData() {
     $this->webtestLogin();
 
     // create new individual
@@ -178,7 +183,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->assertTrue($this->isTextPresent("Your custom field '$checkboxFieldLabel' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '$checkboxFieldLabel' has been saved."));
 
     //create another custom field - Integer Radio
     $this->click("//a[@id='newCustomField']/span");
@@ -220,7 +225,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->assertTrue($this->isTextPresent("Your custom field '$radioFieldLabel' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '$radioFieldLabel' has been saved."));
 
     //add the above custom data to the On Behalf of Profile
     $this->openCiviPage("admin/uf/group", "reset=1");
@@ -232,14 +237,14 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("link=Add Field");
     $this->waitForElementPresent('_qf_Field_next-bottom');
     $this->select('field_name[0]', 'value=Membership');
-    $label = $checkboxFieldLabel.' :: '. $customGroupTitle;
+    $label = $checkboxFieldLabel . ' :: ' . $customGroupTitle;
     $this->select('field_name[1]', "label=$label");
     $this->click('field_name[1]');
     $this->click('_qf_Field_next_new-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->select('field_name[0]', 'value=Membership');
-    $label = $radioFieldLabel.' :: '. $customGroupTitle;
+    $label = $radioFieldLabel . ' :: ' . $customGroupTitle;
     $this->select('field_name[1]', "label=$label");
     $this->click('field_name[1]');
     $this->click('_qf_Field_next-bottom');
@@ -247,8 +252,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent("Your CiviCRM Profile Field '{$radioFieldLabel}' has been saved to 'On Behalf Of Organization'."));
 
     //create organisation
-    $orgName = "Org WebAccess ". substr(sha1(rand()), 0, 7);
-    $orgEmail = "org". substr(sha1(rand()), 0, 7) . "@web.com";
+    $orgName = "Org WebAccess " . substr(sha1(rand()), 0, 7);
+    $orgEmail = "org" . substr(sha1(rand()), 0, 7) . "@web.com";
     $this->webtestAddOrganization($orgName, $orgEmail);
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -311,8 +316,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("details-save");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 100;
@@ -370,11 +375,17 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     // Add membership custom data field to profile
     $this->waitForElementPresent('_qf_Group_cancel-bottom');
     $this->type('title', $profileTitle);
-    $this->click('_qf_Group_next-bottom');
+    $this->clickLink('_qf_Group_next-bottom');
 
-    $this->waitForElementPresent('_qf_Field_cancel-bottom');
     $this->assertTrue($this->isTextPresent("Your CiviCRM Profile '{$profileTitle}' has been added. You can add fields to this profile now."));
 
+    $gid = $this->urlArg('gid');
+
+    $this->openCiviPage('admin/uf/group/field/add', array(
+        'action' => 'add',
+        'reset' => 1,
+        'gid' => $gid,
+      ), 'field_name[0]');
     $this->select('field_name[0]', "value=Membership");
     $this->select('field_name[1]', "label={$checkboxFieldLabel} :: {$customGroupTitle}");
     $this->click('field_name[1]');
@@ -436,7 +447,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->webtestLogout();
   }
 
-  function testOnBehalfOfOrganizationWithOrgData() {
+  public function testOnBehalfOfOrganizationWithOrgData() {
     $this->webtestLogin();
 
     $this->openCiviPage("profile/edit", "reset=1&gid=4");
@@ -476,8 +487,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //create organisation
-    $orgName = "Org WebAccess ". substr(sha1(rand()), 0, 7);
-    $orgEmail = "org". substr(sha1(rand()), 0, 7) . "@web.com";
+    $orgName = "Org WebAccess " . substr(sha1(rand()), 0, 7);
+    $orgEmail = "org" . substr(sha1(rand()), 0, 7) . "@web.com";
     $this->webtestAddOrganization($orgName, $orgEmail);
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -531,7 +542,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $pageId = $this->webtestAddContributionPage($hash,
       $rand,
       $pageTitle,
-      null,
+      NULL,
       $amountSection,
       $payLater,
       $onBehalf,
@@ -551,10 +562,101 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
       $honoreeSection
     );
 
-     $this->_testOrganization($pageId, $cid, $pageTitle);
+    $this->_testOrganization($pageId, $cid, $pageTitle);
   }
 
-  function _testOrganization($pageId, $cid, $pageTitle) {
+  public function testWithContactSubtypeDupe() {
+    $this->webtestLogin();
+
+    //create organisation
+    $orgName = "Org WebAccess " . substr(sha1(rand()), 0, 7);
+    $orgEmail = "org" . substr(sha1(rand()), 0, 7) . "@web.com";
+    $contactSubType = 'Sponsor';
+    $this->webtestAddOrganization($orgName, $orgEmail, $contactSubType);
+
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $cid = $this->urlArg('cid');
+
+    $pageTitle = substr(sha1(rand()), 0, 7);
+    $rand = 100;
+    $hash = substr(sha1(rand()), 0, 7);
+    $amountSection = TRUE;
+    $payLater = TRUE;
+    $onBehalf = TRUE;
+    $pledges = FALSE;
+    $recurring = FALSE;
+    $memberships = FALSE;
+    $memPriceSetId = NULL;
+    $friend = FALSE;
+    $profilePreId = NULL;
+    $profilePostId = NULL;
+    $premiums = FALSE;
+    $widget = FALSE;
+    $pcp = FALSE;
+    $honoreeSection = FALSE;
+    $isAddPaymentProcessor = FALSE;
+    $isPcpApprovalNeeded = FALSE;
+    $isSeparatePayment = FALSE;
+
+    // create a new online contribution page
+    // create contribution page with randomized title and default params
+    $pageId = $this->webtestAddContributionPage($hash,
+      $rand,
+      $pageTitle,
+      NULL,
+      $amountSection,
+      $payLater,
+      $onBehalf,
+      $pledges,
+      $recurring,
+      $memberships,
+      $memPriceSetId,
+      $friend,
+      $profilePreId,
+      $profilePostId,
+      $premiums,
+      $widget,
+      $pcp,
+      $isAddPaymentProcessor,
+      $isPcpApprovalNeeded,
+      $isSeparatePayment,
+      $honoreeSection
+    );
+
+    //Open Live Contribution Page
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->waitForElementPresent("onbehalf_state_province-3");
+
+    $this->type("onbehalf_organization_name", $orgName);
+    $this->waitForElementPresent("onbehalf_phone-3-1");
+    $this->type("onbehalf_phone-3-1", 9999999999);
+    $this->waitForElementPresent("onbehalf_email-3");
+    $this->type("onbehalf_email-3", "org@example.com");
+    $this->type("onbehalf_street_address-3", "Test Street Address");
+    $this->type("onbehalf_city-3", "Test City");
+    $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
+    $this->click("onbehalf_country-3");
+    $this->select("onbehalf_country-3", "label=UNITED STATES");
+    $this->click("onbehalf_state_province-3");
+    $this->select("onbehalf_state_province-3", "label=Alabama");
+
+    $this->waitForElementPresent("_qf_Main_upload-bottom");
+    $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
+
+    $this->click("_qf_Confirm_next-bottom");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    $this->openCiviPage("contact/view", "reset=1&cid=$cid", "xpath=//div[@class='crm-content crm-contact_type_label']");
+
+    $this->verifyText("xpath=//div[@class='crm-content crm-contact_type_label']", $contactSubType);
+  }
+
+  /**
+   * @param int $pageId
+   * @param int $cid
+   * @param $pageTitle
+   */
+  public function _testOrganization($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
@@ -568,7 +670,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("onbehalf_city-3", "Test City");
     $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
     $this->click("onbehalf_country-3");
-    $this->select("onbehalf_country-3", "label=United States");
+    $this->select("onbehalf_country-3", "label=UNITED STATES");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
 
@@ -580,7 +682,12 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
   }
 
-  function _testAnomoyousOganization($pageId, $cid, $pageTitle) {
+  /**
+   * @param int $pageId
+   * @param int $cid
+   * @param $pageTitle
+   */
+  public function _testAnomoyousOganization($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
 
@@ -604,7 +711,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("onbehalf_city-3", "Test City");
     $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
     $this->click("onbehalf_country-3");
-    $this->select("onbehalf_country-3", "label=United States");
+    $this->select("onbehalf_country-3", "label=UNITED STATES");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
 
@@ -650,7 +757,12 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     }
   }
 
-  function _testUserWithOneRelationship($pageId, $cid, $pageTitle) {
+  /**
+   * @param int $pageId
+   * @param int $cid
+   * @param $pageTitle
+   */
+  public function _testUserWithOneRelationship($pageId, $cid, $pageTitle) {
     $this->webtestLogin('admin');
 
     // Create new group
@@ -708,7 +820,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your custom field '$fieldTitle' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '$fieldTitle' has been saved."));
     $fieldId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody//tr/td[1][text()='$fieldTitle']/../td[8]/span/a@href"));
 
     // Enable CiviCampaign module if necessary
@@ -793,7 +905,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", "{$orgName1} street address");
     $this->type("address_1_city", "{$orgName1} city");
     $this->type("address_1_postal_code", substr(sha1(rand()), 0, 4));
-    $this->assertTrue($this->isTextPresent("- select - United States"));
+    $this->assertTrue($this->isTextPresent("- select - UNITED STATES"));
     $this->select("address_1_state_province_id", "value=1019");
     $this->type("address_1_geo_code_1", "1234");
     $this->type("address_1_geo_code_2", "5678");
@@ -891,7 +1003,12 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->assertTrue($this->isTextPresent('Selected Profile Field has been deleted.'), "Status message didn't show up after saving!");
   }
 
-  function _testUserWithMoreThanOneRelationship($pageId, $cid, $pageTitle) {
+  /**
+   * @param int $pageId
+   * @param int $cid
+   * @param $pageTitle
+   */
+  public function _testUserWithMoreThanOneRelationship($pageId, $cid, $pageTitle) {
     $this->webtestLogin('admin');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -953,7 +1070,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->assertTrue($this->isTextPresent("Your custom field '$fieldTitle' has been saved."));
+    $this->assertTrue($this->isTextPresent("Custom field '$fieldTitle' has been saved."));
     $fieldId = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody//tr/td[1]/span[text()='$fieldTitle']/../td[8]/span/a@href"));
 
     // Enable CiviCampaign module if necessary
@@ -1039,7 +1156,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", "{$orgName1} street address");
     $this->type("address_1_city", "{$orgName1} city");
     $this->type("address_1_postal_code", "9999999999");
-    $this->assertTrue($this->isTextPresent("- select - United States"));
+    $this->assertTrue($this->isTextPresent("- select - UNITED STATES"));
     $this->select("address_1_state_province_id", "value=1019");
     $this->type("address_1_geo_code_1", "1234");
     $this->type("address_1_geo_code_2", "5678");
@@ -1072,7 +1189,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", "{$orgName2} street address");
     $this->type("address_1_city", "{$orgName2} city");
     $this->type("address_1_postal_code", "7777777777");
-    $this->assertTrue($this->isTextPresent("- select - United States"));
+    $this->assertTrue($this->isTextPresent("- select - UNITED STATES"));
     $this->select("address_1_state_province_id", "value=1019");
     $this->type("address_1_geo_code_1", "1224");
     $this->type("address_1_geo_code_2", "5628");
@@ -1095,7 +1212,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     $this->type('minimum_fee', '50');
 
-    $this->select( 'financial_type_id', 'value=2' );
+    $this->select('financial_type_id', 'value=2');
 
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
@@ -1256,9 +1373,9 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@id='current-relationships']/div/table/tbody//tr/td[2]/a[text()='{$orgName1}']/../../td[9]/span[2][text()='more ']/ul/li[2]/a[text()='Delete']");
 
     // Check confirmation alert.
-    $this->assertTrue((bool)preg_match("/^Are you sure you want to delete this relationship?/",
-        $this->getConfirmation()
-      ));
+    $this->assertTrue((bool) preg_match("/^Are you sure you want to delete this relationship?/",
+      $this->getConfirmation()
+    ));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isTextPresent('Selected relationship has been deleted successfully.'),
@@ -1266,7 +1383,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     );
   }
 
-  function testOnBehalfOfOrganizationWithImage() {
+  public function testOnBehalfOfOrganizationWithImage() {
     $this->webtestLogin();
 
     $this->openCiviPage("profile/edit", "reset=1&gid=4");
@@ -1299,8 +1416,8 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->click('_qf_Field_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    // We need a payment processor
-    $processorName = "Webtest Dummy" . substr(sha1(rand()), 0, 7);
+    // Use default payment processor
+    $processorName = 'Test Processor';
     $processorType = 'Dummy';
     $pageTitle = substr(sha1(rand()), 0, 7);
     $rand = 100;
@@ -1362,7 +1479,12 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "Selected Profile Field has been deleted.");
   }
 
-  function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {
+  /**
+   * @param int $pageId
+   * @param int $cid
+   * @param $pageTitle
+   */
+  public function _testOrganizationWithImageUpload($pageId, $cid, $pageTitle) {
     //Open Live Contribution Page
     $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", '_qf_Main_upload-bottom');
 
@@ -1379,7 +1501,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("onbehalf_city-3", "Test City");
     $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
     $this->click("onbehalf_country-3");
-    $this->select("onbehalf_country-3", "label=United States");
+    $this->select("onbehalf_country-3", "label=UNITED STATES");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
 
@@ -1388,11 +1510,11 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
 
     //header("Content-Type: image/png");
     $im = imagecreate(110, 20)
-      or die("Cannot Initialize new GD image stream");
+    or die("Cannot Initialize new GD image stream");
     $background_color = imagecolorallocate($im, 0, 0, 0);
     $text_color = imagecolorallocate($im, 233, 14, 91);
-    imagestring($im, 1, 5, 5,  "On Behalf-Org Logo", $text_color);
-    imagepng($im,"/tmp/file.png");
+    imagestring($im, 1, 5, 5, "On Behalf-Org Logo", $text_color);
+    imagepng($im, "/tmp/file.png");
 
     $imagePath = "/tmp/file.png";
     $this->webtestAttachFile('onbehalf_image_URL', $imagePath);
@@ -1433,5 +1555,5 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     //check whether the image is present
     $this->assertTrue($this->isElementPresent("xpath=//div[@id='crm-contact-thumbnail']/div/a/img"));
   }
-}
 
+}

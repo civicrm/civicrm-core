@@ -1,7 +1,7 @@
 {if $action & 1024}
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
 {/if}
-{capture assign='reqMark'}<span class="marker"  title="{ts}This field is required.{/ts}">*</span>{/capture}
+
 <div class="form-item">
 {if $event.intro_text}
     <div id="intro_text">
@@ -35,7 +35,7 @@
                                 {assign var="count" value=`$count+1`}
                             {/if}
                         {/if}
-	              {/foreach}
+                {/foreach}
                     </tr>
                 </table>
             </dd>
@@ -53,7 +53,7 @@
 <div class="form-item">
      <dt></dt>
      <dd>{include file="CRM/Event/Form/CalculatePriceset.tpl"}</dd>
-</div> 
+</div>
 {if $priceSet.help_post}
   <dt>&nbsp;</dt>
   <dd class="description">{$priceSet.help_post}</dd>
@@ -77,7 +77,7 @@
 
 </div>
      <table class="form-layout-compressed">
-        <tr><td class="label nowrap">{$event.fee_label} <span class="marker">*</span></td>
+        <tr><td class="label nowrap">{$event.fee_label} <span class="crm-marker">*</span></td>
             <td>&nbsp;</td>
             <td>{$form.amount.html}</td>
         </tr>
@@ -108,21 +108,21 @@
                 <td>{$form.additional_participants.html|crmReplace:class:two}<br />
                     <span class="description">{ts}You will be able to enter registration information for each additional person after you complete this page and click Continue.{/ts}</span>
                 </td>
-       	    </tr>
+             </tr>
             </table>
         </div>
-    </div> 
+    </div>
 
 {* User account registration option. Displays if enabled for one of the profiles on this page. *}
 {include file="CRM/common/CMSUser.tpl"}
 
-{include file="CRM/UF/Form/Block.tpl" fields=$customPre} 
+{include file="CRM/UF/Form/Block.tpl" fields=$customPre}
 
-{if $paidEvent}   
-    {include file='CRM/Core/BillingBlock.tpl'} 
-{/if}        
+{if $paidEvent}
+    {include file='CRM/Core/BillingBlock.tpl'}
+{/if}
 
-{include file="CRM/UF/Form/Block.tpl" fields=$customPost}   
+{include file="CRM/UF/Form/Block.tpl" fields=$customPost}
 
 {if $isCaptcha}
   {include file='CRM/common/ReCAPTCHA.tpl'}
@@ -135,7 +135,7 @@
     <fieldset><legend>{ts}Checkout with PayPal{/ts}</legend>
     <table class="form-layout-compressed">
     <tr><td class="description">{ts}Click the PayPal button to continue.{/ts}</td></tr>
-    <tr><td>{$form.$expressButtonName.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span></td></tr>
+    <tr><td>{$form.$expressButtonName.html} <span style="font-size:11px; font-family: Arial, Verdana;">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</span></td></tr>
     </table>
     </fieldset>
 {/if}
@@ -153,43 +153,43 @@
 </div>
 
 {* Hide Credit Card Block and Billing information if registration is pay later. *}
-{if $form.is_pay_later and $hidePaymentInformation} 
-{include file="CRM/common/showHideByFieldValue.tpl" 
+{if $form.is_pay_later and $hidePaymentInformation}
+{include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="is_pay_later"
     trigger_value       =""
-    target_element_id   ="payment_information" 
+    target_element_id   ="payment_information"
     target_element_type ="table-row"
     field_type          ="radio"
     invert              = 1
 }
 {/if}
-{literal} 
+{literal}
 <script type="text/javascript">
 
     function allowParticipant( ) {
-	var additionalParticipant = document.getElementById('additional_participants').value; 
-	var validNumber = "";
-	for( i = 0; i< additionalParticipant.length; i++ ) {
-	    if ( additionalParticipant.charAt(i) >=1 || additionalParticipant.charAt(i) <=9 ) {
-		validNumber += additionalParticipant.charAt(i);
-	    } else {
-		document.getElementById('additional_participants').value = validNumber;
-	    }
-	}
+  var additionalParticipant = document.getElementById('additional_participants').value;
+  var validNumber = "";
+  for( i = 0; i< additionalParticipant.length; i++ ) {
+      if ( additionalParticipant.charAt(i) >=1 || additionalParticipant.charAt(i) <=9 ) {
+    validNumber += additionalParticipant.charAt(i);
+      } else {
+    document.getElementById('additional_participants').value = validNumber;
+      }
+  }
     }
-    {/literal}{if $form.is_pay_later and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}{literal} 
-	showHidePayPalExpressOption();
+    {/literal}{if $form.is_pay_later and $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}{literal}
+  showHidePayPalExpressOption();
     {/literal} {/if}{literal}
     function showHidePayPalExpressOption()
     {
         if (document.getElementsByName("is_pay_later")[0].checked) {
-	    show("crm-submit-buttons");
-	    hide("paypalExpress");
-	} else {
+      show("crm-submit-buttons");
+      hide("paypalExpress");
+  } else {
             show("paypalExpress");
             hide("crm-submit-buttons");
         }
     }
 
 </script>
-{/literal} 
+{/literal}

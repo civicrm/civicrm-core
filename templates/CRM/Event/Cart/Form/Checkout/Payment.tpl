@@ -93,16 +93,18 @@
   </tfoot>
 </table>
 {if $payment_required == true}
-<div class="crm-section {$form.is_pay_later.name}-section">
-  <div class="label">{$form.is_pay_later.label}</div>
-  <div class="content">{$form.is_pay_later.html}
-  </div>
-  <div class="clear"></div>
-</div>
-<div class="pay-later-instructions" style="display:none">
-  {$pay_later_instructions}
-</div>
-{include file='CRM/Core/BillingBlock.tpl'}
+  {if $form.is_pay_later.label}
+    <div class="crm-section {$form.is_pay_later.name}-section">
+      <div class="label">{$form.is_pay_later.label}</div>
+      <div class="content">{$form.is_pay_later.html}
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div class="pay-later-instructions" style="display:none">
+      {$pay_later_instructions}
+    </div>
+{/if}
+{include file='CRM/Core/BillingBlockWrapper.tpl'}
 {/if}
 {if $collect_billing_email == true}
 <div class="crm-section {$form.billing_contact_email.name}-section">
@@ -155,23 +157,23 @@
 <script type="text/javascript">
 var pay_later_sel = "input#{$form.is_pay_later.name}";
 {literal}
-cj("document").ready(function() {
+CRM.$(function($) {
   function refresh() {
-    var is_pay_later = cj(pay_later_sel).prop("checked");
-    cj(".credit_card_info-group").toggle(!is_pay_later);
-    cj(".pay-later-instructions").toggle(is_pay_later);
-    cj("div.billingNameInfo-section .description").html(is_pay_later ? "Enter the billing address at which you can be invoiced." : "Enter the name as shown on your credit or debit card, and the billing address for this card.");
+    var is_pay_later = $(pay_later_sel).prop("checked");
+    $(".credit_card_info-group").toggle(!is_pay_later);
+    $(".pay-later-instructions").toggle(is_pay_later);
+    $("div.billingNameInfo-section .description").html(is_pay_later ? "Enter the billing address at which you can be invoiced." : "Enter the name as shown on your credit or debit card, and the billing address for this card.");
   }
-  cj("input#source").prop('disabled', true);
+  $("input#source").prop('disabled', true);
 
-  cj(pay_later_sel).change(function() {
+  $(pay_later_sel).change(function() {
     refresh();
   });
-  cj(".payment_type-section :radio").change(function() {
-    var sel = cj(this).attr("id");
-    cj(".check_number-section").toggle(
-        cj(this).is(":checked") &&
-        cj("label[for="+sel+"]").html() == "{/literal}{ts escape='js'}Check{/ts}{literal}"
+  $(".payment_type-section :radio").change(function() {
+    var sel = $(this).attr("id");
+    $(".check_number-section").toggle(
+        $(this).is(":checked") &&
+        $("label[for="+sel+"]").html() == "{/literal}{ts escape='js'}Check{/ts}{literal}"
     );
   });
   refresh();

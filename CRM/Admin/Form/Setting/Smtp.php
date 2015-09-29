@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,28 +23,22 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This class generates form components for Smtp Server
- *
+ * This class generates form components for Smtp Server.
  */
 class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   protected $_testButtonName;
 
   /**
-   * Function to build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
 
@@ -68,18 +62,15 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
     $this->_testButtonName = $this->getButtonName('refresh', 'test');
 
-    $this->add('submit', $this->_testButtonName, ts('Save & Send Test Email'));
-
     $this->addFormRule(array('CRM_Admin_Form_Setting_Smtp', 'formRule'));
     parent::buildQuickForm();
+    $buttons = $this->getElement('buttons')->getElements();
+    $buttons[] = $this->createElement('submit', $this->_testButtonName, ts('Save & Send Test Email'), array('crm-icon' => 'mail-closed'));
+    $this->getElement('buttons')->setElements($buttons);
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form submission.
    */
   public function postProcess() {
     // flush caches so we reload details for future requests
@@ -93,7 +84,8 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     if ($buttonName == $this->_testButtonName) {
       if ($formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
         CRM_Core_Session::setStatus(ts('You have selected "Disable Outbound Email". A test email can not be sent.'), ts("Email Disabled"), "error");
-      } elseif ( $formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB ) {
+      }
+      elseif ($formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB) {
         CRM_Core_Session::setStatus(ts('You have selected "Redirect to Database". A test email can not be sent.'), ts("Email Disabled"), "error");
       }
       else {
@@ -117,9 +109,12 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           $toDisplayName = $toEmail;
         }
 
-        $to                = '"' . $toDisplayName . '"' . "<$toEmail>";
-        $from              = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
-        $testMailStatusMsg = ts('Sending test email. FROM: %1 TO: %2.<br />', array(1 => $domainEmailAddress, 2 => $toEmail));
+        $to = '"' . $toDisplayName . '"' . "<$toEmail>";
+        $from = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
+        $testMailStatusMsg = ts('Sending test email. FROM: %1 TO: %2.<br />', array(
+            1 => $domainEmailAddress,
+            2 => $toEmail,
+          ));
 
         $params = array();
         if ($formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
@@ -132,7 +127,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           if ($formValues['smtpAuth']) {
             $params['username'] = $formValues['smtpUsername'];
             $params['password'] = $formValues['smtpPassword'];
-            $params['auth']     = TRUE;
+            $params['auth'] = TRUE;
           }
           else {
             $params['auth'] = FALSE;
@@ -155,8 +150,8 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           $mailerName = 'sendmail';
         }
         elseif ($formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MAIL) {
-          $subject    = "Test for PHP mail settings";
-          $message    = "mail settings are correct.";
+          $subject = "Test for PHP mail settings";
+          $message = "mail settings are correct.";
           $mailerName = 'mail';
         }
 
@@ -186,7 +181,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     );
 
     if (!empty($mailingBackend)) {
-      CRM_Core_BAO_ConfigSetting::formatParams($formValues, $mailingBackend);
+      $formValues = array_merge($mailingBackend, $formValues);
     }
 
     // if password is present, encrypt it
@@ -201,15 +196,15 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param   array  $fields   posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return  array  list of errors to be posted back to the form
-   * @static
-   * @access  public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     if ($fields['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
       if (empty($fields['smtpServer'])) {
         $errors['smtpServer'] = 'SMTP Server name is a required field.';
@@ -239,14 +234,9 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * This function sets the default values for the form.
-   * default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
+   * Set default values for the form.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (!$this->_defaults) {
       $this->_defaults = array();
 
@@ -275,5 +265,5 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     }
     return $this->_defaults;
   }
-}
 
+}

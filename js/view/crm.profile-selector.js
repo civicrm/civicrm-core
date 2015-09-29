@@ -44,6 +44,7 @@
       'click .crm-profile-selector-edit': 'doEdit',
       'click .crm-profile-selector-copy': 'doCopy',
       'click .crm-profile-selector-create': 'doCreate',
+      'click .crm-profile-selector-preview': 'doShowPreview',
       // prevent interaction with preview form
       'click .crm-profile-selector-preview-pane': false,
       'crmLoad .crm-profile-selector-preview-pane': 'disableForm'
@@ -58,6 +59,7 @@
       this.setUfGroupId(this.options.ufGroupId, {silent: true});
       this.toggleButtons();
       this.$('.crm-profile-selector-select select').css('width', '25em').crmSelect2();
+      this.doShowPreview();
     },
     onChangeUfGroupId: function(event) {
       this.options.ufGroupId = $(event.target).val();
@@ -69,7 +71,7 @@
       this.$('.crm-profile-selector-edit,.crm-profile-selector-copy').prop('disabled', !this.hasUfGroupId());
     },
     hasUfGroupId: function() {
-      return (this.getUfGroupId() && this.getUfGroupId() != '') ? true : false;
+      return (this.getUfGroupId() && this.getUfGroupId() !== '') ? true : false;
     },
     setUfGroupId: function(value, options) {
       this.options.ufGroupId = value;
@@ -87,8 +89,21 @@
         CRM.loadPage(CRM.url("civicrm/ajax/inline", {class_name: 'CRM_UF_Form_Inline_PreviewById', id: this.getUfGroupId()}), {target: $pane});
       }
     },
+    doShowPreview: function() {
+      var $preview = this.$('.crm-profile-selector-preview');
+      var $pane = this.$('.crm-profile-selector-preview-pane');
+      if ($preview.hasClass('crm-profile-selector-preview-show')) {
+        $preview.removeClass('crm-profile-selector-preview-show');
+        $preview.find('.icon').removeClass('ui-icon-zoomin').addClass('ui-icon-zoomout');
+        $pane.show();
+      } else {
+        $preview.addClass('crm-profile-selector-preview-show');
+        $preview.find('.icon').removeClass('ui-icon-zoomout').addClass('ui-icon-zoomin');
+        $pane.hide();
+      }
+    },
     disableForm: function() {
-      this.$(':input', '.crm-profile-selector-preview-pane').prop('readOnly', true);
+      this.$(':input', '.crm-profile-selector-preview-pane').not('.select2-input').prop('readOnly', true);
     },
     doEdit: function(e) {
       e.preventDefault();

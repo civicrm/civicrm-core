@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,27 +28,25 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
 
   /**
-   * construct method
+   * Construct method.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * function to add contribution soft credit record
+   * Add contribution soft credit record.
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object soft contribution of object that is added
-   * @access public
-   *
+   * @return object
+   *   soft contribution of object that is added
    */
   public static function add(&$params) {
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
@@ -63,20 +61,157 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Process the soft contribution and/or link to personal campaign page.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   * @param object $contribution CRM_Contribute_DAO_Contribution
    *
-   * @return object CRM_Contribute_BAO_ContributionSoft object
-   * @access public
-   * @static
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function processSoftContribution($params, $contribution) {
+    //retrieve existing soft-credit and pcp id(s) if any against $contribution
+    $softIDs = self::getSoftCreditIds($contribution->id);
+    $pcpId = self::getSoftCreditIds($contribution->id, TRUE);
+
+    if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
+      $softParams = array();
+      $softParams['id'] = $pcpId ? $pcpId : NULL;
+      $softParams['contribution_id'] = $contribution->id;
+      $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
+      $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
+        $pcp['pcp_made_through_id'], 'contact_id'
+      );
+      $softParams['currency'] = $contribution->currency;
+      $softParams['amount'] = $contribution->total_amount;
+      $softParams['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcp);
+      $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
+      $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
+      $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
+      $contributionSoft = self::add($softParams);
+      //Send notification to owner for PCP
+      if ($contributionSoft->pcp_id && empty($pcpId)) {
+        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+      }
+    }
+    //Delete PCP against this contribution and create new on submitted PCP information
+    elseif (array_key_exists('pcp', $params) && $pcpId) {
+      $deleteParams = array('id' => $pcpId);
+      CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+    }
+    if (isset($params['soft_credit'])) {
+      $softParams = $params['soft_credit'];
+      foreach ($softParams as $softParam) {
+        if (!empty($softIDs)) {
+          $key = key($softIDs);
+          $softParam['id'] = $softIDs[$key];
+          unset($softIDs[$key]);
+        }
+        $softParam['contribution_id'] = $contribution->id;
+        $softParam['currency'] = $contribution->currency;
+        //case during Contribution Import when we assign soft contribution amount as contribution's total_amount by default
+        if (empty($softParam['amount'])) {
+          $softParam['amount'] = $contribution->total_amount;
+        }
+        CRM_Contribute_BAO_ContributionSoft::add($softParam);
+      }
+
+      // delete any extra soft-credit while updating back-office contribution
+      foreach ((array) $softIDs as $softID) {
+        if (!in_array($softID, $params['soft_credit_ids'])) {
+          $deleteParams = array('id' => $softID);
+          CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+        }
+      }
+    }
+  }
+
+  /**
+   * Function used to save pcp / soft credit entry.
+   *
+   * This is used by contribution and also event pcps
+   *
+   * @param array $params
+   * @param object $form
+   *   Form object.
+   */
+  public static function formatSoftCreditParams(&$params, &$form) {
+    $pcp = $softParams = $softIDs = array();
+    if (!empty($params['pcp_made_through_id'])) {
+      $fields = array(
+        'pcp_made_through_id',
+        'pcp_display_in_roll',
+        'pcp_roll_nickname',
+        'pcp_personal_note',
+      );
+      foreach ($fields as $f) {
+        $pcp[$f] = CRM_Utils_Array::value($f, $params);
+      }
+    }
+
+    if (!empty($form->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
+      $honorId = NULL;
+
+      $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
+      //check if there is any duplicate contact
+      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']);
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
+      $dedupeParams['check_permission'] = FALSE;
+      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType);
+      if (count($ids)) {
+        $honorId = CRM_Utils_Array::value(0, $ids);
+      }
+
+      $honorId = CRM_Contact_BAO_Contact::createProfileContact(
+        $params['honor'], CRM_Core_DAO::$_nullArray,
+        $honorId, NULL,
+        $form->_values['honoree_profile_id']
+      );
+      $softParams[] = array(
+        'contact_id' => $honorId,
+        'soft_credit_type_id' => $params['soft_credit_type_id'],
+      );
+
+      if (CRM_Utils_Array::value('is_email_receipt', $form->_values)) {
+        $form->_values['honor'] = array(
+          'soft_credit_type' => CRM_Utils_Array::value(
+            $params['soft_credit_type_id'],
+            CRM_Core_OptionGroup::values("soft_credit_type")
+          ),
+          'honor_id' => $honorId,
+          'honor_profile_id' => $form->_values['honoree_profile_id'],
+          'honor_profile_values' => $params['honor'],
+        );
+      }
+    }
+    elseif (!empty($params['soft_credit_contact_id'])) {
+      //build soft credit params
+      foreach ($params['soft_credit_contact_id'] as $key => $val) {
+        if ($val && $params['soft_credit_amount'][$key]) {
+          $softParams[$key]['contact_id'] = $val;
+          $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
+          $softParams[$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
+          if (!empty($params['soft_credit_id'][$key])) {
+            $softIDs[] = $softParams[$key]['id'] = $params['soft_credit_id'][$key];
+          }
+        }
+      }
+    }
+
+    $params['pcp'] = !empty($pcp) ? $pcp : NULL;
+    $params['soft_credit'] = $softParams;
+    $params['soft_credit_ids'] = $softIDs;
+  }
+
+  /**
+   * Fetch object based on array of properties.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
+   *
+   * @return CRM_Contribute_BAO_ContributionSoft
+   */
+  public static function retrieve(&$params, &$defaults) {
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
     $contributionSoft->copyValues($params);
     if ($contributionSoft->find(TRUE)) {
@@ -87,21 +222,27 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Function to delete soft credits
+   * Delete soft credits.
    *
-   * @param int $contributionTypeId
-   * @static
+   * @param array $params
+   *
    */
-  static function del($params) {
+  public static function del($params) {
     //delete from contribution soft table
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    foreach($params as $column => $value) {
+    foreach ($params as $column => $value) {
       $contributionSoft->$column = $value;
     }
     $contributionSoft->delete();
   }
 
-  static function getSoftContributionTotals($contact_id, $isTest = 0) {
+  /**
+   * @param int $contact_id
+   * @param int $isTest
+   *
+   * @return array
+   */
+  public static function getSoftContributionTotals($contact_id, $isTest = 0) {
     $query = '
     SELECT SUM(amount) as amount, AVG(total_amount) as average, cc.currency
     FROM civicrm_contribution_soft  ccs
@@ -109,8 +250,10 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     WHERE cc.is_test = %2 AND ccs.contact_id = %1
     GROUP BY currency';
 
-    $params = array(1 => array($contact_id, 'Integer'),
-      2 => array($isTest, 'Integer'));
+    $params = array(
+      1 => array($contact_id, 'Integer'),
+      2 => array($isTest, 'Integer'),
+    );
 
     $cs = CRM_Core_DAO::executeQuery($query, $params);
 
@@ -137,14 +280,16 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   *  Function to retrieve soft contributions for contribution record.
-   *  @param array $params an associated array
-   *  @param boolean $all include PCP data
+   * Retrieve soft contributions for contribution record.
    *
-   *  @return array of soft contribution ids, amounts, and associated contact ids
-   *  @static
+   * @param int $contributionID
+   * @param bool $all
+   *   Include PCP data.
+   *
+   * @return array
+   *   Array of soft contribution ids, amounts, and associated contact ids
    */
-  static function getSoftContribution($contributionID, $all = FALSE) {
+  public static function getSoftContribution($contributionID, $all = FALSE) {
     $pcpFields = array(
       'pcp_id',
       'pcp_title',
@@ -184,7 +329,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
           'amount' => $dao->amount,
           'contact_name' => $dao->display_name,
           'soft_credit_type' => $dao->soft_credit_type_id,
-          'soft_credit_type_label' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $dao->soft_credit_type_id)
+          'soft_credit_type_label' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $dao->soft_credit_type_id),
         );
         $count++;
       }
@@ -193,7 +338,13 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     return $softContribution;
   }
 
-  static function getSoftCreditIds($contributionID , $isPCP = FALSE) {
+  /**
+   * @param int $contributionID
+   * @param bool $isPCP
+   *
+   * @return array
+   */
+  public static function getSoftCreditIds($contributionID, $isPCP = FALSE) {
     $query = "
   SELECT id
   FROM  civicrm_contribution_soft
@@ -222,12 +373,16 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
 
   /**
    *  Function to retrieve the list of soft contributions for given contact.
-   *  @param int $contact_id contact id
    *
-   *  @return array
-   *  @static
+   * @param int $contact_id
+   *   Contact id.
+   * @param string $filter
+   * @param int $isTest
+   *   Additional filter criteria, later used in where clause.
+   *
+   * @return array
    */
-  static function getSoftContributionList($contact_id, $isTest = 0) {
+  public static function getSoftContributionList($contact_id, $filter = NULL, $isTest = 0) {
     $query = '
     SELECT ccs.id, ccs.amount as amount,
            ccs.contribution_id,
@@ -251,12 +406,19 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       LEFT JOIN civicrm_contact contact ON
       ccs.contribution_id = cc.id AND cc.contact_id = contact.id
       LEFT JOIN civicrm_financial_type cct ON cc.financial_type_id = cct.id
-    WHERE cc.is_test = %2 AND ccs.contact_id = %1
-    ORDER BY cc.receive_date DESC';
+    ';
+
+    $where = "
+      WHERE cc.is_test = %2 AND ccs.contact_id = %1";
+    if ($filter) {
+      $where .= $filter;
+    }
+
+    $query .= "{$where} ORDER BY cc.receive_date DESC";
 
     $params = array(
       1 => array($contact_id, 'Integer'),
-      2 => array($isTest, 'Integer')
+      2 => array($isTest, 'Integer'),
     );
     $cs = CRM_Core_DAO::executeQuery($query, $params);
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
@@ -284,17 +446,21 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     return $result;
   }
 
-  /*
-   *  Function to assign honor profile fields to template/form, if $honorId (as soft-credit's contact_id)
-   *  is passed  then  whole honoreeprofile fields with title/value assoc array assigned or only honoreeName
-   *  is assigned
+  /**
+   * Function to assign honor profile fields to template/form, if $honorId (as soft-credit's contact_id)
+   * is passed  then  whole honoreeprofile fields with title/value assoc array assigned or only honoreeName
+   * is assigned
    *
-   *  @static
+   * @param CRM_Core_Form $form
+   * @param array $params
+   * @param int $honorId
    */
-
-  static function formatHonoreeProfileFields($form, $params, $honoreeprofileId, $honorId = NULL) {
-    $profileContactType = CRM_Core_BAO_UFGroup::getContactType($honoreeprofileId);
-    $profileFields = CRM_Core_BAO_UFGroup::getFields($honoreeprofileId);
+  public static function formatHonoreeProfileFields($form, $params, $honorId = NULL) {
+    if (empty($form->_values['honoree_profile_id'])) {
+      return;
+    }
+    $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']);
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($form->_values['honoree_profile_id']);
     $honoreeProfileFields = $values = array();
     $honorName = NULL;
 
@@ -318,24 +484,26 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
           );
           unset($profileFields['prefix_id']);
         }
-          $honorName .= ' ' . $params['first_name'] . ' ' . $params['last_name'];
-          unset($profileFields['first_name']);
-          unset($profileFields['last_name']);
-          if (array_key_exists('suffix_id', $params)) {
-            $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id', $params),
+        $honorName .= ' ' . $params['first_name'] . ' ' . $params['last_name'];
+        unset($profileFields['first_name']);
+        unset($profileFields['last_name']);
+        if (array_key_exists('suffix_id', $params)) {
+          $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id', $params),
               CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
             );
-            unset($profileFields['suffix_id']);
-          }
-          break;
-        case 'Organization':
-          $honorName = $params['organization_name'];
-          unset($profileFields['organization_name']);
-          break;
-        case 'Household':
-          $honorName = $params['household_name'];
-          unset($profileFields['household_name']);
-          break;
+          unset($profileFields['suffix_id']);
+        }
+        break;
+
+      case 'Organization':
+        $honorName = $params['organization_name'];
+        unset($profileFields['organization_name']);
+        break;
+
+      case 'Household':
+        $honorName = $params['household_name'];
+        unset($profileFields['household_name']);
+        break;
     }
 
     if ($honorId) {
@@ -350,5 +518,5 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $form->assign('honorName', $honorName);
     }
   }
-}
 
+}

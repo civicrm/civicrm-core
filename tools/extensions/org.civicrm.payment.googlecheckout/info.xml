@@ -36,5 +36,5 @@
    <billingMode>notify</billingMode>
    <isRecur>0</isRecur>
    <paymentType>1</paymentType>
-  </typeInfo>  
+  </typeInfo>
 </extension>

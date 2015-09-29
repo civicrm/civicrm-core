@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -49,7 +49,9 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $detail;
   protected $summary;
 
-  function __construct() {
+  /**
+   */
+  public function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button
     $this->_add2groupSupported = FALSE;
 
@@ -57,28 +59,35 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->db = $dsn['database'];
 
     $this->log_conn_id = CRM_Utils_Request::retrieve('log_conn_id', 'Integer', CRM_Core_DAO::$_nullObject);
-    $this->log_date    = CRM_Utils_Request::retrieve('log_date', 'String', CRM_Core_DAO::$_nullObject);
-    $this->cid         = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $this->raw         = CRM_Utils_Request::retrieve('raw', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->log_date = CRM_Utils_Request::retrieve('log_date', 'String', CRM_Core_DAO::$_nullObject);
+    $this->cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
+    $this->raw = CRM_Utils_Request::retrieve('raw', 'Boolean', CRM_Core_DAO::$_nullObject);
 
-    $this->altered_name  = CRM_Utils_Request::retrieve('alteredName', 'String',  CRM_Core_DAO::$_nullObject);
-    $this->altered_by    = CRM_Utils_Request::retrieve('alteredBy',   'String',  CRM_Core_DAO::$_nullObject);
+    $this->altered_name = CRM_Utils_Request::retrieve('alteredName', 'String', CRM_Core_DAO::$_nullObject);
+    $this->altered_by = CRM_Utils_Request::retrieve('alteredBy', 'String', CRM_Core_DAO::$_nullObject);
     $this->altered_by_id = CRM_Utils_Request::retrieve('alteredById', 'Integer', CRM_Core_DAO::$_nullObject);
- 
+
     parent::__construct();
 
     CRM_Utils_System::resetBreadCrumb();
-    $breadcrumb =
+    $breadcrumb = array(
       array(
-            array('title' => ts('Home'),
-                  'url' => CRM_Utils_System::url()),
-            array('title' => ts('CiviCRM'),
-                  'url' => CRM_Utils_System::url('civicrm', 'reset=1')),
-            array('title' => ts('View Contact'),
-                  'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}")),
-            array('title' => ts('Search Results'),
-                  'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1")),
-            );
+        'title' => ts('Home'),
+        'url' => CRM_Utils_System::url(),
+      ),
+      array(
+        'title' => ts('CiviCRM'),
+        'url' => CRM_Utils_System::url('civicrm', 'reset=1'),
+      ),
+      array(
+        'title' => ts('View Contact'),
+        'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}"),
+      ),
+      array(
+        'title' => ts('Search Results'),
+        'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1"),
+      ),
+    );
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
     if (CRM_Utils_Request::retrieve('revert', 'Boolean', CRM_Core_DAO::$_nullObject)) {
@@ -95,7 +104,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
 
     // make sure the report works even without the params
     if (!$this->log_conn_id or !$this->log_date) {
-      $dao = new CRM_Core_DAO;
+      $dao = new CRM_Core_DAO();
       $dao->query("SELECT log_conn_id, log_date FROM `{$this->db}`.log_{$this->tables[0]} WHERE log_action = 'Update' ORDER BY log_date DESC LIMIT 1");
       $dao->fetch();
       $this->log_conn_id = $dao->log_conn_id;
@@ -109,9 +118,17 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     );
   }
 
-  function buildQuery($applyLimit = TRUE) {}
+  /**
+   * @param bool $applyLimit
+   */
+  public function buildQuery($applyLimit = TRUE) {
+  }
 
-  function buildRows($sql, &$rows) {
+  /**
+   * @param $sql
+   * @param $rows
+   */
+  public function buildRows($sql, &$rows) {
     // safeguard for when there aren’t any log entries yet
     if (!$this->log_conn_id or !$this->log_date) {
       return;
@@ -128,6 +145,11 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $table
+   *
+   * @return array
+   */
   protected function diffsInTable($table) {
     $rows = array();
 
@@ -145,8 +167,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $skipped = array('contact_id', 'entity_id', 'id');
     foreach ($diffs as $diff) {
       $field = $diff['field'];
-      $from  = $diff['from'];
-      $to    = $diff['to'];
+      $from = $diff['from'];
+      $to = $diff['to'];
 
       if ($this->raw) {
         $field = "$table.$field";
@@ -161,10 +183,11 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         }
 
         // special-case for multiple values. Also works for CRM-7251: preferred_communication_method
-        if ((substr($from, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR && 
-            substr($from, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) || 
-          (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR && 
-            substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)) {
+        if ((substr($from, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
+            substr($from, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR) ||
+          (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
+            substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
+        ) {
           $froms = $tos = array();
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($from, CRM_Core_DAO::VALUE_SEPARATOR)) as $val) {
             $froms[] = CRM_Utils_Array::value($val, $values[$field]);
@@ -173,7 +196,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
             $tos[] = CRM_Utils_Array::value($val, $values[$field]);
           }
           $from = implode(', ', array_filter($froms));
-          $to   = implode(', ', array_filter($tos));
+          $to = implode(', ', array_filter($tos));
         }
 
         if (isset($values[$field][$from])) {
@@ -199,7 +222,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     return $rows;
   }
 
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
 
     $params = array(
@@ -208,15 +231,15 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     );
 
     $this->assign('whom_url', CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}"));
-    $this->assign('who_url',  CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->altered_by_id}"));
+    $this->assign('who_url', CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->altered_by_id}"));
     $this->assign('whom_name', $this->altered_name);
-    $this->assign('who_name',  $this->altered_by);
+    $this->assign('who_name', $this->altered_by);
 
     $this->assign('log_date', CRM_Utils_Date::mysqlToIso($this->log_date));
 
     $q = "reset=1&log_conn_id={$this->log_conn_id}&log_date={$this->log_date}";
     $this->assign('revertURL', CRM_Report_Utils_Report::getNextUrl($this->detail, "$q&revert=1", FALSE, TRUE));
-    $this->assign('revertConfirm', ts('Are you sure you want to revert all these changes?'));
+    $this->assign('revertConfirm', ts('Are you sure you want to revert all changes?'));
   }
-}
 
+}

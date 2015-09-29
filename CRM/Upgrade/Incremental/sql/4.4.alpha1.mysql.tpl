@@ -67,9 +67,11 @@ ALTER TABLE `civicrm_custom_group`
   ADD COLUMN `is_reserved` tinyint(4) DEFAULT '0' COMMENT 'Is this a reserved Custom Group?';
 
 --CRM-12986 fix event_id & contact_id to NOT NULL fields on participant table
+SET foreign_key_checks = 0;
 ALTER TABLE `civicrm_participant`
   CHANGE COLUMN `event_id` `event_id` INT(10) UNSIGNED NOT NULL,
   CHANGE COLUMN `contact_id` `contact_id` INT(10) UNSIGNED NOT NULL;
+SET foreign_key_checks = 1;
 
 -- CRM-12964 civicrm_print_label table creation
 CREATE TABLE IF NOT EXISTS `civicrm_print_label` (

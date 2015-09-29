@@ -21,7 +21,6 @@
         -khtml-border-radius:   4px;
         border-radius:      4px;
     }
-
     .crm-contribute-widget .crm-amounts {
         height:1em;
         margin:.8em 0px;
@@ -65,18 +64,15 @@
     .crm-contribute-widget .crm-amount-raised {
         font-weight:bold;
     }
-
     .crm-contribute-widget .crm-logo {
         text-align:center;
     }
-
     .crm-contribute-widget .crm-comments,
     .crm-contribute-widget .crm-donors,
     .crm-contribute-widget .crm-campaign {
         font-size:11px;
         margin-bottom:.8em;
     }
-
     .crm-contribute-widget .crm-contribute-button {
         display:block;
         background-color:#CECECE;
@@ -91,54 +87,42 @@
         padding:2px;
         font-size:13px;
     }
-
     .crm-contribute-widget .crm-home-url {
         text-decoration:none;
         border:0px;
     }
-
 </style>
 <style>
     .crm-contribute-widget {
         background-color: {/literal}{$form.color_main.value}{literal}; /* background color */
         border-color:{/literal}{$form.color_bg.value}{literal}; /* border color */
     }
-
     .crm-contribute-widget h5 {
         color: {/literal}{$form.color_title.value}{literal};
         background-color: {/literal}{$form.color_main_bg.value}{literal};
     } /* title */
-
     .crm-contribute-widget .crm-amount-raised { color:#000; }
-    .crm-contribute-widget .crm-amount-bar  /* progress bar */
-        background-color:{/literal}{$form.color_bar.value}{literal};
-        border-color:#CECECE;
+    .crm-contribute-widget .crm-amount-fill {
+      background-color:{/literal}{$form.color_bar.value}{literal};
     }
-    .crm-contribute-widget .crm-amount-fill { background-color:#2786C2; }
-
     .crm-contribute-widget a.crm-contribute-button { /* button color */
         background-color:{/literal}{$form.color_button.value}{literal};
     }
-
     .crm-contribute-widget .crm-contribute-button-inner { /* button text color */
         padding:2px;
         display:block;
         color:{/literal}{$form.color_about_link.value}{literal};
     }
-
     .crm-contribute-widget .crm-comments,
     .crm-contribute-widget .crm-donors,
     .crm-contribute-widget .crm-campaign {
         color:{/literal}{$form.color_main_text.value}{literal} /* other color*/
     }
-
     .crm-contribute-widget .crm-home-url {
         color:{/literal}{$form.color_homepage_link.value}{literal} /* home page link color*/
     }
-
 </style>
 {/literal}
-
 <div id="crm_cpid_{$cpageId}" class="crm-contribute-widget">
     <h5 id="crm_cpid_{$cpageId}_title"></h5>
     <div class="crm-amounts">
@@ -162,9 +146,7 @@
         <a href='{crmURL p="civicrm/contribute/transact" q="reset=1&id=$cpageId" h=0 a=1 fe=1}' class="crm-contribute-button"><span class="crm-contribute-button-inner" id="crm_cpid_{$cpageId}_btn_txt"> -- placeholder -- </span></a>
     </div>
 </div>
-
 {literal}
-
 <script type="text/javascript">
 // Cleanup functions for the document ready method
 if ( document.addEventListener ) {
@@ -181,12 +163,10 @@ if ( document.addEventListener ) {
         }
     };
 }
-
 if ( document.readyState === "complete" ) {
     // Handle it asynchronously to allow scripts the opportunity to delay ready
     setTimeout( onReady, 1 );
 }
-
 // Mozilla, Opera and webkit support this event
 if ( document.addEventListener ) {
     // Use the handy event callback
@@ -198,15 +178,12 @@ if ( document.addEventListener ) {
     // ensure firing before onload,
     // maybe late but safe also for iframes
     document.attachEvent("onreadystatechange", DOMContentLoaded);
-
     // A fallback to window.onload, that will always work
     window.attachEvent( "onload", onReady );
 }
-
 function onReady( ) {
     var cpid    = {/literal}{$cpageId}{literal};
     var jsonvar = eval('jsondata' + cpid);
-
     var crmCurrency = jsonvar.currencySymbol;
     document.getElementById('crm_cpid_'+cpid+'_title').innerHTML        = jsonvar.title;
     if ( jsonvar.money_target > 0 ) {
@@ -227,13 +204,11 @@ function onReady( ) {
         document.getElementById('crm_cpid_'+cpid+'_amt_fill').style.width = moneyRaised;
         document.getElementById('crm_cpid_'+cpid+'_percentage').innerHTML = jsonvar.money_raised_percentage;
     }
-
     if ( !jsonvar.is_active ) {
         document.getElementById('crm_cpid_'+cpid+'_button').innerHTML   = jsonvar.home_url;
         document.getElementById('crm_cpid_'+cpid+'_button').style.color = 'red';
     }
 }
-
 </script>
 {/literal}
 <script type="text/javascript" src="{$config->userFrameworkResourceURL}/extern/widget.php?cpageId={$cpageId}&widgetId={$widget_id}&format=3"></script>

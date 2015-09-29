@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,15 +33,18 @@
   <div class="icon inform-icon"></div>&nbsp;
         {ts}Are you sure you want to delete this record?{/ts}
   </div>
-  <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
-  <div class="crm-submit-buttons" style='display:inline'>{include file="CRM/common/formButtons.tpl"}</div>
+
+  <div class="crm-submit-buttons">
+    <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
+    <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+  </div>
 {else}
 {if ! empty( $fields )}
 {* Wrap in crm-container div so crm styles are used.*}
 {* Replace div id "crm-container" only when profile is not loaded in civicrm container, i.e for profile shown in my account and in profile standalone mode otherwise id should be "crm-profile-block" *}
 
   {if $action eq 1 or $action eq 2 or $action eq 4 }
-  <div id="crm-profile-block" class="crm-container-snippet crm-public">
+  <div id="crm-profile-block" class="crm-container crm-public">
     {else}
   <div id="crm-container" class="crm-container crm-public" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   {/if}
@@ -104,7 +107,7 @@
         <div class="form-layout-compressed">
         {/if}
         {if $field.help_pre && $action neq 4 && $form.$n.html}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-pre" id="helprow-{$n}">
             <div class="content description">{$field.help_pre}</div>
           </div>
         {/if}
@@ -147,9 +150,6 @@
               {if $n|substr:0:3 eq 'im-'}
                 {assign var="provider" value=$n|cat:"-provider_id"}
                 {$form.$provider.html}&nbsp;
-                {elseif $n|substr:0:4 eq 'url-'}
-                {assign var="websiteType" value=$n|cat:"-website_type_id"}
-                {$form.$websiteType.html}&nbsp;
               {/if}
               {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
                 {include file="CRM/Profile/Form/GreetingType.tpl"}
@@ -195,13 +195,13 @@
 
       {* Show explanatory text for field if not in 'view' mode *}
         {if $field.help_post && $action neq 4 && $form.$n.html}
-          <div class="crm-section helprow-{$n}-section" id="helprow-{$n}">
+          <div class="crm-section helprow-{$n}-section helprow-post" id="helprow-{$n}">
             <div class="content description">{$field.help_post}</div>
           </div>
         {/if}
       {/if}{* end of main if field name if *}
     {/foreach}
-   
+
     {if $isCaptcha && ( $mode eq 8 || $mode eq 4 || $mode eq 1 ) }
       {include file='CRM/common/ReCAPTCHA.tpl'}
       <script type="text/javascript">cj('.recaptcha_label').attr('width', '140px');</script>
@@ -222,7 +222,13 @@
         {assign var=floatStyle value='float:right'}
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
-      {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
+        {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
+        <a class="button cancel" href="{$cancelURL}">
+          <span>
+            <div class="icon ui-icon-close"></div>
+            {ts}Cancel{/ts}
+          </span>
+        </a>
       </div>
     {/if}
     {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}
@@ -265,7 +271,7 @@ invert              = 0
 {literal}
 <script type="text/javascript">
 
-cj(document).ready(function(){
+CRM.$(function($) {
   cj('#selector tr:even').addClass('odd-row ');
   cj('#selector tr:odd ').addClass('even-row');
 });

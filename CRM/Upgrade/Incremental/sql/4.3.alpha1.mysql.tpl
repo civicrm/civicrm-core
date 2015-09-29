@@ -125,7 +125,7 @@ ALTER TABLE civicrm_uf_field
 -- CRM-1115
 -- note that country names are not translated in the DB
 SELECT @region_id   := max(id) from civicrm_worldregion where name = "Europe and Central Asia";
-INSERT INTO civicrm_country (name,iso_code,region_id,is_province_abbreviated) VALUES("Kosovo", "XK", @region_id, 0);
+INSERT IGNORE INTO civicrm_country (name,iso_code,region_id,is_province_abbreviated) VALUES("Kosovo", "XK", @region_id, 0);
 
 UPDATE civicrm_country SET name = 'Libya' WHERE name LIKE 'Libyan%';
 UPDATE civicrm_country SET name = 'Congo, Republic of the' WHERE name = 'Congo';
@@ -601,7 +601,7 @@ SELECT 'civicrm_payment_processor', id, @option_value_rel_id_as, @financial_acco
 -- CRM-9923 and CRM-11037
 SELECT @option_group_id_batch_status   := max(id) from civicrm_option_group where name = 'batch_status';
 
-SELECT @weight                 := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_batch_status;
+SELECT @weight                 := MAX(ROUND(value)) FROM civicrm_option_value WHERE option_group_id = @option_group_id_batch_status;
 
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`)

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,12 +66,14 @@
   </tr>
 </table>
 </div>
-<br/>
-<table id="crm-group-selector">
+<div class="css_right">
+  <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
+</div>
+<table class="crm-group-selector">
   <thead>
     <tr>
       <th class='crm-group-name'>{ts}Name{/ts}</th>
-      <th class='crm-group-group_id'>{ts}ID{/ts}</th>
+      <th class='crm-group-count'>{ts}Count{/ts}</th>
       <th class='crm-group-created_by'>{ts}Created By{/ts}</th>
       <th class='crm-group-description'>{ts}Description{/ts}</th>
       <th class='crm-group-group_type'>{ts}Group Type{/ts}</th>
@@ -87,13 +89,12 @@
 
 {* handle enable/disable actions*}
 {include file="CRM/common/enableDisableApi.tpl"}
-{include file="CRM/common/crmeditable.tpl"}
 
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
   // for CRM-11310 and CRM-10635 : processing just parent groups on initial display
-  // passing '1' for parentsOnlyArg to show parent child heirarchy structure display
+  // passing '1' for parentsOnlyArg to show parent child hierarchy structure display
   // on initial load of manage group page and
   // also to handle search filtering for initial load of same page.
   buildGroupSelector(true, 1);
@@ -105,17 +106,17 @@ CRM.$(function($) {
     .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
     .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
         // Refresh datatable when form completes
-        $('#crm-group-selector').dataTable().fnDraw();
+        var $context = $('#crm-main-content-wrapper');
+        $('table.crm-group-selector', $context).dataTable().fnDraw();
     });
-});
 
-function buildGroupSelector( filterSearch, parentsOnlyArg ) {
+  function buildGroupSelector( filterSearch, parentsOnlyArg ) {
     if ( filterSearch ) {
-        if (typeof crmGroupSelector !== 'undefined') {
-          crmGroupSelector.fnDestroy();
-        }
-        var parentsOnly = 0;
-        var ZeroRecordText = '<div class="status messages">{/literal}{ts escape="js"}No matching Groups found for your search criteria. Suggestions:{/ts}{literal}<div class="spacer"></div><ul><li>{/literal}{ts escape="js"}Check your spelling.{/ts}{literal}</li><li>{/literal}{ts escape="js"}Try a different spelling or use fewer letters.{/ts}{literal}</li><li>{/literal}{ts escape="js"}Make sure you have enough privileges in the access control system.{/ts}{literal}</li></ul></div>';
+      if (typeof crmGroupSelector !== 'undefined') {
+        crmGroupSelector.fnDestroy();
+      }
+      var parentsOnly = 0;
+      var ZeroRecordText = '<div class="status messages">{/literal}{ts escape="js"}No matching Groups found for your search criteria. Suggestions:{/ts}{literal}<div class="spacer"></div><ul><li>{/literal}{ts escape="js"}Check your spelling.{/ts}{literal}</li><li>{/literal}{ts escape="js"}Try a different spelling or use fewer letters.{/ts}{literal}</li><li>{/literal}{ts escape="js"}Make sure you have enough privileges in the access control system.{/ts}{literal}</li></ul></div>';
     } else {
         var parentsOnly = 1;
         var ZeroRecordText = {/literal}'{ts escape="js"}<div class="status messages">No Groups have been created for this site.{/ts}</div>'{literal};
@@ -129,14 +130,15 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
     var columns = '';
     var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal};
     var showOrgInfo = {/literal}"{$showOrgInfo}"{literal};
+    var $context = $('#crm-main-content-wrapper');
 
-    crmGroupSelector = cj('#crm-group-selector').dataTable({
+    crmGroupSelector = $('table.crm-group-selector', $context).dataTable({
         "bFilter"    : false,
         "bAutoWidth" : false,
         "aaSorting"  : [],
         "aoColumns"  : [
                         {sClass:'crm-group-name'},
-                        {sClass:'crm-group-group_id'},
+                        {sClass:'crm-group-count'},
                         {sClass:'crm-group-created_by'},
                         {sClass:'crm-group-description', bSortable:false},
                         {sClass:'crm-group-group_type'},
@@ -170,15 +172,23 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
                         }
                     },
         "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-          var id = cj('td:eq(1)', nRow).text();
-          cj(nRow).addClass('crm-entity').attr('data-entity', 'group').attr('data-id', id);
-          cj('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-name" />');
-          cj('td:eq(3)', nRow).wrapInner('<span class="crm-editable crmf-description" data-type="textarea" />');
+          var id = $('td:last', nRow).text().split(',')[0];
+          var cl = $('td:last', nRow).text().split(',')[1];
+          $(nRow).addClass(cl).attr({id: 'row_' + id, 'data-id': id, 'data-entity': 'group'});
+          //$('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-title" />');
+          $('td:eq(1)', nRow).addClass('right');
+          $('td:eq(3)', nRow).wrapInner('<div class="crm-editable crmf-description" data-type="textarea" />');
+          $('td:eq(5)', nRow).wrapInner('<div class="crm-editable crmf-visibility" data-type="select" />');
+          if (parentsOnly) {
+            if ($(nRow).hasClass('crm-group-parent')) {
+              $(nRow).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
+            }
+          }
           return nRow;
         },
         "fnDrawCallback": function() {
-          setSelectorClass( parentsOnly, showOrgInfo );
-          cj('.crm-editable').crmEditable();
+          // FIXME: trigger crmLoad and crmEditable would happen automatically
+          $('.crm-editable').crmEditable();
         },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
             aoData.push( {name:'showOrgInfo', value: showOrgInfo },
@@ -186,23 +196,23 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
                        );
             if ( filterSearch ) {
                 var groupTypes = '';
-                cj('#group_type-block input').each(function(index) {
-                if (cj(this).prop('checked')) {
+                $('#group_type-block input').each(function(index) {
+                if ($(this).prop('checked')) {
                   if (groupTypes) {
-                    groupTypes = groupTypes + ',' + cj(this).attr('id').substr(11);
+                    groupTypes = groupTypes + ',' + $(this).attr('id').substr(11);
                   }
                   else {
-                    groupTypes = cj(this).attr('id').substr(11);
+                    groupTypes = $(this).attr('id').substr(11);
                   }
                 }
                 });
 
                 var groupStatus = '';
-                if ( cj('.crm-group-search-form-block #group_status_1').prop('checked') ) {
+                if ( $('.crm-group-search-form-block #group_status_1').prop('checked') ) {
                     groupStatus = '1';
                 }
 
-                if ( cj('.crm-group-search-form-block #group_status_2').prop('checked') ) {
+                if ( $('.crm-group-search-form-block #group_status_2').prop('checked') ) {
                     if ( groupStatus ) {
                         groupStatus = '3';
                     } else {
@@ -211,14 +221,14 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
                 }
 
                 aoData.push(
-                    {name:'title', value: cj('.crm-group-search-form-block #title').val()},
-                    {name:'created_by', value: cj('.crm-group-search-form-block #created_by').val()},
+                    {name:'title', value: $('.crm-group-search-form-block #title').val()},
+                    {name:'created_by', value: $('.crm-group-search-form-block #created_by').val()},
                     {name:'group_type', value: groupTypes },
-                    {name:'visibility', value: cj('.crm-group-search-form-block #visibility').val()},
+                    {name:'visibility', value: $('.crm-group-search-form-block #visibility').val()},
                     {name:'status', value: groupStatus }
                 );
             }
-            cj.ajax( {
+            $.ajax( {
                 "dataType": 'json',
                 "type": "POST",
                 "url": sSource,
@@ -227,95 +237,81 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
             } );
         }
     });
-}
+  }
 
-function setSelectorClass( parentsOnly, showOrgInfo ) {
-  cj('#crm-group-selector tr').each( function( ) {
-    var className = cj(this).find('td:last-child').text();
-    cj(this).addClass( className );
-    var rowID = cj(this).find('td:nth-child(2)').text();
-    cj(this).prop( 'id', 'row_' + rowID );
-    if (parentsOnly) {
-      if ( cj(this).hasClass('crm-group-parent') ) {
-        cj(this).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
-      }
+  // show hide children
+  var $context = $('#crm-main-content-wrapper');
+  $('table.crm-group-selector', $context).on( 'click', 'span.show-children', function(){
+    var showOrgInfo = {/literal}"{$showOrgInfo}"{literal};
+    var rowID = $(this).parents('tr').prop('id');
+    var parentRow = rowID.split('_');
+    var parent_id = parentRow[1];
+    var group_id = '';
+    if ( parentRow[2]) {
+      group_id = parentRow[2];
+    }
+    var levelClass = 'level_2';
+    // check enclosing td if already at level 2
+    if ( $(this).parent().hasClass('level_2') ) {
+      levelClass = 'level_3';
+    }
+    if ( $(this).hasClass('collapsed') ) {
+      $(this).removeClass("collapsed").addClass("expanded").attr("title",{/literal}"{ts escape='js'}hide child groups{/ts}"{literal});
+      showChildren( parent_id, showOrgInfo, group_id, levelClass );
+    }
+    else {
+      $(this).removeClass("expanded").addClass("collapsed").attr("title",{/literal}"{ts escape='js'}show child groups{/ts}"{literal});
+      $('.parent_is_' + parent_id).find('.show-children').removeClass("expanded").addClass("collapsed").attr("title",{/literal}"{ts escape='js'}show child groups{/ts}"{literal});
+      $('.parent_is_' + parent_id).hide();
+      $('.parent_is_' + parent_id).each(function(i, obj) {
+        // also hide children of children
+        var gID = $(this).find('td:nth-child(2)').text();
+        $('.parent_is_' + gID).hide();
+      });
     }
   });
-}
-
-// show hide children
-cj('#crm-group-selector').on( 'click', 'span.show-children', function(){
-  var showOrgInfo = {/literal}"{$showOrgInfo}"{literal};
-  var rowID = cj(this).parents('tr').prop('id');
-  var parentRow = rowID.split('_');
-  var parent_id = parentRow[1];
-  var group_id = '';
-  if ( parentRow[2]) {
-    group_id = parentRow[2];
-  }
-  var levelClass = 'level_2';
-  // check enclosing td if already at level 2
-  if ( cj(this).parent().hasClass('level_2') ) {
-    levelClass = 'level_3';
-  }
-  if ( cj(this).hasClass('collapsed') ) {
-    cj(this).removeClass("collapsed").addClass("expanded").attr("title",{/literal}"{ts escape='js'}hide child groups{/ts}"{literal});
-    showChildren( parent_id, showOrgInfo, group_id, levelClass );
-  }
-  else {
-    cj(this).removeClass("expanded").addClass("collapsed").attr("title",{/literal}"{ts escape='js'}show child groups{/ts}"{literal});
-    cj('.parent_is_' + parent_id).find('.show-children').removeClass("expanded").addClass("collapsed").attr("title",{/literal}"{ts escape='js'}show child groups{/ts}"{literal});
-    cj('.parent_is_' + parent_id).hide();
-    cj('.parent_is_' + parent_id).each(function(i, obj) {
-      // also hide children of children
-      var gID = cj(this).find('td:nth-child(2)').text();
-      cj('.parent_is_' + gID).hide();
-    });
+  function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
+    var rowID = '#row_' + parent_id;
+    if ( group_id ) {
+      rowID = '#row_' + parent_id + '_' + group_id;
+    }
+    if ( $(rowID).next().hasClass('parent_is_' + parent_id ) ) {
+      // child rows for this parent have already been retrieved so just show them
+      $('.parent_is_' + parent_id ).show();
+    } else {
+      var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal};
+      $.ajax( {
+          "dataType": 'json',
+          "url": sourceUrl,
+          "data": {'parent_id': parent_id, 'showOrgInfo': showOrgInfo},
+          "success": function(response){
+            var appendHTML = '';
+            $.each( response, function( i, val ) {
+              appendHTML += '<tr id="row_'+ val.group_id +'_'+parent_id+'" data-entity="group" data-id="'+ val.group_id +'" class="parent_is_' + parent_id + ' crm-row-child ' + val.class.split(',')[1] + '">';
+              if ( val.is_parent ) {
+                appendHTML += '<td class="crm-group-name ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.group_name + '</td>';
+              }
+              else {
+                appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span>' + val.group_name + '</td>';
+              }
+              appendHTML += '<td class="right">' + val.count + "</td>";
+              appendHTML += "<td>" + val.created_by + "</td>";
+              appendHTML += '<td class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</td>";
+              appendHTML += "<td>" + val.group_type + "</td>";
+              appendHTML += '<td class="crm-editable crmf-visibility" data-type="select">' + val.visibility + "</td>";
+              if (showOrgInfo) {
+                appendHTML += "<td>" + val.org_info + "</td>";
+              }
+              appendHTML += "<td>" + val.links + "</td>";
+              appendHTML += "</tr>";
+            });
+            $( rowID ).after( appendHTML );
+            $( rowID ).next().trigger('crmLoad');
+          }
+      });
+    }
   }
 });
-
-function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
-  var rowID = '#row_' + parent_id;
-  if ( group_id ) {
-    rowID = '#row_' + parent_id + '_' + group_id;
-  }
-  if ( cj(rowID).next().hasClass('parent_is_' + parent_id ) ) {
-    // child rows for this parent have already been retrieved so just show them
-    cj('.parent_is_' + parent_id ).show();
-  } else {
-    var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal};
-    cj.ajax( {
-        "dataType": 'json',
-        "url": sourceUrl,
-        "data": {'parent_id': parent_id, 'showOrgInfo': showOrgInfo},
-        "success": function(response){
-          var appendHTML = '';
-          cj.each( response, function( i, val ) {
-            appendHTML += '<tr id="row_'+ val.group_id +'_'+parent_id+'" data-entity="group" data-id="'+ val.group_id +'" class="crm-entity parent_is_' + parent_id + ' crm-row-child ' + val.class + '">';
-            if ( val.is_parent ) {
-              appendHTML += '<td class="crm-group-name ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}<span class="crm-editable crmf-name">' + val.group_name + '</span></td>';
-            }
-            else {
-              appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span><span class="crm-editable crmf-name">' + val.group_name + '</span></td>';
-            }
-            appendHTML += "<td>" + val.group_id + "</td>";
-            appendHTML += "<td>" + val.created_by + "</td>";
-            appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
-            appendHTML += "<td>" + val.group_type + "</td>";
-            appendHTML += "<td>" + val.visibility + "</td>";
-						if (showOrgInfo) {
-							appendHTML += "<td>" + val.org_info + "</td>";
-						}
-            appendHTML += "<td>" + val.links + "</td>";
-            appendHTML += "</tr>";
-          });
-          cj( rowID ).after( appendHTML );
-          cj( rowID ).next().trigger('crmLoad');
-          cj('.crm-editable').crmEditable();
-        }
-    } );
-  }
-}
 
 </script>
 {/literal}

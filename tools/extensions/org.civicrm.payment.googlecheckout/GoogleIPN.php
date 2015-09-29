@@ -37,6 +37,10 @@
 require_once 'CRM/Core/Payment/BaseIPN.php';
 
 define('GOOGLE_DEBUG_PP', 1);
+
+/**
+ * Class org_civicrm_payment_googlecheckout_GoogleIPN
+ */
 class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
@@ -44,7 +48,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -52,10 +55,17 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * mode of operation: live or test
    *
    * @var object
-   * @static
    */
   static protected $_mode = NULL;
 
+  /**
+   * @param $name
+   * @param $type
+   * @param $object
+   * @param bool $abort
+   *
+   * @return mixed
+   */
   static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {
@@ -80,7 +90,9 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @return void
+   * @param $paymentProcessor
+   *
+   * @return \org_civicrm_payment_googlecheckout_GoogleIPN
    */
   function __construct($mode, &$paymentProcessor) {
     parent::__construct();
@@ -92,11 +104,11 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml   $dataRoot    response send by google in xml format
+   * @param xml $dataRoot response send by google in xml format
    * @param array $privateData contains the name value pair of <merchant-private-data>
    *
+   * @param $component
    * @return void
-   *
    */
   function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();
@@ -170,7 +182,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
       }
     }
 
-    // CRM_Core_Error::debug_var( 'c', $contribution );
     $contribution->save();
     $transaction->commit();
     return TRUE;
@@ -179,18 +190,18 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
   /**
    * The function gets called when the state(CHARGED, CANCELLED..) changes for an order
    *
-   * @param string $status      status of the transaction send by google
-   * @param array  $privateData contains the name value pair of <merchant-private-data>
+   * @param string $status status of the transaction send by google
+   * @param $dataRoot
+   * @param $component
+   * @internal param array $privateData contains the name value pair of <merchant-private-data>
    *
    * @return void
-   *
    */
   function orderStateChange($status, $dataRoot, $component) {
     $input = $objects = $ids = array();
 
     $input['component'] = strtolower($component);
 
-    // CRM_Core_Error::debug_var( "$status, $component", $dataRoot );
     $orderNo = $dataRoot['google-order-number']['VALUE'];
 
     require_once 'CRM/Contribute/DAO/Contribution.php';
@@ -238,7 +249,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
     require_once 'CRM/Core/Transaction.php';
     $transaction = new CRM_Core_Transaction();
 
-    // CRM_Core_Error::debug_var( 'c', $contribution );
     if ($status == 'PAYMENT_DECLINED' ||
       $status == 'CANCELLED_BY_GOOGLE' ||
       $status == 'CANCELLED'
@@ -260,11 +270,11 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    *
    * @param string $mode the mode of operation: live or test
    *
+   * @param $component
+   * @param $paymentProcessor
    * @return object
-   * @static
    */
-  static
-  function &singleton($mode, $component, &$paymentProcessor) {
+  static function &singleton($mode, $component, &$paymentProcessor) {
     if (self::$_singleton === NULL) {
       self::$_singleton = new org_civicrm_payment_googlecheckout_GoogleIPN($mode, $paymentProcessor);
     }
@@ -277,7 +287,6 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * @param int $orderNo <order-total> send by google
    *
    * @return amount
-   * @access public
    */
   function getAmount($orderNo) {
     require_once 'CRM/Contribute/DAO/Contribution.php';
@@ -300,12 +309,8 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
    * @param string  $root           root of xml-response
    *
    * @return array context of this call (test, module, payment processor id)
-   * @static
    */
-  static
-  function getContext($xml_response, $privateData, $orderNo, $root) {
-    require_once 'CRM/Contribute/DAO/Contribution.php';
-
+  static function getContext($xml_response, $privateData, $orderNo, $root) {
     $isTest = NULL;
     $module = NULL;
     if ($root == 'new-order-notification') {
@@ -402,7 +407,7 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
   /**
    * This method is handles the response that will be invoked (from extern/googleNotify) every time
    * a notification or request is sent by the Google Server.
-   *
+   * @param $xml_response
    */
   static
   function main($xml_response) {
@@ -519,7 +524,13 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
       }
     }
 
-    function getInput(&$input, &$ids) {
+  /**
+   * @param $input
+   * @param $ids
+   *
+   * @return bool
+   */
+  function getInput(&$input, &$ids) {
       if (!$this->getBillingID($ids)) {
         return FALSE;
       }
@@ -542,10 +553,12 @@ class org_civicrm_payment_googlecheckout_GoogleIPN extends CRM_Core_Payment_Base
       return TRUE;
     }
 
-    /**
-     * Converts the comma separated name-value pairs in <merchant-private-data>
-     * to an array of name-value pairs.
-     */
+  /**
+   * Converts the comma separated name-value pairs in <merchant-private-data>
+   * to an array of name-value pairs.
+   * @param $str
+   * @return array
+   */
     static
     function stringToArray($str) {
       $vars = $labels = array();

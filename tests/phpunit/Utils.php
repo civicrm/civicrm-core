@@ -6,12 +6,12 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: Utils.php 40328 2012-05-11 23:06:13Z allen $
- *   @package   CiviCRM
+ * @version   $Id: Utils.php 40328 2012-05-11 23:06:13Z allen $
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -32,18 +32,22 @@
 
 /**
  *  Utility functions
- *   @package   CiviCRM
+ * @package   CiviCRM
  */
 class Utils {
 
   /**
-   *  PDO for the database
-   *  @var PDO
+   *  PDO for the database.
+   * @var PDO
    */
   public $pdo;
 
   /**
-   *  Construct an object for this database
+   *  Construct an object for this database.
+   * @param $host
+   * @param $port
+   * @param $user
+   * @param $pass
    */
   public function __construct($host, $port, $user, $pass) {
     try {
@@ -52,21 +56,21 @@ class Utils {
         array(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE)
       );
     }
-    catch(PDOException$e) {
+    catch (PDOException$e) {
       echo "Can't connect to MySQL server:" . PHP_EOL . $e->getMessage() . PHP_EOL;
       exit(1);
     }
   }
 
   /**
-   *  Prepare and execute a query
+   * Prepare and execute a query.
    *
-   *  If the query fails, output a diagnostic message
-   *  @param  string  Query to run
-   *  @return mixed   PDOStatement => Results of the query
-   *                  false        => Query failed
+   * If the query fails, output a diagnostic message
+   * @param string $query
+   *   Query to run
+   * @return bool
    */
-  function do_query($query) {
+  public function do_query($query) {
     // echo "do_query($query)\n";
     // $stmt = $this->pdo->query( $query, PDO::FETCH_ASSOC );
     // echo "PDO returned";
@@ -91,42 +95,44 @@ class Utils {
     }
 
     /*******
-     if ( $this->pdo->errorCode() == 0 ) {
-     //echo "returning the PDOStmt\n";
-     return $stmt;
-     }
-
-     //  operation failed, so output description of where and why
-     $errorInfo = $this->pdo->errorInfo();
-     echo "Oops, can't do query:\n    {$query}\n    in "
-     . basename( __FILE__) . " line " . __LINE__.":\n    "
-     . $errorInfo[0] . ": " . $errorInfo[2] . "\n    Call stack:\n";
-     $backtrace = debug_backtrace();
-     $dir_name  = dirname( __FILE__ );
-     $cwd_len   = strlen( $dir_name ) + 1;
-     foreach( $backtrace as $frame ){
-     echo "      ";
-     if ( array_key_exists( 'class', $frame ) ) {
-     echo " class {$frame['class']}";
-     if ( array_key_exists( 'function', $frame ) ) {
-     echo " method {$frame['function']}";
-     }
-     } else {
-     if ( array_key_exists( 'function', $frame ) ) {
-     echo " function {$frame['function']}";
-     }
-     }
-     if ( array_key_exists( 'file', $frame ) ) {
-     echo " file ". substr( $frame['file'], $cwd_len );
-     }
-     if ( array_key_exists( 'line', $frame ) ) {
-     echo " line {$frame['line']}";
-     }
-     echo "\n";
-     }
+     * if ( $this->pdo->errorCode() == 0 ) {
+     * //echo "returning the PDOStmt\n";
+     * return $stmt;
+     * }
+     *
+     * //  operation failed, so output description of where and why
+     * $errorInfo = $this->pdo->errorInfo();
+     * echo "Oops, can't do query:\n    {$query}\n    in "
+     * . basename( __FILE__) . " line " . __LINE__.":\n    "
+     * . $errorInfo[0] . ": " . $errorInfo[2] . "\n    Call stack:\n";
+     * $backtrace = debug_backtrace();
+     * $dir_name  = dirname( __FILE__ );
+     * $cwd_len   = strlen( $dir_name ) + 1;
+     * foreach ($backtrace as $frame ) {
+     * echo "      ";
+     * if ( array_key_exists( 'class', $frame ) ) {
+     * echo " class {$frame['class']}";
+     * if ( array_key_exists( 'function', $frame ) ) {
+     * echo " method {$frame['function']}";
+     * }
+     * }
+     * else {
+     * if ( array_key_exists( 'function', $frame ) ) {
+     * echo " function {$frame['function']}";
+     * }
+     * }
+     * if ( array_key_exists( 'file', $frame ) ) {
+     * echo " file ". substr( $frame['file'], $cwd_len );
+     * }
+     * if ( array_key_exists( 'line', $frame ) ) {
+     * echo " line {$frame['line']}";
+     * }
+     * echo "\n";
+     * }
      ******/
     return TRUE;
   }
+
 }
 // class Utils
 
@@ -138,4 +144,3 @@ class Utils {
 // c-hanging-comment-ender-p: nil
 // indent-tabs-mode: nil
 // End:
-

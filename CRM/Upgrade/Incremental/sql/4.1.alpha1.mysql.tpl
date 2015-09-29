@@ -18,7 +18,7 @@ ADD UNIQUE INDEX UI_name ( name );
 DELETE FROM civicrm_currency WHERE name = 'EEK';
 
 -- CRM-8769
-INSERT INTO civicrm_state_province
+INSERT IGNORE INTO civicrm_state_province
   (`name`, `abbreviation`, `country_id`)
 VALUES
   ('Metropolitan Manila' , 'MNL', '1170');
@@ -197,7 +197,7 @@ SET @locallastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, 'civicrm/admin/setting/localization&reset=1',          '{ts escape="sql" skip="true"}Languages, Currency, Location{/ts}', 'Languages, Currency, Locations',   'administer CiviCRM', '', @locallastID, '1', NULL, 1 ),
+    ( @domainID, 'civicrm/admin/setting/localization&reset=1',          '{ts escape="sql" skip="true"}Languages, Currency, Locations{/ts}', 'Languages, Currency, Locations',   'administer CiviCRM', '', @locallastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/setting/preferences/address&reset=1',   '{ts escape="sql" skip="true"}Address Settings{/ts}',               'Address Settings',                 'administer CiviCRM', '', @locallastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/admin/setting/date&reset=1',                  '{ts escape="sql" skip="true"}Date Format{/ts}',                    'Date Formats',                     'administer CiviCRM', '', @locallastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/admin/options/languages&group=languages&reset=1', '{ts escape="sql" skip="true"}Preferred Language Options{/ts}', 'Preferred Language Options',       'administer CiviCRM', '', @locallastID, '1', NULL, 4 );

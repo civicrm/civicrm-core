@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,10 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting membership type  *}
-<h3>{if $action eq 1}{ts}New Membership Type{/ts}{elseif $action eq 2}{ts}Edit Membership Type{/ts}{else}{ts}Delete Membership Type{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-membership-type-form-block">
 
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <div class="form-item" id="membership_type_form">
   {if $action eq 8}
     <div class="messages status no-popup">
@@ -35,6 +33,7 @@
     </div>
     <div> {include file="CRM/common/formButtons.tpl"}</div>
   {else}
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
       <tr class="crm-membership-type-form-block-name">
         <td class="label">{$form.name.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_type' field='name' id=$membershipTypeId}{/if}
@@ -61,7 +60,7 @@
       <tr class="crm-membership-type-form-block-minimum_fee">
         <td class="label">{$form.minimum_fee.label}</td>
         <td>{$form.minimum_fee.html|crmMoney}<br />
-          <span  class="description">{ts}Minimum fee required for this membership type. For free/complimentary memberships - set minimum fee to zero (0).{/ts}</span>
+          <span  class="description">{ts}Minimum fee required for this membership type. For free/complimentary memberships - set minimum fee to zero (0). NOTE: When using CiviCRM to process sales taxes this should be the tax exclusive amount.{/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-financial_type_id">
@@ -161,25 +160,25 @@
 <script type="text/javascript">
 CRM.$(function($) {
   showHidePeriodSettings();
-  cj('#duration_unit').change(function(){
+  $('#duration_unit').change(function(){
     showHidePeriodSettings();
   });
 
-  cj('#period_type').change(function(){
+  $('#period_type').change(function(){
     showHidePeriodSettings();
   });
 
   {/literal}
   {if $action eq 2}
   {literal}
-    showHideMaxRelated(cj('#relationship_type_id').val());
-    cj('#relationship_type_id').change(function(){
-      showHideMaxRelated(cj('#relationship_type_id').val());
+    showHideMaxRelated($('#relationship_type_id').val());
+    $('#relationship_type_id').change(function(){
+      showHideMaxRelated($('#relationship_type_id').val());
     });
   {/literal}{else}{literal}
-    showHideMaxRelated(cj('#relationship_type_id :selected').val());
-    cj('#relationship_type_id').change(function(){
-      showHideMaxRelated(cj('#relationship_type_id :selected').val());
+    showHideMaxRelated($('#relationship_type_id :selected').val());
+    $('#relationship_type_id').change(function(){
+      showHideMaxRelated($('#relationship_type_id :selected').val());
     });
   {/literal}{/if}{literal}
 });

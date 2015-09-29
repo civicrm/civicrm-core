@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,29 +23,22 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This class gets the name of the file to upload
+ * This class gets the name of the file to upload.
  */
 class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
 
-
-
   /**
-   * Function to set variables up before form is built
-   *
-   * @return void
-   * @access public
+   * Set variables up before form is built.
    */
   public function preProcess() {
     $this->_mapperFields = $this->get('fields');
@@ -69,8 +62,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     else {
       $this->assign('rowDisplayCount', 2);
     }
-    $highlightedFields = array();
-    $highlightedFields[] = 'financial_type';
+    $highlightedFields = array('financial_type', 'total_amount');
     //CRM-2219 removing other required fields since for updation only
     //invoice id or trxn id or contribution id is required.
     if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
@@ -81,14 +73,23 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       //modify field title only for update mode. CRM-3245
       foreach (array(
-        'contribution_id', 'invoice_id', 'trxn_id') as $key) {
+                 'contribution_id',
+                 'invoice_id',
+                 'trxn_id',
+               ) as $key) {
         $this->_mapperFields[$key] .= ' (match to contribution record)';
         $highlightedFields[] = $key;
       }
     }
     elseif ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
       unset($this->_mapperFields['contribution_id']);
-      $highlightedFieldsArray = array('contribution_contact_id', 'email', 'first_name', 'last_name', 'external_identifier', 'total_amount');
+      $highlightedFieldsArray = array(
+        'contribution_contact_id',
+        'email',
+        'first_name',
+        'last_name',
+        'external_identifier',
+      );
       foreach ($highlightedFieldsArray as $name) {
         $highlightedFields[] = $name;
       }
@@ -101,10 +102,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     //to save the current mappings
@@ -201,7 +199,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
 
     $softCreditFields['contact_id'] = ts('Contact ID');
-    $softCreditFields['external_identifier'] = ts('External Identifier');
+    $softCreditFields['external_identifier'] = ts('External ID');
     $softCreditFields['email'] = ts('Email');
 
     $sel2['soft_credit'] = $softCreditFields;
@@ -217,7 +215,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $warning = 0;
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
-      $sel = & $this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
+      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
       $jsSet = FALSE;
       if ($this->get('savedMapping')) {
         if (isset($mappingName[$i])) {
@@ -291,12 +289,12 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
             0,
           );
         }
-        if(!empty($mapperKeysValues) && $mapperKeysValues[$i][0] == 'soft_credit') {
-          $js .="cj('#mapper_".$i."_1').val($mapperKeysValues[$i][1]);\n";
-          $js .="cj('#mapper_".$i."_2').val($mapperKeysValues[$i][2]);\n";
+        if (!empty($mapperKeysValues) && $mapperKeysValues[$i][0] == 'soft_credit') {
+          $js .= "cj('#mapper_" . $i . "_1').val($mapperKeysValues[$i][1]);\n";
+          $js .= "cj('#mapper_" . $i . "_2').val($mapperKeysValues[$i][2]);\n";
         }
       }
-      $sel->setOptions(array($sel1, $sel2, $sel3,$sel4));
+      $sel->setOptions(array($sel1, $sel2, $sel3, $sel4));
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
@@ -321,11 +319,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->addButtons(array(
         array(
           'type' => 'back',
-          'name' => ts('<< Previous'),
+          'name' => ts('Previous'),
         ),
         array(
           'type' => 'next',
-          'name' => ts('Continue >>'),
+          'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ),
@@ -338,15 +336,18 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @param $files
+   * @param $self
+   *
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = array();
     $fieldMessage = NULL;
     $contactORContributionId = $self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE ? 'contribution_id' : 'contribution_contact_id';
@@ -390,7 +391,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $requiredFields = array(
         $contactORContributionId == 'contribution_id' ? 'contribution_id' : 'contribution_contact_id' => $contactORContributionId == 'contribution_id' ? ts('Contribution ID') : ts('Contact ID'),
         'total_amount' => ts('Total Amount'),
-        'financial_type' => ts('Financial Type')
+        'financial_type' => ts('Financial Type'),
       );
 
       foreach ($requiredFields as $field => $title) {
@@ -403,7 +404,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
               $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
             ) {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                  1 => $threshold
+                  1 => $threshold,
                 )) . '<br />';
             }
             elseif ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
@@ -416,7 +417,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
           }
           else {
             $errors['_qf_default'] .= ts('Missing required field: %1', array(
-                1 => $title
+                1 => $title,
               )) . '<br />';
           }
         }
@@ -468,11 +469,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
-   * @access public
+   * Process the mapped fields and map it into the uploaded file preview the file and extract some summary statistics.
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');
@@ -501,7 +498,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       if (isset($mapperKeys[$i][0]) && $mapperKeys[$i][0] == 'soft_credit') {
         $mapperSoftCredit[$i] = $mapperKeys[$i][1];
-        if (strpos($mapperSoftCredit[$i], '_') !== false) {
+        if (strpos($mapperSoftCredit[$i], '_') !== FALSE) {
           list($first, $second) = explode('_', $mapperSoftCredit[$i]);
           $softCreditFields[$i] = ucwords($first . " " . $second);
         }
@@ -514,7 +511,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         );
       }
       else {
-        $mapperSoftCredit[$i] = $softCreditFields[$i] =  $mapperSoftCreditType[$i] = NULL;
+        $mapperSoftCredit[$i] = $softCreditFields[$i] = $mapperSoftCreditType[$i] = NULL;
       }
     }
 
@@ -584,5 +581,5 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     // add all the necessary variables to the form
     $parser->set($this);
   }
-}
 
+}

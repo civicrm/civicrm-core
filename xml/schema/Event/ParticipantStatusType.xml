@@ -8,6 +8,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <title>Participant Status Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>unique participant status type id</comment>
@@ -30,6 +31,7 @@
   </field>
   <field>
     <name>label</name>
+    <title>Participant Status Label</title>
     <type>varchar</type>
     <length>255</length>
     <unique>true</unique>
@@ -39,11 +41,12 @@
   </field>
   <field>
     <name>class</name>
+    <title>Participant Status Class</title>
     <type>varchar</type>
     <length>8</length>
     <comment>the general group of status type this one belongs to</comment>
     <pseudoconstant>
-      <callback>CRM_Event_PseudoConstant::participantStatusClass</callback>
+      <callback>CRM_Event_PseudoConstant::participantStatusClassOptions</callback>
     </pseudoconstant>
     <add>3.0</add>
     <html>
@@ -52,12 +55,14 @@
   </field>
   <field>
     <name>is_reserved</name>
+    <title>Participant Status Is Reserved?></title>
     <type>boolean</type>
     <comment>whether this is a status type required by the system</comment>
     <add>3.0</add>
   </field>
   <field>
     <name>is_active</name>
+    <title>Participant Status is Active</title>
     <type>boolean</type>
     <default>1</default>
     <comment>whether this status type is active</comment>
@@ -65,12 +70,14 @@
   </field>
   <field>
     <name>is_counted</name>
+    <title>Participant Status Counts?</title>
     <type>boolean</type>
     <comment>whether this status type is counted against event size limit</comment>
     <add>3.0</add>
   </field>
   <field>
     <name>weight</name>
+    <title>Order</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>controls sort order</comment>
@@ -78,6 +85,7 @@
   </field>
   <field>
     <name>visibility_id</name>
+    <title>Participant Status Visibility</title>
     <type>int unsigned</type>
     <comment>whether the status type is visible to the public, an implicit foreign key to option_value.value related to the `visibility` option_group</comment>
     <add>3.0</add>

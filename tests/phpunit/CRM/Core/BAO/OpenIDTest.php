@@ -1,16 +1,12 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
-class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'OpenID BAOs',
-      'description' => 'Test all Core_BAO_OpenID methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function tearDown() {
+/**
+ * Class CRM_Core_BAO_OpenIDTest
+ */
+class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
+  public function tearDown() {
     // If we truncate only contact, then stale domain and openid records will be left.
     // If we truncate none of these tables, then contactDelete() will incrementally
     // clean correctly.
@@ -18,14 +14,14 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     //$this->quickCleanup($tablesToTruncate);
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * add() method (create and update modes)
+   * Add() method (create and update modes)
    */
-  function testAdd() {
+  public function testAdd() {
     $contactId = Contact::createIndividual();
     $this->assertDBRowExist('CRM_Contact_DAO_Contact', $contactId);
 
@@ -67,9 +63,9 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
   }
 
   /**
-   * ifAllowedToLogin() method (set and reset allowed_to_login)
+   * IfAllowedToLogin() method (set and reset allowed_to_login)
    */
-  function testIfAllowedToLogin() {
+  public function testIfAllowedToLogin() {
     $contactId = Contact::createIndividual();
     $this->assertDBRowExist('CRM_Contact_DAO_Contact', $contactId);
     $openIdURL = "http://test-username.civicrm.org/";
@@ -112,9 +108,9 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
   }
 
   /**
-   * allOpenIDs() method - get all OpenIDs for the given contact
+   * AllOpenIDs() method - get all OpenIDs for the given contact
    */
-  function testAllOpenIDs() {
+  public function testAllOpenIDs() {
     $contactId = Contact::createIndividual();
     $this->assertDBRowExist('CRM_Contact_DAO_Contact', $contactId);
 
@@ -174,5 +170,5 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
     $this->assertDBRowNotExist('CRM_Contact_DAO_Contact', $contactId);
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,15 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This is a part of CiviCRM extension management functionality.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
@@ -40,44 +38,41 @@
 class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
    * Obtains the group name from url and sets the title.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
-        $destination = CRM_Utils_System::url( 'civicrm/admin/extensions',
-                                              'reset=1' );
+    $destination = CRM_Utils_System::url('civicrm/admin/extensions',
+      'reset=1');
 
-        $destination = urlencode( $destination );
-        $this->assign( 'destination', $destination );
+    $destination = urlencode($destination);
+    $this->assign('destination', $destination);
   }
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_Extension';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::ADD => array(
@@ -118,23 +113,16 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
 
   /**
-   * Browse all options
-   *
-   *
-   * @return void
-   * @access public
-   * @static
+   * Browse all options.
    */
-  function browse() {
+  public function browse() {
     $mapper = CRM_Extension_System::singleton()->getMapper();
     $manager = CRM_Extension_System::singleton()->getManager();
 
@@ -159,10 +147,11 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $localExtensionRows = array(); // array($pseudo_id => extended_CRM_Extension_Info)
     $keys = array_keys($manager->getStatuses());
     sort($keys);
-    foreach($keys as $key) {
+    foreach ($keys as $key) {
       try {
         $obj = $mapper->keyToInfo($key);
-      } catch (CRM_Extension_Exception $ex) {
+      }
+      catch (CRM_Extension_Exception $ex) {
         CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
         continue;
       }
@@ -176,17 +165,21 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         case CRM_Extension_Manager::STATUS_UNINSTALLED:
           $action += CRM_Core_Action::ADD;
           break;
+
         case CRM_Extension_Manager::STATUS_DISABLED:
           $action += CRM_Core_Action::ENABLE;
           $action += CRM_Core_Action::DELETE;
           break;
+
         case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
           $action += CRM_Core_Action::DELETE;
           break;
+
         case CRM_Extension_Manager::STATUS_INSTALLED:
         case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
           $action += CRM_Core_Action::DISABLE;
           break;
+
         default:
       }
       // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
@@ -210,7 +203,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     }
     $this->assign('localExtensionRows', $localExtensionRows);
 
-    // build list of availabe downloads
+    // build list of available downloads
     $remoteExtensionRows = array();
     foreach (CRM_Extension_System::singleton()->getBrowser()->getExtensions() as $info) {
       $row = (array) $info;
@@ -239,41 +232,46 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_Extensions';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'CRM_Admin_Form_Extensions';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/extensions';
   }
 
   /**
-   * function to get userContext params
+   * Get userContext params.
    *
-   * @param int $mode mode that we are in
+   * @param int $mode
+   *   Mode that we are in.
    *
    * @return string
-   * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
   }
 
@@ -282,6 +280,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * extension's status on the local system.
    *
    * The result format resembles the old CRM_Core_Extensions_Extension.
+   *
+   * @param CRM_Extension_Info $obj
    *
    * @return array
    */
@@ -292,7 +292,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $extensionRow = (array) $obj;
     try {
       $extensionRow['path'] = $mapper->keyToBasePath($obj->key);
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $extensionRow['path'] = '';
     }
     $extensionRow['status'] = $manager->getStatus($obj->key);
@@ -301,22 +302,27 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       case CRM_Extension_Manager::STATUS_UNINSTALLED:
         $extensionRow['statusLabel'] = ''; // ts('Uninstalled');
         break;
+
       case CRM_Extension_Manager::STATUS_DISABLED:
         $extensionRow['statusLabel'] = ts('Disabled');
         break;
+
       case CRM_Extension_Manager::STATUS_INSTALLED:
         $extensionRow['statusLabel'] = ts('Enabled'); // ts('Installed');
         break;
+
       case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
         $extensionRow['statusLabel'] = ts('Disabled (Missing)');
         break;
+
       case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
         $extensionRow['statusLabel'] = ts('Enabled (Missing)'); // ts('Installed');
         break;
+
       default:
         $extensionRow['statusLabel'] = '(' . $extensionRow['status'] . ')';
     }
     return $extensionRow;
   }
-}
 
+}

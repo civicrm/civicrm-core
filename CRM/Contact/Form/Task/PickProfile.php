@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,56 +23,46 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This class provides the functionality for batch profile update
+ * This class provides the functionality for batch profile update.
  */
 class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * maximum contacts that should be allowed to update
-   *
+   * Maximum contacts that should be allowed to update
    */
   protected $_maxContacts = 100;
 
   /**
-   * maximum profile fields that will be displayed
-   *
+   * Maximum profile fields that will be displayed
    */
   protected $_maxFields = 9;
 
   /**
-   * variable to store redirect path
-   *
+   * Variable to store redirect path
    */
   protected $_userContext;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+  public function preProcess() {
+    // initialize the task and row fields
     parent::preProcess();
 
     $session = CRM_Core_Session::singleton();
@@ -81,7 +71,10 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     $validate = FALSE;
     //validations
     if (count($this->_contactIds) > $this->_maxContacts) {
-      CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Batch Update is %1. You have selected %2. Please select fewer contacts from your search results and try again.", array(1 => $this->_maxContacts, 2 => count($this->_contactIds))), ts('Maximum Exceeded'), 'error');
+      CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Batch update is %1. You have selected %2. Please select fewer contacts from your search results and try again.", array(
+            1 => $this->_maxContacts,
+            2 => count($this->_contactIds),
+          )), ts('Maximum Exceeded'), 'error');
       $validate = TRUE;
     }
 
@@ -97,13 +90,9 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Batch Profile Update for Contact'));
 
     foreach ($this->_contactIds as $id) {
@@ -117,35 +106,31 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
 
     if (empty($profiles)) {
       $types = implode(' ' . ts('or') . ' ', $this->_contactTypes);
-      CRM_Core_Session::setStatus(ts("The contact type selected for Batch Update does not have a corresponding profile. Please set up a profile for %1s and try again.", array(1 => $types)), ts('No Profile Available'), 'error');
+      CRM_Core_Session::setStatus(ts("The contact type selected for Batch update does not have a corresponding profile. Please set up a profile for %1s and try again.", array(1 => $types)), ts('No Profile Available'), 'error');
       CRM_Utils_System::redirect($this->_userContext);
     }
-    $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'), array('' => ts('- select profile -')) + $profiles, TRUE);
+    $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'), array('' => ts('- select profile -')) + $profiles, TRUE, array('class' => 'crm-select2 huge'));
 
-    $this->addDefaultButtons(ts('Continue >>'));
+    $this->addDefaultButtons(ts('Continue'));
   }
 
   /**
-   * Add local and global form rules
-   *
-   * @access protected
-   *
-   * @return void
+   * Add local and global form rules.
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Task_PickProfile', 'formRule'));
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     if (CRM_Core_BAO_UFField::checkProfileType($fields['uf_group_id'])) {
       $errorMsg['uf_group_id'] = "You cannot select mix profile for batch update.";
     }
@@ -158,11 +143,7 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -172,6 +153,5 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     // also reset the batch page so it gets new values from the db
     $this->controller->resetPage('Batch');
   }
-  //end of function
-}
 
+}
