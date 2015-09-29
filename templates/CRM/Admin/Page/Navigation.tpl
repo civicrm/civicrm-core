@@ -41,6 +41,10 @@
     <div class="spacer"></div>
     <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
     <div class="spacer"></div>
+    <div>
+      <a href="{crmURL p="#"}" id='nav-reset'><span>{ts}Click here{/ts}</span></a> {ts}to reset the reports menu structure to the default.{/ts}
+    </div>
+    <div class="spacer"></div>
   </div>
   {literal}
   <style type="text/css">
@@ -53,6 +57,11 @@
   </style>
   <script type="text/javascript">
     CRM.$(function($) {
+      $('#nav-reset').on('click', function(e) {
+        e.preventDefault();
+        CRM.api3('Navigation', 'reset', {'for' : 'report'}, ts('Report menu reset. Changes will be visible when you ' +
+            'refresh'))
+      });
       $("#navigation-tree").jstree({
         plugins: [ "themes", "json_data", "dnd","ui", "crrm","contextmenu" ],
         json_data: {
