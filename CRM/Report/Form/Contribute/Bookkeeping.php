@@ -484,7 +484,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = " GROUP BY  {$this->_aliases['civicrm_contribution']}.id, {$this->_aliases['civicrm_line_item']}.id ";
+    $this->_groupBy = " GROUP BY  {$this->_aliases['civicrm_entity_financial_trxn']}.id, {$this->_aliases['civicrm_line_item']}.id ";
   }
 
   /**
