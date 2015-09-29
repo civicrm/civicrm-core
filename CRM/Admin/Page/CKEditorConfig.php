@@ -35,12 +35,12 @@
  * Page for configuring CKEditor options.
  *
  * Note that while this is implemented as a CRM_Core_Page, it is actually a form.
- * Because the form needs to be submitted and refreshed via javascrit, it seemed like
+ * Because the form needs to be submitted and refreshed via javascript, it seemed like
  * Quickform and CRM_Core_Form/Controller might get in the way.
  */
 class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
 
-  const CONFIG_FILENAME = 'crm-ckeditor-config.js';
+  const CONFIG_FILENAME = '[civicrm.files]/persist/crm-ckeditor-config.js';
 
   /**
    * Default settings if config file has not been initialized
@@ -121,14 +121,13 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
-   * Get CKEditor plugins.
+   * Get available CKEditor plugin list.
    *
    * @return array
    */
   private function getCKPlugins() {
     $plugins = array();
-    global $civicrm_root;
-    $pluginDir = CRM_Utils_file::addTrailingSlash($civicrm_root, '/') . 'bower_components/ckeditor/plugins';
+    $pluginDir = Civi::paths()->getPath('[civicrm.root]/bower_components/ckeditor/plugins');
 
     foreach (glob($pluginDir . '/*', GLOB_ONLYDIR) as $dir) {
       $dir = rtrim(str_replace('\\', '/', $dir), '/');
@@ -157,14 +156,13 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
-   * Get CK Editor skins.
+   * Get available CKEditor skins.
    *
    * @return array
    */
   private function getCKSkins() {
     $skins = array();
-    global $civicrm_root;
-    $skinDir = CRM_Utils_file::addTrailingSlash($civicrm_root, '/') . 'bower_components/ckeditor/skins';
+    $skinDir = Civi::paths()->getPath('[civicrm.root]/bower_components/ckeditor/skins');
     foreach (glob($skinDir . '/*', GLOB_ONLYDIR) as $dir) {
       $dir = rtrim(str_replace('\\', '/', $dir), '/');
       $skins[] = substr($dir, strrpos($dir, '/') + 1);
@@ -195,10 +193,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    */
   public static function getConfigUrl() {
     if (self::getConfigFile()) {
-      // FIXME: Basing file path off imageUploadURL sucks, but it's all we got
-      $url = CRM_Utils_file::addTrailingSlash(CRM_Core_Config::singleton()->imageUploadURL, '/');
-      $url = str_replace('/persist/contribute/', '/persist/', $url);
-      return $url . self::CONFIG_FILENAME;
+      return Civi::paths()->getUrl(self::CONFIG_FILENAME);
     }
     return NULL;
   }
@@ -210,11 +205,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    * @return null|string
    */
   public static function getConfigFile($checkIfFileExists = TRUE) {
-    // FIXME: Basing file path off imageUploadDir sucks, but it's all we got
-    $dir = CRM_Core_Config::singleton()->imageUploadDir;
-    $dir = CRM_Utils_file::addTrailingSlash(str_replace('\\', '/', $dir), '/');
-    $dir = str_replace('/persist/contribute/', '/persist/', $dir);
-    $fileName = $dir . self::CONFIG_FILENAME;
+    $fileName = Civi::paths()->getPath(self::CONFIG_FILENAME);
     return !$checkIfFileExists || is_file($fileName) ? $fileName : NULL;
   }
 
