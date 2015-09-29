@@ -629,7 +629,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    *   (reference ) action links
    */
   public static function getPermissionedLinks($memTypeID, &$links) {
-    if (!self::isACLFinancialTypeStatus()) {
+    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
       return FALSE;
     }
     $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeID, 'financial_type_id');
