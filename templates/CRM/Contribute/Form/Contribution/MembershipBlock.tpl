@@ -256,7 +256,7 @@ function showHideAutoRenew( memTypeId )
      //to load auto_renew checked.
      //isChecked = true;
 
-  } else if ( currentOption == 2 ) {
+  } else if ( currentOption == 2 || currentOption == 4) {
      funName = 'show();';
      isChecked = readOnly = true;
   }
