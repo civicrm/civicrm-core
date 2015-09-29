@@ -59,8 +59,7 @@
     CRM.$(function($) {
       $('#nav-reset').on('click', function(e) {
         e.preventDefault();
-        CRM.api3('Navigation', 'reset', {'for' : 'report'}, ts('Report menu reset. Changes will be visible when you ' +
-            'refresh'))
+        CRM.api3('Navigation', 'reset', {'for' : 'report'}, ts('Report menu reset. Changes will be visible when you refresh'))
       });
       $("#navigation-tree").jstree({
         plugins: [ "themes", "json_data", "dnd","ui", "crrm","contextmenu" ],
