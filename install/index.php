@@ -1467,6 +1467,10 @@ class Installer extends InstallRequirements {
 
         $c = CRM_Core_Config::singleton(FALSE);
         $c->free();
+        $wpInstallRedirect = admin_url("?page=CiviCRM&q=civicrm&reset=1");
+        echo "<script>
+         window.location = '$wpInstallRedirect';
+        </script>";
       }
     }
 
