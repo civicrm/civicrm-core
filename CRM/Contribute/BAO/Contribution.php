@@ -2989,12 +2989,20 @@ WHERE  contribution_id = %1 ";
     if ($context == 'changedStatus') {
       //get all the statuses
       $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
 
       if ($params['prevContribution']->contribution_status_id == array_search('Completed', $contributionStatus)
         && ($params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
           || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))
       ) {
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
+        if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
+          $query = "select count(creditnote_id) as creditnote_number from civicrm_contribution";
+          $dao = CRM_Core_DAO::executeQuery($query);
+          $dao->fetch();
+          $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . ($dao->creditnote_number + 1);
+          CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
+        }
       }
       elseif (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
           && $params['prevContribution']->is_pay_later) || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)
@@ -3006,6 +3014,13 @@ WHERE  contribution_id = %1 ";
         if ($params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)) {
           $params['trxnParams']['to_financial_account_id'] = $arAccountId;
           $params['trxnParams']['total_amount'] = -$params['total_amount'];
+          if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
+            $query = "select count(creditnote_id) as creditnote_number from civicrm_contribution";
+            $dao = CRM_Core_DAO::executeQuery($query);
+            $dao->fetch();
+            $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . ($dao->creditnote_number + 1);
+            CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
+          }
         }
         else {
           $params['trxnParams']['from_financial_account_id'] = $arAccountId;
