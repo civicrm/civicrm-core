@@ -445,7 +445,7 @@ class InstallRequirements {
 
     $this->errors = NULL;
 
-    $this->requirePHPVersion('5.3.3', array(
+    $this->requirePHPVersion('5.3.4', array(
       ts("PHP Configuration"),
       ts("PHP5 installed"),
       NULL,
