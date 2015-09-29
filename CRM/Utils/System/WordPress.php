@@ -84,12 +84,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $filesPath       = NULL;
     $upload_dir      = wp_upload_dir();
     $settingsDir     = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
+    $settingsURL     = $upload_dir['baseurl'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
     if (is_dir(ABSPATH . 'wp-content/plugins/files/civicrm/')) {
       //for legacy path
       $filesURL = $baseURL . "wp-content/plugins/files/civicrm/";
     }
     elseif (is_dir($settingsDir)) {
-      $filesURL = $settingsDir;
+      $filesURL = $settingsURL;
     }
     else {
       throw new CRM_Core_Exception("Failed to locate default file storage ($config->userFramework)");
