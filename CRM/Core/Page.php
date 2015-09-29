@@ -218,7 +218,7 @@ class CRM_Core_Page {
     CRM_Utils_Check::singleton()->showPeriodicAlerts();
 
     if ($this->useLivePageJS && Civi::settings()->get('ajaxPopupsEnabled')) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
+      Civi::resources()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
     }
 
     $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');

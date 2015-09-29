@@ -233,7 +233,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
     CRM_Core_Config::clearDBCache();
     CRM_Utils_System::flushCache();
-    CRM_Core_Resources::singleton()->resetCacheCode();
+    Civi::resources()->resetCacheCode();
 
     CRM_Core_Session::setStatus(" ", ts('Changes Saved'), "success");
   }

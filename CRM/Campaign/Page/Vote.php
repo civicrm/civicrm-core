@@ -91,7 +91,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     }
     $this->assign('subPageType', $subPageType);
 
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
         'tabSettings' => array(

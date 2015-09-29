@@ -70,7 +70,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    */
   public static function addCreditCardJs() {
     $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10)
       // workaround for CRM-13634
       // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));

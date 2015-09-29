@@ -289,7 +289,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     }
     else {
       // Jump directly to adding a field if popups are disabled
-      $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? 'browse' : 'add';
+      $action = Civi::resources()->ajaxPopupsEnabled ? 'browse' : 'add';
       $url = CRM_Utils_System::url('civicrm/admin/price/field', array(
           'reset' => 1,
           'action' => $action,

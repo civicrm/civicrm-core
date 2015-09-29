@@ -49,7 +49,7 @@ class Main extends \CRM_Core_Page {
    */
   public function __construct($title = NULL, $mode = NULL, $res = NULL) {
     parent::__construct($title, $mode);
-    $this->res = \CRM_Core_Resources::singleton();
+    $this->res = \Civi::resources();
     $this->angular = \Civi::service('angular');
     $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
   }
@@ -119,7 +119,7 @@ class Main extends \CRM_Core_Page {
     // If trying to load an Angular page via AJAX, the route must be passed as a
     // URL parameter, since the server doesn't receive information about
     // URL fragments (i.e, what comes after the #).
-    \CRM_Core_Resources::singleton()->addSetting(array(
+    \Civi::resources()->addSetting(array(
       'angularRoute' => \CRM_Utils_Request::retrieve('route', 'String'),
     ));
   }

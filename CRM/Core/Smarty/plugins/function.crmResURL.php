@@ -45,7 +45,7 @@
  * @return string
  */
 function smarty_function_crmResURL($params, &$smarty) {
-  $res = CRM_Core_Resources::singleton();
+  $res = Civi::resources();
   if (!array_key_exists('file', $params)) {
     $params['file'] = NULL;
   }

@@ -66,7 +66,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       $this->save($_POST);
     }
 
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/fulltoolbareditor.js', 1)
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/abstracttoolbarmodifier.js', 2)
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/toolbarmodifier.js', 3)

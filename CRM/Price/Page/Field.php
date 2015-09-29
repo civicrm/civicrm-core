@@ -114,7 +114,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @return void
    */
   public function browse() {
-    $resourceManager = CRM_Core_Resources::singleton();
+    $resourceManager = Civi::resources();
     if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
     }

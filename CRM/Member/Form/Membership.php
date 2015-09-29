@@ -231,7 +231,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       else {
         // In standalone mode we don't have a contact id yet so lookup will be done client-side with this script:
-        $resources = CRM_Core_Resources::singleton();
+        $resources = Civi::resources();
         $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/MembershipStandalone.js');
         $passthru = array(
           'typeorgs' => CRM_Member_BAO_MembershipType::getMembershipTypeOrganization(),

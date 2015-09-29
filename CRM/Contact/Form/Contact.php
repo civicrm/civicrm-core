@@ -148,7 +148,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $this->_dedupeButtonName = $this->getButtonName('refresh', 'dedupe');
     $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
 
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addStyleFile('civicrm', 'css/contactSummary.css', 2, 'html-header');
 
     $session = CRM_Core_Session::singleton();

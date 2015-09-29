@@ -160,7 +160,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $form->assign('loadjsTree', FALSE);
       if (!empty($loadJsTree)) {
         // CODE FROM CRM/Tag/Form/Tag.php //
-        CRM_Core_Resources::singleton()
+        Civi::resources()
           ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
           ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
         $form->assign('loadjsTree', TRUE);

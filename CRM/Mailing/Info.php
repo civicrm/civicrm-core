@@ -146,7 +146,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'option_group_id' => "from_email_address",
       'domain_id' => CRM_Core_Config::domainID(),
     ));
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addSetting(array(
         'crmMailing' => array(
           'civiMails' => $civiMails['values'],

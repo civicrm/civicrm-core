@@ -101,7 +101,7 @@ class Civi {
    * @return CRM_Core_Resources
    */
   public static function resources() {
-    return CRM_Core_Resources::singleton();
+    return Civi::resources();
   }
 
   /**
