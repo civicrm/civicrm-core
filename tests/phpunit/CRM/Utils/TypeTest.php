@@ -68,7 +68,7 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array(-10, 'Positive', NULL),
       array('-10', 'Positive', NULL),
       array('-10foo', 'Positive', NULL),
-      array(array('10', 20), 'Country', array(10, 20)),
+      array(array('10', 20), 'Country', array('10', 20)),
       array(array('10', '-10foo'), 'Country', NULL),
       array('', 'Timestamp', ''),
       array('', 'ContactReference', ''),
