@@ -849,7 +849,7 @@ function civicrm_api3_contact_getquick($params) {
     $exactWhereClause = " WHERE ( sort_name LIKE '$name' $exactIncludeNickName ) {$where} ";
     if ($config->includeEmailInName) {
       if (!in_array('email', $list)) {
-        $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";
+        $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id )";
       }
       $emailWhere = " WHERE email LIKE '$strSearch'";
     }
