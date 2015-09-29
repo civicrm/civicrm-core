@@ -38,6 +38,16 @@
       editor.on('insertText', function() {
         $(item).trigger("keypress");
       });
+      var debounce = null;
+      angular.forEach(['key', 'pasteState'], function(evName) {
+        editor.on(evName, function(evt) {
+          if (debounce) clearTimeout(debounce);
+          debounce = setTimeout(function() {
+            editor.updateElement();
+            $(item).trigger("change");
+          }, 50);
+        });
+      });
       editor.on('pasteState', function() {
         $(item).trigger("paste");
       });
