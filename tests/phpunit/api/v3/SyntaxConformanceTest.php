@@ -449,7 +449,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingEventResubscribe',
       'UFGroup',
       'Activity',
-      'Email',
       'Event',
       'GroupContact',
       'MembershipPayment',
@@ -565,6 +564,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'cant_update' => array(
           // can't be changed through api
           'pcp_id',
+        ),
+      ),
+      'Email' => array(
+        'cant_update' => array(
+          // This is being legitimately manipulated to always have a valid primary - skip.
+          'is_primary',
         ),
       ),
       'Pledge' => array(
@@ -1182,6 +1187,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           }
           else {
             $entity[$fieldName] = substr('New String', 0, CRM_Utils_Array::Value('maxlength', $specs, 100));
+            if ($fieldName == 'email') {
+              $entity[$fieldName] = strtolower($entity[$fieldName]);
+            }
             // typecast with array to satisfy changes made in CRM-13160
             if ($entityName == 'MembershipType' && in_array($fieldName, array(
                 'relationship_type_id',
