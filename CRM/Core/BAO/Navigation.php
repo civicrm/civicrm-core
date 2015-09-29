@@ -862,7 +862,8 @@ ORDER BY parent_id, weight";
       elseif ($component['name'] === 'CiviCampaign') {
         $permission = "access CiviReport";
       }
-      $component_nav = self::createOrUpdateReportNavItem($component_nav_name, 'civicrm/report/list', "compid={$component_id}&reset=1", $reports_nav->id, $permission, $domain_id);
+      $component_nav = self::createOrUpdateReportNavItem($component_nav_name, 'civicrm/report/list',
+        "compid={$component_id}&reset=1", $reports_nav->id, $permission, $domain_id, TRUE);
       foreach ($component['reports'] as $report_id => $report) {
         // Create or update the report instance links.
         $report_nav = self::createOrUpdateReportNavItem($report['title'], $report['url'], 'reset=1', $component_nav->id, $report['permission'], $domain_id);
@@ -910,17 +911,17 @@ ORDER BY parent_id, weight";
    * @param string $url
    * @param array $url_params
    *
-   * @return bool|\CRM_Core_DAO
+   * @param int|null $parent_id
+   *   Optionally restrict to one parent.
+   *
+   * @return bool|\CRM_Core_BAO_Navigation
    */
-  public static function getNavItemByUrl($url, $url_params) {
-    $query = "SELECT * FROM civicrm_navigation WHERE url = %1";
-    $params = array(
-      1 => array("{$url}?{$url_params}", 'String'),
-    );
-    $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Core_DAO_Navigation');
-    $dao->fetch();
-    if (isset($dao->id)) {
-      return $dao;
+  public static function getNavItemByUrl($url, $url_params, $parent_id = NULL) {
+    $nav = new CRM_Core_BAO_Navigation();
+    $nav->url = "{$url}?{$url_params}";
+    $nav->parent_id = $parent_id;
+    if ($nav->find(TRUE)) {
+      return $nav;
     }
     return FALSE;
   }
@@ -979,14 +980,21 @@ ORDER BY parent_id, weight";
    * @param string $permission
    * @param int $domain_id
    *
+   * @param bool $onlyMatchParentID
+   *   If True then do not match with a url that has a different parent
+   *   (This is because for top level items there is a risk of 'stealing' rows that normally
+   *   live under 'Contact' and intentionally duplicate the report examples.)
+   *
    * @return \CRM_Core_DAO_Navigation
    */
-  protected static function createOrUpdateReportNavItem($name, $url, $url_params, $parent_id, $permission, $domain_id) {
+  protected static function createOrUpdateReportNavItem($name, $url, $url_params, $parent_id, $permission,
+                                                        $domain_id, $onlyMatchParentID = FALSE) {
     $id = NULL;
-    $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
+    $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params, ($onlyMatchParentID ? $parent_id : NULL));
     if ($existing_nav) {
       $id = $existing_nav->id;
     }
+
     $nav = self::createReportNavItem($name, $url, $url_params, $parent_id, $permission, $id, $domain_id);
     return $nav;
   }
@@ -1020,11 +1028,10 @@ ORDER BY parent_id, weight";
       ),
       'domain_id' => $domain_id,
     );
-    if ($id !== NULL) {
+    if ($id) {
       $params['id'] = $id;
     }
-    $nav = CRM_Core_BAO_Navigation::add($params);
-    return $nav;
+    return CRM_Core_BAO_Navigation::add($params);
   }
 
   /**
