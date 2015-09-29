@@ -353,9 +353,9 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Change Membership Status{/ts}',           35, 'Change Membership Status',   NULL, 1, NULL, 35, '{ts escape="sql"}Change Membership Status.{/ts}',                         0, 1, 1, @memberCompId, NULL),
    (@option_group_id_act, '{ts escape="sql"}Change Membership Type{/ts}',             36, 'Change Membership Type',     NULL, 1, NULL, 36, '{ts escape="sql"}Change Membership Type.{/ts}',                           0, 1, 1, @memberCompId, NULL),
 
-   (@option_group_id_act, '{ts escape="sql"}Cancel Recurring Contribution{/ts}',      37, 'Cancel Recurring Contribution', NULL,1, 0, 37, '', 0, 1, 1, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Update Recurring Contribution Billing Details{/ts}',      38, 'Update Recurring Contribution Billing Details', NULL,1, 0, 38, '', 0, 1, 1, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Update Recurring Contribution{/ts}',      39, 'Update Recurring Contribution', NULL,1, 0, 39, '', 0, 1, 1, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Cancel Recurring Contribution{/ts}',      37, 'Cancel Recurring Contribution', NULL,1, 0, 37, '', 0, 1, 1, @contributeCompId, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Update Recurring Contribution Billing Details{/ts}',      38, 'Update Recurring Contribution Billing Details', NULL,1, 0, 38, '', 0, 1, 1, @contributeCompId, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Update Recurring Contribution{/ts}',      39, 'Update Recurring Contribution', NULL,1, 0, 39, '', 0, 1, 1, @contributeCompId, NULL),
 
    (@option_group_id_act, '{ts escape="sql"}Reminder Sent{/ts}',                40, 'Reminder Sent', NULL, 1, 0, 40, '', 0, 1, 1, NULL, NULL),
 
