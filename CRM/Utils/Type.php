@@ -173,13 +173,13 @@ class CRM_Utils_Type {
       // CRM-8925 for custom fields of this type
       case 'Country':
       case 'StateProvince':
-        if (is_array($data)) {
+        // Handle multivalued data in delimited or array format
+        if (is_array($data) || (strpos($data, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE)) {
           $valid = TRUE;
-          foreach ($data as &$item) {
+          foreach (CRM_Utils_Array::explodePadded($data) as $item) {
             if (!CRM_Utils_Rule::positiveInteger($item)) {
               $valid = FALSE;
             }
-            $item = (int) $item;
           }
           if ($valid) {
             return $data;
