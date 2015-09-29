@@ -39,7 +39,7 @@
         $(item).trigger("keypress");
       });
       var debounce = null;
-      angular.forEach(['key', 'pasteState'], function(evName) {
+      _.each(['key', 'pasteState'], function(evName) {
         editor.on(evName, function(evt) {
           if (debounce) clearTimeout(debounce);
           debounce = setTimeout(function() {
