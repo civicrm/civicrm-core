@@ -572,6 +572,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'is_primary',
         ),
       ),
+      'Navigation' => array(
+        'cant_update' => array(
+          // Weight is deliberately altered when this is changed - skip.
+          'parent_id',
+        ),
+      ),
       'Pledge' => array(
         'cant_update' => array(
           'pledge_original_installment_amount',
