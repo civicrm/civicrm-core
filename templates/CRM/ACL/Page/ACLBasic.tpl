@@ -62,7 +62,7 @@
         {/strip}
 
         {if $action ne 1 and $action ne 2}
-            <div class="crm-submit-buttons">
+            <div class="action-link">
 -            {crmButton q="action=add&reset=1" id="newACL"  icon="crm-i fa-plus-circle"}{ts}Add Role Assignment{/ts}{/crmButton}
             </div>
         {/if}
