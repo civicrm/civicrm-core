@@ -180,7 +180,6 @@ class CRM_Utils_Type {
             if (!CRM_Utils_Rule::positiveInteger($item)) {
               $valid = FALSE;
             }
-            $item = (int) $item;
           }
           if ($valid) {
             return $data;
