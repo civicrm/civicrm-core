@@ -64,7 +64,7 @@
       {/strip}
 
       <div class="action-link">
-        <a href="{crmURL q="action=add&reset=1"}" id="newLabelFormat" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Label Format{/ts}</span></a>
+        {crmButton q="action=add&reset=1" id="newLabelFormat" icon="crm-i fa-plus-circle"}{ts}Add Label Format{/ts}{/crmButton}
       </div>
     </div>
   {else}
