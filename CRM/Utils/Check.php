@@ -181,7 +181,7 @@ class CRM_Utils_Check {
    *   Array of messages
    * @link https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
-  public function checkAll($showHushed = FALSE) {
+  public function checkAll() {
     $checks = array();
     $checks[] = new CRM_Utils_Check_Security();
     $checks[] = new CRM_Utils_Check_Env();
@@ -204,13 +204,9 @@ class CRM_Utils_Check {
 
     CRM_Utils_Hook::check($messages);
 
-    if (!$showHushed) {
-      foreach ($messages as $key => $message) {
-        $hush = self::checkHushSnooze($message);
-        if ($hush) {
-          unset($messages[$key]);
-        }
-      }
+    foreach ($messages as $key => $message) {
+      $hush = self::checkHushSnooze($message);
+      $message->setVisible($hush);
     }
     uasort($messages, array(__CLASS__, 'severitySort'));
 

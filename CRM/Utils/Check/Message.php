@@ -59,6 +59,13 @@ class CRM_Utils_Check_Message {
   private $help;
 
   /**
+   *
+   * @var bool
+   *      This is used for Admin Status Page to determine hushed statuses.
+   */
+  private $isVisible;
+
+  /**
    * @param string $name
    *   Symbolic name for the check.
    * @param string $message
@@ -135,11 +142,20 @@ class CRM_Utils_Check_Message {
       'message' => $this->message,
       'title' => $this->title,
       'severity' => $this->level,
+      'isVisible' => $this->isVisible,
     );
     if (!empty($this->help)) {
       $array['help'] = $this->help;
     }
     return $array;
+  }
+
+  public function isVisibile() {
+    return $this->isVisible;
+  }
+
+  public function setVisible($isVisible) {
+    $this->isVisible = $isVisible;
   }
 
 }
