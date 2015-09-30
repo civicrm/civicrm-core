@@ -716,7 +716,7 @@ function civicrm_api3_contact_getquick($params) {
         if ($value == 'phone') {
           $actualSelectElements[] = $select[] = 'phone_ext';
         }
-        $from[$value] = "LEFT JOIN civicrm_{$value} {$suffix} ON ( cc.id = {$suffix}.contact_id ) ";
+        $from[$value] = "LEFT JOIN civicrm_{$value} {$suffix} ON ( cc.id = {$suffix}.contact_id AND {$suffix}.is_primary = 1 ) ";
         break;
 
       case 'country':
@@ -849,7 +849,7 @@ function civicrm_api3_contact_getquick($params) {
     $exactWhereClause = " WHERE ( sort_name LIKE '$name' $exactIncludeNickName ) {$where} ";
     if ($config->includeEmailInName) {
       if (!in_array('email', $list)) {
-        $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id )";
+        $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";
       }
       $emailWhere = " WHERE email LIKE '$strSearch'";
     }
