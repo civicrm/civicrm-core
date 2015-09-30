@@ -27,7 +27,9 @@
 
 {if $surveys}
   <div class="action-link">
-    {crmButton href=$addSurveyUrl icon="crm-i fa-plus-circle"}{ts}Add Survey{/ts}{/crmButton}
+    <a href="{$addSurveyUrl}" class="button">
+      <span><i class="crm-i fa-plus-circle"></i> {ts}Add Survey{/ts}</span>
+    </a>
   </div>
  {include file="CRM/common/enableDisableApi.tpl"}
  {include file="CRM/common/jsortable.tpl"}
@@ -68,5 +70,7 @@
   </div>
 {/if}
 <div class="action-link">
-  {crmButton href=$addSurveyUrl icon="crm-i fa-plus-circle"}{ts}Add Survey{/ts}{/crmButton}
+  <a href="{$addSurveyUrl}" class="button">
+    <span><i class="crm-i fa-plus-circle"></i> {ts}Add Survey{/ts}</span>
+  </a>
 </div>
