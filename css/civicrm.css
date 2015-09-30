@@ -2233,6 +2233,31 @@ input.crm-form-entityref {
   margin-right: 5px;
 }
 
+/* Same as fa-question-circle, plus coloring */
+.crm-container a.helpicon {
+  display: inline-block;
+  color: #F5F6F1;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  opacity: .7;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.crm-container  a.helpicon:hover,
+.crm-container  a.helpicon:focus {
+  opacity: 1;
+}
+
+.crm-container a.helpicon:before {
+  content: "\f059";
+}
+
+.crm-container div.crm-accordion-header a.helpicon {
+  color: #2786C2;
+}
+
 /* These .crm-icon classes use item_sprites.png */
 
 .crm-container .crm-icon {
@@ -2453,32 +2478,6 @@ input.crm-form-entityref {
 
 .crm-status-box-outer.status-error .crm-status-box-inner {
   background: rgba(255, 7, 0, 0.7);
-}
-
-/* Pop-up help icon - eliminate forced line break */
-.crm-container a.helpicon,
-.crm-container .crm-master-accordion-header a.helpicon {
-  background-color: #6177D5;
-  background-image: url("../i/icons/jquery-ui-F5F6F1.png");
-  background-position: -50px -146px;
-  border-radius: 6px;
-  display: inline-block;
-  height: 12px;
-  width: 12px;
-  opacity: .7;
-  position: relative;
-  top: 2px;
-  padding: 0;
-}
-
-div.crm-accordion-header a.helpicon {
-  background-color: #F5F6F1;
-  background-image: url(../i/icons/jquery-ui-2786C2.png);
-}
-
-div a.helpicon:hover,
-div a.helpicon:focus {
-  opacity: 1;
 }
 
 .crm-container .crm-summary-link {
