@@ -14,3 +14,7 @@ SELECT @CompId := MAX(id) FROM civicrm_component where name = 'CiviContribute';
 UPDATE civicrm_option_value 
 SET component_id = @CompId 
 WHERE (name = 'Cancel Recurring Contribution' OR name = 'Update Recurring Contribution Billing Details' OR name = 'Update Recurring Contribution') AND option_group_id = @option_group_id_act;
+
+-- CRM-17309
+INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id,pattern) VALUES
+(3,'Unable to resolve MX record for ');
