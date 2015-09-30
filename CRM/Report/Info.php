@@ -30,7 +30,6 @@
  * information about it. It needs to extend CRM_Core_Component_Info
  * abstract class.
  *
- * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2016
  * $Id$
  *
@@ -50,9 +49,6 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    *
    * @return array
    *   collection of required component settings
-   */
-  /**
-   * @return array
    */
   public function getInfo() {
     return array(
@@ -91,6 +87,14 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
         ts('access Report Criteria'),
         ts('Change report search criteria'),
       ),
+      'access own private reports' => array(
+        ts('access own private reports'),
+        ts('Access reports owned by the contact'),
+      ),
+      'access all private reports' => array(
+        ts('access all private reports'),
+        ts('Access all private reports'),
+      ),
       'administer reserved reports' => array(
         ts('administer reserved reports'),
         ts('Edit all reports that have been marked as reserved'),
@@ -123,9 +127,6 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of required dashboard settings,
    *                    null if no element offered
-   */
-  /**
-   * @return array|null
    */
   public function getUserDashboardElement() {
     // no dashboard element for this component

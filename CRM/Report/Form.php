@@ -1331,7 +1331,10 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
     }
-    if (!empty($this->_options)) {
+    if (!empty($this->_options) &&
+        (!$this->_id
+          || ($this->_id && CRM_Report_BAO_ReportInstance::contactCanAdministerReport($this->_id)))
+    ) {
       $this->tabs['ReportOptions'] = array(
         'title' => ts('Display Options'),
         'tpl' => 'ReportOptions',
