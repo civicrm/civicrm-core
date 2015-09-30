@@ -10,11 +10,11 @@
         function refresh() {
           if (scope.$parent.$eval(attrs.crmOn)) {
             scope.spanClasses = {'crmMailing-active': true};
-            scope.iconClasses = {'ui-icon-check': true};
+            scope.iconClasses = {'fa-check': true};
           }
           else {
             scope.spanClasses = {'crmMailing-inactive': true};
-            scope.iconClasses = {'ui-icon-close': true};
+            scope.iconClasses = {'fa-times': true};
           }
           scope.evalTitle = scope.$parent.$eval(attrs.crmTitle);
         }
