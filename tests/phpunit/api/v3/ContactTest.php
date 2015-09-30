@@ -2708,4 +2708,35 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test the duplicate check function.
+   */
+  public function testDuplicateCheck() {
+    $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'Harry',
+      'last_name' => 'Potter',
+      'email' => 'harry@hogwarts.edu',
+      'contact_type' => 'Individual',
+    ));
+    $result = $this->callAPISuccess('Contact', 'duplicatecheck', array(
+      'match' => array(
+        'first_name' => 'Harry',
+        'last_name' => 'Potter',
+        'email' => 'harry@hogwarts.edu',
+        'contact_type' => 'Individual',
+      ),
+    ));
+
+    $this->assertEquals(1, $result['count']);
+    $result = $this->callAPISuccess('Contact', 'duplicatecheck', array(
+      'match' => array(
+        'first_name' => 'Harry',
+        'last_name' => 'Potter',
+        'email' => 'no5@privet.drive',
+        'contact_type' => 'Individual',
+      ),
+    ));
+    $this->assertEquals(0, $result['count']);
+  }
+
 }
