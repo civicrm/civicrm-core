@@ -103,13 +103,17 @@ function _civicrm_api3_system_check_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_system_check($params) {
+  // array(array('name'=> $, 'severity'=>$, ...))
   $returnValues = array();
+
+  // array(CRM_Utils_Check_Message)
   $messages = CRM_Utils_Check::singleton()->checkAll();
+
   $showHushed = CRM_Utils_Array::value('show_hushed', $params);
   if (!$showHushed) {
     foreach ($messages as $key => $message) {
-      if (!$message->isVisible()) {
-        unset($messages[$key]);
+      if ($message->isVisible()) {
+        $returnValues[] = $message->toArray();
       }
     }
   }

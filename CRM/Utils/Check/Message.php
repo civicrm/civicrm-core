@@ -150,7 +150,7 @@ class CRM_Utils_Check_Message {
     return $array;
   }
 
-  public function isVisibile() {
+  public function isVisible() {
     return $this->isVisible;
   }
 
