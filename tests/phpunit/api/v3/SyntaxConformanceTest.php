@@ -101,7 +101,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'OptionGroup',
       'MailingRecipients',
       'UFMatch',
-      'LocationType',
       'CustomSearch',
       'Extension',
       'ReportTemplate',
@@ -118,7 +117,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFJoin',
       'UFMatch',
       'Extension',
-      'LocationType',
       'System',
     );
     $this->onlyIDNonZeroCount['get'] = array(
@@ -563,6 +561,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'cant_update' => array(
           // can't be changed through api
           'pcp_id',
+        ),
+      ),
+      'LocationType' => array(
+        'cant_update' => array(
+          // I'm on the fence about whether the test should skip or the behaviour is wrong.
+          // display_name is set to match name if display_name is not provided. It would be more 'normal'
+          // to only calculate a default IF id is not set - but perhaps the current behaviour is kind
+          // of what someone updating the name expects..
+          'name',
         ),
       ),
       'Pledge' => array(
