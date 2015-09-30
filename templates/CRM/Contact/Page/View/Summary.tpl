@@ -57,7 +57,7 @@
             <li>
               {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
               <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
-              <span><div class="icon ui-icon-pencil"></div>{ts}Edit{/ts}</span>
+              <span><i class="crm-i fa-pencil"></i> {ts}Edit{/ts}</span>
               </a>
             </li>
           {/if}
@@ -68,14 +68,14 @@
           $is_deleted)}
           <li class="crm-contact-restore">
             <a href="{crmURL p='civicrm/contact/view/delete' q="reset=1&cid=$contactId&restore=1"}" class="delete button" title="{ts}Restore{/ts}">
-              <span><div class="icon restore-icon"></div>{ts}Restore from Trash{/ts}</span>
+              <span><i class="crm-i fa-undo"></i> {ts}Restore from Trash{/ts}</span>
             </a>
           </li>
 
           {if call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
             <li class="crm-contact-permanently-delete">
               <a href="{crmURL p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId&skip_undelete=1"}" class="delete button" title="{ts}Delete Permanently{/ts}">
-                <span><div class="icon delete-icon"></div>{ts}Delete Permanently{/ts}</span>
+                <span><i class="crm-i fa-trash"></i> {ts}Delete Permanently{/ts}</span>
               </a>
             </li>
           {/if}
@@ -84,7 +84,7 @@
           {assign var='deleteParams' value="&reset=1&delete=1&cid=$contactId"}
           <li class="crm-delete-action crm-contact-delete">
             <a href="{crmURL p='civicrm/contact/view/delete' q=$deleteParams}" class="delete button" title="{ts}Delete{/ts}">
-              <span><div class="icon delete-icon"></div>{ts}Delete Contact{/ts}</span>
+              <span><i class="crm-i fa-trash"></i> {ts}Delete Contact{/ts}</span>
             </a>
           </li>
         {/if}
@@ -99,7 +99,7 @@
             {assign var='viewParams' value=$urlParams|cat:"&cid=$nextContactID"}
             <li class="crm-next-action">
               <a href="{crmURL p='civicrm/contact/view' q=$viewParams}" class="view button" title="{$nextContactName}">
-                <span title="{$nextContactName}"><div class="icon ui-icon-carat-1-e"></div>{ts}Next{/ts}</span>
+                <span title="{$nextContactName}"><i class="crm-i fa-chevron-right"></i> {ts}Next{/ts}</span>
               </a>
             </li>
           {/if}
@@ -107,7 +107,7 @@
             {assign var='viewParams' value=$urlParams|cat:"&cid=$prevContactID"}
             <li class="crm-previous-action">
               <a href="{crmURL p='civicrm/contact/view' q=$viewParams}" class="view button" title="{$prevContactName}">
-                <span title="{$prevContactName}"><div class="icon ui-icon-carat-1-w"></div>{ts}Previous{/ts}</span>
+                <span title="{$prevContactName}"><i class="crm-i fa-chevron-left"></i> {ts}Previous{/ts}</span>
               </a>
             </li>
           {/if}
@@ -116,7 +116,7 @@
         {if !empty($groupOrganizationUrl)}
           <li class="crm-contact-associated-groups">
             <a href="{$groupOrganizationUrl}" class="associated-groups button" title="{ts}Associated Multi-Org Group{/ts}">
-              <span><div class="icon associated-groups-icon"></div>{ts}Associated Multi-Org Group{/ts}</span>
+              <span><i class="crm-i fa-cubes"></i> {ts}Associated Multi-Org Group{/ts}</span>
             </a>
           </li>
         {/if}

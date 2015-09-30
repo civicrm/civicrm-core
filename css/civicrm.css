@@ -2220,6 +2220,18 @@ input.crm-form-entityref {
 
 /* Font Awesome */
 
+.crm-container a,
+.crm-container a:link,
+.crm-container a:visited,
+.crm-container a:active,
+.crm-container a:hover {
+  color: inherit;
+}
+
+a.crm-i:hover {
+  text-decoration: none;
+}
+
 .crm-i.crm-i-red {
   color: #8A1F11;
 }
