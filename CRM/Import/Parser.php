@@ -182,9 +182,15 @@ abstract class CRM_Import_Parser {
    * @var int
    */
   public $_contactType;
+  /**
+   * Contact sub-type
+   *
+   * @var int
+   */
+  public $_contactSubType;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     $this->_maxLinesToProcess = 0;

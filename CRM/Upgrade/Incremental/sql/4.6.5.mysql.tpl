@@ -1,7 +1,7 @@
 {* file to handle db changes in 4.6.5 during upgrade *}
 
 -- CRM-16173
-CREATE TABLE `civicrm_cxn` (
+CREATE TABLE IF NOT EXISTS `civicrm_cxn` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Connection ID',
      `app_guid` varchar(128)    COMMENT 'Application GUID',
      `app_meta` text    COMMENT 'Application Metadata (JSON)',
