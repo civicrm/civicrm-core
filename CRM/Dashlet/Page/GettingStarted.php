@@ -59,7 +59,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
   public function gettingStartedUrl() {
     // Note: We use "*default*" as the default (rather than self::GETTING_STARTED_URL) so that future
     // developers can change GETTING_STARTED_URL without needing to update {civicrm_setting}.
-    $url = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'gettingStartedUrl', NULL, '*default*');
+    $url = Civi::settings()->get('gettingStartedUrl');
     if ($url === '*default*') {
       $url = self::GETTING_STARTED_URL;
     }
