@@ -843,7 +843,12 @@
         restrict: 'EA',
         scope: {},
         link: function (scope, element, attrs) {
-          $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          if (attrs.crmIcon.substring(0,3) == 'fa-') {
+            $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '"></i> ');
+          }
+          else {
+            $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          }
           if ($(element).is('button')) {
             $(element).addClass('crm-button');
           }
