@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   // Represent a datetime field as if it were a radio ('schedule.mode') and a datetime ('schedule.datetime').
   // example: <div crm-mailing-radio-date="mySchedule" ng-model="mailing.scheduled_date">...</div>
-  angular.module('crmMailing').directive('crmMailingRadioDate', function() {
+  angular.module('crmMailing').directive('crmMailingRadioDate', function(crmUiAlert) {
     return {
       require: 'ngModel',
       link: function($scope, element, attrs, ngModel) {
@@ -48,6 +48,27 @@
             if (context === 'userInput' && $(this).val() === '' && $(this).siblings('.crm-form-date').val().length) {
               schedule.mode = 'at';
               schedule.datetime = '?';
+            } else { 
+              var d = new Date()
+              var submittedDate = $(this).val();
+              console.log(submittedDate);
+              month = '' + (d.getMonth() + 1),
+              day = '' + d.getDate(),
+              year = d.getFullYear();
+              if (month.length < 2) month = '0' + month;
+              if (day.length < 2) day = '0' + day;
+              date = [year, month, day].join('-');
+              hours = '' + (d.getHours()),
+              minutes = '' + (d.getMinutes());
+              time = [hours, minutes, "00"].join(':');
+              currentDate = date + ' ' + time;
+              ngModel.$setValidity('dateTimeInThePast', !($(this).val().length && submittedDate < currentDate));
+              if ($(this).val().length && submittedDate < currentDate) {
+                crmUiAlert({
+                  text: ts('The Scheulded date and time is in the past'),
+                  title: ts('Error')
+                });
+              }
             }
           });
 

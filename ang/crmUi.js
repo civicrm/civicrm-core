@@ -88,20 +88,6 @@
                 requiredLength = 8;
               }
               ngModel.$setValidity('incompleteDateTime', !($(this).val().length && $(this).val().length !== requiredLength));
-              var d = new Date(),
-                month = '' + (d.getMonth() + 1),
-                day = '' + d.getDate(),
-                year = d.getFullYear();
-              if (month.length < 2) month = '0' + month;
-              if (day.length < 2) day = '0' + day;
-              currentDate = [year, month, day].join('-');
-              ngModel.$setValidity('dateTimeInThePast', !($(this).val().length && $(this).val() < currentDate));
-              if ($(this).val().length && $(this).val() < currentDate){
-               crmUiAlert({
-                 text: ts('The Scheulded date and time is in the past'),
-                 title: ts('Error')
-               });
-              }
             });
         }
       };
