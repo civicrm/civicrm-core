@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -33,41 +33,6 @@
 
 /**
  * Adjust metadata for navigation reset action.
- *
- * @param array $params
- */
-function _civicrm_api3_navigation_reset_spec(&$params) {
-  $params['for']['api.required'] = TRUE;
-  $params['for']['title'] = "Is this reset for all navigation or reports";
-  $params['for']['type'] = CRM_Utils_Type::T_STRING;
-  $params['for']['options'] = array(
-    'all' => 'General Navigation rebuild from xml',
-    'report' => 'Reset report menu to default structure',
-  );
-  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
-  $params['domain_id']['type'] = CRM_Utils_Type::T_INT;
-  $params['domain_id']['title'] = 'Domain ID';
-}
-
-/**
- * Reset navigation.
- *
- * @param array $params
- *   Array of name/value pairs.
- *
- * @return array
- *   API result array.
- */
-function civicrm_api3_navigation_reset($params) {
-  if ($params['for'] == 'report') {
-    CRM_Core_BAO_Navigation::resetNavigation();
-  }
-  CRM_Core_BAO_Navigation::rebuildReportsNavigation($params['domain_id']);
-  return civicrm_api3_create_success(1, $params, 'navigation', 'reset');
-}
-
-/**
- * Adjust metadata for navigation get action.
  *
  * @param array $params
  */
@@ -117,7 +82,7 @@ function _civicrm_api3_navigation_delete_spec(&$params) {
 }
 
 /**
- * Delete navigation item.
+ * Create navigation item.
  *
  * @param array $params
  *   Array of name/value pairs.

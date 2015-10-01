@@ -199,7 +199,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    */
   public function testGroupContactCacheAddSearch() {
     $returnProperties = array('contact_id');
-    $params = array(array('group', 'IN', array(1), 0, 0));
+    $params = array(array('group', 'IN', array(1 => 1), 0, 0));
 
     $query = new CRM_Contact_BAO_Query(
       $params, $returnProperties,

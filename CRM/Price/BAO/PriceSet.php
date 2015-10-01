@@ -1288,11 +1288,6 @@ GROUP BY     mt.member_of_contact_id";
   /**
    * Check if auto renew option should be shown.
    *
-   * The auto-renew option should be visible if membership types associated with all the fields has
-   * been set for auto-renew option.
-   *
-   * Auto renew checkbox should be frozen if for all the membership type auto renew is required
-   *
    * @param int $priceSetId
    *   Price set id.
    *
@@ -1300,46 +1295,43 @@ GROUP BY     mt.member_of_contact_id";
    *   $autoRenewOption ( 0:hide, 1:optional 2:required )
    */
   public static function checkAutoRenewForPriceSet($priceSetId) {
-    $query = 'SELECT DISTINCT mt.auto_renew, mt.duration_interval, mt.duration_unit,
-             pf.html_type, pf.id as price_field_id
+    // auto-renew option should be visible if membership types associated with all the fields has
+    // been set for auto-renew option
+    // Auto renew checkbox should be frozen if for all the membership type auto renew is required
+
+    // get the membership type auto renew option and check if required or optional
+    $query = 'SELECT mt.auto_renew, mt.duration_interval, mt.duration_unit
             FROM civicrm_price_field_value pfv
             INNER JOIN civicrm_membership_type mt ON pfv.membership_type_id = mt.id
             INNER JOIN civicrm_price_field pf ON pfv.price_field_id = pf.id
             WHERE pf.price_set_id = %1
             AND   pf.is_active = 1
-            AND   pfv.is_active = 1
-            ORDER BY price_field_id';
+            AND   pfv.is_active = 1';
 
     $params = array(1 => array($priceSetId, 'Integer'));
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
-
     $autoRenewOption = 2;
-    $priceFields = array();
+    $interval = $unit = array();
     while ($dao->fetch()) {
       if (!$dao->auto_renew) {
-        // If any one can't be renewed none can.
-        return 0;
+        $autoRenewOption = 0;
+        break;
       }
       if ($dao->auto_renew == 1) {
         $autoRenewOption = 1;
       }
 
-      if ($dao->html_type == 'Checkbox' && !in_array($dao->duration_interval . $dao->duration_unit, $priceFields[$dao->price_field_id])) {
-        // Checkbox fields cannot support auto-renew if they have more than one duration configuration
-        // as more than one can be selected. Radio and select are either-or so they can have more than one duration.
-        return 0;
-      }
-      $priceFields[$dao->price_field_id][] = $dao->duration_interval . $dao->duration_unit;
-      foreach ($priceFields as $priceFieldID => $durations) {
-        if ($priceFieldID != $dao->price_field_id && !in_array($dao->duration_interval . $dao->duration_unit, $durations)) {
-          // Another price field has a duration configuration that differs so we can't offer auto-renew.
-          return 0;
-        }
-      }
+      $interval[$dao->duration_interval] = $dao->duration_interval;
+      $unit[$dao->duration_unit] = $dao->duration_unit;
     }
 
-    return $autoRenewOption;
+    if (count($interval) == 1 && count($unit) == 1 && $autoRenewOption > 0) {
+      return $autoRenewOption;
+    }
+    else {
+      return 0;
+    }
   }
 
   /**

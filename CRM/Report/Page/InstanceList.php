@@ -29,10 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 
 /**
- * Page for invoking report instances.
+ * Page for invoking report instances
  */
 class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
@@ -76,9 +78,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   protected $_title = NULL;
 
   /**
-   * Retrieves report instances, optionally filtered.
-   *
-   * Filtering available by parent report template ($ovID) or by component ($compID).
+   * Retrieves report instances, optionally filtered by parent report template ($ovID)
+   * or by component ($compID)
    *
    * @return array
    */
@@ -172,6 +173,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
   /**
    * Run this page (figure out the action needed and perform it).
+   *
+   * @return void
    */
   public function run() {
     //Filters by source report template or by component

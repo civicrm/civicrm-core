@@ -29,6 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
+ * $Id$
+ *
  */
 class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
@@ -236,10 +238,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   }
 
   /**
-   * Retrieve instance.
-   *
    * @param array $params
-   * @param array $defaults
+   * @param $defaults
    *
    * @return CRM_Report_DAO_ReportInstance|null
    */

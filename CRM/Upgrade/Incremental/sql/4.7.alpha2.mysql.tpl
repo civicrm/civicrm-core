@@ -23,3 +23,9 @@ VALUES
 ('La Libertad', 'LI', 1066),
 ('La Paz', 'PA', 1066),
 ('La Union','UN', 1066);
+
+-- CRM-17309
+INSERT INTO civicrm_mailing_bounce_pattern
+(bounce_type_id,pattern)
+VALUES
+(3,'Unable to resolve MX record for');

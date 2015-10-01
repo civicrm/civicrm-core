@@ -870,9 +870,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         );
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
         // Wrap with crm-editable. Not an ideal solution.
-        if (in_array(CRM_Core_Permission::EDIT, $groupPermissions)) {
-          $values[$object->id]['title'] = '<span class="crm-editable crmf-title">' . $values[$object->id]['title'] . '</span>';
-        }
+        $values[$object->id]['title'] = '<span class="crm-editable crmf-title">' . $values[$object->id]['title'] . '</span>';
 
         if ($object->saved_search_id) {
           $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';

@@ -1584,9 +1584,7 @@ class CRM_Contact_BAO_Query {
       // prior to 4.7, formValues for some attributes (e.g. group, tag) are stored in array(id1 => 1, id2 => 1),
       // as per the recent Search fixes $values need to be in standard array(id1, id2) format
       $ids = array_keys($values, 1);
-      if (count($ids) > 1 ||
-        (count($ids) == 1 && (key($values) > 1 || (key($values) == 1 && $values[1] == 1))) // handle (0 => 4), (1 => 1)
-      ) {
+      if (count($ids) > 1 || (count($ids) == 1 && key($values) > 1)) {
         $values = $ids;
       }
     }
