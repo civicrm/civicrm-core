@@ -76,9 +76,11 @@ class CRM_Upgrade_Headless {
 
     CRM_Upgrade_Form::doFinish();
 
+    $message = file_get_contents($postUpgradeMessageFile);
     return array(
       'latestVer' => $latestVer,
-      'message' => file_get_contents($postUpgradeMessageFile),
+      'message' => $message,
+      'text' => CRM_Utils_String::htmlToText($message),
     );
   }
 
