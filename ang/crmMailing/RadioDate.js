@@ -49,17 +49,16 @@
               schedule.mode = 'at';
               schedule.datetime = '?';
             } else { 
-              var d = new Date()
-              var submittedDate = $(this).val();
-              console.log(submittedDate);
+              var d = new Date(),
               month = '' + (d.getMonth() + 1),
               day = '' + d.getDate(),
-              year = d.getFullYear();
+              year = d.getFullYear(),
+              hours = '' + d.getHours(),
+              minutes = '' + d.getMinutes();
+              var submittedDate = $(this).val();
               if (month.length < 2) month = '0' + month;
               if (day.length < 2) day = '0' + day;
               date = [year, month, day].join('-');
-              hours = '' + (d.getHours()),
-              minutes = '' + (d.getMinutes());
               time = [hours, minutes, "00"].join(':');
               currentDate = date + ' ' + time;
               ngModel.$setValidity('dateTimeInThePast', !($(this).val().length && submittedDate < currentDate));
