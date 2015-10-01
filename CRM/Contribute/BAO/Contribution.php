@@ -133,6 +133,19 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
+    //if contribution is created with cancelled or refunded status, add credit note id
+    if (!empty($params['contribution_status_id'])) {
+      $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
+      if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
+          || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
+      ) {
+        if (is_null($params['creditnote_id']) || $params['creditnote_id'] == "null") {
+          $params['creditnote_id'] = self::createCreditNoteId();
+        }
+      }
+    }
+
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
@@ -386,6 +399,19 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     foreach ($dateFields as $df) {
       if (isset($params[$df])) {
         $params[$df] = CRM_Utils_Date::isoToMysql($params[$df]);
+      }
+    }
+
+    //if contribution is created with cancelled or refunded status, add credit note id
+    if (!empty($params['contribution_status_id'])) {
+      $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
+      if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
+          || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
+      ) {
+        if (is_null($params['creditnote_id']) || $params['creditnote_id'] == "null") {
+          $params['creditnote_id'] = self::createCreditNoteId();
+        }
       }
     }
 
@@ -3192,7 +3218,8 @@ WHERE  contribution_id = %1 ";
       ) {
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
         if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
-          self::createCreditNoteId($params['contribution']->id);
+          $creditNoteId = self::createCreditNoteId();
+          CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
         }
       }
       elseif (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
@@ -3206,7 +3233,8 @@ WHERE  contribution_id = %1 ";
           $params['trxnParams']['to_financial_account_id'] = $arAccountId;
           $params['trxnParams']['total_amount'] = -$params['total_amount'];
           if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
-            self::createCreditNoteId($params['contribution']->id);
+            $creditNoteId = self::createCreditNoteId();
+            CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
           }
         }
         else {
@@ -4374,13 +4402,10 @@ LIMIT 1;";
   /**
    * Generate credit note id with next avaible number
    *
-   * @param Integer $contributionId
-   *   Contribution Id.
-   *
    * @return string
    *   Credit Note Id.
    */
-  public static function createCreditNoteId($contributionId) {
+  public static function createCreditNoteId() {
     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
 
     $query = "select count(creditnote_id) as creditnote_number from civicrm_contribution";
@@ -4398,7 +4423,6 @@ LIMIT 1;";
       ));
     } while ($result > 0);
 
-    CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'creditnote_id', $creditNoteId);
     return $creditNoteId;
   }
 
