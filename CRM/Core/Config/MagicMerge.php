@@ -232,13 +232,10 @@ class CRM_Core_Config_MagicMerge {
         return $value;
 
       case 'setting-url-abs':
-        $value = $this->getSettings()->get($name);
-        $this->cache[$k] = Civi::paths()->getUrl($value, 'absolute');
-        return $this->cache[$k];
-
       case 'setting-url-rel':
-        $value = $this->getSettings()->get($name);
-        $this->cache[$k] = Civi::paths()->getUrl($value, 'relative');
+        $type = (strstr($type, 'abs')) ? 'absolute' : 'relative';
+        $value =  CRM_Utils_File::addTrailingSlash($this->getSettings()->get($name));
+        $this->cache[$k] = Civi::paths()->getUrl($value, $type);
         return $this->cache[$k];
 
       case 'runtime':
