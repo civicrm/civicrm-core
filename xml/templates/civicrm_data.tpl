@@ -1239,6 +1239,7 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'no (mail server|matches to nameserver query|dns entries)'),
     (@bounceTypeID, 'reverse dns entry'),
     (@bounceTypeID, 'Host or domain name not found');
+    (@bounceTypeID, 'Unable to resolve MX record for');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
