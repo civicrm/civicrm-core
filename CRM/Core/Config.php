@@ -505,6 +505,9 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         CRM_Utils_System::mapConfigToSSL();
       }
       $rrb = parse_url($this->userFrameworkResourceURL);
+      if(array_key_exists('port', $rrb)) {
+        $rrb['host'] .= ':' . $rrb['port'];
+      }
       // don't use absolute path if resources are stored on a different server
       // CRM-4642
       $this->resourceBase = $this->userFrameworkResourceURL;
