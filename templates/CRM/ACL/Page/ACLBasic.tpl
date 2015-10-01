@@ -63,7 +63,7 @@
 
         {if $action ne 1 and $action ne 2}
             <div class="action-link">
--            {crmButton q="action=add&reset=1" id="newACL" icon="crm-i fa-plus-circle"}{ts}Add Role Assignment{/ts}{/crmButton}
+-            {crmButton q="action=add&reset=1" id="newACL" icon="crm-i fa-plus-circle"}{ts}Add ACL{/ts}{/crmButton}
             </div>
         {/if}
     </div>
