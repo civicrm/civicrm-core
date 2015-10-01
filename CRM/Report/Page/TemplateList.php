@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying list of Reprot templates available
+ * Page for displaying list of Report templates available.
  */
 class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
@@ -108,8 +106,6 @@ LEFT  JOIN civicrm_component comp
 
   /**
    * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
    */
   public function run() {
     $compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);
