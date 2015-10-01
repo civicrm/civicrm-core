@@ -303,11 +303,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
         if (is_null($contribution->creditnote_id)) {
-          $query = "select count(creditnote_id) as creditnote_number from civicrm_contribution";
-          $dao = CRM_Core_DAO::executeQuery($query);
-          $dao->fetch();
-          $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . ($dao->creditnote_number + 1);
-          CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
+          $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId($contribution->id);
         }
         else {
           $creditNoteId = $contribution->creditnote_id;
