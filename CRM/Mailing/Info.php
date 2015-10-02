@@ -32,8 +32,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
@@ -58,7 +56,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * Get AngularJS modules and their dependencies
+   * Get AngularJS modules and their dependencies.
    *
    * @return array
    *   list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
@@ -97,8 +95,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
-    // Get past mailings
-    // CRM-16155 - Limit to a reasonable number
+    // Get past mailings.
+    // CRM-16155 - Limit to a reasonable number.
     $civiMails = civicrm_api3('Mailing', 'get', array(
       'is_completed' => 1,
       'mailing_type' => array('IN' => array('standalone', 'winner')),
@@ -110,7 +108,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'sort' => 'is_archived asc, scheduled_date desc',
       ),
     ));
-    // Generic params
+    // Generic params.
     $params = array(
       'options' => array('limit' => 0),
       'sequential' => 1,

@@ -29,13 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class holds all the Pseudo constants that are specific to Mass mailing. This avoids
- * polluting the core class and isolates the mass mailer class
+ * polluting the core class and isolates the mass mailer class.
  */
 class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 

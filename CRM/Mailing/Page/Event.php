@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -49,8 +47,6 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
   /**
    * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
    */
   public function run() {
     $selector = &new CRM_Mailing_Selector_Event(
@@ -63,7 +59,7 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
     $mailing_id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
 
-    //assign backurl
+    // assign backurl
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     if ($context == 'activitySelector') {

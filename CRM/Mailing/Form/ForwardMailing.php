@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
   public function preProcess() {
@@ -48,7 +46,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
 
     if ($q == NULL) {
 
-      /** ERROR **/
+      // ERROR.
       CRM_Core_Error::fatal(ts('Invalid form parameters.'));
       CRM_Core_Error::statusBounce(ts('Invalid form parameters.'));
     }
@@ -60,8 +58,8 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
       $this->assign('fromEmail', $fromEmail);
     }
 
-    /* Show the subject instead of the name here, since it's being
-     * displayed to external contacts/users */
+    // Show the subject instead of the name here, since it's being
+    // displayed to external contacts/users.
 
     CRM_Utils_System::setTitle(ts('Forward Mailing: %1', array(1 => $mailing->subject)));
 
@@ -72,8 +70,6 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     for ($i = 0; $i < 5; $i++) {
@@ -103,9 +99,6 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
 
   /**
    * Form submission of new/edit contact is processed.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $queue_id = $this->get('queue_id');

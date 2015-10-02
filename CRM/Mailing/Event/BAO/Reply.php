@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'Mail/mime.php';
@@ -66,7 +64,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *   The mailing object, or null on failure
    */
   public static function &reply($job_id, $queue_id, $hash, $replyto = NULL) {
-    /* First make sure there's a matching queue event */
+    // First make sure there's a matching queue event.
 
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
 
@@ -117,8 +115,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *   HTML part of the body (ignored if $fullEmail provided).
    * @param string $fullEmail
    *   Whole email to forward in one string.
-   *
-   * @return void
    */
   public static function send($queue_id, &$mailing, &$bodyTxt, $replyto, &$bodyHTML = NULL, &$fullEmail = NULL) {
     $domain = CRM_Core_BAO_Domain::getDomain();
@@ -219,8 +215,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    *   The queue ID.
    * @param string $replyto
    *   Optional reply-to from the reply.
-   *
-   * @return void
    */
   private static function autoRespond(&$mailing, $queue_id, $replyto) {
     $config = CRM_Core_Config::singleton();
@@ -263,7 +257,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       'Return-Path' => "do-not-reply@$emailDomain",
     );
 
-    /* TODO: do we need reply tokens? */
+    // TODO: do we need reply tokens?
 
     $html = $component->body_html;
     if ($component->body_text) {
