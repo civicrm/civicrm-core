@@ -64,7 +64,7 @@
               ngModel.$setValidity('dateTimeInThePast', !($(this).val().length && submittedDate < currentDate));
               if ($(this).val().length && submittedDate < currentDate) {
                 crmUiAlert({
-                  text: ts('The Scheulded date and time is in the past'),
+                  text: ts('The scheduled date and time is in the past'),
                   title: ts('Error')
                 });
               }
