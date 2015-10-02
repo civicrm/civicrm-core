@@ -628,8 +628,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $params = $targetParams = $deliveredParams = array();
     $count = 0;
 
-     // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
-     // Solution is to skip checking for on hold
+    // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
+    // Solution is to skip checking for on hold
     $skipOnHold = TRUE;    //do include a statement to check wether e-mail address is on hold
     if ($mailing->sms_provider_id) {
       $skipOnHold = FALSE; //do not include a statement to check wether e-mail address is on hold
