@@ -140,7 +140,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
           || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
       ) {
-        if (is_null($params['creditnote_id']) || $params['creditnote_id'] == "null") {
+        if (empty($params['creditnote_id']) || $params['creditnote_id'] == "null") {
           $params['creditnote_id'] = self::createCreditNoteId();
         }
       }
@@ -409,7 +409,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
           || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
       ) {
-        if (is_null($params['creditnote_id']) || $params['creditnote_id'] == "null") {
+        if (empty($params['creditnote_id']) || $params['creditnote_id'] == "null") {
           $params['creditnote_id'] = self::createCreditNoteId();
         }
       }
@@ -3217,7 +3217,7 @@ WHERE  contribution_id = %1 ";
           || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))
       ) {
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
-        if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
+        if (empty($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
           $creditNoteId = self::createCreditNoteId();
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
         }
@@ -4408,10 +4408,7 @@ LIMIT 1;";
   public static function createCreditNoteId() {
     $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
 
-    $query = "select count(creditnote_id) as creditnote_number from civicrm_contribution";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $dao->fetch();
-    $creditNoteNum = $dao->creditnote_number;
+    $creditNoteNum = CRM_Core_DAO::singleValueQuery("SELECT count(creditnote_id) as creditnote_number FROM civicrm_contribution");
     $creditNoteId = NULL;
 
     do {
