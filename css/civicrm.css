@@ -2240,6 +2240,24 @@ a.crm-i:hover {
   color: #6177D5;
 }
 
+.crm-i-button>.crm-i {
+  padding-left: 2px;
+}
+
+.crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"] {
+  background: none repeat scroll 0 0 transparent !important;
+  color: #F5F6F1;
+}
+
+.crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"]:hover {
+
+}
+
+.crm-container .crm-button.crm-i-button input[type="button"],
+.crm-container .crm-button.crm-i-button input.crm-form-submit {
+  padding-left: 0;
+}
+
 .crm-container .inform-icon {
   background-position: -16px -144px;
   margin-right: 5px;
@@ -2264,10 +2282,6 @@ a.crm-i:hover {
 
 .crm-container a.helpicon:before {
   content: "\f059";
-}
-
-.crm-container div.crm-accordion-header a.helpicon {
-  color: #2786C2;
 }
 
 /* These .crm-icon classes use item_sprites.png */
