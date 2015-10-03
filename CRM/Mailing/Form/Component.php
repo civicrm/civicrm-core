@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Location Type
- *
+ * This class generates form components for Location Type.
  */
 class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
@@ -60,8 +57,6 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->applyFilter('__ALL__', 'trim');
@@ -109,9 +104,6 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -131,9 +123,6 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

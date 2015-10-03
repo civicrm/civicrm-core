@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'Mail.php';
@@ -84,8 +82,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    *
    * @param array $testParams
    * @param null $mode
-   *
-   * @return void
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
@@ -198,7 +194,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
       // Mark the child complete
       if ($isComplete) {
-        /* Finish the job */
+        // Finish the job.
 
         $transaction = new CRM_Core_Transaction();
 
@@ -223,8 +219,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   }
 
   /**
-   * post process to determine if the parent job.
-   * as well as the mailing is complete after the run
+   * Post process to determine if the parent job
+   * as well as the mailing is complete after the run.
    * @param null $mode
    */
   public static function runJobs_post($mode = NULL) {
@@ -478,8 +474,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
    *   A Mail object to send the messages.
    *
    * @param array $testParams
-   *
-   * @return void
    */
   public function deliver(&$mailer, $testParams = NULL) {
     $mailing = new CRM_Mailing_BAO_Mailing();
@@ -566,7 +560,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
     // CRM-12376
     // This handles the edge case scenario where all the mails
-    // have been delivered in prior jobs
+    // have been delivered in prior jobs.
     $isDelivered = TRUE;
 
     // make sure that there's no more than $mailerBatchLimit mails processed in a run
@@ -634,11 +628,9 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $params = $targetParams = $deliveredParams = array();
     $count = 0;
 
-    /**
-     * CRM-15702: Sending bulk sms to contacts without e-mail address fails.
-     * Solution is to skip checking for on hold
-     */
-    $skipOnHold = TRUE; //do include a statement to check wether e-mail address is on hold
+    // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
+    // Solution is to skip checking for on hold
+    $skipOnHold = TRUE;    //do include a statement to check wether e-mail address is on hold
     if ($mailing->sms_provider_id) {
       $skipOnHold = FALSE; //do not include a statement to check wether e-mail address is on hold
     }
@@ -663,7 +655,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $details[0][$contactID] = array();
       }
 
-      /* Compose the mailing */
+      // Compose the mailing.
       $recipient = $replyToEmail = NULL;
       $replyValue = strcmp($mailing->replyto_email, $mailing->from_email);
       if ($replyValue) {
@@ -683,7 +675,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         continue;
       }
 
-      /* Send the mailing */
+      // Send the mailing.
 
       $body = &$message->get();
       $headers = &$message->headers();
@@ -740,7 +732,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           CRM_Utils_System::civiExit();
         }
 
-        /* Register the bounce event */
+        // Register the bounce event.
 
         $params = array(
           'event_queue_id' => $field['id'],
@@ -760,7 +752,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         CRM_Core_Error::debug_log_message($result->getMessage());
       }
       else {
-        /* Register the delivery event */
+        // Register the delivery event.
         $deliveredParams[] = $field['id'];
         $targetParams[] = $field['contact_id'];
 
