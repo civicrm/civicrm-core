@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 require_once 'Mail/mime.php';
 
@@ -42,54 +40,54 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   /**
    * An array that holds the complete templates
    * including any headers or footers that need to be prepended
-   * or appended to the body
+   * or appended to the body.
    */
   private $preparedTemplates = NULL;
 
   /**
    * An array that holds the complete templates
    * including any headers or footers that need to be prepended
-   * or appended to the body
+   * or appended to the body.
    */
   private $templates = NULL;
 
   /**
-   * An array that holds the tokens that are specifically found in our text and html bodies
+   * An array that holds the tokens that are specifically found in our text and html bodies.
    */
   private $tokens = NULL;
 
   /**
-   * An array that holds the tokens that are specifically found in our text and html bodies
+   * An array that holds the tokens that are specifically found in our text and html bodies.
    */
   private $flattenedTokens = NULL;
 
   /**
-   * The header associated with this mailing
+   * The header associated with this mailing.
    */
   private $header = NULL;
 
   /**
-   * The footer associated with this mailing
+   * The footer associated with this mailing.
    */
   private $footer = NULL;
 
   /**
-   * The HTML content of the message
+   * The HTML content of the message.
    */
   private $html = NULL;
 
   /**
-   * The text content of the message
+   * The text content of the message.
    */
   private $text = NULL;
 
   /**
-   * Cached BAO for the domain
+   * Cached BAO for the domain.
    */
   private $_domain = NULL;
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -105,14 +103,14 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    */
   public static function getRecipientsCount($job_id, $mailing_id = NULL) {
     // need this for backward compatibility, so we can get count for old mailings
-    // please do not use this function if possible
+    // please do not use this function if possible.
     $eq = self::getRecipients($job_id, $mailing_id);
     return $eq->N;
   }
 
   /**
    * note that $job_id is used only as a variable in the temp table construction
-   * and does not play a role in the queries generated
+   * and does not play a role in the queries generated.
    * @param int $job_id
    *   (misnomer) a nonce value used to name temporary tables.
    * @param int $mailing_id
@@ -192,15 +190,15 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $order_by = "ORDER BY $email.is_bulkmail";
     }
 
-    /* Create a temp table for contact exclusion */
+    // Create a temp table for contact exclusion.
     $mailingGroup->query(
       "CREATE TEMPORARY TABLE X_$job_id
             (contact_id int primary key)
             ENGINE=HEAP"
     );
 
-    /* Add all the members of groups excluded from this mailing to the temp
-     * table */
+    // Add all the members of groups excluded from this mailing to the temp
+    // table.
 
     $excludeSubGroup = "INSERT INTO        X_$job_id (contact_id)
                     SELECT  DISTINCT    $g2contact.contact_id
@@ -213,8 +211,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
                         AND             $mg.group_type = 'Exclude'";
     $mailingGroup->query($excludeSubGroup);
 
-    /* Add all unsubscribe members of base group from this mailing to the temp
-     * table */
+    // Add all unsubscribe members of base group from this mailing to the temp
+    // table.
 
     $unSubscribeBaseGroup = "INSERT INTO        X_$job_id (contact_id)
                     SELECT  DISTINCT    $g2contact.contact_id
@@ -227,8 +225,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
                         AND             $mg.group_type = 'Base'";
     $mailingGroup->query($unSubscribeBaseGroup);
 
-    /* Add all the (intended) recipients of an excluded prior mailing to
-     * the temp table */
+    // Add all the (intended) recipients of an excluded prior mailing to
+    // the temp table.
 
     $excludeSubMailing = "INSERT IGNORE INTO X_$job_id (contact_id)
                     SELECT  DISTINCT    $eq.contact_id
@@ -276,7 +274,7 @@ WHERE  c.group_id = {$groupDAO->id}
       $tempColumn = 'phone_id';
     }
 
-    /* Get all the group contacts we want to include */
+    // Get all the group contacts we want to include.
 
     $mailingGroup->query(
       "CREATE TEMPORARY TABLE I_$job_id
@@ -284,8 +282,8 @@ WHERE  c.group_id = {$groupDAO->id}
             ENGINE=HEAP"
     );
 
-    /* Get the group contacts, but only those which are not in the
-     * exclusion temp table */
+    // Get the group contacts, but only those which are not in the
+    // exclusion temp table.
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
 
@@ -347,7 +345,7 @@ WHERE  c.group_id = {$groupDAO->id}
     }
     $mailingGroup->query($query);
 
-    /* Query prior mailings */
+    // Query prior mailings.
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
                     SELECT DISTINCT     $email.id as email_id,
@@ -453,9 +451,7 @@ WHERE      gc.group_id = {$groupDAO->id}
       $mailingGroup->query($smartGroupInclude);
     }
 
-    /**
-     * Construct the filtered search queries
-     */
+    // Construct the filtered search queries.
     $query = "
 SELECT search_id, search_args, entity_id
 FROM   $mg
@@ -473,7 +469,7 @@ AND    $mg.mailing_id = {$mailing_id}
       $mailingGroup->query($query);
     }
 
-    /* Get the emails with only location override */
+    // Get the emails with only location override.
 
     $query = "REPLACE INTO       I_$job_id (email_id, contact_id)
                     SELECT DISTINCT     $email.id as local_email_id,
@@ -567,7 +563,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
       }
     }
 
-    /* Delete the temp table */
+    // Delete the temp table.
 
     $mailingGroup->reset();
     $mailingGroup->query("DROP TEMPORARY TABLE X_$job_id");

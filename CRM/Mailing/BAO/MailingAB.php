@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -117,8 +115,6 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    *
    * @param int $id
    *   Id of the mail to delete.
-   *
-   * @return void
    */
   public static function del($id) {
     if (empty($id)) {

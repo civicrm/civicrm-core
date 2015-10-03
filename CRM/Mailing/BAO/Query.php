@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_BAO_Query {
 
@@ -55,8 +53,6 @@ class CRM_Mailing_BAO_Query {
    * If mailings are involved, add the specific Mailing fields
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     // if Mailing mode add mailing id
@@ -399,7 +395,6 @@ class CRM_Mailing_BAO_Query {
    *
    *
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function buildSearchForm(&$form) {
     // mailing selectors
@@ -468,8 +463,6 @@ class CRM_Mailing_BAO_Query {
    * @param $fieldTitle
    *
    * @param $valueTitles
-   *
-   * @return void
    */
   public static function mailingEventQueryBuilder(&$query, &$values, $tableName, $fieldName, $fieldTitle, &$valueTitles) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
