@@ -568,6 +568,7 @@ ORDER BY parent_id, weight";
     }
 
     if ($makeLink) {
+      $url = CRM_Utils_System::evalUrl($url);
       if ($target) {
         $name = "<a href=\"{$url}\" target=\"{$target}\">{$name}</a>";
       }
