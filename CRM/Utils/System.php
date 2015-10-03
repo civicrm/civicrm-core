@@ -1797,11 +1797,20 @@ class CRM_Utils_System {
   }
 
   /**
+   * Returns the unique identifier for this site, as used by community messages.
+   *
+   * SiteID will be generated if it is not already stored in the settings table.
+   *
    * @return string
    */
   public static function getSiteID() {
-    $config = CRM_Core_Config::singleton();
-    return md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL);
+    $sid = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'site_id');
+    if (!$sid) {
+      $config = CRM_Core_Config::singleton();
+      $sid = md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL);
+      civicrm_api3('Setting', 'create', array('domain_id' => 'all', 'site_id' => $sid));
+    }
+    return $sid;
   }
 
   /**
