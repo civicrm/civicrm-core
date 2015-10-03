@@ -608,7 +608,7 @@ if (!CRM.vars) CRM.vars = {};
         $clearLink = $();
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><span class="icon ui-icon-close"></span></a>')
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><i class="crm-i fa-times"></i></a>')
           .insertAfter($dataField);
       }
       if (settings.time !== false) {
@@ -920,7 +920,7 @@ if (!CRM.vars) CRM.vars = {};
       }
       // Add resize button
       if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
-        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
+        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'fa-expand'}, text: false}));
         $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
           if ($el.data('origSize')) {
             $el.dialog('option', $el.data('origSize'));
@@ -1149,7 +1149,7 @@ if (!CRM.vars) CRM.vars = {};
         buttons.push({
           text: label,
           'data-op': op,
-          icons: {primary: op === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
+          icons: {primary: op === 'no' ? 'fa-times' : 'fa-check'},
           click: function() {
             var event = $.Event('crmConfirm:' + op);
             $(this).trigger(event);
