@@ -354,7 +354,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     $form->addFormRule(array('CRM_Contact_Form_Task_EmailCommon', 'formRule'), $form);
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js', 0, 'html-header');
+    Civi::resources()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js', 0, 'html-header');
   }
 
   /**

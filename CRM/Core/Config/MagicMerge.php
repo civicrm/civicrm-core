@@ -262,7 +262,7 @@ class CRM_Core_Config_MagicMerge {
         if (!isset($this->map[$k][1], $this->map[$k][2])) {
           throw new \CRM_Core_Exception("Cannot find getter for property CRM_Core_Config::\${$k}");
         }
-        return \Civi\Core\Resolver::singleton()->call(array($this->map[$k][1], $this->map[$k][2]), array($k));
+        return \Civi::call(array($this->map[$k][1], $this->map[$k][2]), array($k));
 
       default:
         throw new \CRM_Core_Exception("Cannot read property CRM_Core_Config::\${$k} ($type)");
@@ -330,7 +330,7 @@ class CRM_Core_Config_MagicMerge {
         if (!isset($this->map[$k][1], $this->map[$k][4])) {
           throw new \CRM_Core_Exception("Cannot find unsetter for property CRM_Core_Config::\${$k}");
         }
-        \Civi\Core\Resolver::singleton()->call(array($this->map[$k][1], $this->map[$k][4]), array($k));
+        \Civi::call(array($this->map[$k][1], $this->map[$k][4]), array($k));
         return;
 
       default:

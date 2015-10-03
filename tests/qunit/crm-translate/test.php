@@ -1,5 +1,5 @@
 <?php
-CRM_Core_Resources::singleton()->addSetting(array(
+Civi::resources()->addSetting(array(
     'strings' => array(
       'One, two, three' => 'Un, deux, trois',
       'I know' => 'Je sais',
@@ -9,6 +9,6 @@ CRM_Core_Resources::singleton()->addSetting(array(
     ),
   )
 );
-// CRM_Core_Resources::singleton()->addScriptFile(...);
-// CRM_Core_Resources::singleton()->addStyleFile(...);
-// CRM_Core_Resources::singleton()->addSetting(...);
+// Civi::resources()->addScriptFile(...);
+// Civi::resources()->addStyleFile(...);
+// Civi::resources()->addSetting(...);

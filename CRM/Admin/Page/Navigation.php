@@ -104,7 +104,7 @@ class CRM_Admin_Page_Navigation extends CRM_Core_Page_Basic {
     $this->assign('homeMenuId', $homeMenuId);
 
     // Add jstree support
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
       ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
   }

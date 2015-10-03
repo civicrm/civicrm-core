@@ -67,7 +67,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       'partials' => array('ang/crmCaseType'),
     );
 
-    CRM_Core_Resources::singleton()->addSetting(array(
+    Civi::resources()->addSetting(array(
       'crmCaseType' => array(
         'REL_TYPE_CNAME' => CRM_Case_XMLProcessor::REL_TYPE_CNAME,
       ),

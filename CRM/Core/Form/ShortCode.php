@@ -171,8 +171,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
    * Build form elements based on the above metadata.
    */
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'js/crm.insert-shortcode.js');
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.insert-shortcode.js');
 
     $components = CRM_Utils_Array::collect('label', $this->components);
     $data = CRM_Utils_Array::collect('select', $this->components);

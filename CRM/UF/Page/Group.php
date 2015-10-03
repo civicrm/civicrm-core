@@ -263,7 +263,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     }
 
     // add header files
-    CRM_Core_Resources::singleton()->addCoreResources('html-header');
+    Civi::resources()->addCoreResources('html-header');
     $profile = CRM_Core_Region::instance('html-header')->render('', FALSE) . $profile;
 
     $this->assign('profile', htmlentities($profile, ENT_NOQUOTES, 'UTF-8'));

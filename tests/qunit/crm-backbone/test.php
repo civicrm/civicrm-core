@@ -1,5 +1,5 @@
 <?php
-CRM_Core_Resources::singleton()
+Civi::resources()
   ->addScriptFile('civicrm', 'packages/backbone/json2.js', 100, 'html-header', FALSE)
   ->addScriptFile('civicrm', 'packages/backbone/backbone.js', 120, 'html-header')
   ->addScriptFile('civicrm', 'packages/backbone/backbone.modelbinder.js', 125, 'html-header', FALSE)

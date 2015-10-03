@@ -105,7 +105,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     $loadJsTree = CRM_Utils_Array::retrieveValueRecursive($tree, 'children');
     $this->assign('loadjsTree', FALSE);
     if (!empty($loadJsTree)) {
-      CRM_Core_Resources::singleton()
+      Civi::resources()
         ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
         ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
       $this->assign('loadjsTree', TRUE);

@@ -42,7 +42,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
    * @return string
    */
   public function run() {
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/Admin/Page/APIExplorer.js')
       ->addScriptFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.js', 99)
       ->addStyleFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.css', 99);

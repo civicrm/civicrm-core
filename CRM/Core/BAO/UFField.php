@@ -834,7 +834,7 @@ SELECT  id
     }
 
     $potentiallyMissingRequiredFields = array_diff($requiredBillingFields, $requiredProfileFields);
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addSetting(array('billing' => array('billingProfileIsHideable' => empty($potentiallyMissingRequiredFields))));
   }
 

@@ -215,7 +215,7 @@ class Container {
    * @return \Civi\Angular\Manager
    */
   public function createAngularManager() {
-    return new \Civi\Angular\Manager(\CRM_Core_Resources::singleton());
+    return new \Civi\Angular\Manager(\Civi::resources());
   }
 
   /**

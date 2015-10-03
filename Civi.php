@@ -101,7 +101,28 @@ class Civi {
    * @return CRM_Core_Resources
    */
   public static function resources() {
-    return CRM_Core_Resources::singleton();
+    return Civi::resources();
+  }
+
+  /**
+   * Invoke a callback function.
+   *
+   * This is like call_user_func_array(), but it accepts a few more
+   * notations for the callback -- e.g. "SomeClass::someFunc" or
+   * "api3://SomeEntity/Someaction?some_field=@1".
+   *
+   * @param string|callable $id
+   *   A function-name, a callable array, a callable object, or any
+   *   other notation supported by Resolver.
+   * @param array $args
+   *   Ordered list of function arguments.
+   * @return mixed
+   *   The result from the callback.
+   * @see call_user_func_array
+   * @see \Civi\Core\Resolver
+   */
+  public static function call($id, $args = array()) {
+    return \Civi\Core\Resolver::singleton()->call($id, $args);
   }
 
   /**

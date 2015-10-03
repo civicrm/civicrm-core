@@ -375,7 +375,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
                 CRM_Core_Action::UPDATE,
               )))
         ) {
-          CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
+          Civi::resources()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multirecord listing page
           $multiRecordFieldListing = TRUE;
           $page = new CRM_Profile_Page_MultipleRecordFieldsListing();

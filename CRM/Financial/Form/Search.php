@@ -55,7 +55,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jquery.redirect.min.js', 0, 'html-header');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
     $attributes['total']['class'] = $attributes['item_count']['class'] = 'number';

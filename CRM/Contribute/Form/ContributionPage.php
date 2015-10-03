@@ -243,7 +243,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       }
     }
     // set value in DOM that membership price set exists
-    CRM_Core_Resources::singleton()->addSetting(array('memberPriceset' => $hasMembershipBlk));
+    Civi::resources()->addSetting(array('memberPriceset' => $hasMembershipBlk));
   }
 
   /**

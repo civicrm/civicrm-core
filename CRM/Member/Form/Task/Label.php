@@ -47,7 +47,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
   public function preProcess() {
     parent::preProcess();
     $this->setContactIDs();
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Member/Form/Task/Label.js');
+    Civi::resources()->addScriptFile('civicrm', 'templates/CRM/Member/Form/Task/Label.js');
   }
 
   /**

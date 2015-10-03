@@ -346,7 +346,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       // jsTree is needed for tags popup
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
       ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');

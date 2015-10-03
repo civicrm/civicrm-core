@@ -47,7 +47,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       $form->set('tabHeader', $tabs);
     }
     $form->assign_by_ref('tabHeader', $tabs);
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
         'tabSettings' => array(

@@ -48,7 +48,7 @@
  * @throws Exception
  */
 function smarty_function_crmScript($params, &$smarty) {
-  $res = CRM_Core_Resources::singleton();
+  $res = Civi::resources();
 
   if (empty($params['weight'])) {
     $params['weight'] = CRM_Core_Resources::DEFAULT_WEIGHT;

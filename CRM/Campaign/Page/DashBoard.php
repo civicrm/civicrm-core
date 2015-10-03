@@ -472,7 +472,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       //build the tabs.
       $this->buildTabs();
     }
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
         'tabSettings' => array(

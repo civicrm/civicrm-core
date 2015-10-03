@@ -47,7 +47,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     }
 
     $config = CRM_Core_Config::singleton();
-    $resources = CRM_Core_Resources::singleton();
+    $resources = Civi::resources();
     $resources->addSetting(
       array(
         'kcfinderPath' => $config->userFrameworkResourceURL . 'packages' . DIRECTORY_SEPARATOR,

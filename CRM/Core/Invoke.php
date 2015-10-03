@@ -385,7 +385,7 @@ class CRM_Core_Invoke {
 
     Civi::service('settings_manager')->flush();
     // Clear js caches
-    CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
+    Civi::resources()->flushStrings()->resetCacheCode();
     CRM_Case_XMLRepository::singleton(TRUE);
 
     // also rebuild triggers if requested explicitly

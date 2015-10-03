@@ -1939,14 +1939,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // from that page
       // we don't really need to set it when $tempID is set because the params have that stored
       $this->set('cid', 0);
-      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
+      Civi::resources()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return (int) $tempID;
     }
 
     $userID = $this->getLoggedInUserContactID();
 
     if (!is_null($tempID) && $tempID === $userID) {
-      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
+      Civi::resources()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return (int) $userID;
     }
 
@@ -1956,18 +1956,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       //check for anonymous user.
       $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
       if ($validUser) {
-        CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
-        CRM_Core_Resources::singleton()->addVars('coreForm', array('checksum' => (int) $tempID));
+        Civi::resources()->addVars('coreForm', array('contact_id' => (int) $tempID));
+        Civi::resources()->addVars('coreForm', array('checksum' => (int) $tempID));
         return $tempID;
       }
     }
     // check if user has permission, CRM-12062
     elseif ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
-      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
+      Civi::resources()->addVars('coreForm', array('contact_id' => (int) $tempID));
       return $tempID;
     }
     if (is_numeric($userID)) {
-      CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $userID));
+      Civi::resources()->addVars('coreForm', array('contact_id' => (int) $userID));
     }
     return is_numeric($userID) ? $userID : NULL;
   }
@@ -2023,7 +2023,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           'api' => $autoCompleteField['api'],
         ));
 
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
+      Civi::resources()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
         ->addSetting(array(
           'form' => array('autocompletes' => $autoCompleteField),
           'ids' => array('profile' => $profiles),

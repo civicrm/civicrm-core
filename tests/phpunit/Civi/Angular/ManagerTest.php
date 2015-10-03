@@ -51,7 +51,7 @@ class ManagerTest extends \CiviUnitTestCase {
     $this->useTransaction(TRUE);
     parent::setUp();
     $this->createLoggedInUser();
-    $this->res = \CRM_Core_Resources::singleton();
+    $this->res = \Civi::resources();
     $this->angular = new Manager($this->res);
   }
 

@@ -100,7 +100,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       // get the profile id associted with this batch type
       $this->_profileId = CRM_Batch_BAO_Batch::getProfileId($this->_batchInfo['type_id']);
     }
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js', 1, 'html-header')
       ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])))
       ->addSetting(array('setting' => array('monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator)))
@@ -240,7 +240,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
 
     $this->assign('fields', $this->_fields);
-    CRM_Core_Resources::singleton()
+    Civi::resources()
       ->addSetting(array(
         'contact' => array(
           'return' => implode(',', $contactReturnProperties),
