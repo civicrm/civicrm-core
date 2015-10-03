@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -49,7 +47,6 @@ class CRM_Utils_Date {
    *
    * @return string
    *   formatted string for date
-   *
    */
   public static function format($date, $separator = '', $invalidDate = 0) {
     if (is_numeric($date) &&
@@ -679,7 +676,7 @@ class CRM_Utils_Date {
     if ($params[$dateParam]) {
       $params[$dateParam] = "$year$month$day";
     }
-    //if month is invalid return as error
+    // if month is invalid return as error
     if ($month !== '00' && $month <= 12) {
       return TRUE;
     }
@@ -1292,7 +1289,7 @@ class CRM_Utils_Date {
             $subtractYear = 0;
             $quarter = ceil($now['mon'] / 3);
             $quarter = $quarter - $difference;
-            //CRM-14550 QA Fix
+            // CRM-14550 QA Fix
             if ($quarter > 4) {
               $now['year'] = $now['year'] + 1;
               $quarter = 1;
@@ -1379,7 +1376,7 @@ class CRM_Utils_Date {
             break;
 
           case 'earlier':
-            //before end of past month
+            // before end of past month
             if ($now['mon'] == 1) {
               $to['M'] = 12;
               $to['Y'] = $now['year'] - 1;
@@ -1401,7 +1398,7 @@ class CRM_Utils_Date {
             break;
 
           case 'greater_previous':
-            //from end of past month
+            // from end of past month
             if ($now['mon'] == 1) {
               $from['M'] = 12;
               $from['Y'] = $now['year'] - 1;
@@ -1447,7 +1444,7 @@ class CRM_Utils_Date {
             break;
 
           case 'less':
-            //CRM-14550 QA Fix
+            // CRM-14550 QA Fix
             $to['Y'] = $now['year'];
             $to['M'] = $now['mon'];
             $to['d'] = date('t', mktime(0, 0, 0, $now['mon'], 1, $now['year']));
@@ -1581,7 +1578,7 @@ class CRM_Utils_Date {
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
-            //CRM-14550 QA Fix
+            // CRM-14550 QA Fix
             $to = self::intervalAdd('day', -1 * ($diffDay) + 6, $to);
             unset($from);
             break;
@@ -1700,7 +1697,7 @@ class CRM_Utils_Date {
     $date = date("Y-m-d");
     $currentYear = date("Y");
 
-    //recalculate the date because month 4::04 make the difference
+    // recalculate the date because month 4::04 make the difference
     $fiscalYear = explode('-', date("Y-m-d", mktime(0, 0, 0, $fyMonth, $fyDate, $currentYear)));
     $fyDate = $fiscalYear[2];
     $fyMonth = $fiscalYear[1];
@@ -1716,7 +1713,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   *  Function to process date, convert to mysql format
+   * Function to process date, convert to mysql format
    *
    * @param string $date
    *   Date string.
@@ -1745,7 +1742,7 @@ class CRM_Utils_Date {
   }
 
   /**
-   *  Function to convert mysql to date plugin format.
+   * Function to convert mysql to date plugin format.
    *
    * @param string $mysqlDate
    *   Date string.
@@ -1870,10 +1867,10 @@ class CRM_Utils_Date {
       return $formattedDate;
     }
 
-    //1. first convert date to default format.
-    //2. append time to default formatted date (might be removed during format)
-    //3. validate date / date time.
-    //4. If date and time then convert to default date time format.
+    // 1. first convert date to default format.
+    // 2. append time to default formatted date (might be removed during format)
+    // 3. validate date / date time.
+    // 4. If date and time then convert to default date time format.
 
     $dateKey = 'date';
     $dateParams = array($dateKey => $date);
@@ -1895,10 +1892,10 @@ class CRM_Utils_Date {
       $valid = CRM_Utils_Rule::$ruleName($dateVal);
 
       if ($valid) {
-        //format date and time to default.
+        // format date and time to default.
         if ($ruleName == 'dateTime') {
           $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", "", $dateVal), '%Y%m%d%H%i');
-          //hack to add seconds
+          // hack to add seconds
           $dateVal .= '00';
         }
         $formattedDate = $dateVal;

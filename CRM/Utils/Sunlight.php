@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_Sunlight {
   static $_apiURL = 'http://api.sunlightlabs.com/';

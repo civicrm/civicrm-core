@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 
 /**
@@ -104,8 +102,6 @@ class CRM_Utils_File {
    *   The path name.
    * @param bool $abort
    *   Should we abort or just return an invalid code.
-   *
-   * @return void
    */
   public static function createDir($path, $abort = TRUE) {
     if (is_dir($path) || empty($path)) {
@@ -137,7 +133,6 @@ class CRM_Utils_File {
    * @param bool $verbose
    *
    * @throws Exception
-   * @return void
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
     static $exceptions = array('.', '..');
@@ -276,7 +271,8 @@ class CRM_Utils_File {
    */
   public static function addTrailingSlash($path, $slash = NULL) {
     if (!$slash) {
-      // FIXME: Defaulting to backslash on windows systems can produce unexpected results, esp for URL strings which should always use forward-slashes.
+      // FIXME: Defaulting to backslash on windows systems can produce 
+      // unexpected results, esp for URL strings which should always use forward-slashes.
       // I think this fn should default to forward-slash instead.
       $slash = DIRECTORY_SEPARATOR;
     }
@@ -312,7 +308,7 @@ class CRM_Utils_File {
       $string = $prefix . $fileName;
     }
 
-    //get rid of comments starting with # and --
+    // get rid of comments starting with # and --
 
     $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
     $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
@@ -345,7 +341,7 @@ class CRM_Utils_File {
     if (!$extensions) {
       $extensions = CRM_Core_OptionGroup::values('safe_file_extension', TRUE);
 
-      //make extensions to lowercase
+      // make extensions to lowercase
       $extensions = array_change_key_case($extensions, CASE_LOWER);
       // allow html/htm extension ONLY if the user is admin
       // and/or has access CiviMail
@@ -360,7 +356,7 @@ class CRM_Utils_File {
         unset($extensions['htm']);
       }
     }
-    //support lower and uppercase file extensions
+    // support lower and uppercase file extensions
     return isset($extensions[strtolower($ext)]) ? TRUE : FALSE;
   }
 
@@ -616,7 +612,7 @@ HTACCESS;
   /**
    * Create a path to a temporary file which can endure for multiple requests.
    *
-   * TODO: Automatic file cleanup using, eg, TTL policy
+   * @todo Automatic file cleanup using, eg, TTL policy
    *
    * @param string $prefix
    *
@@ -624,9 +620,9 @@ HTACCESS;
    * @see tempnam
    */
   public static function tempnam($prefix = 'tmp-') {
-    //$config = CRM_Core_Config::singleton();
-    //$nonce = md5(uniqid() . $config->dsn . $config->userFrameworkResourceURL);
-    //$fileName = "{$config->configAndLogDir}" . $prefix . $nonce . $suffix;
+    // $config = CRM_Core_Config::singleton();
+    // $nonce = md5(uniqid() . $config->dsn . $config->userFrameworkResourceURL);
+    // $fileName = "{$config->configAndLogDir}" . $prefix . $nonce . $suffix;
     $fileName = tempnam(sys_get_temp_dir(), $prefix);
     return $fileName;
   }
@@ -634,7 +630,7 @@ HTACCESS;
   /**
    * Create a path to a temporary directory which can endure for multiple requests.
    *
-   * TODO: Automatic file cleanup using, eg, TTL policy
+   * @todo Automatic file cleanup using, eg, TTL policy
    *
    * @param string $prefix
    *
@@ -741,7 +737,7 @@ HTACCESS;
       }
     }
 
-    // return rename($fromDir, $toDir); // CRM-11987, https://bugs.php.net/bug.php?id=54097
+    // return rename($fromDir, $toDir); CRM-11987, https://bugs.php.net/bug.php?id=54097
 
     CRM_Utils_File::copyDir($fromDir, $toDir);
     if (!CRM_Utils_File::cleanDir($fromDir, TRUE, FALSE)) {

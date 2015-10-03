@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_Utils_Check_Env {
 
@@ -281,7 +279,7 @@ class CRM_Utils_Check_Env {
       else {
         $vNum = $vc->localVersion;
         if ($newerVersion['status'] == 'lts') {
-          $vNum .= ' ' . ts('(long-term support)');  // LTS = long-term support version
+          $vNum .= ' ' . ts('(long-term support)');      // LTS = long-term support version
         }
 
         $severity = \Psr\Log\LogLevel::INFO;

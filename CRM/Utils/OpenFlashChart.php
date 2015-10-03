@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'packages/OpenFlashChart/php-ofc-library/open-flash-chart.php';
@@ -89,7 +87,7 @@ class CRM_Utils_OpenFlashChart {
     $xValues = array_keys($values[0]);
     $yValues = array_values($values[0]);
 
-    //set y axis parameters.
+    // set y axis parameters.
     $yMin = 0;
 
     // calculate max scale for graph.
@@ -148,7 +146,7 @@ class CRM_Utils_OpenFlashChart {
     $xAxis = new x_axis();
     $xAxis->set_labels($xLabels);
 
-    //create y axis and set range.
+    // create y axis and set range.
     $yAxis = new y_axis();
     $yAxis->set_range($yMin, $yMax, $ySteps);
 
@@ -215,7 +213,7 @@ class CRM_Utils_OpenFlashChart {
     }
     $graphTitle = !empty($params['legend']) ? $params['legend'] : ts('Pie Chart');
 
-    //get the currency.
+    // get the currency.
     $config = CRM_Core_Config::singleton();
     $symbol = $config->defaultCurrencySymbol;
 
@@ -240,7 +238,7 @@ class CRM_Utils_OpenFlashChart {
 
     $pie->set_values($values);
 
-    //create chart.
+    // create chart.
     $chart = new open_flash_chart();
 
     // create chart title obj.
@@ -328,7 +326,7 @@ class CRM_Utils_OpenFlashChart {
 
     $chartTitle = !empty($params['legend']) ? $params['legend'] : ts('Bar Chart');
 
-    //set y axis parameters.
+    // set y axis parameters.
     $yMin = 0;
 
     // calculate max scale for graph.
@@ -359,7 +357,7 @@ class CRM_Utils_OpenFlashChart {
     $xAxis = new x_axis();
     $xAxis->set_labels($xLabels);
 
-    //create y axis and set range.
+    // create y axis and set range.
     $yAxis = new y_axis();
     $yAxis->set_range($yMin, $yMax, $ySteps);
 
@@ -466,7 +464,7 @@ class CRM_Utils_OpenFlashChart {
       $chartData['tip'] = $rows['tip'];
     }
 
-    //legend
+    // legend
     $chartData['xname'] = CRM_Utils_Array::value('xname', $rows);
     $chartData['yname'] = CRM_Utils_Array::value('yname', $rows);
 
@@ -544,7 +542,7 @@ class CRM_Utils_OpenFlashChart {
         if ($chart == 'barChart') {
           $ySize = CRM_Utils_Array::value('ySize', $params, 250);
           $xSize = 60 * count($params['values']);
-          //hack to show tooltip.
+          // hack to show tooltip.
           if ($xSize < 200) {
             $xSize = (count($params['values']) > 1) ? 100 * count($params['values']) : 170;
           }

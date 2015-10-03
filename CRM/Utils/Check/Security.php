@@ -29,15 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_Utils_Check_Security {
 
   /**
    * CMS have a different pattern to their default file path and URL.
    *
-   * @TODO This function might be better shared in CRM_Utils_Check
+   * @todo This function might be better shared in CRM_Utils_Check
    * class, but that class doesn't yet exist.
    */
   public function getFilePathMarker() {
@@ -138,7 +136,7 @@ class CRM_Utils_Check_Security {
    *   Array of messages
    * @see CRM-14091
    *
-   * @TODO: Test with WordPress, Joomla.
+   * @todo Test with WordPress, Joomla.
    */
   public function checkUploadsAreNotAccessible() {
     $messages = array();
@@ -185,7 +183,7 @@ class CRM_Utils_Check_Security {
    *   Array of messages
    * @see CRM-14091
    *
-   * @TODO: Test with WordPress, Joomla.
+   * @todo Test with WordPress, Joomla.
    */
   public function checkDirectoriesAreNotBrowseable() {
     $messages = array();
@@ -233,15 +231,15 @@ class CRM_Utils_Check_Security {
     $messages = array();
     $files = array(
       array(
-        "{$civicrm_root}/packages/dompdf/dompdf.php", // CRM-16005, upgraded from Civi <= 4.5.6
+        "{$civicrm_root}/packages/dompdf/dompdf.php",                                   // CRM-16005, upgraded from Civi <= 4.5.6
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
-        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.5.7
+        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php",                     // CRM-16005, Civi >= 4.5.7
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(
-        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.6.0
+        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php",                              // CRM-16005, Civi >= 4.6.0
         \Psr\Log\LogLevel::CRITICAL,
       ),
       array(

@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_Mail {
 
@@ -218,7 +216,7 @@ class CRM_Utils_Mail {
       $headers['Auto-Submitted'] = "Auto-Generated";
     }
 
-    //make sure we has to have space, CRM-6977
+    // make sure we has to have space, CRM-6977
     foreach (array('From', 'To', 'Cc', 'Bcc', 'Reply-To', 'Return-Path') as $fld) {
       if (isset($headers[$fld])) {
         $headers[$fld] = str_replace('"<', '" <', $headers[$fld]);
@@ -265,8 +263,8 @@ class CRM_Utils_Mail {
     // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
     // be included in both $to and $headers['Cc', 'Bcc']
     if (get_class($mailer) != "Mail_mail") {
-      //get emails from headers, since these are
-      //combination of name and email addresses.
+      // get emails from headers, since these are
+      // combination of name and email addresses.
       if (!empty($headers['Cc'])) {
         $to[] = CRM_Utils_Array::value('Cc', $headers);
       }
@@ -471,6 +469,10 @@ class CRM_Utils_Mail {
    * and if so does the needful and return the formatted name
    *
    * This code has been copied and adapted from ezc/Mail/src/tools.php
+   *
+   * @param string $name
+   *
+   * @return string
    */
   public static function formatRFC2822Name($name) {
     $name = trim($name);
@@ -499,10 +501,10 @@ class CRM_Utils_Mail {
   public static function appendPDF($fileName, $html, $format = NULL) {
     $pdf_filename = CRM_Core_Config::singleton()->templateCompileDir . CRM_Utils_File::makeFileName($fileName);
 
-    //FIXME : CRM-7894
-    //xmlns attribute is required in XHTML but it is invalid in HTML,
-    //Also the namespace "xmlns=http://www.w3.org/1999/xhtml" is default,
-    //and will be added to the <html> tag even if you do not include it.
+    // FIXME : CRM-7894
+    // xmlns attribute is required in XHTML but it is invalid in HTML,
+    // Also the namespace "xmlns=http://www.w3.org/1999/xhtml" is default,
+    // and will be added to the <html> tag even if you do not include it.
     $html = preg_replace('/(<html)(.+?xmlns=["\'].[^\s]+["\'])(.+)?(>)/', '\1\3\4', $html);
 
     file_put_contents($pdf_filename, CRM_Utils_PDF_Utils::html2pdf($html,

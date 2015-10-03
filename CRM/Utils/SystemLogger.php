@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\LoggerInterface {
   /**
@@ -39,7 +37,6 @@ class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\
    * @param mixed $level
    * @param string $message
    * @param array $context
-   *
    */
   public function log($level, $message, array $context = array()) {
     if (!isset($context['hostname'])) {

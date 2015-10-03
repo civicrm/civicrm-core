@@ -50,7 +50,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 require_once 'api/Wrapper.php';
@@ -76,7 +75,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function fromApiInput($apiRequest) {
 
@@ -126,7 +125,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
           break;
 
         default:
-          // be forgiveful of sloppily api calls
+          // be forgiving of sloppy api calls
       }
     }
 
@@ -164,7 +163,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function toApiOutput($apiRequest, $result) {
     return $result;

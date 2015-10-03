@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_ReCAPTCHA {
 
@@ -63,9 +61,8 @@ class CRM_Utils_ReCAPTCHA {
     return self::$_singleton;
   }
 
-  /**
-   */
   public function __construct() {
+    // Empty function?
   }
 
   /**

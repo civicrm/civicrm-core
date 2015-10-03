@@ -26,6 +26,11 @@
  */
 
 /**
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * Utilities for manipulating/inspecting CRM_*_PseudoConstant classes.
  */
 class CRM_Utils_PseudoConstant {
@@ -40,7 +45,8 @@ class CRM_Utils_PseudoConstant {
   );
 
   /**
-   * @var array ($name => $className)
+   * @var array 
+   *   ($name => $className)
    */
   private static $constants = NULL;
 
