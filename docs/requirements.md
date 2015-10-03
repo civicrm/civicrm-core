@@ -25,8 +25,8 @@ steps (e.g.  [Setup Command Line
 PHP](http://wiki.civicrm.org/confluence/display/CRMDOC/Setup+Command-Line+PHP)
 for MAMP).
 
-If the command-line is misconfigured, the command `civi-download-tools`
-(below) will attempt to display an appropriate warning.
+In subsequent steps, the download script will attempt to identify
+misconfigurations and display an appropriate message.
 
 # Buildkit
 
@@ -39,7 +39,28 @@ already installed a few.  You could install all the tools individually --
 but that takes a lot of work.
 
 [civicrm-buildkit](https://github.com/civicrm/civicrm-buildkit) provides
-a script which downloads the full collection:
+a script which downloads the full collection.
+
+### - Option #1: Full Stack Ubuntu (Opinionated)
+
+If you have a new installation of Ubuntu 12.04 or 14.04, then you can download everything -- buildkit and the system
+requirements (`git`, `php`, `apache`, `mysql`, etc) -- with one command.  This command will install buildkit to `~/buildkit`:
+
+```bash
+curl -Ls https://civicrm.org/get-buildkit.sh | bash -s -- --full --dir ~/buildkit
+```
+
+Note:
+
+ * When executing the above command, you must ***NOT*** run as `root`. (Doing so will produce incorrect permissions.)
+   Instead, you must have `sudo` permissions.
+ * The `--full` option is opinionated; it specifically installs `php`, `apache`, and `mysql` (rather than `hvm`, `nginx`, `lighttpd`, or `percona`).
+   If you try to mix `--full` with alternative systems, then expect conflicts.
+
+
+### - Option #2: Other Systems
+
+If you already installed the requirements (`git`, `php`, etc), then you can download buildkit to `~/buildkit` with these commands:
 
 ```bash
 git clone https://github.com/civicrm/civicrm-buildkit.git buildkit
@@ -48,7 +69,9 @@ cd buildkit/bin
 export PATH="$PWD:$PATH"
 ```
 
-To update buildkit, you may wish to periodically run:
+### - Option #3: Upgrade
+
+If you have previously downloaded buildkit and want to update it, run:
 
 ```bash
 cd buildkit

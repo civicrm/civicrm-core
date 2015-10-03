@@ -1,10 +1,15 @@
 site_name: CiviCRM Development
 pages:
  - Introduction: index.md
- - Requirements: requirements.md
- - Develop: develop.md
- - Extend: extend.md
- - Test: test.md
- - Customize: customize.md
- - Reference: reference.md
+ - Setup:
+   - Requirements: requirements.md
+   - Git Install: build.md
+ - Tutorial:
+   - Customize: customize.md
+   - Extend: extend.md
+   - Develop: develop.md
+   - Test: test.md
+ - Reference:
+   - 'APIv3': api.md
+   - 'Hooks': hook.md
 theme: readthedocs
