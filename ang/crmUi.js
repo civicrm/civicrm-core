@@ -119,7 +119,7 @@
     })
 
     // Display a field/row in a field list
-    // example: <div crm-ui-field="{title: ts('My Field')}"> {{mydata}} </div>
+    // example: <div crm-ui-field="{title: ts('My Field'), class: 'my-field'}"> {{mydata}} </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name')}"> {{mydata}} </div>
@@ -134,7 +134,7 @@
         require: '^crmUiIdScope',
         restrict: 'EA',
         scope: {
-          // {title, name, help, helpFile}
+          // {title, name, help, helpFile, class}
           crmUiField: '='
         },
         templateUrl: function(tElement, tAttrs){
@@ -144,6 +144,7 @@
         transclude: true,
         link: function (scope, element, attrs, crmUiIdCtrl) {
           $(element).addClass('crm-section');
+          $(element).addClass(scope.crmUiField.class);
           scope.help = null;
           scope.$watch('crmUiField', function(crmUiField) {
             if (crmUiField && crmUiField.help) {
