@@ -33,8 +33,6 @@ define('DOMPDF_ENABLE_AUTOLOAD', FALSE);
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_PDF_Utils {
 

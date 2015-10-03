@@ -31,7 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 require_once 'api/Wrapper.php';
@@ -86,7 +85,7 @@ class CRM_Utils_API_NullOutputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   /**
    * @param $apiRequest

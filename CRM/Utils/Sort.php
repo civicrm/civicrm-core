@@ -27,12 +27,6 @@
 
 /**
  *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- */
-
-/**
- *
  * Base class to provide generic sort functionality.
  *
  * Note that some ideas have been borrowed from the drupal tablesort.inc code.
@@ -42,8 +36,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_Sort {
 
@@ -257,7 +249,6 @@ class CRM_Utils_Sort {
    *
    * @return int
    *   returns of the current sort id
-   * @acccess public
    */
   public function getCurrentSortID() {
     return $this->_currentSortID;
@@ -268,7 +259,6 @@ class CRM_Utils_Sort {
    *
    * @return int
    *   returns of the current sort direction
-   * @acccess public
    */
   public function getCurrentSortDirection() {
     return $this->_currentSortDirection;
@@ -295,7 +285,7 @@ class CRM_Utils_Sort {
         } // else: $a and $b are equal wrt to this attribute, try next...
       }
     }
-    // if we get here, $a and $b es equal for all we know
+    // if we get here, $a and $b are equal for all we know
     // however, as I understand we don't want equality here:
     return -1;
   }

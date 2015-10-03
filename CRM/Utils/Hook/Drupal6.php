@@ -29,8 +29,6 @@
  *
  * @package CiviCRM_Hook
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_Utils_Hook_Drupal6 extends CRM_Utils_Hook_DrupalBase {
 }

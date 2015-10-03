@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_Utils_Check {
-  const
-    // How often to run checks and notify admins about issues.
-    CHECK_TIMER = 86400;
+  // How often to run checks and notify admins about issues.
+  const CHECK_TIMER = 86400;    
 
   /**
    * We only need one instance of this object, so we use the
@@ -97,7 +94,7 @@ class CRM_Utils_Check {
             $statusMessage = '<ul><li>' . implode('</li><li>', $statusMessages) . '</li></ul>';
           }
 
-          // TODO: add link to status page
+          // @todo add link to status page
           CRM_Core_Session::setStatus($statusMessage, $statusTitle, $statusType);
         }
       }

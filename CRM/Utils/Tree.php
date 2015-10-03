@@ -69,12 +69,6 @@
  *      'name' - string
  *      'children' - array
  *      'data' - array
- *
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_Utils_Tree {
 

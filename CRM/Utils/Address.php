@@ -26,9 +26,10 @@
  */
 
 /**
- * Address utilties
+ * Address Utilities
  *
  * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 class CRM_Utils_Address {
 

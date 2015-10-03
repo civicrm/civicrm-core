@@ -26,6 +26,12 @@
  */
 
 /**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * Class CRM_Utils_Constant
  */
 class CRM_Utils_Constant {

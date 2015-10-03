@@ -39,7 +39,8 @@ class CRM_Utils_System {
   static $_callbacks = NULL;
 
   /**
-   * @var string Page title
+   * @var string
+   *   Page title
    */
   static $title = '';
 
@@ -114,7 +115,7 @@ class CRM_Utils_System {
           list($name, $value) = explode('=', $qs[$i]);
           if ($name != $urlVar) {
             $name = rawurldecode($name);
-            //check for arrays in parameters: site.php?foo[]=1&foo[]=2&foo[]=3
+            // check for arrays in parameters: site.php?foo[]=1&foo[]=2&foo[]=3
             if ((strpos($name, '[') !== FALSE) &&
               (strpos($name, ']') !== FALSE)
             ) {
@@ -347,7 +348,7 @@ class CRM_Utils_System {
    * Uses the referer if valid else uses the default.
    *
    * @param array $names
-   *   Refererer should match any str in this array.
+   *   Referrer should match any str in this array.
    * @param string $default
    *   (optional) The default userContext if no match found.
    */
@@ -798,7 +799,7 @@ class CRM_Utils_System {
     self::setHttpHeader('Content-Type', $mimeType);
     self::setHttpHeader('Expires', $now);
 
-    // lem9 & loic1: IE need specific headers
+    // lem9 & loic1: IE needs specific headers
     $isIE = strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE');
     if ($ext) {
       $fileString = "filename=\"{$name}.{$ext}\"";
@@ -862,7 +863,7 @@ class CRM_Utils_System {
     }
 
     // at some point we'll add code here to make sure the url is not
-    // something that will mess up up, so we need to clean it up here
+    // something that will mess up, so we need to clean it up here
     return $url;
   }
 
@@ -1110,8 +1111,6 @@ class CRM_Utils_System {
     return $headers;
   }
 
-  /**
-   */
   public static function getRequestHeaders() {
     if (function_exists('apache_request_headers')) {
       return apache_request_headers();
@@ -1134,8 +1133,6 @@ class CRM_Utils_System {
         strtolower($_SERVER['HTTPS']) != 'off') ? TRUE : FALSE;
   }
 
-  /**
-   */
   public static function redirectToSSL($abort = FALSE) {
     $config = CRM_Core_Config::singleton();
     $req_headers = self::getRequestHeaders();
@@ -1179,7 +1176,7 @@ class CRM_Utils_System {
 
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal && function_exists('ip_address')) {
-      //drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
+      // drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
       // that reach this point without bootstrapping hence the check that the fn exists
       $address = ip_address();
     }
@@ -1476,8 +1473,6 @@ class CRM_Utils_System {
     return $config->userSystem->getLoggedInUfID();
   }
 
-  /**
-   */
   public static function baseCMSURL() {
     static $_baseURL = NULL;
     if (!$_baseURL) {
@@ -1673,7 +1668,6 @@ class CRM_Utils_System {
     }
     return $file_list;
   }
-  // listIncludeFiles()
 
   /**
    * Get a list of all "plugins" (PHP classes that implement a piece of
@@ -1709,10 +1703,7 @@ class CRM_Utils_System {
     }
     return $plugins;
   }
-  // getPluginList()
 
-  /**
-   */
   public static function executeScheduledJobs() {
     $facility = new CRM_Core_JobManager();
     $facility->execute(FALSE);
