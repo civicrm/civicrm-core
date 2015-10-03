@@ -348,6 +348,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->add('select', 'financial_type_id', ts('Financial Type'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
     );
+
+    $this->add('text', 'num_terms', ts('Extend Membership by'), array('onchange' => "setPaymentBlock();"), TRUE);
+    $this->addRule('num_terms', ts('Please enter a whole number for how many periods to renew.'), 'integer');
+
     if (CRM_Core_Permission::access('CiviContribute') && !$this->_mode) {
       $this->addElement('checkbox', 'record_contribution', ts('Record Renewal Payment?'), NULL, array('onclick' => "checkPayment();"));
 
@@ -355,9 +359,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
 
       $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
-
-      $this->add('text', 'num_terms', ts('Extend Membership by'), array('onchange' => "setPaymentBlock();"), TRUE);
-      $this->addRule('num_terms', ts('Please enter a whole number for how many periods to renew.'), 'integer');
 
       $this->add('select', 'payment_instrument_id', ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),

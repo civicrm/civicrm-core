@@ -90,6 +90,20 @@
         <td class="label">{$form.renewal_date.label}</td>
         <td>{include file="CRM/common/jcalendar.tpl" elementName=renewal_date}</td>
       </tr>
+      <tr id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms">
+        <td colspan="2" class="description">
+          {ts}Renewal extends membership end date by one membership period{/ts}
+          &nbsp; <a id="changeTermsLink" href='#'
+                    onclick='changeNumTerms(); return false;'>{ts}change{/ts}</a>
+        </td>
+      </tr>
+      <tr id="changeNumTerms" class="crm-member-membershiprenew-form-block-change-num_terms">
+        <td class="label">{$form.num_terms.label}</td>
+        <td>{$form.num_terms.html|crmAddClass:two} {ts}membership periods{/ts}<br/>
+          <span
+            class="description">{ts}Extend the membership end date by this many membership periods. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
+        </td>
+      </tr>
       {if $accessContribution and ! $membershipMode}
         <tr class="crm-member-membershiprenew-form-block-record_contribution">
           <td class="label">{$form.record_contribution.label}</td>
@@ -102,21 +116,6 @@
           <td colspan="2">
             <fieldset>
               <legend>{ts}Renewal Payment and Receipt{/ts}</legend>
-              <table class="form-layout-compressed">
-                <tr id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms">
-                  <td colspan="2" class="description">
-                    {ts}Renewal extends membership end date by one membership period{/ts}
-                    &nbsp; <a id="changeTermsLink" href='#'
-                              onclick='changeNumTerms(); return false;'>{ts}change{/ts}</a>
-                  </td>
-                </tr>
-                <tr id="changeNumTerms" class="crm-member-membershiprenew-form-block-change-num_terms">
-                  <td class="label">{$form.num_terms.label}</td>
-                  <td>{$form.num_terms.html|crmAddClass:two} {ts}membership periods{/ts}<br/>
-                    <span
-                      class="description">{ts}Extend the membership end date by this many membership periods. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
-                  </td>
-                </tr>
       {/if}
       {include file="CRM/Member/Form/MembershipCommon.tpl"}
       {if $emailExists and $outBound_option != 2}
