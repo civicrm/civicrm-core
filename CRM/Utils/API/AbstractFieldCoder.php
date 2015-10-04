@@ -92,7 +92,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
   public abstract function decodeOutput(&$values);
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function fromApiInput($apiRequest) {
     $lowerAction = strtolower($apiRequest['action']);
@@ -117,7 +117,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
   }
 
   /**
-   * {@inheritDoc}
+   * @inheritDoc
    */
   public function toApiOutput($apiRequest, $result) {
     $lowerAction = strtolower($apiRequest['action']);
