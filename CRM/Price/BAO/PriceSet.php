@@ -880,7 +880,23 @@ WHERE  id = %1";
     if (is_array($lineItem)) {
       foreach ($lineItem as $values) {
         $totalParticipant += $values['participant_count'];
-        $amount_level[] = $values['label'] . ' - ' . (float) $values['qty'];
+        // This is a bit nasty. The logic of 'quick config' was because price set configuration was
+        // (and still is) too difficult to replace the 'quick config' price set configuration on the contribution
+        // page.
+        //
+        // However, because the quick config concept existed all sorts of logic was hung off it
+        // and function behaviour sometimes depends on whether 'price set' is set - although actually it
+        // is always set at the functional level. In this case we are dealing with the default 'quick config'
+        // price set having a label of 'Contribution Amount' which could wind up creating a 'funny looking' label.
+        // The correct answer is probably for it to have an empty label in the DB - the label is never shown so it is a
+        // place holder.
+        //
+        // But, in the interests of being careful when capacity is low - avoiding the known default value
+        // will get us by.
+        // Crucially a test has been added so a better solution can be implemented later with some comfort.
+        if ($values['label'] != ts('Contribution Amount')) {
+          $amount_level[] = $values['label'] . ' - ' . (float) $values['qty'];
+        }
       }
     }
 
@@ -888,7 +904,9 @@ WHERE  id = %1";
     if ($totalParticipant > 0) {
       $displayParticipantCount = ' Participant Count -' . $totalParticipant;
     }
-    $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    if (!empty($amount_level) && !empty($displayParticipantCount)) {
+      $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
     $params['amount'] = CRM_Utils_Money::format($totalPrice, NULL, NULL, TRUE);
     $params['tax_amount'] = $totalTax;
     if ($component) {
