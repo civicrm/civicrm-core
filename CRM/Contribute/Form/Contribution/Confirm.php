@@ -1020,6 +1020,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             }
           }
         }
+        // This could be set by a hook.
+        if (!empty($this->_params['installments'])) {
+          $membershipParams['installments'] = $this->_params['installments'];
+        }
         $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems, $isPayLater);
         if (!$this->_amount > 0.0 || !$membershipParams['amount']) {
           // we need to explicitly create a CMS user in case of free memberships
