@@ -104,28 +104,17 @@ function _civicrm_api3_system_check_spec(&$spec) {
  */
 function civicrm_api3_system_check($params) {
   // array(array('name'=> $, 'severity'=>$, ...))
+  $id = 1;
   $returnValues = array();
 
   // array(CRM_Utils_Check_Message)
   $messages = CRM_Utils_Check::singleton()->checkAll();
 
-  $showHushed = CRM_Utils_Array::value('show_hushed', $params);
-  if (!$showHushed) {
-    foreach ($messages as $key => $message) {
-      if ($message->isVisible()) {
-        $returnValues[] = $message->toArray();
-      }
-    }
-  }
-  else {
-    foreach ($messages as $msg) {
-      $returnValues[] = $msg->toArray();
-    }
+  foreach ($messages as $msg) {
+    $returnValues[] = $msg->toArray() + array('id' => $id++);
   }
 
-
-  // Spec: civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL)
-  return civicrm_api3_create_success($returnValues, $params, 'System', 'Check');
+  return _civicrm_api3_basic_array_get('systemCheck', $params, $returnValues, id, array('id', 'name', 'message', 'title', 'severity', 'isVisible'));
 }
 
 /**
