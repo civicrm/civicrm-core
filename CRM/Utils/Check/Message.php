@@ -142,7 +142,7 @@ class CRM_Utils_Check_Message {
       'message' => $this->message,
       'title' => $this->title,
       'severity' => $this->level,
-      'isVisible' => $this->isVisible,
+      'is_visible' => $this->isVisible,
     );
     if (!empty($this->help)) {
       $array['help'] = $this->help;
