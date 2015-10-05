@@ -788,6 +788,7 @@ class CRM_Contribute_BAO_Query {
       'contribution_soft_credit_type' => 1,
     );
     if ($isExportMode) {
+      $properties['contribution_soft_credit_contact_id'] = 1;
       $properties['contribution_soft_credit_contribution_id'] = 1;
     }
     return $properties;

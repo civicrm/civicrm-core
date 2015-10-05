@@ -744,6 +744,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'where' => 'civicrm_contribution_soft.contribution_id',
           'data_type' => CRM_Utils_Type::T_INT,
         ),
+        'contribution_soft_credit_contact_id' => array(
+          'name' => 'contribution_soft_credit_contact_id',
+          'title' => 'Soft Credit For Contact ID',
+          'where' => 'civicrm_contribution_soft.contact_id',
+          'data_type' => CRM_Utils_Type::T_INT,
+        ),
       );
 
       // CRM-16713 - contribution search by Premiums on 'Find Contribution' form.
