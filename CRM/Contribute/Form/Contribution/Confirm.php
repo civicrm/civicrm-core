@@ -2186,7 +2186,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param bool $isPayLater
    */
   protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $isPayLater) {
-
+    // This could be set by a hook.
+    if (!empty($this->_params['installments'])) {
+      $membershipParams['installments'] = $this->_params['installments'];
+    }
     // added new parameter for cms user contact id, needed to distinguish behaviour for on behalf of sign-ups
     if (isset($this->_params['related_contact'])) {
       $membershipParams['cms_contactID'] = $this->_params['related_contact'];
