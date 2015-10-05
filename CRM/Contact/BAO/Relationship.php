@@ -1230,8 +1230,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       while ($relationship->fetch()) {
         $rid = $relationship->civicrm_relationship_id;
         $cid = $relationship->civicrm_contact_id;
+
         if ($permissionedContact &&
-          (!CRM_Contact_BAO_Contact_Permission::relationship($cid, $contactId))
+          (!CRM_Contact_BAO_Contact_Permission::allow($cid))
         ) {
           continue;
         }
@@ -1955,13 +1956,12 @@ AND cc.sort_name LIKE '%$name%'";
     }
     $mask = CRM_Core_Action::mask($permissions);
 
+    $permissionedContacts = TRUE;
     if ($params['context'] != 'user') {
       $links = CRM_Contact_Page_View_Relationship::links();
-      $permissionedContacts = FALSE;
     }
     else {
       $links = CRM_Contact_Page_View_UserDashBoard::links();
-      $permissionedContacts = TRUE;
       $mask = NULL;
     }
     // get contact relationships
@@ -1977,12 +1977,13 @@ AND cc.sort_name LIKE '%$name%'";
     $params['total'] = 0;
     if (!empty($relationships)) {
       // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
-      $params['total'] = $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+      $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
         $relationshipStatus,
-        0, 1, 0,
+        0, 0, 0,
         NULL, NULL,
         $permissionedContacts
       );
+      $params['total'] = count($permissionedRelationships);
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
