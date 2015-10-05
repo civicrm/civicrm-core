@@ -312,7 +312,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
 
       if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
-        $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . $contribution->id;
+        if (is_null($contribution->creditnote_id)) {
+          $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
+          CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
+        }
+        else {
+          $creditNoteId = $contribution->creditnote_id;
+        }
       }
       $invoiceId = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $contribution->id;
 
@@ -544,9 +550,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
 
       CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'invoice_id', $invoiceId);
-      if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
-        CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
-      }
       $invoiceTemplate->clearTemplateVars();
     }
 
