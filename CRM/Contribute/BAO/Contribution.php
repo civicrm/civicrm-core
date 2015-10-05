@@ -135,6 +135,19 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
+    //if contribution is created with cancelled or refunded status, add credit note id
+    if (!empty($params['contribution_status_id'])) {
+      $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
+      if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
+          || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
+      ) {
+        if (empty($params['creditnote_id']) || $params['creditnote_id'] == "null") {
+          $params['creditnote_id'] = self::createCreditNoteId();
+        }
+      }
+    }
+
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
@@ -309,6 +322,19 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     foreach ($dateFields as $df) {
       if (isset($params[$df])) {
         $params[$df] = CRM_Utils_Date::isoToMysql($params[$df]);
+      }
+    }
+
+    //if contribution is created with cancelled or refunded status, add credit note id
+    if (!empty($params['contribution_status_id'])) {
+      $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+
+      if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
+          || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
+      ) {
+        if (empty($params['creditnote_id']) || $params['creditnote_id'] == "null") {
+          $params['creditnote_id'] = self::createCreditNoteId();
+        }
       }
     }
 
@@ -2995,6 +3021,10 @@ WHERE  contribution_id = %1 ";
           || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))
       ) {
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
+        if (empty($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
+          $creditNoteId = self::createCreditNoteId();
+          CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
+        }
       }
       elseif (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
           && $params['prevContribution']->is_pay_later) || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)
@@ -3006,6 +3036,10 @@ WHERE  contribution_id = %1 ";
         if ($params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)) {
           $params['trxnParams']['to_financial_account_id'] = $arAccountId;
           $params['trxnParams']['total_amount'] = -$params['total_amount'];
+          if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
+            $creditNoteId = self::createCreditNoteId();
+            CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
+          }
         }
         else {
           $params['trxnParams']['from_financial_account_id'] = $arAccountId;
@@ -3727,6 +3761,30 @@ WHERE con.id = {$contributionId}
     if ($result->N > 1) {
       $errors['financial_type_id'] = ts('One or more line items have a different financial type than the contribution. Editing the financial type is not yet supported in this situation.');
     }
+  }
+
+  /**
+   * Generate credit note id with next avaible number
+   *
+   * @return string
+   *   Credit Note Id.
+   */
+  public static function createCreditNoteId() {
+    $prefixValue = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
+
+    $creditNoteNum = CRM_Core_DAO::singleValueQuery("SELECT count(creditnote_id) as creditnote_number FROM civicrm_contribution");
+    $creditNoteId = NULL;
+
+    do {
+      $creditNoteNum++;
+      $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . $creditNoteNum;
+      $result = civicrm_api3('Contribution', 'getcount', array(
+        'sequential' => 1,
+        'creditnote_id' => $creditNoteId,
+      ));
+    } while ($result > 0);
+
+    return $creditNoteId;
   }
 
 }
