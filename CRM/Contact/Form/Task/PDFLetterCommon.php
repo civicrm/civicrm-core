@@ -173,15 +173,15 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     if ($form->get('action') != CRM_Core_Action::VIEW) {
       $buttons[] = array(
         'type' => 'submit',
-        'name' => $form->_single ? ts('Preview PDF') : ts('Preview PDFs'),
-        'subName' => 'preview',
-        'icon' => 'zoomin',
-        'isDefault' => FALSE,
+        'name' => $form->_single ? ts('Make PDF') : ts('Make PDFs'),
+        'isDefault' => TRUE,
       );
       $buttons[] = array(
         'type' => 'submit',
-        'name' => $form->_single ? ts('Make PDF') : ts('Make PDFs'),
-        'isDefault' => TRUE,
+        'name' => ts('Preview'),
+        'subName' => 'preview',
+        'icon' => 'search',
+        'isDefault' => FALSE,
       );
     }
     $buttons[] = array(
