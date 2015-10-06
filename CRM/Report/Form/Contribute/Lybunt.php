@@ -166,6 +166,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'grouping' => 'contact-field',
@@ -222,7 +225,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
@@ -426,6 +429,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->from();
     $this->where();
     $this->groupBy();
+
+    $this->getPermissionedFTQuery($this);
 
     $rows = $this->_contactIds = array();
     $this->limit();
