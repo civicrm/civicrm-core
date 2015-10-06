@@ -1163,7 +1163,7 @@ LIMIT 1;";
           $from = ' FROM ' . $tableName;
           $where = " WHERE {$tableName}.entity_id = {$sourceContributionId}";
           $query = $insert . $select . $from . $where;
-          $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          CRM_Core_DAO::executeQuery($query);
         }
       }
     }
