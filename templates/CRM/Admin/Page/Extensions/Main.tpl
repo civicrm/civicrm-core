@@ -46,6 +46,6 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 {else}
   <div class="messages status no-popup">
        <div class="icon inform-icon"></div>
-      {ts 1="http://civicrm.org/extensions"}There are no extensions to display. Click the "Add New" tab to browse and install extensions posted on the <a href="%1">public CiviCRM Extensions Directory</a>. If you have downloaded extensions manually and don't see them here, try clicking the "Refresh" button.{/ts}
+      {ts 1="https://civicrm.org/extensions"}There are no extensions to display. Click the "Add New" tab to browse and install extensions posted on the <a href="%1">public CiviCRM Extensions Directory</a>. If you have downloaded extensions manually and don't see them here, try clicking the "Refresh" button.{/ts}
   </div>
 {/if}
