@@ -30,7 +30,7 @@ UPDATE civicrm_navigation
 SET name = 'Support', label = '{ts escape="sql" skip="true"}Support{/ts}'
 WHERE id = @adminHelplastID;
 
-DELETE FROM civicrm_navigation where parent_id = @adminHelplastID;
+DELETE FROM civicrm_navigation where parent_id = @adminHelplastID AND (name = 'Developer' OR url LIKE "http://civicrm.org%");
 
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
