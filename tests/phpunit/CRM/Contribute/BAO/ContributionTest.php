@@ -465,4 +465,44 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     Contact::delete($contactId);
   }
 
+  /**
+   * Check credit note id creation
+   * when a contribution is cancelled or refunded
+   * createCreditNoteId();
+   */
+  public function testCreateCreditNoteId() {
+    $contactId = Contact::createIndividual();
+
+    $ids = array('contribution' => NULL);
+
+    $param = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 3,
+      'payment_instrument_id' => 1,
+      'source' => 'STUDENT',
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'id' => NULL,
+      'non_deductible_amount' => 0.00,
+      'total_amount' => 300.00,
+      'fee_amount' => 5,
+      'net_amount' => 295,
+      'trxn_id' => '76ereeswww835',
+      'invoice_id' => '93ed39a9e9hd621bs0eafe3da82',
+      'thankyou_date' => '20080522',
+    );
+
+    $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
+    $contribution = CRM_Contribute_BAO_Contribution::create($param, $ids);
+    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($creditNoteId, $contribution->creditnote_id, 'Check if credit note id is created correctly.');
+
+    // Delete Contribution
+    $this->contributionDelete($contribution->id);
+    // Delete Contact
+    Contact::delete($contactId);
+  }
+
 }
