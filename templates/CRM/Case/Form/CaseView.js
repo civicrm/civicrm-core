@@ -66,8 +66,36 @@
     },
     '#addCaseRoleDialog': {
       pre: function() {
-        $('[name=role_type]', this).val('').change();
-        $('[name=add_role_contact_id]', this).val('').crmEntityRef({create: true, api: {params: {contact_type: 'Individual'}}});
+        var $contactField = $('[name=add_role_contact_id]', this);
+        $('[name=role_type]', this)
+          .off('.miniform')
+          .on('change.miniform', function() {
+            var val = $(this).val();
+            $contactField.val('').change().prop('disabled', !val);
+            if (val) {
+              var
+                pieces = val.split('_'),
+                rType = pieces[0],
+                target = pieces[2], // b or a
+                contact_type = CRM.vars.relationshipTypes[rType]['contact_type_' + target],
+                contact_sub_type = CRM.vars.relationshipTypes[rType]['contact_sub_type_' + target],
+                api = {params: {}};
+              if (contact_type) {
+                api.params.contact_type = contact_type;
+              }
+              if (contact_sub_type) {
+                api.params.contact_sub_type = contact_sub_type;
+              }
+              $contactField
+                .data('api-params', api)
+                .data('user-filter', {})
+                .attr('placeholder', CRM.vars.relationshipTypes[rType]['placeholder_' + target])
+                .change();
+            }
+          })
+          .val('')
+          .change();
+        $contactField.val('').crmEntityRef({create: true, api: {params: {contact_type: 'Individual'}}});
       },
       post: function(data) {
         var contactID = $('[name=add_role_contact_id]', this).val(),

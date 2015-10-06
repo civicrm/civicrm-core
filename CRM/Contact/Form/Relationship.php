@@ -300,24 +300,14 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $relationshipList = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactId, $this->_rtype, $this->_relationshipId);
 
     // Metadata needed on clientside
-    $contactTypes = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
-    $jsData = array();
-    // Get just what we need to keep the dom small
-    $whatWeWant = array_flip(array('contact_type_a', 'contact_type_b', 'contact_sub_type_a', 'contact_sub_type_b'));
+    $this->assign('relationshipData', self::getRelationshipTypeMetadata($relationshipList));
+
     foreach ($this->_allRelationshipNames as $id => $vals) {
       if ($vals['name_a_b'] === 'Employee of') {
         $this->assign('employmentRelationship', $id);
-      }
-      if (isset($relationshipList["{$id}_a_b"]) || isset($relationshipList["{$id}_b_a"])) {
-        $jsData[$id] = array_filter(array_intersect_key($this->_allRelationshipNames[$id], $whatWeWant));
-        // Add user-friendly placeholder
-        foreach (array('a', 'b') as $x) {
-          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : CRM_Utils_Array::value("contact_type_$x", $jsData[$id]);
-          $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', array(strtolower($contactTypes[$type]['label']))) : ts('- select contact -');
-        }
+        break;
       }
     }
-    $this->assign('relationshipData', $jsData);
 
     $this->addField('relationship_type_id', array('options' => array('' => ts('- select -')) + $relationshipList, 'class' => 'huge', 'placeholder' => '- select -'), TRUE);
 
@@ -570,6 +560,34 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     if (!empty($outcome['saved'])) {
       CRM_Core_Session::setStatus(ts('Relationship record has been updated.'), ts('Saved'), 'success');
     }
+  }
+
+  /**
+   * @param $relationshipList
+   * @return array
+   */
+  public static function getRelationshipTypeMetadata($relationshipList) {
+    $contactTypes = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
+    $allRelationshipNames = CRM_Core_PseudoConstant::relationshipType('name');
+    $jsData = array();
+    // Get just what we need to keep the dom small
+    $whatWeWant = array_flip(array(
+      'contact_type_a',
+      'contact_type_b',
+      'contact_sub_type_a',
+      'contact_sub_type_b',
+    ));
+    foreach ($allRelationshipNames as $id => $vals) {
+      if (isset($relationshipList["{$id}_a_b"]) || isset($relationshipList["{$id}_b_a"])) {
+        $jsData[$id] = array_filter(array_intersect_key($allRelationshipNames[$id], $whatWeWant));
+        // Add user-friendly placeholder
+        foreach (array('a', 'b') as $x) {
+          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : CRM_Utils_Array::value("contact_type_$x", $jsData[$id]);
+          $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', array(strtolower($contactTypes[$type]['label']))) : ts('- select contact -');
+        }
+      }
+    }
+    return $jsData;
   }
 
 }
