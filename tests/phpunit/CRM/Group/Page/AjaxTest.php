@@ -60,10 +60,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * @param $permission
    */
   public function setPermissionAndRequest($permission) {
-    if (!is_array($permission)) {
-      $permission = array($permission);
-    }
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = $permission;
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = (array) $permission;
     CRM_Contact_BAO_Group::getPermissionClause(TRUE);
     global $_REQUEST;
     $_REQUEST = $this->_params;
@@ -74,10 +71,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    * @param $hook
    */
   public function setHookAndRequest($permission, $hook) {
-    if (!is_array($permission)) {
-      $permission = array($permission);
-    }
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = $permission;
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = (array) $permission;
     $this->hookClass->setHook('civicrm_aclGroup', array($this, $hook));
     CRM_Contact_BAO_Group::getPermissionClause(TRUE);
     global $_REQUEST;
