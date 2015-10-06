@@ -122,7 +122,6 @@ class WebTest_Mailing_AddMessageTemplateTest extends CiviSeleniumTestCase {
     $this->waitForTextPresent("~1 recipient");
     $this->click("msg_template_id");
     $this->select("msg_template_id", "label=$msgTitle");
-    
     $this->waitForAjaxContent();
     $this->select2('s2id_autogen1', "Unsubscribe via web page");
     $this->select2('s2id_autogen1', "Domain (organization) address");

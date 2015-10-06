@@ -113,6 +113,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
     );
     $this->_columns += $this->getAddressColumns();
     $this->_columns += array(
@@ -172,7 +175,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'name' => 'financial_type_id',
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
@@ -308,8 +311,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
                          AND {$this->_aliases['civicrm_email']}.is_primary = 1
              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                            {$this->_aliases['civicrm_phone']}.is_primary = 1
-  ";
+                            {$this->_aliases['civicrm_phone']}.is_primary = 1";
     $this->addAddressFromClause();
   }
 
@@ -380,6 +382,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->select();
 
     $this->from();
+    $this->getPermissionedFTQuery($this);
 
     $this->where();
 

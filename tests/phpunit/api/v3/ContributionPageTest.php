@@ -567,6 +567,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'label' => 'Long Haired Goat',
           'financial_type_id' => 'Donation',
           'amount' => 20,
+          'financial_type_id' => 'Donation',
         )
       );
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
@@ -575,6 +576,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'label' => 'Shoe-eating Goat',
           'financial_type_id' => 'Donation',
           'amount' => 10,
+          'financial_type_id' => 'Donation',
         )
       );
       $this->_ids['price_field_value'] = array($priceFieldValue['id']);
