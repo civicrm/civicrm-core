@@ -159,7 +159,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     ),
       CRM_Core_Action::ADD);
-    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
+    $this->assertEmpty($contribution['amount_level']);
   }
 
   /**
@@ -289,6 +290,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(.08, $contribution['fee_amount']);
     $this->assertEquals(49.92, $contribution['net_amount']);
     $this->assertEquals('tx', $contribution['trxn_id']);
+    $this->assertEmpty($contribution['amount_level']);
   }
 
   /**
