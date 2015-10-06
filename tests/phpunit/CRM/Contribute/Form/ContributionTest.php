@@ -292,6 +292,56 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test a fully deductible contribution submitted by credit card (CRM-16669).
+   */
+  public function testSubmitCreditCardFullyDeductible() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_mode = 'Live';
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'credit_card_number' => 4444333322221111,
+      'cvv2' => 123,
+      'credit_card_exp_date' => array(
+        'M' => 9,
+        'Y' => 2025,
+      ),
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Junko',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'Adams',
+      'billing_street_address-5' => '790L Lincoln St S',
+      'billing_city-5' => 'Maryknoll',
+      'billing_state_province_id-5' => 1031,
+      'billing_postal_code-5' => 10545,
+      'billing_country_id-5' => 1228,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'installments' => '',
+      'hidden_AdditionalDetail' => 1,
+      'hidden_Premium' => 1,
+      'from_email_address' => '"civi45" <civi45@civicrm.com>',
+      'receipt_date' => '',
+      'receipt_date_time' => '',
+      'payment_processor_id' => $this->paymentProcessorID,
+      'currency' => 'USD',
+      'source' => '',
+    ), CRM_Core_Action::ADD);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+      'contribution_status_id' => 'Completed',
+    ));
+    $this->assertEquals('50', $contribution['total_amount']);
+    $this->assertEquals(0, $contribution['non_deductible_amount']);
+  }
+
+  /**
    * Test the submit function with an invalid payment.
    *
    * We expect the contribution to be created but left pending. The payment has failed.
