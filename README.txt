@@ -15,7 +15,7 @@ README file for CiviCRM
 CiviCRM is a constituent relationship management system designed to
 meet the needs of advocacy, non-profit and non-governmental groups.
 It is an open source project, licensed under GNU AGPL 3, and
-coordinated by CiviCRM LLC. The project website is http://civicrm.org/
+coordinated by CiviCRM LLC. The project website is https://civicrm.org/
 
 CiviCRM is released as a module that runs within the Drupal, Joomla,
 and WordPress content management systems.
@@ -24,8 +24,10 @@ and WordPress content management systems.
 *************************
 2. Installation
 *************************
-Links to download the full CiviCRM package are on our website:
-http://civicrm.org/go/download
+The download URLs and installation instructions are available on our
+website:
+
+https://civicrm.org/download
 
 Installation instruction can be found on the wiki:
 http://wiki.civicrm.org/
@@ -35,7 +37,7 @@ http://wiki.civicrm.org/
 3. Documentation
 *************************
 Documentation, as well as the project bug tracker and mailing lists,
-can be found at http://civicrm.org/ Just click on the appropriate link.
+can be found at https://civicrm.org/ Just click on the appropriate link.
 
 Our main documentation site is the CiviCRM wiki:
 http://wiki.civicrm.org/
@@ -44,11 +46,11 @@ http://wiki.civicrm.org/
 *************************
 4. Support
 *************************
-The best place to get support is from the CiviCRM Stack Exchange site:
-http://civicrm.stackexchange.com/
+Answers for users, administrators & integrators:
+http://civicrm.stackexchange.com
 
-There is also a forum, for more in-depth discussions:
-http://forum.civicrm.org/
+Paid support available from
+https://civicrm.org/providers
 
 
 *************************
@@ -63,4 +65,4 @@ instructions are on the wiki:
 http://wiki.civicrm.org/confluence/display/CRMDOC/Github+for+CiviCRM
 
 Report all issues to CiviCRM via JIRA:
-http://issues.civicrm.org
+https://issues.civicrm.org
