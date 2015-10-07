@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * Cache is an empty base object, we'll modify the scheme when we have different caching schemes
- *
  */
 class CRM_Utils_Cache {
   /**

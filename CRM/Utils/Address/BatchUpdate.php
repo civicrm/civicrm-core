@@ -26,11 +26,16 @@
  */
 
 /**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * A PHP cron script to format all the addresses in the database. Currently
  * it only does geocoding if the geocode values are not set. At a later
  * stage we will also handle USPS address cleanup and other formatting
  * issues
- *
  */
 class CRM_Utils_Address_BatchUpdate {
 

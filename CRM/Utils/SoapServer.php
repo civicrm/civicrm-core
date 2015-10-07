@@ -95,7 +95,7 @@ class CRM_Utils_SoapServer {
       throw new SoapFault('Client', 'Expired key');
     }
 
-    /* otherwise, we're ok.  update the timestamp */
+    // otherwise, we're ok.  update the timestamp
 
     $session->set('soap_time', $t);
   }

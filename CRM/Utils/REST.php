@@ -30,7 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- *
  */
 class CRM_Utils_REST {
 
@@ -68,7 +67,7 @@ class CRM_Utils_REST {
   public static function ping($var = NULL) {
     $session = CRM_Core_Session::singleton();
     $key = $session->get('key');
-    //$session->set( 'key', $var );
+    // $session->set( 'key', $var );
     return self::simple(array('message' => "PONG: $key"));
   }
 
@@ -317,7 +316,7 @@ class CRM_Utils_REST {
     }
 
     // Everyone should be required to provide the server key, so the whole
-    //  interface can be disabled in more change to the configuration file.
+    // interface can be disabled in more change to the configuration file.
     // first check for civicrm site key
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
       $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
@@ -329,8 +328,7 @@ class CRM_Utils_REST {
     }
 
     // At this point we know we are not calling ping which does not require authentication.
-    // Therefore we now need a valid server key and API key
-
+    // Therefore we now need a valid server key and API key.
     // Check and see if a valid secret API key is provided.
     $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
     if (!$api_key || strtolower($api_key) == 'null') {
@@ -525,8 +523,9 @@ class CRM_Utils_REST {
 
   /**
    * This is a wrapper so you can call an api via json (it returns json too)
-   * http://example.org/civicrm/api/json?entity=Contact&action=Get"&json={"contact_type":"Individual","email.get.email":{}} to take all the emails from individuals
-   * works for POST & GET (POST recommended)
+   * http://example.org/civicrm/api/json?entity=Contact&action=Get"&json={"contact_type":"Individual","email.get.email":{}}
+   * to take all the emails from individuals.
+   * Works for POST & GET (POST recommended).
    */
   public static function ajaxJson() {
     $requestParams = CRM_Utils_Request::exportValues();
