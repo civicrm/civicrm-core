@@ -34,6 +34,8 @@
  */
 class CRM_Utils_Check_Env {
 
+  const MINIMUM_RECOMMENDED_PHP_VERSION = '5.5';
+
   /**
    * Run some sanity checks.
    *
@@ -41,6 +43,7 @@ class CRM_Utils_Check_Env {
    */
   public function checkAll() {
     $messages = array_merge(
+      $this->checkPhpVersion(),
       $this->checkMysqlTime(),
       $this->checkDebug(),
       $this->checkOutboundMail(),
@@ -53,6 +56,40 @@ class CRM_Utils_Check_Env {
       $this->checkDbVersion(),
       $this->checkDbEngine()
     );
+    return $messages;
+  }
+
+  /**
+   * @return array
+   */
+  public function checkPhpVersion() {
+    $messages = array();
+
+    if (version_compare(phpversion(), self::MINIMUM_RECOMMENDED_PHP_VERSION) < 0) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkPhpVersion',
+        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
+          array(
+            1 => phpversion(),
+            2 => self::MINIMUM_RECOMMENDED_PHP_VERSION,
+          )),
+        ts('PHP Out-of-Date'),
+        \Psr\Log\LogLevel::NOTICE
+      );
+    }
+    else {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkPhpVersion',
+        ts('This system uses PHP version %1 which meets or exceeds the minimum recommendation of %2.',
+          array(
+            1 => phpversion(),
+            2 => self::MINIMUM_RECOMMENDED_PHP_VERSION,
+          )),
+        ts('PHP Up-to-Date'),
+        \Psr\Log\LogLevel::INFO
+      );
+    }
+
     return $messages;
   }
 
