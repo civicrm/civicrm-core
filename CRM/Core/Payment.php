@@ -1178,4 +1178,33 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     return isset($this->_paymentProcessor['url_recur']) ? $this->_paymentProcessor['url_recur'] : '';
   }
 
+  /**
+   * Get description of payment to pass to processor.
+   *
+   * This is often what people see in the interface so we want to get
+   * as much unique information in as possible within the field length (& presumably the early part of the field)
+   *
+   * People seeing these can be assumed to be advanced users so quantity of information probably trumps
+   * having field names to clarify
+   *
+   * @param array $params
+   * @param int $length
+   *
+   * @return string
+   */
+  protected function getPaymentDescription($params, $length = 24) {
+    $parts = array('contactID', 'contributionID', 'description', 'billing_first_name', 'billing_last_name');
+    $validParts = array();
+    if (isset($params['description'])) {
+      $uninformativeStrings = array(ts('Online Event Registration: '), ts('Online Contribution: '));
+      $params['description'] = str_replace($uninformativeStrings, '', $params['description']);
+    }
+    foreach ($parts as $part) {
+      if ((!empty($params[$part]))) {
+        $validParts[] = $params[$part];
+      }
+    }
+    return substr(implode('-', $validParts), 0, $length);
+  }
+
 }
