@@ -1778,8 +1778,8 @@ class CRM_Utils_System {
    * @return string|FALSE
    */
   public static function evalUrl($url) {
-    if ($url === FALSE) {
-      return FALSE;
+    if (!$url || strpos($url, '{') === FALSE) {
+      return $url;
     }
     else {
       $config = CRM_Core_Config::singleton();
@@ -1787,18 +1787,31 @@ class CRM_Utils_System {
         '{ver}' => CRM_Utils_System::version(),
         '{uf}' => $config->userFramework,
         '{php}' => phpversion(),
-        '{sid}' => md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL),
+        '{sid}' => self::getSiteID(),
         '{baseUrl}' => $config->userFrameworkBaseURL,
         '{lang}' => $config->lcMessages,
         '{co}' => $config->defaultContactCountry,
       );
-      foreach (array_keys($vars) as $k) {
-        $vars[$k] = urlencode($vars[$k]);
-      }
-      return strtr($url, $vars);
+      return strtr($url, array_map('urlencode', $vars));
     }
   }
 
+  /**
+   * Returns the unique identifier for this site, as used by community messages.
+   *
+   * SiteID will be generated if it is not already stored in the settings table.
+   *
+   * @return string
+   */
+  public static function getSiteID() {
+    $sid = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'site_id');
+    if (!$sid) {
+      $config = CRM_Core_Config::singleton();
+      $sid = md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL);
+      civicrm_api3('Setting', 'create', array('domain_id' => 'all', 'site_id' => $sid));
+    }
+    return $sid;
+  }
 
   /**
    * Determine whether this is a developmental system.
