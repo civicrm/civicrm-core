@@ -399,7 +399,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `civicrm_domain` WRITE;
 /*!40000 ALTER TABLE `civicrm_domain` DISABLE KEYS */;
-INSERT INTO `civicrm_domain` (`id`, `name`, `description`, `config_backend`, `version`, `contact_id`, `locales`, `locale_custom_strings`) VALUES (1,'Default Domain Name',NULL,NULL,'4.6.9',1,NULL,NULL);
+INSERT INTO `civicrm_domain` (`id`, `name`, `description`, `config_backend`, `version`, `contact_id`, `locales`, `locale_custom_strings`) VALUES (1,'Default Domain Name',NULL,NULL,'4.6.10',1,NULL,NULL);
 /*!40000 ALTER TABLE `civicrm_domain` ENABLE KEYS */;
 UNLOCK TABLES;
 
