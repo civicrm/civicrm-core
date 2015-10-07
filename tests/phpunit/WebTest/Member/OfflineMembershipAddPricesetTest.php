@@ -338,13 +338,13 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
       $this->click('_qf_Membership_upload-bottom');
     }
     else {
-      $this->click("xpath=//div[@id='memberships']/div//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+      $this->click("xpath=//div[@id='memberships']/div//table/tbody//tr/td[text()='{$memTypeTitle1}']/../td[9]/span[2][text()='Renew...']/ul/li/a[text()='Renew']");
       $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
       $this->waitForAjaxContent();
       $this->click('_qf_MembershipRenewal_upload-bottom');
 
       $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");
-      $this->click("xpath=//div[@id='memberships']/div//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+      $this->click("xpath=//div[@id='memberships']/div//table/tbody//tr/td[text()='{$memTypeTitle2}']/../td[9]/span[2][text()='Renew...']/ul/li/a[text()='Renew']");
       $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
       $this->waitForAjaxContent();
       $this->click('_qf_MembershipRenewal_upload-bottom');
