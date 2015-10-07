@@ -307,7 +307,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     $this->addButtons(array(
         array(
           'type' => 'next',
-          'name' => ts('Sign the Petition'),
+          'name' => ts('Take Action'),
           'isDefault' => TRUE,
         ),
       )
