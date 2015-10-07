@@ -64,7 +64,7 @@
 
     // Simple wrapper around $.crmDatepicker.
     // example with no time input: <input crm-ui-datepicker="{time: false}" ng-model="myobj.datefield"/>
-    // example with custom date format: <input crm-ui-datepicker="{dateFormat: 'm/d/y'}" ng-model="myobj.datefield"/>
+    // example with custom date format: <input crm-ui-datepicker="{date: 'm/d/y'}" ng-model="myobj.datefield"/>
     .directive('crmUiDatepicker', function () {
       return {
         restrict: 'AE',

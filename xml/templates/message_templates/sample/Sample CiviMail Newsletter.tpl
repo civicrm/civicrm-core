@@ -12,11 +12,11 @@
       <table border="0" cellpadding="0" cellspacing="0" >
         <tr>
           <td>
-          <a href="http://www.civicrm.org"><img src="http://civicrm.org/sites/civicrm.org/files/top-logo_2.png" border=0 alt="Replace this logo with the URL to your own"></a>
+          <a href="https://civicrm.org"><img src="https://civicrm.org/sites/civicrm.org/files/top-logo_2.png" border=0 alt="Replace this logo with the URL to your own"></a>
           </td>
           <td>&nbsp; &nbsp;</td>
           <td>
-          <a href="http://www.civicrm.org" style="text-decoration: none;"><font size=5 face="Arial, Verdana, sans-serif" color="#8bc539">Your Newsletter Title</font></a>
+          <a href="https://civicrm.org" style="text-decoration: none;"><font size=5 face="Arial, Verdana, sans-serif" color="#8bc539">Your Newsletter Title</font></a>
           </td>
         </tr>
       </table>

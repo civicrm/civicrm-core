@@ -33,7 +33,7 @@
   <li>{docURL page="Payment Processors" text="Processor comparison and setup guide" resource="wiki"}</li>
 </ul>
 <p>{ts}If you're not sure which processor to use - we recommend reviewing terms, limitations and coverage areas on each processor's website before proceeding.{/ts}</p>
-<p>{ts 1="http://civicrm.org/extensions/civicrm?cat=125"}If your desired processor is not in the list, check the <a href="%1">Extensions Directory</a> for more payment processors you can download. If you still can't find it, consider partnering with a developer and contributing a new extension.{/ts}</p>
+<p>{ts 1="https://civicrm.org/extensions/civicrm?cat=125"}If your desired processor is not in the list, check the <a href="%1">Extensions Directory</a> for more payment processors you can download. If you still can't find it, consider partnering with a developer and contributing a new extension.{/ts}</p>
 {/htxt}
 
 {htxt id='AuthNet-live-user-name'}
