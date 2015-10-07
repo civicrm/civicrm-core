@@ -26,13 +26,11 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- *
  * This class extends the PEAR pager object by substituting standard default pager arguments
  * We also extract the pageId from either the GET variables or the POST variable (since we
  * use a POST to jump to a specific page). At some point we should evaluate if we want
@@ -55,6 +53,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * The output of the pager. This is a name/value array with various keys
    * that an application could use to display the pager
+   *
    * @var array
    */
   public $_response;
@@ -110,8 +109,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
     /**
      * A page cannot have two variables with the same form name. Hence in the
      * pager display, we have a form submission at the top with the normal
-     * page variable, but a different form element for one at the bottom
-     *
+     * page variable, but a different form element for one at the bottom.
      */
     $this->_response['titleTop'] = ts('Page %1 of %2', array(
         1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />',
@@ -133,15 +131,15 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @return array
    */
   public function initialize(&$params) {
-    /* set the mode for the pager to Sliding */
+    // set the mode for the pager to Sliding
 
     $params['mode'] = 'Sliding';
 
-    /* also set the urlVar to be a crm specific get variable */
+    // also set the urlVar to be a crm specific get variable.
 
     $params['urlVar'] = self::PAGE_ID;
 
-    /* set this to a small value, since we dont use this functionality */
+    // set this to a small value, since we dont use this functionality
 
     $params['delta'] = 1;
 

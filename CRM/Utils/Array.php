@@ -407,7 +407,7 @@ class CRM_Utils_Array {
 
     $look = $reverse ? array_flip($lookup) : $lookup;
 
-    //trim lookup array, ignore . ( fix for CRM-1514 ), eg for prefix/suffix make sure Dr. and Dr both are valid
+    // trim lookup array, ignore . ( fix for CRM-1514 ), eg for prefix/suffix make sure Dr. and Dr both are valid
     $newLook = array();
     foreach ($look as $k => $v) {
       $newLook[trim($k, ".")] = $v;
@@ -866,7 +866,7 @@ class CRM_Utils_Array {
 
   /**
    * Diff multidimensional arrays
-   * ( array_diff does not support multidimensional array)
+   * (array_diff does not support multidimensional array)
    *
    * @param array $array1
    * @param array $array2

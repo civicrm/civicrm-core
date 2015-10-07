@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * class for managing a http request
- *
+ * Class for managing a http request
  */
 class CRM_Utils_Request {
 
