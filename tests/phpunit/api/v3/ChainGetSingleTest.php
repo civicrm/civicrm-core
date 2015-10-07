@@ -57,7 +57,7 @@ class api_v3_ChainGetSingleTest extends CiviUnitTestCase {
     $event1->campaign_id = 'null';
     $event1->save();
 
-    $api = $this->callAPIAndDocument('event', 'get', array(
+    $api = $this->callAPISuccess('event', 'get', array(
       'api.campaign.getsingle' => array(),
       'sequential' => 1,
     ), __FUNCTION__, __FILE__);
