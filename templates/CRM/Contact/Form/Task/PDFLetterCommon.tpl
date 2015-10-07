@@ -133,6 +133,12 @@ CRM.$(function($) {
   $form.closest('.ui-dialog-content.crm-ajax-container').on('dialogbeforeclose', function() {
     $(this).trigger('crmFormSuccess');
   });
+  showSaveDetails($('input[name=saveTemplate]', $form)[0]);
+
+  function showSaveTemplate() {
+    $('#updateDetails').toggle(!!$(this).val());
+  }
+  $('[name=template]', $form).each(showSaveTemplate).change(showSaveTemplate);
 });
 
 var currentWidth;
