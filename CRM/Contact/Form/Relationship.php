@@ -323,7 +323,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $this->addField('start_date', array('label' => ts('Start Date'), 'formatType' => 'searchDate'));
     $this->addField('end_date', array('label' => ts('End Date'), 'formatType' => 'searchDate'));
 
-    $this->addField('is_active', array('label' => ts('Enabled?')));
+    $this->addField('is_active', array('label' => ts('Enabled?'), 'type' => 'advcheckbox'));
 
     $this->addField('is_permission_a_b');
     $this->addField('is_permission_b_a');
