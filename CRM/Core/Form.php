@@ -1458,6 +1458,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         unset($props['text']);
         return $this->addElement('checkbox', $name, $label, $text, $props);
 
+      //add support for 'Advcheckbox' field
+      case 'advcheckbox':
+        $text = isset($props['text']) ? $props['text'] : NULL;
+        unset($props['text']);
+        return $this->addElement('advcheckbox', $name, $label, $text, $props);
+
       case 'File':
         // We should not build upload file in search mode.
         if (isset($props['context']) && $props['context'] == 'search') {
