@@ -77,7 +77,7 @@ class CRM_Contact_Form_Edit_Email {
         $form->addElement('select', "email[$blockId][on_hold]", '', $holdOptions);
       }
       else {
-        $form->addField("email[$blockId][on_hold]", array('entity' => 'email'));
+        $form->addField("email[$blockId][on_hold]", array('entity' => 'email', 'type' => 'advcheckbox'));
       }
 
       //Bulkmail checkbox
