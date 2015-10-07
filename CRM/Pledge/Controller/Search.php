@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -39,10 +37,9 @@
  *  - the search controller is used for building/processing multiform
  *    searches.
  *
- * Typically the first form will display the search criteria and it's results
+ * Typically the first form will display the search criteria and it's results.
  *
- * The second form is used to process search results with the asscociated actions
- *
+ * The second form is used to process search results with the asscociated actions.
  */
 class CRM_Pledge_Controller_Search extends CRM_Core_Controller {
 
