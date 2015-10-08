@@ -108,7 +108,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
       // if text, retrieve price
       if ($defaults['html_type'] == 'Text') {
-        $isActive = $defaults['is_active'];   
+        $isActive = $defaults['is_active'];
         $valueParams = array('price_field_id' => $this->_fid);
 
         CRM_Price_BAO_PriceFieldValue::retrieve($valueParams, $defaults);
