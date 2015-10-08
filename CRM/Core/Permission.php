@@ -744,8 +744,12 @@ class CRM_Core_Permission {
         $prefix . ts('view all activities'),
         ts('View all activities (for visible contacts)'),
       ),
+      'edit all activities' => array(
+        $prefix . ts('edit all activities'),
+        ts('Edit all activities (for visible contacts)'),
+      ),
       'delete activities' => array(
-        $prefix . ts('Delete activities'),
+        $prefix . ts('delete activities'),
       ),
       'access CiviCRM' => array(
         $prefix . ts('access CiviCRM'),
