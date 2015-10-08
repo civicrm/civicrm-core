@@ -140,6 +140,9 @@ CRM.$(function($) {
       }]);
     }
   });
+  $('[name^=_qf_PDF_submit]', $form).click(function() {
+    CRM.status({/literal}"{ts escape='js'}Downloading...{/ts}"{literal});
+  });
   showSaveDetails($('input[name=saveTemplate]', $form)[0]);
 
   function showSaveTemplate() {
