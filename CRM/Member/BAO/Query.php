@@ -208,6 +208,15 @@ class CRM_Member_BAO_Query {
       case 'membership_status_id':
       case 'membership_type':
       case 'membership_type_id':
+        // CRM-17075 we are specifically handling the possibility we are dealing with the entity reference field
+        // for membership_type_id here (although status would be handled if converted). The unhandled pathway at the moment
+        // is from groupContactCache::load and this is a small fix to get the entity reference field to work.
+        // However, it would seem the larger fix would be to NOT invoke the form formValues for
+        // the load function. The where clause and the whereTables are saved so they should suffice to generate the query
+        // to get a contact list. But, better to deal with in 4.8 now...
+        if (is_string($value) && strpos($value, ',') && $op == '=') {
+          $value = array('IN' => explode(',', $value));
+        }
       case 'member_id':
         if (strpos($name, 'status') !== FALSE) {
           $name = 'status_id';
