@@ -52,8 +52,12 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     }
     if ($rev == '4.7.alpha4') {
       // CRM-17004 Warn of Moneris removal
-      $monerisProcessors = civicrm_api3('PaymentProcessor', 'getcount', array('payment_processor_type_id' => "Moneris"));
-      if (!empty($monerisProcessors['result']) && !function_exists('moneris_civicrm_managed')) {
+      $count = 1;
+      // Query only works in 4.3+
+      if (version_compare($currentVer, "4.3.0") > 0) {
+        $count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN (SELECT id FROM civicrm_payment_processor_type WHERE name = 'Moneris')");
+      }
+      if ($count && !function_exists('moneris_civicrm_managed')) {
         $preUpgradeMessage .= '<p>' . ts('The %1 payment processor is no longer bundled with CiviCRM. After upgrading you will need to install the extension to continue using it.', array(1 => 'Moneris')) . '</p>';
       }
     }
