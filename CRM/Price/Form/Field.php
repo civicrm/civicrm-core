@@ -647,7 +647,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       //$params['option_description']  = array( 1 => $params['description'] );
       $params['option_weight'] = array(1 => $params['weight']);
       $params['option_financial_type_id'] = array(1 => $params['financial_type_id']);
-      $params['is_active'] = array(1 => 1);
     }
 
     if ($this->_fid) {
