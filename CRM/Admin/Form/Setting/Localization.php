@@ -54,6 +54,10 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     'provinceLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
   );
 
+  protected $_settings = array(
+    'contact_default_language' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+  );
+
   /**
    * Build the form object.
    */
