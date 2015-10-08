@@ -747,7 +747,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'contribution_soft_credit_contact_id' => array(
           'name' => 'contribution_soft_credit_contact_id',
           'title' => 'Soft Credit For Contact ID',
-          'where' => 'civicrm_contribution_soft.contact_id',
+          'where' => 'civicrm_contact_d.id',
           'data_type' => CRM_Utils_Type::T_INT,
         ),
       );

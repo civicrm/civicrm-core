@@ -170,6 +170,7 @@ class CRM_Contribute_BAO_Query {
     if (!empty($query->_returnProperties['contribution_soft_credit_contact_id'])) {
       $query->_tables['civicrm_contribution'] = 1;
       $query->_tables['civicrm_contribution_soft'] = 1;
+      $query->_tables['civicrm_contribution_soft_contact'] = 1;
     }
 
     if (!empty($query->_returnProperties['contribution_soft_credit_amount'])) {
