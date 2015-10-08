@@ -268,7 +268,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function logger($message) {
-    if (CRM_Core_Config::singleton()->userFrameworkLogging) {
+    if (CRM_Core_Config::singleton()->userFrameworkLogging && function_exists('watchdog')) {
       watchdog('civicrm', '%message', array('%message' => $message), NULL, WATCHDOG_DEBUG);
     }
   }

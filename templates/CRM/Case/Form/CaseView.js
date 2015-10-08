@@ -74,8 +74,8 @@
         $('[name=add_role_contact_id]', this).val('').crmEntityRef({create: true, api: {params: {contact_type: 'Individual'}}});
       },
       post: function(data) {
-        var contactID = $('[name=add_role_contact_id]').val(),
-          relType = $('[name=role_type]').val();
+        var contactID = $('[name=add_role_contact_id]', this).val(),
+          relType = $('[name=role_type]', this).val();
         if (contactID && relType) {
           $.extend(data, {
             case_id: caseId(),

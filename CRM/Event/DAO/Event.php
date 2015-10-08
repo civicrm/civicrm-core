@@ -772,7 +772,7 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO
         'default_role_id' => array(
           'name' => 'default_role_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Participant Role') ,
+          'title' => ts('Default Role ID') ,
           'description' => 'Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.',
           'import' => true,
           'where' => 'civicrm_event.default_role_id',

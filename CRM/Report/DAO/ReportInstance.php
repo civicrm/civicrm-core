@@ -147,6 +147,18 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO
    */
   public $is_active;
   /**
+   * FK to contact table.
+   *
+   * @var int unsigned
+   */
+  public $created_id;
+  /**
+   * FK to contact table.
+   *
+   * @var int unsigned
+   */
+  public $owner_id;
+  /**
    * Subject of email
    *
    * @var string
@@ -214,6 +226,8 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO
     if (!self::$_links) {
       self::$_links = static ::createReferenceColumns(__CLASS__);
       self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'domain_id', 'civicrm_domain', 'id');
+      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'created_id', 'civicrm_contact', 'id');
+      self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'owner_id', 'civicrm_contact', 'id');
       self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'navigation_id', 'civicrm_navigation', 'id');
       self::$_links[] = new CRM_Core_Reference_Basic(self::getTableName() , 'drilldown_id', 'civicrm_report_instance', 'id');
     }
@@ -346,6 +360,20 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO
             'type' => 'CheckBox',
           ) ,
         ) ,
+        'created_id' => array(
+          'name' => 'created_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Report Instance Created By') ,
+          'description' => 'FK to contact table.',
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ) ,
+        'owner_id' => array(
+          'name' => 'owner_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Report Instance Owned By') ,
+          'description' => 'FK to contact table.',
+          'FKClassName' => 'CRM_Contact_DAO_Contact',
+        ) ,
         'email_subject' => array(
           'name' => 'email_subject',
           'type' => CRM_Utils_Type::T_STRING,
@@ -454,6 +482,8 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO
         'grouprole' => 'grouprole',
         'form_values' => 'form_values',
         'is_active' => 'is_active',
+        'created_id' => 'created_id',
+        'owner_id' => 'owner_id',
         'email_subject' => 'email_subject',
         'email_to' => 'email_to',
         'email_cc' => 'email_cc',

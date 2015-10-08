@@ -300,7 +300,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO
           'where' => 'civicrm_participant.role_id',
           'headerPattern' => '/(participant.)?(role)$/i',
           'dataPattern' => '',
-          'export' => false,
+          'export' => true,
           'default' => 'NULL',
           'html' => array(
             'type' => 'Select',

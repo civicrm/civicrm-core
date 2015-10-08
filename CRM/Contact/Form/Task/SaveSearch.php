@@ -187,7 +187,13 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     //save the search
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $this->_id;
-    $savedSearch->form_values = serialize($this->get('formValues'));
+    // Use the query parameters rather than the form values - these have already been assessed / converted
+    // with the extra knowledge that the form has.
+    // Note that we want to move towards a standardised way of saving the query that is not
+    // an exact match for the form requirements & task the form layer with converting backwards and forwards.
+    // Ideally per CRM-17075 we will use entity reference fields heavily in the form layer & convert to the
+    // sql operator syntax at the query layer.
+    $savedSearch->form_values = serialize($this->get('queryParams'));
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = $this->get('customSearchID');
     $savedSearch->save();

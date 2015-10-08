@@ -82,11 +82,12 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           )),
           $this->getBasicContactFields(),
           array(
-          'age_at_event' => array(
-            'title' => ts('Age at Event'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, event_civireport.start_date)',
-          ),
-        )),
+            'age_at_event' => array(
+              'title' => ts('Age at Event'),
+              'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, event_civireport.start_date)',
+            ),
+          )
+        ),
         'grouping' => 'contact-fields',
         'order_bys' => array(
           'sort_name' => array(

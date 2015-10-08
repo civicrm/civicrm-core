@@ -1322,6 +1322,7 @@ LEFT JOIN {$additionReminderClause}
 WHERE c.is_deleted = 0 AND c.is_deceased = 0
 {$addWhereClause}
 
+AND reminder.id IS NULL
 AND c.id NOT IN (
      SELECT rem.contact_id
      FROM civicrm_action_log rem INNER JOIN {$mapping->entity} e ON rem.entity_id = e.id
@@ -1337,25 +1338,25 @@ GROUP BY c.id
         $repeatEvent = ($actionSchedule->end_action == 'before' ? 'DATE_SUB' : 'DATE_ADD') . "({$dateField}, INTERVAL {$actionSchedule->end_frequency_interval} {$actionSchedule->end_frequency_unit})";
 
         if ($actionSchedule->repetition_frequency_unit == 'day') {
-          $hrs = 24 * $actionSchedule->repetition_frequency_interval;
+          $interval = "{$actionSchedule->repetition_frequency_interval} DAY";
         }
         elseif ($actionSchedule->repetition_frequency_unit == 'week') {
-          $hrs = 24 * $actionSchedule->repetition_frequency_interval * 7;
+          $interval = "{$actionSchedule->repetition_frequency_interval} WEEK";
         }
         elseif ($actionSchedule->repetition_frequency_unit == 'month') {
-          $hrs = "24*(DATEDIFF(DATE_ADD(latest_log_time, INTERVAL 1 MONTH ), latest_log_time))";
+          $interval = "{$actionSchedule->repetition_frequency_interval} MONTH";
         }
         elseif ($actionSchedule->repetition_frequency_unit == 'year') {
-          $hrs = "24*(DATEDIFF(DATE_ADD(latest_log_time, INTERVAL 1 YEAR ), latest_log_time))";
+          $interval = "{$actionSchedule->repetition_frequency_interval} YEAR";
         }
         else {
-          $hrs = $actionSchedule->repetition_frequency_interval;
+          $interval = "{$actionSchedule->repetition_frequency_interval} HOUR";
         }
 
         // (now <= repeat_end_time )
         $repeatEventClause = "'{$now}' <= {$repeatEvent}";
         // diff(now && logged_date_time) >= repeat_interval
-        $havingClause = "HAVING TIMEDIFF({$now}, latest_log_time) >= TIME('{$hrs}:00:00')";
+        $havingClause = "HAVING TIMESTAMPDIFF(HOUR, latest_log_time, CAST({$now} AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL $interval))";
         $groupByClause = 'GROUP BY reminder.contact_id, reminder.entity_id, reminder.entity_table';
         $selectClause .= ', MAX(reminder.action_date_time) as latest_log_time';
         //CRM-15376 - do not send our reminders if original criteria no longer applies

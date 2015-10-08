@@ -329,6 +329,8 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * @deprecated - use CRM_Core_Pseudoconstant::getLabel
+   *
    * @param string $groupName
    * @param $value
    * @param bool $onlyActiveValue

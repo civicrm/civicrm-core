@@ -297,8 +297,7 @@ class CRM_Core_Payment_Form {
 
     // $processor->buildForm appears to be an undocumented (possibly unused) option for payment processors
     // which was previously available only in some form flows
-    if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->isSupported('buildForm')) {
-      $form->_paymentProcessor['object']->buildForm($form);
+    if (!empty($form->_paymentProcessor) && !empty($form->_paymentProcessor['object']) && $form->_paymentProcessor['object']->buildForm($form)) {
       return NULL;
     }
 

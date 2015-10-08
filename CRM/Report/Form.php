@@ -2722,8 +2722,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   public function groupBy() {
     $groupBys = array();
     if (!empty($this->_params['group_bys']) &&
-      is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
+      is_array($this->_params['group_bys'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
@@ -3874,8 +3873,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
-   * Check for empty order_by configurations and remove them; also set
-   * template to hide them.
+   * Check for empty order_by configurations and remove them.
+   *
+   * Also set template to hide them.
    *
    * @param array $formValues
    */
@@ -4224,27 +4224,19 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   public function alterDisplayContactFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText) {
     $entryFound = FALSE;
-    if (array_key_exists('civicrm_contact_prefix_id', $row)) {
-      $prefixes = CRM_Contact_BAO_Contact::buildOptions('prefix_id');
-      if ($value = $row['civicrm_contact_prefix_id']) {
-        $rows[$rowNum]['civicrm_contact_prefix_id'] = $prefixes[$rows[$rowNum]['civicrm_contact_prefix_id']];
+    // There is no reason not to add links for all fields but it seems a bit odd to be able to click on
+    // 'Mrs'. Also, we don't have metadata about the title. So, add selectively to addLinks.
+    $addLinks = array('gender_id' => 'Gender');
+    foreach (array('prefix_id', 'suffix_id', 'gender_id') as $fieldName) {
+      if (array_key_exists('civicrm_contact_' . $fieldName, $row)) {
+        if (($value = $row['civicrm_contact_' . $fieldName]) != FALSE) {
+          $rows[$rowNum]['civicrm_contact_' . $fieldName] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', $fieldName, $value);
+          if (($title = CRM_Utils_Array::value($fieldName, $addLinks)) != FALSE) {
+            $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, $fieldName, 'civicrm_contact', $title);
+          }
+        }
+        $entryFound = TRUE;
       }
-      $entryFound = TRUE;
-    }
-    if (array_key_exists('civicrm_contact_suffix_id', $row)) {
-      $suffixes = CRM_Contact_BAO_Contact::buildOptions('suffix_id');
-      if ($value = $row['civicrm_contact_suffix_id']) {
-        $rows[$rowNum]['civicrm_contact_suffix_id'] = $suffixes[$rows[$rowNum]['civicrm_contact_suffix_id']];
-      }
-      $entryFound = TRUE;
-    }
-    if (array_key_exists('civicrm_contact_gender_id', $row)) {
-      $genders = CRM_Contact_BAO_Contact::buildOptions('gender_id');
-      if (($value = $row['civicrm_contact_gender_id']) != FALSE) {
-        $rows[$rowNum]['civicrm_contact_gender_id'] = $genders[$rows[$rowNum]['civicrm_contact_gender_id']];
-        $this->addLinkToRow($rows[$rowNum], $baseUrl, $linkText, $value, 'gender_id', 'civicrm_contact', 'Gender');
-      }
-      $entryFound = TRUE;
     }
     return $entryFound;
   }

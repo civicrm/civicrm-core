@@ -765,4 +765,17 @@ return array(
     'description' => 'CiviCRM will use this setting as path to bootstrap WP.',
     'help_text' => NULL,
   ),
+  'site_id' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'site_id',
+    'type' => 'String',
+    'default' => '',
+    'add' => '4.6',
+    'title' => 'Unique Site ID',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => NULL,
+    'help_text' => NULL,
+  ),
 );

@@ -144,6 +144,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           if (!in_array($name, $skipFields)) {
             $params[$name] = $value;
           }
+          if (substr($name, 0, 6) == 'price_') {
+            $params[$name] = $this->_params[0][$name];
+          }
         }
         $this->set('getExpressCheckoutDetails', $params);
       }

@@ -693,7 +693,7 @@ function drush_civicrm_upgrade_db() {
     $upgradeHeadless = new CRM_Upgrade_Headless();
     // FIXME Exception handling?
     $result = $upgradeHeadless->run();
-    drush_print("Upgrade outputs: " . "\"" . $result['message'] . "\"");
+    drush_print("Upgrade outputs:\n" . $result['text']);
   }
   else {
     require_once 'CRM/Core/Smarty.php';

@@ -527,6 +527,27 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       if ($cid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['external_identifier'], 'id', 'external_identifier')) {
         $formatted['id'] = $cid;
       }
+      else {
+        // CRM-17275 - External identifier is treated as a special field/
+        // Having it set will inhibit various efforts to retrieve a duplicate
+        // However, it is valid to update a contact with no external identifier to having
+        // an external identifier if they match according to the dedupe rules so
+        // we check for that possibility here.
+        // There is probably a better approach but this fix is the FIRST (!#!) time
+        /// unit tests have been added to this & we need to build those up a bit before
+        // doing much else in here. Remember when you have build a house of card the
+        // golden rule ... walk away ... carefully.
+        // (did I mention unit tests...)
+        $checkParams = array('check_permissions' => FALSE, 'match' => $params);
+        unset($checkParams['match']['external_identifier']);
+        $checkParams['match']['contact_type'] = $this->_contactType;
+        $possibleMatches = civicrm_api3('Contact', 'duplicatecheck', $checkParams);
+        foreach (array_keys($possibleMatches['values']) as $possibleID) {
+          if (!CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $possibleID, 'external_identifier', 'id')) {
+            $formatted['id'] = $cid = $possibleID;
+          }
+        }
+      }
     }
 
     //format common data, CRM-4062
@@ -551,7 +572,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           foreach ($matchedIDs as $contactId) {
             if ($params['id'] == $contactId) {
               $contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['id'], 'contact_type');
-
               if ($formatted['contact_type'] == $contactType) {
                 //validation of subtype for update mode
                 //CRM-5125
@@ -1631,7 +1651,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    */
   public function createContact(&$formatted, &$contactFields, $onDuplicate, $contactId = NULL, $requiredCheck = TRUE, $dedupeRuleGroupID = NULL) {
     $dupeCheck = FALSE;
-
     $newContact = NULL;
 
     if (is_null($contactId) && ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK)) {
@@ -1808,7 +1827,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param string $dateParam
    *   Index of params.
    */
-  public function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
+  public static function formatCustomDate(&$params, &$formatted, $dateType, $dateParam) {
     //fix for CRM-2687
     CRM_Utils_Date::convertToDefaultDate($params, $dateType, $dateParam);
     $formatted[$dateParam] = CRM_Utils_Date::processDate($params[$dateParam]);
@@ -2001,7 +2020,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       }
     }
 
-    if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) && array_key_exists($customFieldID, $customFields) &&
+    if (!empty($key) && ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) && array_key_exists($customFieldID, $customFields) &&
       !array_key_exists($customFieldID, $addressCustomFields)
     ) {
       // @todo calling api functions directly is not supported

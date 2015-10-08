@@ -204,7 +204,7 @@ class CRM_Core_CommunityMessages {
       'ver' => CRM_Utils_System::version(),
       'uf' => $config->userFramework,
       'php' => phpversion(),
-      'sid' => md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL),
+      'sid' => CRM_Utils_System::getSiteID(),
       'baseUrl' => $config->userFrameworkBaseURL,
       'lang' => $config->lcMessages,
       'co' => $config->defaultContactCountry,
