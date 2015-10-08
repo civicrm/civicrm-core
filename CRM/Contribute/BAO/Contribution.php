@@ -2479,6 +2479,18 @@ WHERE  contribution_id = %1 ";
       $values['address'] = $addressDetails[0]['display'];
     }
     if ($this->_component == 'contribute') {
+      // get notes.
+      $notes = civicrm_api3('Note', 'get', array(
+        'entity_table' => 'civicrm_contribution',
+        'entity_id' => $this->id,
+      ));
+      if ($notes['count'] > 0) {
+        $values['notes'] = array();
+        foreach($notes['values'] as $note) {
+          $values['notes'][] = $note['note'];
+        }
+      }
+
       //get soft contributions
       $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);
       if (!empty($softContributions)) {
@@ -2755,6 +2767,9 @@ WHERE  contribution_id = %1 ";
     $template->assign('address', CRM_Utils_Address::format($input));
     if (!empty($values['customGroup'])) {
       $template->assign('customGroup', $values['customGroup']);
+    }
+    if (!empty($values['notes'])) {
+      $template->assign('notes', $values['notes']);
     }
     if (!empty($values['softContributions'])) {
       $template->assign('softContributions', $values['softContributions']);
