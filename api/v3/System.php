@@ -84,9 +84,8 @@ function _civicrm_api3_system_flush_spec(&$params) {
  */
 function _civicrm_api3_system_check_spec(&$spec) {
   // $spec['magicword']['api.required'] = 1;
-  $spec['show_hushed'] = array(
-    'api.default' => FALSE,
-    'title' => 'Show hushed',
+  $spec['is_visible'] = array(
+    'title' => 'is visible',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   );
 }
@@ -114,7 +113,7 @@ function civicrm_api3_system_check($params) {
     $returnValues[] = $msg->toArray() + array('id' => $id++);
   }
 
-  return _civicrm_api3_basic_array_get('systemCheck', $params, $returnValues, id, array('id', 'name', 'message', 'title', 'severity', 'isVisible'));
+  return _civicrm_api3_basic_array_get('systemCheck', $params, $returnValues, id, array('id', 'name', 'message', 'title', 'severity', 'is_visible'));
 }
 
 /**
