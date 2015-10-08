@@ -172,14 +172,14 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
 
     $title = NULL;
     if (isset($this->_mailing->body_html) && empty($_GET['text'])) {
-      $header = 'Content-Type: text/html; charset=utf-8';
+      $header = 'text/html; charset=utf-8';
       $content = $mime->getHTMLBody();
       if (strpos($content, '<head>') === FALSE && strpos($content, '<title>') === FALSE) {
         $title = '<head><title>' . $this->_mailing->subject . '</title></head>';
       }
     }
     else {
-      $header = 'Content-Type: text/plain; charset=utf-8';
+      $header = 'text/plain; charset=utf-8';
       $content = $mime->getTXTBody();
     }
     CRM_Utils_System::setTitle($this->_mailing->subject);
@@ -188,7 +188,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       CRM_Core_Page_AJAX::returnJsonResponse($content);
     }
     if ($print) {
-      header($header);
+      CRM_Utils_System::setHttpHeader('Content-Type', $header);
       print $title;
       print $content;
       CRM_Utils_System::civiExit();
