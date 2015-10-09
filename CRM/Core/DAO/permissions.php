@@ -114,7 +114,6 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
     'default' => array(
       'access CiviCRM',
-      'edit all contacts',
     ),
   );
   $permissions['email'] = $permissions['address'];
