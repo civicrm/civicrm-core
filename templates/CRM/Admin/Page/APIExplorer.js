@@ -559,22 +559,25 @@
     };
     smartyPhp = [];
     $.each(params, function(key, value) {
-      var js = JSON.stringify(value);
+      var json = JSON.stringify(value),
+        // Encourage 'return' to be an array - at least in php & js
+        js = key === 'return' ? JSON.stringify(evaluate(value, true)) : json,
+        php = key === 'return' ? phpFormat(evaluate(value, true)) : phpFormat(value);
       if (!(i++)) {
         q.php += ", array(\n";
         q.json += ", {\n";
       } else {
         q.json += ",\n";
       }
-      q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
+      q.php += "  '" + key + "' => " + php + ",\n";
       q.json += "  \"" + key + '": ' + js;
       // smarty already defaults to sequential
       if (key !== 'sequential') {
-        q.smarty += ' ' + key + '=' + smartyFormat(value, js, key);
+        q.smarty += ' ' + key + '=' + smartyFormat(value, json, key);
       }
       // FIXME: This is not totally correct cli syntax
-      q.drush += key + '=' + js + ' ';
-      q.wpcli += key + '=' + js + ' ';
+      q.drush += key + '=' + json + ' ';
+      q.wpcli += key + '=' + json + ' ';
     });
     if (i) {
       q.php += ")";
