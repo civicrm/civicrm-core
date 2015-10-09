@@ -425,7 +425,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $result = $this->invokeAPI($args);
     return array(
       'fee_amount' => $result['feeamt'],
-      'net_amount' => $params['gross_amount'] - $params['fee_amount'],
+      'net_amount' => $params['gross_amount'] - $result['feeamt'],
     );
   }
 
