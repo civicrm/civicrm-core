@@ -124,6 +124,17 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   // @todo - ditto
   $permissions['note'] = $permissions['entity_tag'];
 
+  // CRM-17350 - entity_tag ACL permissions are checked at the BAO level
+  $permissions['entity_tag'] = array(
+    'get' => array(
+      'access CiviCRM',
+      'view all contacts',
+    ),
+    'default' => array(
+      'access CiviCRM',
+    ),
+  );
+
   // Allow non-admins to get and create tags to support tagset widget
   // Delete is still reserved for admins
   $permissions['tag'] = array(
