@@ -121,7 +121,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Given an array of entity ids and entity table, add all the entity to the tags
+   * Given an array of entity ids and entity table, add all the entity to the tags.
    *
    * @param array $entityIds
    *   (reference ) the array of entity ids to be added.
@@ -139,6 +139,12 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $entityIdsAdded = array();
 
     foreach ($entityIds as $entityId) {
+      // CRM-17350 - check if we have permission to edit the contact
+      // that this tag belongs to.
+      if (!CRM_Contact_BAO_Contact_Permission::allow($entityId, CRM_Core_Permission::EDIT)) {
+        $numEntitiesNotAdded++;
+        continue;
+      }
       $tag = new CRM_Core_DAO_EntityTag();
 
       $tag->entity_id = $entityId;
@@ -184,6 +190,12 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $entityIdsRemoved = array();
 
     foreach ($entityIds as $entityId) {
+      // CRM-17350 - check if we have permission to edit the contact
+      // that this tag belongs to.
+      if (!CRM_Contact_BAO_Contact_Permission::allow($entityId, CRM_Core_Permission::EDIT)) {
+        $numEntitiesNotAdded++;
+        continue;
+      }
       $tag = new CRM_Core_DAO_EntityTag();
 
       $tag->entity_id = $entityId;
