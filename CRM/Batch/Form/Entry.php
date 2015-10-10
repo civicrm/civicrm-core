@@ -102,6 +102,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js', 1, 'html-header')
+      ->addScriptFile('civicrm', 'templates/CRM/Contribute/Form/PCP.js.tpl', 1, 'html-header')
       ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])))
       ->addSetting(array('setting' => array('monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator)))
       ->addSetting(array('setting' => array('monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint)));
