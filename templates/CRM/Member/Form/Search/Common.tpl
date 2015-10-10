@@ -80,6 +80,15 @@
         {ts}clear{/ts}</a>)
       </span>
     </p>
+    <p>
+    {$form.member_override.label}
+    {help id="id-member_override" file="CRM/Member/Form/Search.hlp"}
+    {$form.member_override.html}
+      <span class="crm-clear-link">
+        (<a href="#" title="unselect" onclick="unselectRadio('member_override', '{$form.formName}'); return false;" >
+        {ts}clear{/ts}</a>)
+      </span>
+    </p>
   </td>
 </tr>
 
