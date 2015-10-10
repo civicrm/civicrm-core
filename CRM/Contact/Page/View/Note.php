@@ -58,8 +58,9 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     $note->id = $this->_id;
     if ($note->find(TRUE)) {
       $values = array();
+
       CRM_Core_DAO::storeValues($note, $values);
-      $values['privacy'] = CRM_Core_OptionGroup::optionLabel('note_privacy', $values['privacy']);
+      $values['privacy'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Note', 'privacy', $values['privacy']);
       $this->assign('note', $values);
     }
 
