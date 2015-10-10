@@ -103,4 +103,26 @@ class CRM_Upgrade_Incremental_Base {
     $queue->createItem($task, array('weight' => -1));
   }
 
+  /**
+   * Remove a payment processor if not in use
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $name
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function removePaymentProcessorType(CRM_Queue_TaskContext $ctx, $name) {
+    $processors = civicrm_api3('PaymentProcessor', 'getcount', array('payment_processor_type_id' => $name));
+    if (empty($processors['result'])) {
+      $result = civicrm_api3('PaymentProcessorType', 'get', array(
+        'name' => $name,
+        'return' => 'id',
+      ));
+      if (!empty($result['id'])) {
+        civicrm_api3('PaymentProcessorType', 'delete', array('id' => $result['id']));
+      }
+    }
+    return TRUE;
+  }
+
 }

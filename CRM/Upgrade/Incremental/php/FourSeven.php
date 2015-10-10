@@ -44,11 +44,21 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.7.alpha1') {
-
       // CRM-16478 Remove custom fatal error template path option
       $config = CRM_Core_Config::singleton();
       if (!empty($config->fatalErrorTemplate) && $config->fatalErrorTemplate != 'CRM/common/fatal.tpl') {
         $preUpgradeMessage .= '<p>' . ts('The custom fatal error template setting will be removed during the upgrade. You are currently using this custom template: %1 . Following the upgrade you will need to use the standard approach to overriding template files, as described in the documentation.', array(1 => $config->fatalErrorTemplate)) . '</p>';
+      }
+    }
+    if ($rev == '4.7.alpha4') {
+      // CRM-17004 Warn of Moneris removal
+      $count = 1;
+      // Query only works in 4.3+
+      if (version_compare($currentVer, "4.3.0") > 0) {
+        $count = CRM_Core_DAO::singleValueQuery("SELECT COUNT(id) FROM civicrm_payment_processor WHERE payment_processor_type_id IN (SELECT id FROM civicrm_payment_processor_type WHERE name = 'Moneris')");
+      }
+      if ($count && !function_exists('moneris_civicrm_managed')) {
+        $preUpgradeMessage .= '<p>' . ts('The %1 payment processor is no longer bundled with CiviCRM. After upgrading you will need to install the extension to continue using it.', array(1 => 'Moneris')) . '</p>';
       }
     }
   }
@@ -104,6 +114,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask(ts('Migrate Settings to %1', array(1 => $rev)), 'migrateSettings', $rev);
     $this->addTask(ts('Add Getting Started dashlet to %1: SQL', array(1 => $rev)), 'addGettingStartedDashlet', $rev);
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_alpha4($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Remove %1', array(1 => 'Moneris')), 'removePaymentProcessorType', 'Moneris');
   }
 
   /**
