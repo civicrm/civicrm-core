@@ -230,8 +230,10 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
   if (is_array($values)) {
     $result['count'] = (int) count($values);
 
-    // Convert value-separated strings to array
-    _civicrm_api3_separate_values($values);
+    if (!in_array($action, array('getfields', 'create'))) {
+      // Convert value-separated strings to array
+      _civicrm_api3_separate_values($values);
+    }
 
     if ($result['count'] == 1) {
       list($result['id']) = array_keys($values);
@@ -396,24 +398,32 @@ function _civicrm_api3_get_BAO($name) {
 }
 
 /**
- * Recursive function to explode value-separated strings into arrays.
+ * Explode value-separated strings into arrays.
  *
- * @param $values
+ * @param array $values
  */
 function _civicrm_api3_separate_values(&$values) {
+  // test if this is cheaper that iterating every array
+  if (strpos(json_encode($values), CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+    array_walk_recursive($values, "_civicrm_api3_value_to_array");
+  }
+}
+
+/**
+ * Split out custom value separated fields.
+ *
+ * @param mixed $value
+ * @param string $key
+ */
+function _civicrm_api3_value_to_array(&$value, $key) {
   $sp = CRM_Core_DAO::VALUE_SEPARATOR;
-  foreach ($values as $key => & $value) {
-    if (is_array($value)) {
-      _civicrm_api3_separate_values($value);
+  if (is_string($value) && strpos($value, $sp) !== FALSE) {
+    // this is to honor the way case API was originally written
+    if ($key == 'case_type_id') {
+      $value = trim(str_replace($sp, ',', $value), ',');
     }
-    elseif (is_string($value)) {
-      // This is to honor the way case API was originally written.
-      if ($key == 'case_type_id') {
-        $value = trim(str_replace($sp, ',', $value), ',');
-      }
-      elseif (strpos($value, $sp) !== FALSE) {
-        $value = explode($sp, trim($value, $sp));
-      }
+    else {
+      $value = explode($sp, trim($value, $sp));
     }
   }
 }
