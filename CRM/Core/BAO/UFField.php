@@ -1090,6 +1090,10 @@ SELECT  id
           'name' => 'contribution_note',
           'title' => ts('Contribution Note'),
         ),
+        'contribution_soft_credit_pcp_id' => array(
+          'name' => 'contribution_soft_credit_pcp_id',
+          'title' => ts('Personal Campaign Page'),
+        ),
       );
     }
     return self::$_contriBatchEntryFields;
