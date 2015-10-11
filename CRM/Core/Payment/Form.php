@@ -307,7 +307,7 @@ class CRM_Core_Payment_Form {
     $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     return array_intersect_key(
       $paymentProcessorObject->getBillingAddressFieldsMetadata($billingLocationID),
-      array_flip (self::getBillingAddressFields($paymentProcessor, $billingLocationID))
+      array_flip(self::getBillingAddressFields($paymentProcessor, $billingLocationID))
     );
   }
 
