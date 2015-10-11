@@ -87,16 +87,23 @@ if (!defined( 'CIVICRM_PLUGIN_DIR')) {
   define( 'CIVICRM_PLUGIN_DIR', plugin_dir_path(CIVICRM_PLUGIN_FILE) );
 }
 
-// store PATH to this plugin's settings file
-if (!defined('CIVICRM_SETTINGS_PATH')) {
-  define( 'CIVICRM_SETTINGS_PATH', CIVICRM_PLUGIN_DIR . 'civicrm.settings.php' );
+// Test where the settings file exists, if in the 4.6 and prior location use that as CIVICRM_SETTINGS_PATH, otherwise set the new location as CIVICRM_SETTINGS_PATH
+  $upload_dir    = wp_upload_dir();
+  $wp_civi_settings = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php' ;
+  $wp_civi_settings_deprectated = CIVICRM_PLUGIN_DIR . 'civicrm.settings.php';
+
+if (file_exists($wp_civi_settings_deprectated)) {
+  define( 'CIVICRM_SETTINGS_PATH', $wp_civi_settings_deprectated );
+}
+else  {
+  define( 'CIVICRM_SETTINGS_PATH', $wp_civi_settings );
 }
 
 // test if Civi is installed
-if ( file_exists( CIVICRM_SETTINGS_PATH ) ) {
-  define( 'CIVICRM_INSTALLED', TRUE );
-} else {
-  define( 'CIVICRM_INSTALLED', FALSE );
+if ( file_exists( CIVICRM_SETTINGS_PATH )  ) {
+    define( 'CIVICRM_INSTALLED', TRUE );
+  } else {
+    define( 'CIVICRM_INSTALLED', FALSE );
 }
 
 // prevent CiviCRM from rendering its own header
@@ -575,7 +582,7 @@ class CiviCRM_For_WordPress {
       // check for settings
       if ( ! CIVICRM_INSTALLED ) {
         $error = FALSE;
-      } else {
+      } elseif ( file_exists( CIVICRM_SETTINGS_PATH) ) {
         $error = include_once ( CIVICRM_SETTINGS_PATH );
       }
 
@@ -744,13 +751,20 @@ class CiviCRM_For_WordPress {
 
     } else {
 
-      // add menu item to options menu
-      $options_page = add_options_page(
+      $civilogo = plugins_url(
+        'civicrm/i/logo16px.png',
+        __FILE__
+      );
+
+      // add top level menu item
+      $menu_page = add_menu_page(
         __( 'CiviCRM Installer', 'civicrm' ),
         __( 'CiviCRM Installer', 'civicrm' ),
         'manage_options',
         'civicrm-install',
-        array( $this, 'run_installer' )
+        array( $this, 'run_installer' ),
+        $civilogo,
+        apply_filters( 'civicrm_menu_item_position', '3.904981' ) // 3.9 + random digits to reduce risk of conflict
       );
 
       /*
