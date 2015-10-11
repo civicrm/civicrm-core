@@ -1740,6 +1740,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         // mhas == multiple has
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
+          $value = CRM_Utils_Type::escapeAll($value, $type);
           $clause
             = "{$field['dbAlias']} REGEXP '[[:cntrl:]]" . implode('|', $value) .
             "[[:cntrl:]]'";
@@ -1750,6 +1751,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         // mnot == multiple is not one of
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
+          $value = CRM_Utils_Type::escapeAll($value, $type);
           $clause
             = "( {$field['dbAlias']} NOT REGEXP '[[:cntrl:]]" . implode('|', $value) .
             "[[:cntrl:]]' OR {$field['dbAlias']} IS NULL )";
