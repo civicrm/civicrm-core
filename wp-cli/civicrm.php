@@ -55,6 +55,10 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
          * ===============
          * Command for to turn debug on.
          *
+         * wp civicrm disable-debug
+         * ===============
+         * Command for to turn debug off.
+         *
          * wp civicrm member-records
          * ===============
          * Run the CiviMember UpdateMembershipRecord cron (civicrm member-records).
@@ -132,6 +136,7 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
                 'api'                => 'api',
                 'cache-clear'        => 'cacheClear',
                 'enable-debug'       => 'enableDebug',
+                'disable-debug'       => 'disableDebug',
                 'install'            => 'install',
                 'member-records'     => 'memberRecords',
                 'process-mail-queue' => 'processMailQueue',
@@ -244,31 +249,24 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
          * Implementation of command 'enable-debug'
          */
         private function enableDebug() {
-
             civicrm_initialize();
+            Civi::settings()->add(array(
+              'debug_enabled' => 1,
+              'backtrace' => 1,
+            ));
+            WP_CLI::success('Debug setting enabled.');
+        }
 
-            require_once 'CRM/Core/DAO/Domain.php';
-
-            $domain = new CRM_Core_DAO_Domain();
-            $domain->id = CRM_Core_Config::domainID();
-            $domain->find(TRUE);
-
-            if ($domain->config_backend) {
-
-                $config = unserialize($domain->config_backend);
-                $config['debug_enabled']     = 1;
-                $config['debug']     = 1;
-                $config['backtrace'] = 1;
-
-                require_once 'CRM/Core/BAO/ConfigSetting.php';
-                CRM_Core_BAO_ConfigSetting::add($config);
-
-                WP_CLI::success('Debug setting enabled.');
-
-            } else {
-                WP_CLI::error('Error retrieving current config_backend.');
-            }
-
+        /**
+         * Implementation of command 'disable-debug'
+         */
+        private function disableDebug() {
+            civicrm_initialize();
+            Civi::settings()->add(array(
+              'debug_enabled' => 0,
+              'backtrace' => 0,
+            ));
+            WP_CLI::success('Debug setting disabled.');
         }
 
         /**
@@ -299,13 +297,14 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
             # begin install
 
             $wp_root = ABSPATH;
+            $plugins_dir = plugin_dir_path( __FILE__ );
 
             if ($pluginPath = $this->getOption('destination', FALSE))
                 $pluginPath = $wp_root . $pluginPath;
             else
-                $pluginPath = $wp_root . 'wp-content/plugins';
+                $pluginPath = $plugins_dir;
 
-            if (is_dir($pluginPath . '/civicrm'))
+            if (is_dir($pluginPath ))
                 return WP_CLI::error("Existing CiviCRM found. No action taken.");
 
             # extract the archive
@@ -327,7 +326,7 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
             # include civicrm installer helper file
             global $crmPath;
 
-            $crmPath                = "$pluginPath/civicrm/civicrm";
+            $crmPath                = "$pluginPath/civicrm";
             $civicrmInstallerHelper = "$crmPath/install/civicrm.php";
 
             if (!file_exists($civicrmInstallerHelper))
@@ -341,14 +340,16 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
                     return WP_CLI::error("No language tarfile specified, use --langtarfile=path/to/tarfile");
 
             # create files dirs
-            civicrm_setup("$pluginPath/files");
-            WP_CLI::launch("chmod 0777 $pluginPath/files/civicrm -R");
+            $upload_dir      = wp_upload_dir();
+            $settingsDir     = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
+            civicrm_setup("$settingsDir");
+            WP_CLI::launch("chmod 0777 $settingsDir -R");
 
             # now we've got some files in place, require PEAR DB and check db setup
             $dsn = "mysql://{$dbuser}:{$dbpass}@{$dbhost}/{$dbname}?new_link=true";
             $dsn_nodb = "mysql://{$dbuser}:{$dbpass}@{$dbhost}";
 
-            require_once ABSPATH . '/wp-content/plugins/civicrm/civicrm/packages/DB.php';
+            require_once $plugins_dir . '/civicrm/packages/DB.php';
 
             $db = DB::connect($dsn);
             if (DB::iserror($db)) {
@@ -410,10 +411,11 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
             $baseUrl = !$baseUrl ? get_bloginfo('url') : $protocol . '://' . $baseUrl;
             if (substr($baseUrl, -1) != '/')
                 $baseUrl .= '/';
-
+            $upload_dir      = wp_upload_dir();
+            $settingsDir     = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
             $params = array(
                 'crmRoot'            => $crmPath . '/',
-                'templateCompileDir' => "$pluginPath/files/civicrm/templates_c",
+                'templateCompileDir' => "$settingsDir/files/civicrm/templates_c",
                 'frontEnd'           => 0,
                 'cms'                => 'WordPress',
                 'baseURL'            => $baseUrl,
@@ -434,7 +436,7 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
 
             $str = trim($str);
 
-            $configFile = "$pluginPath/civicrm/civicrm.settings.php";
+            $configFile = "$settingsDir/civicrm.settings.php";
             civicrm_write_file($configFile, $str);
             WP_CLI::launch("chmod 0644 $configFile");
             WP_CLI::success(sprintf("Settings file generated: %s", $configFile));
@@ -473,7 +475,8 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
                 );
 
                 # if (!defined('CIVICRM_CONFDIR')) {
-                #     define('CIVICRM_CONFDIR', ABSPATH . '/wp-content/plugins/civicrm');
+                # $plugins_dir = plugin_dir_path( __FILE__ );
+                #     define('CIVICRM_CONFDIR', $plugins_dir );
                 # }
 
                 include "bin/UpdateMembershipRecord.php";
@@ -834,7 +837,8 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
 
                 # attempt to preserve webserver ownership of templates_c, civicrm/upload
                 if ($webserver_user and $webserver_group) {
-                    $civicrm_files_dir = ABSPATH . '/wp-content/plugins/files/civicrm';
+                    $upload_dir      = wp_upload_dir();
+                    $civicrm_files_dir      = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
                     system(sprintf('chown -R %s:%s %s/templates_c', $webserver_user, $webserver_group, $civicrm_files_dir));
                     system(sprintf('chown -R %s:%s %s/upload', $webserver_user, $webserver_group, $civicrm_files_dir));
                 }
@@ -862,9 +866,12 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
                 define('CIVICRM_UPGRADE_ACTIVE', 1);
 
             $wp_root       = ABSPATH;
-            $settings_path = ABSPATH . '/wp-content/plugins/civicrm/civicrm.settings.php';
-            if (!file_exists($settings_path))
-                return WP_CLI::error('Unable to locate settings file at ' . $settings_path);
+            $plugins_dir = plugin_dir_path( __FILE__ );
+            $legacy_settings_file = $plugins_dir . '/civicrm.settings.php';
+            $upload_dir      = wp_upload_dir();
+            $settings_file     = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
+            if (!file_exists($legacy_settings_file) || !file_exists($settings_file)  )
+                return WP_CLI::error('Unable to locate settings file at ' . $legacy_settings_file . 'or at ' . $settings_file );
 
             # nb: we don't want to require civicrm.settings.php here, because ..
             #
@@ -876,13 +883,20 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
             # pull out the lines we need using a regex and run them - yes, it's pretty silly ..
             # don't try this at home, kids.
 
-            $settings = file_get_contents($settings_path);
+            $legacy_settings = file_get_contents($legacy_settings_file);
+            $legacy_settings = str_replace("\r", '', $legacy_settings);
+            $legacy_settings = explode("\n", $legacy_settings);
+            $settings = file_get_contents($settings_file);
             $settings = str_replace("\r", '', $settings);
             $settings = explode("\n", $settings);
 
-            if ($civicrm_root_code = reset(preg_grep('/^\s*\$civicrm_root\s*=.*$/', $settings))) {
+            if ($civicrm_root_code = reset(preg_grep('/^\s*\$civicrm_root\s*=.*$/', $legacy_settings))) {
                 eval($civicrm_root_code);
-            } else {
+            }
+            elseif ($civicrm_root_code = reset(preg_grep('/^\s*\$civicrm_root\s*=.*$/', $settings))){
+                eval($civicrm_root_code);
+            }
+            else {
                 return WP_CLI::error('Unable to read $civicrm_root from civicrm.settings.php');
             }
 
@@ -1162,9 +1176,17 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
          * @return string - the user which owns templates_c / empty string if not found
          */
         private function getWebServerUser() {
-
-            $tplPath = ABSPATH . '/wp-content/plugins/files/civicrm/templates_c';
-            if (is_dir($tplPath)) {
+            $plugins_dir = plugin_dir_path( __FILE__ );
+            $plugins_dir_root = WP_PLUGIN_DIR;
+            $upload_dir      = wp_upload_dir();
+            $tplPath     = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'templates_c';
+            $legacy_tplPath = $plugins_dir_root . '/files/civicrm/templates_c';
+            if (is_dir($legacy_tplPath)) {
+                $owner = posix_getpwuid(fileowner($legacy_tplPath));
+                if (isset($owner['name']))
+                    return $owner['name'];
+            }
+            elseif (is_dir($tplPath)) {
                 $owner = posix_getpwuid(fileowner($tplPath));
                 if (isset($owner['name']))
                     return $owner['name'];
@@ -1177,9 +1199,17 @@ if (!defined('CIVICRM_WPCLI_LOADED')) {
          * Get the group the webserver runs as - as above, but for group
          */
         private function getWebServerGroup() {
-
-            $tplPath = ABSPATH . '/wp-content/plugins/files/civicrm/templates_c';
-            if (is_dir($tplPath)) {
+            $plugins_dir = plugin_dir_path( __FILE__ );
+            $plugins_dir_root = WP_PLUGIN_DIR;
+            $upload_dir      = wp_upload_dir();
+            $tplPath     = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'templates_c';
+            $legacy_tplPath = $plugins_dir_root . '/files/civicrm/templates_c';
+            if (is_dir($legacy_tplPath)) {
+                $group = posix_getgrgid(filegroup($legacy_tplPath));
+                if (isset($group['name']))
+                    return $group['name'];
+            }
+            elseif (is_dir($tplPath)) {
                 $group = posix_getgrgid(filegroup($tplPath));
                 if (isset($group['name']))
                     return $group['name'];
