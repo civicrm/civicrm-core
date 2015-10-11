@@ -38,11 +38,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('hidden', 'hidden_basic', 1);
 
     if ($form->_searchOptions['contactType']) {
-      // add checkboxes for contact type
-      //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
-      // this is loaded onto then replace with something like '__' & test
-      $separator = CRM_Core_DAO::VALUE_SEPARATOR;
-      $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
+      $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
 
       if ($contactTypes) {
         $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,

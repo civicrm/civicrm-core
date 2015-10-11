@@ -1508,7 +1508,24 @@ class CRM_Contact_BAO_Query {
         $params[] = $values;
         continue;
       }
-      if ($id == 'privacy') {
+      // The form uses 1 field to represent two db fields
+      if ($id == 'contact_type' && $values && (!is_array($values) || !array_intersect(array_keys($values), CRM_Core_DAO::acceptedSQLOperators()))) {
+        $contactType = array();
+        $subType = array();
+        foreach ((array) $values as $key => $type) {
+          $types = explode('__', is_numeric($type) ? $key : $type);
+          $contactType[$types[0]] = $types[0];
+          // Add sub-type if specified
+          if (!empty($types[1])) {
+            $subType[$types[1]] = $types[1];
+          }
+        }
+        $params[] = array('contact_type', 'IN', $contactType, 0, 0);
+        if ($subType) {
+          $params[] = array('contact_sub_type', 'IN', $subType, 0, 0);
+        }
+      }
+      elseif ($id == 'privacy') {
         if (is_array($formValues['privacy'])) {
           $op = !empty($formValues['privacy']['do_not_toggle']) ? '=' : '!=';
           foreach ($formValues['privacy'] as $key => $value) {
@@ -1711,10 +1728,6 @@ class CRM_Contact_BAO_Query {
     switch ($values[0]) {
       case 'deleted_contacts':
         $this->deletedContacts($values);
-        return;
-
-      case 'contact_type':
-        $this->contactType($values);
         return;
 
       case 'contact_sub_type':
@@ -2794,7 +2807,7 @@ class CRM_Contact_BAO_Query {
 
     $clause = array();
     $alias = "contact_a.contact_sub_type";
-    $qillOperators = array('NOT LIKE' => ts('Not Like')) + CRM_Core_SelectValues::getSearchBuilderOperators();
+    $qillOperators = CRM_Core_SelectValues::getSearchBuilderOperators();
 
     $op = str_replace('IN', 'LIKE', $op);
     $op = str_replace('=', 'LIKE', $op);
@@ -5371,8 +5384,8 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       case 'IN':
       case 'NOT IN':
         // I feel like this would be escaped properly if passed through $queryString = CRM_Core_DAO::createSqlFilter.
-        if (!empty($value) && is_array($value) && !array_key_exists($op, $value)) {
-          $value = array($op => $value);
+        if (!empty($value) && (!is_array($value) || !array_key_exists($op, $value))) {
+          $value = array($op => (array) $value);
         }
 
       default:
