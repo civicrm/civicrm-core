@@ -305,7 +305,10 @@ class CRM_Core_Payment_Form {
    */
   public static function getBillingAddressMetadata($paymentProcessor, $billingLocationID) {
     $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
-    return $paymentProcessorObject->getBillingAddressFieldsMetadata($billingLocationID);
+    return array_intersect_key(
+      $paymentProcessorObject->getBillingAddressFieldsMetadata($billingLocationID),
+      array_flip (self::getBillingAddressFields($paymentProcessor, $billingLocationID))
+    );
   }
 
   /**
