@@ -1130,6 +1130,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];
+    $financialType->find(TRUE);
 
     // Add some financial type details to the params list
     // if folks need to use it.
@@ -1799,6 +1800,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];
+    $financialType->find(TRUE);
 
     if ($financialType->is_deductible) {
 
