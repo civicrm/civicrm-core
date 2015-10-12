@@ -26,6 +26,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       'civicrm_entity_tag',
       'civicrm_tag',
       'civicrm_contact',
+      'civicrm_address',
     );
     $this->quickCleanup($tablesToTruncate);
   }
@@ -210,6 +211,41 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     list($select) = $query->query(FALSE);
     $this->assertEquals('SELECT contact_a.id as contact_id', $select);
+  }
+
+  /**
+   * Test smart groups with non-numeric don't fail on range queries.
+   *
+   * CRM-14720
+   */
+  public function testNumericPostal() {
+    $this->individualCreate(array('api.address.create' => array('postal_code' => 5, 'location_type_id' => 'Main')));
+    $this->individualCreate(array('api.address.create' => array('postal_code' => 'EH10 4RB-889', 'location_type_id' => 'Main')));
+    $this->individualCreate(array('api.address.create' => array('postal_code' => '4', 'location_type_id' => 'Main')));
+    $this->individualCreate(array('api.address.create' => array('postal_code' => '6', 'location_type_id' => 'Main')));
+
+    $params = array(array('postal_code_low', '=', 5, 0, 0));
+    CRM_Contact_BAO_Query::convertFormValues($params);
+
+    $query = new CRM_Contact_BAO_Query(
+      $params, array('contact_id'),
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+
+    $sql = $query->query(FALSE);
+    $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
+    $this->assertEquals(2, $result->N);
+
+    // We save this as a smart group and then load it. With mysql warnings on & CRM-14720 this
+    // results in mysql warnings & hence fatal errors.
+    /// I was unable to get mysql warnings to activate in the context of the unit tests - but
+    // felt this code still provided a useful bit of coverage as it runs the various queries to load
+    // the group & could generate invalid sql if a bug were introduced.
+    $groupParams = array('title' => 'postal codes', 'formValues' => $params, 'is_active' => 1);
+    $group = CRM_Contact_BAO_Group::createSmartGroup($groupParams);
+    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
   }
 
 }
