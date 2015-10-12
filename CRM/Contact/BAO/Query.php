@@ -820,7 +820,7 @@ class CRM_Contact_BAO_Query {
                 $this->_pseudoConstantsSelect[$tName]['select'] = "{$field['where']} as `$name`";
                 $this->_pseudoConstantsSelect[$tName]['element'] = $name;
               }
-              elseif (strpos($name, 'contribution_soft_credit') !== FALSE ) {
+              elseif (strpos($name, 'contribution_soft_credit') !== FALSE) {
                 if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_params)) {
                   $this->_select[$name] = "{$field['where']} as `$name`";
                 }
