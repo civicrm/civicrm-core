@@ -231,7 +231,9 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
     $result['count'] = (int) count($values);
 
     // Convert value-separated strings to array
-    _civicrm_api3_separate_values($values);
+    if ($action != 'getfields') {
+      _civicrm_api3_separate_values($values);
+    }
 
     if ($result['count'] == 1) {
       list($result['id']) = array_keys($values);
