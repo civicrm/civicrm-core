@@ -61,10 +61,7 @@
       <div class="bold" style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
-          {ts 1="https://civicrm.org/become-a-member?src=ug&sid=$sid" 2="https://civicrm.org/contribute?src=ug&sid=$sid"}The CiviCRM Core Team has been hard at work and is proud to release 4.6, the first major update of 2015. Though it is packed with enhancements and continues to mature the leading open source CRM for nonprofits worldwide, it does come with a cost to produce, maintain and improve upon. Without funding from organizations like yours, future releases are at risk of never being realized. We invite you to enjoy the improvements in 4.6 and ask that you <a href="%1" target="_blank">support CiviCRM by becoming a member</a> or by <a href="%2" target="_blank">making a donation</a>. ~ Dave Greenberg, Co-Founder{/ts}
-        </p>
-        <p>
-          {ts 1="https://civicrm.org/register-your-site?src=ug&sid=$sid"}Not ready for a membership yet? You can still help us learn how to improve CiviCRM by <a href="%1" target="_blank">registering your site</a>.{/ts}
+          {ts 1="https://civicrm.org/core-team" 2="https://civicrm.org/providers/contributors" 3="https://civicrm.org/become-a-member?src=ug&sid=$sid"}Thank you for upgrading to 4.7, the latest version of CiviCRM. Packed with new features and improvements, this release was made possible by the <a href="%1">CiviCRM Core Team</a> plus an incredible group of <a href="%2">contributors</a>, with the financial support of CiviCRM Members and Partners, without whom the project could not exist. We invite you to join their ranks by <a href="%3">becoming a member of CiviCRM today</a>. There is no better way to say thanks than to support those that have made CiviCRM 4.7 possible. <a href="%3">Join today</a>.{/ts}
         </p>
       </div>
       <p><span class="crm-status-icon success"> </span>{$message}</p>
