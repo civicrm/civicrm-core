@@ -248,4 +248,32 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
   }
 
+  /**
+   * Test smart groups with non-numeric don't fail on equal queries.
+   *
+   * CRM-14720
+   */
+  public function testNonNumericEqualsPostal() {
+    $this->individualCreate(array('api.address.create' => array('postal_code' => 5, 'location_type_id' => 'Main')));
+    $this->individualCreate(array('api.address.create' => array('postal_code' => 'EH10 4RB-889', 'location_type_id' => 'Main')));
+    $this->individualCreate(array('api.address.create' => array('postal_code' => '4', 'location_type_id' => 'Main')));
+    $this->individualCreate(array('api.address.create' => array('postal_code' => '6', 'location_type_id' => 'Main')));
+
+    $params = array(array('postal_code', '=', 'EH10 4RB-889', 0, 0));
+    CRM_Contact_BAO_Query::convertFormValues($params);
+
+    $query = new CRM_Contact_BAO_Query(
+      $params, array('contact_id'),
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+
+    $sql = $query->query(FALSE);
+    $this->assertEquals("WHERE  ( civicrm_address.postal_code = 'eh10 4rb-889' )  AND (contact_a.is_deleted = 0)", $sql[2]);
+    $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
+    $this->assertEquals(1, $result->N);
+
+  }
+
 }
