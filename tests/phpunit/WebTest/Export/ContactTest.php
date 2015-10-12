@@ -484,6 +484,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $softCreditFname = substr(sha1(rand()), 0, 7);
     $softCreditLname = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
+    $softContactId = $this->urlArg('cid');
 
     $firstName = 'a' . substr(sha1(rand()), 0, 7);
     $this->openCiviPage('contribute/add', 'reset=1&action=add&context=standalone', '_qf_Contribution_upload-bottom');
@@ -537,6 +538,9 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->select("mapper_1_3_0", 'Contribution');
     $this->select("mapper_1_3_1", 'Soft Credit Type');
 
+    $this->select("mapper_1_4_0", 'Contribution');
+    $this->select("mapper_1_4_1", 'Soft Credit For Contact ID');
+
     $csvFile = $this->downloadCSV("_qf_Map_next-bottom", 'CiviCRM_Contribution_Search.csv');
 
     // All other rows to be check.
@@ -546,6 +550,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
         'Soft Credit For' => "{$softCreditLname}, {$softCreditFname}",
         'Soft Credit For Contribution ID' => $contributionID,
         'Soft Credit Type' => 'Solicited',
+        'Soft Credit For Contact ID' => $softContactId,
       ),
     );
 
