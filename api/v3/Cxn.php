@@ -275,9 +275,9 @@ function civicrm_api3_cxn_create($params) {
       $dao = new CRM_Cxn_DAO_Cxn();
       $dao->id = $cxnId;
 
-      if ($dao->find()) {        
+      if ($dao->find()) {
         if (isset($params['is_active'])) {
-          $dao->is_active = (int)$params['is_active'];
+          $dao->is_active = (int) $params['is_active'];
         }
         if (isset($params['options'])) {
           $dao->options = $params['options'];
@@ -285,14 +285,12 @@ function civicrm_api3_cxn_create($params) {
 
         $result = $dao->save();
       }
-      else {
-        //TODO: create?
-      }
 
     }
     return civicrm_api3_create_success($result, $params, 'Cxn', 'create');
 
-  } catch( Exception $ex){      
+  }
+  catch(Exception $ex){
     throw $ex;
   }
 }
