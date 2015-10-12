@@ -37,6 +37,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
+   *
    * This method is called before a test is executed.
    */
   protected function setUp() {
@@ -45,6 +46,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
   /**
    * Tears down the fixture, for example, closes a network connection.
+   *
    * This method is called after a test is executed.
    */
   protected function tearDown() {
@@ -52,7 +54,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for add( )
+   * Test case for add( ).
    */
   public function testAddSimple() {
 
@@ -72,6 +74,9 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Test adding a smart group.
+   */
   public function testAddSmart() {
 
     $checkParams = $params = array(
@@ -93,7 +98,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Load all sql data sets & return an array of saved searches
+   * Load all sql data sets & return an array of saved searches.
+   *
    * @return array
    */
   public function dataProviderSavedSearch() {
@@ -114,7 +120,9 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check we can load smart groups based on config from 'real DBs' without fatal errors - note that we are only testing lack of errors at this stage
+   * Check we can load smart groups based on config from 'real DBs' without fatal errors.
+   *
+   * Note that we are only testing lack of errors at this stage
    * @todo - for some reason the data was getting truncated from the group table using dataprovider - would be preferable to get that working
    * //@notdataProvider dataProviderSavedSearch
    * //@notparam integer $groupID

@@ -46,13 +46,14 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
   /**
    * Tears down the fixture, for example, closes a network connection.
+   *
    * This method is called after a test is executed.
    */
   protected function tearDown() {
   }
 
   /**
-   * Test case for add( )
+   * Test case for add( ).
    */
   public function testAdd() {
 
