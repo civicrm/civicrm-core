@@ -475,7 +475,8 @@ $event_summary_limit
             }
 
             $eventSummary['events'][$dao->id][$property] = $set;
-            if (in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
+            if (is_array($permissions[CRM_Core_Permission::EDIT])
+              && in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
               $eventSummary['events'][$dao->id]['configure'] = CRM_Utils_System::url('civicrm/admin/event', "action=update&id=$dao->id&reset=1");
             }
             break;
