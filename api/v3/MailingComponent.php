@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,61 +23,70 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 mailing_component functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_mailing_component
- *
  */
 
 /**
- * Save a mailing_component
+ * This api exposes CiviCRM MailingComponent (header and footer).
  *
- * Allowed @params array keys are:
- * {@getfields mailing_component_create}
- * @example mailing_componentCreate.php
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Save a MailingComponent.
  *
- * @param $params
+ * @param array $params
  *
  * @throws API_Exception
- * @return array of newly created mailing_component property values.
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_mailing_component_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+
 /**
- * Get a mailing_component
+ * Adjust Metadata for Create action.
  *
- * Allowed @params array keys are:
- * {@getfields mailing_component_get}
- * @example mailing_componentCreate.php
+ * The metadata is used for setting defaults, documentation & validation.
  *
- * @param $params
+ * @param array $spec
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_mailing_component_create_spec(&$spec) {
+  $spec['is_active']['api.default'] = 1;
+}
+
+/**
+ * Get a MailingComponent.
  *
- * @return array of retrieved mailing_component property values.
- * @access public
+ * @param array $params
+ *
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_mailing_component_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a mailing_component
+ * Adjust metadata for get.
  *
- * Allowed @params array keys are:
- * {@getfields mailing_component_delete}
- * @example mailing_componentCreate.php
+ * @param array $params
+ */
+function _civicrm_api3_mailing_component_get_spec(&$params) {
+  // fetch active records by default
+  $params['is_active']['api.default'] = 1;
+}
+
+/**
+ * Delete a MailingComponent.
  *
- * @param $params
+ * @param array $params
  *
  * @throws API_Exception
- * @return array of deleted values.
- * @access public
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_mailing_component_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

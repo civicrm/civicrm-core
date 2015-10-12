@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -38,13 +38,12 @@ class CRM_Core_Key {
   static $_sessionID = NULL;
 
   /**
-   * Generate a private key per session and store in session
+   * Generate a private key per session and store in session.
    *
-   * @return string private key for this session
-   * @static
-   * @access private
+   * @return string
+   *   private key for this session
    */
-  static function privateKey() {
+  public static function privateKey() {
     if (!self::$_key) {
       $session = CRM_Core_Session::singleton();
       self::$_key = $session->get('qfPrivateKey');
@@ -59,7 +58,7 @@ class CRM_Core_Key {
   /**
    * @return mixed|null|string
    */
-  static function sessionID() {
+  public static function sessionID() {
     if (!self::$_sessionID) {
       $session = CRM_Core_Session::singleton();
       self::$_sessionID = $session->get('qfSessionID');
@@ -75,20 +74,17 @@ class CRM_Core_Key {
    * Generate a form key based on form name, the current user session
    * and a private key. Modelled after drupal's form API
    *
-   * @param $name
+   * @param string $name
    * @param bool $addSequence
+   *   Should we add a unique sequence number to the end of the key.
    *
-   * @internal param string $value name of the form
-   * @paeam boolean $addSequence should we add a unique sequence number to the end of the key
-   *
-   * @return string       valid formID
-   * @static
-   * @acess public
+   * @return string
+   *   valid formID
    */
-  static function get($name, $addSequence = FALSE) {
+  public static function get($name, $addSequence = FALSE) {
     $privateKey = self::privateKey();
-    $sessionID  = self::sessionID();
-    $key        = md5($sessionID . $name . $privateKey);
+    $sessionID = self::sessionID();
+    $key = md5($sessionID . $name . $privateKey);
 
     if ($addSequence) {
       // now generate a random number between 1 and 100K and add it to the key
@@ -99,19 +95,16 @@ class CRM_Core_Key {
   }
 
   /**
-   * Validate a form key based on the form name
+   * Validate a form key based on the form name.
    *
-   * @param $key
+   * @param string $key
    * @param string $name
-   *
    * @param bool $addSequence
    *
-   * @internal param string $formKey
-   * @return string $formKey if valid, else null
-   * @static
-   * @acess public
+   * @return string
+   *   if valid, else null
    */
-  static function validate($key, $name, $addSequence = FALSE) {
+  public static function validate($key, $name, $addSequence = FALSE) {
     if (!is_string($key)) {
       return NULL;
     }
@@ -139,7 +132,7 @@ class CRM_Core_Key {
    *
    * @return bool
    */
-  static function valid($key) {
+  public static function valid($key) {
     // a valid key is a 32 digit hex number
     // followed by an optional _ and a number between 1 and 10000
     if (strpos('_', $key) !== FALSE) {
@@ -160,5 +153,5 @@ class CRM_Core_Key {
     // ensure that hash is a 32 digit hex number
     return preg_match('#[0-9a-f]{32}#i', $hash) ? TRUE : FALSE;
   }
-}
 
+}

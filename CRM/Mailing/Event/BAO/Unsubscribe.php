@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,22 +41,24 @@ require_once 'Mail/mime.php';
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Unsubscribe a contact from the domain
+   * Unsubscribe a contact from the domain.
    *
-   * @param int $job_id       The job ID
-   * @param int $queue_id     The Queue Event ID of the recipient
-   * @param string $hash      The hash
+   * @param int $job_id
+   *   The job ID.
+   * @param int $queue_id
+   *   The Queue Event ID of the recipient.
+   * @param string $hash
+   *   The hash.
    *
-   * @return boolean          Was the contact successfully unsubscribed?
-   * @access public
-   * @static
+   * @return bool
+   *   Was the contact successfully unsubscribed?
    */
   public static function unsub_from_domain($job_id, $queue_id, $hash) {
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
@@ -77,7 +79,8 @@ SET    on_hold = 2,
        hold_date = %1
 WHERE  email = %2
 ";
-        $sqlParams = array(1 => array($now, 'Timestamp'),
+        $sqlParams = array(
+          1 => array($now, 'Timestamp'),
           2 => array($email->email, 'String'),
         );
         CRM_Core_DAO::executeQuery($sql, $sqlParams);
@@ -111,16 +114,19 @@ WHERE  email = %2
   }
 
   /**
-   * Unsubscribe a contact from all groups that received this mailing
+   * Unsubscribe a contact from all groups that received this mailing.
    *
-   * @param int $job_id       The job ID
-   * @param int $queue_id     The Queue Event ID of the recipient
-   * @param string $hash      The hash
-   * @param boolean $return   If true return the list of groups.
+   * @param int $job_id
+   *   The job ID.
+   * @param int $queue_id
+   *   The Queue Event ID of the recipient.
+   * @param string $hash
+   *   The hash.
+   * @param bool $return
+   *   If true return the list of groups.
    *
-   * @return array|null $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
-   * @access public
-   * @static
+   * @return array|null
+   *   $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
    */
   public static function &unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE) {
     /* First make sure there's a matching queue event */
@@ -168,8 +174,7 @@ WHERE  email = %2
     );
 
     /* Make a list of groups and a list of prior mailings that received
-         * this mailing */
-
+     * this mailing */
 
     $groups = array();
     $base_groups = array();
@@ -190,7 +195,7 @@ WHERE  email = %2
     }
 
     /* As long as we have prior mailings, find their groups and add to the
-         * list */
+     * list */
 
     while (!empty($mailings)) {
       $do->query("
@@ -218,12 +223,16 @@ WHERE  email = %2
     CRM_Utils_Hook::unsubscribeGroups('unsubscribe', $mailing_id, $contact_id, $group_ids, $base_group_ids);
 
     /* Now we have a complete list of recipient groups.  Filter out all
-         * those except smart groups, those that the contact belongs to and
-         * base groups from search based mailings */
+     * those except smart groups, those that the contact belongs to and
+     * base groups from search based mailings */
 
     $baseGroupClause = '';
     if (!empty($base_group_ids)) {
       $baseGroupClause = "OR  $group.id IN(" . implode(', ', $base_group_ids) . ")";
+    }
+    $groupIdClause = '';
+    if ($group_ids || $base_group_ids) {
+      $groupIdClause = "AND $group.id IN (" . implode(', ', array_merge($group_ids, $base_group_ids)) . ")";
     }
     $do->query("
             SELECT      $group.id as group_id,
@@ -232,8 +241,8 @@ WHERE  email = %2
             FROM        $group
             LEFT JOIN   $gc
                 ON      $gc.group_id = $group.id
-            WHERE       $group.id IN (" . implode(', ', array_merge($group_ids, $base_group_ids)) . ")
-                AND     $group.is_hidden = 0
+            WHERE       $group.is_hidden = 0
+                        $groupIdClause
                 AND     ($group.saved_search_id is not null
                             OR  ($gc.contact_id = $contact_id
                                 AND $gc.status = 'Added')
@@ -283,17 +292,19 @@ WHERE  email = %2
   }
 
   /**
-   * Send a reponse email informing the contact of the groups from which he
+   * Send a reponse email informing the contact of the groups from which he.
    * has been unsubscribed.
    *
-   * @param string $queue_id      The queue event ID
-   * @param array $groups         List of group IDs
-   * @param bool $is_domain       Is this domain-level?
-   * @param int $job              The job ID
+   * @param string $queue_id
+   *   The queue event ID.
+   * @param array $groups
+   *   List of group IDs.
+   * @param bool $is_domain
+   *   Is this domain-level?.
+   * @param int $job
+   *   The job ID.
    *
    * @return void
-   * @access public
-   * @static
    */
   public static function send_unsub_response($queue_id, $groups, $is_domain = FALSE, $job) {
     $config = CRM_Core_Config::singleton();
@@ -405,20 +416,23 @@ WHERE  email = %2
   }
 
   /**
-   * Get row count for the event selector
+   * Get row count for the event selector.
    *
-   * @param int $mailing_id ID of the mailing
-   * @param int $job_id Optional ID of a job to filter on
-   * @param boolean $is_distinct Group by queue ID?
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of a job to filter on.
+   * @param bool $is_distinct
+   *   Group by queue ID?.
    *
    * @param null $org_unsubscribe
    *
-   * @return int                  Number of rows in result set
-   * @access public
-   * @static
+   * @return int
+   *   Number of rows in result set
    */
-  public static function getTotalCount($mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $org_unsubscribe = NULL
+  public static function getTotalCount(
+    $mailing_id, $job_id = NULL,
+    $is_distinct = FALSE, $org_unsubscribe = NULL, $toDate = NULL
   ) {
     $dao = new CRM_Core_DAO();
 
@@ -441,6 +455,10 @@ WHERE  email = %2
                     ON  $job.mailing_id = $mailing.id
                     AND $job.is_test = 0
             WHERE       $mailing.id = " . CRM_Utils_Type::escape($mailing_id, 'Integer');
+
+    if (!empty($toDate)) {
+      $query .= " AND $unsub.time_stamp <= $toDate";
+    }
 
     if (!empty($job_id)) {
       $query .= " AND $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer');
@@ -465,21 +483,27 @@ WHERE  email = %2
   }
 
   /**
-   * Get rows for the event browser
+   * Get rows for the event browser.
    *
-   * @param int $mailing_id ID of the mailing
-   * @param int $job_id optional ID of the job
-   * @param boolean $is_distinct Group by queue id?
-   * @param int $offset Offset
-   * @param int $rowCount Number of rows
-   * @param array $sort sort array
+   * @param int $mailing_id
+   *   ID of the mailing.
+   * @param int $job_id
+   *   Optional ID of the job.
+   * @param bool $is_distinct
+   *   Group by queue id?.
+   * @param int $offset
+   *   Offset.
+   * @param int $rowCount
+   *   Number of rows.
+   * @param array $sort
+   *   Sort array.
    *
    * @param null $org_unsubscribe
-   * @return array                Result set
-   * @access public
-   * @static
+   * @return array
+   *   Result set
    */
-  public static function &getRows($mailing_id, $job_id = NULL,
+  public static function &getRows(
+    $mailing_id, $job_id = NULL,
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL,
     $org_unsubscribe = NULL
   ) {
@@ -568,7 +592,7 @@ WHERE  email = %2
   }
 
   /**
-   * @param $queueID
+   * @param int $queueID
    *
    * @return array
    */
@@ -595,5 +619,5 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
 
     return array($displayName, $email);
   }
-}
 
+}

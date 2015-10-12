@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This is the base Action class for all actions which we redefine. This is
  * integrated with the StateMachine, Controller and State objects
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -42,30 +42,29 @@ require_once 'HTML/QuickForm/Action.php';
 class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
 
   /**
-   * reference to the state machine i belong to
+   * Reference to the state machine i belong to.
    * @var object
    */
   protected $_stateMachine;
 
   /**
-   * constructor
+   * Constructor.
    *
-   * @param object $stateMachine reference to state machine object
+   * @param object $stateMachine
+   *   Reference to state machine object.
    *
    * @return \CRM_Core_QuickForm_Action
-  @access public
    */
-  function __construct(&$stateMachine) {
+  public function __construct(&$stateMachine) {
     $this->_stateMachine = &$stateMachine;
   }
 
   /**
-   * returns the user to the top of the user context stack.
+   * Returns the user to the top of the user context stack.
    *
    * @return void
-   * @access public
    */
-  function popUserContext() {
+  public function popUserContext() {
     $session = CRM_Core_Session::singleton();
     $config = CRM_Core_Config::singleton();
 
@@ -87,5 +86,5 @@ class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
       CRM_Utils_System::redirect($destination);
     }
   }
-}
 
+}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -21,12 +21,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,13 +43,14 @@ class CRM_Badge_BAO_Badge {
   public $border = 0;
 
   /**
-   *  This function is called to create name label pdf
+   *  This function is called to create name label pdf.
    *
-   * @param   array $participants associated array with participant info
-   * @param   array $layoutInfo   associated array which contains meta data about format/layout
+   * @param array $participants
+   *   Associated array with participant info.
+   * @param array $layoutInfo
+   *   Associated array which contains meta data about format/layout.
    *
-   * @return  void
-   * @access  public
+   * @return void
    */
   public function createLabels(&$participants, &$layoutInfo) {
     $this->pdf = new CRM_Utils_PDF_Label($layoutInfo['format'], 'mm');
@@ -74,18 +75,20 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * Funtion to create structure and add meta data according to layout
+   * Funtion to create structure and add meta data according to layout.
    *
-   * @param array $row row element that needs to be formatted
-   * @param array $layout layout meta data
+   * @param array $row
+   *   Row element that needs to be formatted.
+   * @param array $layout
+   *   Layout meta data.
    *
-   * @return array $formattedRow row with meta data
+   * @return array
+   *   row with meta data
    */
-  static function formatLabel(&$row, &$layout) {
+  public static function formatLabel(&$row, &$layout) {
     $formattedRow = array('labelFormat' => $layout['label_format_name']);
     $formattedRow['labelTitle'] = $layout['title'];
     $formattedRow['labelId'] = $layout['id'];
-
 
     if (!empty($layout['data']['rowElements'])) {
       foreach ($layout['data']['rowElements'] as $key => $element) {
@@ -163,6 +166,7 @@ class CRM_Badge_BAO_Badge {
       case 'Hanging Badge 3-3/4" x 4-3"/4':
         self::labelCreator($formattedRow, 5);
         break;
+
       case 'Avery 5395':
       default:
         self::labelCreator($formattedRow);
@@ -196,22 +200,25 @@ class CRM_Badge_BAO_Badge {
     }
 
     if ((CRM_Utils_Array::value('height_image_1', $formattedRow) >
-      CRM_Utils_Array::value('height_image_2', $formattedRow)) && !empty($formattedRow['height_image_1'])) {
+        CRM_Utils_Array::value('height_image_2', $formattedRow)) && !empty($formattedRow['height_image_1'])
+    ) {
       $startOffset = CRM_Utils_Array::value('height_image_1', $formattedRow);
     }
     elseif (!empty($formattedRow['height_image_2'])) {
       $startOffset = CRM_Utils_Array::value('height_image_2', $formattedRow);
     }
 
-    if (CRM_Utils_Array::value('participant_image', $formattedRow)) {
+    if (!empty($formattedRow['participant_image'])) {
       $imageAlign = 0;
       switch (CRM_Utils_Array::value('alignment_participant_image', $formattedRow)) {
         case 'R':
           $imageAlign = 68;
           break;
+
         case 'L':
           $imageAlign = 0;
           break;
+
         default:
           break;
       }
@@ -226,7 +233,7 @@ class CRM_Badge_BAO_Badge {
       'cap' => 'round',
       'join' => 'round',
       'dash' => '2,2',
-      'color' => array(0, 0, 200)
+      'color' => array(0, 0, 200),
     ));
 
     $rowCount = CRM_Badge_Form_Layout::FIELD_ROWCOUNT;
@@ -261,8 +268,7 @@ class CRM_Badge_BAO_Badge {
       $data = $formattedRow['values'];
 
       if ($formattedRow['barcode']['type'] == 'barcode') {
-        $data['current_value'] =
-          $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
+        $data['current_value'] = $formattedRow['values']['contact_id'] . '-' . $formattedRow['values']['participant_id'];
       }
       else {
         // view participant url
@@ -286,9 +292,11 @@ class CRM_Badge_BAO_Badge {
           case 'L':
             $xAlign += -14;
             break;
+
           case 'R':
             $xAlign += 27;
             break;
+
           case 'C':
             $xAlign += 9;
             break;
@@ -322,33 +330,36 @@ class CRM_Badge_BAO_Badge {
           case 'L':
             $xAlign += -5;
             break;
+
           case 'R':
             $xAlign += 56;
             break;
+
           case 'C':
             $xAlign += 29;
             break;
         }
 
         $style = array(
-          'border' => false,
+          'border' => FALSE,
           'hpadding' => 13.5,
           'vpadding' => 'auto',
-          'fgcolor' => array(0,0,0),
-          'bgcolor' => false,
+          'fgcolor' => array(0, 0, 0),
+          'bgcolor' => FALSE,
           'position' => '',
         );
 
-        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y  + $this->pdf->height - 26, 30,
+        $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y + $this->pdf->height - 26, 30,
           30, $style, 'B');
       }
     }
   }
 
   /**
-   * Helper function to print images
+   * Helper function to print images.
    *
-   * @param string $img image url
+   * @param string $img
+   *   Image url.
    *
    * @param string $x
    * @param string $y
@@ -356,9 +367,8 @@ class CRM_Badge_BAO_Badge {
    * @param null $h
    *
    * @return void
-   * @access public
    */
-  function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
+  public function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
     if (!$x) {
       $x = $this->pdf->GetAbsX();
     }
@@ -385,7 +395,7 @@ class CRM_Badge_BAO_Badge {
    *
    * @return array
    */
-  static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
+  public static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
     $imgsize = getimagesize($img);
     $f = $imgRes / 25.4;
     $w = !empty($w) ? $w : $imgsize[0] / $f;
@@ -394,21 +404,19 @@ class CRM_Badge_BAO_Badge {
   }
 
   /**
-   * function to build badges parameters before actually creating badges.
+   * Build badges parameters before actually creating badges.
    *
-   * @param  array $params associated array of submitted values
-   * @param $form
-   * @params object $form form/controller object
+   * @param array $params
+   *   Associated array of submitted values.
+   * @param CRM_Core_Form $form
    *
    * @return void
-   * @access public
-   * @static
    */
   public static function buildBadges(&$params, &$form) {
     // get name badge layout info
     $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
 
-    // spit / get actual field names from tokeni and individual contact image URLs
+    // split/get actual field names from token and individual contact image URLs
     $returnProperties = array();
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
@@ -478,12 +486,17 @@ class CRM_Badge_BAO_Badge {
       $query->convertToPseudoNames($dao);
       $rows[$dao->participant_id] = array();
       foreach ($returnProperties as $key => $dontCare) {
-        $rows[$dao->participant_id][$key] = isset($dao->$key) ? $dao->$key : NULL;
+        $value = isset($dao->$key) ? $dao->$key : NULL;
+        // Format custom fields
+        if (strstr($key, 'custom_') && isset($value)) {
+          $value = CRM_Core_BAO_CustomField::getDisplayValue($value, substr($key, 7), $query->_options, $dao->contact_id);
+        }
+        $rows[$dao->participant_id][$key] = $value;
       }
     }
 
     $eventBadgeClass = new CRM_Badge_BAO_Badge();
     $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
-}
 
+}

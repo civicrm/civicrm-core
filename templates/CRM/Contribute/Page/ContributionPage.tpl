@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
     {if NOT ($action eq 1 or $action eq 2) }
       <table class="form-layout-compressed">
       <tr>
-      <td><a href="{$newPageURL}" class="button"><span><div class="icon add-icon"></div>{ts}Add Contribution Page{/ts}</span></a></td>
+      <td><a href="{$newPageURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Contribution Page{/ts}</span></a></td>
             <td style="vertical-align: top"><a class="button" href="{crmURL p="civicrm/admin/pcp" q="reset=1"}"><span>{ts}Manage Personal Campaign Pages{/ts}</span></a> {help id="id-pcp-intro" file="CRM/PCP/Page/PCP.hlp"}</td>
       </tr>
       </table>
@@ -46,7 +46,6 @@
              {include file="CRM/common/pagerAToZ.tpl"}
              {* handle enable/disable actions *}
              {include file="CRM/common/enableDisableApi.tpl"}
-             {include file="CRM/common/crmeditable.tpl"}
        {include file="CRM/common/jsortable.tpl"}
              <table id="options" class="display">
                <thead>

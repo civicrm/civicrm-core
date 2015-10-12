@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,15 +39,15 @@
 class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
   /**
-   * takes an associative array and adds im
+   * Takes an associative array and adds im.
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object       CRM_Core_BAO_Website object on success, null otherwise
-   * @access public
-   * @static
+   * @return object
+   *   CRM_Core_BAO_Website object on success, null otherwise
    */
-  static function add(&$params) {
+  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Website', CRM_Utils_Array::value('id', $params), $params);
 
@@ -60,18 +60,17 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   }
 
   /**
-   * process website
+   * Process website.
    *
-   * @param array $params associated array
-   * @param int $contactID contact id
+   * @param array $params
+   * @param int $contactID
+   *   Contact id.
    *
    * @param $skipDelete
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function create(&$params, $contactID, $skipDelete) {
+  public static function create(&$params, $contactID, $skipDelete) {
     if (empty($params)) {
       return FALSE;
     }
@@ -111,14 +110,14 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   }
 
   /**
-   * Delete website
+   * Delete website.
    *
-   * @param array $ids website ids
+   * @param array $ids
+   *   Website ids.
    *
    * @return void
-   * @static
    */
-  static function del($ids) {
+  public static function del($ids) {
     $query = 'DELETE FROM civicrm_website WHERE id IN ( ' . implode(',', $ids) . ')';
     CRM_Core_DAO::executeQuery($query);
     // FIXME: we should return false if the del was unsuccessful
@@ -129,18 +128,14 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param $params
+   * @param array $params
    * @param $values
    *
-   * @internal param \entityBlock $array input parameters to find object
-   *
-   * @return boolean
-   * @access public
-   * @static
+   * @return bool
    */
-  static function &getValues(&$params, &$values) {
-    $websites            = array();
-    $website             = new CRM_Core_DAO_Website();
+  public static function &getValues(&$params, &$values) {
+    $websites = array();
+    $website = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];
     $website->find();
 
@@ -157,17 +152,17 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   }
 
   /**
-   * Get all the websites for a specified contact_id
+   * Get all the websites for a specified contact_id.
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
    * @param bool $updateBlankLocInfo
    *
-   * @return array  the array of website details
-   * @access public
-   * @static
+   * @return array
+   *   the array of website details
    */
-  static function allWebsites($id, $updateBlankLocInfo = FALSE) {
+  public static function allWebsites($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
       return NULL;
     }
@@ -179,8 +174,8 @@ SELECT  id, website_type_id
     $params = array(1 => array($id, 'Integer'));
 
     $websites = $values = array();
-    $dao      = CRM_Core_DAO::executeQuery($query, $params);
-    $count    = 1;
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $count = 1;
     while ($dao->fetch()) {
       $values = array(
         'id' => $dao->id,
@@ -196,5 +191,5 @@ SELECT  id, website_type_id
     }
     return $websites;
   }
-}
 
+}

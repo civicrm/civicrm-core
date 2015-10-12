@@ -1,5 +1,7 @@
 <?php
 namespace Civi\Core;
+
+use Civi\Core\Lock\LockManager;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\FileCacheReader;
@@ -8,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Tools\Setup;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -27,7 +30,8 @@ class Container {
   private static $singleton;
 
   /**
-   * @param bool $reset whether to forcibly rebuild the entire container
+   * @param bool $reset
+   *   Whether to forcibly rebuild the entire container.
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
    */
   public static function singleton($reset = FALSE) {
@@ -48,21 +52,33 @@ class Container {
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
     $container->set(self::SELF, $this);
 
-// TODO Move configuration to an external file; define caching structure
-//    if (empty($configDirectories)) {
-//      throw new \Exception(__CLASS__ . ': Missing required properties (civicrmRoot, configDirectories)');
-//    }
-//    $locator = new FileLocator($configDirectories);
-//    $loaderResolver = new LoaderResolver(array(
-//      new YamlFileLoader($container, $locator)
-//    ));
-//    $delegatingLoader = new DelegatingLoader($loaderResolver);
-//    foreach (array('services.yml') as $file) {
-//      $yamlUserFiles = $locator->locate($file, NULL, FALSE);
-//      foreach ($yamlUserFiles as $file) {
-//        $delegatingLoader->load($file);
-//      }
-//    }
+    // TODO Move configuration to an external file; define caching structure
+    //    if (empty($configDirectories)) {
+    //      throw new \Exception(__CLASS__ . ': Missing required properties (civicrmRoot, configDirectories)');
+    //    }
+    //    $locator = new FileLocator($configDirectories);
+    //    $loaderResolver = new LoaderResolver(array(
+    //      new YamlFileLoader($container, $locator)
+    //    ));
+    //    $delegatingLoader = new DelegatingLoader($loaderResolver);
+    //    foreach (array('services.yml') as $file) {
+    //      $yamlUserFiles = $locator->locate($file, NULL, FALSE);
+    //      foreach ($yamlUserFiles as $file) {
+    //        $delegatingLoader->load($file);
+    //      }
+    //    }
+
+    $container->setDefinition('lockManager', new Definition(
+      '\Civi\Core\Lock\LockManager',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createLockManager');
+
+    $container->setDefinition('angular', new Definition(
+      '\Civi\Angular\Manager',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createAngularManager');
 
     $container->setDefinition('dispatcher', new Definition(
       '\Symfony\Component\EventDispatcher\EventDispatcher',
@@ -81,7 +97,34 @@ class Container {
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
+    $container->setDefinition('cxn_reg_client', new Definition(
+      '\Civi\Cxn\Rpc\RegistrationClient',
+      array()
+    ))
+      ->setFactoryClass('CRM_Cxn_BAO_Cxn')->setFactoryMethod('createRegistrationClient');
+
+    // Expose legacy singletons as services in the container.
+    $singletons = array(
+      'resources' => 'CRM_Core_Resources',
+      'httpClient' => 'CRM_Utils_HttpClient',
+      // Maybe? 'config' => 'CRM_Core_Config',
+      // Maybe? 'smarty' => 'CRM_Core_Smarty',
+    );
+    foreach ($singletons as $name => $class) {
+      $container->setDefinition($name, new Definition(
+        $class
+      ))
+        ->setFactoryClass($class)->setFactoryMethod('singleton');
+    }
+
     return $container;
+  }
+
+  /**
+   * @return \Civi\Angular\Manager
+   */
+  public function createAngularManager() {
+    return new \Civi\Angular\Manager(\CRM_Core_Resources::singleton());
   }
 
   /**
@@ -93,7 +136,33 @@ class Container {
     $dispatcher->addListener('hook_civicrm_post::Case', array('\Civi\CCase\Events', 'fireCaseChange'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\Events', 'delegateToXmlListeners'));
     $dispatcher->addListener('hook_civicrm_caseChange', array('\Civi\CCase\SequenceListener', 'onCaseChange_static'));
+    $dispatcher->addListener('DAO::post-insert', array('\CRM_Core_BAO_RecurringEntity', 'triggerInsert'));
+    $dispatcher->addListener('DAO::post-update', array('\CRM_Core_BAO_RecurringEntity', 'triggerUpdate'));
+    $dispatcher->addListener('DAO::post-delete', array('\CRM_Core_BAO_RecurringEntity', 'triggerDelete'));
+    $dispatcher->addListener('hook_civicrm_unhandled_exception', array(
+      'CRM_Core_LegacyErrorHandler',
+      'handleException',
+    ));
     return $dispatcher;
+  }
+
+  /**
+   * @return LockManager
+   */
+  public function createLockManager() {
+    // Ideally, downstream implementers could override any definitions in
+    // the container. For now, we'll make-do with some define()s.
+    $lm = new LockManager();
+    $lm
+      ->register('/^cache\./', defined('CIVICRM_CACHE_LOCK') ? CIVICRM_CACHE_LOCK : array('CRM_Core_Lock', 'createScopedLock'))
+      ->register('/^data\./', defined('CIVICRM_DATA_LOCK') ? CIVICRM_DATA_LOCK : array('CRM_Core_Lock', 'createScopedLock'))
+      ->register('/^worker\.mailing\.send\./', defined('CIVICRM_WORK_LOCK') ? CIVICRM_WORK_LOCK : array('CRM_Core_Lock', 'createCivimailLock'))
+      ->register('/^worker\./', defined('CIVICRM_WORK_LOCK') ? CIVICRM_WORK_LOCK : array('CRM_Core_Lock', 'createScopedLock'));
+
+    // Registrations may use complex resolver expressions, but (as a micro-optimization)
+    // the default factory is specified as an array.
+
+    return $lm;
   }
 
   /**
@@ -121,6 +190,26 @@ class Container {
     $reflectionProvider = new \Civi\API\Provider\ReflectionProvider($kernel);
     $dispatcher->addSubscriber($reflectionProvider);
 
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\DynamicFKAuthorization(
+      $kernel,
+      'Attachment',
+      array('create', 'get', 'delete'),
+      // Given a file ID, determine the entity+table it's attached to.
+      'SELECT if(cf.id,1,0) as is_valid, cef.entity_table, cef.entity_id
+         FROM civicrm_file cf
+         LEFT JOIN civicrm_entity_file cef ON cf.id = cef.file_id
+         WHERE cf.id = %1',
+      // Get a list of custom fields (field_name,table_name,extends)
+      'SELECT concat("custom_",fld.id) as field_name,
+        grp.table_name as table_name,
+        grp.extends as extends
+       FROM civicrm_custom_field fld
+       INNER JOIN civicrm_custom_group grp ON fld.custom_group_id = grp.id
+       WHERE fld.data_type = "File"
+      ',
+      array('civicrm_activity', 'civicrm_mailing', 'civicrm_contact', 'civicrm_grant')
+    ));
+
     $kernel->setApiProviders(array(
       $reflectionProvider,
       $magicFunctionProvider,
@@ -128,4 +217,5 @@ class Container {
 
     return $kernel;
   }
+
 }

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 <div class="crm-accordion-wrapper crm-notesBlock-accordion collapsed">
  <div class="crm-accordion-header">
-   
+
     {$title}
   </div><!-- /.crm-accordion-header -->
   <div class="crm-accordion-body" id="notesBlock">

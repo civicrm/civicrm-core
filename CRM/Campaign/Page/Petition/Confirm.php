@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -37,16 +37,16 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
    * @return string
    * @throws Exception
    */
-  function run() {
+  public function run() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
-    
-    $contact_id   = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
+
+    $contact_id = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
     $subscribe_id = CRM_Utils_Request::retrieve('sid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $hash         = CRM_Utils_Request::retrieve('h', 'String', CRM_Core_DAO::$_nullObject);
-    $activity_id  = CRM_Utils_Request::retrieve('a', 'String', CRM_Core_DAO::$_nullObject);
-    $petition_id  = CRM_Utils_Request::retrieve('pid', 'String', CRM_Core_DAO::$_nullObject);
+    $hash = CRM_Utils_Request::retrieve('h', 'String', CRM_Core_DAO::$_nullObject);
+    $activity_id = CRM_Utils_Request::retrieve('a', 'String', CRM_Core_DAO::$_nullObject);
+    $petition_id = CRM_Utils_Request::retrieve('pid', 'String', CRM_Core_DAO::$_nullObject);
     if (!$petition_id) {
-      $petition_id  = CRM_Utils_Request::retrieve('p', 'String', CRM_Core_DAO::$_nullObject);
+      $petition_id = CRM_Utils_Request::retrieve('p', 'String', CRM_Core_DAO::$_nullObject);
     }
 
     if (!$contact_id ||
@@ -72,7 +72,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
 
     $this->assign('survey_id', $petition_id);
 
-    $pparams['id']   = $petition_id;
+    $pparams['id'] = $petition_id;
     $this->petition = array();
     CRM_Campaign_BAO_Survey::retrieve($pparams, $this->petition);
     $this->assign('is_share', CRM_Utils_Array::value('is_share', $this->petition));
@@ -91,18 +91,20 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
   }
 
   /**
-   * Confirm email verification
+   * Confirm email verification.
    *
-   * @param int $contact_id The id of the contact
-   * @param int $subscribe_id The id of the subscription event
-   * @param string $hash The hash
+   * @param int $contact_id
+   *   The id of the contact.
+   * @param int $subscribe_id
+   *   The id of the subscription event.
+   * @param string $hash
+   *   The hash.
    *
-   * @param $activity_id
-   * @param $petition_id
+   * @param int $activity_id
+   * @param int $petition_id
    *
-   * @return boolean              True on success
-   * @access public
-   * @static
+   * @return bool
+   *   True on success
    */
   public static function confirm($contact_id, $subscribe_id, $hash, $activity_id, $petition_id) {
     $se = CRM_Mailing_Event_BAO_Subscribe::verify($contact_id, $subscribe_id, $hash);
@@ -129,5 +131,5 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $bao = new CRM_Campaign_BAO_Petition();
     $bao->confirmSignature($activity_id, $contact_id, $petition_id);
   }
-}
 
+}

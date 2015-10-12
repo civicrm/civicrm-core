@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,4 +35,11 @@
 {/htxt}
 {htxt id="id-create_sort_name"}
 {ts}Find mailings by the name of the person who created or sent them. You can enter a complete OR partial name (last name, first name format).{/ts}
+{/htxt}
+
+{htxt id="is_archived-title"}
+  {ts}Archived{/ts}
+{/htxt}
+{htxt id="is_archived"}
+  {ts}This field is disabled when searching for Draft/Unscheduled mailings.{/ts}
 {/htxt}

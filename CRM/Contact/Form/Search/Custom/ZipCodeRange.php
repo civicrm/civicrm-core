@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,20 +23,22 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_columns = array(
@@ -48,9 +50,9 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     $form->add('text',
       'postal_code_low',
       ts('Postal Code Start'),
@@ -78,12 +80,20 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
   /**
    * @return array
    */
-  function summary() {
+  public function summary() {
     $summary = array();
     return $summary;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL
+   *
+   * @return string
+   */
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
@@ -96,7 +106,8 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
    *
    * @return string
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  public function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     if ($justIDs) {
@@ -120,14 +131,16 @@ address.postal_code    as postal_code
   /**
    * @return string
    */
-  function from() {
-    return "
+  public function from() {
+    $this->buildACLClause('contact_a');
+    $from = "
 FROM      civicrm_contact contact_a
 LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
                                        address.is_primary       = 1 )
 LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
-                                       email.is_primary = 1 )
+                                       email.is_primary = 1 ) {$this->_aclFrom}
 ";
+    return $from;
   }
 
   /**
@@ -135,7 +148,7 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
     $params = array();
 
     $low = CRM_Utils_Array::value('postal_code_low',
@@ -154,31 +167,35 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
     }
 
     $where = "ROUND(address.postal_code) >= %1 AND ROUND(address.postal_code) <= %2";
-    $params = array(1 => array(trim($low), 'Integer'),
+    $params = array(
+      1 => array(trim($low), 'Integer'),
       2 => array(trim($high), 'Integer'),
     );
 
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
     return $this->whereClause($where, $params);
   }
 
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return array();
   }
 
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -186,5 +203,12 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

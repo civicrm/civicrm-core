@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2014                                |
+| Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Class CRM_Event_Cart_BAO_MerParticipant
@@ -33,13 +33,13 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   public $contribution_id = NULL;
   public $cart = NULL;
 
-  //XXX
   /**
+   * XXX.
    * @param null $participant
    */
-  function __construct($participant = NULL) {
+  public function __construct($participant = NULL) {
     parent::__construct();
-    $a = (array)$participant;
+    $a = (array) $participant;
     $this->copyValues($a);
 
     $this->email = CRM_Utils_Array::value('email', $participant);
@@ -51,7 +51,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    * @return CRM_Event_Cart_BAO_MerParticipant
    * @throws Exception
    */
-  public static function &create($params) {
+  public static function create(&$params) {
     $participantParams = array(
       'id' => CRM_Utils_Array::value('id', $params),
       'role_id' => self::get_attendee_role_id(),
@@ -78,7 +78,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   /**
    * @return mixed
    */
-  static function get_attendee_role_id() {
+  public static function get_attendee_role_id() {
     $roles = CRM_Event_PseudoConstant::participantRole(NULL, "v.label='Attendee'");
     $role_names = array_keys($roles);
     return end($role_names);
@@ -87,14 +87,14 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   /**
    * @return mixed
    */
-  static function get_pending_in_cart_status_id() {
+  public static function get_pending_in_cart_status_id() {
     $status_types = CRM_Event_PseudoConstant::participantStatus(NULL, "name='Pending in cart'");
     $status_names = array_keys($status_types);
     return end($status_names);
   }
 
   /**
-   * @param $event_cart_id
+   * @param int $event_cart_id
    *
    * @return array|null
    */
@@ -106,8 +106,8 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   }
 
   /**
-   * @param $event_id
-   * @param $event_cart_id
+   * @param int $event_id
+   * @param int $event_cart_id
    *
    * @return array|null
    */
@@ -119,7 +119,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   }
 
   /**
-   * @param $params
+   * @param array $params
    *
    * @return array
    */
@@ -136,7 +136,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   }
 
   /**
-   * @param $id
+   * @param int $id
    *
    * @return mixed
    */
@@ -145,7 +145,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
     return array_pop($results);
   }
 
-  function load_associations() {
+  public function load_associations() {
     $contact_details = CRM_Contact_BAO_Contact::getContactDetails($this->contact_id);
     $this->email = $contact_details[1];
   }
@@ -153,7 +153,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   /**
    * @return int
    */
-  function get_participant_index() {
+  public function get_participant_index() {
     if (!$this->cart) {
       $this->cart = CRM_Event_Cart_BAO_Cart::find_by_id($this->cart_id);
       $this->cart->load_associations();
@@ -167,7 +167,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    *
    * @return null
    */
-  static function billing_address_from_contact($contact) {
+  public static function billing_address_from_contact($contact) {
     foreach ($contact->address as $loc) {
       if ($loc['is_billing']) {
         return $loc;
@@ -184,8 +184,8 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   /**
    * @return CRM_Event_Cart_Form_MerParticipant
    */
-  function get_form() {
+  public function get_form() {
     return new CRM_Event_Cart_Form_MerParticipant($this);
   }
-}
 
+}

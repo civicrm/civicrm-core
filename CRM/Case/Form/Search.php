@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,60 +23,53 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This file is for Case search
+ * This file is for Case search.
  */
 class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
   /**
-   * the params that are sent to the query
+   * The params that are sent to the query
    *
    * @var array
-   * @access protected
    */
   protected $_queryParams;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_single = FALSE;
 
   /**
-   * are we restricting ourselves to a single contact
+   * Are we restricting ourselves to a single contact
    *
-   * @access protected
    * @var boolean
    */
   protected $_limit = NULL;
 
   /**
-   * prefix for the controller
-   *
+   * Prefix for the controller
    */
   protected $_prefix = 'case_';
 
   protected $_defaults;
 
   /**
-   * processing needed for buildForm and later
+   * Processing needed for buildForm and later.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $this->set('searchFormName', 'Search');
 
     //check for civicase access.
@@ -101,13 +94,13 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $this->defaults = array();
 
     /*
-         * we allow the controller to set force/reset externally, useful when we are being
-         * driven by the wizard framework
-         */
+     * we allow the controller to set force/reset externally, useful when we are being
+     * driven by the wizard framework
+     */
 
-    $this->_reset   = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $this->_force   = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit   = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
+    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
 
     $this->assign('context', $this->_context);
@@ -138,7 +131,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
         $this->get(CRM_Utils_Sort::SORT_DIRECTION)
       );
     }
-
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Case_Selector_Search($this->_queryParams,
@@ -172,13 +164,12 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addElement('text',
       'sort_name',
@@ -225,9 +216,8 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * @param
    *
    * @return void
-   * @access public
    */
-  function postProcess() {
+  public function postProcess() {
     if ($this->_done) {
       return;
     }
@@ -256,7 +246,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
@@ -318,29 +308,25 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
    * @return void
-   * @access public
    * @see valid_date
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Case_Form_Search', 'formRule'));
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
-   *
-   * @internal param array $errors list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
    *
    * @return void
-   * @static
-   * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
 
     if (!empty($errors)) {
@@ -351,19 +337,19 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     $defaults = $this->_formValues;
     return $defaults;
   }
 
-  function fixFormValues() {
+  public function fixFormValues() {
     if (!$this->_force) {
       return;
     }
@@ -415,7 +401,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       }
     }
     else {
-        // First, if "all" is stored in the session, default to all cases, otherwise default to no selection.
+      // First, if "all" is stored in the session, default to all cases, otherwise default to no selection.
       $session = CRM_Core_Session::singleton();
       if (CRM_Utils_Request::retrieve('all', 'Positive', $session)) {
         $this->_formValues['case_owner'] = 1;
@@ -440,7 +426,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return null
    */
-  function getFormValues() {
+  public function getFormValues() {
     return NULL;
   }
 
@@ -448,10 +434,9 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Find Cases');
   }
-}
 
+}

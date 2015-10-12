@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: Email.php 45499 2013-02-08 12:31:05Z kurund $
- *
  */
 
 /**
@@ -56,18 +55,16 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
   public $_noEmails = FALSE;
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system.
    *
    * @var array
    */
   public $_templates = NULL;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
     parent::preProcess();
 
@@ -78,11 +75,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     //enable form element
@@ -92,14 +85,10 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return void
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
   }
-}
 
+}

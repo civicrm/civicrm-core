@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,27 +39,26 @@
 class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
 
   /**
-   * name of the tag
+   * Name of the tag
    *
    * @var string
    */
   protected $_name;
 
   /**
-   * all the tags in the system
+   * All the tags in the system
    *
    * @var array
    */
   protected $_tags;
 
   /**
-   * Build the form
+   * Build the form object
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // add select for tag
     $this->_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
     foreach ($this->_tags as $tagID => $tagName) {
@@ -72,17 +71,17 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     $this->addDefaultButtons(ts('Remove Tags from activities'));
   }
 
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Activity_Form_Task_RemoveFromTag', 'formRule'));
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $rule
    *
    * @return array
    */
-  static function formRule($form, $rule) {
+  public static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['tag']) && empty($form['activity_taglist'])) {
       $errors['_qf_default'] = "Please select atleast one tag.";
@@ -91,9 +90,8 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
@@ -136,14 +134,21 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
 
       list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_activityHolderIds, $key, 'civicrm_activity');
 
-      $status = array(ts('%count activities un-tagged', array('count' => $removed, 'plural' => '%count activities un-tagged')));
+      $status = array(
+        ts('%count activity un-tagged', array(
+            'count' => $removed,
+            'plural' => '%count activities un-tagged',
+          )),
+      );
       if ($notRemoved) {
-        $status[] = ts('1 activity already did not have this tag', array('count' => $notRemoved, 'plural' => '%count activities already did not have this tag'));
+        $status[] = ts('1 activity already did not have this tag', array(
+            'count' => $notRemoved,
+            'plural' => '%count activities already did not have this tag',
+          ));
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
     }
   }
-  //end of function
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -58,20 +58,19 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   protected $_newParticipants;
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
+  public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
   }
 
   /**
-   * the initializer code, called before the processing
+   * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
-  function init() {
+  public function init() {
     $fields = CRM_Event_BAO_Participant::importableFields($this->_contactType, FALSE);
     $fields['event_id']['title'] = 'Event ID';
     $eventfields = &CRM_Event_BAO_Event::fields();
@@ -124,43 +123,45 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * handle the values in mapField mode
+   * Handle the values in mapField mode.
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
-   * @return boolean
-   * @access public
+   * @return bool
    */
-  function mapField(&$values) {
+  public function mapField(&$values) {
     return CRM_Import_Parser::VALID;
   }
 
   /**
-   * handle the values in preview mode
+   * Handle the values in preview mode.
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
-   * @access public
+   * @return bool
+   *   the result of this processing
    */
-  function preview(&$values) {
+  public function preview(&$values) {
     return $this->summary($values);
   }
 
   /**
-   * handle the values in summary mode
+   * Handle the values in summary mode.
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
-   * @access public
+   * @return bool
+   *   the result of this processing
    */
-  function summary(&$values) {
+  public function summary(&$values) {
     $erroneousField = NULL;
 
-    $response      = $this->setActiveFieldValues($values, $erroneousField);
+    $response = $this->setActiveFieldValues($values, $erroneousField);
     $errorRequired = FALSE;
-    $index         = -1;
+    $index = -1;
 
     if ($this->_eventIndex > -1 && $this->_eventTitleIndex > -1) {
       array_unshift($values, ts('Select either EventID OR Event Title'));
@@ -228,7 +229,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         else {
           foreach ($val as $role) {
             if (!CRM_Contact_Import_Parser_Contact::in_value(trim($role), $roleIDs)) {
-                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Role', $errorMessage);
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Role', $errorMessage);
               break;
             }
           }
@@ -264,25 +265,27 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * handle the values in import mode
+   * Handle the values in import mode.
    *
-   * @param int $onDuplicate the code for what action to take on duplicates
-   * @param array $values the array of values belonging to this line
+   * @param int $onDuplicate
+   *   The code for what action to take on duplicates.
+   * @param array $values
+   *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
-   * @access public
+   * @return bool
+   *   the result of this processing
    */
-  function import($onDuplicate, &$values) {
+  public function import($onDuplicate, &$values) {
 
     // first make sure this is a valid line
     $response = $this->summary($values);
     if ($response != CRM_Import_Parser::VALID) {
       return $response;
     }
-    $params       = &$this->getActiveFieldParams();
-    $session      = CRM_Core_Session::singleton();
-    $dateType     = $session->get('dateTypes');
-    $formatted    = array('version' => 3);
+    $params = &$this->getActiveFieldParams();
+    $session = CRM_Core_Session::singleton();
+    $dateType = $session->get('dateTypes');
+    $formatted = array('version' => 3);
     $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
 
     // don't add to recent items, CRM-4399
@@ -299,7 +302,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
             $params[$key] = CRM_Utils_String::strtoboolstr($val);
           }
         }
-        if($key == 'participant_register_date') {
+        if ($key == 'participant_register_date') {
           CRM_Utils_Date::convertToDefaultDate($params, $dateType, 'participant_register_date');
           $formatted['participant_register_date'] = CRM_Utils_Date::processDate($params['participant_register_date']);
         }
@@ -380,7 +383,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           if (!empty($formatted['fee_level'])) {
             $otherParams = array(
               'fee_label' => $formatted['fee_level'],
-              'event_id' => $newParticipant->event_id
+              'event_id' => $newParticipant->event_id,
             );
             CRM_Price_BAO_LineItem::syncLineItems($newParticipant->id, 'civicrm_participant', $newParticipant->fee_amount, $otherParams);
           }
@@ -416,7 +419,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         // Using new Dedupe rule.
         $ruleParams = array(
           'contact_type' => $this->_contactType,
-          'used'         => 'Unsupervised',
+          'used' => 'Unsupervised',
         );
         $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
 
@@ -463,9 +466,9 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
     if (is_array($newParticipant) && civicrm_error($newParticipant)) {
       if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
 
-        $contactID     = CRM_Utils_Array::value('contactID', $newParticipant);
+        $contactID = CRM_Utils_Array::value('contactID', $newParticipant);
         $participantID = CRM_Utils_Array::value('participantID', $newParticipant);
-        $url           = CRM_Utils_System::url('civicrm/contact/view/participant',
+        $url = CRM_Utils_System::url('civicrm/contact/view/participant',
           "reset=1&id={$participantID}&cid={$contactID}&action=view", TRUE
         );
         if (is_array($newParticipant['error_message']) &&
@@ -490,21 +493,20 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   }
 
   /**
-   * Get the array of successfully imported Participation ids
+   * Get the array of successfully imported Participation ids.
    *
    * @return array
-   * @access public
    */
-  function &getImportedParticipations() {
+  public function &getImportedParticipations() {
     return $this->_newParticipants;
   }
 
   /**
-   * the initializer code, called before the processing
+   * The initializer code, called before the processing
    *
    * @return void
-   * @access public
    */
-  function fini() {}
-}
+  public function fini() {
+  }
 
+}

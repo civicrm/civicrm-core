@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: PaymentProcessorType.php 9702 2007-05-29 23:57:16Z lobo $
  *
  */
@@ -42,7 +42,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
 
   protected $_fields = NULL;
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->_fields = array(
@@ -146,12 +146,11 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @param bool $check
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -160,7 +159,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
       return;
     }
 
-        $attributes = CRM_Core_DAO::getAttribute( 'CRM_Financial_DAO_PaymentProcessorType' );
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_PaymentProcessorType');
 
     foreach ($this->_fields as $field) {
       $required = CRM_Utils_Array::value('required', $field, FALSE);
@@ -181,7 +180,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if (!$this->_id) {
@@ -193,7 +192,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
       return $defaults;
     }
 
-        $dao = new CRM_Financial_DAO_PaymentProcessorType( );
+    $dao = new CRM_Financial_DAO_PaymentProcessorType();
     $dao->id = $this->_id;
 
     if (!$dao->find(TRUE)) {
@@ -206,14 +205,13 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache( 'CRM_Financial_DAO_PaymentProcessorType' );
+    CRM_Utils_System::flushCache('CRM_Financial_DAO_PaymentProcessorType');
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Financial_BAO_PaymentProcessorType::del($this->_id);
@@ -228,12 +226,12 @@ UPDATE civicrm_payment_processor SET is_default = 0";
       CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     }
 
-        $dao = new CRM_Financial_DAO_PaymentProcessorType( );
+    $dao = new CRM_Financial_DAO_PaymentProcessorType();
 
-    $dao->id         = $this->_id;
+    $dao->id = $this->_id;
     $dao->is_default = CRM_Utils_Array::value('is_default', $values, 0);
-    $dao->is_active  = CRM_Utils_Array::value('is_active', $values, 0);
-    $dao->is_recur   = CRM_Utils_Array::value('is_recur', $values, 0);
+    $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
+    $dao->is_recur = CRM_Utils_Array::value('is_recur', $values, 0);
 
     $dao->name = $values['name'];
     $dao->description = $values['description'];
@@ -246,5 +244,5 @@ UPDATE civicrm_payment_processor SET is_default = 0";
     }
     $dao->save();
   }
-}
 
+}

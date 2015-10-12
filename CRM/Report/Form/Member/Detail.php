@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -48,12 +48,9 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   protected $_customGroupGroupBy = FALSE;
 
   /**
-   *
+   * Class constructor.
    */
-  /**
-   *
-   */
-  function __construct() {
+  public function __construct() {
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
@@ -67,38 +64,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-            'required' => TRUE,
-            'default' => TRUE,
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact SubType'),
-          ),
-        ),
+        'fields' => $this->getBasicContactFields(),
         'filters' => array(
           'sort_name' => array(
             'title' => ts('Contact Name'),
@@ -111,7 +77,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
-            'default_order' => 'ASC'
+            'default_order' => 'ASC',
           ),
         ),
         'grouping' => 'contact-fields',
@@ -154,7 +120,21 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'options' => CRM_Member_PseudoConstant::membershipType(),
           ),
         ),
+        'order_bys' => array(
+          'membership_type_id' => array(
+            'title' => ts('Membership Type'),
+            'default' => '0',
+            'default_weight' => '1',
+            'default_order' => 'ASC',
+          ),
+        ),
         'grouping' => 'member-fields',
+        'group_bys' => array(
+          'id' => array(
+            'title' => ts('Membership'),
+            'default' => TRUE,
+          ),
+        ),
       ),
       'civicrm_membership_status' => array(
         'dao' => 'CRM_Member_DAO_MembershipStatus',
@@ -175,21 +155,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           ),
         ),
         'grouping' => 'member-fields',
-      ),
-      'civicrm_address' => array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'fields' => array(
-          'street_address' => NULL,
-          'city' => NULL,
-          'postal_code' => NULL,
-          'state_province_id' => array(
-            'title' => ts('State/Province'),
-          ),
-          'country_id' => array(
-            'title' => ts('Country'),
-          ),
-        ),
-        'grouping' => 'contact-fields',
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
@@ -255,9 +220,20 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           ),
           'total_amount' => array('title' => ts('Contribution Amount')),
         ),
+        'order_bys' => array(
+          'receive_date' => array(
+            'title' => ts('Receive Date'),
+            'default_weight' => '2',
+            'default_order' => 'DESC',
+          ),
+        ),
         'grouping' => 'contri-fields',
       ),
-    );
+    ) + $this->getAddressColumns(array(
+      // These options are only excluded because they were not previously present.
+      'order_by' => FALSE,
+      'group_by' => FALSE,
+    ));
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
@@ -280,22 +256,19 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->assign('reportTitle', ts('Membership Detail Report'));
     parent::preProcess();
   }
 
-  function select() {
+  public function select() {
     $select = $this->_columnHeaders = array();
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_email') {
+            if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
             elseif ($tableName == 'civicrm_phone') {
@@ -317,7 +290,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
          FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
                INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
@@ -327,15 +300,14 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                           ON {$this->_aliases['civicrm_membership_status']}.id =
                              {$this->_aliases['civicrm_membership']}.status_id ";
 
-
-    //used when address field is selected
-    if ($this->_addressField) {
+    if ($this->isTableSelected('civicrm_address')) {
       $this->_from .= "
              LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
                        ON {$this->_aliases['civicrm_contact']}.id =
                           {$this->_aliases['civicrm_address']}.contact_id AND
                           {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
+
     //used when email field is selected
     if ($this->_emailField) {
       $this->_from .= "
@@ -362,19 +334,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
-    $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-  }
-
-  function orderBy() {
-    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id, {$this->_aliases['civicrm_membership']}.membership_type_id";
-
-    if ($this->_contribField) {
-      $this->_orderBy .= ", {$this->_aliases['civicrm_contribution']}.receive_date DESC";
-    }
-  }
-
-  function postProcess() {
+  public function postProcess() {
 
     $this->beginPostProcess();
 
@@ -391,10 +351,15 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
    */
-  function alterDisplay(&$rows) {
-    // custom code to alter rows
+  public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $checkList = array();
 
@@ -402,19 +367,32 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
+    $repeatFound = FALSE;
     foreach ($rows as $rowNum => $row) {
-
+      if ($repeatFound == FALSE ||
+        $repeatFound < $rowNum - 1
+      ) {
+        unset($checkList);
+        $checkList = array();
+      }
       if (!empty($this->_noRepeats) && $this->_outputMode != 'csv') {
         // not repeat contact display names if it matches with the one
         // in previous row
-        $repeatFound = FALSE;
         foreach ($row as $colName => $colVal) {
-          if (!empty($checkList[$colName]) &&
-            is_array($checkList[$colName]) &&
-            in_array($colVal, $checkList[$colName])
+          if (in_array($colName, $this->_noRepeats) &&
+            $rowNum > 0
           ) {
-            $rows[$rowNum][$colName] = "";
-            $repeatFound = TRUE;
+            if ($rows[$rowNum][$colName] == $rows[$rowNum - 1][$colName] ||
+              (!empty($checkList[$colName]) &&
+              in_array($colVal, $checkList[$colName]))
+              ) {
+              $rows[$rowNum][$colName] = "";
+              // CRM-15917: Don't blank the name if it's a different contact
+              if ($colName == 'civicrm_contact_exposed_id') {
+                $rows[$rowNum]['civicrm_contact_sort_name'] = "";
+              }
+              $repeatFound = $rowNum;
+            }
           }
           if (in_array($colName, $this->_noRepeats)) {
             $checkList[$colName][] = $colVal;
@@ -476,10 +454,13 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           $entryFound = TRUE;
         }
       }
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'member/detail', 'List all memberships(s) for this ') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'member/detail', 'List all memberships(s) for this ') ? TRUE : $entryFound;
 
       if (!$entryFound) {
         break;
       }
     }
   }
+
 }

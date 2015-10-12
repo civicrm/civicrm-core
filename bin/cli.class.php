@@ -1,14 +1,14 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2008                 |
  +--------------------------------------------------------------------+
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -16,12 +16,13 @@
  | See the GNU Affero General Public License for more details.        |
  |                                                                    |
  | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This files provides several classes for doing command line work with
@@ -30,13 +31,12 @@
  * In addition, there are several additional classes that inherit
  * civicrm_cli to do more precise functions.
  *
- **/
+ */
 
 /**
  * base class for doing all command line operations via civicrm
  * used by cli.php
- **/
-
+ */
 class civicrm_cli {
   // required values that must be passed
   // via the command line
@@ -78,6 +78,11 @@ class civicrm_cli {
     return TRUE;
   }
 
+  /**
+   * Ensure function is being run from the cli.
+   *
+   * @return bool
+   */
   public function _accessing_from_cli() {
     if (PHP_SAPI === 'cli') {
       return TRUE;
@@ -110,6 +115,9 @@ class civicrm_cli {
       $this->_log($result['error_message']);
       return FALSE;
     }
+    elseif ($this->_output === 'json') {
+      echo json_encode($result, defined('JSON_PRETTY_PRINT') ? JSON_PRETTY_PRINT : 0);
+    }
     elseif ($this->_output) {
       print_r($result['values']);
     }
@@ -138,7 +146,7 @@ class civicrm_cli {
       // find the value of this arg
       if (preg_match('/=/', $arg)) {
         $parts = explode('=', $arg);
-        $arg   = $parts[0];
+        $arg = $parts[0];
         $value = $parts[1];
       }
       else {
@@ -171,11 +179,14 @@ class civicrm_cli {
       elseif ($arg == '-o' || $arg == '--output') {
         $this->_output = TRUE;
       }
+      elseif ($arg == '-J' || $arg == '--json') {
+        $this->_output = 'json';
+      }
       elseif ($arg == '-j' || $arg == '--joblog') {
         $this->_joblog = TRUE;
       }
       else {
-        while(list($short, $long) = each ($this->_additional_arguments)) {
+        foreach ($this->_additional_arguments as $short => $long) {
           if ($arg == '-' . $short || $arg == '--' . $long) {
             $property = '_' . $long;
             $this->$property = $value;
@@ -199,7 +210,7 @@ class civicrm_cli {
     $_SERVER['HTTP_HOST'] = $this->_site;
     $_SERVER['REMOTE_ADDR'] = "127.0.0.1";
     $_SERVER['SERVER_SOFTWARE'] = NULL;
-    $_SERVER['REQUEST_METHOD']  = 'GET';
+    $_SERVER['REQUEST_METHOD'] = 'GET';
 
     // SCRIPT_FILENAME needed by CRM_Utils_System::cmsRootPath
     $_SERVER['SCRIPT_FILENAME'] = __FILE__;
@@ -211,9 +222,14 @@ class civicrm_cli {
 
     $civicrm_root = dirname(__DIR__);
     chdir($civicrm_root);
-    require_once ('civicrm.config.php');
+    if (getenv('CIVICRM_SETTINGS')) {
+      require_once getenv('CIVICRM_SETTINGS');
+    }
+    else {
+      require_once 'civicrm.config.php';
+    }
     // autoload
-    if ( !class_exists('CRM_Core_ClassLoader') ) {
+    if (!class_exists('CRM_Core_ClassLoader')) {
       require_once $civicrm_root . '/CRM/Core/ClassLoader.php';
     }
     CRM_Core_ClassLoader::singleton()->register();
@@ -223,10 +239,10 @@ class civicrm_cli {
     // HTTP_HOST will be 'localhost' unless overwritten with the -s argument.
     // Now we have a Config object, we can set it from the Base URL.
     if ($_SERVER['HTTP_HOST'] == 'localhost') {
-        $_SERVER['HTTP_HOST'] = preg_replace(
-                '!^https?://([^/]+)/$!i',
-                '$1',
-                $this->_config->userFrameworkBaseURL);
+      $_SERVER['HTTP_HOST'] = preg_replace(
+        '!^https?://([^/]+)/$!i',
+        '$1',
+        $this->_config->userFrameworkBaseURL);
     }
 
     $class = 'CRM_Utils_System_' . $this->_config->userFramework;
@@ -245,7 +261,7 @@ class civicrm_cli {
     }
 
     if (!empty($this->_user)) {
-      if(!CRM_Utils_System::authenticateScript(TRUE, $this->_user, $this->_password, TRUE, FALSE, FALSE)) {
+      if (!CRM_Utils_System::authenticateScript(TRUE, $this->_user, $this->_password, TRUE, FALSE, FALSE)) {
         $this->_log(ts("Failed to login as %1. Wrong username or password.", array('1' => $this->_user)));
         return FALSE;
       }
@@ -290,12 +306,13 @@ class civicrm_cli {
    * @return string
    */
   private function _getUsage() {
-    $out = "Usage: cli.php -e entity -a action [-u user] [-s site] [--output] [PARAMS]\n";
+    $out = "Usage: cli.php -e entity -a action [-u user] [-s site] [--output|--json] [PARAMS]\n";
     $out .= "  entity is the name of the entity, e.g. Contact, Event, etc.\n";
     $out .= "  action is the name of the action e.g. Get, Create, etc.\n";
     $out .= "  user is an optional username to run the script as\n";
     $out .= "  site is the domain name of the web site (for Drupal multi site installs)\n";
-    $out .= "  --output will print the result from the api call\n";
+    $out .= "  --output will pretty print the result from the api call\n";
+    $out .= "  --json will print the result from the api call as JSON\n";
     $out .= "  PARAMS is one or more --param=value combinations to pass to the api\n";
     return ts($out);
   }
@@ -308,42 +325,41 @@ class civicrm_cli {
     // that properly logs
     print "$error\n";
   }
+
 }
 
 /**
  * class used by csv/export.php to export records from
  * the database in a csv file format.
- **/
-
+ */
 class civicrm_cli_csv_exporter extends civicrm_cli {
   var $separator = ',';
 
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     $this->_required_arguments = array('entity');
     parent::initialize();
   }
 
-  function run() {
+  public function run() {
     $out = fopen("php://output", 'w');
     fputcsv($out, $this->columns, $this->separator, '"');
 
     $this->row = 1;
     $result = civicrm_api($this->_entity, 'Get', $this->_params);
-    $first = true;
+    $first = TRUE;
     foreach ($result['values'] as $row) {
-      if($first) {
+      if ($first) {
         $columns = array_keys($row);
         fputcsv($out, $columns, $this->separator, '"');
-        $first = false;
+        $first = FALSE;
       }
       //handle values returned as arrays (i.e. custom fields that allow multiple selections) by inserting a control character
       foreach ($row as &$field) {
-        if(is_array($field)) {
+        if (is_array($field)) {
           //convert to string
-          $field = implode($field,CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
+          $field = implode($field, CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
         }
       }
       fputcsv($out, $row, $this->separator, '"');
@@ -351,6 +367,7 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
     fclose($out);
     echo "\n";
   }
+
 }
 
 /**
@@ -358,22 +375,23 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
  * and civicrm_cli_csv_deleter to add or delete
  * records based on those found in a csv file
  * passed to the script.
- **/
-
+ */
 class civicrm_cli_csv_file extends civicrm_cli {
   var $header;
   var $separator = ',';
 
   /**
-   *
    */
-  function __construct() {
-    $this->_required_arguments = array('entity','file');
+  public function __construct() {
+    $this->_required_arguments = array('entity', 'file');
     $this->_additional_arguments = array('f' => 'file');
     parent::initialize();
   }
 
-  function run() {
+  /**
+   * Run CLI function.
+   */
+  public function run() {
     $this->row = 1;
     $handle = fopen($this->_file, "r");
 
@@ -397,13 +415,14 @@ class civicrm_cli_csv_file extends civicrm_cli {
     $this->header = $header;
     while (($data = fgetcsv($handle, 0, $this->separator)) !== FALSE) {
       // skip blank lines
-      if(count($data) == 1 && is_null($data[0])) continue;
+      if (count($data) == 1 && is_null($data[0])) {
+        continue;
+      }
       $this->row++;
       $params = $this->convertLine($data);
       $this->processLine($params);
     }
     fclose($handle);
-    return;
   }
 
   /* return a params as expected */
@@ -412,12 +431,12 @@ class civicrm_cli_csv_file extends civicrm_cli {
    *
    * @return array
    */
-  function convertLine($data) {
+  public function convertLine($data) {
     $params = array();
     foreach ($this->header as $i => $field) {
       //split any multiselect data, denoted with CRM_Core_DAO::VALUE_SEPARATOR
       if (strpos($data[$i], CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-        $data[$i] = explode(CRM_Core_DAO::VALUE_SEPARATOR,$data[$i]);
+        $data[$i] = explode(CRM_Core_DAO::VALUE_SEPARATOR, $data[$i]);
         $data[$i] = array_combine($data[$i], $data[$i]);
       }
       $params[$field] = $data[$i];
@@ -425,19 +444,19 @@ class civicrm_cli_csv_file extends civicrm_cli {
     $params['version'] = 3;
     return $params;
   }
+
 }
 
 /**
  * class for processing records to add
  * used by csv/import.php
  *
- **/
-
+ */
 class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
   /**
-   * @param $params
+   * @param array $params
    */
-  function processline($params) {
+  public function processline($params) {
     $result = civicrm_api($this->_entity, 'Create', $params);
     if ($result['is_error']) {
       echo "\nERROR line " . $this->row . ": " . $result['error_message'] . "\n";
@@ -446,24 +465,26 @@ class civicrm_cli_csv_importer extends civicrm_cli_csv_file {
       echo "\nline " . $this->row . ": created " . $this->_entity . " id: " . $result['id'] . "\n";
     }
   }
+
 }
 
 /**
  * class for processing records to delete
  * used by csv/delete.php
  *
- **/
-
+ */
 class civicrm_cli_csv_deleter extends civicrm_cli_csv_file {
   /**
-   * @param $params
+   * @param array $params
    */
-  function processline($params) {
+  public function processline($params) {
     $result = civicrm_api($this->_entity, 'Delete', $params);
     if ($result['is_error']) {
       echo "\nERROR line " . $this->row . ": " . $result['error_message'] . "\n";
-    } else {
+    }
+    else {
       echo "\nline " . $this->row . ": deleted\n";
     }
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,10 +40,9 @@
 class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -89,16 +88,16 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array  $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array    if errors then list of errors to be posted back to the form,
+   * @return array
+   *   if errors then list of errors to be posted back to the form,
    *                  true otherwise
-   * @static
-   * @access public
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
 
     if ($fields['name'] == 'activityDateTime' && !$fields['time_format']) {
@@ -109,9 +108,8 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -125,18 +123,22 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
     $params = $this->controller->exportValues($this->_name);
 
     // action is taken depending upon the mode
-    $dao              = new CRM_Core_DAO_PreferencesDate();
-    $dao->id          = $this->_id;
+    $dao = new CRM_Core_DAO_PreferencesDate();
+    $dao->id = $this->_id;
     $dao->description = $params['description'];
-    $dao->start       = $params['start'];
-    $dao->end         = $params['end'];
+    $dao->start = $params['start'];
+    $dao->end = $params['end'];
     $dao->date_format = $params['date_format'];
     $dao->time_format = $params['time_format'];
 
     $dao->save();
 
+    // Update dynamic js to reflect new date settings
+    CRM_Core_Resources::singleton()->resetCacheCode();
+
     CRM_Core_Session::setStatus(ts("The date type '%1' has been saved.",
-        array(1 => $params['name'])
-      ), ts('Saved'), 'success');
+      array(1 => $params['name'])
+    ), ts('Saved'), 'success');
   }
+
 }

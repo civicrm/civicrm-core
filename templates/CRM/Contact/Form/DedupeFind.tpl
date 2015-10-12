@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,9 +25,9 @@
 *}
 <div class="crm-block crm-form-block crm-dedupe-find-form-block">
 <div id="help">
-    {ts}You can search all contacts for duplicates or limit the search to a specific group.{/ts} 
+    {ts}You can search all contacts for duplicates or limit the search to a specific group.{/ts}
 </div>
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div> 
+   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    <table class="form-layout-compressed">
      <tr class="crm-dedupe-find-form-block-group_id">
        <td class="label">{$form.group_id.label}</td>

@@ -2,10 +2,11 @@
 (function($, CRM) {
   'use strict';
 
+  /* jshint validthis: true */
   /**
    * Handle user input - field or operator selection.
    *
-   * Decide whether to display select drop down, regular text or date 
+   * Decide whether to display select drop down, regular text or date
    * field for the given field and row.
    */
   function handleUserInputField() {
@@ -63,7 +64,7 @@
     $('input[id^=value]', row)
       .hide()
       .after('<select class="crm-form-' + multiSelect.substr(0, 5) + 'select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
-    
+
     fetchOptions(row, field);
   }
 
@@ -179,7 +180,7 @@
       $('tr:not(.crm-search-builder-add-row)', block).each(function(rowNo) {
         var row = $(this);
         if ($('select:first', row).val() === '') {
-          if (!skippedRow && (rowNo == 0 || blockNo + 1 == newBlock)) {
+          if (!skippedRow && (rowNo === 0 || blockNo + 1 == newBlock)) {
             skippedRow = true;
           }
           else {
@@ -234,7 +235,7 @@
       .on('change', '.crm-search-value select', function() {
         var value = $(this).val() || '';
         if ($(this).attr('multiple') == 'multiple' && value.length) {
-          value = '(' + value.join(',') + ')';
+          value = value.join(',');
         }
         $(this).siblings('input').val(value);
       })

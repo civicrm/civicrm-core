@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,12 +41,11 @@
 class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     $session = CRM_Core_Session::singleton();
 
     //this is done to unset searchRows variable assign during AddToHousehold and AddToOrganization
@@ -54,7 +53,9 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
 
     $context = $this->get('context');
     if (in_array($context, array(
-      'smog', 'amtg'))) {
+      'smog',
+      'amtg',
+    ))) {
       $urlParams = 'reset=1&force=1&context=smog&gid=';
       $urlParams .= ($context == 'smog') ? $this->get('gid') : $this->get('amtgID');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/group/search', $urlParams));
@@ -93,14 +94,12 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
 
     $url = CRM_Utils_System::url('civicrm/contact/' . $fragment, $path);
     $session->replaceUserContext($url);
-    return;
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -112,5 +111,5 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
       )
     );
   }
-}
 
+}

@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,12 +38,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   protected $_phoneField = FALSE;
 
   /**
-   *
    */
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -73,7 +70,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'sort_name' => array(
-            'title' => ts('Contact Name')
+            'title' => ts('Contact Name'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -88,7 +85,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'email' => array(
-            'title' => ts('Email')
+            'title' => ts('Email'),
           ),
         ),
         'grouping' => 'contact-fields',
@@ -97,7 +94,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
           'phone' => array(
-            'title' => 'Phone'
+            'title' => 'Phone',
           ),
         ),
         'grouping' => 'contact-fields',
@@ -126,7 +123,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'filters' => array(
           'activity_date_time' => array(
-            'operatorType' => CRM_Report_Form::OP_DATE
+            'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
@@ -145,11 +142,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ),
         ),
         'group_bys' => array(
-          'activity_date_time' =>
-            array(
-              'title' => ts('Activity Date'),
-              'frequency' => TRUE,
-            ),
+          'activity_date_time' => array(
+            'title' => ts('Activity Date'),
+            'frequency' => TRUE,
+          ),
           'activity_type_id' => array(
             'title' => ts('Activity Type'),
             'default' => TRUE,
@@ -157,10 +153,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'activity_date_time' => array(
-            'title' => ts('Activity Date')
+            'title' => ts('Activity Date'),
           ),
           'activity_type_id' => array(
-            'title' => ts('Activity Type')
+            'title' => ts('Activity Type'),
           ),
         ),
         'grouping' => 'activity-fields',
@@ -171,7 +167,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
@@ -276,7 +272,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -327,7 +323,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
-  function where() {
+  public function where() {
     $this->_where = " WHERE civicrm_option_group.name = 'activity_type' AND
                                 {$this->_aliases['civicrm_activity']}.is_test = 0 AND
                                 {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
@@ -377,7 +373,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = array();
     if (is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
@@ -424,7 +420,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
    *
    * @return array
    */
-  function formRule($fields, $files, $self) {
+  public function formRule($fields, $files, $self) {
     $errors = array();
     $contactFields = array('sort_name', 'email', 'phone');
     if (!empty($fields['group_bys'])) {
@@ -455,17 +451,22 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     return $errors;
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
     parent::postProcess();
   }
 
   /**
-   * @param $rows
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
    */
-  function alterDisplay(&$rows) {
-    // custom code to alter rows
+  public function alterDisplay(&$rows) {
 
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
@@ -532,5 +533,5 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       }
     }
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,57 +23,62 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: $
  *
  */
 class CRM_Utils_Type {
-  CONST
-    T_INT        = 1,
-    T_STRING     = 2,
-    T_ENUM       = 2,
-    T_DATE       = 4,
-    T_TIME       = 8,
-    T_BOOLEAN    = 16,
-    T_TEXT       = 32,
-    T_LONGTEXT   = 32,
-    T_BLOB       = 64,
-    T_TIMESTAMP  = 256,
-    T_FLOAT      = 512,
-    T_MONEY      = 1024,
-    T_EMAIL      = 2048,
-    T_URL        = 4096,
-    T_CCNUM      = 8192,
+  const
+    T_INT = 1,
+    T_STRING = 2,
+    T_ENUM = 2,
+    T_DATE = 4,
+    T_TIME = 8,
+    T_BOOLEAN = 16,
+    T_TEXT = 32,
+    T_LONGTEXT = 32,
+    T_BLOB = 64,
+    T_TIMESTAMP = 256,
+    T_FLOAT = 512,
+    T_MONEY = 1024,
+    T_EMAIL = 2048,
+    T_URL = 4096,
+    T_CCNUM = 8192,
     T_MEDIUMBLOB = 16384;
 
-  CONST
-    TWO       = 2,
-    FOUR      = 4,
-    SIX       = 6,
-    EIGHT     = 8,
-    TWELVE    = 12,
-    SIXTEEN   = 16,
-    TWENTY    = 20,
-    MEDIUM    = 20,
-    THIRTY    = 30,
-    BIG       = 30,
+  // @todo What's the point of these constants? Backwards compatibility?
+  const
+    TWO = 2,
+    FOUR = 4,
+    SIX = 6,
+    EIGHT = 8,
+    TWELVE = 12,
+    SIXTEEN = 16,
+    TWENTY = 20,
+    MEDIUM = 20,
+    THIRTY = 30,
+    BIG = 30,
     FORTYFIVE = 45,
-    HUGE      = 45;
+    HUGE = 45;
 
   /**
-   * Convert Constant Data type to String
+   * Gets the string representation for a data type.
    *
-   * @param  $type       integer datatype
+   * @param int $type
+   *   Integer number identifying the data type.
    *
-   * @return string $string     String datatype respective to integer datatype@access public
-   * @static
+   * @return string
+   *   String identifying the data type, e.g. 'Int' or 'String'.
    */
-  static function typeToString($type) {
+  public static function typeToString($type) {
+    // @todo Use constants in the case statements, e.g. "case T_INT:".
+    // @todo return directly, instead of assigning a value.
+    // @todo Use a lookup array, as a property or as a local variable.
     switch ($type) {
       case 1:
         $string = 'Int';
@@ -107,7 +112,7 @@ class CRM_Utils_Type {
         $string = 'Blob';
         break;
 
-        // CRM-10404
+      // CRM-10404
       case 12:
       case 256:
         $string = 'Timestamp';
@@ -138,55 +143,56 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Verify that a variable is of a given type
+   * Verify that a variable is of a given type, and apply a bit of processing.
    *
-   * @param mixed   $data         The variable
-   * @param string  $type         The type
-   * @param boolean $abort        Should we abort if invalid
+   * @param mixed $data
+   *   The value to be verified/escaped.
+   * @param string $type
+   *   The type to verify against.
+   * @param bool $abort
+   *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    *
-   * @return mixed                The data, escaped if necessary
-   * @access public
-   * @static
+   * @return mixed
+   *   The data, escaped if necessary.
    */
   public static function escape($data, $type, $abort = TRUE) {
     switch ($type) {
       case 'Integer':
       case 'Int':
         if (CRM_Utils_Rule::integer($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
       case 'Positive':
-      // CRM-8925 the 3 below are for custom fields of this type
+        if (CRM_Utils_Rule::positiveInteger($data)) {
+          return (int) $data;
+        }
+        break;
+
+      // CRM-8925 for custom fields of this type
       case 'Country':
       case 'StateProvince':
-        // Checked for multi valued state/country value
-        if (is_array($data)) {
-          $returnData = TRUE;
-          foreach ($data as $data) {
-            if (CRM_Utils_Rule::positiveInteger($data) || CRM_Core_DAO::escapeString($data)) {
-              $returnData = TRUE;
-            }
-            else {
-              $returnData = FALSE;
+        // Handle multivalued data in delimited or array format
+        if (is_array($data) || (strpos($data, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE)) {
+          $valid = TRUE;
+          foreach (CRM_Utils_Array::explodePadded($data) as $item) {
+            if (!CRM_Utils_Rule::positiveInteger($item)) {
+              $valid = FALSE;
             }
           }
-          if ($returnData) {
+          if ($valid) {
             return $data;
           }
         }
-        elseif (!is_numeric($data) &&  CRM_Core_DAO::escapeString($data)) {
-          return $data;
-        }
         elseif (CRM_Utils_Rule::positiveInteger($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
       case 'File':
         if (CRM_Utils_Rule::positiveInteger($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
@@ -236,15 +242,18 @@ class CRM_Utils_Type {
         }
 
         if (CRM_Utils_Rule::validContact($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
       default:
-        CRM_Core_Error::fatal("Cannot recognize $type for $data");
+        CRM_Core_Error::fatal(
+          $type . " is not a recognised (camel cased) data type."
+        );
         break;
     }
 
+    // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
       CRM_Core_Error::fatal("$data is not of the type $type");
@@ -253,29 +262,32 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Verify that a variable is of a given type
+   * Verify that a variable is of a given type.
    *
-   * @param mixed   $data         The variable
-   * @param string  $type         The type
-   * @param boolean $abort        Should we abort if invalid
-   * @name string   $name    The name of the attribute
+   * @param mixed $data
+   *   The value to validate.
+   * @param string $type
+   *   The type to validate against.
+   * @param bool $abort
+   *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
+   * @name string $name
+   *   The name of the attribute
    *
-   * @return mixed                The data, escaped if necessary
-   * @access public
-   * @static
+   * @return mixed
+   *   The data, escaped if necessary
    */
   public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {
     switch ($type) {
       case 'Integer':
       case 'Int':
         if (CRM_Utils_Rule::integer($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
       case 'Positive':
         if (CRM_Utils_Rule::positiveInteger($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
@@ -349,5 +361,5 @@ class CRM_Utils_Type {
 
     return NULL;
   }
-}
 
+}

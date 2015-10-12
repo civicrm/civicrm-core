@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 
 {if $config->empoweredBy}
-  {capture assign=civilogo}<a href="http://civicrm.org/" title="{ts}CiviCRM.org - Growing and Sustaining Relationships{/ts}" target="_blank" class="empowered-by-link"><div class="empowered-by-logo"><span>CiviCRM</span></div></a>{/capture}
+  {capture assign=civilogo}<a href="https://civicrm.org/" title="{ts}CiviCRM.org - Growing and Sustaining Relationships{/ts}" target="_blank" class="empowered-by-link"><div class="empowered-by-logo"><span>CiviCRM</span></div></a>{/capture}
   <div class="crm-public-footer" id="civicrm-footer">
     {ts 1=$civilogo}empowered by %1{/ts}
   </div>

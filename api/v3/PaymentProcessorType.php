@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,51 +26,40 @@
  */
 
 /**
- * new version of civicrm apis. See blog post at
- * http://civicrm.org/node/131
+ * This api exposes CiviCRM payment processor types.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Contact
- * @copyright CiviCRM LLC (c) 2004-2014
- * $Id: PaymentProcessorType.php 30415 2010-10-29 12:02:47Z shot $
- *
  */
 
 /**
- * Include common API util functions
- */
-
-/**
- * Function to create payment_processor type
+ * Create payment_processor type.
  *
- * @param  array $params   Associative array of property name/value pairs to insert in new payment_processor type.
+ * @param array $params
+ *   Associative array of property name/value pairs to insert in new payment_processor type.
  *
- * @return Newly created PaymentProcessor_type object
- * {@getfields PaymentProcessorType_create}
- * @access public
- * {@schema Core/PaymentProcessorType.xml}
+ * @return array
  */
 function civicrm_api3_payment_processor_type_create($params) {
-  $ids = array();
   if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
     return civicrm_api3_create_error('Invalid value for payment_processor type ID');
   }
 
-  $payProcType = new CRM_Financial_BAO_PaymentProcessorType();
-  $payProcType = CRM_Financial_BAO_PaymentProcessorType::create($params);
+  $paymentProcessorType = CRM_Financial_BAO_PaymentProcessorType::create($params);
 
   $relType = array();
 
-  _civicrm_api3_object_to_array($payProcType, $relType[$payProcType->id]);
+  _civicrm_api3_object_to_array($paymentProcessorType, $relType[$paymentProcessorType->id]);
 
-  return civicrm_api3_create_success($relType, $params, 'payment_processor_type', 'create', $payProcType);
+  return civicrm_api3_create_success($relType, $params, 'PaymentProcessorType', 'create', $paymentProcessorType);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_payment_processor_type_create_spec(&$params) {
   $params['billing_mode']['api.required'] = 1;
@@ -84,25 +72,23 @@ function _civicrm_api3_payment_processor_type_create_spec(&$params) {
 }
 
 /**
- * Function to get all payment_processor type
- * retruns  An array of PaymentProcessor_type
- * @access  public
- * {@getfields PaymentProcessorType_get}
- * @example PaymentProcessorTypeGet.php
+ * Get all payment_processor types.
+ *
+ * @param array $params
+ *
+ * @return array
  */
 function civicrm_api3_payment_processor_type_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a payment_processor type delete
+ * Delete a payment_processor type delete.
  *
- * @param  id of payment_processor type  $id
+ * @param array $params
  *
- * @return array API Result Array
- * {@getfields PaymentProcessorType_delete}
- * @static void
- * @access public
+ * @return array
+ *   API Result Array
  */
 function civicrm_api3_payment_processor_type_delete($params) {
   if ($params['id'] != NULL && !CRM_Utils_Rule::integer($params['id'])) {
@@ -114,5 +100,5 @@ function civicrm_api3_payment_processor_type_delete($params) {
   if (!$result) {
     return civicrm_api3_create_error('Could not delete payment processor type');
   }
-  return civicrm_api3_create_success($result, $params, 'payment_processor_type', 'delete', $payProcTypeBAO);
+  return civicrm_api3_create_success($result, $params, 'PaymentProcessorType', 'delete', $payProcTypeBAO);
 }

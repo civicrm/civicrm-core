@@ -12,7 +12,7 @@ class CRM_Core_CodeGen_Util_Template {
   /**
    * @param string $filetype
    */
-  function __construct($filetype) {
+  public function __construct($filetype) {
     $this->filetype = $filetype;
 
     $this->smarty = CRM_Core_CodeGen_Util_Smarty::singleton()->getSmarty();
@@ -39,24 +39,28 @@ class CRM_Core_CodeGen_Util_Template {
   }
 
   /**
-   * @param array $inputs template filenames
-   * @param string $outpath full path to the desired output file
+   * @param array $inputs
+   *   Template filenames.
+   * @param string $outpath
+   *   Full path to the desired output file.
    */
-  function runConcat($inputs, $outpath) {
+  public function runConcat($inputs, $outpath) {
     if (file_exists($outpath)) {
       unlink($outpath);
     }
     foreach ($inputs as $infile) {
       // FIXME: does not beautify.  Document.
-      file_put_contents($outpath, $this->smarty->fetch($infile) ."\n", FILE_APPEND);
+      file_put_contents($outpath, $this->smarty->fetch($infile) . "\n", FILE_APPEND);
     }
   }
 
   /**
-   * @param string $infile filename of the template, without a path
-   * @param string $outpath full path to the desired output file
+   * @param string $infile
+   *   Filename of the template, without a path.
+   * @param string $outpath
+   *   Full path to the desired output file.
    */
-  function run($infile, $outpath) {
+  public function run($infile, $outpath) {
     $renderedContents = $this->smarty->fetch($infile);
 
     if ($this->filetype === 'php') {
@@ -64,7 +68,8 @@ class CRM_Core_CodeGen_Util_Template {
       $this->beautifier->setOutputFile($outpath);
       $this->beautifier->process();
       $this->beautifier->save();
-    } else {
+    }
+    else {
       file_put_contents($outpath, $renderedContents);
     }
   }
@@ -73,16 +78,17 @@ class CRM_Core_CodeGen_Util_Template {
    * @param $key
    * @param $value
    */
-  function assign($key, $value) {
+  public function assign($key, $value) {
     $this->smarty->assign_by_ref($key, $value);
   }
 
   /**
-   * Clear the smarty cache and assign default values
+   * Clear the smarty cache and assign default values.
    * FIXME: unused cos we no longer do evil singleton magick
    */
   protected function reset() {
     $this->smarty->clear_all_assign();
     $this->smarty->clear_all_cache();
   }
+
 }

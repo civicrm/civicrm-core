@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,8 +32,8 @@
 
   <div class="crm-block crm-content-block">
     <div id="new-menu-item">
-      <a href="{crmURL p="civicrm/admin/menu" q="action=add&reset=1"}" class="button" style="margin-left: 6px;"><span><div class="icon add-icon"></div>{ts}Add Menu Item{/ts}</span></a>&nbsp;&nbsp;&nbsp;&nbsp;
-        <span id="reset-menu" class="success-status" style="display:none">
+      <a href="{crmURL p="civicrm/admin/menu" q="action=add&reset=1"}" class="button" style="margin-left: 6px;"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Menu Item{/ts}</span></a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id="reset-menu" class="status" style="display:none">
         {capture assign=rebuildURL}{crmURL p='civicrm/admin/menu' q="reset=1"}{/capture}
           {ts 1=$rebuildURL}<a href='%1' title="Reload page"><strong>Click here</strong></a> to reload the page and see your changes in the menu bar above.{/ts}
         </span><br/><br/>
@@ -130,7 +130,7 @@
           $("#navigation-tree").jstree('refresh');
           return false;
         }
-        var deleteMsg = {/literal}"{ts escape='js'}Are you sure you want to delete this menu item:{/ts}" + " "{literal} + menuName + {/literal}" ? {ts}This action can not be undone.{/ts}"{literal};
+        var deleteMsg = {/literal}"{ts escape='js'}Are you sure you want to delete this menu item:{/ts}" + " "{literal} + menuName + {/literal}" ? {ts}This action cannot be undone.{/ts}"{literal};
         var isDelete  = confirm( deleteMsg );
         if ( isDelete ) {
           var postURL = {/literal}"{crmURL p='civicrm/ajax/menutree' h=0 q='key='}{crmKey name='civicrm/ajax/menutree'}"{literal};

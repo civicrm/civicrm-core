@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -122,7 +122,7 @@
           }
 
         if ( showError ) {
-          cj('#validate_pricefield').show().html("<span class='icon red-icon alert-icon'></span>{/literal}{ts escape='js'}This Option is already full for this event.{/ts}{literal}");
+          cj('#validate_pricefield').show().html("<span class='icon red-icon ui-icon-alert'></span>{/literal}{ts escape='js'}This Option is already full for this event.{/ts}{literal}");
         }
         else {
           cj('#validate_pricefield').hide( ).html('');
@@ -373,6 +373,9 @@
         if ($('#discount_id', $form).val()) {
           buildFeeBlock($('#discount_id', $form).val());
         }
+        $($form).on('change', '#discount_id', function() {
+          buildFeeBlock($(this).val());
+        });
 
         function buildRoleCustomData() {
           var roleId = $('select[name^=role_id]', $form).val().join();

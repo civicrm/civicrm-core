@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -47,7 +47,7 @@
         <thead>
         <tr class="columnheader">
             <th id="sortable">{ts}ACL Role{/ts}</th>
-            <th>{ts}Assigned To{/ts}</th>
+            <th>{ts}Assigned to{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
             <th></th>
         </tr>
@@ -67,7 +67,7 @@
 
         {if $action ne 1 and $action ne 2}
       <div class="crm-submit-buttons">
-            <a href="{crmURL q="action=add&reset=1"}" id="newACL" class="button"><span><div class="icon add-icon"></div>{ts}Add Role Assignment{/ts}</span></a>
+            {crmButton q="action=add&reset=1" id="newACL"  icon="circle-plus"}{ts}Add Role Assignment{/ts}{/crmButton}
         </div>
         {/if}
 </div>

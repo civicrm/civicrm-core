@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -44,10 +44,8 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
    * the contact and calls the appropriate type of page to view.
    *
    * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     //fetch the dedupe exception contacts.
     $dedupeExceptions = array();
 
@@ -58,14 +56,15 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
       $key = "{$exception->contact_id1}_{$exception->contact_id2}";
       $contactIds[$exception->contact_id1] = $exception->contact_id1;
       $contactIds[$exception->contact_id2] = $exception->contact_id2;
-      $dedupeExceptions[$key] = array('main' => array('id' => $exception->contact_id1),
+      $dedupeExceptions[$key] = array(
+        'main' => array('id' => $exception->contact_id1),
         'other' => array('id' => $exception->contact_id2),
       );
     }
     //get the dupe contacts display names.
     if (!empty($dedupeExceptions)) {
-      $sql          = 'select id, display_name from civicrm_contact where id IN ( ' . implode(', ', $contactIds) . ' )';
-      $contact      = CRM_Core_DAO::executeQuery($sql);
+      $sql = 'select id, display_name from civicrm_contact where id IN ( ' . implode(', ', $contactIds) . ' )';
+      $contact = CRM_Core_DAO::executeQuery($sql);
       $displayNames = array();
       while ($contact->fetch()) {
         $displayNames[$contact->id] = $contact->display_name;
@@ -79,15 +78,14 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads,
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
-}
 
+}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -148,7 +148,7 @@
         <td>{$form.custom_post_id.html}
           <div
             class="description">{ts}Include additional fields on this registration form by selecting and configuring a CiviCRM Profile to be included at the bottom of the page.{/ts}</div>
-          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#" 
+          &nbsp;<span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'>&nbsp;<a href="#"
 class="crm-hover-button crm-button-add-profile"><span
                 class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
           <br/>
@@ -194,7 +194,7 @@ class="crm-hover-button crm-button-add-profile"><span
         <td>{$form.additional_custom_post_id.html}
           <div
             class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}
-					</div>
+          </div>
           &nbsp;<span class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a
               href="#" class="crm-hover-button crm-button-add-profile"><span
                 class="icon ui-icon-plus"></span>{ts}add another profile (bottom of page){/ts}</a></span>
@@ -424,6 +424,7 @@ invert              = 0
     var profileBottomCountAdd = Number({/literal}{$profilePostMultipleAdd|@count}{literal});
 
     function addBottomProfile( e ) {
+        var urlPath;
         e.preventDefault();
 
         var addtlPartc = $(this).data('addtlPartc');
@@ -450,8 +451,9 @@ invert              = 0
         $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main,tr:visible:last .profile_bottom_add_link, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
 
-    var strSameAs = ' - '+ts('same as for main contact')+' - ';
-    var strSelect = ' - '+ts('select')+' - ';
+    var
+      strSameAs = '{/literal}{ts escape='js'}- same as for main contact -{/ts}{literal}',
+      strSelect = '{/literal}{ts escape='js'}- select -{/ts}{literal}';
 
     $('#crm-container').on('crmLoad', function() {
         var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
@@ -483,19 +485,16 @@ $(function($) {
             $('#additional_profile_pre,#additional_profile_post').show();
         }
 
-        showRuleFields({/literal}{$ruleFields}{literal});
     });
-
-    $('#allow_same_participant_emails').change( function() { showRuleFields({/literal}{$ruleFields}{literal}) });
 
     $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
     $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
 
     $('#crm-container').on('crmLoad', function(e) {
         $('tr[id^="additional_profile"] input[id^="additional_custom_"]').change(function(e) {
-            $input = $(e.target);
+            var $input = $(e.target);
             if ( $input.val() == '') {
-                $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
+                var $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
                 if ($selected.text() == strSelect) { $input.val('none'); }
             }
         });

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,35 +39,19 @@
  * components in CiviCRM (since they all have send email as a task)
  */
 class CRM_Contact_Form_Task_LabelCommon {
+
   /**
-   * Check for presence of tokens to be swapped out
+   * Create labels (pdf)
    *
-   * @param array $contact
-   * @param array $mailingFormatProperties
-   * @param array $tokenFields
+   * @param array $contactRows
+   *   Assciated array of contact data.
+   * @param string $format
+   *   Format in which labels needs to be printed.
+   * @param string $fileName
+   *   The name of the file to save the label in.
    *
-   * @return bool
    */
-  function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
-    foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
-      //we should not consider addressee for data exists, CRM-6025
-       if ($key != 'addressee' && !empty($contact[$key])) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
-  /**
-   * function to create labels (pdf)
-   *
-   * @param   array    $contactRows   assciated array of contact data
-   * @param   string   $format   format in which labels needs to be printed
-   * @param   string   $fileName    The name of the file to save the label in
-   *
-   * @return  null
-   * @access  public
-   */
-  static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
+  public static function createLabel(&$contactRows, &$format, $fileName = 'MailingLabels_CiviCRM.pdf') {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
@@ -87,25 +71,24 @@ class CRM_Contact_Form_Task_LabelCommon {
 
 
   /**
-   * function to get the rows for the labels
+   * Get the rows for the labels.
    *
    * @param $contactIDs
-   * @param integer $locationTypeID
-   * @param boolean $respectDoNotMail
+   * @param int $locationTypeID
+   * @param bool $respectDoNotMail
    * @param $mergeSameAddress
-   * @param $mergeSameHousehold
+   * @param bool $mergeSameHousehold
+   *   UNUSED.
    *
-   * @internal param array $contactIds Contact IDS to do labels for
-   * @return array of rows for labels
-   * @access  public
+   * @return array
+   *   Array of rows for labels
    */
-
-  static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
+  public static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
     $locName = NULL;
     //get the address format sequence from the config file
     $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
 
-    //build the returnproperties
+    //build the return properties
     $returnProperties = array('display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1);
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
@@ -113,7 +96,7 @@ class CRM_Contact_Form_Task_LabelCommon {
 
     $mailingFormatProperties = array();
     if ($mailingFormat) {
-      $mailingFormatProperties = CRM_Contact_Form_Task_LabelCommon::regexReturnProperties($mailingFormat);
+      $mailingFormatProperties = CRM_Utils_Token::getReturnProperties($mailingFormat);
       $returnProperties = array_merge($returnProperties, $mailingFormatProperties);
     }
 
@@ -140,7 +123,10 @@ class CRM_Contact_Form_Task_LabelCommon {
     foreach ($contactIDs as $key => $contactID) {
       $params[] = array(
         CRM_Core_Form::CB_PREFIX . $contactID,
-        '=', 1, 0, 0,
+        '=',
+        1,
+        0,
+        0,
       );
     }
 
@@ -152,11 +138,11 @@ class CRM_Contact_Form_Task_LabelCommon {
     $params[] = array('is_deceased', '=', 0, 0, 0);
 
     if ($locationTypeID) {
-      $locType          = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-      $locName          = $locType[$locationTypeID];
-      $location         = array('location' => array("{$locName}" => $addressReturnProperties));
+      $locType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locName = $locType[$locationTypeID];
+      $location = array('location' => array("{$locName}" => $addressReturnProperties));
       $returnProperties = array_merge($returnProperties, $location);
-      $params[]         = array('location_type', '=', array($locationTypeID => 1), 0, 0);
+      $params[] = array('location_type', '=', array($locationTypeID => 1), 0, 0);
     }
     else {
       $returnProperties = array_merge($returnProperties, $addressReturnProperties);
@@ -173,8 +159,8 @@ class CRM_Contact_Form_Task_LabelCommon {
     $numberofContacts = count($contactIDs);
     //this does the same as calling civicrm_api3('contact, get, array('id' => array('IN' => $this->_contactIds)
     // except it also handles multiple locations
-    $query            = new CRM_Contact_BAO_Query($params, $returnProperties);
-    $details          = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
+    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
+    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
 
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
     $details = $details[0];
@@ -199,7 +185,7 @@ class CRM_Contact_Form_Task_LabelCommon {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 
-        if(!CRM_Contact_Form_Task_LabelCommon::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
+        if (!CRM_Contact_Form_Task_Label::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
           continue;
         }
 
@@ -218,11 +204,16 @@ class CRM_Contact_Form_Task_LabelCommon {
         $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
         if ($locationTypeID) {
           foreach ($valuesothers as $vals) {
-            if ( CRM_Utils_Array::value('location_type_id', $vals) ==
-              $locationTypeID) {
+            if (CRM_Utils_Array::value('location_type_id', $vals) ==
+              $locationTypeID
+            ) {
               foreach ($vals as $k => $v) {
                 if (in_array($k, array(
-                  'email', 'phone', 'im', 'openid'))) {
+                  'email',
+                  'phone',
+                  'im',
+                  'openid',
+                ))) {
                   if ($k == 'im') {
                     $rows[$value][$k] = $v['1']['name'];
                   }
@@ -237,7 +228,7 @@ class CRM_Contact_Form_Task_LabelCommon {
         }
       }
       else {
-        if(!CRM_Contact_Form_Task_LabelCommon::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
+        if (!CRM_Contact_Form_Task_Label::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
           continue;
         }
 
@@ -259,41 +250,13 @@ class CRM_Contact_Form_Task_LabelCommon {
   }
 
   /**
-   * function to extract the return properties from the mailing format
-   * @todo I'm placing bets this is a duplicate of code elsewhere - find & merge
-   * @param unknown_type $format
-   * @return multitype:number
+   * Get array of return properties for address fields required for mailing label.
+   *
+   * @return array
+   *   return properties for address e.g
+   *   [street_address => 1, supplemental_address_1 => 1, supplemental_address_2 => 1]
    */
-  function regexReturnProperties(&$format) {
-    $returnProperties = array();
-    $matches = array();
-    preg_match_all('/(?<!\{|\\\\)\{(\w+\.\w+)\}(?!\})/',
-    $format,
-    $matches,
-    PREG_PATTERN_ORDER
-    );
-    if ($matches[1]) {
-      foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
-        if ($name) {
-          $returnProperties["{$name}"] = 1;
-        }
-      }
-    }
-
-    return $returnProperties;
-  }
-
-  /**
-   * Get array of return properties for address fields required for mailing label
-   * @return array return properites for address e.g
-   * array (
-   *  - [street_address] => 1,
-   * -  [supplemental_address_1] => 1,
-   * -  [supplemental_address_2] => 1
-   * )
-   */
-  function getAddressReturnProperties() {
+  public static function getAddressReturnProperties() {
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
     );
@@ -309,10 +272,10 @@ class CRM_Contact_Form_Task_LabelCommon {
 
   /**
    * Get token list from mailing format & contacts
-   * @param unknown_type $contacts
-   * @return unknown
+   * @param array $contacts
+   * @return array
    */
-  function getTokenData(&$contacts) {
+  public static function getTokenData(&$contacts) {
     $mailingFormat = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'mailing_format'
     );
@@ -325,7 +288,7 @@ class CRM_Contact_Form_Task_LabelCommon {
       NULL,
       $messageToken,
       'CRM_Contact_Form_Task_LabelCommon'
-     );
+    );
 
     CRM_Utils_Hook::tokens($tokens);
 
@@ -337,80 +300,14 @@ class CRM_Contact_Form_Task_LabelCommon {
     return $tokenFields;
 
   }
-  /**
-   * Merge contacts with the Same address to get one shared label
-   * @param unknown_type $rows
-   */
-  function mergeSameAddress(&$rows) {
-    $uniqueAddress = array();
-    foreach (array_keys($rows) as $rowID) {
-      // load complete address as array key
-      $address =
-      trim($rows[$rowID]['street_address']) . trim($rows[$rowID]['city']) . trim($rows[$rowID]['state_province']) . trim($rows[$rowID]['postal_code']) . trim($rows[$rowID]['country']);
-      if (isset($rows[$rowID]['last_name'])) {
-        $name = $rows[$rowID]['last_name'];
-      }
-      else {
-        $name = $rows[$rowID]['display_name'];
-      }
-      $formatted = array(
-       'first_name' => $rows[$rowID]['first_name'],
-       'individual_prefix' => $rows[$rowID]['individual_prefix']
-      );
-      $format = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'display_name_format');
-      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format,  FALSE, FALSE, TRUE);
-      $firstNameWithPrefix = trim($firstNameWithPrefix);
-
-      // fill uniqueAddress array with last/first name tree
-      if (isset($uniqueAddress[$address])) {
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
-        // drop unnecessary rows
-        unset($rows[$rowID]);
-        // this is the first listing at this address
-      }
-      else {
-        $uniqueAddress[$address]['ID'] = $rowID;
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
-      }
-    }
-    foreach ($uniqueAddress as $address => $data) {
-      // copy data back to $rows
-      $count = 0;
-      // one last name list per row
-      foreach ($data['names'] as $last_name => $first_names) {
-        // too many to list
-        if ($count > 2) {
-          break;
-        }
-        if(count($first_names) == 1) {
-          $family = $first_names[current(array_keys($first_names))]['addressee_display'];
-        }
-        else {
-          // collapse the tree to summarize
-          $family = trim(implode(" & ", $first_names) . " " . $last_name);
-        }
-        if ($count) {
-          $processedNames .= "\n" . $family;
-        }
-        else {
-          // build display_name string
-          $processedNames = $family;
-        }
-        $count++;
-      }
-      $rows[$data['ID']]['addressee'] = $rows[$data['ID']]['addressee_display'] = $rows[$data['ID']]['display_name'] = $processedNames;
-    }
-  }
 
   /**
-   * @param $rows
+   * @param array $rows
    *
    * @return array
    */
-  function mergeSameHousehold(&$rows) {
-    # group selected contacts by type
+  public function mergeSameHousehold(&$rows) {
+    // group selected contacts by type
     $individuals = array();
     $households = array();
     foreach ($rows as $contact_id => $row) {
@@ -422,21 +319,22 @@ class CRM_Contact_Form_Task_LabelCommon {
       }
     }
 
-    # exclude individuals belonging to selected households
+    // exclude individuals belonging to selected households
     foreach ($households as $household_id => $row) {
-    $dao = new CRM_Contact_DAO_Relationship();
-    $dao->contact_id_b = $household_id;
-    $dao->find();
-    while ($dao->fetch()) {
-    $individual_id = $dao->contact_id_a;
-    if (array_key_exists($individual_id, $individuals)) {
-    unset($individuals[$individual_id]);
-    }
-    }
+      $dao = new CRM_Contact_DAO_Relationship();
+      $dao->contact_id_b = $household_id;
+      $dao->find();
+      while ($dao->fetch()) {
+        $individual_id = $dao->contact_id_a;
+        if (array_key_exists($individual_id, $individuals)) {
+          unset($individuals[$individual_id]);
+        }
+      }
     }
 
-    # merge back individuals and households
+    // merge back individuals and households
     $rows = array_merge($individuals, $households);
     return $rows;
-    }
+  }
+
 }

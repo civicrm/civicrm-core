@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,14 +43,15 @@
 class CRM_Utils_ICalendar {
 
   /**
-   * Escape text elements for safe ICalendar use
+   * Escape text elements for safe ICalendar use.
    *
-   * @param $text Text to escape
+   * @param $text
+   *   Text to escape.
    *
-   * @return  Escaped text
-   *
+   * @return string
+   *   Escaped text
    */
-  static function formatText($text) {
+  public static function formatText($text) {
     $text = strip_tags($text);
     $text = str_replace("\"", "DQUOTE", $text);
     $text = str_replace("\\", "\\\\", $text);
@@ -62,15 +63,17 @@ class CRM_Utils_ICalendar {
   }
 
   /**
-   * Escape date elements for safe ICalendar use
+   * Escape date elements for safe ICalendar use.
    *
-   * @param $date Date to escape
+   * @param $date
+   *   Date to escape.
    *
    * @param bool $gdata
    *
-   * @return  Escaped date
+   * @return string
+   *   Escaped date
    */
-  static function formatDate($date, $gdata = FALSE) {
+  public static function formatDate($date, $gdata = FALSE) {
 
     if ($gdata) {
       return date("Y-m-d\TH:i:s.000",
@@ -85,29 +88,25 @@ class CRM_Utils_ICalendar {
   }
 
   /**
-   *
    * Send the ICalendar to the browser with the specified content type
    * - 'text/calendar' : used for downloaded ics file
    * - 'text/plain'    : used for iCal formatted feed
    * - 'text/xml'      : used for gData or rss formatted feeds
    *
-   * @access public
    *
-   * @param string $calendar The calendar data to be published.
-   *
+   * @param string $calendar
+   *   The calendar data to be published.
    * @param string $content_type
-   *
-   * @param string $charset The character set to use, defaults to
-   * 'us-ascii'.
-   *
-   * @param null $fileName
-   * @param string $disposition How the file should be sent ('attachment' for downloads)
-   *
-   * @internal param string $filename The file name (for downloads)
+   * @param string $charset
+   *   The character set to use, defaults to 'us-ascii'.
+   * @param string $fileName
+   *   The file name (for downloads).
+   * @param string $disposition
+   *   How the file should be sent ('attachment' for downloads).
    *
    * @return void
    */
-  static function send($calendar, $content_type = 'text/calendar', $charset = 'us-ascii', $fileName = NULL, $disposition = NULL) {
+  public static function send($calendar, $content_type = 'text/calendar', $charset = 'us-ascii', $fileName = NULL, $disposition = NULL) {
     $config = CRM_Core_Config::singleton();
     $lang = $config->lcMessages;
     header("Content-Language: $lang");
@@ -124,5 +123,5 @@ class CRM_Utils_ICalendar {
 
     echo $calendar;
   }
-}
 
+}

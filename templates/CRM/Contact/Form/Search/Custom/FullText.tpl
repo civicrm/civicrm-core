@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,7 +67,7 @@
           <tr class="{cycle values="odd-row,even-row"}">
             <td><a
                 href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}"
-                title="{ts}View contact details{/ts}">{$row.sort_name}</a></td>
+                title="{ts}View Contact Details{/ts}">{$row.sort_name}</a></td>
             {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             <td><a
                 href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}">{ts}View{/ts}</a>
@@ -114,15 +114,15 @@
             <td>{$row.details|escape}</td>
             <td>
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}"
-                title="{ts}View contact details{/ts}">{$row.sort_name}</a>
+                title="{ts}View Contact Details{/ts}">{$row.sort_name}</a>
             </td>
             <td>
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.target_contact_id`&context=fulltext&key=`$qfKey`"}"
-                title="{ts}View contact details{/ts}">{$row.target_sort_name}</a>
+                title="{ts}View Contact Details{/ts}">{$row.target_sort_name}</a>
             </td>
             <td>
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.assignee_contact_id`&context=fulltext&key=`$qfKey`"}"
-                title="{ts}View contact details{/ts}">{$row.assignee_sort_name}</a>
+                title="{ts}View Contact Details{/ts}">{$row.assignee_sort_name}</a>
             </td>
             {if $allowFileSearch}<td>{$row.fileHtml}</td>{/if}
             <td>
@@ -173,7 +173,7 @@
           <tr class="{cycle values="odd-row,even-row"}">
             <td>
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}"
-                title="{ts}View contact details{/ts}">{$row.sort_name}</a>
+                title="{ts}View Contact Details{/ts}">{$row.sort_name}</a>
             </td>
             <td>{$row.case_start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
             <td>{$row.case_end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
@@ -233,7 +233,7 @@
             <td>
               <a href="{crmURL p='civicrm/contact/view'
               q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}"
-                title="{ts}View contact details{/ts}">{$row.sort_name}</a>
+                title="{ts}View Contact Details{/ts}">{$row.sort_name}</a>
             </td>
             <td>{$row.contribution_total_amount|crmMoney}</td>
             <td>{$row.financial_type}</td>
@@ -288,7 +288,7 @@
           <tr class="{cycle values="odd-row,even-row"}">
             <td>
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}"
-                title="{ts}View contact details{/ts}">{$row.sort_name}</a>
+                title="{ts}View Contact Details{/ts}">{$row.sort_name}</a>
             </td>
             <td>{$row.event_title}</td>
             <td>{$row.participant_fee_level}</td>
@@ -344,7 +344,7 @@
           <tr class="{cycle values="odd-row,even-row"}">
             <td>
               <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&context=fulltext&key=`$qfKey`"}"
-                title="{ts}View contact details{/ts}">{$row.sort_name}</a>
+                title="{ts}View Contact Details{/ts}">{$row.sort_name}</a>
             </td>
             <td>{$row.membership_type}</td>
             <td>{$row.membership_fee|crmMoney}</td>

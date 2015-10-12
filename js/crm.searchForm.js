@@ -59,7 +59,7 @@
       }
       // Master checkbox
       else if ($el.hasClass('select-rows')) {
-        params.name = $('input.select-row').map(function() {return $(this).attr('id')}).get().join('-');
+        params.name = $('input.select-row').map(function() {return $(this).attr('id');}).get().join('-');
       }
     }
     $.getJSON(url, params, function(data) {

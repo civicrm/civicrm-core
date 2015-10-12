@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,12 +43,12 @@ return array(
     'name' => 'is_enabled',
     'title' => 'Multisite Is enabled',
     'type' => 'Integer',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Multisite is enabled',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'domain_group_id' => array(
     'group_name' => 'Multi Site Preferences',
@@ -56,12 +56,12 @@ return array(
     'name' => 'domain_group_id',
     'title' => 'Multisite Domain Group',
     'type' => 'Integer',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
   'event_price_set_domain_id' => array(
     'group_name' => 'Multi Site Preferences',
@@ -69,12 +69,12 @@ return array(
     'name' => 'event_price_set_domain_id',
     'title' => 'Domain Event Price Set',
     'type' => 'Integer',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
   'uniq_email_per_site' => array(
     'group_name' => 'Multi Site Preferences',
@@ -82,11 +82,11 @@ return array(
     'name' => 'uniq_email_per_site',
     'type' => 'Integer',
     'title' => 'Unique Email per Domain?',
-    'default' => null,
+    'default' => NULL,
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => null,
+    'help_text' => NULL,
   ),
- );
+);

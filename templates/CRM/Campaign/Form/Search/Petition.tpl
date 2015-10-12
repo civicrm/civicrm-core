@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,11 +27,11 @@
 {if !$hasPetitions}
     <div class="messages status no-popup">
         <div class="icon inform-icon"></div> &nbsp;
-        {ts}No petitions found.{/ts}
+        {ts}None found.{/ts}
     </div>
 
     <div class="action-link">
-         <a href="{crmURL p='civicrm/petition/add' q='reset=1' h=0 }" class="button"><span><div class="icon add-icon"></div>{ts}Add Petition{/ts}</span></a>
+         {crmButton p='civicrm/petition/add' q='reset=1' h=0  icon="circle-plus"}{ts}Add Petition{/ts}{/crmButton}
     </div>
 
 {elseif $buildSelector}
@@ -42,7 +42,6 @@
        {* load petition selector *}
 
        {include file="CRM/common/enableDisableApi.tpl"}
-       {include file="CRM/common/crmeditable.tpl"}
 
        {literal}
        <script type="text/javascript">
@@ -73,7 +72,7 @@
 {else}
 
    <div class="action-link">
-      <a href="{crmURL p='civicrm/petition/add' q='reset=1' h=0 }" class="button"><span><div class="icon add-icon"></div>{ts}Add Petition{/ts}</span></a>
+      {crmButton p='civicrm/petition/add' q='reset=1' h=0  icon="circle-plus"}{ts}Add Petition{/ts}{/crmButton}
    </div>
 
     {* build search form here *}
@@ -178,17 +177,18 @@ function loadPetitionList( )
              "bProcessing": false,
              "bLengthChange": false,
              "aaSorting": [],
-             "aoColumns":[{sClass:'crm-petition-id                          hiddenElement' },
-                 {sClass:'crm-petition-title'                                     },
-           {sClass:'crm-petition-campaign_id                 hiddenElement' },
-           {sClass:'crm-petition-campaign'                                  },
-           {sClass:'crm-petition-activity_type_id            hiddenElement' },
-           {sClass:'crm-petition-activity_type               hiddenElement' },
-           {sClass:'crm-petition-is_default'                                },
-           {sClass:'crm-petition-is_active                   hiddenElement' },
-           {sClass:'crm-petition-isActive'                                  },
-           {sClass:'crm-petition-action',                    bSortable:false}
-           ],
+             "aoColumns":[
+                 {sClass:'crm-petition-id                          hiddenElement' },
+                 {sClass:'crmf-title'                                     },
+                 {sClass:'crm-petition-campaign_id                 hiddenElement' },
+                 {sClass:'crmf-campaign_id'                                  },
+                 {sClass:'crm-petition-activity_type_id            hiddenElement' },
+                 {sClass:'crm-petition-activity_type               hiddenElement' },
+                 {sClass:'crm-petition-is_default'                                },
+                 {sClass:'crm-petition-is_active                   hiddenElement' },
+                 {sClass:'crm-petition-isActive'                                  },
+                 {sClass:'crm-petition-action',                    bSortable:false}
+             ],
              "sPaginationType": "full_numbers",
              "sDom"       : 'rt<"crm-datatable-pager-bottom"ip>',
              "bServerSide": true,
@@ -197,8 +197,15 @@ function loadPetitionList( )
              "asStripClasses" : [ "odd-row", "even-row" ],
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
-             "fnDrawCallback": function() { CRM.$().crmtooltip(); },
+             "fnDrawCallback": function() {
+               // FIXME: trigger crmLoad and crmEditable would happen automatically
+               CRM.$('.crm-editable').crmEditable();
+             },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+
+               // Crm-editable
+               CRM.$(nRow).children().eq(1).addClass('crm-editable');
+
          //insert the id for each row for enable/disable.
          var rowId = 'survey-' + aData[0];
          CRM.$(nRow).attr( 'id', rowId).addClass('crm-entity');

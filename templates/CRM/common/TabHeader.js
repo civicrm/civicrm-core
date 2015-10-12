@@ -25,7 +25,7 @@ CRM.$(function($) {
             // Hack: "Save and done" and "Cancel" buttons submit without ajax
             $('.cancel.crm-form-submit, input[name$=upload_done]', this).on('click', function(e) {
               $(this).closest('form').ajaxFormUnbind();
-            })
+            });
           });
         }
         if (ui.tab.hasClass('livePage') && CRM.config.ajaxPopupsEnabled) {
@@ -124,13 +124,23 @@ CRM.$(function($) {
   };
 
   /**
-   * Refresh tab immediately if it is active, otherwise ensure it will be refreshed next time the user clicks on it
+   * Refresh tab immediately if it is active (or force=true)
+   * otherwise ensure it will be refreshed next time the user clicks on it
+   *
    * @param tab
+   * @param force
    */
-  CRM.tabHeader.resetTab = function(tab) {
+  CRM.tabHeader.resetTab = function(tab, force) {
     var $panel = CRM.tabHeader.getTabPanel(tab);
     if ($(tab).hasClass('ui-tabs-active')) {
       $panel.crmSnippet('refresh');
+    }
+    else if (force) {
+      if ($panel.data("civiCrmSnippet")) {
+        $panel.crmSnippet('refresh');
+      } else {
+        $("#mainTabContainer").trigger('tabsbeforeload', [{panel: $panel, tab: $(tab)}]);
+      }
     }
     else if ($panel.data("civiCrmSnippet")) {
       $panel.crmSnippet('destroy');

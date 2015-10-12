@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Event;
 
@@ -34,10 +34,12 @@ namespace Civi\API\Event;
 class PrepareEvent extends Event {
   /**
    * @param array $apiRequest
+   *   The full description of the API request.
    * @return RespondEvent
    */
   public function setApiRequest($apiRequest) {
     $this->apiRequest = $apiRequest;
     return $this;
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 namespace Civi\API\Event;
 
@@ -39,13 +39,18 @@ class ExceptionEvent extends Event {
   private $exception;
 
   /**
-   * @param $exception
-   * @param $apiProvider
-   * @param $apiRequest
+   * @param \Exception $exception
+   *   The exception which arose while processing the API request.
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   *   The API provider responsible for executing the request.
+   * @param array $apiRequest
+   *   The full description of the API request.
+   * @param \Civi\API\Kernel $apiKernel
+   *   The kernel which fired the event.
    */
-  function __construct($exception, $apiProvider, $apiRequest) {
+  public function __construct($exception, $apiProvider, $apiRequest, $apiKernel) {
     $this->exception = $exception;
-    parent::__construct($apiProvider, $apiRequest);
+    parent::__construct($apiProvider, $apiRequest, $apiKernel);
   }
 
   /**
@@ -54,4 +59,5 @@ class ExceptionEvent extends Event {
   public function getException() {
     return $this->exception;
   }
+
 }

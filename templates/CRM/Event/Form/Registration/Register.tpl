@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,12 +25,12 @@
 *}
 {* Callback snippet: Load payment processor *}
 {if $snippet}
-  {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
+  {include file="CRM/Core/BillingBlock.tpl"}
   <div id="paypalExpress">
     {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
     {if $paymentProcessor.payment_processor_type EQ 'PayPal_Express'}
       {assign var=expressButtonName value='_qf_Register_upload_express'}
-      <fieldset class="crm-group payPalExpress-group">
+      <fieldset class="crm-public-form-item crm-group payPalExpress-group">
         <legend>{ts}Checkout with PayPal{/ts}</legend>
         <div class="description">{ts}Click the PayPal button to continue.{/ts}</div>
         <div>{$form.$expressButtonName.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span>
@@ -60,27 +60,27 @@
     {/if}
 
     {if $contact_id}
-      <div class="messages status no-popup" id="crm-event-register-different">
+      <div class="messages status no-popup crm-not-you-message" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}. (<a
           href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
           title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
       </div>
     {/if}
     {if $event.intro_text}
-      <div id="intro_text" class="crm-section intro_text-section">
+      <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
         <p>{$event.intro_text}</p>
       </div>
     {/if}
 
     {include file="CRM/common/cidzero.tpl"}
     {if $pcpSupporterText}
-      <div class="crm-section pcpSupporterText-section">
+      <div class="crm-public-form-item crm-section pcpSupporterText-section">
         <div class="content">{$pcpSupporterText}</div>
       </div>
     {/if}
 
     {if $form.additional_participants.html}
-      <div class="crm-section additional_participants-section" id="noOfparticipants">
+      <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
         <div class="label">{$form.additional_participants.label}</div>
         <div class="content">
           {$form.additional_participants.html}{if $contact_id || $contact_id == NULL} &nbsp; ({ts}including yourself{/ts}){/if}
@@ -92,36 +92,40 @@
       </div>
     {/if}
 
-    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
-    {include file="CRM/common/CMSUser.tpl"}
+    <div class="crm-public-form-item crm-section cms_user-section">
+      {* User account registration option. Displays if enabled for one of the profiles on this page. *}
+      {include file="CRM/common/CMSUser.tpl"}
+    </div>
 
-    {* Display "Top of page" profile immediately after the introductory text *}
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+    <div class="crm-public-form-item crm-section custom_pre-section">
+      {* Display "Top of page" profile immediately after the introductory text *}
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
+    </div>
 
     {if $priceSet}
-      {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
+      {if ! $quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
         <legend>{$event.fee_label}</legend>{/if}
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
       {if ! $quickConfig}</fieldset>{/if}
     {/if}
     {if $pcp && $is_honor_roll }
-      <fieldset class="crm-group pcp-group">
-        <div class="crm-section pcp-section">
-          <div class="crm-section display_in_roll-section">
+      <fieldset class="crm-public-form-item crm-group pcp-group">
+        <div class="crm-public-form-item crm-section pcp-section">
+          <div class="crm-public-form-item crm-section display_in_roll-section">
             <div class="content">
               {$form.pcp_display_in_roll.html} &nbsp;
               {$form.pcp_display_in_roll.label}
             </div>
             <div class="clear"></div>
           </div>
-          <div id="nameID" class="crm-section is_anonymous-section">
+          <div id="nameID" class="crm-public-form-item crm-section is_anonymous-section">
             <div class="content">
               {$form.pcp_is_anonymous.html}
             </div>
             <div class="clear"></div>
           </div>
-          <div id="nickID" class="crm-section pcp_roll_nickname-section">
+          <div id="nickID" class="crm-public-form-item crm-section pcp_roll_nickname-section">
             <div class="label">{$form.pcp_roll_nickname.label}</div>
             <div class="content">{$form.pcp_roll_nickname.html}
               <div
@@ -129,7 +133,7 @@
             </div>
             <div class="clear"></div>
           </div>
-          <div id="personalNoteID" class="crm-section pcp_personal_note-section">
+          <div id="personalNoteID" class="crm-public-form-item crm-section pcp_personal_note-section">
             <div class="label">{$form.pcp_personal_note.label}</div>
             <div class="content">
               {$form.pcp_personal_note.html}
@@ -142,9 +146,9 @@
     {/if}
 
     {if $form.payment_processor.label}
-      <fieldset class="crm-group payment_options-group" style="display:none;">
+      <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>
-        <div class="crm-section payment_processor-section">
+        <div class="crm-public-form-item crm-section payment_processor-section">
           <div class="label">{$form.payment_processor.label}</div>
           <div class="content">{$form.payment_processor.html}</div>
           <div class="clear"></div>
@@ -154,13 +158,15 @@
 
     <div id="billing-payment-block">
       {* If we have a payment processor, load it - otherwise it happens via ajax *}
-      {if $ppType}
+      {if $paymentProcessorID or $isBillingAddressRequiredForPayLater}
         {include file="CRM/Event/Form/Registration/Register.tpl" snippet=4}
       {/if}
     </div>
     {include file="CRM/common/paymentBlock.tpl"}
 
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+    <div class="crm-public-form-item crm-section custom_pre-section">
+      {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
+    </div>
 
     {if $isCaptcha}
       {include file='CRM/common/ReCAPTCHA.tpl'}
@@ -171,7 +177,7 @@
     </div>
 
     {if $event.footer_text}
-      <div id="footer_text" class="crm-section event_footer_text-section">
+      <div id="footer_text" class="crm-public-form-item crm-section event_footer_text-section">
         <p>{$event.footer_text}</p>
       </div>
     {/if}

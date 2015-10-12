@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,29 +23,35 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
-  function __construct() {
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
     parent::__construct('Participant', ts('Participants'));
   }
 
-  function isActive() {
+  /**
+   * @return bool
+   */
+  public function isActive() {
     $config = CRM_Core_Config::singleton();
     return in_array('CiviEvent', $config->enableComponents) &&
-      CRM_Core_Permission::check('view event participants');
+    CRM_Core_Permission::check('view event participants');
   }
 
   /**
-   * {@inheritdoc}
+   * @inheritDoc
    */
   public function fillTempTable($queryText, $entityIDTableName, $toTable, $queryLimit, $detailLimit) {
     $queries = $this->prepareQueries($queryText, $entityIDTableName);
@@ -58,13 +64,14 @@ class CRM_Contact_Form_Search_Custom_FullText_Participant extends CRM_Contact_Fo
   }
 
   /**
-   * get participant ids in entity tables.
+   * Get participant ids in entity tables.
    *
    * @param string $queryText
    * @param string $entityIDTableName
-   * @return array list tables/queries (for runQueries)
+   * @return array
+   *   list tables/queries (for runQueries)
    */
-  function prepareQueries($queryText, $entityIDTableName) {
+  public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
     $contactSQL = array();
@@ -102,6 +109,12 @@ WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_n
     return $tables;
   }
 
+  /**
+   * Move IDs.
+   * @param string $fromTable
+   * @param string $toTable
+   * @param int $limit
+   */
   public function moveIDs($fromTable, $toTable, $limit) {
     $sql = "
 INSERT INTO {$toTable}

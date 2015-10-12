@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -167,9 +167,6 @@ function selectValue( val, prefix) {
       if (prefix == "SMS") {
           text_message = "sms_text_message";
       }
-      else {
-        cj("#subject").val( data.subject );
-      }
       if ( data.msg_text ) {
         cj("#"+text_message).val( data.msg_text );
         cj("div.text").show();
@@ -183,6 +180,9 @@ function selectValue( val, prefix) {
 
     if (prefix == "SMS") {
       return;
+    }
+    else {
+      cj("#subject").val( data.subject );
     }
     var html_body  = "";
     if (  data.msg_html ) {
@@ -385,11 +385,11 @@ CRM.$(function($) {
   // Initialize token selector widgets
   var form = $('form.{/literal}{$form.formClass}{literal}');
   $('input.crm-token-selector', form)
-    .addClass('crm-action-menu')
+    .addClass('crm-action-menu action-icon-token')
     .change(insertToken)
     .crmSelect2({
       data: form.data('tokens'),
-      placeholder: '{/literal}{ts escape='js'}Insert Token{/ts}{literal}'
+      placeholder: '{/literal}{ts escape='js'}Tokens{/ts}{literal}'
     });
 
   $('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ");

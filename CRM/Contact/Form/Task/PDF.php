@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,7 +40,7 @@
 class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
 
   /**
-   * all the existing templates in the system
+   * All the existing templates in the system.
    *
    * @var array
    */
@@ -53,12 +53,11 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   public $_activityId = NULL;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
 
     $this->skipOnHold = $this->skipDeceased = FALSE;
     CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
@@ -88,17 +87,15 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form. Relationship that in edit/view action
+   * Set default values for the form. Relationship that in edit/view action
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
   /**
-   *
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
     if (isset($this->_activityId)) {
       $params = array('id' => $this->_activityId);
@@ -110,9 +107,8 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
@@ -123,14 +119,13 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
    * @return void
    */
   public function postProcess() {
     CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
   }
-}
 
+}

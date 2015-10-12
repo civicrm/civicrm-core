@@ -35,9 +35,9 @@ $params = array(1 => array($_GET['userid'], 'String'));
 
 $dpsSettings = CRM_Core_DAO::executeQuery($query, $params);
 while ($dpsSettings->fetch()) {
-  $dpsUrl    = $dpsSettings->url_site;
-  $dpsUser   = $dpsSettings->user_name;
-  $dpsKey    = $dpsSettings->password;
+  $dpsUrl = $dpsSettings->url_site;
+  $dpsUser = $dpsSettings->user_name;
+  $dpsKey = $dpsSettings->password;
   $dpsMacKey = $dpsSettings->signature;
 }
 

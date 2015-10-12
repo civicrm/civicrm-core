@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,7 +39,7 @@ class CRM_Core_I18n_PseudoConstant {
    *
    * @return mixed
    */
-  static function longForShort($short) {
+  public static function longForShort($short) {
     $longForShortMapping = self::longForShortMapping();
     return $longForShortMapping[$short];
   }
@@ -47,7 +47,7 @@ class CRM_Core_I18n_PseudoConstant {
   /**
    * @return array
    */
-  static function &longForShortMapping() {
+  public static function &longForShortMapping() {
     static $longForShortMapping = NULL;
     if ($longForShortMapping === NULL) {
       $rows = array();
@@ -74,8 +74,8 @@ class CRM_Core_I18n_PseudoConstant {
    *
    * @return string
    */
-  static function shortForLong($long) {
+  public static function shortForLong($long) {
     return substr($long, 0, 2);
   }
-}
 
+}

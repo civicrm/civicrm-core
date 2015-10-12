@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -59,7 +59,7 @@
   {/section}
   <tr>
     <td>
-      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon add-icon"></span> {ts}another soft credit{/ts}</a>
+      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon ui-icon-circle-plus"></span> {ts}another soft credit{/ts}</a>
     </td>
   </tr>
 </table>
@@ -88,29 +88,6 @@
       }
       return false;
     });
-
-    // FIXME: This could be much simpler as an entityRef field but pcp doesn't have a searchable api :(
-    var pcpURL = CRM.url('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1');
-    $('#pcp_made_through_id').crmSelect2({
-      placeholder: {/literal}'{ts escape="js"}- select -{/ts}'{literal},
-      minimumInputLength: 1,
-      ajax: {
-        url: pcpURL,
-        data: function(term) {
-          return {term: term};
-        },
-        results: function(response) {
-          return {results: response};
-        }
-      },
-      initSelection: function(el, callback) {
-        callback({id: $(el).val(), text: $('[name=pcp_made_through]', $form).val()});
-      }
-    })
-      // This is just a cheap trick to store the name in case of a formrule error
-      .on('change', function() {
-        $('[name=pcp_made_through]', $form).val($(this).select2('data').text || '');
-      });
 
     $('.crm-soft-credit-block tr span').each(function () {
       if ($(this).hasClass('crm-error')) {

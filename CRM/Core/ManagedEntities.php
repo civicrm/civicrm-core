@@ -7,6 +7,11 @@
  */
 class CRM_Core_ManagedEntities {
 
+  /**
+   * Get clean up options.
+   *
+   * @return array
+   */
   public static function getCleanupOptions() {
     return array(
       'always' => ts('Always'),
@@ -16,17 +21,22 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @var array($status => array($name => CRM_Core_Module))
+   * @var array
+   *   Array($status => array($name => CRM_Core_Module)).
    */
   protected $moduleIndex;
 
   /**
-   * @var array per hook_civicrm_managed
+   * @var array
+   *   List of all entity declarations.
+   * @see CRM_Utils_Hook::managed()
    */
   protected $declarations;
 
   /**
-   * Get an instance
+   * Get an instance.
+   * @param bool $fresh
+   * @return \CRM_Core_ManagedEntities
    */
   public static function singleton($fresh = FALSE) {
     static $singleton;
@@ -39,7 +49,7 @@ class CRM_Core_ManagedEntities {
   /**
    * Perform an asynchronous reconciliation when the transaction ends.
    */
-  public static function scheduleReconcilation() {
+  public static function scheduleReconciliation() {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
       function () {
@@ -51,23 +61,31 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param array $modules CRM_Core_Module
-   * @param array $declarations per hook_civicrm_managed
+   * @param array $modules
+   *   CRM_Core_Module.
+   * @param array $declarations
+   *   Per hook_civicrm_managed.
    */
   public function __construct($modules, $declarations) {
     $this->moduleIndex = self::createModuleIndex($modules);
 
     if ($declarations !== NULL) {
       $this->declarations = self::cleanDeclarations($declarations);
-    } else {
+    }
+    else {
       $this->declarations = NULL;
     }
   }
 
   /**
-   * Read the managed entity
+   * Read a managed entity using APIv3.
    *
-   * @return array|NULL API representation, or NULL if the entity does not exist
+   * @param string $moduleName
+   *   The name of the module which declared entity.
+   * @param string $name
+   *   The symbolic name of the entity.
+   * @return array|NULL
+   *   API representation, or NULL if the entity does not exist
    */
   public function get($moduleName, $name) {
     $dao = new CRM_Core_DAO_Managed();
@@ -85,11 +103,18 @@ class CRM_Core_ManagedEntities {
         $this->onApiError($dao->entity_type, 'getsingle', $params, $result);
       }
       return $result;
-    } else {
+    }
+    else {
       return NULL;
     }
   }
 
+  /**
+   * Identify any enabled/disabled modules. Add new entities, update
+   * existing entities, and remove orphaned (stale) entities.
+   *
+   * @throws Exception
+   */
   public function reconcile() {
     if ($error = $this->validate($this->getDeclarations())) {
       throw new Exception($error);
@@ -99,7 +124,12 @@ class CRM_Core_ManagedEntities {
     $this->reconcileUnknownModules();
   }
 
-
+  /**
+   * For all enabled modules, add new entities, update
+   * existing entities, and remove orphaned (stale) entities.
+   *
+   * @throws Exception
+   */
   public function reconcileEnabledModules() {
     // Note: any thing currently declared is necessarily from
     // an active module -- because we got it from a hook!
@@ -109,19 +139,24 @@ class CRM_Core_ManagedEntities {
     foreach ($decls as $moduleName => $todos) {
       if (isset($this->moduleIndex[TRUE][$moduleName])) {
         $this->reconcileEnabledModule($this->moduleIndex[TRUE][$moduleName], $todos);
-      } elseif (isset($this->moduleIndex[FALSE][$moduleName])) {
+      }
+      elseif (isset($this->moduleIndex[FALSE][$moduleName])) {
         // do nothing -- module should get swept up later
-      } else {
+      }
+      else {
         throw new Exception("Entity declaration references invalid or inactive module name [$moduleName]");
       }
     }
   }
 
   /**
-   * Create, update, and delete entities declared by an active module
+   * For one enabled module, add new entities, update existing entities,
+   * and remove orphaned (stale) entities.
    *
-   * @param \CRM_Core_Module|string $module string
-   * @param $todos array $name => array()
+   * @param \CRM_Core_Module $module
+   * @param array $todos
+   *   List of entities currently declared by this module.
+   *   array(string $name => array $entityDef).
    */
   public function reconcileEnabledModule(CRM_Core_Module $module, $todos) {
     $dao = new CRM_Core_DAO_Managed();
@@ -132,7 +167,8 @@ class CRM_Core_ManagedEntities {
         // update existing entity; remove from $todos
         $this->updateExistingEntity($dao, $todos[$dao->name]);
         unset($todos[$dao->name]);
-      } else {
+      }
+      else {
         // remove stale entity; not in $todos
         $this->removeStaleEntity($dao);
       }
@@ -144,6 +180,9 @@ class CRM_Core_ManagedEntities {
     }
   }
 
+  /**
+   * For all disabled modules, disable any managed entities.
+   */
   public function reconcileDisabledModules() {
     if (empty($this->moduleIndex[FALSE])) {
       return;
@@ -159,6 +198,10 @@ class CRM_Core_ManagedEntities {
     }
   }
 
+  /**
+   * Remove any orphaned (stale) entities that are linked to
+   * unknown modules.
+   */
   public function reconcileUnknownModules() {
     $knownModules = array();
     if (array_key_exists(0, $this->moduleIndex) && is_array($this->moduleIndex[0])) {
@@ -166,7 +209,6 @@ class CRM_Core_ManagedEntities {
     }
     if (array_key_exists(1, $this->moduleIndex) && is_array($this->moduleIndex[1])) {
       $knownModules = array_merge($knownModules, array_keys($this->moduleIndex[1]));
-
     }
 
     $dao = new CRM_Core_DAO_Managed();
@@ -181,9 +223,10 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Create a new entity
+   * Create a new entity.
    *
-   * @param array $todo entity specification (per hook_civicrm_managedEntities)
+   * @param array $todo
+   *   Entity specification (per hook_civicrm_managedEntities).
    */
   public function insertNewEntity($todo) {
     $result = civicrm_api($todo['entity'], 'create', $todo['params']);
@@ -204,7 +247,8 @@ class CRM_Core_ManagedEntities {
    * Update an entity which (a) is believed to exist and which (b) ought to be active.
    *
    * @param CRM_Core_DAO_Managed $dao
-   * @param array $todo entity specification (per hook_civicrm_managedEntities)
+   * @param array $todo
+   *   Entity specification (per hook_civicrm_managedEntities).
    */
   public function updateExistingEntity($dao, $todo) {
     $policy = CRM_Utils_Array::value('update', $todo, 'always');
@@ -218,7 +262,7 @@ class CRM_Core_ManagedEntities {
       $params = array_merge($defaults, $todo['params']);
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($dao->entity_type, 'create',$params, $result);
+        $this->onApiError($dao->entity_type, 'create', $params, $result);
       }
     }
 
@@ -245,15 +289,16 @@ class CRM_Core_ManagedEntities {
       );
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
-        $this->onApiError($dao->entity_type, 'create',$params, $result);
+        $this->onApiError($dao->entity_type, 'create', $params, $result);
       }
     }
   }
 
   /**
-   * Remove a stale entity (if policy allows)
+   * Remove a stale entity (if policy allows).
    *
    * @param CRM_Core_DAO_Managed $dao
+   * @throws Exception
    */
   public function removeStaleEntity($dao) {
     $policy = empty($dao->cleanup) ? 'always' : $dao->cleanup;
@@ -261,13 +306,15 @@ class CRM_Core_ManagedEntities {
       case 'always':
         $doDelete = TRUE;
         break;
+
       case 'never':
         $doDelete = FALSE;
         break;
+
       case 'unused':
         $getRefCount = civicrm_api3($dao->entity_type, 'getrefcount', array(
           'debug' => 1,
-          'id' => $dao->entity_id
+          'id' => $dao->entity_id,
         ));
 
         $total = 0;
@@ -277,6 +324,7 @@ class CRM_Core_ManagedEntities {
 
         $doDelete = ($total == 0);
         break;
+
       default:
         throw new \Exception('Unrecognized cleanup policy: ' . $policy);
     }
@@ -292,11 +340,16 @@ class CRM_Core_ManagedEntities {
       }
 
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', array(
-        1 => array($dao->id, 'Integer')
+        1 => array($dao->id, 'Integer'),
       ));
     }
   }
 
+  /**
+   * Get declarations.
+   *
+   * @return array|null
+   */
   public function getDeclarations() {
     if ($this->declarations === NULL) {
       $this->declarations = array();
@@ -311,9 +364,11 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $modules
+   * @param array $modules
+   *   Array<CRM_Core_Module>.
    *
-   * @return array indexed by is_active,name
+   * @return array
+   *   indexed by is_active,name
    */
   protected static function createModuleIndex($modules) {
     $result = array();
@@ -324,10 +379,11 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $moduleIndex
-   * @param $declarations
+   * @param array $moduleIndex
+   * @param array $declarations
    *
-   * @return array indexed by module,name
+   * @return array
+   *   indexed by module,name
    */
   protected static function createDeclarationIndex($moduleIndex, $declarations) {
     $result = array();
@@ -349,7 +405,8 @@ class CRM_Core_ManagedEntities {
   /**
    * @param $declarations
    *
-   * @return mixed string on error, or FALSE
+   * @return string|bool
+   *   string on error, or FALSE
    */
   protected static function validate($declarations) {
     foreach ($declarations as $declare) {
@@ -365,9 +422,9 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * @param $declarations
+   * @param array $declarations
    *
-   * @return mixed
+   * @return array
    */
   protected static function cleanDeclarations($declarations) {
     foreach ($declarations as $name => &$declare) {
@@ -395,5 +452,5 @@ class CRM_Core_ManagedEntities {
     ));
     throw new Exception('API error: ' . $result['error_message']);
   }
-}
 
+}

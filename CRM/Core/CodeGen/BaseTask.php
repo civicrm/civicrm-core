@@ -7,18 +7,19 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
   protected $config;
 
   /**
-   *
    */
-  function __construct() {
+  public function __construct() {
   }
 
-  // TODO: this is the most rudimentary possible hack.  CG config should
-  // eventually be made into a first-class object.
   /**
-   * @param is $config
+   * TODO: this is the most rudimentary possible hack.  CG config should
+   * eventually be made into a first-class object.
+   *
+   * @param object $config
    */
-  function setConfig($config) {
+  public function setConfig($config) {
     $this->config = $config;
     $this->tables = $this->config->tables;
   }
+
 }

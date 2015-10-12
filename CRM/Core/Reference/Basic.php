@@ -19,7 +19,7 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
    * @param string $targetKey
    * @param null $refTypeColumn
    */
-  function __construct($refTable, $refKey, $targetTable = NULL, $targetKey = 'id', $refTypeColumn = NULL) {
+  public function __construct($refTable, $refKey, $targetTable = NULL, $targetKey = 'id', $refTypeColumn = NULL) {
     $this->refTable = $refTable;
     $this->refKey = $refKey;
     $this->targetTable = $targetTable;
@@ -30,35 +30,35 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   /**
    * @return mixed
    */
-  function getReferenceTable() {
+  public function getReferenceTable() {
     return $this->refTable;
   }
 
   /**
    * @return mixed
    */
-  function getReferenceKey() {
+  public function getReferenceKey() {
     return $this->refKey;
   }
 
   /**
    * @return null
    */
-  function getTypeColumn() {
+  public function getTypeColumn() {
     return $this->refTypeColumn;
   }
 
   /**
    * @return null
    */
-  function getTargetTable() {
+  public function getTargetTable() {
     return $this->targetTable;
   }
 
   /**
    * @return string
    */
-  function getTargetKey() {
+  public function getTargetKey() {
     return $this->targetKey;
   }
 
@@ -79,7 +79,7 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   public function findReferences($targetDao) {
     $targetColumn = $this->getTargetKey();
     $params = array(
-      1 => array($targetDao->$targetColumn, 'String')
+      1 => array($targetDao->$targetColumn, 'String'),
     );
     $sql = <<<EOS
 SELECT id
@@ -100,7 +100,7 @@ EOS;
   public function getReferenceCount($targetDao) {
     $targetColumn = $this->getTargetKey();
     $params = array(
-      1 => array($targetDao->$targetColumn, 'String')
+      1 => array($targetDao->$targetColumn, 'String'),
     );
     $sql = <<<EOS
 SELECT count(id)
@@ -113,7 +113,8 @@ EOS;
       'type' => get_class($this),
       'table' => $this->getReferenceTable(),
       'key' => $this->getReferenceKey(),
-      'count' => CRM_Core_DAO::singleValueQuery($sql, $params)
+      'count' => CRM_Core_DAO::singleValueQuery($sql, $params),
     );
   }
+
 }

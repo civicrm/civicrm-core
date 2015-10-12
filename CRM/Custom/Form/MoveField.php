@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,47 +39,47 @@
 class CRM_Custom_Form_MoveField extends CRM_Core_Form {
 
   /**
-   * the src group id
+   * The src group id.
    *
    * @var int
    */
   protected $_srcGID;
 
   /**
-   * the src field id
+   * The src field id.
    *
    * @var int
    */
   protected $_srcFID;
 
   /**
-   * the dst group id
+   * The dst group id.
    *
    * @var int
    */
   protected $_dstGID;
 
   /**
-   * the dst field id
+   * The dst field id.
    *
    * @var int
    */
   protected $_dstFID;
 
   /**
-   * The title of the field being moved
+   * The title of the field being moved.
    *
    * @var string
    */
   protected $_srcFieldLabel;
 
   /**
-   * set up variables to build the form
+   * Set up variables to build the form.
    *
    * @return void
    * @acess protected
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_srcFID = CRM_Utils_Request::retrieve('fid', 'Positive',
       $this, TRUE
     );
@@ -95,18 +95,17 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     );
 
     CRM_Utils_System::setTitle(ts('Custom Field Move: %1',
-        array(1 => $this->_srcFieldLabel)
-      ));
+      array(1 => $this->_srcFieldLabel)
+    ));
 
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field', "reset=1&action=browse&gid={$this->_srcGID}"));
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -117,7 +116,8 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     }
 
     $customGroup = array(
-      '' => ts('- select -')) + $customGroup;
+      '' => ts('- select -'),
+    ) + $customGroup;
     $this->add('select',
       'dst_group_id',
       ts('Destination'),
@@ -148,10 +148,10 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
    *
    * @return array|bool
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $self->_dstGID = $fields['dst_group_id'];
-    $tmp           = CRM_Core_BAO_CustomField::_moveFieldValidate($self->_srcFID, $self->_dstGID);
-    $errors        = array();
+    $tmp = CRM_Core_BAO_CustomField::_moveFieldValidate($self->_srcFID, $self->_dstGID);
+    $errors = array();
     if ($tmp['newGroupID']) {
       $errors['dst_group_id'] = $tmp['newGroupID'];
     }
@@ -159,10 +159,9 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     CRM_Core_BAO_CustomField::moveField($this->_srcFID, $this->_dstGID);
@@ -174,10 +173,10 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     $srcUrl = CRM_Utils_System::url('civicrm/admin/custom/group/field', "reset=1&action=browse&gid={$this->_dstGID}");
     CRM_Core_Session::setStatus(ts("%1 has been moved to the custom set <a href='%3'>%2</a>.",
       array(
-      1 => $this->_srcFieldLabel,
-          2 => $dstGroup,
-        3 => $srcUrl
-        )), '', 'success');
+        1 => $this->_srcFieldLabel,
+        2 => $dstGroup,
+        3 => $srcUrl,
+      )), '', 'success');
   }
-}
 
+}

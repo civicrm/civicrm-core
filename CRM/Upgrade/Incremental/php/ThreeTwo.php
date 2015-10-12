@@ -1,15 +1,15 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
  | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007.                                       |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
  |                                                                    |
  | CiviCRM is distributed in the hope that it will be useful, but     |
  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
@@ -17,17 +17,18 @@
  | See the GNU Affero General Public License for more details.        |
  |                                                                    |
  | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
  | at info[AT]civicrm[DOT]org. If you have questions about the        |
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -37,20 +38,24 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
    *
    * @return bool
    */
-  function verifyPreDBstate(&$errors) {
+  public function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
   /**
    * @param $rev
    */
-  function upgrade_3_2_alpha1($rev) {
+  public function upgrade_3_2_alpha1($rev) {
     //CRM-5666 -if user already have 'access CiviCase'
     //give all new permissions and drop access CiviCase.
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal) {
 
-      $config->userSystem->replacePermission('access CiviCase', array('access my cases and activities', 'access all cases and activities', 'administer CiviCase'));
+      $config->userSystem->replacePermission('access CiviCase', array(
+          'access my cases and activities',
+          'access all cases and activities',
+          'administer CiviCase',
+        ));
 
       //insert core acls.
       $casePermissions = array(
@@ -90,8 +95,8 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
   /**
    * @param $rev
    */
-  function upgrade_3_2_beta4($rev) {
-    $upgrade = new CRM_Upgrade_Form;
+  public function upgrade_3_2_beta4($rev) {
+    $upgrade = new CRM_Upgrade_Form();
 
     $config = CRM_Core_Config::singleton();
     $seedLocale = $config->lcMessages;
@@ -101,14 +106,17 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
 
     // CRM-6451: for multilingual sites we need to find the optimal
     // locale to use as the final civicrm_membership_status.name column
-    $domain = new CRM_Core_DAO_Domain;
+    $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $locales = array();
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       // optimal: an English locale
       foreach (array(
-        'en_US', 'en_GB', 'en_AU') as $loc) {
+                 'en_US',
+                 'en_GB',
+                 'en_AU',
+               ) as $loc) {
         if (in_array($loc, $locales)) {
           $seedLocale = $loc;
           break;
@@ -216,7 +224,7 @@ class CRM_Upgrade_Incremental_php_ThreeTwo {
     $statusIds = array();
     $insertedNewRecord = FALSE;
     foreach ($statuses as $status) {
-      $dao = new CRM_Member_DAO_MembershipStatus;
+      $dao = new CRM_Member_DAO_MembershipStatus();
 
       // try to find an existing English status
       $dao->name = $status['name'];
@@ -264,7 +272,7 @@ UPDATE  civicrm_membership_status
   /**
    * @param $rev
    */
-  function upgrade_3_2_1($rev) {
+  public function upgrade_3_2_1($rev) {
     //CRM-6565 check if Activity Index is already exists or not.
     $addActivityTypeIndex = TRUE;
     $indexes = CRM_Core_DAO::executeQuery('SHOW INDEXES FROM civicrm_activity');
@@ -277,9 +285,9 @@ UPDATE  civicrm_membership_status
     $config = CRM_Core_Config::singleton();
     CRM_Utils_File::restrictAccess($config->uploadDir);
     CRM_Utils_File::restrictAccess($config->configAndLogDir);
-    $upgrade = new CRM_Upgrade_Form;
+    $upgrade = new CRM_Upgrade_Form();
     $upgrade->assign('addActivityTypeIndex', $addActivityTypeIndex);
     $upgrade->processSQL($rev);
   }
-}
 
+}

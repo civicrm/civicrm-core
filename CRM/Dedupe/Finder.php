@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,15 +43,17 @@ class CRM_Dedupe_Finder {
    * Return a contact_id-keyed array of arrays of possible dupes
    * (of the key contact_id) - limited to dupes of $cids if provided.
    *
-   * @param int   $rgid  rule group id
-   * @param array $cids  contact ids to limit the search to
+   * @param int $rgid
+   *   Rule group id.
+   * @param array $cids
+   *   Contact ids to limit the search to.
    *
-   * @return array  array of (cid1, cid2, weight) dupe triples
+   * @return array
+   *   array of (cid1, cid2, weight) dupe triples
    */
-  static function dupes($rgid, $cids = array(
-    )) {
-    $rgBao             = new CRM_Dedupe_BAO_RuleGroup();
-    $rgBao->id         = $rgid;
+  public static function dupes($rgid, $cids = array()) {
+    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
       CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
@@ -79,18 +81,25 @@ class CRM_Dedupe_Finder {
    * permission to be checked for anonymous users. Refer CRM-6211. We might be beaking
    * Multi-Site dedupe for public pages.
    *
-   * @param array  $params  array of params of the form $params[$table][$field] == $value
-   * @param string $ctype   contact type to match against
-   * @param string $used    dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General')
-   * @param array  $except  array of contacts that shouldn't be considered dupes
-   * @param int    $ruleGroupID the id of the dedupe rule we should be using
+   * @param array $params
+   *   Array of params of the form $params[$table][$field] == $value.
+   * @param string $ctype
+   *   Contact type to match against.
+   * @param string $used
+   *   Dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General').
+   * @param array $except
+   *   Array of contacts that shouldn't be considered dupes.
+   * @param int $ruleGroupID
+   *   The id of the dedupe rule we should be using.
    *
-   * @return array  matching contact ids
+   * @return array
+   *   matching contact ids
    */
-  static function dupesByParams($params,
+  public static function dupesByParams(
+    $params,
     $ctype,
-    $used        = 'Unsupervised',
-    $except      = array(),
+    $used = 'Unsupervised',
+    $except = array(),
     $ruleGroupID = NULL
   ) {
     // If $params is empty there is zero reason to proceed.
@@ -100,8 +109,8 @@ class CRM_Dedupe_Finder {
 
     $foundByID = FALSE;
     if ($ruleGroupID) {
-      $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
-      $rgBao->id           = $ruleGroupID;
+      $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+      $rgBao->id = $ruleGroupID;
       $rgBao->contact_type = $ctype;
       if ($rgBao->find(TRUE)) {
         $foundByID = TRUE;
@@ -109,9 +118,9 @@ class CRM_Dedupe_Finder {
     }
 
     if (!$foundByID) {
-      $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
+      $rgBao = new CRM_Dedupe_BAO_RuleGroup();
       $rgBao->contact_type = $ctype;
-      $rgBao->used         = $used;
+      $rgBao->used = $used;
       if (!$rgBao->find(TRUE)) {
         CRM_Core_Error::fatal("$used rule for $ctype does not exist");
       }
@@ -135,29 +144,36 @@ class CRM_Dedupe_Finder {
   /**
    * Return a contact_id-keyed array of arrays of possible dupes in the given group.
    *
-   * @param int $rgid  rule group id
-   * @param int $gid   contact group id (currently, works only with non-smart groups)
+   * @param int $rgid
+   *   Rule group id.
+   * @param int $gid
+   *   Contact group id (currently, works only with non-smart groups).
    *
-   * @return array  array of (cid1, cid2, weight) dupe triples
+   * @return array
+   *   array of (cid1, cid2, weight) dupe triples
    */
-  static function dupesInGroup($rgid, $gid) {
+  public static function dupesInGroup($rgid, $gid) {
     $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid));
-    if ( !empty($cids) ) {
-    return self::dupes($rgid, $cids);
-  }
+    if (!empty($cids)) {
+      return self::dupes($rgid, $cids);
+    }
     return array();
   }
 
   /**
    * Return dupes of a given contact, using the default rule group (of a provided usage).
    *
-   * @param int    $cid    contact id of the given contact
-   * @param string $used   dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General')
-   * @param string $ctype  contact type of the given contact
+   * @param int $cid
+   *   Contact id of the given contact.
+   * @param string $used
+   *   Dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General').
+   * @param string $ctype
+   *   Contact type of the given contact.
    *
-   * @return array  array of dupe contact_ids
+   * @return array
+   *   array of dupe contact_ids
    */
-  static function dupesOfContact($cid, $used = 'Unsupervised', $ctype = NULL) {
+  public static function dupesOfContact($cid, $used = 'Unsupervised', $ctype = NULL) {
     // if not provided, fetch the contact type from the database
     if (!$ctype) {
       $dao = new CRM_Contact_DAO_Contact();
@@ -167,8 +183,8 @@ class CRM_Dedupe_Finder {
       }
       $ctype = $dao->contact_type;
     }
-    $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
-    $rgBao->used         = $used;
+    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao->used = $used;
     $rgBao->contact_type = $ctype;
     if (!$rgBao->find(TRUE)) {
       CRM_Core_Error::fatal("$used rule for $ctype does not exist");
@@ -192,12 +208,15 @@ class CRM_Dedupe_Finder {
    * A hackish function needed to massage CRM_Contact_Form_$ctype::formRule()
    * object into a valid $params array for dedupe
    *
-   * @param array $fields  contact structure from formRule()
-   * @param string $ctype  contact type of the given contact
+   * @param array $fields
+   *   Contact structure from formRule().
+   * @param string $ctype
+   *   Contact type of the given contact.
    *
-   * @return array  valid $params array for dedupe
+   * @return array
+   *   valid $params array for dedupe
    */
-  static function formatParams($fields, $ctype) {
+  public static function formatParams($fields, $ctype) {
     $flat = array();
     CRM_Utils_Array::flatten($fields, $flat);
 
@@ -216,7 +235,9 @@ class CRM_Dedupe_Finder {
 
     // handle {birth,deceased}_date
     foreach (array(
-      'birth_date', 'deceased_date') as $date) {
+               'birth_date',
+               'deceased_date',
+             ) as $date) {
       if (!empty($fields[$date])) {
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {
@@ -286,8 +307,10 @@ class CRM_Dedupe_Finder {
           $fields['location_type_id'] = '';
           // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
           $fixes = array(
-            'address_name' => 'name', 'country' => 'country_id',
-            'state_province' => 'state_province_id', 'county' => 'county_id',
+            'address_name' => 'name',
+            'country' => 'country_id',
+            'state_province' => 'state_province_id',
+            'county' => 'county_id',
           );
           foreach ($fixes as $orig => $target) {
             if (!empty($flat[$orig])) {
@@ -304,5 +327,5 @@ class CRM_Dedupe_Finder {
     }
     return $params;
   }
-}
 
+}

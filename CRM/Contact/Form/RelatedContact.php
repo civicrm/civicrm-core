@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,14 +23,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
- *
  */
 
 /**
@@ -39,12 +38,11 @@
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
   /**
-   * The contact type of the form
+   * The contact type of the form.
    *
    * @var string
    */
@@ -58,27 +56,24 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   public $_contactId;
 
   /**
-   * form defaults
+   * Form defaults.
    *
    * @var array
    */
   protected $_defaults = array();
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     // reset action from the session
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'update'
     );
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
 
-    $rcid    = CRM_Utils_Request::retrieve('rcid', 'Positive', $this);
-    $rcid    = $rcid ? "&id={$rcid}" : '';
+    $rcid = CRM_Utils_Request::retrieve('rcid', 'Positive', $this);
+    $rcid = $rcid ? "&id={$rcid}" : '';
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/user', "reset=1{$rcid}"));
 
@@ -104,27 +99,22 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   * @access public
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the
+   * database
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return $this->_defaults;
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
-    $params       = array();
+    $params = array();
     $params['id'] = $params['contact_id'] = $this->_contactId;
-    $contact      = CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
+    $contact = CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
 
     $countryID = '';
     $stateID = '';
@@ -144,24 +134,20 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     );
 
     $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      ));
+      array(
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
   /**
    * Form submission of new/edit contact is processed.
-   *
-   * @access public
-   *
-   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -169,7 +155,10 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
     $locType = CRM_Core_BAO_LocationType::getDefault();
     foreach (array(
-      'phone', 'email', 'address') as $locFld) {
+               'phone',
+               'email',
+               'address',
+             ) as $locFld) {
       if (!empty($this->_defaults[$locFld]) && $this->_defaults[$locFld][1]['location_type_id']) {
         $params[$locFld][1]['is_primary'] = $this->_defaults[$locFld][1]['is_primary'];
         $params[$locFld][1]['location_type_id'] = $this->_defaults[$locFld][1]['location_type_id'];
@@ -182,7 +171,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
     $params['contact_type'] = $this->_contactType;
     //CRM-14904
-    if ( isset($this->_defaults['contact_sub_type']) ) {
+    if (isset($this->_defaults['contact_sub_type'])) {
       $params['contact_sub_type'] = $this->_defaults['contact_sub_type'];
     }
     $params['contact_id'] = $this->_contactId;
@@ -198,5 +187,5 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     }
     CRM_Core_Session::setStatus($message, ts('Contact Saved'), 'success');
   }
-}
 
+}

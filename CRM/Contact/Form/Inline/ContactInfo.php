@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,10 +39,9 @@
 class CRM_Contact_Form_Inline_ContactInfo extends CRM_Contact_Form_Inline {
 
   /**
-   * build the form elements
+   * Build the form object elements.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -53,27 +52,25 @@ class CRM_Contact_Form_Inline_ContactInfo extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
     return parent::setDefaultValues();
   }
 
   /**
-   * process the form
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $params = $this->exportValues();
 
     // Process / save contact info
     $params['contact_type'] = $this->_contactType;
-    $params['contact_id']   = $this->_contactId;
+    $params['contact_id'] = $this->_contactId;
 
     if (!empty($this->_contactSubType)) {
       $params['contact_sub_type'] = $this->_contactSubType;
@@ -94,4 +91,5 @@ class CRM_Contact_Form_Inline_ContactInfo extends CRM_Contact_Form_Inline {
 
     $this->response();
   }
+
 }

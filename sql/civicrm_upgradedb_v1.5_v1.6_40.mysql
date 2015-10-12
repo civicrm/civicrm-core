@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 3.2                                                |
+-- | CiviCRM version 4.6                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -34,9 +34,9 @@
 -- *
 -- *******************************************************/
 
-INSERT INTO 
-   `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`) 
-VALUES 
+INSERT INTO
+   `civicrm_option_group` (`domain_id`, `name`, `description`, `is_reserved`, `is_active`)
+VALUES
    (@domain_id, 'activity_type'                 , 'Activity Type'                      , 0, 1),
    (@domain_id, 'gender'                        , 'Gender'                             , 0, 1),
    (@domain_id, 'instant_messenger_service'     , 'Instant Messenger (IM) screen-names', 0, 1),
@@ -59,8 +59,8 @@ SELECT @option_group_id_acc            := max(id) from civicrm_option_group wher
 SELECT @option_group_id_pi             := max(id) from civicrm_option_group where name = 'payment_instrument';
 SELECT @option_group_id_cs             := max(id) from civicrm_option_group where name = 'contribution_status';
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
 VALUES
    (@option_group_id_act, 'Meeting', 1, 'Meeting',NULL, 0, NULL, 1, 'Schedule a meeting', 0, 0, 1),
    (@option_group_id_act, 'Phone Call', 2, 'Phone Call', NULL,  0, NULL, 2, 'Schedule a Phone Call', 0, 0, 1),
@@ -177,8 +177,8 @@ VALUES
 
 DROP TABLE IF EXISTS civicrm_accept_credit_card;
 DROP TABLE IF EXISTS civicrm_activity_type;
-DROP TABLE IF EXISTS civicrm_acl_group; 
-DROP TABLE IF EXISTS civicrm_acl_group_join; 
+DROP TABLE IF EXISTS civicrm_acl_group;
+DROP TABLE IF EXISTS civicrm_acl_group_join;
 DROP TABLE IF EXISTS civicrm_gender;
 DROP TABLE IF EXISTS civicrm_individual_prefix;
 DROP TABLE IF EXISTS civicrm_individual_suffix;
@@ -200,17 +200,17 @@ CREATE TABLE civicrm_acl_cache (
      id int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique table ID',
      contact_id int unsigned    COMMENT 'Foreign Key to Contact',
      acl_id int unsigned NOT NULL   COMMENT 'Foreign Key to ACL',
-     modified_date date    COMMENT 'When was this cache entry last modified' 
+     modified_date date    COMMENT 'When was this cache entry last modified'
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_contact_id ( contact_id ) ,  
+
+
+,      INDEX FKEY_contact_id ( contact_id ) ,
      FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id)
-,      INDEX FKEY_acl_id ( acl_id ) ,  
+,      INDEX FKEY_acl_id ( acl_id ) ,
      FOREIGN KEY (acl_id) REFERENCES civicrm_acl(id)
 ,    INDEX index_acl_id( acl_id)
-  
+
 )  TYPE=InnoDB;
 
 -- /*******************************************************
@@ -228,10 +228,10 @@ CREATE TABLE civicrm_acl_entity_role (
      acl_role_id int unsigned NOT NULL   COMMENT 'Foreign Key to ACL Role (which is an option value pair and hence an implicit FK)',
      entity_table varchar(64) NOT NULL   COMMENT 'Table of the object joined to the ACL Role (Contact or Group)',
      entity_id int unsigned NOT NULL   COMMENT 'ID of the group/contact object being joined',
-     is_active tinyint    COMMENT 'Is this property active?' 
+     is_active tinyint    COMMENT 'Is this property active?'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_role(
         acl_role_id
   )
@@ -239,10 +239,10 @@ CREATE TABLE civicrm_acl_entity_role (
         entity_table
       , entity_id
   )
-  
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
 
 
@@ -262,16 +262,16 @@ CREATE TABLE civicrm_msg_template (
      msg_subject varchar(255)    COMMENT 'Subject for email message.',
      msg_text text    COMMENT 'Text formatted message',
      msg_html text    COMMENT 'HTML formatted message',
-     is_active tinyint   DEFAULT 1  
+     is_active tinyint   DEFAULT 1
 ,
     PRIMARY KEY ( id )
- 
- 
-,      INDEX FKEY_domain_id ( domain_id ) ,  
+
+
+,      INDEX FKEY_domain_id ( domain_id ) ,
      FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  TYPE=InnoDB  ;
-  
+
 -- /*******************************************************
 -- *
 -- * Modify the civicrm_acl  Table Structure
@@ -286,7 +286,7 @@ CREATE TABLE civicrm_msg_template (
   ALTER TABLE `civicrm_acl` CHANGE `operation` `operation` ENUM('All', 'View', 'Edit', 'Create', 'Delete', 'Grant', 'Revoke') NOT NULL   COMMENT 'What operation does this ACL entry control?';
 
   ALTER TABLE `civicrm_acl` ADD is_active tinyint(4) COMMENT 'Is this property active?';
-  
+
   ALTER TABLE `civicrm_acl` ADD INDEX index_acl_id (acl_id);
 
 -- /*******************************************************
@@ -322,38 +322,38 @@ CREATE TABLE civicrm_msg_template (
   ALTER TABLE civicrm_contact ADD INDEX index_contact_type_domain (contact_type, domain_id);
   ALTER TABLE civicrm_contact ADD INDEX index_contact_sub_type_domain (contact_sub_type, domain_id);
   ALTER TABLE civicrm_contact ADD INDEX index_preferred_communication_method (preferred_communication_method);
-  
-  UPDATE civicrm_contact 
-  SET `preferred_communication_method` = CONCAT(char(1),`preferred_communication_method`,char(1)) 
+
+  UPDATE civicrm_contact
+  SET `preferred_communication_method` = CONCAT(char(1),`preferred_communication_method`,char(1))
   WHERE civicrm_contact.preferred_communication_method IS NOT NULL;
-  
+
 -- /*******************************************************
 -- *
 -- * civicrm_contribution
 -- *
 -- *******************************************************/
 
-  ALTER TABLE `civicrm_contribution` ADD  `contribution_status_id` int unsigned   DEFAULT '1';  
+  ALTER TABLE `civicrm_contribution` ADD  `contribution_status_id` int unsigned   DEFAULT '1';
   ALTER TABLE `civicrm_contribution` DROP FOREIGN KEY `civicrm_contribution_ibfk_6`;
   ALTER TABLE `civicrm_contribution` DROP FOREIGN KEY `civicrm_contribution_ibfk_7`;
   ALTER TABLE `civicrm_contribution` DROP INDEX `FKEY_payment_instrument_id`;
   ALTER TABLE `civicrm_contribution` DROP INDEX `FKEY_recur_contribution_id`;
-  
+
   ALTER TABLE `civicrm_contribution` DROP recur_contribution_id;
-  
+
   ALTER TABLE `civicrm_contribution` ADD is_test tinyint NULL DEFAULT 0;
   ALTER TABLE `civicrm_contribution` ADD `honor_contact_id` int unsigned COMMENT 'FK to contact ID';
   ALTER TABLE `civicrm_contribution` ADD contribution_recur_id int unsigned AFTER note;
   ALTER TABLE `civicrm_contribution` ADD INDEX FKEY_contribution_recur_id (contribution_recur_id);
   ALTER TABLE `civicrm_contribution` ADD CONSTRAINT FOREIGN KEY (`contribution_recur_id`) REFERENCES civicrm_contribution_recur (`id`);
-  
+
   ALTER TABLE `civicrm_contribution` ADD INDEX `UI_contrib_payment_instrument_id`(payment_instrument_id);
   ALTER TABLE `civicrm_contribution` ADD INDEX `index_contribution_status` (contribution_status_id);
   ALTER TABLE `civicrm_contribution` ADD INDEX FKEY_honor_contact_id (honor_contact_id);
   ALTER TABLE `civicrm_contribution` ADD CONSTRAINT FOREIGN KEY (`honor_contact_id`) REFERENCES `civicrm_contact` (`id`);
 
   UPDATE civicrm_contribution SET contribution_status_id=3          WHERE cancel_date IS NOT NULL;
-  
+
 -- /*******************************************************
 -- *
 -- * civicrm_contribution_page
@@ -374,27 +374,27 @@ CREATE TABLE civicrm_msg_template (
 -- * civicrm_contribution_recur
 -- *
 -- *******************************************************/
-  
+
   ALTER TABLE `civicrm_contribution_recur` ADD domain_id int unsigned NOT NULL DEFAULT '0' COMMENT 'Which Domain owns this contact';
   ALTER TABLE `civicrm_contribution_recur` ADD trxn_id varchar(255) COMMENT 'unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method';
   ALTER TABLE `civicrm_contribution_recur` ADD  invoice_id varchar(255) COMMENT 'unique invoice id, system generated or passed in';
   ALTER TABLE `civicrm_contribution_recur` ADD contribution_status_id int unsigned NULL DEFAULT '1' AFTER invoice_id;
   ALTER TABLE `civicrm_contribution_recur` ADD end_date datetime NOT NULL AFTER cancel_date;
   ALTER TABLE `civicrm_contribution_recur` ADD is_test tinyint NULL DEFAULT '0' AFTER contribution_status_id;
-  
+
   ALTER TABLE `civicrm_contribution_recur` MODIFY start_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00';
       ALTER TABLE `civicrm_contribution_recur` MODIFY create_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00';
       ALTER TABLE `civicrm_contribution_recur` MODIFY modified_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00';
       ALTER TABLE `civicrm_contribution_recur` MODIFY cancel_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00';
       ALTER TABLE `civicrm_contribution_recur` MODIFY next_sched_contribution datetime NOT NULL DEFAULT '0000-00-00 00:00:00';
       ALTER TABLE `civicrm_contribution_recur` MODIFY failure_retry_date datetime NULL DEFAULT NULL;
-  
+
   ALTER TABLE `civicrm_contribution_recur` DROP is_active;
-  
+
   ALTER TABLE `civicrm_contribution_recur` ADD INDEX FKEY_domain_id (domain_id);
-  ALTER TABLE `civicrm_contribution_recur` ADD INDEX index_contribution_status (contribution_status_id);  
-  ALTER TABLE `civicrm_contribution_recur` ADD FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id);  
-    
+  ALTER TABLE `civicrm_contribution_recur` ADD INDEX index_contribution_status (contribution_status_id);
+  ALTER TABLE `civicrm_contribution_recur` ADD FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id);
+
 -- /*******************************************************
 -- *
 -- * civicrm_custom_group
@@ -407,27 +407,27 @@ CREATE TABLE civicrm_msg_template (
   ALTER TABLE `civicrm_custom_group` ADD extends_entity_column_value varchar(64) COMMENT 'linking custom group for dynamic object';
 
   ALTER TABLE `civicrm_custom_group` MODIFY extends enum('Contact','Individual','Household','Organization','Location','Address','Contribution','Activity','Relationship','Phonecall','Meeting','Group','Membership') NULL DEFAULT 'Contact' COMMENT 'Type of object this group extends (can add other options later e.g. contact_address, etc.).';
-  
+
    UPDATE civicrm_custom_group
    SET extends_entity_column_value=NULL
    WHERE extends='Activity';
-  
+
   UPDATE civicrm_custom_group
    SET extends='Activity', extends_entity_column_value='2'
    WHERE extends='Phonecall';
-  
+
   UPDATE civicrm_custom_group
    SET extends='Activity', extends_entity_column_value='1'
    WHERE extends='Meeting';
-  
+
   UPDATE civicrm_custom_group
    SET extends_entity_column_value=NULL
    WHERE extends='Contact';
-  
+
   UPDATE civicrm_custom_group
    SET extends_entity_column_value=NULL
    WHERE extends='Relationship';
-  
+
 -- /*******************************************************
 -- *
 -- * civicrm_custom_value
@@ -506,19 +506,19 @@ CREATE TABLE civicrm_msg_template (
 -- * Define contact-individual specific properties. Extends civicrm_contact.
 -- *
 -- *******************************************************/
-  
+
   ALTER TABLE civicrm_individual DROP FOREIGN KEY civicrm_individual_ibfk_2;
   ALTER TABLE civicrm_individual DROP FOREIGN KEY civicrm_individual_ibfk_3;
   ALTER TABLE civicrm_individual DROP FOREIGN KEY civicrm_individual_ibfk_4;
-  
+
   ALTER TABLE civicrm_individual DROP INDEX FKEY_prefix_id;
       ALTER TABLE civicrm_individual DROP INDEX FKEY_suffix_id;
       ALTER TABLE civicrm_individual DROP INDEX FKEY_gender_id;
-    
+
   ALTER TABLE civicrm_individual ADD INDEX UI_prefix (prefix_id);
       ALTER TABLE civicrm_individual ADD INDEX UI_suffix (suffix_id);
       ALTER TABLE civicrm_individual ADD INDEX UI_gender (gender_id);
-  
+
 -- /*******************************************************
 -- *
 -- * civicrm_mapping
@@ -536,7 +536,7 @@ CREATE TABLE civicrm_msg_template (
 -- * Contact Membership records.
 -- *
 -- *******************************************************/
-  
+
   ALTER TABLE civicrm_membership ADD reminder_date date AFTER is_override;
 
 -- /*******************************************************
@@ -546,7 +546,7 @@ CREATE TABLE civicrm_msg_template (
 -- * Logs actions which affect a Membership record (signup, status override, renewal, etc.)
 -- *
 -- *******************************************************/
-  
+
   ALTER TABLE civicrm_membership_log ADD renewal_reminder_date date AFTER modified_date;
 
 -- /*******************************************************
@@ -556,13 +556,13 @@ CREATE TABLE civicrm_msg_template (
 -- * Sites can configure multiple types of memberships. They encode the owner organization, fee, and the rules needed to set start and end (expire) dates when a member signs up for that type.
 -- *
 -- *******************************************************/
-  
+
   ALTER TABLE civicrm_membership_type ADD renewal_msg_id int unsigned AFTER weight;
       ALTER TABLE civicrm_membership_type ADD renewal_reminder_day int AFTER renewal_msg_id;
-  
+
   ALTER TABLE civicrm_membership_type ADD INDEX FKEY_renewal_msg_id ( renewal_msg_id );
   ALTER TABLE civicrm_membership_type ADD FOREIGN KEY (renewal_msg_id) REFERENCES civicrm_msg_template(id);
-    
+
 -- /*******************************************************
 -- *
 -- * civicrm_phone
@@ -586,7 +586,7 @@ CREATE TABLE civicrm_msg_template (
 
   ALTER TABLE civicrm_project DROP FOREIGN KEY civicrm_project_ibfk_2;
   ALTER TABLE civicrm_project DROP INDEX FKEY_status_id;
-  
+
 -- /*******************************************************
 -- *
 -- * civicrm_saved_search
@@ -599,7 +599,7 @@ CREATE TABLE civicrm_msg_template (
 
   ALTER TABLE `civicrm_saved_search` ADD select_tables text DEFAULT NULL COMMENT 'the tables to be included in a select data';
 
-  ALTER TABLE `civicrm_saved_search` ADD where_tables text DEFAULT NULL COMMENT 'the tables to be included in the count statement'; 
+  ALTER TABLE `civicrm_saved_search` ADD where_tables text DEFAULT NULL COMMENT 'the tables to be included in the count statement';
 
 -- /*******************************************************/
 
@@ -613,7 +613,7 @@ CREATE TABLE civicrm_msg_template (
 
   ALTER TABLE `civicrm_task` DROP FOREIGN KEY civicrm_task_ibfk_2;
   ALTER TABLE `civicrm_task` DROP FOREIGN KEY civicrm_task_ibfk_3;
-  
+
   ALTER TABLE `civicrm_task` DROP INDEX FKEY_task_type_id;
   ALTER TABLE `civicrm_task` DROP INDEX FKEY_priority_id;
 
@@ -624,7 +624,7 @@ CREATE TABLE civicrm_msg_template (
 -- * Tracks the responsible entity, optional target entity and status of a task. Tasks can have multiple task_status entries if assigned to multiple responsible entities and-or there are multiple targets.
 -- *
 -- *******************************************************/
-  
+
   ALTER TABLE `civicrm_task_status` DROP FOREIGN KEY civicrm_task_status_ibfk_2;
   ALTER TABLE `civicrm_task_status` DROP INDEX FKEY_status_id;
 
@@ -646,14 +646,14 @@ CREATE TABLE civicrm_msg_template (
 
     CREATE UNIQUE INDEX UI_contact_group ON civicrm_group_contact(contact_id,group_id);
     CREATE UNIQUE INDEX UI_contact ON civicrm_individual(contact_id);
-    CREATE UNIQUE INDEX UI_contact ON civicrm_household(contact_id); 
+    CREATE UNIQUE INDEX UI_contact ON civicrm_household(contact_id);
     CREATE UNIQUE INDEX UI_contact ON civicrm_organization(contact_id);
-    
-    CREATE UNIQUE INDEX UI_location ON civicrm_address(location_id); 
-    
+
+    CREATE UNIQUE INDEX UI_location ON civicrm_address(location_id);
+
     CREATE UNIQUE INDEX UI_contact ON civicrm_uf_match(contact_id);
     DROP INDEX UI_uf_id ON civicrm_uf_match;
-    CREATE UNIQUE INDEX UI_uf_id ON civicrm_uf_match(uf_id);    
+    CREATE UNIQUE INDEX UI_uf_id ON civicrm_uf_match(uf_id);
     CREATE UNIQUE INDEX UI_contrib_trxn_id_domain_id ON civicrm_contribution_recur(trxn_id, domain_id);
     CREATE UNIQUE INDEX UI_contrib_invoice_id_domain_id ON civicrm_contribution_recur(invoice_id, domain_id);
-  
+

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -46,16 +46,7 @@
             {/foreach}
             <tr class="crm-contact-custom-search-contributionDetails-form-block-financial_type">
                 <td class="label">{ts}Financial Type{/ts}</td>
-                <td>
-                    <div class="listing-box">
-                        {foreach from=$form.financial_type_id item="financial_type_val"}
-                            <div class="{cycle values="odd-row,even-row"}">
-                                {$financial_type_val.html}
-                            </div>
-                        {/foreach}
-                    </div>
-                    <div class="spacer"></div>
-                </td>
+                <td>{$form.financial_type_id.html|crmAddClass:twenty}</td>
             </tr>
         </table>
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

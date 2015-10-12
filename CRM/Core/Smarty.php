@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -45,7 +45,7 @@ if (!class_exists('Smarty')) {
  *
  */
 class CRM_Core_Smarty extends Smarty {
-  CONST
+  const
     // use print.tpl and bypass the CMS. Civi prints a valid html file
     PRINT_PAGE = 1,
     // this and all the below bypasses the CMS html surrounding it and assumes we will embed this within other pages
@@ -69,7 +69,6 @@ class CRM_Core_Smarty extends Smarty {
    * pattern and cache the instance in this variable
    *
    * @var object
-   * @static
    */
   static private $_singleton = NULL;
 
@@ -79,16 +78,15 @@ class CRM_Core_Smarty extends Smarty {
   private $backupFrames = array();
 
   /**
-   * class constructor
+   * Class constructor.
    *
    * @return CRM_Core_Smarty
-   * @access private
    */
   private function __construct() {
     parent::__construct();
   }
 
-  private function initialize( ) {
+  private function initialize() {
     $config = CRM_Core_Config::singleton();
 
     if (isset($config->customTemplateDir) && $config->customTemplateDir) {
@@ -119,12 +117,12 @@ class CRM_Core_Smarty extends Smarty {
 
     $customPluginsDir = NULL;
     if (isset($config->customPHPPathDir)) {
-      $customPluginsDir =
-        $config->customPHPPathDir . DIRECTORY_SEPARATOR .
-        'CRM'                     . DIRECTORY_SEPARATOR .
-        'Core'                    . DIRECTORY_SEPARATOR .
-        'Smarty'                  . DIRECTORY_SEPARATOR .
-        'plugins'                 . DIRECTORY_SEPARATOR;
+      $customPluginsDir
+        = $config->customPHPPathDir . DIRECTORY_SEPARATOR .
+        'CRM' . DIRECTORY_SEPARATOR .
+        'Core' . DIRECTORY_SEPARATOR .
+        'Smarty' . DIRECTORY_SEPARATOR .
+        'plugins' . DIRECTORY_SEPARATOR;
       if (!file_exists($customPluginsDir)) {
         $customPluginsDir = NULL;
       }
@@ -177,10 +175,10 @@ class CRM_Core_Smarty extends Smarty {
    * Method providing static instance of SmartTemplate, as
    * in Singleton pattern.
    */
-  static function &singleton() {
+  public static function &singleton() {
     if (!isset(self::$_singleton)) {
-      self::$_singleton = new CRM_Core_Smarty( );
-      self::$_singleton->initialize( );
+      self::$_singleton = new CRM_Core_Smarty();
+      self::$_singleton->initialize();
 
       self::registerStringResource();
     }
@@ -188,17 +186,17 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * executes & returns or displays the template results
+   * Executes & returns or displays the template results
    *
    * @param string $resource_name
    * @param string $cache_id
    * @param string $compile_id
-   * @param boolean $display
+   * @param bool $display
    *
    * @return bool|mixed|string
    */
-  function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
-    if (preg_match( '/^(\s+)?string:/', $resource_name)) {
+  public function fetch($resource_name, $cache_id = NULL, $compile_id = NULL, $display = FALSE) {
+    if (preg_match('/^(\s+)?string:/', $resource_name)) {
       $old_security = $this->security;
       $this->security = TRUE;
     }
@@ -213,15 +211,17 @@ class CRM_Core_Smarty extends Smarty {
    * Fetch a template (while using certain variables)
    *
    * @param string $resource_name
-   * @param array $vars (string $name => mixed $value) variables to export to Smarty
+   * @param array $vars
+   *   (string $name => mixed $value) variables to export to Smarty.
    * @throws Exception
    * @return bool|mixed|string
    */
-  function fetchWith($resource_name, $vars) {
+  public function fetchWith($resource_name, $vars) {
     $this->pushScope($vars);
     try {
       $result = $this->fetch($resource_name);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       // simulate try { ... } finally { ... }
       $this->popScope();
       throw $e;
@@ -231,10 +231,10 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * @param $name
+   * @param string $name
    * @param $value
    */
-  function appendValue($name, $value) {
+  public function appendValue($name, $value) {
     $currentValue = $this->get_template_vars($name);
     if (!$currentValue) {
       $this->assign($name, $value);
@@ -246,7 +246,7 @@ class CRM_Core_Smarty extends Smarty {
     }
   }
 
-  function clearTemplateVars() {
+  public function clearTemplateVars() {
     foreach (array_keys($this->_tpl_vars) as $key) {
       if ($key == 'config' || $key == 'session') {
         continue;
@@ -255,7 +255,7 @@ class CRM_Core_Smarty extends Smarty {
     }
   }
 
-  static function registerStringResource() {
+  public static function registerStringResource() {
     require_once 'CRM/Core/Smarty/resources/String.php';
     civicrm_smarty_register_string_resource();
   }
@@ -263,11 +263,12 @@ class CRM_Core_Smarty extends Smarty {
   /**
    * @param $path
    */
-  function addTemplateDir($path) {
-    if ( is_array( $this->template_dir ) ) {
-      array_unshift( $this->template_dir, $path );
-    } else {
-      $this->template_dir = array( $path, $this->template_dir );
+  public function addTemplateDir($path) {
+    if (is_array($this->template_dir)) {
+      array_unshift($this->template_dir, $path);
+    }
+    else {
+      $this->template_dir = array($path, $this->template_dir);
     }
 
   }
@@ -284,7 +285,8 @@ class CRM_Core_Smarty extends Smarty {
    * $smarty->popScope();
    * @endcode
    *
-   * @param array $vars (string $name => mixed $value)
+   * @param array $vars
+   *   (string $name => mixed $value).
    * @return CRM_Core_Smarty
    * @see popScope
    */
@@ -313,7 +315,8 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
-   * @param array $vars (string $name => mixed $value)
+   * @param array $vars
+   *   (string $name => mixed $value).
    * @return CRM_Core_Smarty
    */
   public function assignAll($vars) {
@@ -322,5 +325,5 @@ class CRM_Core_Smarty extends Smarty {
     }
     return $this;
   }
-}
 
+}

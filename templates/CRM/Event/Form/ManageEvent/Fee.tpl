@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -96,12 +96,18 @@
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='pay_later_receipt' id=$id}{/if}{$form.pay_later_receipt.html|crmAddClass:big}
                </td>
             </tr>
-      <tr>
+            <tr>
                 <td>&nbsp;</td>
                 <td class="description">{ts}Instructions added to Confirmation and Thank-you pages when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}
                 </td>
             </tr>
-
+            <tr>
+               <td class="extra-long-fourty label">{$form.is_billing_required.html}</td>
+               <td>
+                 {$form.is_billing_required.label}<br />
+                 <span class="description">{ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}</span>
+               </td>
+            </tr>
         </table>
 
         <table id="contributionType" class="form-layout">
@@ -122,7 +128,7 @@
             </tr>
             <tr>
                <td>&nbsp;</td>
-               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online.{/ts}
+               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online. If using a price set below note that the contribution record will have this financial type, however line items will be processed using the actual financial type selected for the price set item.{/ts}
                </td>
             </tr>
         </table>

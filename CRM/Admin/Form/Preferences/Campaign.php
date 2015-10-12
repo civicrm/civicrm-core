@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: Display.php 36505 2011-10-03 14:19:56Z lobo $
  *
  */
@@ -38,11 +38,10 @@
  *
  */
 class CRM_Admin_Form_Preferences_Campaign extends CRM_Admin_Form_Preferences {
-  function preProcess() {
+  public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviCampaign Component Settings'));
     $this->_varNames = array(
-      CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME =>
-      array(
+      CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => array(
         'tag_unconfirmed' => array(
           'html_type' => 'text',
           'title' => ts('Tag for Unconfirmed Petition Signers'),
@@ -60,5 +59,5 @@ class CRM_Admin_Form_Preferences_Campaign extends CRM_Admin_Form_Preferences {
 
     parent::preProcess();
   }
-}
 
+}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,23 +23,25 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_debug = 0;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_columns = array(
@@ -52,7 +54,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     $this->initialize();
   }
 
-  function initialize() {
+  public function initialize() {
     $this->_segmentSize = CRM_Utils_Array::value('segmentSize', $this->_formValues);
 
     $this->_includeGroups = CRM_Utils_Array::value('includeGroups', $this->_formValues);
@@ -76,7 +78,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
     $form->add('text',
       'segmentSize',
       ts('Segment Size'),
@@ -118,7 +120,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @return null
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
@@ -131,7 +133,8 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
    *
    * @return string
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  public function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     if ($justIDs) {
@@ -153,14 +156,14 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @return string
    */
-  function from() {
+  public function from() {
     //define table name
     $randomNum = md5(uniqid());
     $this->_tableName = "civicrm_temp_custom_{$randomNum}";
 
     //block for Group search
-    $smartGroup       = array();
-    $group            = new CRM_Contact_DAO_Group();
+    $smartGroup = array();
+    $group = new CRM_Contact_DAO_Group();
     $group->is_active = 1;
     $group->find();
     while ($group->fetch()) {
@@ -291,6 +294,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
         CRM_Core_DAO::executeQuery($insertGroupNameQuery);
       }
     }
+    $this->buildACLClause('contact_a');
 
     $from = "FROM civicrm_contact contact_a";
 
@@ -307,11 +311,10 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     if (substr($this->_segmentSize, -1) == '%') {
       $countSql = "SELECT DISTINCT contact_a.id $from $fromTail
                          WHERE " . $this->where();
-      $dao        = CRM_Core_DAO::executeQuery($countSql);
-      $totalSize  = $dao->N;
+      $dao = CRM_Core_DAO::executeQuery($countSql);
+      $totalSize = $dao->N;
       $multiplier = substr($this->_segmentSize, 0, strlen($this->_segmentSize) - 1);
       $multiplier /= 100;
-      //CRM_Core_Error::debug( "Total size: $totalSize<br/>Multiplier: $multiplier<br/>");
       $this->_segmentSize = round($totalSize * $multiplier);
     }
 
@@ -324,11 +327,12 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     $from = "FROM random_{$this->_tableName} random";
 
-    $from .= " INNER JOIN civicrm_contact contact_a ON random.id = contact_a.id";
+    $from .= " INNER JOIN civicrm_contact contact_a ON random.id = contact_a.id {$this->_aclFrom}";
 
     $from .= " $fromTail";
 
     return $from;
+
   }
 
   /**
@@ -336,21 +340,27 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
+  public function where($includeContactIDs = FALSE) {
+    $where = '(1)';
+
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
+
     return '(1)';
   }
 
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -365,18 +375,28 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   /**
    * @return mixed
    */
-  function count() {
+  public function count() {
     $sql = $this->all();
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     return $dao->N;
   }
 
-  function __destruct() {
+  /**
+   * Destructor function.
+   */
+  public function __destruct() {
     // the temporary tables are dropped automatically
     // so we don't do it here
     // but let mysql clean up
-    return;
+    return NULL;
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

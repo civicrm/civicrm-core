@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,15 +39,14 @@
 class CRM_Contact_Form_Edit_Demographics {
 
   /**
-   * build the form elements for Demographics object
+   * Build the form object elements for Demographics object.
    *
-   * @param CRM_Core_Form $form       reference to the form object
+   * @param CRM_Core_Form $form
+   *   Reference to the form object.
    *
    * @return void
-   * @access public
-   * @static
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     // radio button for gender
     $genderOptions = array();
     $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
@@ -61,21 +60,21 @@ class CRM_Contact_Form_Edit_Demographics {
 
     $form->addDate('birth_date', ts('Date of Birth'), FALSE, array('formatType' => 'birth'));
 
-    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is deceased'), array('onclick' => "showDeceasedDate()"));
-    $form->addDate('deceased_date', ts('Deceased date'), FALSE, array('formatType' => 'birth'));
+    $form->addElement('checkbox', 'is_deceased', NULL, ts('Contact is Deceased'), array('onclick' => "showDeceasedDate()"));
+    $form->addDate('deceased_date', ts('Deceased Date'), FALSE, array('formatType' => 'birth'));
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param $defaults
    *
    * @return void
    */
-  static function setDefaultValues(&$form, &$defaults) {}
-}
+  public static function setDefaultValues(&$form, &$defaults) {
+  }
 
+}

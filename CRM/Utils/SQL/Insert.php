@@ -35,14 +35,15 @@ class CRM_Utils_SQL_Insert {
   private $rows;
 
   /**
-   * array<string> list of column names
+   * Array<string> list of column names
    */
   private $columns;
 
   /**
-   * Create a new INSERT query
+   * Create a new INSERT query.
    *
-   * @param string $table table-name and optional alias
+   * @param string $table
+   *   Table-name and optional alias.
    * @return CRM_Utils_SQL_Insert
    */
   public static function into($table) {
@@ -50,13 +51,22 @@ class CRM_Utils_SQL_Insert {
   }
 
   /**
-   * Create a new SELECT query
+   * Create a new SELECT query.
    *
-   * @param string $from table-name and optional alias
+   * @param string $table
+   *   Table-name and optional alias.
    */
   public function __construct($table) {
     $this->table = $table;
     $this->rows = array();
+  }
+
+  public function columns($columns) {
+    if ($this->columns !== NULL) {
+      throw new CRM_Core_Exception("Column order already specified.");
+    }
+    $this->columns = $columns;
+    return $this;
   }
 
   /**
@@ -77,17 +87,17 @@ class CRM_Utils_SQL_Insert {
    */
   public function row($row) {
     $columns = array_keys($row);
-    sort($columns);
 
     if ($this->columns === NULL) {
+      sort($columns);
       $this->columns = $columns;
     }
-    elseif ($this->columns != $columns) {
+    elseif (array_diff($this->columns, $columns) !== array()) {
       throw new CRM_Core_Exception("Inconsistent column names");
     }
 
     $escapedRow = array();
-    foreach ($columns as $column) {
+    foreach ($this->columns as $column) {
       $escapedRow[$column] = $this->escapeString($row[$column]);
     }
     $this->rows[] = $escapedRow;
@@ -96,7 +106,7 @@ class CRM_Utils_SQL_Insert {
   }
 
   /**
-   * Use REPLACE INTO instead of INSERT INTO
+   * Use REPLACE INTO instead of INSERT INTO.
    *
    * @param bool $asReplace
    * @return CRM_Utils_SQL_Insert
@@ -108,14 +118,16 @@ class CRM_Utils_SQL_Insert {
 
   /**
    * @param string|NULL $value
-   * @return string SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
+   * @return string
+   *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
    */
   protected function escapeString($value) {
     return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
   }
 
   /**
-   * @return string SQL statement
+   * @return string
+   *   SQL statement
    */
   public function toSQL() {
     $columns = "`" . implode('`,`', $this->columns) . "`";
@@ -130,4 +142,5 @@ class CRM_Utils_SQL_Insert {
 
     return $sql;
   }
+
 }

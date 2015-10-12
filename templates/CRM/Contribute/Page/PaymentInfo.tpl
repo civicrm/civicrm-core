@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,13 @@ CRM.$(function($) {
       }
     });
 
-    $('.total_amount-section').remove();
+    var taxAmount = "{$totalTaxAmount}";
+    if (taxAmount) {
+      $('.total_amount-section').show();
+    }
+    else {
+      $('.total_amount-section').remove();
+    }
   }
 });
 </script>
@@ -57,7 +63,10 @@ CRM.$(function($) {
     <td class='right'>
       {if $paymentInfo.paid > 0}
         {$paymentInfo.paid|crmMoney}<br/>
-        <a class="crm-hover-button crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>&raquo; {ts}view payments{/ts}</a>
+        <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
+          <span class="icon ui-icon-zoomin"></span>
+          {ts}view payments{/ts}
+        </a>
       {/if}
     </td>
     <td class='right'>{$paymentInfo.balance|crmMoney}</td>
@@ -69,6 +78,6 @@ CRM.$(function($) {
   {elseif $paymentInfo.balance < 0}
      {assign var=paymentButtonName value='Record Refund'}
   {/if}
-  <a class="button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}' title="{ts}{$paymentButtonName}{/ts}"><span><div class="icon add-icon"></div> {ts}{$paymentButtonName}{/ts}</span></a>
+  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}'><span class="icon ui-icon-circle-plus"></span> {ts}{$paymentButtonName}{/ts}</a>
 {/if}
 {/if}

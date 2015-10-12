@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,10 +40,9 @@
 class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
 
   /**
-   * the financial type id saved to the session for an update
+   * The financial type id saved to the session for an update.
    *
    * @var int
-   * @access protected
    */
   protected $_aid;
 
@@ -51,29 +50,27 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * The financial type accounts id, used when editing the field
    *
    * @var int
-   * @access protected
    */
   protected $_id;
 
   /**
-   * The name of the BAO object for this form
+   * The name of the BAO object for this form.
    *
    * @var string
    */
   protected $_BAOName;
 
   /**
-   * Flag if its a AR account type
+   * Flag if its a AR account type.
    *
    * @var boolean
    */
   protected $_isARFlag = FALSE;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     $this->_aid = CRM_Utils_Request::retrieve('aid', 'Positive', $this);
@@ -109,22 +106,22 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if ($this->_id) {
       $financialAccount = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $this->_id, 'financial_account_id');
       $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccount, 'name');
-      CRM_Utils_System::setTitle($fieldTitle . ' - '. ts('Financial Type Accounts'));
+      CRM_Utils_System::setTitle($fieldTitle . ' - ' . ts('Financial Type Accounts'));
     }
 
     $breadCrumb = array(
-      array('title' => ts('Financial Type Accounts'),
+      array(
+        'title' => ts('Financial Type Accounts'),
         'url' => $url,
-      )
+      ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -168,14 +165,14 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if ($this->_action == CRM_Core_Action::ADD) {
       if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
         $financialAccountType = array(
-           '5' => 5, //expense
-           '3' => 1, //AR relation
-           '1' => 3, //revenue
-           '6' => 1,  //Asset
-           '7' => 4, //cost of sales
-           '8' => 1, //premium inventory
-           '9' => 3 //discount account is
-          );
+          '5' => 5, //expense
+          '3' => 1, //AR relation
+          '1' => 3, //revenue
+          '6' => 1, //Asset
+          '7' => 4, //cost of sales
+          '8' => 1, //premium inventory
+          '9' => 3, //discount account is,
+        );
 
         $financialAccountType = CRM_Utils_Array::value($this->_submitValues['account_relationship'], $financialAccountType);
         $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
@@ -184,7 +181,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       }
       else {
         $financialAccountSelect = array(
-          'select' => ts('- select -')
+          'select' => ts('- select -'),
         ) + CRM_Contribute_PseudoConstant::financialAccount();
       }
     }
@@ -193,11 +190,11 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         '5' => 5, //expense
         '3' => 1, //AR relation
         '1' => 3, //revenue
-        '6' => 1,  //Asset
+        '6' => 1, //Asset
         '7' => 4, //cost of sales
         '8' => 1, //premium inventory
-        '9' => 3 //discount account is
-       );
+        '9' => 3, //discount account is,
+      );
 
       $financialAccountType = $financialAccountType[$this->_defaultValues['account_relationship']];
       $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
@@ -213,38 +210,37 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     );
 
     $this->addButtons(array(
-      array(
-        'type'      => 'next',
-        'name'      => ts('Save'),
-        'isDefault' => TRUE
-      ),
-      array(
-        'type'      => 'next',
-        'name'      => ts('Save and New'),
-        'subName'   => 'new'
-      ),
-      array (
-        'type'      => 'cancel',
-        'name'      => ts('Cancel')
-      ))
+        array(
+          'type' => 'next',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'next',
+          'name' => ts('Save and New'),
+          'subName' => 'new',
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
     );
     $this->addFormRule(array('CRM_Financial_Form_FinancialTypeAccount', 'formRule'), $this);
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param $values
+   * @param array $values
+   *   posted values of the form
    * @param $files
    * @param $self
    *
-   * @internal param array $fields posted values of the form
-   *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($values, $files, $self) {
+  public static function formRule($values, $files, $self) {
     $errorMsg = array();
     $errorFlag = FALSE;
     if ($self->_action == CRM_Core_Action::DELETE) {
@@ -268,10 +264,17 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if (!empty($values['account_relationship']) && !empty($values['financial_account_id'])) {
       $params = array(
         'account_relationship' => $values['account_relationship'],
-        'entity_id'            => $self->_aid
+        'entity_id' => $self->_aid,
       );
       $defaults = array();
       if ($self->_action == CRM_Core_Action::ADD) {
+        $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
+        $isTax = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $values['financial_account_id'], 'is_tax');
+        if ($values['account_relationship'] == $relationshipId) {
+          if (!($isTax)) {
+            $errorMsg['financial_account_id'] = ts('Is Tax? must be set for respective financial account');
+          }
+        }
         $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
         if ($result) {
           $errorFlag = TRUE;
@@ -298,9 +301,8 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    * @return void
    */
   public function postProcess() {
@@ -342,5 +344,3 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   }
 
 }
-
-

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -23,21 +23,20 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
@@ -47,28 +46,28 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
 
     $this->add('text', 'title', ts('Find'), $attributes);
 
-    $financial_account = CRM_Contribute_PseudoConstant::financialType( );
-    foreach($financial_account as $contributionId => $contributionName) {
+    $financial_account = CRM_Contribute_PseudoConstant::financialType();
+    foreach ($financial_account as $contributionId => $contributionName) {
       $this->addElement('checkbox', "financial_type_id[$contributionId]", 'Financial Type', $contributionName);
     }
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
     $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
+      array(
+        'type' => 'refresh',
+        'name' => ts('Search'),
+        'isDefault' => TRUE,
+      ),
+    ));
   }
 
-  function postProcess() {
+  public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
     $parent = $this->controller->getParent();
     $parent->set('searchResult', 1);
     if (!empty($params)) {
-      $fields = array( 'title', 'financial_type_id', 'campaign_id' );
+      $fields = array('title', 'financial_type_id', 'campaign_id');
       foreach ($fields as $field) {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])
@@ -81,5 +80,5 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
       }
     }
   }
-}
 
+}

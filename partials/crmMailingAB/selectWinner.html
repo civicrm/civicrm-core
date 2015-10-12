@@ -1,0 +1,19 @@
+<div ng-controller="CrmMailingABWinnerDialogCtrl">
+  <form novalidate name="winnerForm">
+    <div class="help">
+      {{ts('After selecting %1 as the winner, one must schedule the delivery for the final mailing.', {1: mailingTitle})}}
+    </div>
+
+    <div crm-mailing-radio-date="schedule" ng-model="abtest.mailings.c.scheduled_date">
+      <div>
+        <input ng-model="schedule.mode" type="radio" name="send" value="now" id="schedule-send-now"/>
+        <label for="schedule-send-now">{{ts('Send final mailing immediately')}}</label>
+      </div>
+      <div>
+        <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
+        <label for="schedule-send-at">{{ts('Send final mailing at:')}}</label>
+        <input crm-ui-datepicker ng-model="schedule.datetime"/>
+      </div>
+    </div>
+  </form>
+</div>

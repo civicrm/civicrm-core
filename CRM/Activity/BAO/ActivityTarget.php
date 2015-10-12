@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,22 +40,19 @@
 class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * function to add activity target
+   * Add activity target.
    *
-   * @param $params
+   * @param array $params
    *
-   * @internal param array $activity_id (reference ) an assoc array of name/value pairs
-   * @internal param array $target_contact_id (reference ) the array that holds all the db ids
-   *
-   * @return object activity type of object that is added
-   * @access public
+   * @return object
+   *   activity type of object that is added
    */
   public static function create(&$params) {
     $target = new CRM_Activity_BAO_ActivityContact();
@@ -63,22 +60,18 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     $target->copyValues($params);
-    $target->record_type_id = $targetID ;
+    $target->record_type_id = $targetID;
     return $target->save();
   }
 
   /**
-   * function to retrieve id of target contact by activity_id
+   * Retrieve id of target contact by activity_id.
    *
-   * @param $activity_id
-   *
-   * @internal param int $id ID of the activity
+   * @param int $activity_id
    *
    * @return mixed
-   *
-   * @access public
    */
-  static function retrieveTargetIdsByActivityId($activity_id) {
+  public static function retrieveTargetIdsByActivityId($activity_id) {
     $targetArray = array();
     if (!CRM_Utils_Rule::positiveInteger($activity_id)) {
       return $targetArray;
@@ -103,17 +96,13 @@ AND        civicrm_contact.is_deleted = 0
   }
 
   /**
-   * function to retrieve names of target contact by activity_id
+   * Retrieve names of target contact by activity_id.
    *
-   * @param $activityID
-   *
-   * @internal param int $id ID of the activity
+   * @param int $activityID
    *
    * @return array
-   *
-   * @access public
    */
-  static function getTargetNames($activityID) {
+  public static function getTargetNames($activityID) {
     $targetNames = array();
 
     if (empty($activityID)) {
@@ -139,5 +128,5 @@ AND        contact_a.is_deleted = 0
 
     return $targetNames;
   }
-}
 
+}

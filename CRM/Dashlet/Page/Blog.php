@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -58,11 +58,9 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
   }
 
   /**
-   * List blog articles as dashlet
-   *
-   * @access public
+   * List blog articles as dashlet.
    */
-  function run() {
+  public function run() {
     $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');
     $this->assign('context', $context);
 
@@ -72,12 +70,10 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
   }
 
   /**
-   * Load blog articles from cache
+   * Load blog articles from cache.
    * Refresh cache if expired
    *
    * @return array
-   *
-   * @access private
    */
   private function _getBlog() {
     // Fetch data from cache
@@ -100,13 +96,12 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
   }
 
   /**
-   * Parse rss feed and cache results
+   * Parse rss feed and cache results.
    *
    * @param $url
    *
-   * @return array|NULL array of blog items; or NULL if not available
-   *
-   * @access public
+   * @return array|NULL
+   *   array of blog items; or NULL if not available
    */
   public function _getFeed($url) {
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
@@ -122,7 +117,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
         $item = (array) $item;
         // Clean up description - remove tags that would break dashboard layout
         $description = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $item['description']);
-        $item['description'] = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br>");
+        $item['description'] = strip_tags($description, "<a><p><h4><h5><h6><b><i><em><strong><ol><ul><li><dd><dt><code><pre><br/>");
         $blog[] = $item;
       }
       if ($blog) {
@@ -131,4 +126,5 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
     }
     return $blog;
   }
+
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,11 +40,11 @@
 class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
   const FIELD_ROWCOUNT = 6;
+
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -55,14 +55,14 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $resources = CRM_Core_Resources::singleton();
     $resources->addSetting(
       array(
-        'kcfinderPath' => $config->userFrameworkResourceURL .'packages' .DIRECTORY_SEPARATOR
+        'kcfinderPath' => $config->userFrameworkResourceURL . 'packages' . DIRECTORY_SEPARATOR,
       )
     );
     $resources->addScriptFile('civicrm', 'templates/CRM/Badge/Form/Layout.js', 1, 'html-header');
 
     $this->applyFilter('__ALL__', 'trim');
 
-    $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), true);
+    $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'), TRUE);
 
     $labelStyle = CRM_Core_BAO_LabelFormat::getList(TRUE, 'name_badge');
     $this->add('select', 'label_format_name', ts('Label Format'), array('' => ts('- select -')) + $labelStyle, TRUE);
@@ -76,7 +76,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       '{event.event_id}' => ts('Event ID'),
       '{event.title}' => ts('Event Title'),
       '{event.start_date}' => ts('Event Start Date'),
-      '{event.end_date}' => ts('Event End Date')
+      '{event.end_date}' => ts('Event End Date'),
     );
     $participantTokens = CRM_Core_SelectValues::participantTokens();
 
@@ -93,7 +93,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     unset($imageAlignment['C']);
 
     $rowCount = self::FIELD_ROWCOUNT;
-    for ( $i =1; $i <= $rowCount; $i++ ) {
+    for ($i = 1; $i <= $rowCount; $i++) {
       $this->add('select', "token[$i]", ts('Token'), array('' => ts('- skip -')) + $tokens);
       $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
       $this->add('select', "font_size[$i]", ts('Font Size'), $fontSizes);
@@ -108,8 +108,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('select', "barcode_type", ts('Type'), $barcodeTypes);
     $this->add('select', "barcode_alignment", ts('Alignment'), $textAlignment);
 
-
-    $attributes = array('readonly'=> true);
+    $attributes = array('readonly' => TRUE);
     $this->add('text', 'image_1', ts('Image (top left)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
     $this->add('text', 'width_image_1', ts('Width (mm)'), array('size' => 6));
@@ -119,7 +118,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
     $this->add('text', 'width_image_2', ts('Width (mm)'), array('size' => 6));
     $this->add('text', 'height_image_2', ts('Height (mm)'), array('size' => 6));
-
 
     $this->add('checkbox', 'show_participant_image', ts('Use Participant Image?'));
     $this->add('text', 'width_participant_image', ts('Width (mm)'), array('size' => 6));
@@ -156,14 +154,13 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (isset($this->_id)) {
       $defaults = array_merge($this->_values,
         CRM_Badge_BAO_Layout::getDecodedData($this->_values['data']));
@@ -185,9 +182,8 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -223,7 +219,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   }
 
   /**
-   * @param $params
+   * @param array $params
    */
   public function buildPreview(&$params) {
     // get a max participant id
@@ -241,4 +237,5 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
     CRM_Badge_BAO_Badge::buildBadges($params, $this);
   }
+
 }

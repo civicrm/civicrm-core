@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.5                                                |
+   | CiviCRM version 4.6                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2014                                |
+   | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -38,7 +38,7 @@
  * one or a group of contact ids.
  */
 class CRM_Contact_Form_Task_SMSCommon {
-  CONST RECIEVED_SMS_ACTIVITY_SUBJECT = "SMS Received";
+  const RECIEVED_SMS_ACTIVITY_SUBJECT = "SMS Received";
 
   public $_contactDetails = array();
 
@@ -48,9 +48,9 @@ class CRM_Contact_Form_Task_SMSCommon {
 
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
-  static function preProcessProvider(&$form) {
+  public static function preProcessProvider(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
 
@@ -76,22 +76,21 @@ class CRM_Contact_Form_Task_SMSCommon {
       }
       if ($activityCheck == count($form->_activityHolderIds)) {
         CRM_Core_Error::statusBounce(ts("The Reply SMS Could only be sent for activities with '%1' subject.",
-            array(1 => self::RECIEVED_SMS_ACTIVITY_SUBJECT)
-          ));
+          array(1 => self::RECIEVED_SMS_ACTIVITY_SUBJECT)
+        ));
       }
     }
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
 
     $toArray = array();
 
@@ -162,14 +161,16 @@ class CRM_Contact_Form_Task_SMSCommon {
         $errorMess = "";
         if ($extendTargetContacts) {
           $errorMess = ts('One selected activity consists of more than one target contact.', array(
-                           'count' => $extendTargetContacts,
-                           'plural' => '%count selected activities consist of more than one target contact.'));
+            'count' => $extendTargetContacts,
+            'plural' => '%count selected activities consist of more than one target contact.',
+          ));
         }
         if ($invalidActivity) {
           $errorMess = ($errorMess ? ' ' : '');
           $errorMess .= ts('The selected activity is invalid.', array(
-                          'count' => $invalidActivity,
-                          'plural' => '%count selected activities are invalid.'));
+            'count' => $invalidActivity,
+            'plural' => '%count selected activities are invalid.',
+          ));
         }
         CRM_Core_Error::statusBounce(ts("%1: SMS Reply will not be sent.", array(1 => $errorMess)));
       }
@@ -215,12 +216,13 @@ class CRM_Contact_Form_Task_SMSCommon {
 
           //if phone is not primary check if non-primary phone is "Mobile"
           if (!empty($value['phone'])
-            && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes) && empty($value['is_deceased'])) {
+            && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes) && empty($value['is_deceased'])
+          ) {
             $filter = array('do_not_sms' => 0);
             $contactPhones = CRM_Core_BAO_Phone::allPhones($contactId, FALSE, 'Mobile', $filter);
             if (count($contactPhones) > 0) {
               $mobilePhone = CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'phone');
-              $form->_contactDetails[$contactId]['phone_id'] =  CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'id');
+              $form->_contactDetails[$contactId]['phone_id'] = CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'id');
               $form->_contactDetails[$contactId]['phone'] = $mobilePhone;
               $form->_contactDetails[$contactId]['phone_type_id'] = CRM_Utils_Array::value('Mobile', $phoneTypes);
             }
@@ -268,7 +270,6 @@ class CRM_Contact_Form_Task_SMSCommon {
       $form->assign('extendTargetContacts', $extendTargetContacts);
     }
 
-
     $form->assign('toContact', json_encode($toArray));
     $form->assign('suppressedSms', $suppressedSms);
     $form->assign('totalSelectedContacts', count($form->_contactIds));
@@ -300,17 +301,18 @@ class CRM_Contact_Form_Task_SMSCommon {
   }
 
   /**
-   * form rule
+   * Form rule.
    *
-   * @param array $fields    the input form values
+   * @param array $fields
+   *   The input form values.
    * @param array $dontCare
-   * @param array $self      additional values form 'this'
+   * @param array $self
+   *   Additional values form 'this'.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   *
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $dontCare, $self) {
+  public static function formRule($fields, $dontCare, $self) {
     $errors = array();
 
     $template = CRM_Core_Smarty::singleton();
@@ -337,15 +339,14 @@ class CRM_Contact_Form_Task_SMSCommon {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function postProcess(&$form) {
+  public static function postProcess(&$form) {
 
     // check and ensure that
     $thisValues = $form->controller->exportValues($form->getName());
@@ -404,7 +405,10 @@ class CRM_Contact_Form_Task_SMSCommon {
     );
 
     if ($countSuccess > 0) {
-      CRM_Core_Session::setStatus(ts('One message was sent successfully.', array('plural' => '%count messages were sent successfully.', 'count' => $countSuccess)), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $countSuccess)), 'success');
+      CRM_Core_Session::setStatus(ts('One message was sent successfully.', array(
+            'plural' => '%count messages were sent successfully.',
+            'count' => $countSuccess,
+          )), ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $countSuccess)), 'success');
     }
 
     if (is_array($sent)) {
@@ -415,16 +419,20 @@ class CRM_Contact_Form_Task_SMSCommon {
         $status .= '<li>' . $errMsg . '</li>';
       }
       $status .= '</ul>';
-      CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array('count' => count($sent), 'plural' => '%count Messages Not Sent')), 'info');
-    } else {
+      CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array(
+            'count' => count($sent),
+            'plural' => '%count Messages Not Sent',
+          )), 'info');
+    }
+    else {
       //Display the name and number of contacts for those sms is not sent.
       $smsNotSent = array_diff_assoc($allContactIds, $contactIds);
 
       if (!empty($smsNotSent)) {
         $not_sent = array();
         foreach ($smsNotSent as $index => $contactId) {
-          $displayName    = $form->_allContactDetails[$contactId]['display_name'];
-          $phone          = $form->_allContactDetails[$contactId]['phone'];
+          $displayName = $form->_allContactDetails[$contactId]['display_name'];
+          $phone = $form->_allContactDetails[$contactId]['phone'];
           $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$contactId");
           $not_sent[] = "<a href='$contactViewUrl' title='$phone'>$displayName</a>";
         }
@@ -433,9 +441,12 @@ class CRM_Contact_Form_Task_SMSCommon {
           $status .= ' ' . ts("or the contact is not part of the activity '%1'", array(1 => self::RECIEVED_SMS_ACTIVITY_SUBJECT));
         }
         $status .= ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
-        CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array('count' => count($smsNotSent), 'plural' => '%count Messages Not Sent')), 'info');
+        CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array(
+              'count' => count($smsNotSent),
+              'plural' => '%count Messages Not Sent',
+            )), 'info');
       }
     }
   }
-}
 
+}

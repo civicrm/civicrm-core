@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -34,7 +34,12 @@
  */
 
 /**
- * Retrieve CiviCRM settings from the api for use in templates
+ * Retrieve CiviCRM settings from the api for use in templates.
+ *
+ * @param $params
+ * @param $smarty
+ *
+ * @return int|string|null
  */
 function smarty_function_crmSetting($params, &$smarty) {
 
@@ -48,7 +53,7 @@ function smarty_function_crmSetting($params, &$smarty) {
   unset($errorScope);
   if ($result === FALSE) {
     $smarty->trigger_error("Unknown error");
-    return;
+    return NULL;
   }
 
   if (empty($params['var'])) {

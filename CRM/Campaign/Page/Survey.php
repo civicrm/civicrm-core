@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -45,7 +45,7 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
   /**
    * @return array
    */
-  function &actionLinks() {
+  public function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
 
@@ -77,14 +77,14 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
     return self::$_actionLinks;
   }
 
-  function browse() {
+  public function browse() {
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveySummary();
 
     if (!empty($surveys)) {
 
-      $surveyType    = CRM_Campaign_BAO_Survey::getSurveyActivityType();
-      $campaigns     = CRM_Campaign_BAO_Campaign::getAllCampaign();
+      $surveyType = CRM_Campaign_BAO_Survey::getSurveyActivityType();
+      $campaigns = CRM_Campaign_BAO_Campaign::getAllCampaign();
       $activityTypes = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, FALSE, 'name');
       foreach ($surveys as $sid => $survey) {
         $surveys[$sid]['campaign_id'] = $campaigns[$survey['campaign_id']];
@@ -119,7 +119,7 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
   /**
    * @return string
    */
-  function run() {
+  public function run() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
     }
@@ -132,5 +132,5 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

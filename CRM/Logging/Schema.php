@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -48,14 +48,14 @@ class CRM_Logging_Schema {
 
   //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement
   private $exceptions = array(
-    'civicrm_job'   => array('last_run'),
-    'civicrm_group' => array('cache_date'),
+    'civicrm_job' => array('last_run'),
+    'civicrm_group' => array('cache_date', 'refresh_date'),
   );
 
   /**
    * Populate $this->tables and $this->logs with current db state.
    */
-  function __construct() {
+  public function __construct() {
     $dao = new CRM_Contact_DAO_Contact();
     $civiDBName = $dao->_database;
 
@@ -80,6 +80,9 @@ AND    TABLE_NAME LIKE 'civicrm_%'
 
     // do not log civicrm_mailing_event* tables, CRM-12300
     $this->tables = preg_grep('/^civicrm_mailing_event_/', $this->tables, PREG_GREP_INVERT);
+
+    // do not log civicrm_mailing_recipients table, CRM-16193
+    $this->tables = array_diff($this->tables, array('civicrm_mailing_recipients'));
 
     if (defined('CIVICRM_LOGGING_DSN')) {
       $dsn = DB::parseDSN(CIVICRM_LOGGING_DSN);
@@ -107,14 +110,14 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Return logging custom data tables.
    */
-  function customDataLogTables() {
+  public function customDataLogTables() {
     return preg_grep('/^log_civicrm_value_/', $this->logs);
   }
 
   /**
    * Return custom data tables for specified entity / extends.
    */
-  function entityCustomDataLogTables($extends) {
+  public function entityCustomDataLogTables($extends) {
     $customGroupTables = array();
     $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
     $customGroupDAO->find();
@@ -127,7 +130,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Disable logging by dropping the triggers (but keep the log tables intact).
    */
-  function disableLogging() {
+  public function disableLogging() {
     $config = CRM_Core_Config::singleton();
     $config->logging = FALSE;
 
@@ -142,8 +145,8 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Drop triggers for all logged tables.
    */
-  function dropTriggers($tableName = NULL) {
-    $dao = new CRM_Core_DAO;
+  public function dropTriggers($tableName = NULL) {
+    $dao = new CRM_Core_DAO();
 
     if ($tableName) {
       $tableNames = array($tableName);
@@ -160,7 +163,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
 
-     // after triggers
+      // after triggers
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
@@ -186,7 +189,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    *
    * @return void
    */
-  function enableLogging() {
+  public function enableLogging() {
     $this->fixSchemaDifferences(TRUE);
     $this->addReports();
   }
@@ -194,11 +197,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Sync log tables and rebuild triggers.
    *
-   * @param bool $enableLogging: Ensure logging is enabled
+   * @param bool $enableLogging : Ensure logging is enabled
    *
    * @return void
    */
-  function fixSchemaDifferences($enableLogging = FALSE) {
+  public function fixSchemaDifferences($enableLogging = FALSE) {
     $config = CRM_Core_Config::singleton();
     if ($enableLogging) {
       $config->logging = TRUE;
@@ -213,13 +216,16 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * Add missing (potentially specified) log table columns for the given table.
    *
-   * @param $table string  name of the relevant table
-   * @param $cols mixed    array of columns to add or null (to check for the missing columns)
-   * @param $rebuildTrigger boolean should we rebuild the triggers
+   * @param string $table
+   *   name of the relevant table.
+   * @param array $cols
+   *   Mixed array of columns to add or null (to check for the missing columns).
+   * @param bool $rebuildTrigger
+   *   should we rebuild the triggers.
    *
    * @return void
    */
-  function fixSchemaDifferencesFor($table, $cols = array(), $rebuildTrigger = FALSE) {
+  public function fixSchemaDifferencesFor($table, $cols = array(), $rebuildTrigger = FALSE) {
     if (empty($table)) {
       return FALSE;
     }
@@ -289,7 +295,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
   /**
    * @param bool $rebuildTrigger
    */
-  function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
+  public function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
     $diffs = array();
     foreach ($this->tables as $table) {
       if (empty($this->logs[$table])) {
@@ -310,17 +316,16 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     }
   }
 
-  /*
-   * log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
+  /**
+   * Log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
    * so there's no need for a default timestamp and therefore we remove such default timestamps
    * also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
-   */
-  /**
+   *
    * @param $query
    *
    * @return mixed
    */
-  function fixTimeStampAndNotNullSQL($query) {
+  public function fixTimeStampAndNotNullSQL($query) {
     $query = str_ireplace("TIMESTAMP NOT NULL", "TIMESTAMP NULL", $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", '', $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP", '', $query);
@@ -345,13 +350,14 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     // add report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao             = new CRM_Report_DAO_ReportInstance;
-      $dao->domain_id  = $domain_id;
-      $dao->report_id  = $report;
-      $dao->title      = $titles[$report];
+      $dao = new CRM_Report_DAO_ReportInstance();
+      $dao->domain_id = $domain_id;
+      $dao->report_id = $report;
+      $dao->title = $titles[$report];
       $dao->permission = 'administer CiviCRM';
-      if ($report == 'logging/contact/summary')
+      if ($report == 'logging/contact/summary') {
         $dao->is_reserved = 1;
+      }
       $dao->insert();
     }
   }
@@ -390,11 +396,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
         $dao = new CRM_Contact_DAO_Contact();
         $civiDB = $dao->_database;
       }
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      CRM_Core_TemporaryErrorScope::ignoreException();
       // NOTE: W.r.t Performance using one query to find all details and storing in static array is much faster
       // than firing query for every given table.
       $query = "
-SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT
+SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_TYPE
 FROM   INFORMATION_SCHEMA.COLUMNS
 WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -405,13 +411,15 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         if (!array_key_exists($dao->TABLE_NAME, $columnSpecs)) {
           $columnSpecs[$dao->TABLE_NAME] = array();
         }
-        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] =
-          array(
-              'COLUMN_NAME' => $dao->COLUMN_NAME,
-              'DATA_TYPE'   => $dao->DATA_TYPE,
-              'IS_NULLABLE' => $dao->IS_NULLABLE,
-              'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT
-            );
+        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] = array(
+          'COLUMN_NAME' => $dao->COLUMN_NAME,
+          'DATA_TYPE' => $dao->DATA_TYPE,
+          'IS_NULLABLE' => $dao->IS_NULLABLE,
+          'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT,
+        );
+        if (($first = strpos($dao->COLUMN_TYPE, '(')) != 0) {
+          $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = substr($dao->COLUMN_TYPE, $first, strpos($dao->COLUMN_TYPE, ')'));
+        }
       }
     }
     return $columnSpecs[$table];
@@ -423,9 +431,9 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
    *
    * @return array
    */
-  function columnsWithDiffSpecs($civiTable, $logTable) {
+  public function columnsWithDiffSpecs($civiTable, $logTable) {
     $civiTableSpecs = $this->columnSpecsOf($civiTable);
-    $logTableSpecs  = $this->columnSpecsOf($logTable);
+    $logTableSpecs = $this->columnSpecsOf($logTable);
 
     $diff = array('ADD' => array(), 'MODIFY' => array(), 'OBSOLETE' => array());
 
@@ -436,22 +444,29 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition
     // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
     foreach ($civiTableSpecs as $col => $colSpecs) {
-      if (!isset($logTableSpecs[$col]) || !is_array($logTableSpecs[$col]) ) {
+      if (!isset($logTableSpecs[$col]) || !is_array($logTableSpecs[$col])) {
         $logTableSpecs[$col] = array();
       }
 
       $specDiff = array_diff($civiTableSpecs[$col], $logTableSpecs[$col]);
       if (!empty($specDiff) && $col != 'id' && !array_key_exists($col, $diff['ADD'])) {
         // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
-        if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])) {
+        if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])
+        // We won't alter the log if the length is decreased in case some of the existing data won't fit.
+        || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
+        ) {
           // if data-type is different, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
-          $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
+        }
+        elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
+          $logTableSpecs[$col]['IS_NULLABLE'] == 'NO'
+        ) {
           // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != CRM_Utils_Array::value('COLUMN_DEFAULT', $logTableSpecs[$col]) &&
-          !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')) {
+        }
+        elseif ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != CRM_Utils_Array::value('COLUMN_DEFAULT', $logTableSpecs[$col]) &&
+          !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')
+        ) {
           // if default property is different, and its not about a timestamp column, consider it
           $diff['MODIFY'][] = $col;
         }
@@ -462,7 +477,8 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     $oldCols = array_diff(array_keys($logTableSpecs), array_keys($civiTableSpecs));
     foreach ($oldCols as $col) {
       if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action')) &&
-        $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
+        $logTableSpecs[$col]['IS_NULLABLE'] == 'NO'
+      ) {
         // if its a column present only in log table, not among those used by log tables for special purpose, and not-null
         $diff['OBSOLETE'][] = $col;
       }
@@ -523,7 +539,7 @@ COLS;
     // delete report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao            = new CRM_Report_DAO_ReportInstance;
+      $dao = new CRM_Report_DAO_ReportInstance();
       $dao->domain_id = $domain_id;
       $dao->report_id = $report;
       $dao->delete();
@@ -563,7 +579,7 @@ COLS;
    * @param null $tableName
    * @param bool $force
    */
-  function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
+  public function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
     // check if we have logging enabled
     $config =& CRM_Core_Config::singleton();
     if (!$config->logging) {
@@ -586,7 +602,7 @@ COLS;
       $columns = $this->columnsOf($table, $force);
 
       // only do the change if any data has changed
-      $cond = array( );
+      $cond = array();
       foreach ($columns as $column) {
         // ignore modified_date changes
         if ($column != 'modified_date' && !in_array($column, CRM_Utils_Array::value($table, $this->exceptions, array()))) {
@@ -594,7 +610,7 @@ COLS;
         }
       }
       $suppressLoggingCond = "@civicrm_disable_logging IS NULL OR @civicrm_disable_logging = 0";
-      $updateSQL = "IF ( (" . implode( ' OR ', $cond ) . ") AND ( $suppressLoggingCond ) ) THEN ";
+      $updateSQL = "IF ( (" . implode(' OR ', $cond) . ") AND ( $suppressLoggingCond ) ) THEN ";
 
       if ($this->useDBPrefix) {
         $sqlStmt = "INSERT INTO `{$this->db}`.log_{tableName} (";
@@ -612,13 +628,13 @@ COLS;
 
       $sqlStmt = '';
       foreach ($columns as $column) {
-        $sqlStmt   .= "NEW.$column, ";
+        $sqlStmt .= "NEW.$column, ";
         $deleteSQL .= "OLD.$column, ";
       }
-      $sqlStmt   .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
+      $sqlStmt .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
       $deleteSQL .= "CONNECTION_ID(), @civicrm_user_id, '{eventName}');";
 
-      $sqlStmt   .= "END IF;";
+      $sqlStmt .= "END IF;";
       $deleteSQL .= "END IF;";
 
       $insertSQL .= $sqlStmt;
@@ -652,16 +668,13 @@ COLS;
    * where we want to do a mass cleanup but dont want to bother with
    * an audit trail
    *
-   * @static
-   * @public
    */
-  static function disableLoggingForThisConnection( ) {
+  public static function disableLoggingForThisConnection() {
     // do this only if logging is enabled
-    $config = CRM_Core_Config::singleton( );
-    if ( $config->logging ) {
-      CRM_Core_DAO::executeQuery( 'SET @civicrm_disable_logging = 1' );
+    $config = CRM_Core_Config::singleton();
+    if ($config->logging) {
+      CRM_Core_DAO::executeQuery('SET @civicrm_disable_logging = 1');
     }
   }
 
 }
-

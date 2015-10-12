@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,50 +39,46 @@
 class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
 
   /**
-   * The context that we are working on
+   * The context that we are working on.
    *
    * @var string
    */
   protected $_context;
 
   /**
-   * the groupId retrieved from the GET vars
+   * The groupId retrieved from the GET vars.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * the title of the group
+   * The title of the group.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+  public function preProcess() {
+    // initialize the task and row fields
     parent::preProcess();
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @param CRM_Core_Form $form
    * @param $proxSearch
    *
    * @return void
    */
-  function buildQuickForm($form, $proxSearch) {
+  public function buildQuickForm($form, $proxSearch) {
     // is proximity search required (2) or optional (1)?
     $proxRequired = ($proxSearch == 2 ? TRUE : FALSE);
     $form->assign('proximity_search', TRUE);
@@ -108,19 +104,18 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
-   * @param $form
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param CRM_Core_Form $form
    *
-   * @internal param array $options additional user data
-   *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $form) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
     // If Distance is present, make sure state, country and city or postal code are populated.
     if (!empty($fields['prox_distance'])) {
@@ -138,17 +133,17 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues($form) {
-    $defaults       = array();
-    $config         = CRM_Core_Config::singleton();
+  public function setDefaultValues($form) {
+    $defaults = array();
+    $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
 
     if ($countryDefault) {
@@ -163,5 +158,5 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
     $form->setDefaults($defaults);
     return $defaults;
   }
-}
 
+}

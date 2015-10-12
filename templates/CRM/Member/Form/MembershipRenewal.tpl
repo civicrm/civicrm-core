@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -94,6 +94,12 @@
         <td>{include file="CRM/common/jcalendar.tpl" elementName=renewal_date}</td>
       </tr>
       {if $membershipMode}
+        {if !empty($form.auto_renew)}
+          <tr id="autoRenew" class="crm-membership-form-block-auto_renew">
+            <td class="label"> {$form.auto_renew.label} {help id="id-auto_renew" file="CRM/Member/Form/Membership.hlp" action=$action} </td>
+            <td> {$form.auto_renew.html} </td>
+          </tr>
+        {/if}
         <tr class="crm-member-membershiprenew-form-block-financial_type_id">
           <td class="label">{$form.financial_type_id.label}</td>
           <td>{$form.financial_type_id.html}<br/>
@@ -159,6 +165,7 @@
                   <td>{$form.total_amount.html}<br/>
                     <span
                       class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span>
+                      <div class="totaltaxAmount"></div>
                   </td>
                 </tr>
                 <tr class="crm-membershiprenew-form-block-receive_date">
@@ -191,6 +198,7 @@
           <td>{$form.total_amount.html}<br/>
             <span
               class="description">{ts}Membership payment amount. A contribution record will be created for this amount.{/ts}</span>
+              <div class="totaltaxAmount"></div>
           </td>
         </tr>
       {/if}
@@ -384,11 +392,13 @@
       var term = cj("#num_terms").val();
       if (term) {
         var renewTotal = allMemberships[memType]['total_amount_numeric'] * term;
-        cj("#total_amount").val(renewTotal.toFixed(2));
+        cj("#total_amount").val(CRM.formatMoney(renewTotal, true));
       }
       else {
         cj("#total_amount").val(allMemberships[memType]['total_amount']);
       }
+
+      cj('.totaltaxAmount').html(allMemberships[memType]['tax_message']);
     }
 
     // show/hide different contact section

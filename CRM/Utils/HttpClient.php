@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class handles HTTP downloads
@@ -34,7 +34,7 @@
  * want to deal with that so late in the 4.3 dev cycle.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -74,8 +74,10 @@ class CRM_Utils_HttpClient {
   /**
    * Download the remote zipfile.
    *
-   * @param string $remoteFile URL of a .zip file
-   * @param string $localFile path at which to store the .zip file
+   * @param string $remoteFile
+   *   URL of a .zip file.
+   * @param string $localFile
+   *   Path at which to store the .zip file.
    * @return STATUS_OK|STATUS_WRITE_ERROR|STATUS_DL_ERROR
    */
   public function fetch($remoteFile, $localFile) {
@@ -112,10 +114,12 @@ class CRM_Utils_HttpClient {
   }
 
   /**
-   * Send an HTTP GET for a remote resource
+   * Send an HTTP GET for a remote resource.
    *
-   * @param string $remoteFile URL of remote file
-   * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   * @param string $remoteFile
+   *   URL of remote file.
+   * @return array
+   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function get($remoteFile) {
     // Download extension zip file ...
@@ -148,13 +152,14 @@ class CRM_Utils_HttpClient {
   }
 
   /**
-   * Send an HTTP POST for a remote resource
+   * Send an HTTP POST for a remote resource.
    *
-   * @param string $remoteFile URL of a .zip file
-   * @param $params
+   * @param string $remoteFile
+   *   URL of a .zip file.
+   * @param array $params
    *
-   * @internal param string $localFile path at which to store the .zip file
-   * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   * @return array
+   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function post($remoteFile, $params) {
     // Download extension zip file ...
@@ -171,9 +176,9 @@ class CRM_Utils_HttpClient {
     }
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POST,count($params));
-    curl_setopt($ch, CURLOPT_POSTFIELDS,$params);
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POST, count($params));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
       return array(self::STATUS_DL_ERROR, $data);
@@ -187,12 +192,12 @@ class CRM_Utils_HttpClient {
 
   /**
    * @param string $remoteFile
-   * @return array (0 => resource, 1 => CA_Config_Curl)
+   * @return array
+   *   (0 => resource, 1 => CA_Config_Curl)
    */
   protected function createCurl($remoteFile) {
-    require_once 'CA/Config/Curl.php';
     $caConfig = CA_Config_Curl::probe(array(
-      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE)
+      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE),
     ));
 
     $ch = curl_init();

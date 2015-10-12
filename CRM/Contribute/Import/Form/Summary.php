@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,10 +39,9 @@
 class CRM_Contribute_Import_Form_Summary extends CRM_Import_Form_Summary {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     // set the error message path to display
@@ -106,7 +105,25 @@ class CRM_Contribute_Import_Form_Summary extends CRM_Import_Form_Summary {
     }
     $this->assign('dupeActionString', $dupeActionString);
 
-    $properties = array('totalRowCount', 'validRowCount', 'invalidRowCount', 'validSoftCreditRowCount', 'invalidSoftCreditRowCount', 'conflictRowCount', 'downloadConflictRecordsUrl', 'downloadErrorRecordsUrl', 'duplicateRowCount', 'downloadDuplicateRecordsUrl', 'downloadMismatchRecordsUrl', 'groupAdditions', 'unMatchCount', 'validPledgePaymentRowCount', 'invalidPledgePaymentRowCount', 'downloadPledgePaymentErrorRecordsUrl', 'downloadSoftCreditErrorRecordsUrl');
+    $properties = array(
+      'totalRowCount',
+      'validRowCount',
+      'invalidRowCount',
+      'validSoftCreditRowCount',
+      'invalidSoftCreditRowCount',
+      'conflictRowCount',
+      'downloadConflictRecordsUrl',
+      'downloadErrorRecordsUrl',
+      'duplicateRowCount',
+      'downloadDuplicateRecordsUrl',
+      'downloadMismatchRecordsUrl',
+      'groupAdditions',
+      'unMatchCount',
+      'validPledgePaymentRowCount',
+      'invalidPledgePaymentRowCount',
+      'downloadPledgePaymentErrorRecordsUrl',
+      'downloadSoftCreditErrorRecordsUrl',
+    );
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }

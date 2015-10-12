@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,66 +23,65 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * File for the CiviCRM APIv3 domain functions
+ * This api exposes CiviCRM WordReplacement records.
+ *
+ * Word replacements are used to globally alter strings in the CiviCRM UI.
+ * Note that the original source string is always English, regardless of language settings.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_WordReplacement
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * Get CiviCRM Word Replacement details
- * {@getfields word_replacement_create}
- *
- */
-function civicrm_api3_word_replacement_get($params) {
-  $bao = new CRM_Core_BAO_WordReplacement();
-  _civicrm_api3_dao_set_filter($bao, $params, true, 'WordReplacement');
-  $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, true,'WordReplacement');
-
-  return civicrm_api3_create_success($wordReplacements, $params, 'word_replacement', 'get', $bao);
-}
-
-
-/**
- * Create a new Word Replacement
+ * Get CiviCRM Word Replacement details.
  *
  * @param array $params
  *
  * @return array
+ * @throws \API_Exception
+ */
+function civicrm_api3_word_replacement_get($params) {
+  $bao = new CRM_Core_BAO_WordReplacement();
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
+  $wordReplacements = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'WordReplacement');
+
+  return civicrm_api3_create_success($wordReplacements, $params, 'WordReplacement', 'get', $bao);
+}
+
+
+/**
+ * Create a new Word Replacement.
  *
- * {@getfields word_replacement_create}
+ * @param array $params
+ *
+ * @return array
  */
 function civicrm_api3_word_replacement_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_word_replacement_create_spec(&$params) {
   unset($params['version']);
 }
 
 /**
- * delete an existing word_replacement
+ * Delete an existing WordReplacement.
  *
+ * @param array $params
+ *   Array containing id of the WordReplacement to be deleted.
  *
- * @param array $params array containing id of the word_replacement
- *  to be deleted
- *
- * @return array api result array
- *
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_word_replacement_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

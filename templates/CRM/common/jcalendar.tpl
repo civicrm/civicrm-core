@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,7 +49,8 @@
     {$form.$elementName.html}
 {/if}
 
-{assign var='displayDate' value=$elementId|cat:"_display"}
+{* CRM-15804 - CiviEvent Date Picker broken in modal dialog *}
+{assign var='displayDate' value=$elementId|cat:"_display"|cat:"_$string"|uniqid}
 
 {if $action neq 1028}
     <input type="text" name="{$displayDate}" id="{$displayDate}" class="dateplugin" autocomplete="off"/>
@@ -65,7 +66,7 @@
 {/if}
 
 {if $action neq 1028}
-    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a>
 {/if}
 
 <script type="text/javascript">

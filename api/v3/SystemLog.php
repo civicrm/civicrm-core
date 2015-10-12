@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,30 +26,29 @@
  */
 
 /**
- * File for the CiviCRM APIv3 SystemLog functions
+ * This api exposes CiviCRM SystemLog.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_SystemLog
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: SystemLog.php 30171 2010-10-14 09:11:27Z mover $
- *
  */
 
 /**
- * @param $params
+ * Delete system log record.
+ *
+ * @param array $params
  *
  * @return array
  */
 function civicrm_api3_system_log_delete($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, True, 'SystemLog');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'SystemLog');
 }
 
 /**
- * Create system log
+ * Create system log record.
+ *
  * It's arguable whether this function should exist as it fits our crud pattern and adding it meets our SyntaxConformance test requirements
  * but it just wraps system.log which is more consistent with the PSR3 implemented.
- * @param $params
+ *
+ * @param array $params
  *
  * @return array
  */
@@ -59,21 +57,22 @@ function civicrm_api3_system_log_create($params) {
 }
 
 /**
- * @param $params
+ * Adjust system log create metadata.
  *
- * @return array
+ * @param array $params
  */
 function _civicrm_api3_system_log_create_spec(&$params) {
-  require_once('api/v3/System.php');
-   _civicrm_api3_system_log_spec($params);
+  require_once 'api/v3/System.php';
+  _civicrm_api3_system_log_spec($params);
 }
 
 /**
- * @param $params
+ * Get system log record.
+ *
+ * @param array $params
  *
  * @return array
  */
 function civicrm_api3_system_log_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, True, 'SystemLog');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'SystemLog');
 }
-

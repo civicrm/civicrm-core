@@ -15,9 +15,12 @@
  * {/tsScope}
  * @endcode
  *
- * @param array $params must define 'name'
- * @param string $content Default content
- * @param object $smarty the Smarty object
+ * @param array $params
+ *   Must define 'name'.
+ * @param string $content
+ *   Default content.
+ * @param CRM_Core_Smarty $smarty
+ *   The Smarty object.
  *
  * @param $repeat
  *

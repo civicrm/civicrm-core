@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -136,8 +136,7 @@
 {htxt id='id-is_update_dupe'}
   <p>{ts}If you are using the profile as a contact signup and editing form - this option controls what happens if the data matches an existing contact record. Using this option user can update the matching record or create a duplicate record or otherwise he will get a 'duplicate record' warning, and their input will not be saved. Contact matching is based on your configured 'Strict' rule for identifying duplicate contacts.{/ts} {docURL page="user/common-workflows/deduping-and-merging"}</p>
   <p>{ts}This setting is ignored if the profile is embedded in an online contribution, membership signup or event registration form. In this case a contact match always results in the transaction being linked to the matching contact.</p>{/ts}
-  <p>{ts}In all cases, the check for an existing matching contact uses the default "Individual Strict Duplicate Matching Rule" (match on email address). If you are concerned with existing contact data being over-written by anonymous visitors, you can modify this rule to make matches less likely (or even impossible).
-  For example, if you NEVER want anonymous input to match (i.e. always create a new contact record) - edit that rule and set the 'weight threshold' higher than 10. You will then need to run Find Duplicates periodically using a different rule, and merge any duplicate records with their associated memberships, contributions, etc.{/ts}</p>
+  <p>{ts}In all cases, the check for an existing matching contact uses the default "Individual Strict Duplicate Matching Rule" (match on email address). If you are concerned with existing contact data being over-written by anonymous visitors, you can modify this rule to make matches less likely (or even impossible). For example, if you NEVER want anonymous input to match (i.e. always create a new contact record) - edit that rule and set the 'weight threshold' higher than 10. You will then need to run Find Duplicates periodically using a different rule, and merge any duplicate records with their associated memberships, contributions, etc.{/ts}</p>
   <p>{ts}NOTE: If there are multiple matching contacts, the first matching record is used.{/ts}</p>
 {/htxt}
 

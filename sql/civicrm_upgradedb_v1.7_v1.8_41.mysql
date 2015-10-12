@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 3.2                                                |
+-- | CiviCRM version 4.6                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2010                                |
+-- | Copyright CiviCRM LLC (c) 2004-2015                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -40,12 +40,12 @@ CREATE TABLE civicrm_dedupe_rule_group (
      id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique dedupe rule group id',
      domain_id int unsigned NOT NULL COMMENT 'The id of the domain this rule group belongs to',
      contact_type enum('Individual', 'Organization', 'Household')    COMMENT 'The type of contacts this group applies to',
-     threshold int NOT NULL COMMENT 'The weight threshold the sum of the rule weights has to cross to consider two contacts the same' 
+     threshold int NOT NULL COMMENT 'The weight threshold the sum of the rule weights has to cross to consider two contacts the same'
 
 ,    PRIMARY KEY ( id )
 
 ,    CONSTRAINT FK_civicrm_dedupe_rule_group_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -62,12 +62,12 @@ CREATE TABLE civicrm_dedupe_rule (
      rule_table varchar(64) NOT NULL COMMENT 'The name of the table this rule is about',
      rule_field varchar(64) NOT NULL COMMENT 'The name of the field of the table referenced in rule_table',
      rule_length int unsigned COMMENT 'The lenght of the matching substring',
-     rule_weight int NOT NULL COMMENT 'The weight of the rule' 
+     rule_weight int NOT NULL COMMENT 'The weight of the rule'
 
 ,    PRIMARY KEY ( id )
 
 ,    CONSTRAINT FK_civicrm_dedupe_rule_dedupe_rule_group_id FOREIGN KEY (dedupe_rule_group_id) REFERENCES civicrm_dedupe_rule_group(id)
-  
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -103,14 +103,14 @@ CREATE TABLE civicrm_payment_processor (
      subject varchar(255),
      class_name varchar(255),
      billing_mode int unsigned NOT NULL COMMENT 'Billing Mode',
-     is_recur tinyint COMMENT 'Can process recurring contributions' 
+     is_recur tinyint COMMENT 'Can process recurring contributions'
 
 ,    PRIMARY KEY ( id )
- 
+
 ,    UNIQUE INDEX UI_name_test( name, is_test )
-  
+
 ,    CONSTRAINT FK_civicrm_payment_processor_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -119,7 +119,7 @@ CREATE TABLE civicrm_payment_processor (
 -- *
 -- *******************************************************/
 CREATE TABLE civicrm_payment_processor_type (
-    
+
      id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Payment Processor Type ID',
      domain_id int unsigned NOT NULL COMMENT 'Which Domain owns this payment processor.',
      name varchar(64) COMMENT 'Payment Processor Name.',
@@ -139,14 +139,14 @@ CREATE TABLE civicrm_payment_processor_type (
      url_recur_test_default varchar(255),
      url_button_test_default varchar(255),
      billing_mode int unsigned NOT NULL COMMENT 'Billing Mode',
-     is_recur tinyint COMMENT 'Can process recurring contributions' 
+     is_recur tinyint COMMENT 'Can process recurring contributions'
 ,
     PRIMARY KEY ( id )
- 
+
 ,   UNIQUE INDEX UI_name( name )
-  
+
 ,   CONSTRAINT FK_civicrm_payment_processor_type_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
@@ -175,10 +175,10 @@ CREATE TABLE civicrm_preferences (
      individual_name_format text    COMMENT 'Format to display a individual name',
      address_standardization_provider varchar(64)    COMMENT 'object name of provider for address standarization',
      address_standardization_userid varchar(64)    COMMENT 'user id for provider login',
-     address_standardization_url varchar(255)    COMMENT 'url of address standardization service' 
+     address_standardization_url varchar(255)    COMMENT 'url of address standardization service'
 ,
     PRIMARY KEY ( id )
- 
+
     ,     INDEX index_contact_view_options(
         contact_view_options
   )
@@ -194,12 +194,12 @@ CREATE TABLE civicrm_preferences (
   ,     INDEX index_address_options(
         address_options
   )
-  
-,      
+
+,
      CONSTRAINT FK_civicrm_preferences_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-,      
+,
      CONSTRAINT FK_civicrm_preferences_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id)
-  
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
@@ -217,16 +217,16 @@ CREATE TABLE civicrm_price_set (
      is_active tinyint DEFAULT 1 COMMENT 'Is this price set active',
      help_pre text COMMENT 'Description and/or help text to display before fields in form.',
      help_post text COMMENT 'Description and/or help text to display after fields in form.',
-     javascript varchar(64) COMMENT 'Optional Javascript script function(s) included on the form with this price_set. Can be used for conditional' 
+     javascript varchar(64) COMMENT 'Optional Javascript script function(s) included on the form with this price_set. Can be used for conditional'
 
 ,    PRIMARY KEY ( id )
- 
+
 ,    UNIQUE INDEX UI_name( name )
 
 ,    UNIQUE INDEX UI_title( title )
-  
+
 ,    CONSTRAINT FK_civicrm_price_set_domain_id FOREIGN KEY (domain_id) REFERENCES civicrm_domain(id)
-  
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -251,14 +251,14 @@ CREATE TABLE civicrm_price_field (
      is_required tinyint DEFAULT 1 COMMENT 'Is this price field required (value must be > 1)',
      active_on datetime DEFAULT 0 COMMENT 'If non-zero, do not show this field before the date specified',
      expire_on datetime DEFAULT 0 COMMENT 'If non-zero, do not show this field after the date specified',
-     javascript varchar(255) COMMENT 'Optional scripting attributes for field' 
+     javascript varchar(255) COMMENT 'Optional scripting attributes for field'
 
 ,    PRIMARY KEY ( id )
 
 ,    INDEX index_name( name )
-  
+
 ,    CONSTRAINT FK_civicrm_price_field_price_set_id FOREIGN KEY (price_set_id) REFERENCES civicrm_price_set(id)
-  
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
@@ -272,14 +272,14 @@ CREATE TABLE civicrm_price_set_entity (
      id int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Price Set Entity',
      entity_table varchar(64) NOT NULL COMMENT 'Table which uses this price set',
      entity_id int unsigned NOT NULL COMMENT 'Item in table',
-     price_set_id int unsigned NOT NULL COMMENT 'price set being used' 
+     price_set_id int unsigned NOT NULL COMMENT 'price set being used'
 
 ,    PRIMARY KEY ( id )
- 
+
 ,    UNIQUE INDEX UI_entity( entity_table, entity_id )
-  
+
 ,    CONSTRAINT FK_civicrm_price_set_entity_price_set_id FOREIGN KEY (price_set_id) REFERENCES civicrm_price_set(id)
-  
+
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 
@@ -320,7 +320,7 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_activity_history
 -- *
 -- *******************************************************/
-  ALTER TABLE civicrm_activity_history 
+  ALTER TABLE civicrm_activity_history
       ADD is_test tinyint(4) NULL DEFAULT '0';
 
 
@@ -395,7 +395,7 @@ CREATE TABLE civicrm_line_item (
 -- *******************************************************/
   ALTER TABLE civicrm_location
       MODIFY location_type_id int(10) unsigned NULL DEFAULT NULL;
-   
+
 
 -- /*******************************************************
 -- *
@@ -447,9 +447,9 @@ CREATE TABLE civicrm_line_item (
 -- *
 -- *******************************************************/
 
-  INSERT INTO civicrm_payment_processor_type 
+  INSERT INTO civicrm_payment_processor_type
       (domain_id, name, title, description, is_active, is_default, user_name_label, password_label, signature_label, subject_label, class_name, url_site_default, url_recur_default, url_button_default, url_site_test_default, url_recur_test_default, url_button_test_default, billing_mode, is_recur )
-  VALUES 
+  VALUES
       (@domain_id,'Dummy','Dummy Payment Processor',NULL,1,1,'User Name',NULL,NULL,NULL,'Payment_Dummy',NULL,NULL,NULL,NULL,NULL,NULL,1,NULL),
       (@domain_id,'PayPal_Standard','PayPal - Website Payments Standard',NULL,1,0,'Merchant Account Email',NULL,NULL,NULL,'Payment_PayPalImpl','https://www.paypal.com/','https://www.paypal.com/',NULL,'https://www.sandbox.paypal.com/','https://www.sandbox.paypal.com/',NULL,4,1),
       (@domain_id,'PayPal','PayPal - Website Payments Pro',NULL,1,0,'User Name','Password','Signature',NULL,'Payment_PayPalImpl','https://www.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif','https://www.sandbox.paypal.com/',NULL,'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',3,NULL),
@@ -464,7 +464,7 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_uf_group
 -- *
 -- *******************************************************/
-  ALTER TABLE civicrm_uf_group 
+  ALTER TABLE civicrm_uf_group
         ADD is_cms_user tinyint(4) NULL DEFAULT '0',
       ADD notify varchar(255) NULL DEFAULT NULL COMMENT 'If you want member(s) of your organization to receive a notification email whenever this Profile form is used to enter or update contact information, enter one or more email addresses here separated by a comma';
 
@@ -475,24 +475,24 @@ CREATE TABLE civicrm_line_item (
 -- *
 -- *******************************************************/
 
-  INSERT INTO 
-    civicrm_option_group (domain_id, name, description, is_reserved, is_active) 
-  VALUES 
+  INSERT INTO
+    civicrm_option_group (domain_id, name, description, is_reserved, is_active)
+  VALUES
     (@domain_id, 'contact_view_options', 'Contact View Options', 0, 1),
     (@domain_id, 'contact_edit_options', 'Contact Edit Options', 0, 1),
      (@domain_id, 'advanced_search_options', 'Advanced Search Options', 0, 1),
     (@domain_id, 'user_dashboard_options', 'User Dashboard Options', 0, 1),
     (@domain_id, 'address_options', 'Addressing Options', 0, 1);
-   
+
   SELECT @option_group_id_cvOpt := max(id) from civicrm_option_group where name = 'contact_view_options';
   SELECT @option_group_id_ceOpt := max(id) from civicrm_option_group where name = 'contact_edit_options';
   SELECT @option_group_id_asOpt := max(id) from civicrm_option_group where name = 'advanced_search_options';
   SELECT @option_group_id_udOpt := max(id) from civicrm_option_group where name = 'user_dashboard_options';
   SELECT @option_group_id_adOpt := max(id) from civicrm_option_group where name = 'address_options';
 
-  INSERT INTO 
-     civicrm_option_value (option_group_id, label, value, name, grouping, filter, is_default, weight, description, is_optgroup, is_reserved, is_active) 
-  VALUES  
+  INSERT INTO
+     civicrm_option_value (option_group_id, label, value, name, grouping, filter, is_default, weight, description, is_optgroup, is_reserved, is_active)
+  VALUES
     (@option_group_id_cvOpt, 'Activities'   ,   1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
     (@option_group_id_cvOpt, 'Relationships',   2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
     (@option_group_id_cvOpt, 'Groups'       ,   3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
@@ -507,7 +507,7 @@ CREATE TABLE civicrm_line_item (
     (@option_group_id_ceOpt, 'Demographics'             ,   2, NULL, NULL, 0, NULL, 2, NULL, 0, 0, 1 ),
     (@option_group_id_ceOpt, 'Tags and Groups'          ,   3, NULL, NULL, 0, NULL, 3, NULL, 0, 0, 1 ),
     (@option_group_id_ceOpt, 'Notes'                    ,   4, NULL, NULL, 0, NULL, 4, NULL, 0, 0, 1 ),
-  
+
     (@option_group_id_asOpt, 'Address Fields'      ,   1, NULL, NULL, 0, NULL,  1, NULL, 0, 0, 1 ),
     (@option_group_id_asOpt, 'Custom Fields'       ,   2, NULL, NULL, 0, NULL,  2, NULL, 0, 0, 1 ),
     (@option_group_id_asOpt, 'Activity History'    ,   3, NULL, NULL, 0, NULL,  3, NULL, 0, 0, 1 ),
@@ -542,9 +542,9 @@ CREATE TABLE civicrm_line_item (
 -- * civicrm_preferences
 -- *
 -- *******************************************************/
-        INSERT INTO 
+        INSERT INTO
           civicrm_preferences(domain_id, contact_id, is_domain, location_count, contact_view_options, contact_edit_options, advanced_search_options, user_dashboard_options, address_options, address_format, mailing_format, individual_name_format, address_standardization_provider, address_standardization_userid, address_standardization_url )
-        VALUES 
+        VALUES
           (@domain_id,NULL,1,1,'123456789','1234','12345678910','1234','123456891011','{street_address}\n{supplemental_address_1}\n{supplemental_address_2}\n{city}{, }{state_province}{ }{postal_code}\n{country}','{street_address}\n{supplemental_address_1}\n{supplemental_address_2}\n{city}{, }{state_province}{ }{postal_code}\n{country}','{individual_prefix}{ } {first_name}{ }{middle_name}{ }{last_name}{ }{individual_suffix}',NULL,NULL,NULL);
 
 -- /*******************************************************
@@ -566,7 +566,7 @@ INSERT INTO civicrm_dedupe_rule_group (domain_id, contact_type, threshold) VALUE
 SELECT @dedupe_rule_group_id := MAX(id) FROM civicrm_dedupe_rule_group;
 
 INSERT INTO civicrm_dedupe_rule (dedupe_rule_group_id, rule_table, rule_field, rule_weight)
- VALUES 
+ VALUES
  (@dedupe_rule_group_id, 'civicrm_individual', 'first_name', 5),
  (@dedupe_rule_group_id, 'civicrm_individual', 'last_name',  7),
  (@dedupe_rule_group_id, 'civicrm_email',      'email',     10);

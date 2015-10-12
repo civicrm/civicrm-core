@@ -1,35 +1,34 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                       |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                    |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                      |
- |                                      |
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
  | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License        |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.    |
- |                                    |
- | CiviCRM is distributed in the hope that it will be useful, but    |
- | WITHOUT ANY WARRANTY; without even the implied warranty of        |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.          |
- | See the GNU Affero General Public License for more details.      |
- |                                    |
- | You should have received a copy of the GNU Affero General Public    |
- | License and the CiviCRM Licensing Exception along          |
- | with this program; if not, contact CiviCRM LLC            |
- | at info[AT]civicrm[DOT]org. If you have questions about the      |
- | GNU Affero General Public License or the licensing of CiviCRM,    |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing      |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -46,222 +45,269 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
   /**
-   *
    */
-  /**
-   *
-   */
-  function __construct() {
+  public function __construct() {
     $this->_columns = array(
-      'civicrm_contact' =>
-      array(
+      'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' =>
-        array(
-          'sort_name' =>
-          array('title' => ts('Name'),
+        'fields' => array(
+          'sort_name' => array(
+            'title' => ts('Name'),
             'default' => TRUE,
             'no_repeat' => TRUE,
             'required' => TRUE,
           ),
-          'id' =>
-          array(
+          'first_name' => array(
+            'title' => ts('First Name'),
+          ),
+          'middle_name' => array(
+            'title' => ts('Middle Name'),
+          ),
+          'last_name' => array(
+            'title' => ts('Last Name'),
+          ),
+          'id' => array(
             'no_display' => TRUE,
             'required' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+          ),
+          'age' => array(
+            'title' => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
+        ),
+        'filters' => array(
+          'sort_name' => array(
+            'title' => ts('Participant Name'),
+            'operator' => 'like',
+          ),
+          'id' => array(
+            'title' => ts('Contact ID'),
+            'no_display' => TRUE,
+          ),
+          'gender_id' => array(
+            'title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+          'birth_date' => array(
+            'title' => ts('Birth Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
+        ),
+        'grouping' => 'contact-fields',
+        'order_bys' => array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'ASC',
+          ),
+          'first_name' => array(
+            'name' => 'first_name',
+            'title' => ts('First Name'),
+          ),
+          'gender_id' => array(
+            'name' => 'gender_id',
+            'title' => ts('Gender'),
+          ),
+          'birth_date' => array(
+            'name' => 'birth_date',
+            'title' => ts('Birth Date'),
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' => array(
+            'title' => ts('Contact Subtype'),
+          ),
+        ),
+      ),
+      'civicrm_employer' => array(
+        'dao' => 'CRM_Contact_DAO_Contact',
+        'grouping' => 'contact-fields',
+        'fields' => array(
+          'id' => array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
+          'organization_name' => array(
+            'title' => 'Employer',
+            'default' => TRUE,
+            'no_repeat' => TRUE,
+          ),
+        ),
+      ),
+      'civicrm_email' => array(
+        'dao' => 'CRM_Core_DAO_Email',
+        'fields' => array(
+          'email' => array(
+            'title' => ts('Email'),
+            'no_repeat' => TRUE,
           ),
         ),
         'grouping' => 'contact-fields',
         'filters' => array(
-          'sort_name' =>
-          array('title' => ts('Participant Name'),
+          'email' => array(
+            'title' => ts('Participant E-mail'),
             'operator' => 'like',
           ),
         ),
       ),
-      'civicrm_employer' =>
-      array(
-        'dao'       => 'CRM_Contact_DAO_Contact',
-        'grouping'  => 'contact-fields',
-        'fields'    => array(
-          'id'           => array(
-            'no_display' => true,
-            'required'   => true,
-          ),
-          'organization_name' => array(
-            'title'      => 'Employer',
-            'default'    => TRUE,
-            'no_repeat'  => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_email' =>
-      array(
-        'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'email' =>
-          array('title' => ts('Email'),
-            'no_repeat' => TRUE,
-          ),
-        ),
+      'civicrm_phone' => array(
+        'dao' => 'CRM_Core_DAO_Phone',
         'grouping' => 'contact-fields',
-        'filters' =>
-        array(
-          'email' =>
-          array('title' => ts('Participant E-mail'),
-            'operator' => 'like',
+        'fields' => array(
+          'phone' => array(
+            'title' => ts('Phone No'),
+            'default' => TRUE,
           ),
         ),
       ),
-     'civicrm_phone' =>
-     array(
-       'dao' => 'CRM_Core_DAO_Phone',
-       'grouping' => 'contact-fields',
-       'fields' => array(
-         'phone' => array(
-           'title' => ts( 'Phone No' ),
-           'default' => true,
-         ),
-       ),
-     ),
-     'civicrm_address' =>
-      array(
+      'civicrm_address' => array(
         'dao' => 'CRM_Core_DAO_Address',
-        'fields' =>
-        array(
+        'fields' => array(
           'street_address' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
-          'state_province_id' =>
-          array('title' => ts('State/Province'),
+          'state_province_id' => array(
+            'title' => ts('State/Province'),
           ),
-          'country_id' =>
-          array('title' => ts('Country'),
+          'country_id' => array(
+            'title' => ts('Country'),
           ),
         ),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_participant' =>
-      array(
+      'civicrm_participant' => array(
         'dao' => 'CRM_Event_DAO_Participant',
-        'fields' =>
-        array(
-          'participant_id' =>
-          array('title' => ts('Participant ID'),
+        'fields' => array(
+          'participant_id' => array(
+            'title' => ts('Participant ID'),
             'default' => TRUE,
           ),
-          'event_id' =>
-          array('title' => ts('Event'),
+          'event_id' => array(
+            'title' => ts('Event'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
-          'role_id' =>
-          array('title' => ts('Role'),
+          'role_id' => array(
+            'title' => ts('Role'),
             'default' => TRUE,
           ),
-          'status_id' =>
-          array('title' => ts('Status'),
+          'status_id' => array(
+            'title' => ts('Status'),
             'default' => TRUE,
           ),
-          'participant_register_date' =>
-          array('title' => ts('Registration Date'),
+          'participant_register_date' => array(
+            'title' => ts('Registration Date'),
           ),
         ),
         'grouping' => 'event-fields',
-        'filters' =>
-        array(
+        'filters' => array(
           'event_id' => array(
             'name' => 'event_id',
             'title' => ts('Event'),
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
-            'attributes' => array('entity' => 'event', 'select' => array('minimumInputLength' => 0)),
+            'attributes' => array(
+              'entity' => 'event',
+              'select' => array('minimumInputLength' => 0),
+            ),
           ),
-          'sid' =>
-          array(
+          'sid' => array(
             'name' => 'status_id',
             'title' => ts('Participant Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label'),
           ),
-          'rid' =>
-          array(
+          'rid' => array(
             'name' => 'role_id',
             'title' => ts('Participant Role'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT_SEPARATOR,
             'options' => CRM_Event_PseudoConstant::participantRole(),
           ),
-          'participant_register_date' => array('title' => ts('Registration Date'),
+          'participant_register_date' => array(
+            'title' => ts('Registration Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
-        'group_bys' =>
-        array(
-          'event_id' =>
-          array('title' => ts('Event'),
+        'group_bys' => array(
+          'event_id' => array(
+            'title' => ts('Event'),
           ),
         ),
       ),
-      'civicrm_event' =>
-      array(
+      'civicrm_event' => array(
         'dao' => 'CRM_Event_DAO_Event',
-        'fields' =>
-        array(
-          'event_type_id' =>
-          array('title' => ts('Event Type'),
+        'fields' => array(
+          'event_type_id' => array(
+            'title' => ts('Event Type'),
           ),
-          'start_date' =>
-          array('title' => ts('Event Start Date'),
+          'start_date' => array(
+            'title' => ts('Event Start Date'),
           ),
-          'end_date' =>
-          array('title' => ts('Event End Date'),
+          'end_date' => array(
+            'title' => ts('Event End Date'),
           ),
         ),
         'grouping' => 'event-fields',
         'filters' => array(
-          'eid' =>
-          array(
+          'eid' => array(
             'name' => 'event_type_id',
             'title' => ts('Event Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('event_type'),
           ),
-          'event_start_date' =>
-          array(
+          'event_start_date' => array(
             'name' => 'start_date',
             'title' => ts('Event Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
-          'event_end_date' =>
-          array(
+          'event_end_date' => array(
             'name' => 'end_date',
             'title' => ts('Event End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
-        'group_bys' =>
-        array(
-          'event_type_id' =>
-          array('title' => ts('Event Type '),
+        'group_bys' => array(
+          'event_type_id' => array(
+            'title' => ts('Event Type '),
           ),
         ),
       ),
-      'civicrm_line_item' =>
-      array(
+      'civicrm_line_item' => array(
         'dao' => 'CRM_Price_DAO_LineItem',
-        'fields' =>
-        array(
-          'line_total' =>
-          array('title' => ts('Income'),
+        'fields' => array(
+          'line_total' => array(
+            'title' => ts('Income'),
             'default' => TRUE,
-            'statistics' =>
-            array('sum' => ts('Amount'),
+            'statistics' => array(
+              'sum' => ts('Amount'),
               'avg' => ts('Average'),
             ),
           ),
-          'participant_count' =>
-          array('title' => ts('Count'),
+          'participant_count' => array(
+            'title' => ts('Count'),
             'default' => TRUE,
-            'statistics' =>
-            array('sum' => ts('Count'),
+            'statistics' => array(
+              'sum' => ts('Count'),
             ),
           ),
         ),
@@ -269,12 +315,12 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     );
 
     $this->_options = array(
-      'blank_column_begin' =>
-      array('title' => ts('Blank column at the Begining'),
+      'blank_column_begin' => array(
+        'title' => ts('Blank column at the Begining'),
         'type' => 'checkbox',
       ),
-      'blank_column_end' =>
-      array('title' => ts('Blank column at the End'),
+      'blank_column_end' => array(
+        'title' => ts('Blank column at the End'),
         'type' => 'select',
         'options' => array(
           '' => '-select-',
@@ -287,21 +333,21 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     parent::__construct();
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  //Add The statistics
   /**
+   * Add The statistics.
    * @param $rows
    *
    * @return array
    */
-  function statistics(&$rows) {
+  public function statistics(&$rows) {
 
     $statistics = parent::statistics($rows);
-    $avg        = NULL;
-    $select     = " SELECT SUM( {$this->_aliases['civicrm_line_item']}.participant_count ) as count,
+    $avg = NULL;
+    $select = " SELECT SUM( {$this->_aliases['civicrm_line_item']}.participant_count ) as count,
                   SUM( {$this->_aliases['civicrm_line_item']}.line_total )   as amount
             ";
     $sql = "{$select} {$this->_from} {$this->_where}";
@@ -331,19 +377,23 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     return $statistics;
   }
 
-  function select() {
+  public function select() {
     $select = array();
     $this->_columnHeaders = array();
 
     //add blank column at the Start
-    if (array_key_exists('options', $this->_params) && !empty($this->_params['options']['blank_column_begin'])) {
+    if (array_key_exists('options', $this->_params) &&
+      !empty($this->_params['options']['blank_column_begin'])
+    ) {
       $select[] = " '' as blankColumnBegin";
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
     }
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (!empty($field['required']) ||
+            !empty($this->_params['fields'][$fieldName])
+          ) {
             if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
@@ -382,12 +432,12 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
    *
    * @return array
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
       FROM civicrm_participant {$this->_aliases['civicrm_participant']}
          LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
@@ -410,38 +460,22 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
               ON {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_participant' AND {$this->_aliases['civicrm_participant']}.id ={$this->_aliases['civicrm_line_item']}.entity_id";
   }
 
-  function storeWhereHavingClauseArray() {
+  public function storeWhereHavingClauseArray() {
     parent::storeWhereHavingClauseArray();
     $this->_whereClauses[] = "{$this->_aliases['civicrm_participant']}.is_test = 0";
   }
 
-  function groupBy() {
-    $this->_groupBy = "";
-    if (!empty($this->_params['group_bys']) &&
-      is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
-    ) {
-      foreach ($this->_columns as $tableName => $table) {
-        if (array_key_exists('group_bys', $table)) {
-          foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
-              $this->_groupBy[] = $field['dbAlias'];
-            }
-          }
-        }
-      }
+  public function groupBy() {
+    // We override this function because we use GROUP functions in the
+    // SELECT clause, therefore we have to group by *something*. If the
+    // user doesn't select a column to group by, we should group by participant id.
+    parent::groupBy();
+    if (empty($this->_groupBy)) {
+      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id";
     }
-
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy = "ORDER BY " . implode(', ', $this->_groupBy) . ", {$this->_aliases['civicrm_contact']}.sort_name";
-    }
-    else {
-      $this->_groupBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name";
-    }
-    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id " . $this->_groupBy;
   }
 
-  function postProcess() {
+  public function postProcess() {
 
     // get ready with post process params
     $this->beginPostProcess();
@@ -466,10 +500,15 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   }
 
   /**
-   * @param $rows
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
    */
-  function alterDisplay(&$rows) {
-
+  public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $eventType = CRM_Core_OptionGroup::values('event_type');
 
@@ -496,7 +535,9 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
       ) {
         if ($value = $row['civicrm_participant_participant_id']) {
           $url = CRM_Utils_System::url("civicrm/contact/view/participant",
-            'reset=1&id=' . $row['civicrm_participant_participant_id'] . '&cid=' . $row['civicrm_contact_id'] . '&action=view&context=participant',
+            'reset=1&id=' . $row['civicrm_participant_participant_id'] .
+            '&cid=' . $row['civicrm_contact_id'] .
+            '&action=view&context=participant',
             $this->_absoluteUrl
           );
           $rows[$rowNum]['civicrm_participant_participant_id_link'] = $url;
@@ -548,6 +589,23 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
         $entryFound = TRUE;
       }
 
+      //handle gender
+      if (array_key_exists('civicrm_contact_gender_id', $row)) {
+        if ($value = $row['civicrm_contact_gender_id']) {
+          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
+        }
+        $entryFound = TRUE;
+      }
+
+      // display birthday in the configured custom format
+      if (array_key_exists('civicrm_contact_birth_date', $row)) {
+        $birthDate = $row['civicrm_contact_birth_date'];
+        if ($birthDate) {
+          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
+        }
+        $entryFound = TRUE;
+      }
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
@@ -556,5 +614,5 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
       }
     }
   }
-}
 
+}

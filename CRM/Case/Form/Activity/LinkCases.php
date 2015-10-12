@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,11 +39,11 @@
  */
 class CRM_Case_Form_Activity_LinkCases {
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @throws Exception
    */
-  static function preProcess(&$form) {
+  public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
@@ -70,39 +70,38 @@ class CRM_Case_Form_Activity_LinkCases {
   }
 
   /**
-   * This function sets the default values for the form. For edit/view mode
+   * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
-   * @param $form
+   * @param CRM_Core_Form $form
    *
    * @return void
    */
-  static function setDefaultValues(&$form) {
+  public static function setDefaultValues(&$form) {
     return $defaults = array();
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     $form->add('text', 'link_to_case_id', ts('Link To Case'), array('class' => 'huge'), TRUE);
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $values posted values of the form
+   * @param array $values
+   *   Posted values of the form.
    *
    * @param $files
-   * @param $form
+   * @param CRM_Core_Form $form
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($values, $files, $form) {
+  public static function formRule($values, $files, $form) {
     $errors = array();
 
     $linkCaseId = CRM_Utils_Array::value('link_to_case_id', $values);
@@ -121,29 +120,28 @@ class CRM_Case_Form_Activity_LinkCases {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {}
+  public static function beginPostProcess(&$form, &$params) {
+  }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
-   * @param $form
-   * @param $params
+   * @param CRM_Core_Form $form
+   * @param array $params
    * @param $activity
    *
    * @return void
    */
-  static function endPostProcess(&$form, &$params, &$activity) {
+  public static function endPostProcess(&$form, &$params, &$activity) {
     $activityId = $activity->id;
     $linkCaseID = CRM_Utils_Array::value('link_to_case_id', $params);
 
@@ -156,5 +154,5 @@ class CRM_Case_Form_Activity_LinkCases {
       CRM_Case_BAO_Case::processCaseActivity($caseParams);
     }
   }
-}
 
+}

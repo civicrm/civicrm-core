@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
 <dt>{ts}To{/ts}</dt><dd>{$toName|escape}</dd>
 <dt>{ts}Subject{/ts}</dt><dd>{$subject}</dd>
 <dt>{ts}Message{/ts}</dt><dd>{$message}</dd>
-<dt>&nbsp;</dt><dd><a class="button cancel crm-form-submit" href="{crmURL p='civicrm/contact/view' q="history=1&show=1&selectedChild=activity"}">{ts}Done{/ts}</a></dd>
+<dt>&nbsp;</dt><dd>{crmButton class="cancel" icon="close" p='civicrm/contact/view' q="history=1&show=1&selectedChild=activity"}">{ts}Done{/ts}{/crmButton}</dd>
 </dl>
 </fieldset>
 </div>

@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,26 +26,27 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM contact types and sub-types.
+ *
+ * CiviCRM comes with 3 primary contact types - Individual, Organization & Household.
+ * Changing these is not advised, but sub_types can be created with this api.
+ * Pass 'parent_id' param to specify which base type a new sub_type extends.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Survey
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
- * create/update contact_type
+ * Create/update ContactType.
  *
- * This API is used to create new contact_type or update any of the existing
- * In case of updating existing contact_type, id of that particular contact_type must
+ * This API is used to create new ContactType or update any of the existing
+ * In case of updating existing ContactType, id of that particular ContactType must
  * be in $params array.
  *
- * @param array $params  (reference) Associative array of property
- *                       name/value pairs to insert in new 'contact_type'
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return array   contact_type array
- *
- * @access public
+ * @return array
+ *   ContactType array
  */
 function civicrm_api3_contact_type_create($params) {
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__), array('name', 'parent_id'));
@@ -65,14 +65,14 @@ function civicrm_api3_contact_type_create($params) {
 }
 
 /**
- * Returns array of contact_types  matching a set of one or more group properties
+ * Returns array of contact_types matching a set of one or more properties.
  *
- * @param array $params one or more valid
- *                       property_name=>value pairs. If $params is set
- *                       as null, all contact_types will be returned
+ * @param array $params
+ *   One or more valid property_name=>value pairs.
+ *   If $params is set as null, all contact_types will be returned
  *
- * @return array Array of matching contact_types
- * @access public
+ * @return array
+ *   Array of matching contact_types
  */
 function civicrm_api3_contact_type_get($params) {
   civicrm_api3_verify_mandatory($params);
@@ -80,19 +80,16 @@ function civicrm_api3_contact_type_get($params) {
 }
 
 /**
- * delete an existing contact_type
+ * Delete an existing ContactType.
  *
- * This method is used to delete any existing contact_type. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing ContactType given its id.
  *
- * @param array $params array containing id of the group
- *                       to be deleted
+ * @param array $params
+ *   [id]
  *
- * @return array  API Result Array
- *
- * @access public
+ * @return array
+ *   API Result Array
  */
 function civicrm_api3_contact_type_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

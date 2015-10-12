@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,10 +40,9 @@
 class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (!CRM_SMS_BAO_Provider::activeProviderCount()) {
@@ -55,14 +54,13 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    * the default values are retrieved from the database
    *
-   * @access public
    *
    * @return void
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
     $continue = CRM_Utils_Request::retrieve('continue', 'String', $this, FALSE, NULL);
 
@@ -103,10 +101,9 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
 
@@ -169,8 +166,9 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $this->addFormRule(array('CRM_SMS_Form_Group', 'formRule'));
 
     $buttons = array(
-      array('type' => 'next',
-        'name' => ts('Next >>'),
+      array(
+        'type' => 'next',
+        'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
       ),
@@ -192,7 +190,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $groups = array();
 
     foreach (array(
-      'name', 'group_id', 'is_sms') as $n) {
+               'name',
+               'group_id',
+               'is_sms',
+             ) as $n) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
       }
@@ -201,9 +202,9 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $qf_Group_submit = $this->controller->exportValue($this->_name, '_qf_Group_submit');
     $this->set('name', $params['name']);
 
-    $inGroups    = $values['includeGroups'];
-    $outGroups   = $values['excludeGroups'];
-    $inMailings  = $values['includeMailings'];
+    $inGroups = $values['includeGroups'];
+    $outGroups = $values['excludeGroups'];
+    $inMailings = $values['includeMailings'];
     $outMailings = $values['excludeMailings'];
 
     if (is_array($inGroups)) {
@@ -237,10 +238,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       }
     }
 
-    $session            = CRM_Core_Session::singleton();
-    $params['groups']   = $groups;
+    $session = CRM_Core_Session::singleton();
+    $params['groups'] = $groups;
     $params['mailings'] = $mailings;
-    $ids                = array();
+    $ids = array();
     if ($this->get('mailing_id')) {
 
       // don't create a new mass sms if already exists
@@ -251,9 +252,11 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
       // delete previous includes/excludes, if mailing already existed
       foreach (array(
-        'groups', 'mailings') as $entity) {
-        $mg               = new CRM_Mailing_DAO_MailingGroup();
-        $mg->mailing_id   = $ids['mailing_id'];
+                 'groups',
+                 'mailings',
+               ) as $entity) {
+        $mg = new CRM_Mailing_DAO_MailingGroup();
+        $mg->mailing_id = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
         $mg->find();
         while ($mg->fetch()) {
@@ -297,9 +300,8 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Display Name of the form
+   * Display Name of the form.
    *
-   * @access public
    *
    * @return string
    */
@@ -308,15 +310,15 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     $errors = array();
     if (isset($fields['includeGroups']) &&
       is_array($fields['includeGroups']) &&
@@ -344,5 +346,5 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

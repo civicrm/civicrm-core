@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 <div class="crm-block crm-form-block crm-financial_type-form-block">
   {if $action eq 8}
     <div class="messages status">
-      <div class="icon inform-icon"></div>    
+      <div class="icon inform-icon"></div>
       {ts}WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone. Unbalanced transactions may be created if you delete this account.{/ts} {ts}Do you want to continue?{/ts}
       </div>
   {else}

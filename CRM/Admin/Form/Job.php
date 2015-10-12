@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id: $
  *
  */
@@ -39,7 +39,7 @@
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
   protected $_id = NULL;
 
-  function preProcess() {
+  public function preProcess() {
 
     parent::preProcess();
 
@@ -62,12 +62,11 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @param bool $check
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm($check = FALSE) {
     parent::buildQuickForm();
@@ -82,7 +81,10 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $attributes['name'], TRUE
     );
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array('CRM_Core_DAO_Job', $this->_id));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+        'CRM_Core_DAO_Job',
+        $this->_id,
+      ));
 
     $this->add('text', 'description', ts('Description'),
       $attributes['description']
@@ -114,7 +116,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * @return array|bool
    * @throws API_Exception
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
 
     $errors = array();
 
@@ -125,7 +127,8 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
     try {
       $apiKernel->resolve($apiRequest);
-    } catch (\Civi\API\Exception\NotImplementedException $e) {
+    }
+    catch (\Civi\API\Exception\NotImplementedException $e) {
       $errors['api_action'] = ts('Given API command is not defined.');
     }
 
@@ -139,7 +142,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if (!$this->_id) {
@@ -148,8 +151,8 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     }
     $domainID = CRM_Core_Config::domainID();
 
-    $dao            = new CRM_Core_DAO_Job();
-    $dao->id        = $this->_id;
+    $dao = new CRM_Core_DAO_Job();
+    $dao->id = $this->_id;
     $dao->domain_id = $domainID;
     if (!$dao->find(TRUE)) {
       return $defaults;
@@ -168,9 +171,8 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
    * @return void
    */
@@ -189,15 +191,15 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     $dao = new CRM_Core_DAO_Job();
 
-    $dao->id            = $this->_id;
-    $dao->domain_id     = $domainID;
+    $dao->id = $this->_id;
+    $dao->domain_id = $domainID;
     $dao->run_frequency = $values['run_frequency'];
-    $dao->parameters    = $values['parameters'];
-    $dao->name          = $values['name'];
-    $dao->api_entity    = $values['api_entity'];
-    $dao->api_action    = $values['api_action'];
-    $dao->description   = $values['description'];
-    $dao->is_active     = CRM_Utils_Array::value('is_active', $values, 0);
+    $dao->parameters = $values['parameters'];
+    $dao->name = $values['name'];
+    $dao->api_entity = $values['api_entity'];
+    $dao->api_action = $values['api_action'];
+    $dao->description = $values['description'];
+    $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
 
     $dao->save();
 
@@ -209,8 +211,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
     }
 
-
   }
-  //end of function
-}
 
+}

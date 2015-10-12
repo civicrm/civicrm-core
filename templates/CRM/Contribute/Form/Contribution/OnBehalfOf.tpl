@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {**
- * This file provides the HTML for the on-behalf-of form. 
+ * This file provides the HTML for the on-behalf-of form.
  * Also used for related contact edit form.
  * FIXME: This is way more complex than it needs to be
  * FIXME: Why are we not just using the dynamic form tpl to display this profile?
@@ -109,17 +109,19 @@
             {$form.onbehalf.$fieldName.html}
             {if !empty($onBehalfOfFields.$fieldName.html_type)  && $onBehalfOfFields.$fieldName.html_type eq 'Autocomplete-Select'}
               {assign var=elementName value=onbehalf[$fieldName]}
-            {include file="CRM/Custom/Form/AutoComplete.tpl" element_name=$elementName}
+              {if $onBehalfOfFields.$fieldName.data_type eq 'ContactReference'}
+                {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $elementName}
+              {/if}
             {/if}
             {if $onBehalfOfFields.$fieldName.name|substr:0:5 eq 'phone'}
               {assign var="phone_ext_field" value=$onBehalfOfFields.$fieldName.name|replace:'phone':'phone_ext'}
               {if $form.onbehalf.$phone_ext_field.html}
                 &nbsp;{$form.onbehalf.$phone_ext_field.html}
               {/if}
-            {/if} 
-	    {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
-            {assign var=elementName value=onbehalf[$fieldName]}
-	       {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
+            {/if}
+            {if $onBehalfOfFields.$fieldName.data_type eq 'Date'}
+              {assign var=elementName value=onbehalf[$fieldName]}
+              {include file="CRM/common/jcalendar.tpl" elementName=$elementName elementId=onbehalf_$fieldName}
             {/if}
             {if $onBehalfOfFields.$fieldName.help_post}
               <br /><span class='description'>{$onBehalfOfFields.$fieldName.help_post}</span>
@@ -225,6 +227,9 @@ function setLocationDetails(contactID , reset) {
             cj(this).off('.autofill').val(cj(this).data('newVal')).change();
           });
         }
+        else if (cj('#' + ele).data('select2')) {
+          cj('#' + ele).select2('val', data[ele].value);
+        }
         if (data[ele].type == 'Radio') {
           if (data[ele].value) {
             var fldName = ele.replace('onbehalf_', '');
@@ -236,15 +241,6 @@ function setLocationDetails(contactID , reset) {
             var fldName = ele.replace('onbehalf_', '');
             cj("input[name='onbehalf["+ fldName+"]["+ selectedOption +"]']").prop('checked','checked');
           }
-        }
-        else if (data[ele].type == 'Multi-Select') {
-          for (var selectedOption in data[ele].value) {
-            cj('#' + ele + " option[value='" + selectedOption + "']").prop('selected', true);
-          }
-        }
-        else if (data[ele].type == 'Autocomplete-Select') {
-          cj('#' + ele ).val( data[ele].value );
-          cj('#' + ele + '_id').val(data[ele].id);
         }
         else if (data[ele].type == 'AdvMulti-Select') {
           var customFld = ele.replace('onbehalf_', '');

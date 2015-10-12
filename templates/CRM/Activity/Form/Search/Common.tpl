@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,14 +31,9 @@
 </tr>
 <tr>
   {if $form.activity_type_id}
-    <td><label>{ts}Activity Type(s){/ts}</label>
-      <div id="Activity" class="listing-box">
-        {foreach from=$form.activity_type_id item="activity_type_val"}
-          <div class="{cycle values='odd-row,even-row'}">
-            {$activity_type_val.html}
-          </div>
-        {/foreach}
-      </div>
+    <td><label>{$form.activity_type_id.label}</label>
+       <br />
+       {$form.activity_type_id.html}
     </td>
   {else}
     <td>&nbsp;</td>
@@ -65,16 +60,16 @@
     <table>
       <tr><td>
         {if $form.parent_id}
-      	  <label>{ts}Has a Followup Activity?{/ts}</label>
-      	  <br/>
-      	  {$form.parent_id.html}
+          <label>{ts}Has a Followup Activity?{/ts}</label>
+          <br/>
+          {$form.parent_id.html}
         {/if}
       </td></tr>
       <tr><td>
-    	{if $form.followup_parent_id}
-      	  <label>{ts}Is a Followup Activity?{/ts}</label>
-      	  <br/>
-      	  {$form.followup_parent_id.html}
+      {if $form.followup_parent_id}
+          <label>{ts}Is a Followup Activity?{/ts}</label>
+          <br/>
+          {$form.followup_parent_id.html}
         {/if}
       </td></tr>
     </table>
@@ -105,8 +100,8 @@
     {$form.activity_subject.html|crmAddClass:big}
   </td>
   <td colspan="2">
-    {$form.activity_status.label}<br/>
-    {$form.activity_status.html}
+    {$form.status_id.label}<br/>
+    {$form.status_id.html}
   </td>
 </tr>
 <tr>
@@ -118,17 +113,17 @@
   </td>
 </tr>
 {if $buildSurveyResult }
-	<tr>
-	  <td id="activityResult">
-	    <label>{$form.activity_result.label}</label><br />
-	    {$form.activity_result.html}
-	  </td>
-		<td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td>
-	</tr>
+  <tr>
+    <td id="activityResult">
+      <label>{$form.activity_result.label}</label><br />
+      {$form.activity_result.html}
+    </td>
+    <td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td>
+  </tr>
 {else}
-	<tr>
-		<td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td>
-	</tr>
+  <tr>
+    <td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='activity'}</td>
+  </tr>
 {/if}
 
 {* campaign in activity search *}

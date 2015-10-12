@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
   <li>{docURL page="Payment Processors" text="Processor comparison and setup guide" resource="wiki"}</li>
 </ul>
 <p>{ts}If you're not sure which processor to use - we recommend reviewing terms, limitations and coverage areas on each processor's website before proceeding.{/ts}</p>
-<p>{ts 1="http://civicrm.org/extensions/civicrm?cat=125"}If your desired processor is not in the list, check the <a href="%1">Extensions Directory</a> for more payment processors you can download. If you still can't find it, consider partnering with a developer and contributing a new extension.{/ts}</p>
+<p>{ts 1="https://civicrm.org/extensions/civicrm?cat=125"}If your desired processor is not in the list, check the <a href="%1">Extensions Directory</a> for more payment processors you can download. If you still can't find it, consider partnering with a developer and contributing a new extension.{/ts}</p>
 {/htxt}
 
 {htxt id='AuthNet-live-user-name'}
@@ -362,16 +362,12 @@
 {ts 1='4111111111111111' 2='76'}The test Credit Card number is %1 - this is the only credit card number that will work on the test gateway. The test Total Amount can be any amount except one that ends in a value of .%2 (e.g. $10.%2) - all amounts ending in .%2 will return a failed response.{/ts}
 {/htxt}
 
-{htxt id='Payment_Express-test-url-site'} {ts}This is the URL for accessing the DPS/Payment Express payment site.
-If you have been given a MAC key please fill in the Mac Key field, and use https://sec.paymentexpress.com/pxpay/pxpay.aspx for the Site URL.
-Otherwise use https://sec.paymentexpress.com/pxpay/pxaccess.aspx for the Site URL.{/ts} {/htxt}
+{htxt id='Payment_Express-test-url-site'} {ts}This is the URL for accessing the DPS/Payment Express payment site. If you have been given a MAC key please fill in the Mac Key field, and use https://sec.paymentexpress.com/pxpay/pxpay.aspx for the Site URL. Otherwise use https://sec.paymentexpress.com/pxpay/pxaccess.aspx for the Site URL.{/ts} {/htxt}
 
 {htxt id='Payment_Express-live-user-name'} {ts}Payment Express UserID (LIVE account):{/ts}
 {ts}This is the live user name provided to you by DPS/Payment Express.{/ts}{/htxt}
 
-{htxt id='Payment_Express-live-url-site'} {ts}This is the URL for accessing the DPS/Payment Express payment site.
-If you have been given a MAC key please fill in the Mac Key field, and use https://sec.paymentexpress.com/pxpay/pxpay.aspx for the Site URL.
-Otherwise use https://sec.paymentexpress.com/pxpay/pxaccess.aspx for the Site URL.{/ts} {/htxt}
+{htxt id='Payment_Express-live-url-site'} {ts}This is the URL for accessing the DPS/Payment Express payment site. If you have been given a MAC key please fill in the Mac Key field, and use https://sec.paymentexpress.com/pxpay/pxpay.aspx for the Site URL. Otherwise use https://sec.paymentexpress.com/pxpay/pxaccess.aspx for the Site URL.{/ts} {/htxt}
 
 {htxt id='Elavon-live-user-name'}
 <p>{ts}This is the LIVE <strong>Elavon Merchant ID</strong> associated with your Elavon account.{/ts}</p>

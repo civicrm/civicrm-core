@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,7 @@
 </table>
 <div class="clear"><br /></div>
 <div class="action-link">
-    <a href="{crmURL p="civicrm/contact/deduperules" q="reset=1"}" class="button"><span>{ts}Done{/ts}</span></a>
+    {crmButton p="civicrm/contact/deduperules" q="reset=1" icon="close"}{ts}Done{/ts}{/crmButton}
 </div>
 
 

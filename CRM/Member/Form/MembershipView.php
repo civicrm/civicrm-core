@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,19 +40,19 @@
 class CRM_Member_Form_MembershipView extends CRM_Core_Form {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
   static $_links = NULL;
 
   /**
-   * Add context information at the end of a link
+   * Add context information at the end of a link.
    *
-   * @return text extra query parameters
+   * @return string
+   *   extra query parameters
    */
-  function addContext() {
+  public function addContext() {
     $extra = '';
     foreach (array('context', 'selectedChild') as $arg) {
       if ($value = CRM_Utils_Request::retrieve($arg, 'String', $this)) {
@@ -63,11 +63,12 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::DELETE => array(
@@ -88,13 +89,14 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   }
 
   /**
-   * Perform create or delete action on related memberships
+   * Perform create or delete action on related memberships.
    *
-   * @param string $action create or delete
-   * @param array $owner primary membership info (membership_id, contact_id, membership_type ...)
-   *
+   * @param string $action
+   *   Create or delete.
+   * @param array $owner
+   *   Primary membership info (membership_id, contact_id, membership_type ...).
    */
-  function relAction($action, $owner) {
+  public function relAction($action, $owner) {
     switch ($action) {
       case 'delete':
         $id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
@@ -104,6 +106,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been deleted.', array(1 => $relatedDisplayName)),
           ts('Membership Deleted'), 'success');
         break;
+
       case 'create':
         $ids = array();
         $params = array(
@@ -125,6 +128,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', array(1 => $relatedDisplayName)),
           ts('Membership Added'), 'success');
         break;
+
       default:
         CRM_Core_Error::fatal(ts("Invalid action specified in URL"));
     }
@@ -139,10 +143,9 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
   }
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
 
@@ -269,7 +272,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
           'start_date',
           'end_date',
           'is_current_member',
-          'status'
+          'status',
         );
 
         while ($dao->fetch()) {
@@ -390,10 +393,9 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -406,5 +408,5 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       )
     );
   }
-}
 
+}

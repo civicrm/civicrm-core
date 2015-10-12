@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,16 +25,22 @@
 *}
 <div class="crm-form-block crm-block crm-contact-task-createsmartgroup-form-block">
   <h3>{ts}Smart Group{/ts}</h3>
-  {if $qill[0]}
+  <div class="help">
+    <p>{ts}This smart group will stay up-to-date with all contacts who meet the search criteria.{/ts}</p>
+    {if !empty($partiallySelected)}
+      <p>{ts}NOTE: Even if only a few contacts have been selected from the search results, all contacts that meet the following criteria will be in the group.{/ts}</p>
+    {/if}
+    {if !empty($qill[0])}
     <div id="search-status">
       <ul>
         {foreach from=$qill[0] item=criteria}
           <li>{$criteria}</li>
         {/foreach}
       </ul>
-      <br />
     </div>
-  {/if}
+    {/if}
+    <p>{docURL page='user/current/organising-your-data/smart-groups/'}</p>
+  </div>
   <table class="form-layout-compressed">
     <tr class="crm-contact-task-createsmartgroup-form-block-title">
       <td class="label">{$form.title.label}</td>

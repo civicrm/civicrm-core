@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -100,7 +100,7 @@
 
                                         {if $row.$field eq 'Subtotal'}
                                             {$row.$field}
-                                        {elseif $header.type eq 12}
+                                        {elseif $header.type eq 12 || $header.type eq 4}
                                             {if $header.group_by eq 'MONTH' or $header.group_by eq 'QUARTER'}
                                                 {$row.$field|crmDate:$config->dateformatPartial}
                                             {elseif $header.group_by eq 'YEAR'}

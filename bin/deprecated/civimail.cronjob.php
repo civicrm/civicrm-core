@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * A PHP cron script to run the outstanding and scheduled CiviMail jobs
@@ -53,7 +53,7 @@ function run() {
 
 // you can run this program either from an apache command, or from the cli
 if (php_sapi_name() == "cli") {
-  require_once ("bin/cli.php");
+  require_once "bin/cli.php";
   $cli = new civicrm_cli();
 
   require_once 'CRM/Mailing/BAO/Mailing.php';
@@ -64,4 +64,3 @@ if (php_sapi_name() == "cli") {
 else {
   run();
 }
-

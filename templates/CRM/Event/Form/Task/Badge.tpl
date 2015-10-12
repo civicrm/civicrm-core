@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 <div class="crm-section crm-task-count">
     {include file="CRM/Event/Form/Task.tpl"}
 </div>
-<table class="form-layout-compressed"> 
+<table class="form-layout-compressed">
      <tr class="crm-event-badge-form-block-label_id">
         <td class="label">{$form.badge_id.label}</td>
         <td>{$form.badge_id.html}</td>

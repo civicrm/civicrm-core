@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 
 /**
  * This class provides the functionality to delete a group of
- * participations. This class provides functionality for the actual
+ * case records. This class provides functionality for the actual
  * deletion.
  */
 class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
@@ -49,53 +49,60 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
   protected $_single = FALSE;
 
   /**
-   * Are we moving case to Trash
+   * Are we moving case to Trash.
    *
    * @var boolean
    */
   public $_moveToTrash = TRUE;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
-    //check for delete
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     if (!CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
     parent::preProcess();
   }
 
   /**
-   * Build the form
-   *
-   * @access public
+   * Build the form object.
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $this->addDefaultButtons(ts('Delete Cases'), 'done');
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
+   * Process the form after the input has been submitted and validated.
    *
    * @return void
    */
   public function postProcess() {
-    $deletedCases = 0;
+    $deleted = $failed = 0;
     foreach ($this->_caseIds as $caseId) {
       if (CRM_Case_BAO_Case::deleteCase($caseId, $this->_moveToTrash)) {
-        $deletedCases++;
+        $deleted++;
+      }
+      else {
+        $failed++;
       }
     }
 
-    CRM_Core_Session::setStatus($deletedCases, ts('Deleted Cases'), 'success');
-    CRM_Core_Session::setStatus('', ts('Total Selected Case(s): %1', array(1 => count($this->_caseIds))), 'info');
-  }
-}
+    if ($deleted) {
+      if ($this->_moveToTrash) {
+        $msg = ts('%count case moved to trash.', array('plural' => '%count cases moved to trash.', 'count' => $deleted));
+      }
+      else {
+        $msg = ts('%count case permanently deleted.', array('plural' => '%count cases permanently deleted.', 'count' => $deleted));
+      }
+      CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
+    }
 
+    if ($failed) {
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+    }
+  }
+
+}

@@ -8,8 +8,7 @@
 {ts}You have been added to the WAIT LIST for this event.{/ts}
 
 {if $isPrimary}
-{ts}If space becomes available you will receive an email with
-a link to a web page where you can complete your registration.{/ts}
+{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
 
 {/if}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
@@ -20,9 +19,7 @@ a link to a web page where you can complete your registration.{/ts}
 {ts}Your registration has been submitted.{/ts}
 
 {if $isPrimary}
-{ts}Once your registration has been reviewed, you will receive
-an email with a link to a web page where you can complete the
-registration process.{/ts}
+{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}
 
 {/if}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
@@ -83,7 +80,7 @@ registration process.{/ts}
 {ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
 {/if}
 
-{if $event.is_public} 
+{if $event.is_public}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
 {ts}Download iCalendar File:{/ts} {$icalFeed}
 {/if}

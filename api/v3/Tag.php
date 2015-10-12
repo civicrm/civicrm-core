@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,37 +23,37 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * File for the CiviCRM APIv3 tag functions
- *
- * @package CiviCRM_APIv3
- * @subpackage API_Tag
- *
- * @copyright CiviCRM LLC (c) 2004-2014
- * @version $Id: Tag.php 30486 2010-11-02 16:12:09Z shot $
  */
 
 /**
- *  Add a Tag. Tags are used to classify CRM entities (including Contacts, Groups and Actions).
+ * This api exposes CiviCRM tags.
  *
- * Allowed @params array keys are:
+ * Tags are used to classify CRM entities (including Contacts, Groups and Actions).
  *
- * {@example TagCreate.php}
+ * @note this api is for working with tags themselves. To add/remove tags from
+ * a contact or other entity, use the EntityTag api.
  *
- * @param $params
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Create or update a tag.
  *
- * @return array of newly created tag property values.
- * {@getfields tag_create}
- * @access public
+ * Tags are used to classify CRM entities (including Contacts, Groups and Actions).
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
  */
 function civicrm_api3_tag_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Specify Meta data for create. Note that this data is retrievable via the getfields function
+ * Specify Meta data for create.
+ *
+ * Note that this data is retrievable via the getfields function
  * and is used for pre-filling defaults and ensuring mandatory requirements are met.
  *
  * @param array $params
@@ -65,15 +65,12 @@ function _civicrm_api3_tag_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Tag
+ * Delete an existing Tag.
  *
- * @param  array  $params
+ * @param array $params
  *
- * @example TagDelete.ph
- *
- * @return array API result array
- * {@getfields tag_delete}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_tag_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -85,16 +82,13 @@ function civicrm_api3_tag_delete($params) {
  * This api is used for finding an existing tag.
  * Either id or name of tag are required parameters for this api.
  *
- * @example TagGet.php
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @param  array $params  an associative array of name/value pairs.
- *
- * @return  array details of found tags else error
- * {@getfields tag_get}
- * @access public
+ * @return array
+ *   details of found tags else error
  */
 function civicrm_api3_tag_get($params) {
 
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

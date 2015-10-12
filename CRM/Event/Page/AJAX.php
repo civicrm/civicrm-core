@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,10 +39,10 @@
 class CRM_Event_Page_AJAX {
 
   /**
-   * Function for building EventFee combo box
+   * Building EventFee combo box.
    * FIXME: This ajax callback could be eliminated in favor of an entityRef field but the priceFieldValue api doesn't currently support filtering on entity_table
    */
-  function eventFee() {
+  public function eventFee() {
     $name = trim(CRM_Utils_Type::escape($_GET['term'], 'String'));
 
     if (!$name) {
@@ -66,5 +66,5 @@ GROUP BY cv.label";
     }
     CRM_Utils_JSON::output($results);
   }
-}
 
+}

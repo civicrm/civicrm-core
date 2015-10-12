@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,70 +26,60 @@
  */
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM Grant records.
+ *
+ * @note Grant component must be enabled.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Grant
- * @copyright CiviCRM LLC (c) 2004-2014
  */
 
 /**
- * create/update grant
+ * Create/update Grant.
  *
- * This API is used to create new grant or update any of the existing
- * In case of updating existing grant, id of that particular grant must
- * be in $params array.
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @param array $params  Associative array of property
- *                       name/value pairs to insert in new 'grant'
- *
- * @return array   grant array
- * {@getfields grant_create}
- * @access public
+ * @return array
  */
 function civicrm_api3_grant_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Grant');
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_grant_create_spec(&$params) {
   $params['grant_type_id']['api.required'] = 1;
+  $params['status_id']['api.aliases'] = array('grant_status');
 }
 
 /**
- * Returns array of grants  matching a set of one or more group properties
+ * Returns array of grants matching a set of one or more properties.
  *
- * @param array $params Array of one or more valid
- *                       property_name=>value pairs. If $params is set
- *                       as null, all grants will be returned
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * @return array Array of matching grants
- * {@getfields grant_get}
- * @access public
+ * @return array
+ *   Array of matching grants
  */
 function civicrm_api3_grant_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Grant');
 }
 
 /**
- * delete an existing grant
+ * This method is used to delete an existing Grant.
  *
- * This method is used to delete any existing grant. id of the group
- * to be deleted is required field in $params array
+ * @param array $params
+ *   Id of the Grant to be deleted is required.
  *
- * @param array $params   array containing id of the group
- *                       to be deleted
- *
- * @return array  API Result Array
- * {@getfields grant_delete}
- * @access public
+ * @return array
+ *   API Result Array
  */
 function civicrm_api3_grant_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-

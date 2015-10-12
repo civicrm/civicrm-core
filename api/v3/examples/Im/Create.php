@@ -1,61 +1,69 @@
 <?php
 /**
- * Test Generated example of using im create API
- * *
+ * Test Generated example demonstrating the Im.create API.
+ *
+ * @return array
+ *   API result array
  */
-function im_create_example(){
-$params = array(
-  'contact_id' => 3,
-  'name' => 'My Yahoo IM Handle',
-  'location_type_id' => 1,
-  'provider_id' => 1,
-);
+function im_create_example() {
+  $params = array(
+    'contact_id' => 3,
+    'name' => 'My Yahoo IM Handle',
+    'location_type_id' => 1,
+    'provider_id' => 1,
+  );
 
-try{
-  $result = civicrm_api3('im', 'create', $params);
-}
-catch (CiviCRM_API3_Exception $e) {
-  // handle error here
-  $errorMessage = $e->getMessage();
-  $errorCode = $e->getErrorCode();
-  $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
-}
+  try{
+    $result = civicrm_api3('Im', 'create', $params);
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    // Handle error here.
+    $errorMessage = $e->getMessage();
+    $errorCode = $e->getErrorCode();
+    $errorData = $e->getExtraParams();
+    return array(
+      'error' => $errorMessage,
+      'error_code' => $errorCode,
+      'error_data' => $errorData,
+    );
+  }
 
-return $result;
+  return $result;
 }
 
 /**
- * Function returns array of result expected from previous function
+ * Function returns array of result expected from previous function.
+ *
+ * @return array
+ *   API result array
  */
-function im_create_expectedresult(){
+function im_create_expectedresult() {
 
   $expectedResult = array(
-  'is_error' => 0,
-  'version' => 3,
-  'count' => 1,
-  'id' => 1,
-  'values' => array(
+    'is_error' => 0,
+    'version' => 3,
+    'count' => 1,
+    'id' => 1,
+    'values' => array(
       '1' => array(
-          'id' => '1',
-          'contact_id' => '3',
-          'location_type_id' => '1',
-          'name' => 'My Yahoo IM Handle',
-          'provider_id' => '1',
-          'is_primary' => '',
-          'is_billing' => '',
-        ),
+        'id' => '1',
+        'contact_id' => '3',
+        'location_type_id' => '1',
+        'name' => 'My Yahoo IM Handle',
+        'provider_id' => '1',
+        'is_primary' => '',
+        'is_billing' => '',
+      ),
     ),
-);
+  );
 
   return $expectedResult;
 }
 
-
 /*
-* This example has been generated from the API test suite. The test that created it is called
-*
-* testCreateIm and can be found in
+* This example has been generated from the API test suite.
+* The test that created it is called "testCreateIm"
+* and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ImTest.php
 *
 * You can see the outcome of the API tests at
@@ -65,7 +73,7 @@ function im_create_expectedresult(){
 * http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
 * Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api/explorer
+* http://MYSITE.ORG/path/to/civicrm/api
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing

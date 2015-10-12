@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -101,7 +101,7 @@
     </div>
     {/if}
 
-    {if $paidEvent}
+    {if $paidEvent && !$isRequireApproval && !$isOnWaitlist}
         <div class="crm-group event_fees-group">
             <div class="header-dark">
                 {$event.fee_label}
@@ -117,6 +117,12 @@
                   <div class="clear"></div>
                     {/foreach}
             </div>
+                {if $totalTaxAmount}
+                  <div class="crm-section no-label total-amount-section">
+                  <div class="content bold">{ts}Total Tax Amount{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
+                  <div class="clear"></div>
+                  </div>
+                {/if}
                 {if $totalAmount}
                 <div class="crm-section no-label total-amount-section">
                     <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
@@ -149,7 +155,7 @@
 
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
 
-    {if $contributeMode ne 'notify' and !$is_pay_later and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
       <div class="crm-group billing_name_address-group">
             <div class="header-dark">
                 {ts}Billing Name and Address{/ts}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -40,15 +40,13 @@
 class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @param null
-   *
-   * @return array    array of default values
-   * @access public
+   * @return array
+   *   array of default values
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     $ufJoinParams = array(
@@ -57,20 +55,17 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
       'entity_id' => $this->_surveyId,
     );
 
-    list($defaults['contact_profile_id'], $second) =
-      CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+    list($defaults['contact_profile_id'], $second)
+      = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
     $defaults['activity_profile_id'] = $second ? array_shift($second) : '';
 
     return $defaults;
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @param null
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $subTypeId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $this->_surveyId, 'activity_type_id');
@@ -83,7 +78,7 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
           array(
             1 => $activityTypes[$subTypeId],
             2 => CRM_Utils_System::url('civicrm/admin/custom/group', 'action=add&reset=1'),
-            3 => '_blank'
+            3 => '_blank',
           )
         )
       );
@@ -106,12 +101,9 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
 
 
   /**
-   * Process the form
-   *
-   * @param null
+   * Process the form.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -120,9 +112,9 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
     // also update the ProfileModule tables
     $ufJoinParams = array(
       'is_active' => 1,
-      'module'    => 'CiviCampaign',
+      'module' => 'CiviCampaign',
       'entity_table' => 'civicrm_survey',
-      'entity_id'    => $this->_surveyId,
+      'entity_id' => $this->_surveyId,
     );
 
     // first delete all past entries
@@ -150,4 +142,5 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
 
     parent::endPostProcess();
   }
+
 }

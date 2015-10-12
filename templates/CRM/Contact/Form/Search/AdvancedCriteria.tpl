@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -90,7 +90,7 @@ CRM.$(function($) {
     var body = $('.crm-accordion-body.' + id);
     if (header.length > 0 && body.length > 0 && !body.html()) {
       body.html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Loading{/ts}{literal}...</span></div>');
-      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='js'}Remove from search criteria{/ts}"><span class="icon close-icon"></span></a>{literal}');
+      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='js'}Remove from search criteria{/ts}"><span class="icon ui-icon-close"></span></a>{literal}');
       header.addClass('active');
       CRM.loadPage(url, {target: body, block: false});
     }
@@ -130,7 +130,7 @@ CRM.$(function($) {
 
     <table class="form-layout">
         <tr>
-            <td>{$form.buttons.html}</td>
+            <td>{include file="CRM/common/formButtons.tpl" location="botton"}</td>
         </tr>
     </table>
 {/strip}

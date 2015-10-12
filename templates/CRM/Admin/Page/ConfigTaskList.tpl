@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,13 +39,11 @@
         <td>{ts}Localization settings include user language, default currency and available countries for address input.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Organization Address and Contact Info
-        {/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Organization Address and Contact Info{/ts}</a></td>
         <td>{ts}Organization name, email address for system-generated emails, organization address{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components
-        {/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components{/ts}</a></td>
         <td>{ts}Enable the required CiviCRM components.(CiviContribute, CiviEvent etc.){/ts}</td>
     </tr>
     <tr class="even">
@@ -169,7 +167,7 @@
         <td>{ts}Online event registration and participant tracking.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/membership/what-is-civimember" text="CiviMember"}</td>
+        <td class="tasklist nowrap">{docURL page="user/membership/introduction-to-memberships" text="CiviMember"}</td>
         <td>{ts}Online signup and membership management.{/ts}</td>
     </tr>
     <tr class="even">

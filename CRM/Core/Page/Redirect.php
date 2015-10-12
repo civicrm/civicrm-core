@@ -12,19 +12,29 @@
  * @endcoe
  */
 class CRM_Core_Page_Redirect extends CRM_Core_Page {
-  function run($path = NULL, $pageArgs = array()) {
+
+  /**
+   * Run page.
+   *
+   * @param string $path
+   * @param array $pageArgs
+   */
+  public function run($path = NULL, $pageArgs = array()) {
     $url = self::createUrl($path, $_REQUEST, $pageArgs, TRUE);
-    // return $url;
     CRM_Utils_System::redirect($url);
   }
 
   /**
-   * @param array $requestPath the parts of the path in the current page request
-   * @param array $requestArgs any GET arguments
-   * @param array $pageArgs the page_arguments registered in the router
-   * @param array $requestArgs any parameters passed as part of this page request
-   * @param bool $absolute whether to return an absolute URL
-   * @return string URL
+   * @param array $requestPath
+   *   The parts of the path in the current page request.
+   * @param array $requestArgs
+   *   Any GET arguments.
+   * @param array $pageArgs
+   *   The page_arguments registered in the router.
+   * @param bool $absolute
+   *   Whether to return an absolute URL.
+   * @return string
+   *   URL
    */
   public static function createUrl($requestPath, $requestArgs, $pageArgs, $absolute) {
     if (empty($pageArgs['url'])) {
@@ -52,4 +62,5 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
 
     return $url;
   }
+
 }

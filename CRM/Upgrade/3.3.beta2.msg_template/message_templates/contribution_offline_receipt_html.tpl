@@ -25,7 +25,7 @@
     {if $formValues.receipt_text}
      <p>{$formValues.receipt_text|htmlize}</p>
     {else}
-     <p>{ts}Thanks for your support.{/ts}</p>
+     <p>{ts}Thank you for your support.{/ts}</p>
     {/if}
 
     <p>{ts}Please print this receipt for your records.{/ts}</p>

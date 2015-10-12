@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -42,7 +42,7 @@ class CRM_Mailing_Config extends CRM_Core_Component_Config {
   const OUTBOUND_OPTION_REDIRECT_TO_DB = 5;
 
   /**
-   * What should be the verp separator we use
+   * What should be the verp separator we use.
    *
    * @var char
    */
@@ -90,5 +90,5 @@ class CRM_Mailing_Config extends CRM_Core_Component_Config {
    * @var int
    */
   public $mailThrottleTime = 0;
-}
 
+}

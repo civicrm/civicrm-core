@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,7 +41,7 @@
           <tr class="{cycle values="odd-row,even-row"}">
       <td>{$link}</td>
       <td style="text-align: right">{$merge}</td>
-      <td style="text-align: right"><a id='notDuplicate' href="#" title={ts}not a duplicate{/ts} onClick="processDupes( {$main.srcID}, {$main.dstID}, 'dupe-nondupe' );return false;">{ts}not a duplicate{/ts}</a></td>
+      <td style="text-align: right"><a class='crm-notDuplicate' href="#" title={ts}not a duplicate{/ts} onClick="processDupes( {$main.srcID}, {$main.dstID}, 'dupe-nondupe' );return false;">{ts}not a duplicate{/ts}</a></td>
       </tr>
         {/if}
       {/foreach}
@@ -50,24 +50,30 @@
 </div>
 
 {if $context eq 'search'}
-   <a href="{$backURL}" class="button"><span>{ts}Done{/ts}</span></a>
+   {crmButton href=$backURL icon="close"}{ts}Done{/ts}{/crmButton}
 {else}
    {if $gid}
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=renew" a=1}{/capture}
    {else}
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&action=renew" a=1}{/capture}
    {/if}
-   <a href="{$backURL}" title="{ts}Refresh List of Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will refresh the duplicates list. Click OK to proceed.{/ts}');" class="button"><span>{ts}Refresh Duplicates{/ts}</span></a>
+   <a href="{$backURL}" title="{ts}Refresh List of Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will refresh the duplicates list. Click OK to proceed.{/ts}');" class="button">
+     <span><span class="icon ui-icon-refresh"></span> {ts}Refresh Duplicates{/ts}</span>
+   </a>
 
    {if $gid}
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&gid=`$gid`&action=map" a=1}{/capture}
    {else}
       {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="reset=1&rgid=`$rgid`&action=map" a=1}{/capture}
    {/if}
-   <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span>{ts}Batch Merge Duplicates{/ts}</span></a>
+   <a href="{$backURL}" title="{ts}Batch Merge Duplicate Contacts{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the listed duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button">
+     <span><div class="icon ui-icon-script"></div> {ts}Batch Merge Duplicates{/ts}</span>
+   </a>
 
    {capture assign=backURL}{crmURL p="civicrm/contact/deduperules" q="reset=1" a=1}{/capture}
-  <a href="{$backURL}" class="button crm-button-type-cancel"><span>{ts}Done{/ts}</span></a>
+   <a href="{$backURL}" class="button crm-button-type-cancel">
+     <span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span>
+   </a>
 {/if}
 <div style="clear: both;"></div>
 {else}

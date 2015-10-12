@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -41,33 +41,32 @@
 class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
 
   /**
-   * The context that we are working on
+   * The context that we are working on.
    *
    * @var string
    */
   protected $_context;
 
   /**
-   * the groupId retrieved from the GET vars
+   * The groupId retrieved from the GET vars.
    *
    * @var int
    */
   protected $_id;
 
   /**
-   * the title of the group
+   * The title of the group.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
+  public function preProcess() {
     // initialize the task and row fields
     parent::preProcess();
 
@@ -77,13 +76,12 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form object
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
     //create radio buttons to select existing group or add a new group
     $options = array(ts('Add Contact To Existing Group'), ts('Create New Group'));
@@ -150,13 +148,13 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     $defaults = array();
 
     if ($this->_context === 'amtg') {
@@ -168,26 +166,25 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * Add local and global form rules
+   * Add local and global form rules.
    *
-   * @access protected
    *
    * @return void
    */
-  function addRules() {
+  public function addRules() {
     $this->addFormRule(array('CRM_Event_Form_Task_AddToGroup', 'formRule'));
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $params
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($params) {
+  public static function formRule($params) {
     $errors = array();
 
     if (!empty($params['group_option']) && empty($params['title'])) {
@@ -201,11 +198,10 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues();
@@ -217,8 +213,8 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       $groupParams['visibility'] = "User and User Admin Only";
       if (array_key_exists('group_type', $params) && is_array($params['group_type'])) {
         $groupParams['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          array_keys($params['group_type'])
-        ) . CRM_Core_DAO::VALUE_SEPARATOR;
+            array_keys($params['group_type'])
+          ) . CRM_Core_DAO::VALUE_SEPARATOR;
       }
       else {
         $groupParams['group_type'] = '';
@@ -226,23 +222,35 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       $groupParams['is_active'] = 1;
 
       $createdGroup = CRM_Contact_BAO_Group::create($groupParams);
-      $groupID      = $createdGroup->id;
-      $groupName    = $groupParams['title'];
+      $groupID = $createdGroup->id;
+      $groupName = $groupParams['title'];
     }
     else {
-      $groupID   = $params['group_id'];
-      $group     = CRM_Core_PseudoConstant::group();
+      $groupID = $params['group_id'];
+      $group = CRM_Core_PseudoConstant::group();
       $groupName = $group[$groupID];
     }
 
     list($total, $added, $notAdded) = CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $groupID);
 
-    $status = array(ts('%count contact added to group', array('count' => $added, 'plural' => '%count contacts added to group')));
+    $status = array(
+      ts('%count contact added to group', array(
+          'count' => $added,
+          'plural' => '%count contacts added to group',
+      )),
+    );
     if ($notAdded) {
-      $status[] = ts('%count contact was already in group', array('count' => $notAdded, 'plural' => '%count contacts were already in group'));
+      $status[] = ts('%count contact was already in group', array(
+          'count' => $notAdded,
+          'plural' => '%count contacts were already in group',
+        ));
     }
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-    CRM_Core_Session::setStatus($status, ts('Added Contact to %1', array(1 => $groupName, 'count' => $added, 'plural' => 'Added Contacts to %1')), 'success', array('expires' => 0));
+    CRM_Core_Session::setStatus($status, ts('Added Contact to %1', array(
+          1 => $groupName,
+          'count' => $added,
+          'plural' => 'Added Contacts to %1',
+        )), 'success', array('expires' => 0));
   }
-}
 
+}

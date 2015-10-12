@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -39,18 +39,16 @@
 class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
 
   /**
-   * page title
+   * Page title.
    *
    * @var string
-   * @protected
    */
   protected $_title;
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     parent::preProcess();
@@ -63,15 +61,14 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
     }
 
     if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::DELETE)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->assign('title', $this->_title);
@@ -91,10 +88,9 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     $participant = new CRM_Event_DAO_Participant();
@@ -103,8 +99,8 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
     if ($participant->find()) {
       $searchURL = CRM_Utils_System::url('civicrm/event/search', 'reset=1');
       CRM_Core_Session::setStatus(ts('This event cannot be deleted because there are participant records linked to it. If you want to delete this event, you must first find the participants linked to this event and delete them. You can use use <a href=\'%1\'> CiviEvent >> Find Participants page </a>.',
-          array(1 => $searchURL)
-        ), ts('Deletion Error'), 'error');
+        array(1 => $searchURL)
+      ), ts('Deletion Error'), 'error');
       return;
     }
     CRM_Event_BAO_Event::del($this->_id);
@@ -116,5 +112,5 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
       CRM_Core_Session::setStatus(ts("'%1' has been deleted.", array(1 => $this->_title)), ts('Event Deleted'), 'success');
     }
   }
-}
 
+}

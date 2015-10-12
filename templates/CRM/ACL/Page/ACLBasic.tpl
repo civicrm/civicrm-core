@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,7 +63,7 @@
 
         {if $action ne 1 and $action ne 2}
       <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newACL"><div class="icon add-icon"></div>{ts}Add ACL{/ts}</a>
+      <a href="{crmURL q="action=add&reset=1"}" id="newACL"><div class="icon ui-icon-circle-plus"></div>{ts}Add ACL{/ts}</a>
         </div>
         {/if}
     </div>

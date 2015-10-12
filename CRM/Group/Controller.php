@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,21 +23,25 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Group_Controller extends CRM_Core_Controller {
 
   /**
-   * class constructor
+   * Class constructor.
+   *
+   * @param null $title
+   * @param bool|int $action
+   * @param bool $modal
    */
-  function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
+  public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
     parent::__construct($title, $modal);
 
     $this->_stateMachine = new CRM_Group_StateMachine($this, $action);
@@ -71,7 +75,7 @@ class CRM_Group_Controller extends CRM_Core_Controller {
   /**
    * @return mixed
    */
-  function run() {
+  public function run() {
     return parent::run();
   }
 
@@ -81,5 +85,5 @@ class CRM_Group_Controller extends CRM_Core_Controller {
   public function selectorName() {
     return $this->get('selectorName');
   }
-}
 
+}

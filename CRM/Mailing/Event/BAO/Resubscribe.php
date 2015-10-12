@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,13 +43,15 @@ class CRM_Mailing_Event_BAO_Resubscribe {
   /**
    * Resubscribe a contact to the groups, he/she was unsubscribed from.
    *
-   * @param int $job_id       The job ID
-   * @param int $queue_id     The Queue Event ID of the recipient
-   * @param string $hash      The hash
+   * @param int $job_id
+   *   The job ID.
+   * @param int $queue_id
+   *   The Queue Event ID of the recipient.
+   * @param string $hash
+   *   The hash.
    *
-   * @return array|null $groups    Array of all groups to which the contact was added, or null if the queue event could not be found.
-   * @access public
-   * @static
+   * @return array|null
+   *   $groups    Array of all groups to which the contact was added, or null if the queue event could not be found.
    */
   public static function &resub_to_mailing($job_id, $queue_id, $hash) {
     /* First make sure there's a matching queue event */
@@ -100,8 +102,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     );
 
     /* Make a list of groups and a list of prior mailings that received
-         * this mailing */
-
+     * this mailing */
 
     $groups = array();
     $mailings = array();
@@ -116,7 +117,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     }
 
     /* As long as we have prior mailings, find their groups and add to the
-         * list */
+     * list */
 
     while (!empty($mailings)) {
       $do->query("
@@ -143,7 +144,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     CRM_Utils_Hook::unsubscribeGroups('resubscribe', $mailing_id, $contact_id, $group_ids, $base_groups);
 
     /* Now we have a complete list of recipient groups.  Filter out all
-         * those except smart groups and those that the contact belongs to */
+     * those except smart groups and those that the contact belongs to */
 
     $do->query("
             SELECT      $group.id as group_id,
@@ -188,14 +189,16 @@ class CRM_Mailing_Event_BAO_Resubscribe {
    * Send a reponse email informing the contact of the groups to which he/she
    * has been resubscribed.
    *
-   * @param string $queue_id      The queue event ID
-   * @param array $groups         List of group IDs
-   * @param bool $is_domain       Is this domain-level?
-   * @param int $job              The job ID
+   * @param string $queue_id
+   *   The queue event ID.
+   * @param array $groups
+   *   List of group IDs.
+   * @param bool $is_domain
+   *   Is this domain-level?.
+   * @param int $job
+   *   The job ID.
    *
    * @return void
-   * @access public
-   * @static
    */
   public static function send_resub_response($queue_id, $groups, $is_domain = FALSE, $job) {
     // param is_domain is not supported as of now.
@@ -292,5 +295,5 @@ class CRM_Mailing_Event_BAO_Resubscribe {
       unset($errorScope);
     }
   }
-}
 
+}

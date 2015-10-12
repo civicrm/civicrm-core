@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This class proivdes various helper functions for locating extensions
@@ -42,19 +42,19 @@
  * module-extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
 class CRM_Extension_Mapper {
 
   /**
-   * An URL for public extensions repository
+   * An URL for public extensions repository.
    */
-  //CONST DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
+  //const DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
 
   /**
-   * Extension info file name
+   * Extension info file name.
    */
   const EXT_TEMPLATES_DIRNAME = 'templates';
 
@@ -97,26 +97,29 @@ class CRM_Extension_Mapper {
     $this->cacheKey = $cacheKey;
     if ($civicrmUrl) {
       $this->civicrmUrl = rtrim($civicrmUrl, '/');
-    } else {
+    }
+    else {
       $config = CRM_Core_Config::singleton();
       $this->civicrmUrl = rtrim($config->resourceBase, '/');
     }
     if ($civicrmPath) {
-      $this->civicrmPath = rtrim($civicrmPath,'/');
-    } else {
+      $this->civicrmPath = rtrim($civicrmPath, '/');
+    }
+    else {
       global $civicrm_root;
-      $this->civicrmPath = rtrim($civicrm_root,'/');
+      $this->civicrmPath = rtrim($civicrm_root, '/');
     }
   }
 
   /**
    * Given the class, provides extension's key.
    *
-   * @access public
    *
-   * @param string $clazz extension class name
+   * @param string $clazz
+   *   Extension class name.
    *
-   * @return string name of extension key
+   * @return string
+   *   name of extension key
    */
   public function classToKey($clazz) {
     return str_replace('_', '.', $clazz);
@@ -125,13 +128,11 @@ class CRM_Extension_Mapper {
   /**
    * Given the class, provides extension path.
    *
-   * @access public
    *
    * @param $clazz
    *
-   * @internal param string $key extension key
-   *
-   * @return string full path the extension .php file
+   * @return string
+   *   full path the extension .php file
    */
   public function classToPath($clazz) {
     $elements = explode('_', $clazz);
@@ -142,11 +143,12 @@ class CRM_Extension_Mapper {
   /**
    * Given the string, returns true or false if it's an extension key.
    *
-   * @access public
    *
-   * @param string $key a string which might be an extension key
+   * @param string $key
+   *   A string which might be an extension key.
    *
-   * @return boolean true if given string is an extension name
+   * @return bool
+   *   true if given string is an extension name
    */
   public function isExtensionKey($key) {
     // check if the string is an extension name or the class
@@ -156,11 +158,12 @@ class CRM_Extension_Mapper {
   /**
    * Given the string, returns true or false if it's an extension class name.
    *
-   * @access public
    *
-   * @param string $clazz a string which might be an extension class name
+   * @param string $clazz
+   *   A string which might be an extension class name.
    *
-   * @return boolean true if given string is an extension class name
+   * @return bool
+   *   true if given string is an extension class name
    */
   public function isExtensionClass($clazz) {
 
@@ -171,18 +174,20 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * @param string $key extension fully-qualified-name
+   * @param string $key
+   *   Extension fully-qualified-name.
    * @param bool $fresh
    *
    * @throws CRM_Extension_Exception
    * @throws Exception
-   * @return object CRM_Extension_Info
+   * @return CRM_Extension_Info
    */
   public function keyToInfo($key, $fresh = FALSE) {
     if ($fresh || !array_key_exists($key, $this->infos)) {
       try {
         $this->infos[$key] = CRM_Extension_Info::loadFromFile($this->container->getPath($key) . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME);
-      } catch (CRM_Extension_Exception $e) {
+      }
+      catch (CRM_Extension_Exception $e) {
         // file has more detailed info, but we'll fallback to DB if it's missing -- DB has enough info to uninstall
         $this->infos[$key] = CRM_Extension_System::singleton()->getManager()->createInfoFromDB($key);
         if (!$this->infos[$key]) {
@@ -196,11 +201,12 @@ class CRM_Extension_Mapper {
   /**
    * Given the key, provides extension's class name.
    *
-   * @access public
    *
-   * @param string $key extension key
+   * @param string $key
+   *   Extension key.
    *
-   * @return string name of extension's main class
+   * @return string
+   *   name of extension's main class
    */
   public function keyToClass($key) {
     return str_replace('.', '_', $key);
@@ -210,11 +216,12 @@ class CRM_Extension_Mapper {
    * Given the key, provides the path to file containing
    * extension's main class.
    *
-   * @access public
    *
-   * @param string $key extension key
+   * @param string $key
+   *   Extension key.
    *
-   * @return string path to file containing extension's main class
+   * @return string
+   *   path to file containing extension's main class
    */
   public function keyToPath($key) {
     $info = $this->keyToInfo($key);
@@ -225,9 +232,10 @@ class CRM_Extension_Mapper {
    * Given the key, provides the path to file containing
    * extension's main class.
    *
-   * @access public
-   * @param string $key extension key
-   * @return string local path of the extension source tree
+   * @param string $key
+   *   Extension key.
+   * @return string
+   *   local path of the extension source tree
    */
   public function keyToBasePath($key) {
     if ($key == 'civicrm') {
@@ -240,11 +248,12 @@ class CRM_Extension_Mapper {
    * Given the key, provides the path to file containing
    * extension's main class.
    *
-   * @access public
    *
-   * @param string $key extension key
+   * @param string $key
+   *   Extension key.
    *
-   * @return string url for resources in this extension
+   * @return string
+   *   url for resources in this extension
    */
   public function keyToUrl($key) {
     if ($key == 'civicrm') {
@@ -263,8 +272,10 @@ class CRM_Extension_Mapper {
   /**
    * Fetch the list of active extensions of type 'module'
    *
-   * @param $fresh bool whether to forcibly reload extensions list from canonical store
-   * @return array - array(array('prefix' => $, 'file' => $))
+   * @param bool $fresh
+   *   whether to forcibly reload extensions list from canonical store.
+   * @return array
+   *   array(array('prefix' => $, 'file' => $))
    */
   public function getActiveModuleFiles($fresh = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -293,7 +304,8 @@ class CRM_Extension_Mapper {
             'prefix' => $dao->file,
             'filePath' => $this->keyToPath($dao->full_name),
           );
-        } catch (CRM_Extension_Exception $e) {
+        }
+        catch (CRM_Extension_Exception $e) {
           // Putting a stub here provides more consistency
           // in how getActiveModuleFiles when racing between
           // dirty file-removals and cache-clears.
@@ -313,9 +325,10 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Get a list of base URLs for all active modules
+   * Get a list of base URLs for all active modules.
    *
-   * @return array (string $extKey => string $baseUrl)
+   * @return array
+   *   (string $extKey => string $baseUrl)
    */
   public function getActiveModuleUrls() {
     // TODO optimization/caching
@@ -331,7 +344,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return bool
    */
@@ -348,7 +361,8 @@ class CRM_Extension_Mapper {
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return array CRM_Core_Module
+   * @return array
+   *   CRM_Core_Module
    */
   public function getModules() {
     $result = array();
@@ -364,11 +378,12 @@ class CRM_Extension_Mapper {
   /**
    * Given the class, provides the template path.
    *
-   * @access public
    *
-   * @param string $clazz extension class name
+   * @param string $clazz
+   *   Extension class name.
    *
-   * @return string path to extension's templates directory
+   * @return string
+   *   path to extension's templates directory
    */
   public function getTemplatePath($clazz) {
     $path = $this->container->getPath($this->classToKey($clazz));
@@ -378,18 +393,19 @@ class CRM_Extension_Mapper {
     $pathElm = explode(DIRECTORY_SEPARATOR, $path);
     array_pop($pathElm);
     return implode(DIRECTORY_SEPARATOR, $pathElm) . DIRECTORY_SEPARATOR . self::EXT_TEMPLATES_DIRNAME;
-    */
+     */
   }
 
   /**
    * Given te class, provides the template name.
    * @todo consider multiple templates, support for one template for now
    *
-   * @access public
    *
-   * @param string $clazz extension class name
+   * @param string $clazz
+   *   Extension class name.
    *
-   * @return string extension's template name
+   * @return string
+   *   extension's template name
    */
   public function getTemplateName($clazz) {
     $info = $this->keyToInfo($this->classToKey($clazz));
@@ -403,4 +419,5 @@ class CRM_Extension_Mapper {
       $this->cache->delete($this->cacheKey . '/moduleFiles');
     }
   }
+
 }

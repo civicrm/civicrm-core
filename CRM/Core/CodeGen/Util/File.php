@@ -8,7 +8,7 @@ class CRM_Core_CodeGen_Util_File {
    * @param $dir
    * @param int $perm
    */
-  static function createDir($dir, $perm = 0755) {
+  public static function createDir($dir, $perm = 0755) {
     if (!is_dir($dir)) {
       mkdir($dir, $perm, TRUE);
     }
@@ -17,7 +17,7 @@ class CRM_Core_CodeGen_Util_File {
   /**
    * @param $dir
    */
-  static function cleanTempDir($dir) {
+  public static function cleanTempDir($dir) {
     foreach (glob("$dir/*") as $tempFile) {
       unlink($tempFile);
     }
@@ -34,7 +34,7 @@ class CRM_Core_CodeGen_Util_File {
    *
    * @return string
    */
-  static function createTempDir($prefix) {
+  public static function createTempDir($prefix) {
     $newTempDir = tempnam(sys_get_temp_dir(), $prefix) . '.d';
     if (file_exists($newTempDir)) {
       self::removeDir($newTempDir);
@@ -45,14 +45,15 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * Calculate a cumulative digest based on a collection of files
+   * Calculate a cumulative digest based on a collection of files.
    *
-   * @param array $files list of file names (strings)
+   * @param array $files
+   *   List of file names (strings).
    * @param callable|string $digest a one-way hash function (string => string)
    *
    * @return string
    */
-  static function digestAll($files, $digest = 'md5') {
+  public static function digestAll($files, $digest = 'md5') {
     $buffer = '';
     foreach ($files as $file) {
       $buffer .= $digest(file_get_contents($file));
@@ -61,12 +62,12 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * Find the path to the main Civi source tree
+   * Find the path to the main Civi source tree.
    *
    * @return string
    * @throws RuntimeException
    */
-  static function findCoreSourceDir() {
+  public static function findCoreSourceDir() {
     $path = str_replace(DIRECTORY_SEPARATOR, '/', __DIR__);
     if (!preg_match(':(.*)/CRM/Core/CodeGen/Util:', $path, $matches)) {
       throw new RuntimeException("Failed to determine path of code-gen");
@@ -76,12 +77,14 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * Find files in several directories using several filename patterns
+   * Find files in several directories using several filename patterns.
    *
-   * @param array $pairs each item is an array(0 => $searchBaseDir, 1 => $filePattern)
-   * @return array of file paths
+   * @param array $pairs
+   *   Each item is an array(0 => $searchBaseDir, 1 => $filePattern).
+   * @return array
+   *   Array of file paths
    */
-  static function findManyFiles($pairs) {
+  public static function findManyFiles($pairs) {
     $files = array();
     foreach ($pairs as $pair) {
       list ($dir, $pattern) = $pair;
@@ -89,4 +92,5 @@ class CRM_Core_CodeGen_Util_File {
     }
     return $files;
   }
+
 }

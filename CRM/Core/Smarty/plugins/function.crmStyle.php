@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -36,13 +36,14 @@
 /**
  * Add a stylesheet <LINK> to a specific part of the page
  *
- * @param $params array with keys:
- *  - ext: string, extension name. see CRM_Core_Resources::addStyleFile
- *  - file: string, relative file path. see CRM_Core_Resources::addStyleFile
- *  - url: string. see CRM_Core_Resources::addStyleURL
- *  - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
- *  - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
- * @param $smarty
+ * @param array $params
+ *   Array with keys:
+ *   - ext: string, extension name. see CRM_Core_Resources::addStyleFile
+ *   - file: string, relative file path. see CRM_Core_Resources::addStyleFile
+ *   - url: string. see CRM_Core_Resources::addStyleURL
+ *   - weight: int; default: CRM_Core_Resources::DEFAULT_WEIGHT (0)
+ *   - region: string; default: CRM_Core_Resources::DEFAULT_REGION ('html-header')
+ * @param CRM_Core_Smarty $smarty
  *
  * @throws Exception
  */
@@ -58,9 +59,11 @@ function smarty_function_crmStyle($params, &$smarty) {
 
   if (array_key_exists('file', $params)) {
     $res->addStyleFile($params['ext'], $params['file'], $params['weight'], $params['region']);
-  } elseif (array_key_exists('url', $params)) {
+  }
+  elseif (array_key_exists('url', $params)) {
     $res->addStyleUrl($params['url'], $params['weight'], $params['region']);
-  } else {
+  }
+  else {
     CRM_Core_Error::debug_var('crmStyle_params', $params);
     throw new Exception("crmStyle requires url or ext+file");
   }

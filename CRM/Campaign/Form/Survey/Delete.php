@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -46,7 +46,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
   protected $_surveyId;
 
   /**
-   * surveyTitle
+   * SurveyTitle
    *
    * @var string
    */
@@ -54,10 +54,9 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
 
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
    * @return void
-   * @access public
    */
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
@@ -73,10 +72,9 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
@@ -94,19 +92,19 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
   }
 
   /**
-   * Process the form when submitted
+   * Process the form when submitted.
    *
    * @return void
-   * @access public
    */
   public function postProcess() {
     if ($this->_surveyId) {
       CRM_Campaign_BAO_Survey::del($this->_surveyId);
       CRM_Core_Session::setStatus('', ts("'%1' survey has been deleted.", array(1 => $this->_surveyTitle)), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey'));
-    } else {
+    }
+    else {
       CRM_Core_Error::fatal(ts('Delete action is missing expected survey ID.'));
     }
   }
-}
 
+}

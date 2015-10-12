@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,6 +61,24 @@
         <tr>
   </table>
 
+      <div class="crm-accordion-wrapper crm-html_email-accordion ">
+        <div class="crm-accordion-header">
+            {ts}HTML Format{/ts}
+            {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
+        </div><!-- /.crm-accordion-header -->
+         <div class="crm-accordion-body">
+           <div class="helpIcon" id="helphtml">
+             <input class="crm-token-selector big" data-field="html_message" />
+             {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
+           </div>
+                <div class="clear"></div>
+                <div class='html resizable-textarea'>
+                    {$form.msg_html.html}
+                    <div class="description">{ts}An HTML formatted version of this message will be sent to contacts whose Email Format preference is 'HTML' or 'Both'.{/ts} {ts 1=$tokenDocsRepeated}Tokens may be included (%1).{/ts}</div>
+                </div>
+        </div><!-- /.crm-accordion-body -->
+      </div><!-- /.crm-accordion-wrapper -->
+
       <div class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
         <div class="crm-accordion-header">
                 {ts}Plain-Text Format{/ts}
@@ -76,24 +94,6 @@
                     <div class="description">{ts}Text formatted message.{/ts} {ts 1=$tokenDocsRepeated}Tokens may be included (%1).{/ts}</div>
                 </div>
             </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
-
-      <div class="crm-accordion-wrapper crm-html_email-accordion ">
-        <div class="crm-accordion-header">
-            {ts}HTML Format{/ts}
-            {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
-        </div><!-- /.crm-accordion-header -->
-         <div class="crm-accordion-body">
-           <div class="helpIcon" id="helphtml">
-             <input class="crm-token-selector big" data-field="html_message" />
-             {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
-           </div>
-                <div class="clear"></div>
-                <div class='html resizable-textarea'>
-                    {$form.msg_html.html}
-                    <div class="description">{ts}You may optionally create an HTML formatted version of this message. It will be sent to contacts whose Email Format preference is 'HTML' or 'Both'.{/ts} {ts 1=$tokenDocsRepeated}Tokens may be included (%1).{/ts}</div>
-                </div>
-        </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
 
       <div class="crm-accordion-wrapper crm-html_email-accordion ">

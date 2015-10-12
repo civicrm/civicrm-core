@@ -1,20 +1,45 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.6                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
 
 /**
- * Retrieve a CustomSearches
+ * This api exposes CiviCRM custom search.
+ *
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Retrieve custom searches.
  *
  * FIXME This is a bare-minimum placeholder
  *
- * @param $params
+ * @param array $params
  *
- * @internal param $array $ params input parameters
- *
- * {@example OptionValueGet.php 0}
- * @example OptionValueGet.php
- *
- * @return  array details of found Option Values
- * {@getfields OptionValue_get}
- * @access public
+ * @return array
+ *   details of found Option Values
  */
 function civicrm_api3_custom_search_get($params) {
   require_once 'api/v3/OptionValue.php';
@@ -25,17 +50,11 @@ function civicrm_api3_custom_search_get($params) {
 }
 
 /**
- * Add a CustomSearch
+ * Add a CustomSearch.
  *
- * Allowed @params array keys are:
+ * @param array $params
  *
- * {@example OptionValueCreate.php}
- *
- * @param $params
- *
- * @return array of newly created option_value property values.
- * {@getfields OptionValue_create}
- * @access public
+ * @return array
  */
 function civicrm_api3_custom_search_create($params) {
   require_once 'api/v3/OptionValue.php';
@@ -50,10 +69,12 @@ function civicrm_api3_custom_search_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_custom_search_create_spec(&$params) {
   require_once 'api/v3/OptionValue.php';
@@ -65,15 +86,12 @@ function _civicrm_api3_custom_search_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing ReportTemplate
+ * Deletes an existing ReportTemplate.
  *
- * @param  array  $params
+ * @param array $params
  *
- * {@example ReportTemplateDelete.php 0}
- *
- * @return array Api result
- * {@getfields ReportTemplate_create}
- * @access public
+ * @return array
+ *   Api result
  */
 function civicrm_api3_custom_search_delete($params) {
   require_once 'api/v3/OptionValue.php';

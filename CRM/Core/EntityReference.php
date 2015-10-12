@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is included for backward compatibility with DAO's generated before 4.5.
  *

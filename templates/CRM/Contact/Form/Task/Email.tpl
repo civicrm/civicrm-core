@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,14 +45,14 @@
       <td class="label">{$form.cc_id.label}</td>
       <td>
         {$form.cc_id.html}
-        <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts}Clear{/ts}" href="#"><span class="icon close-icon"></span></a>
+        <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts}Clear{/ts}" href="#"><span class="icon ui-icon-close"></span></a>
       </td>
     </tr>
     <tr class="crm-contactEmail-form-block-bcc_id" {if !$form.bcc_id.value}style="display:none;"{/if}>
       <td class="label">{$form.bcc_id.label}</td>
       <td>
         {$form.bcc_id.html}
-        <a class="crm-hover-button clear-cc-link" rel="bcc_id" title="{ts}Clear{/ts}" href="#"><span class="icon close-icon"></span></a>
+        <a class="crm-hover-button clear-cc-link" rel="bcc_id" title="{ts}Clear{/ts}" href="#"><span class="icon ui-icon-close"></span></a>
       </td>
     </tr>
     <tr>

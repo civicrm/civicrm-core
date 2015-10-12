@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -37,11 +37,13 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   protected $_groupTree;
   protected $_tables;
   protected $_options;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree("'Contact', 'Individual', 'Organization', 'Household'",
@@ -66,7 +68,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
     }
   }
 
-  function addColumns() {
+  public function addColumns() {
     // add all the fields for chosen groups
     $this->_tables = $this->_options = array();
     foreach ($this->_groupTree as $groupID => $group) {
@@ -92,9 +94,9 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form $form
    */
-  function buildForm(&$form) {
+  public function buildForm(&$form) {
 
     /**
      * You can define a custom title for the search form
@@ -137,11 +139,19 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   /**
    * @return null
    */
-  function summary() {
+  public function summary() {
     return NULL;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL
+   *
+   * @return string
+   */
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
@@ -154,7 +164,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
    *
    * @return string
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
+  public function all($offset = 0, $rowcount = 0, $sort = NULL, $includeContactIDs = FALSE, $justIDs = FALSE) {
     //redirect if custom group not select in search criteria
     if (empty($this->_formValues['custom_group'])) {
       CRM_Core_Error::statusBounce(ts("You must select at least one Custom Group as a search criteria."),
@@ -196,8 +206,9 @@ contact_a.sort_name    as sort_name,
   /**
    * @return string
    */
-  function from() {
-    $from = "FROM civicrm_contact contact_a";
+  public function from() {
+    $this->buildACLClause('contact_a');
+    $from = "FROM civicrm_contact contact_a {$this->_aclFrom}";
     $customFrom = array();
     // lets do an INNER JOIN so we get only relevant values rather than all values
     if (!empty($this->_tables)) {
@@ -226,11 +237,11 @@ contact_a.sort_name    as sort_name,
    *
    * @return string
    */
-  function where($includeContactIDs = FALSE) {
-    $count  = 1;
+  public function where($includeContactIDs = FALSE) {
+    $count = 1;
     $clause = array();
     $params = array();
-    $name   = CRM_Utils_Array::value('sort_name',
+    $name = CRM_Utils_Array::value('sort_name',
       $this->_formValues
     );
     if ($name != NULL) {
@@ -262,6 +273,9 @@ contact_a.sort_name    as sort_name,
     if ($this->_group) {
       $clause[] = "cgc.group_id = {$this->_group}";
     }
+    if ($this->_aclWhere) {
+      $clause[] = " {$this->_aclWhere}";
+    }
 
     $where = '( 1 )';
     if (!empty($clause)) {
@@ -274,28 +288,28 @@ contact_a.sort_name    as sort_name,
   /**
    * @return string
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/MultipleValues.tpl';
   }
 
   /**
    * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     return array();
   }
 
   /**
    * @param $row
    */
-  function alterRow(&$row) {
+  public function alterRow(&$row) {
     foreach ($this->_options as $fieldID => $values) {
       $customVal = $valueSeparatedArray = array();
       if (in_array($values['attributes']['html_type'],
-          array('Radio', 'Select', 'Autocomplete-Select')
-        )) {
+        array('Radio', 'Select', 'Autocomplete-Select')
+      )) {
         if ($values['attributes']['data_type'] == 'ContactReference' && $row["custom_{$fieldID}"]) {
-          $row["custom_{$fieldID}"] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', (int)$row["custom_{$fieldID}"], 'display_name');
+          $row["custom_{$fieldID}"] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', (int) $row["custom_{$fieldID}"], 'display_name');
         }
         elseif ($row["custom_{$fieldID}"] &&
           array_key_exists($row["custom_{$fieldID}"],
@@ -306,8 +320,8 @@ contact_a.sort_name    as sort_name,
         }
       }
       elseif (in_array($values['attributes']['html_type'],
-          array('CheckBox', 'Multi-Select', 'AdvMulti-Select')
-        )) {
+        array('CheckBox', 'Multi-Select', 'AdvMulti-Select')
+      )) {
         $valueSeparatedArray = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $row["custom_{$fieldID}"]));
         foreach ($valueSeparatedArray as $val) {
           $customVal[] = $values[$val];
@@ -315,8 +329,8 @@ contact_a.sort_name    as sort_name,
         $row["custom_{$fieldID}"] = implode(', ', $customVal);
       }
       elseif (in_array($values['attributes']['html_type'],
-          array('Multi-Select State/Province', 'Select State/Province')
-        )) {
+        array('Multi-Select State/Province', 'Select State/Province')
+      )) {
         $valueSeparatedArray = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $row["custom_{$fieldID}"]));
         $stateName = CRM_Core_PseudoConstant::stateProvince();
         foreach ($valueSeparatedArray as $val) {
@@ -325,8 +339,8 @@ contact_a.sort_name    as sort_name,
         $row["custom_{$fieldID}"] = implode(', ', $customVal);
       }
       elseif (in_array($values['attributes']['html_type'],
-          array('Multi-Select Country', 'Select Country')
-        )) {
+        array('Multi-Select Country', 'Select Country')
+      )) {
         $valueSeparatedArray = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $row["custom_{$fieldID}"]));
         CRM_Core_PseudoConstant::populate($countryNames, 'CRM_Core_DAO_Country',
           TRUE, 'name', 'is_active'
@@ -342,8 +356,15 @@ contact_a.sort_name    as sort_name,
   /**
    * @param $title
    */
-  function setTitle($title) {
+  public function setTitle($title) {
     CRM_Utils_System::setTitle($title);
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}
