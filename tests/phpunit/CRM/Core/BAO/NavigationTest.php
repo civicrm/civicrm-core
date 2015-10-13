@@ -93,4 +93,124 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/%'");
   }
 
+  /**
+   * Run fixNavigationMenu() on a menu which already has navIDs
+   * everywhere. They should be unchanged.
+   */
+  public function testFixNavigationMenu_preserveIDs() {
+    $input[10] = array(
+      'attributes' => array(
+        'label' => 'Custom Menu Entry',
+        'parentID' => NULL,
+        'navID' => 10,
+        'active' => 1,
+      ),
+      'child' => array(
+        '11' => array(
+          'attributes' => array(
+            'label' => 'Custom Child Menu',
+            'parentID' => 10,
+            'navID' => 11,
+          ),
+          'child' => NULL,
+        ),
+      ),
+    );
+
+    $output = $input;
+    CRM_Core_BAO_Navigation::fixNavigationMenu($output);
+
+    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
+    $this->assertEquals(10, $output[10]['attributes']['navID']);
+    $this->assertEquals(10, $output[10]['child'][11]['attributes']['parentID']);
+    $this->assertEquals(11, $output[10]['child'][11]['attributes']['navID']);
+  }
+
+  /**
+   * Run fixNavigationMenu() on a menu which is missing some navIDs. They
+   * should be filled in, and others should be preserved.
+   */
+  public function testFixNavigationMenu_inferIDs() {
+    $input[10] = array(
+      'attributes' => array(
+        'label' => 'Custom Menu Entry',
+        'parentID' => NULL,
+        'navID' => 10,
+        'active' => 1,
+      ),
+      'child' => array(
+        '0' => array(
+          'attributes' => array(
+            'label' => 'Custom Child Menu',
+          ),
+          'child' => NULL,
+        ),
+        '100' => array(
+          'attributes' => array(
+            'label' => 'Custom Child Menu 2',
+            'navID' => 100,
+          ),
+          'child' => NULL,
+        ),
+      ),
+    );
+
+    $output = $input;
+    CRM_Core_BAO_Navigation::fixNavigationMenu($output);
+
+    $this->assertEquals('Custom Menu Entry', $output[10]['attributes']['label']);
+    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
+    $this->assertEquals(10, $output[10]['attributes']['navID']);
+
+    $this->assertEquals('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
+    $this->assertEquals(10, $output[10]['child'][101]['attributes']['parentID']);
+    $this->assertEquals(101, $output[10]['child'][101]['attributes']['navID']);
+
+    $this->assertEquals('Custom Child Menu 2', $output[10]['child'][100]['attributes']['label']);
+    $this->assertEquals(10, $output[10]['child'][100]['attributes']['parentID']);
+    $this->assertEquals(100, $output[10]['child'][100]['attributes']['navID']);
+  }
+
+  public function testFixNavigationMenu_inferIDs_deep() {
+    $input[10] = array(
+      'attributes' => array(
+        'label' => 'Custom Menu Entry',
+        'parentID' => NULL,
+        'navID' => 10,
+        'active' => 1,
+      ),
+      'child' => array(
+        '0' => array(
+          'attributes' => array(
+            'label' => 'Custom Child Menu',
+          ),
+          'child' => array(
+            '100' => array(
+              'attributes' => array(
+                'label' => 'Custom Child Menu 2',
+                'navID' => 100,
+              ),
+              'child' => NULL,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    $output = $input;
+    CRM_Core_BAO_Navigation::fixNavigationMenu($output);
+
+    $this->assertEquals('Custom Menu Entry', $output[10]['attributes']['label']);
+    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
+    $this->assertEquals(10, $output[10]['attributes']['navID']);
+
+    $this->assertEquals('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
+    $this->assertEquals(10, $output[10]['child'][101]['attributes']['parentID']);
+    $this->assertEquals(101, $output[10]['child'][101]['attributes']['navID']);
+
+    $this->assertEquals('Custom Child Menu 2', $output[10]['child'][101]['child'][100]['attributes']['label']);
+    $this->assertEquals(101, $output[10]['child'][101]['child'][100]['attributes']['parentID']);
+    $this->assertEquals(100, $output[10]['child'][101]['child'][100]['attributes']['navID']);
+  }
+
 }
