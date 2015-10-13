@@ -175,7 +175,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $errors
    */
   public function validatePaymentInstrument($values, &$errors) {
-    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && empty($values['token'])) {
       CRM_Core_Payment_Form::validateCreditCard($values, $errors);
       CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     }
