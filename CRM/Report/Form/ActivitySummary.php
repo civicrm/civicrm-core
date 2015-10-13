@@ -36,6 +36,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
   protected $_emailField = FALSE;
   protected $_phoneField = FALSE;
+  protected $_tempTableName;
+  protected $_tempDurationSumTableName;
 
   /**
    */
