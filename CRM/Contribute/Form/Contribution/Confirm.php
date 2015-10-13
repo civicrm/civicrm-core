@@ -1260,12 +1260,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         TRUE, NULL, FALSE, TRUE
       );
       // set email in the template here
-      // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-      $billingLocationTypeId = array_search('Billing', $locationTypes);
 
-      if ($billingLocationTypeId) {
-        list($donorName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution->contact_id, FALSE, $billingLocationTypeId);
+      if (CRM_Core_BAO_LocationType::getBilling()) {
+        list($donorName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution->contact_id,
+          FALSE, CRM_Core_BAO_LocationType::getBilling());
       }
       // get primary location email if no email exist( for billing location).
       if (!$email) {
