@@ -2247,6 +2247,7 @@ a.crm-i:hover {
 
 .crm-i-button>.crm-i {
   padding-left: 2px;
+  line-height: inherit;
 }
 
 .crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"] {

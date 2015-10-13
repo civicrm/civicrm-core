@@ -546,11 +546,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       if (in_array($button['type'], array('upload', 'next', 'submit', 'done', 'process', 'refresh'))) {
         $attrs['class'] .= ' validate';
-        $defaultIcon = 'check';
+        $defaultIcon = 'fa-check';
       }
       else {
         $attrs['class'] .= ' cancel';
-        $defaultIcon = $button['type'] == 'back' ? 'triangle-1-w' : 'close';
+        $defaultIcon = $button['type'] == 'back' ? 'fa-chevron-left' : 'fa-times';
       }
 
       if ($button['type'] === 'reset') {
@@ -559,13 +559,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         if (!empty($button['subName'])) {
           if ($button['subName'] == 'new') {
-            $defaultIcon = 'plus';
+            $defaultIcon = 'fa-plus-circle';
           }
           if ($button['subName'] == 'done') {
-            $defaultIcon = 'circle-check';
+            $defaultIcon = 'fa-check-circle';
           }
           if ($button['subName'] == 'next') {
-            $defaultIcon = 'circle-triangle-e';
+            $defaultIcon = 'fa-chevron-right';
           }
         }
 
