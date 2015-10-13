@@ -223,32 +223,28 @@ class CRM_Core_Payment_Form {
    *
    * @param CRM_Core_Form $form
    *   Form that the payment fields are to be added to.
-   * @param bool $useRequired
-   *   Effectively this means are the fields required for pay-later - see above.
    * @param array $paymentFields
    *   Fields that are to be shown on the payment form.
    */
-  protected static function addCommonFields(&$form, $useRequired, $paymentFields) {
+  protected static function addCommonFields(&$form, $paymentFields) {
     $requiredPaymentFields = array();
     foreach ($paymentFields as $name => $field) {
       if (!empty($field['cc_field'])) {
         if ($field['htmlType'] == 'chainSelect') {
-          $form->addChainSelect($field['name'], array('required' => $useRequired && $field['is_required']));
+          $form->addChainSelect($field['name'], array('required' => FALSE));
         }
         else {
           $form->add($field['htmlType'],
             $field['name'],
             $field['title'],
             $field['attributes'],
-            $useRequired ? $field['is_required'] : FALSE
+            FALSE
           );
         }
       }
-      // CRM-17071 We seem to be tying ourselves in knots around the addition
-      // of requiring billing fields for pay-later. Here we 'tell' the form the
-      // field is required if it is not otherwise marked as required and is
-      // required for the billing block.
-      $requiredPaymentFields[$field['name']] = !$useRequired ? $field['is_required'] : FALSE;
+      // This will cause the fields to be marked as required - but it is up to the payment processor to
+      // validate it.
+      $requiredPaymentFields[$field['name']] = $field['is_required'];
     }
     $form->assign('requiredPaymentFields', $requiredPaymentFields);
   }
@@ -360,7 +356,7 @@ class CRM_Core_Payment_Form {
     }
 
     self::setPaymentFieldsByProcessor($form, $processor, empty($isBillingDataOptional), $isBackOffice);
-    self::addCommonFields($form, !$isBillingDataOptional, $form->_paymentFields);
+    self::addCommonFields($form, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
     return (!empty($form->_paymentFields));
   }

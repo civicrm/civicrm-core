@@ -297,6 +297,7 @@ abstract class CRM_Core_Payment {
    * @param array $errors
    */
   public function validatePaymentInstrument($values, &$errors) {
+    CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     if ($this->_paymentProcessor['payment_type'] == 1) {
       CRM_Core_Payment_Form::validateCreditCard($values, $errors);
     }
@@ -388,6 +389,31 @@ abstract class CRM_Core_Payment {
     return $this->_paymentProcessor['payment_type'] == 1 ? $this->getCreditCardFormFields() : $this->getDirectDebitFormFields();
   }
 
+  /**
+   * Get the metadata for all required fields.
+   *
+   * @return array;
+   */
+  protected function getMandatoryFields() {
+    $mandatoryFields = array();
+    foreach ($this->getAllFields() as $field_name => $field_spec) {
+      if (!empty($field_spec['is_required'])) {
+        $mandatoryFields[$field_name] = $field_spec;
+      }
+    }
+    return $mandatoryFields;
+  }
+
+  /**
+   * Get the metadata of all the fields configured for this processor.
+   *
+   * @return array
+   */
+  protected function getAllFields() {
+    $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));
+    $billingFields = array_intersect_key($this->getBillingAddressFieldsMetadata(), array_flip($this->getBillingAddressFields()));
+    return array_merge($paymentFields, $billingFields);
+  }
   /**
    * Get array of fields that should be displayed on the payment form for credit cards.
    *

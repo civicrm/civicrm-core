@@ -175,8 +175,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $errors
    */
   public function validatePaymentInstrument($values, &$errors) {
-    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Pro') {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal') {
       CRM_Core_Payment_Form::validateCreditCard($values, $errors);
+      CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     }
   }
 
@@ -447,7 +448,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   public function doPayment(&$params, $component = 'contribute') {
     if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Express'
-      || ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Pro' && !empty($params['token']))
+      || ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && !empty($params['token']))
     ) {
       $this->_component = $component;
       return $this->doExpressCheckout($params);

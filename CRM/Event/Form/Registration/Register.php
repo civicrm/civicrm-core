@@ -892,9 +892,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       ) {
         return empty($errors) ? TRUE : $errors;
       }
-      if (!empty($self->_paymentFields)) {
-        CRM_Core_Form::validateMandatoryFields($self->_paymentFields, $fields, $errors);
-      }
       CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessorID, $fields, $errors, $self);
     }
 
