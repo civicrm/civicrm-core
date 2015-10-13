@@ -140,7 +140,7 @@ class Manager {
         'ext' => 'civicrm',
         'js' => array('ang/crmStatusPage.js', 'ang/crmStatusPage/*.js'),
         'css' => array('ang/crmStatusPage.css'),
-        'partials' => array('ang/crmStatusPage/*.html'),
+        'partials' => array('ang/crmStatusPage'),
         'settings' => array(),
       );
 
