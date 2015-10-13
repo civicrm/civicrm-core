@@ -2220,11 +2220,16 @@ input.crm-form-entityref {
 
 /* Font Awesome */
 
-.crm-container a,
-.crm-container a:link,
-.crm-container a:visited,
-.crm-container a:active,
-.crm-container a:hover {
+.crm-container a .crm-i,
+.crm-container a:link .crm-i,
+.crm-container a:visited .crm-i,
+.crm-container a:active .crm-i,
+.crm-container a:hover .crm-i,
+.crm-container a .ui-icon[class*=" fa-"],
+.crm-container a:link .ui-icon[class*=" fa-"],
+.crm-container a:visited .ui-icon[class*=" fa-"],
+.crm-container a:active .ui-icon[class*=" fa-"],
+.crm-container a:hover .ui-icon[class*=" fa-"] {
   color: inherit;
 }
 
