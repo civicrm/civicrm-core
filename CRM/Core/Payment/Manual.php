@@ -36,12 +36,8 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
 
   /**
    * This function checks to see if we have the right config values.
-   *
-   * @return string
-   *   the error message if any
    */
-  public function checkConfig() {
-  }
+  public function checkConfig() {}
 
   /**
    * Get billing fields required for this processor.
@@ -158,4 +154,5 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   public function getPaymentTypeLabel() {
     return '';
   }
+
 }

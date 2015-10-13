@@ -681,6 +681,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     else {
       throw new CRM_Core_Exception(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
     }
+
   }
 
   /**
@@ -762,6 +763,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       CRM_Financial_Form_Payment::addCreditCardJs();
     }
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+    // We save the fact that the profile 'billing' is required on the payment form.
+    // Currently pay-later is the only 'processor' that takes notice of this - but ideally
+    // 1) it would be possible to select the minimum_billing_profile_id for the contribution form
+    // 2) that profile_id would be set on the payment processor
+    // 3) the payment processor would return a billing form that combines these user-configured
+    // minimums with the payment processor minimums. This would lead to fields like 'postal_code'
+    // only being on the form if either the admin has configured it as wanted or the processor
+    // requires it.
+    $this->assign('billing_profile_id', (CRM_Utils_Array::value('is_billing_required', $this->_values) ? 'billing' : ''));
   }
 
   /**

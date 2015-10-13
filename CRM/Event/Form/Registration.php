@@ -176,8 +176,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -414,7 +412,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->_values['event']['campaign_id'] = $campID;
     }
 
+    // Set the same value for is_billing_required as contribution page so code can be shared.
+    $this->_values['is_billing_required'] = CRM_Utils_Array::value('is_billing_required', $this->_values['event']);
     // check if billing block is required for pay later
+    // note that I have started removing the use of isBillingAddressRequiredForPayLater in favour of letting
+    // the CRM_Core_Payment_Manual class handle it - but there are ~300 references to it in the code base so only
+    // removing in very limited cases.
     if (CRM_Utils_Array::value('is_pay_later', $this->_values['event'])) {
       $this->_isBillingAddressRequiredForPayLater = CRM_Utils_Array::value('is_billing_required', $this->_values['event']);
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
