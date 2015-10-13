@@ -88,7 +88,7 @@ class CRM_Event_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Batch update participants via profile'),
+          'title' => ts('Update multiple participants'),
           'class' => array(
             'CRM_Event_Form_Task_PickProfile',
             'CRM_Event_Form_Task_Batch',
@@ -116,7 +116,7 @@ class CRM_Event_Task {
           'result' => TRUE,
         ),
         15 => array(
-          'title' => ts('Participant status - change'),
+          'title' => ts('Participant status - change (emails sent)'),
           'class' => 'CRM_Event_Form_Task_ParticipantStatus',
           'result' => TRUE,
         ),
