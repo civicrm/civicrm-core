@@ -70,7 +70,11 @@ class CRM_Core_Payment_ProcessorForm {
     //checks after setting $form->_paymentProcessor
     // we do this outside of the above conditional to avoid
     // saving the country/state list in the session (which could be huge)
-    CRM_Core_Payment_Form::setPaymentFieldsByProcessor($form, $form->_paymentProcessor);
+    CRM_Core_Payment_Form::setPaymentFieldsByProcessor(
+      $form,
+      $form->_paymentProcessor,
+      CRM_Utils_Request::retrieve('billing_profile_id', 'String')
+    );
 
     $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
 
@@ -113,12 +117,14 @@ class CRM_Core_Payment_ProcessorForm {
     //CRM-15743 - we should not set/create hidden element for pay later
     // because payment processor is not selected
     $processorId = $form->getVar('_paymentProcessorID');
-    $isBillingAddressRequiredForPayLater = $form->_isBillingAddressRequiredForPayLater;
+    $billing_profile_id = CRM_Utils_Request::retrieve('billing_profile_id', 'String');
+    if (!empty($form->_values) && !empty($form->_values['is_billing_required'])) {
+      $billing_profile_id = 'billing';
+    }
     if (!empty($processorId)) {
-      $isBillingAddressRequiredForPayLater = FALSE;
       $form->addElement('hidden', 'hidden_processor', 1);
     }
-    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, empty($isBillingAddressRequiredForPayLater), FALSE);
+    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, $billing_profile_id, FALSE);
   }
 
 }

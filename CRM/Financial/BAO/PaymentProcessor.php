@@ -303,6 +303,19 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processor);
     }
 
+    // Add the pay-later pseudo-processor.
+    $processors['values'][0] = array(
+      'object' =>  new CRM_Core_Payment_Manual(),
+      'id' => 0,
+      'payment_processor_type_id' => 0,
+      'class_name' => 'Payment_Manual',
+      'name' => 'pay_later',
+      'billing_mode' => '',
+      // Making this optionally recur would give lots of options -but it should
+      // be a row in the payment processor table before we do that.
+      'is_recur' => FALSE,
+    );
+
     CRM_Utils_Cache::singleton()->set($cacheKey, $processors['values']);
 
     return $processors['values'];

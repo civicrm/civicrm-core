@@ -92,6 +92,22 @@ abstract class CRM_Core_Payment {
   protected $baseReturnUrl;
 
   /**
+   * The profile configured to show on the billing form.
+   *
+   * Currently only the pseudo-profile 'billing' is supported but hopefully in time we will take an id and
+   * load that from the DB and the processor will be able to return a set of fields that combines it's minimum
+   * requirements with the configured requirements.
+   *
+   * Currently only the pseudo-processor 'manual' or 'pay-later' uses this setting to return a 'curated' set
+   * of fields.
+   *
+   * Note this change would probably include converting 'billing' to a reserved profile.
+   *
+   * @var int|string
+   */
+  protected $billingProfile;
+
+  /**
    * Set Base return URL.
    *
    * @param string $url
@@ -99,6 +115,15 @@ abstract class CRM_Core_Payment {
    */
   public function setBaseReturnUrl($url) {
     $this->baseReturnUrl = $url;
+  }
+
+  /**
+   * Set the configured payment profile.
+   *
+   * @param int|string $value
+   */
+  public function setBillingProfile($value) {
+    $this->billingProfile = $value;
   }
 
   /**
