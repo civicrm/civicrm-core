@@ -107,7 +107,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
     $this->click("edit-submit");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->Batch Update Participants Via PrwaitForPageToLoad($this->getTimeoutMsec());
     $permissions = array("edit-{$roleId}-access-civicrm");
     $this->changePermissions($permissions);
 
@@ -140,7 +140,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("task");
     $this->click('radio_ts', 'ts_all');
     $this->click('task');
-    $this->select('task', 'label=Smart group - create');
+    $this->select('task', 'label=Group - create smart group');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $smartGroupTitle = "SmartGroup" . substr(sha1(rand()), 0, 4);
     $this->type("title", $smartGroupTitle);
