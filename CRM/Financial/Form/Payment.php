@@ -31,6 +31,16 @@
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
+
+  /**
+   * @var int
+   */
+  protected $_paymentProcessorID;
+
+  /**
+   * @var array
+   */
+  public $_paymentProcessor;
   /**
    * Set variables up before form is built.
    */
@@ -42,6 +52,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     $this->assignBillingType();
 
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID);
+
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
     self::addCreditCardJs();
@@ -52,6 +63,9 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     $this->controller->_generateQFKey = FALSE;
   }
 
+  /**
+   * Build quickForm.
+   */
   public function buildQuickForm() {
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
   }
@@ -66,7 +80,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   }
 
   /**
-   * Add JS to show icons for the accepted credit cards
+   * Add JS to show icons for the accepted credit cards.
    */
   public static function addCreditCardJs() {
     $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();

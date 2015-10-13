@@ -451,6 +451,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_isBillingAddressRequiredForPayLater = CRM_Utils_Array::value('is_billing_required', $this->_values);
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
+
+    // We save the fact that the profile 'billing' is required on the payment form.
+    // Currently pay-later is the only 'processor' that takes notice of this - but ideally
+    // 1) it would be possible to select the minimum_billing_profile_id for the contribution form
+    // 2) that profile_id would be set on the payment processor
+    // 3) the payment processor would return a billing form that combines these user-configured
+    // minimums with the payment processor minimums. This would lead to fields like 'postal_code'
+    // only being on the form if either the admin has configured it as wanted or the processor
+    // requires it.
+    $this->assign('billing_profile_id', ($this->_isBillingAddressRequiredForPayLater ? 'billing' : ''));
+
   }
 
   /**

@@ -733,6 +733,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function preProcessPaymentOptions() {
     $this->_paymentProcessorID = NULL;
+    $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
     if ($this->_paymentProcessors) {
       if (!empty($this->_submitValues)) {
         $this->_paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $this->_submitValues);
@@ -750,7 +751,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           }
         }
       }
-      if ($this->_paymentProcessorID) {
+      if ($this->_paymentProcessorID
+        || (isset($this->_submitValues['payment_processor_id']) && $this->_submitValues['payment_processor_id'] == 0)
+      ) {
         CRM_Core_Payment_ProcessorForm::preProcess($this);
       }
       else {

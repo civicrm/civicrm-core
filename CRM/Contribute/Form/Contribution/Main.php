@@ -893,19 +893,18 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    // also return if paylater mode
-    if (CRM_Utils_Array::value('payment_processor_id', $fields) == 0 && $self->_isBillingAddressRequiredForPayLater == 0) {
-      return empty($errors) ? TRUE : $errors;
-    }
-
     // if the user has chosen a free membership or the amount is less than zero
-    // i.e. we skip calling the payment processor and hence dont need credit card
-    // info
+    // i.e. we don't need to validate payment related fields or profiles.
     if ((float) $amount <= 0.0) {
       return $errors;
     }
 
-    CRM_Core_Payment_Form::validatePaymentInstrument($fields['payment_processor_id'], $fields, $errors, $self);
+    CRM_Core_Payment_Form::validatePaymentInstrument(
+      $fields['payment_processor_id'],
+      $fields,
+      $errors,
+      (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
+    );
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
@@ -1161,7 +1160,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // be & by requiring $memFee down here we make it harder to do a sensible refactoring of the function
     // above (ie. extract the amount in a small function).
     if ($this->_values['is_monetary'] &&
-      is_array($this->_paymentProcessor) &&
+      !empty($this->_paymentProcessor) &&
       ((float ) $params['amount'] > 0.0 || $memFee > 0.0)
     ) {
       $this->setContributeMode();
