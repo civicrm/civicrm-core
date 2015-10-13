@@ -152,7 +152,7 @@ function custom_option_html_type( ) {
     {if $action eq 2 and $changeFieldType}
     <br />
     <a class="action-item crm-hover-button" href='{crmURL p="civicrm/admin/custom/group/field/changetype" q="reset=1&id=`$id`"}'>
-      <span class="icon ui-icon-gear"></span>
+      <i class="crm-i fa-wrench"></i>
       {ts}Change Input Field Type{/ts}
     </a>
     <div class='clear'></div>
