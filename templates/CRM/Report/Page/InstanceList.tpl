@@ -26,7 +26,7 @@
 {strip}
   <div class="action-link">
     {if $templateUrl}
-      <a href="{$templateUrl}" class="button"><span><div class="icon ui-icon-circle-plus"></div> {$newButton}</span></a>
+      <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle"></i> {$newButton}</span></a>
     {/if}
     {if $reportUrl}
       <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>
@@ -61,7 +61,7 @@
 
     <div class="action-link">
       {if $templateUrl}
-        <a href="{$templateUrl}" class="button"><span><div class="icon ui-icon-circle-plus"></div> {$newButton}</span></a>
+        <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle"></i> {$newButton}</span></a>
       {/if}
       {if $reportUrl}
         <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>

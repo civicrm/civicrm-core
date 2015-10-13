@@ -1781,6 +1781,15 @@ input.crm-form-entityref {
   float: right;
 }
 
+.crm-container a.crm-event-feed-link {
+  margin: 0 1ex;
+  color: #52534D;
+}
+
+.crm-container a.crm-event-feed-link:hover {
+  color: #2786c2;
+}
+
 .crm-container table.criteria-group {
   margin-bottom: .1em;
 }
@@ -2178,6 +2187,14 @@ input.crm-form-entityref {
   padding-left: 18px;
 }
 
+.crm-container .crm-button.button-crm-i {
+  padding: 2px 0 1px 5px;
+}
+
+.crm-container .crm-button.button-crm-i input {
+  padding-left: 0;
+}
+
 .crm-container .crm-button-icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
   height: 16px;
@@ -2201,9 +2218,80 @@ input.crm-form-entityref {
   background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
 
+/* Font Awesome */
+
+.crm-container a .crm-i,
+.crm-container a:link .crm-i,
+.crm-container a:visited .crm-i,
+.crm-container a:active .crm-i,
+.crm-container a:hover .crm-i,
+.crm-container a .ui-icon[class*=" fa-"],
+.crm-container a:link .ui-icon[class*=" fa-"],
+.crm-container a:visited .ui-icon[class*=" fa-"],
+.crm-container a:active .ui-icon[class*=" fa-"],
+.crm-container a:hover .ui-icon[class*=" fa-"] {
+  color: inherit;
+}
+
+a.crm-i:hover {
+  text-decoration: none;
+}
+
+.crm-container a:hover .crm-i.fa-trash,
+.crm-container .crm-button:hover .crm-i.fa-trash,
+.crm-container .crm-hover-button:hover .crm-i.fa-trash,
+.crm-container span:hover > .crm-i.fa-trash,
+.crm-i.crm-i-red {
+  color: #8A1F11;
+}
+
+.crm-i.crm-i-blue {
+  color: #6177D5;
+}
+
+.crm-i-button>.crm-i {
+  padding-left: 2px;
+  line-height: inherit;
+}
+
+.crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"] {
+  background: none repeat scroll 0 0 transparent !important;
+  color: #F5F6F1;
+}
+
+.crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"]:hover {
+
+}
+
+.crm-container .crm-button.crm-i-button input[type="button"],
+.crm-container .crm-button.crm-i-button input.crm-form-submit {
+  padding-left: 0;
+}
+
 .crm-container .inform-icon {
   background-position: -16px -144px;
   margin-right: 5px;
+}
+
+/* Same as fa-question-circle, plus coloring */
+.crm-container a.helpicon {
+  display: inline-block;
+  color: #F5F6F1;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  opacity: .7;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.crm-container  a.helpicon:hover,
+.crm-container  a.helpicon:focus {
+  opacity: 1;
+}
+
+.crm-container a.helpicon:before {
+  content: "\f059";
 }
 
 /* These .crm-icon classes use item_sprites.png */
@@ -2426,32 +2514,6 @@ input.crm-form-entityref {
 
 .crm-status-box-outer.status-error .crm-status-box-inner {
   background: rgba(255, 7, 0, 0.7);
-}
-
-/* Pop-up help icon - eliminate forced line break */
-.crm-container a.helpicon,
-.crm-container .crm-master-accordion-header a.helpicon {
-  background-color: #6177D5;
-  background-image: url("../i/icons/jquery-ui-F5F6F1.png");
-  background-position: -50px -146px;
-  border-radius: 6px;
-  display: inline-block;
-  height: 12px;
-  width: 12px;
-  opacity: .7;
-  position: relative;
-  top: 2px;
-  padding: 0;
-}
-
-div.crm-accordion-header a.helpicon {
-  background-color: #F5F6F1;
-  background-image: url(../i/icons/jquery-ui-2786C2.png);
-}
-
-div a.helpicon:hover,
-div a.helpicon:focus {
-  opacity: 1;
 }
 
 .crm-container .crm-summary-link {
@@ -3989,4 +4051,8 @@ span.crm-status-icon {
 }
 .crm-container .crm-ui-datetime.ng-dirty input.incomplete {
   border: 1px solid red;
+}
+
+.crm-container .crm-grip {
+  cursor: move;
 }

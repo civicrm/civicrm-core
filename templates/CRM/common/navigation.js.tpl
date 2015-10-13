@@ -142,7 +142,7 @@ $('#civicrm-menu').ready(function() {
     if ($('#crm-notification-container').length) {
       var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu" style="text-align: center; margin-top: -8px;">{ts escape='js'}Restore CiviCRM Menu{/ts}</a>'{literal}, '', 'none', {expires: 10000});
       $('#crm-restore-menu')
-        .button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}})
+        .button({icons: {primary: 'fa-undo'}})
         .click(function(e) {
           e.preventDefault();
           alert.close();

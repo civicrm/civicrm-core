@@ -4,7 +4,7 @@
 {else}
 {if $rows}
 <div class="action-link">
-  <a href="{$addSurveyType}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$GName}Add %1{/ts}</span></a>
+  <a href="{$addSurveyType}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts 1=$GName}Add %1{/ts}</span></a>
 </div>
 
 <div id={$gName}>
@@ -41,7 +41,7 @@
         </table>
         {/strip}
         <div class="action-link">
-          <a href="{$addSurveyType}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts 1=$GName}Add %1{/ts}</span></a>
+          <a href="{$addSurveyType}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts 1=$GName}Add %1{/ts}</span></a>
         </div>
 
 </div>

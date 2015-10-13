@@ -107,8 +107,8 @@
   {/if}
   {if $addMoreFields && !$isReserved}
     <div class="action-link">
-      {crmButton q="reset=1&action=add&fid=$fid&sid=$sid" icon="circle-plus"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
-      {crmButton p="civicrm/admin/price/field" q="reset=1&sid=$sid" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+      {crmButton q="reset=1&action=add&fid=$fid&sid=$sid" icon="plus-circle"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field" q="reset=1&sid=$sid" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

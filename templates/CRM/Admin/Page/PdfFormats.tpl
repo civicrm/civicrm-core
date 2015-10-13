@@ -65,7 +65,7 @@
 {/if}
     <div class="spacer"></div>
     <div class="action-link">
-      {crmButton q="action=add&reset=1" id="newPdfFormat"  icon="circle-plus"}{ts}Add PDF Page Format{/ts}{/crmButton}
-      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+      {crmButton q="action=add&reset=1" id="newPdfFormat"  icon="plus-circle"}{ts}Add PDF Page Format{/ts}{/crmButton}
+      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
 {/if}

@@ -429,20 +429,20 @@
           var titleLocked = parse(attrs.titleLocked, ts('Locked'));
           var titleUnlocked = parse(attrs.titleUnlocked, ts('Unlocked'));
 
-          $(element).addClass('ui-icon lock-button');
+          $(element).addClass('crm-i lock-button');
           var refresh = function () {
             var locked = binding(scope);
             if (locked) {
               $(element)
-                .removeClass('ui-icon-unlocked')
-                .addClass('ui-icon-locked')
+                .removeClass('fa-unlock')
+                .addClass('fa-lock')
                 .prop('title', titleLocked(scope))
               ;
             }
             else {
               $(element)
-                .removeClass('ui-icon-locked')
-                .addClass('ui-icon-unlocked')
+                .removeClass('fa-lock')
+                .addClass('fa-unlock')
                 .prop('title', titleUnlocked(scope))
               ;
             }
@@ -837,13 +837,19 @@
       };
     })
 
-    // Example: <button crm-icon="check">Save</button>
+    // Example for Font Awesome: <button crm-icon="fa-check">Save</button>
+    // Example for jQuery UI (deprecated): <button crm-icon="check">Save</button>
     .directive('crmIcon', function() {
       return {
         restrict: 'EA',
         scope: {},
         link: function (scope, element, attrs) {
-          $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          if (attrs.crmIcon.substring(0,3) == 'fa-') {
+            $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '"></i> ');
+          }
+          else {
+            $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          }
           if ($(element).is('button')) {
             $(element).addClass('crm-button');
           }

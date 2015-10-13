@@ -36,8 +36,8 @@
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          {crmButton q="action=add&reset=1" id="newJob"  icon="circle-plus"}{ts}Add New Scheduled Job{/ts}{/crmButton}
-          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog"  icon="zoomin"}{ts}View Log (all jobs){/ts}{/crmButton}
+          {crmButton q="action=add&reset=1" id="newJob"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog" icon="list-alt"}{ts}View Log (all jobs){/ts}{/crmButton}
         </div>
       {/if}
 
@@ -71,8 +71,8 @@
 
     {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newJob-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Scheduled Job{/ts}</span></a>
-          <a href="{crmURL p='civicrm/admin/joblog' q="reset=1"}" id="jobLog-bottom" class="button"><span><div class="icon ui-icon-zoomin"></div>{ts}View Log (all jobs){/ts}</span></a>
+          {crmButton q="action=add&reset=1" id="newJob-bottom"  icon="plus-circle"}{ts}Add New Scheduled Job{/ts}{/crmButton}
+          {crmButton p='civicrm/admin/joblog' q="reset=1" id="jobLog-bottom" icon="list-alt"}{ts}View Log (all jobs){/ts}{/crmButton}
         </div>
     {/if}
 </div>
@@ -82,7 +82,7 @@
         {ts}There are no jobs configured.{/ts}
      </div>
      <div class="action-link">
-       <a href="{crmURL p='civicrm/admin/job' q="action=add&reset=1"}" id="newJob-nojobs" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add New Scheduled Job{/ts}</span></a>
+       <a href="{crmURL p='civicrm/admin/job' q="action=add&reset=1"}" id="newJob-nojobs" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add New Scheduled Job{/ts}</span></a>
      </div>
 
 {/if}
