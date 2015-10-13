@@ -497,18 +497,6 @@
           $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
         });
         $el.dialog('option', 'buttons', buttons);
-<<<<<<< HEAD
-=======
-
-        // Show done button for non-ajax dialogs (e.g. file downloads)
-        $(this).on('submit', "form[data-no-ajax-submit=true]", function() {
-          $el.dialog('option', 'buttons', [{
-            text: ts('Done'),
-            icons: {primary: 'fa-times'},
-            click: function() {$(this).dialog('close');}
-          }]);
-        });
->>>>>>> 11e4f91... CRM-16415 Print icons and more
       }
       // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
