@@ -1,7 +1,7 @@
 // creates a directive for the snooze options page
 
 (function(angular, $, _) {
-  angular.module('statuapage').directive('crmSnoozeOptions', function(statuspageSeverityList) {
+  angular.module('statuspage').directive('crmSnoozeOptions', function(statuspageSeverityList) {
     return {
       templateUrl: '~/statuspage/SnoozeOptions.html',
       transclude: true,
