@@ -3126,7 +3126,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4673, 1211, "65", "Phitsanulok"),
 (4674, 1211, "54", "Phrae"),
 (4675, 1211, "14", "Phra Nakhon Si Ayutthaya"),
-(4676, 1211, "83", "Phaket"),
+(4676, 1211, "83", "Phuket"),
 (4677, 1211, "25", "Prachin Buri"),
 (4678, 1211, "77", "Prachuap Khiri Khan"),
 (4679, 1211, "85", "Ranong"),
@@ -3996,4 +3996,10 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1074, "C", "Central"),
 
 -- CRM-17136 Add missing Pakistani Province (Punjab)
-(NULL, 1163, "PB", "Punjab");
+(NULL, 1163, "PB", "Punjab"),
+
+-- CRM-17184
+(NULL, 1066, "LI", "La Libertad"),
+(NULL, 1066, "PA", "La Paz"),
+(NULL, 1066, "UN", "La Union");
+

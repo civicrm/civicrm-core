@@ -127,9 +127,28 @@ CRM.$(function($) {
   });
   // After the pdf downloads, the user has to manually close the dialog (which would be nice to fix)
   // But at least we can trigger the underlying list of activities to refresh
-  $form.closest('.ui-dialog-content.crm-ajax-container').on('dialogbeforeclose', function() {
-    $(this).trigger('crmFormSuccess');
+  $('[name=_qf_PDF_submit]', $form).click(function() {
+    var $dialog = $(this).closest('.ui-dialog-content.crm-ajax-container');
+    if ($dialog.length) {
+      $dialog.on('dialogbeforeclose', function () {
+        $(this).trigger('crmFormSuccess');
+      });
+      $dialog.dialog('option', 'buttons', [{
+        text: {/literal}"{ts escape='js'}Done{/ts}"{literal},
+        icons: {primary: 'ui-icon-close'},
+        click: function() {$(this).dialog('close');}
+      }]);
+    }
   });
+  $('[name^=_qf_PDF_submit]', $form).click(function() {
+    CRM.status({/literal}"{ts escape='js'}Downloading...{/ts}"{literal});
+  });
+  showSaveDetails($('input[name=saveTemplate]', $form)[0]);
+
+  function showSaveTemplate() {
+    $('#updateDetails').toggle(!!$(this).val());
+  }
+  $('[name=template]', $form).each(showSaveTemplate).change(showSaveTemplate);
 });
 
 var currentWidth;

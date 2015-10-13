@@ -136,7 +136,7 @@ class CRM_ACL_API {
     if ($contactID && (CRM_Core_Permission::check('edit my contact') ||
       $type == self::VIEW && CRM_Core_Permission::check('view my contact'))
     ) {
-      $where = "contact_a.id = $contactID OR ($where)";
+      $where = "(contact_a.id = $contactID OR ($where))";
     }
     return $where;
   }

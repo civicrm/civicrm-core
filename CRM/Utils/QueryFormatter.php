@@ -25,6 +25,11 @@
  +--------------------------------------------------------------------+
  */
 
+ /**
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
 /**
  * Class CRM_Utils_QueryFormatter
  *
@@ -83,7 +88,8 @@ class CRM_Utils_QueryFormatter {
   }
 
   /**
-   * @var string eg MODE_NONE
+   * @var string 
+   *   eg MODE_NONE
    */
   protected $mode;
 

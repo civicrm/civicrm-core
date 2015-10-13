@@ -202,15 +202,16 @@ class CRM_Case_Page_AJAX {
    */
   public static function deleteCaseRoles() {
     $caseId = CRM_Utils_Type::escape($_POST['case_id'], 'Positive');
-    $relType = CRM_Utils_Type::escape($_POST['rel_type'], 'Positive');
+    $cid = CRM_Utils_Type::escape($_POST['cid'], 'Positive');
+    $relType = CRM_Utils_Request::retrieve('rel_type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
 
-    if (!$relType || !CRM_Case_BAO_Case::accessCase($caseId)) {
+    if (!$cid || !CRM_Case_BAO_Case::accessCase($caseId)) {
       CRM_Utils_System::permissionDenied();
     }
 
-    $sql = "DELETE FROM civicrm_relationship WHERE case_id={$caseId} AND relationship_type_id={$relType}";
-    CRM_Core_DAO::executeQuery($sql);
+    list($relTypeId, $a, $b) = explode('_', $relType);
 
+    CRM_Case_BAO_Case::endCaseRole($caseId, $b, $cid, $relTypeId);
     CRM_Utils_System::civiExit();
   }
 

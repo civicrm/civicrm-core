@@ -148,13 +148,9 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
-    if (!empty($fields['is_reserved'])) {
-      return TRUE;
-    }
-
     $fieldSelected = FALSE;
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
-      if (!empty($fields["where_$count"])) {
+      if (!empty($fields["where_$count"]) || (isset($self->_defaults['is_reserved']) && !empty($self->_defaults["where_$count"]))) {
         $fieldSelected = TRUE;
         break;
       }
@@ -224,7 +220,7 @@ UPDATE civicrm_dedupe_rule_group
     }
 
     // lets skip updating of fields for reserved dedupe group
-    if ($rgDao->is_reserved) {
+    if (isset($this->_defaults['is_reserved'])) {
       CRM_Core_Session::setStatus(ts("The rule '%1' has been saved.", array(1 => $rgDao->title)), ts('Saved'), 'success');
       return;
     }

@@ -563,27 +563,6 @@ DELETE g, v
 
   /**
    * @param string $groupName
-   * @param $value
-   *
-   * @return null|string
-   */
-  public static function optionLabel($groupName, $value) {
-    $query = "
-SELECT v.label
-  FROM civicrm_option_group g,
-       civicrm_option_value v
- WHERE g.id = v.option_group_id
-   AND g.name  = %1
-   AND v.value = %2";
-    $params = array(
-      1 => array($groupName, 'String'),
-      2 => array($value, 'String'),
-    );
-    return CRM_Core_DAO::singleValueQuery($query, $params);
-  }
-
-  /**
-   * @param string $groupName
    * @param $fieldValue
    * @param string $field
    * @param string $fieldType

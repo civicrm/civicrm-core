@@ -498,6 +498,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
+    // Throw status bounce when no Membership type or priceset is present
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && empty($this->allMembershipTypeDetails) && empty($priceSets)
+    ) {
+      CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
+    }
     // retrieve all memberships
     $allMembershipInfo = array();
     foreach ($this->allMembershipTypeDetails as $key => $values) {
@@ -519,7 +525,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $selOrgMemType[$memberOfContactId][$key] = CRM_Utils_Array::value('name', $values);
         }
       }
-
       // build membership info array, which is used when membership type is selected to:
       // - set the payment information block
       // - set the max related block
@@ -659,7 +664,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
-      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
+      array('' => ts('- select -')) + CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $this->_action)
     );
 
     $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));

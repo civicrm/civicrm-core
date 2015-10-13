@@ -35,8 +35,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_HttpClient {
 
@@ -50,7 +48,8 @@ class CRM_Utils_HttpClient {
   protected static $singleton;
 
   /**
-   * @var int|NULL seconds; or NULL to use system default
+   * @var int|NULL
+   *   seconds; or NULL to use system default
    */
   protected $connectionTimeout;
 
@@ -135,7 +134,7 @@ class CRM_Utils_HttpClient {
     list($ch, $caConfig) = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
-      //CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
+      // CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
       return array(self::STATUS_DL_ERROR, NULL);
     }
 
@@ -171,7 +170,7 @@ class CRM_Utils_HttpClient {
     list($ch, $caConfig) = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
-      //CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
+      // CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
       return array(self::STATUS_DL_ERROR, NULL);
     }
 

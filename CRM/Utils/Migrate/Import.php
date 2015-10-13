@@ -83,7 +83,7 @@ class CRM_Utils_Migrate_Import {
     $this->profileFields($xml, $idMap);
     $this->profileJoins($xml, $idMap);
 
-    //create DB Template String sample data
+    // create DB Template String sample data
     $this->dbTemplateString($xml, $idMap);
 
     // clean up all caches etc

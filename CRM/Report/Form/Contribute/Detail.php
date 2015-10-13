@@ -163,6 +163,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
       'civicrm_phone' => array(
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' => array(
@@ -255,7 +258,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'contribution_page_id' => array(
@@ -415,6 +418,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
+    $this->getPermissionedFTQuery($this);
 
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'both'
@@ -488,7 +492,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                  LEFT JOIN civicrm_batch {$this->_aliases['civicrm_batch']}
                         ON {$this->_aliases['civicrm_batch']}.id = {$this->_aliases['civicrm_entity_batch']}.batch_id";
     }
-
   }
 
   public function groupBy() {

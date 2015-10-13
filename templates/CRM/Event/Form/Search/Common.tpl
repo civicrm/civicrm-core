@@ -39,6 +39,12 @@
 {include file="CRM/Core/DateRange.tpl" fieldName="event" from='_start_date_low' to='_end_date_high'}
 </tr>
 <tr>
+  <td><label>{ts}Registration Date{/ts}</label></td>
+</tr>
+<tr>
+{include file="CRM/Core/DateRange.tpl" fieldName="participant" from='_register_date_low' to='_register_date_high'}
+</tr>
+<tr>
   <td class="crm-event-form-block-participant_status"><label>{$form.participant_status_id.label}</label>
     <br />
     {$form.participant_status_id.html}

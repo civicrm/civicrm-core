@@ -223,7 +223,12 @@
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
         {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
-        <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+        <a class="button cancel" href="{$cancelURL}">
+          <span>
+            <div class="icon ui-icon-close"></div>
+            {ts}Cancel{/ts}
+          </span>
+        </a>
       </div>
     {/if}
     {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}

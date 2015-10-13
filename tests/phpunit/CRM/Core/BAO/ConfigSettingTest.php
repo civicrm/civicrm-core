@@ -23,30 +23,31 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
+
+require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * Class CiviReportTestCase
  */
-/*
- * Settings metadata file
- */
+class CRM_Core_BAO_ConfigSettingTest extends CiviUnitTestCase {
+  public function testToggleComponent() {
+    $origNames = array();
+    foreach (CRM_Core_Component::getEnabledComponents() as $c) {
+      $origNames[] = $c->name;
+    }
+    $this->assertTrue(!in_array('CiviCase', $origNames));
 
-return array(
-  'multisite_acl_enabled' => array(
-    'group_name' => 'Multi Site Preferences',
-    'group' => 'multisite',
-    'name' => 'multisite_acl_enabled',
-    'type' => 'Integer',
-    'default' => 1,
-    'add' => '4.3',
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => 'Multisite ACL is enabled',
-    'help_text' => 'Should multisite based ACLs be enabled for this site',
-  ),
- );
+    $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
+
+    $newNames = array();
+    foreach (CRM_Core_Component::getEnabledComponents() as $c) {
+      $newNames[] = $c->name;
+    }
+
+    $this->assertTrue(in_array('CiviCase', $newNames));
+    $this->assertEquals(count($newNames), count($origNames) + 1);
+  }
+
+}

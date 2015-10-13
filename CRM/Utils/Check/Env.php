@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_Utils_Check_Env {
 
@@ -41,6 +39,7 @@ class CRM_Utils_Check_Env {
    */
   public function checkAll() {
     $messages = array_merge(
+      $this->checkPhpVersion(),
       $this->checkMysqlTime(),
       $this->checkDebug(),
       $this->checkOutboundMail(),
@@ -53,6 +52,40 @@ class CRM_Utils_Check_Env {
       $this->checkDbVersion(),
       $this->checkDbEngine()
     );
+    return $messages;
+  }
+
+  /**
+   * @return array
+   */
+  public function checkPhpVersion() {
+    $messages = array();
+
+    if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkPhpVersion',
+        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
+          array(
+            1 => phpversion(),
+            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+          )),
+        ts('PHP Out-of-Date'),
+        \Psr\Log\LogLevel::NOTICE
+      );
+    }
+    else {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkPhpVersion',
+        ts('This system uses PHP version %1 which meets or exceeds the minimum recommendation of %2.',
+          array(
+            1 => phpversion(),
+            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+          )),
+        ts('PHP Up-to-Date'),
+        \Psr\Log\LogLevel::INFO
+      );
+    }
+
     return $messages;
   }
 
@@ -281,7 +314,7 @@ class CRM_Utils_Check_Env {
       else {
         $vNum = $vc->localVersion;
         if ($newerVersion['status'] == 'lts') {
-          $vNum .= ' ' . ts('(long-term support)');  // LTS = long-term support version
+          $vNum .= ' ' . ts('(long-term support)');      // LTS = long-term support version
         }
 
         $severity = \Psr\Log\LogLevel::INFO;

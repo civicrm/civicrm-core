@@ -274,7 +274,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_fields = array();
 
       CRM_Contribute_BAO_ContributionPage::setValues($this->_id, $this->_values);
-
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+        && !CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']))
+      ) {
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      }
       if (empty($this->_values['is_active'])) {
         throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
       }
@@ -1198,6 +1202,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   /**
    * Determine if recurring parameters need to be added to the form parameters.
+   *
    *  - is_recur
    *  - frequency_interval
    *  - frequency_unit
@@ -1209,18 +1214,24 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Arguably the form should start to build $this->_params in the pre-process main page & use that array consistently throughout.
    */
   protected function setRecurringMembershipParams() {
-    if (!empty($this->_params['priceSetId']) && !empty($this->_params['selectMembership'])) {
+    $selectedMembershipTypeID = CRM_Utils_Array::value('selectMembership', $this->_params);
+    if ($selectedMembershipTypeID) {
       // @todo the price_x fields will ALWAYS allow us to determine the membership - so we should ignore
       // 'selectMembership' and calculate from the price_x fields so we have one method that always works
       // this is lazy & only catches when selectMembership is set, but the worst of all worlds would be to fix
       // this with an else (calculate for price set).
-      $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->_params['priceSetId']);
-      if (in_array($this->_params['selectMembership'], $membershipTypes['autorenew'])) {
+      $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->_priceSetId);
+      if (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
+        || (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']) &&
+          !empty($this->_params['is_recur']))
+      ) {
         $this->_params['auto_renew'] = TRUE;
       }
     }
-    if ((!empty($this->_params['selectMembership']) || !empty($this->_params['priceSetId'])) && !empty($this->_paymentProcessor['is_recur']) &&
-      CRM_Utils_Array::value('auto_renew', $this->_params) && empty($this->_params['is_recur']) && empty($this->_params['frequency_interval'])
+    if ((!empty($this->_params['selectMembership']) || !empty($this->_params['priceSetId']))
+      && !empty($this->_paymentProcessor['is_recur']) &&
+      CRM_Utils_Array::value('auto_renew', $this->_params)
+      && empty($this->_params['is_recur']) && empty($this->_params['frequency_interval'])
     ) {
 
       $this->_params['is_recur'] = $this->_values['is_recur'] = 1;

@@ -166,6 +166,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_line_item' => array(
+        'dao' => 'CRM_Price_DAO_LineItem',
+      ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'grouping' => 'contact-field',
@@ -222,7 +225,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
@@ -427,10 +430,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->where();
     $this->groupBy();
 
+    $this->getPermissionedFTQuery($this);
+
     $rows = $this->_contactIds = array();
     $this->limit();
     $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}  GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
-
+    $this->addToDeveloperTab($getContacts);
     $dao = CRM_Core_DAO::executeQuery($getContacts);
 
     while ($dao->fetch()) {
@@ -444,7 +449,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     if (!empty($this->_contactIds) || !empty($this->_params['charts'])) {
       $sql = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" . implode(',', $this->_contactIds) . ")
         AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
-
+      $this->addToDeveloperTab($sql);
       $dao = CRM_Core_DAO::executeQuery($sql);
       $current_year = $this->_params['yid_value'];
       $previous_year = $current_year - 1;

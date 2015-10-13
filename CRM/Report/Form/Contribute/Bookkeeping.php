@@ -219,7 +219,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
         ),
         'order_bys' => array(
@@ -410,6 +410,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
                     ON fitem.financial_account_id = {$this->_aliases['civicrm_financial_account']}_credit_2.id
               LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
                     ON  fitem.entity_id = {$this->_aliases['civicrm_line_item']}.id AND fitem.entity_table = 'civicrm_line_item' ";
+    $this->getPermissionedFTQuery($this, "civicrm_line_item_1");
   }
 
   public function orderBy() {
@@ -484,7 +485,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = " GROUP BY  {$this->_aliases['civicrm_contribution']}.id, {$this->_aliases['civicrm_line_item']}.id ";
+    $this->_groupBy = " GROUP BY  {$this->_aliases['civicrm_entity_financial_trxn']}.id, {$this->_aliases['civicrm_line_item']}.id ";
   }
 
   /**

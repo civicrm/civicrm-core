@@ -176,6 +176,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         'name' => $form->_single ? ts('Make PDF') : ts('Make PDFs'),
         'isDefault' => TRUE,
       );
+      $buttons[] = array(
+        'type' => 'submit',
+        'name' => ts('Preview'),
+        'subName' => 'preview',
+        'icon' => 'search',
+        'isDefault' => FALSE,
+      );
     }
     $buttons[] = array(
       'type' => 'cancel',
@@ -312,7 +319,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    */
   public static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);
-
+    $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
 
@@ -345,7 +352,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       $html[] = $tokenHtml;
     }
 
-    self::createActivities($form, $html_message, $form->_contactIds);
+    // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
+    if ($buttonName == '_qf_PDF_submit') {
+      self::createActivities($form, $html_message, $form->_contactIds);
+    }
 
     CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
 

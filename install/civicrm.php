@@ -89,7 +89,9 @@ function civicrm_main(&$config) {
     );
   }
   elseif ($installType == 'wordpress') {
-    civicrm_setup(WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'files');
+    $upload_dir = wp_upload_dir();
+    $files_dirname = $upload_dir['basedir'];
+    civicrm_setup($files_dirname);
   }
 
   $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
@@ -119,7 +121,7 @@ function civicrm_main(&$config) {
     $configFile = $cmsPath . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . $siteDir . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
   }
   elseif ($installType == 'wordpress') {
-    $configFile = $cmsPath . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
+    $configFile = $files_dirname . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
   }
 
   $string = civicrm_config($config);

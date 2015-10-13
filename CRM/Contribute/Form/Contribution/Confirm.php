@@ -1922,22 +1922,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
 
-    if (!array_key_exists('first_name', $fields)) {
-      $nameFields = array('first_name', 'middle_name', 'last_name');
-      foreach ($nameFields as $name) {
-        $fields[$name] = 1;
-        if (array_key_exists("billing_$name", $params)) {
-          $params[$name] = $params["billing_{$name}"];
-          $params['preserveDBName'] = TRUE;
-        }
-      }
-    }
+    $fields = $this->formatParamsForPaymentProcessor($fields);
 
     // billing email address
     $fields["email-{$this->_bltID}"] = 1;
 
     //unset the billing parameters if it is pay later mode
     //to avoid creation of billing location
+    // @todo - note that elsewhere we don't unset these - we simply make
+    // a sensible decision about including them when building the form
+    // and if they are submitted we handle them. Check out abstractEditPaymentForm.
     if ($isPayLater && !$this->_isBillingAddressRequiredForPayLater) {
       $billingFields = array(
         'billing_first_name',
@@ -2192,7 +2186,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param bool $isPayLater
    */
   protected function doMembershipProcessing($contactID, $membershipParams, $premiumParams, $isPayLater) {
-
+    // This could be set by a hook.
+    if (!empty($this->_params['installments'])) {
+      $membershipParams['installments'] = $this->_params['installments'];
+    }
     // added new parameter for cms user contact id, needed to distinguish behaviour for on behalf of sign-ups
     if (isset($this->_params['related_contact'])) {
       $membershipParams['cms_contactID'] = $this->_params['related_contact'];

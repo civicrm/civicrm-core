@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id: $
- *
  */
 class CRM_Utils_Verp {
   /* Mapping of reserved characters to hex codes */

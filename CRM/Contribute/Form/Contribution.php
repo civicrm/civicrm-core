@@ -458,7 +458,17 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object.
    */
   public function buildQuickForm() {
-
+    // FIXME: This probably needs to be done in preprocess
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+      && $this->_action & CRM_Core_Action::UPDATE
+      && CRM_Utils_Array::value('financial_type_id', $this->_values)
+    ) {
+      $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
+      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($this->_id, 'edit');
+      if (!CRM_Core_Permission::check('edit contributions of type ' . $financialTypeID)) {
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      }
+    }
     $allPanes = array();
     $recurJs = NULL;
     //tax rate from financialType
@@ -609,12 +619,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
 
+    // Check permissions for financial type first
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $this->_action);
+    if (empty($financialTypes)) {
+      CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
+    }
     $financialType = $this->add('select', 'financial_type_id',
       ts('Financial Type'),
-      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
+      array('' => ts('- select -')) + $financialTypes,
       TRUE,
       array('onChange' => "CRM.buildCustomData( 'Contribution', this.value );")
     );
+
     $paymentInstrument = FALSE;
     if (!$this->_mode) {
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
@@ -1151,6 +1167,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];
+    $financialType->find(TRUE);
 
     // Add some financial type details to the params list
     // if folks need to use it.
@@ -1413,6 +1430,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $lineID = key($line);
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('price_field_id', $line[$lineID]), 'price_set_id');
       $quickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config');
+      // Why do we do this? Seems like a like a wrapper for old functionality - but single line price sets & quick
+      // config should be treated the same.
       if ($quickConfig) {
         CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_contribution');
       }
@@ -1430,11 +1449,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $submittedValues['price_' . $fieldID] = 1;
     }
 
+    // Every contribution has a price-set - the only reason it shouldn't be set is if we are dealing with
+    // quick config (very very arguably) & yet we see that this could still be quick config so this should be understood
+    // as a point of fragility rather than a logical 'if' clause.
     if ($priceSetId) {
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
         $submittedValues, $lineItem[$priceSetId]);
-
       // Unset tax amount for offline 'is_quick_config' contribution.
+      // @todo WHY  - quick config was conceived as a quick way to configure contribution forms.
+      // this is an example of 'other' functionality being hung off it.
       if ($this->_priceSet['is_quick_config'] &&
         !array_key_exists($submittedValues['financial_type_id'], CRM_Core_PseudoConstant::getTaxRates())
       ) {
@@ -1464,8 +1487,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         }
       }
     }
+
     if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
       // CRM-10117 update the line items for participants.
+      // @todo - if we are completing a contribution then the api call
+      // civicrm_api3('Contribution', 'completetransaction') should take care of
+      // all associated updates rather than replicating them on the form layer.
       if ($pId) {
         $entityTable = 'participant';
         $entityID = $pId;
@@ -1493,6 +1520,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->_priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
       }
 
+      // @todo see above - new functionality has been inappropriately added to the quick config concept
+      // and new functionality has been added onto the form layer rather than the BAO :-(
       if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
         //CRM-16833: Ensure tax is applied only once for membership conribution, when status changed.(e.g Pending to Completed).
         $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
@@ -1530,6 +1559,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //CRM-11529 for quick config back office transactions
     //when financial_type_id is passed in form, update the
     //line items with the financial type selected in form
+    // NOTE that this IS still a legitimate use of 'quick-config' for contributions under the current DB but
+    // we should look at having a price field per contribution type & then there would be little reason
+    // for the back-office contribution form postProcess to know if it is a quick-config form.
     if ($isQuickConfig && !empty($submittedValues['financial_type_id']) && CRM_Utils_Array::value($this->_priceSetId, $lineItem)
     ) {
       foreach ($lineItem[$this->_priceSetId] as &$values) {
@@ -1664,6 +1696,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $params['non_deductible_amount'] = $this->calculateNonDeductibleAmount($params, $formValues);
 
+      // we are already handling note below, so to avoid duplicate notes against $contribution
+      if (!empty($params['note']) && !empty($submittedValues['note'])) {
+        unset($params['note']);
+      }
       $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
 
       // process associated membership / participant, CRM-4395
@@ -1705,7 +1741,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    if ($contribution->id && isset($submittedValues['note'])) {
+    if ($contribution->id && !empty($submittedValues['note'])) {
       CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
 
@@ -1802,6 +1838,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];
+    $financialType->find(TRUE);
 
     if ($financialType->is_deductible) {
 

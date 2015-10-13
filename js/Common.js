@@ -591,6 +591,9 @@ if (!CRM.vars) CRM.vars = {};
     });
   }
 
+  /**
+   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
+   */
   $.fn.crmDatepicker = function(options) {
     return $(this).each(function() {
       if ($(this).is('.crm-form-date-wrapper .crm-hidden-date')) {
@@ -604,7 +607,7 @@ if (!CRM.vars) CRM.vars = {};
         $timeField = $(),
         $clearLink = $();
 
-      if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.hasClass('required')) {
+      if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
         $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><span class="icon ui-icon-close"></span></a>')
           .insertAfter($dataField);
       }
@@ -624,15 +627,15 @@ if (!CRM.vars) CRM.vars = {};
         $dateField = $('<input>').insertAfter($dataField);
         copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
         $dateField.addClass('crm-form-text crm-form-date');
-        settings.dateFormat = settings.dateFormat || CRM.config.dateInputFormat;
-        settings.changeMonth = _.includes('m', settings.dateFormat);
-        settings.changeYear = _.includes('y', settings.dateFormat);
+        settings.date = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
+        settings.changeMonth = _.includes('m', settings.date);
+        settings.changeYear = _.includes('y', settings.date);
         $dateField.datepicker(settings).change(updateDataField);
       }
       // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
       function isValidDate() {
         try {
-          $.datepicker.parseDate(settings.dateFormat, $dateField.val());
+          $.datepicker.parseDate(settings.date, $dateField.val());
           return true;
         } catch (e) {
           return false;
@@ -874,7 +877,19 @@ if (!CRM.vars) CRM.vars = {};
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
       $('table.crm-sortable', e.target).DataTable();
-      $('table.crm-ajax-table', e.target).crmAjaxTable();
+      $('table.crm-ajax-table', e.target).each(function() {
+        var
+          $table = $(this),
+          $accordion = $table.closest('.crm-accordion-wrapper.collapsed, .crm-collapsible.collapsed');
+        // For tables hidden by collapsed accordions, wait.
+        if ($accordion.length) {
+          $accordion.one('crmAccordion:open', function() {
+            $table.crmAjaxTable();
+          });
+        } else {
+          $table.crmAjaxTable();
+        }
+      });
       if ($("input:radio[name=radio_ts]").size() == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }
@@ -1351,13 +1366,15 @@ if (!CRM.vars) CRM.vars = {};
       })
       // Handle accordions
       .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+        var action = 'open';
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);
         }
         else {
           $(this).next().css('display', 'block').slideUp(200);
+          action = 'close';
         }
-        $(this).parent().toggleClass('collapsed');
+        $(this).parent().toggleClass('collapsed').trigger('crmAccordion:' + action);
         e.preventDefault();
       });
 
@@ -1370,13 +1387,15 @@ if (!CRM.vars) CRM.vars = {};
    */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
+      var action = 'open';
       if ($(this).hasClass('collapsed')) {
         $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
       }
       else {
         $('.crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
+        action = 'close';
       }
-      $(this).toggleClass('collapsed');
+      $(this).toggleClass('collapsed').trigger('crmAccordion:' + action);
     });
   };
 

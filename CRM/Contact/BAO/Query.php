@@ -493,6 +493,15 @@ class CRM_Contact_BAO_Query {
 
     $this->selectClause();
     $this->_whereClause = $this->whereClause();
+    if (array_key_exists('civicrm_contribution', $this->_whereTables)) {
+      $component = 'contribution';
+    }
+    if (array_key_exists('civicrm_membership', $this->_whereTables)) {
+      $component = 'membership';
+    }
+    if (isset($component)) {
+      CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
+    }
 
     $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
     $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
@@ -819,6 +828,11 @@ class CRM_Contact_BAO_Query {
               elseif ($tName == 'state_province') {
                 $this->_pseudoConstantsSelect[$tName]['select'] = "{$field['where']} as `$name`";
                 $this->_pseudoConstantsSelect[$tName]['element'] = $name;
+              }
+              elseif (strpos($name, 'contribution_soft_credit') !== FALSE) {
+                if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_params)) {
+                  $this->_select[$name] = "{$field['where']} as `$name`";
+                }
               }
               else {
                 $this->_select[$name] = "{$field['where']} as `$name`";
@@ -1331,6 +1345,13 @@ class CRM_Contact_BAO_Query {
     }
     else {
       if (!empty($this->_paramLookup['group'])) {
+
+        list($name, $op, $value, $grouping, $wildcard) = $this->_paramLookup['group'][0];
+
+        if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+          $this->_paramLookup['group'][0][1] = key($value);
+        }
+
         // make sure there is only one element
         // this is used when we are running under smog and need to know
         // how the contact was added (CRM-1203)
@@ -1347,10 +1368,17 @@ class CRM_Contact_BAO_Query {
 
           if (!isset($group->saved_search_id)) {
             $tbName = "`civicrm_group_contact-{$groupId}`";
-            $this->_select['group_contact_id'] = "$tbName.id as group_contact_id";
-            $this->_element['group_contact_id'] = 1;
-            $this->_select['status'] = "$tbName.status as status";
-            $this->_element['status'] = 1;
+            // CRM-17254 don't retrieve extra fields if contact_id is specifically requested
+            // as this will add load to an intentionally light query.
+            // ideally this code would be removed as it appears to be to support CRM-1203
+            // and passing in the required returnProperties from the url would
+            // make more sense that globally applying the requirements of one form.
+            if (($this->_returnProperties != array('contact_id'))) {
+              $this->_select['group_contact_id'] = "$tbName.id as group_contact_id";
+              $this->_element['group_contact_id'] = 1;
+              $this->_select['status'] = "$tbName.status as status";
+              $this->_element['status'] = 1;
+            }
           }
         }
         $this->_useGroupBy = TRUE;
@@ -1478,6 +1506,9 @@ class CRM_Contact_BAO_Query {
     }
 
     foreach ($formValues as $id => $values) {
+
+      self::legacyConvertFormValues($id, $values);
+
       if (self::isAlreadyProcessedForQueryFormat($values)) {
         $params[] = $values;
         continue;
@@ -1509,11 +1540,16 @@ class CRM_Contact_BAO_Query {
       elseif (preg_match('/_date_relative$/', $id) ||
         $id == 'event_relative' ||
         $id == 'case_from_relative' ||
-        $id == 'case_to_relative'
+        $id == 'case_to_relative' ||
+        $id == 'participant_relative'
       ) {
         if ($id == 'event_relative') {
           $fromRange = 'event_start_date_low';
           $toRange = 'event_end_date_high';
+        }
+        elseif ($id == 'participant_relative') {
+          $fromRange = 'participant_register_date_low';
+          $toRange = 'participant_register_date_high';
         }
         elseif ($id == 'case_from_relative') {
           $fromRange = 'case_from_start_date_low';
@@ -1548,6 +1584,26 @@ class CRM_Contact_BAO_Query {
       }
     }
     return $params;
+  }
+
+  /**
+   * Function to support legacy format for groups and tags.
+   *
+   * @param string $id
+   * @param array|int $values
+   *
+   */
+  public static function legacyConvertFormValues($id, &$values) {
+    if (in_array($id, array('group', 'tag')) && is_array($values)) {
+      // prior to 4.7, formValues for some attributes (e.g. group, tag) are stored in array(id1 => 1, id2 => 1),
+      // as per the recent Search fixes $values need to be in standard array(id1, id2) format
+      $ids = array_keys($values, 1);
+      if (count($ids) > 1 ||
+        (count($ids) == 1 && (key($values) > 1 || (key($values) == 1 && $values[1] == 1))) // handle (0 => 4), (1 => 1)
+      ) {
+        $values = $ids;
+      }
+    }
   }
 
   /**
@@ -1994,7 +2050,7 @@ class CRM_Contact_BAO_Query {
         $where = "civicrm_address.state_province_id";
       }
 
-      $this->_where[$grouping][] = self::buildClause($where, $op, $value, 'Positive');
+      $this->_where[$grouping][] = self::buildClause($where, $op, $value);
       list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_Address', "state_province_id", $value, $op);
       $this->_qill[$grouping][] = ts("State %1 %2", array(1 => $qillop, 2 => $qillVal));
     }
@@ -2777,8 +2833,18 @@ class CRM_Contact_BAO_Query {
   public function group(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
+    // If the $value is in OK (operator as key) array format we need to extract the key as operator and value first
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
+
     // Replace pseudo operators from search builder
     $op = str_replace('EMPTY', 'NULL', $op);
+
+    if (strpos($op, 'NULL')) {
+      $value = NULL;
+    }
 
     if (count($value) > 1) {
       if (strpos($op, 'IN') === FALSE && strpos($op, 'NULL') === FALSE) {
@@ -3454,7 +3520,7 @@ WHERE  $smartGroupClause
 
     // Handle numeric postal code range searches properly by casting the column as numeric
     if (is_numeric($value)) {
-      $field = 'ROUND(civicrm_address.postal_code)';
+      $field = "IF (civicrm_address.postal_code REGEXP '^[0-9]+$', CAST(civicrm_address.postal_code AS UNSIGNED), 0)";
       $val = CRM_Utils_Type::escape($value, 'Integer');
     }
     else {
@@ -3949,12 +4015,7 @@ WHERE  $smartGroupClause
       }
     }
 
-    $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
-    $relTypeOrg = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
-    $relTypeHou = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Household');
-    $allRelationshipType = array();
-    $allRelationshipType = array_merge($relTypeInd, $relTypeOrg);
-    $allRelationshipType = array_merge($allRelationshipType, $relTypeHou);
+    $allRelationshipType = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE);
 
     if ($nameClause || !$targetGroup) {
       if (!empty($relationType)) {
@@ -4738,6 +4799,16 @@ SELECT COUNT( conts.total_amount ) as total_count,
     if ($context == 'search') {
       $where .= " AND contact_a.is_deleted = 0 ";
     }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    if (!empty($financialTypes)) {
+      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND li.id IS NULL";
+      $from .= " LEFT JOIN civicrm_line_item li
+                      ON civicrm_contribution.id = li.contribution_id AND
+                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ") ";
+    }
+    else {
+      $where .= " AND civicrm_contribution.financial_type_id IN (0)";
+    }
 
     // make sure contribution is completed - CRM-4989
     $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
@@ -4747,7 +4818,6 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
     $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
       civicrm_contribution.currency $from $completedWhere";
-
     $query = "$select FROM (
       $innerQuery GROUP BY civicrm_contribution.id
     ) as conts

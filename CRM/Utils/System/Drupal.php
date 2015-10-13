@@ -150,7 +150,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
         )->fetchField();
         if ((bool) $uid) {
           $resetUrl = $config->userFrameworkBaseURL . 'user/password';
-          $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
+          $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
             array(1 => $params['mail'], 2 => $resetUrl)
           );
         }
@@ -764,7 +764,8 @@ AND    u.status = 1
    */
   public function getTimeZoneString() {
     global $user;
-    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+    // Note that 0 is a valid timezone (GMT) so we use strlen not empty to check.
+    if (variable_get('configurable_timezones', 1) && $user->uid && isset($user->timezone) && strlen($user->timezone)) {
       $timezone = $user->timezone;
     }
     else {

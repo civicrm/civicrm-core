@@ -194,7 +194,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
           );
         }
         else {
-          $errors[$emailName] = ts('This email %1 is already registered. Please select another email.',
+          $errors[$emailName] = ts('This email %1 already has an account associated with it. Please select another email.',
             array(1 => $email)
           );
         }
@@ -726,7 +726,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    */
   public function getTimeZoneString() {
     global $user;
-    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+    // Note that 0 is a valid timezone (GMT) so we use strlen not empty to check.
+    if (variable_get('configurable_timezones', 1) && $user->uid && isset($user->timezone) && strlen($user->timezone)) {
       $timezone = $user->timezone;
     }
     else {

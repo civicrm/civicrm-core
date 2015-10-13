@@ -42,9 +42,9 @@ abstract class CRM_Utils_Hook {
 
   // by default - place content below existing content
   const SUMMARY_BELOW = 1;
-  // pace hook content above
+  // place hook content above
   const SUMMARY_ABOVE = 2;
-  // create your own summarys
+  // create your own summaries
   const SUMMARY_REPLACE = 3;
 
   static $_nullObject = NULL;
@@ -1266,7 +1266,7 @@ abstract class CRM_Utils_Hook {
    *   the selector object. Allows you access to the context of the search
    *
    * @return mixed
-   *   modify the header and values object to pass the data u need
+   *   modify the header and values object to pass the data you need
    */
   public static function searchColumns($objectName, &$headers, &$rows, &$selector) {
     return self::singleton()->invoke(4, $objectName, $headers, $rows, $selector,
@@ -1627,9 +1627,9 @@ abstract class CRM_Utils_Hook {
     self::singleton()
       ->invoke(2, $exception, $request, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_unhandled_exception');
     // == 4.4 ==
-    //$event = new stdClass();
-    //$event->exception = $exception;
-    //CRM_Core_LegacyErrorHandler::handleException($event);
+    // $event = new stdClass();
+    // $event->exception = $exception;
+    // CRM_Core_LegacyErrorHandler::handleException($event);
 
     // == 4.5+ ==
     $event = new \Civi\Core\Event\UnhandledExceptionEvent($exception, self::$_nullObject);

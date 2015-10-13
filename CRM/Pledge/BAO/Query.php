@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Pledge_BAO_Query {
   /**
@@ -45,8 +43,6 @@ class CRM_Pledge_BAO_Query {
    * Build select for Pledge.
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     $statusId = implode(',', array_keys(CRM_Core_PseudoConstant::accountOptionValues("contribution_status", NULL, " AND v.name IN  ('Pending', 'Overdue')")));
@@ -56,7 +52,7 @@ class CRM_Pledge_BAO_Query {
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
     }
 
-    //add pledge select
+    // add pledge select
     if (!empty($query->_returnProperties['pledge_amount'])) {
       $query->_select['pledge_amount'] = 'civicrm_pledge.amount as pledge_amount';
       $query->_element['pledge_amount'] = 1;
@@ -513,7 +509,7 @@ class CRM_Pledge_BAO_Query {
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple')
     );
 
-    //unset in progress for payment
+    // unset in progress for payment
     unset($statusValues['5']);
 
     $form->add('select', 'pledge_payment_status_id',
@@ -533,7 +529,7 @@ class CRM_Pledge_BAO_Query {
       FALSE, array('class' => 'crm-select2')
     );
 
-    //add fields for pledge frequency
+    // add fields for pledge frequency
     $form->add('text', 'pledge_frequency_interval', ts('Every'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('pledge_frequency_interval', ts('Please enter valid Pledge Frequency Interval'), 'integer');
     $frequencies = CRM_Core_OptionGroup::values('recur_frequency_units');
@@ -581,7 +577,7 @@ class CRM_Pledge_BAO_Query {
    * @param $tables
    */
   public static function tableNames(&$tables) {
-    //add status table
+    // add status table
     if (!empty($tables['pledge_status']) || !empty($tables['civicrm_pledge_payment'])) {
       $tables = array_merge(array('civicrm_pledge' => 1), $tables);
     }

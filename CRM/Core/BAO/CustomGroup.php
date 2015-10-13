@@ -123,7 +123,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'is_multiple',
     );
     foreach ($fields as $field) {
-      if (isset($params[$field])) {
+      if (isset($params[$field]) || $field == 'is_multiple') {
         $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
       }
     }
@@ -1297,9 +1297,12 @@ ORDER BY civicrm_custom_group.weight,
           continue;
         }
 
-        if (!empty($field['element_name'])) {
-          $elementName = $field['element_name'];
+        if (empty($field['element_name'])) {
+          continue;
         }
+
+        $elementName = $field['element_name'];
+
         switch ($field['html_type']) {
           case 'Multi-Select':
           case 'AdvMulti-Select':

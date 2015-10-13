@@ -55,9 +55,21 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       asort($this->activeCampaigns);
       $this->engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
     }
-    $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE);
-    asort($this->activityTypes);
 
+    $components = CRM_Core_Component::getEnabledComponents();
+    foreach ($components as $componentName => $componentInfo) {
+      if (CRM_Core_Permission::check("access $componentName")) {
+        $accessAllowed[] = $componentInfo->componentID;
+      }
+    }
+
+    $include = '';
+    if (!empty($accessAllowed)) {
+      $include = 'OR v.component_id IN (' . implode(', ', $accessAllowed) . ')';
+    }
+    $condition = " AND ( v.component_id IS NULL {$include} )";
+    $this->activityTypes = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition);
+    asort($this->activityTypes);
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -563,7 +575,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
               if ($fieldName == 'activity_type_id' &&
                 empty($this->_params['activity_type_id_value'])
               ) {
-                $actTypes = array_flip(CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'label', TRUE));
+                $actTypes = array_flip($this->activityTypes);
                 $clause = "( {$this->_aliases['civicrm_activity']}.activity_type_id IN (" .
                   implode(',', $actTypes) . ") )";
               }
@@ -592,14 +604,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             $clauses[] = $clause;
           }
         }
-      }
-    }
-
-    // CRM-12675
-    $components = CRM_Core_Component::getNames();
-    foreach ($components as $componentID => $componentName) {
-      if (!CRM_Core_Permission::check("access $componentName")) {
-        $clauses[] = " ({$this->_aliases['civicrm_option_value']}.component_id IS NULL OR {$this->_aliases['civicrm_option_value']}.component_id <> {$componentID}) ";
       }
     }
 

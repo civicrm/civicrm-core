@@ -117,6 +117,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test civicrm_contact_create.
+   *
+   * Verify that preferred language can be set.
+   */
+  public function testAddCreateIndividualWithPreferredLanguage() {
+    $params = array(
+      'first_name' => 'abc1',
+      'contact_type' => 'Individual',
+      'last_name' => 'xyz1',
+      'preferred_language' => 'es_ES',
+    );
+
+    $contact = $this->callAPISuccess('contact', 'create', $params);
+    $this->getAndCheck($params, $contact['id'], 'Contact');
+  }
+
+  /**
    * Test civicrm_contact_create with sub-types.
    *
    * Verify that sub-types are created successfully and not deleted by subsequent updates.
@@ -2689,6 +2706,37 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     foreach ($deprecated as $action) {
       $this->assertArrayKeyExists($action, $result['deprecated']);
     }
+  }
+
+  /**
+   * Test the duplicate check function.
+   */
+  public function testDuplicateCheck() {
+    $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'Harry',
+      'last_name' => 'Potter',
+      'email' => 'harry@hogwarts.edu',
+      'contact_type' => 'Individual',
+    ));
+    $result = $this->callAPISuccess('Contact', 'duplicatecheck', array(
+      'match' => array(
+        'first_name' => 'Harry',
+        'last_name' => 'Potter',
+        'email' => 'harry@hogwarts.edu',
+        'contact_type' => 'Individual',
+      ),
+    ));
+
+    $this->assertEquals(1, $result['count']);
+    $result = $this->callAPISuccess('Contact', 'duplicatecheck', array(
+      'match' => array(
+        'first_name' => 'Harry',
+        'last_name' => 'Potter',
+        'email' => 'no5@privet.drive',
+        'contact_type' => 'Individual',
+      ),
+    ));
+    $this->assertEquals(0, $result['count']);
   }
 
 }

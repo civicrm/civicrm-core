@@ -466,6 +466,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->add('textarea', 'pcp_personal_note', ts('Personal Note'), array('style' => 'height: 3em; width: 40em;'));
       }
     }
+    if (empty($this->_values['fee'])) {
+      CRM_Core_Error::fatal(ts('This page does not have any price fields configured or you may not have permission for them. Please contact the site administrator for more details.'));
+    }
 
     //we have to load confirm contribution button in template
     //when multiple payment processor as the user
@@ -961,19 +964,34 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * Process the form submission.
    */
   public function postProcess() {
-    $config = CRM_Core_Config::singleton();
     // we first reset the confirm page so it accepts new values
     $this->controller->resetPage('Confirm');
 
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+    $this->submit($params);
 
+    if (empty($this->_values['is_confirm_enabled'])) {
+      $this->skipToThankYouPage();
+    }
+
+  }
+
+  /**
+   * Submit function.
+   *
+   * This is the guts of the postProcess made also accessible to the test suite.
+   *
+   * @param array $params
+   *   Submitted values.
+   */
+  public function submit($params) {
     //carry campaign from profile.
     if (array_key_exists('contribution_campaign_id', $params)) {
       $params['campaign_id'] = $params['contribution_campaign_id'];
     }
 
-    $params['currencyID'] = $config->defaultCurrency;
+    $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     if (!empty($params['priceSetId'])) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
@@ -1025,6 +1043,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $params['is_pay_later'] = 0;
     }
 
+    // Would be nice to someday understand the point of this set.
     $this->set('is_pay_later', $params['is_pay_later']);
     // assign pay later stuff
     $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
@@ -1039,14 +1058,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $params['separate_amount'] = $params['amount'];
     $memFee = NULL;
     if (!empty($params['selectMembership'])) {
-      if (!empty($this->_membershipTypeValues)) {
-        $membershipTypeValues = $this->_membershipTypeValues[$params['selectMembership']];
-      }
-      else {
-        $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this,
+      if (empty($this->_membershipTypeValues)) {
+        $this->_membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this,
           (array) $params['selectMembership']
         );
       }
+      $membershipTypeValues = $this->_membershipTypeValues[$params['selectMembership']];
       $memFee = $membershipTypeValues['minimum_fee'];
       if (!$params['amount'] && !$this->_separateMembershipPayment) {
         $params['amount'] = $memFee ? $memFee : 0;
@@ -1140,9 +1157,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $invoiceID = md5(uniqid(rand(), TRUE));
     $this->set('invoiceID', $invoiceID);
     $params['invoiceID'] = $invoiceID;
-    $params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
+    $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']));
     $params['button'] = $this->controller->getButtonName();
     // required only if is_monetary and valid positive amount
+    // @todo it seems impossible for $memFee to be greater than 0 & $params['amount'] not to
+    // be & by requiring $memFee down here we make it harder to do a sensible refactoring of the function
+    // above (ie. extract the amount in a small function).
     if ($this->_values['is_monetary'] &&
       is_array($this->_paymentProcessor) &&
       ((float ) $params['amount'] > 0.0 || $memFee > 0.0)
@@ -1162,11 +1182,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->handlePreApproval($this->_params);
       }
     }
-
-    if (empty($this->_values['is_confirm_enabled'])) {
-      $this->skipToThankYouPage();
-    }
-
   }
 
   /**
@@ -1216,6 +1231,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // redirect to thank you page
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
+  }
+
+  /**
+   * Function for unit tests on the postProcess function.
+   *
+   * @param array $params
+   */
+  public function testSubmit($params) {
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $this->controller = new CRM_Contribute_Controller_Contribution();
+    $this->submit($params);
   }
 
 }

@@ -264,7 +264,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function logger($message) {
-    if (CRM_Core_Config::singleton()->userFrameworkLogging) {
+    if (CRM_Core_Config::singleton()->userFrameworkLogging && function_exists('watchdog')) {
       watchdog('civicrm', '%message', array('%message' => $message), NULL, WATCHDOG_DEBUG);
     }
   }
@@ -423,6 +423,29 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     }
 
     return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    global $language;
+
+    $langcode = substr($civicrm_language, 0, 2);
+    $languages = language_list();
+
+    if (isset($languages[$langcode])) {
+      $language = $languages[$langcode];
+
+      // Config must be re-initialized to reset the base URL
+      // otherwise links will have the wrong language prefix/domain.
+      $config = CRM_Core_Config::singleton();
+      $config->free();
+
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**

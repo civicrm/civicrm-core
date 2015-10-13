@@ -1232,9 +1232,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       while ($relationship->fetch()) {
         $rid = $relationship->civicrm_relationship_id;
         $cid = $relationship->civicrm_contact_id;
-        if (($permissionedContact &&
-            (!CRM_Contact_BAO_Contact_Permission::relationship($cid, $contactId))
-          ) ||
+
+        if ($permissionedContact &&
           (!CRM_Contact_BAO_Contact_Permission::allow($cid))
         ) {
           continue;
@@ -1617,19 +1616,6 @@ SELECT relationship_type_id, relationship_direction
               }
             }
 
-            if ($action & CRM_Core_Action::UPDATE) {
-              //if updated relationship is already related to contact don't delete existing inherited membership
-              if (in_array($relTypeId, $relTypeIds
-              ) && !empty($values[$relatedContactId]['memberships']) && !empty($ownerMemIds
-              ) && in_array($membershipValues['owner_membership_id'], $ownerMemIds[$relatedContactId])) {
-                continue;
-              }
-
-              //delete the membership record for related
-              //contact before creating new membership record.
-              CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $relatedContactId);
-            }
-
             // check whether we have some related memberships still available
             $query = "
 SELECT count(*)
@@ -1647,19 +1633,22 @@ SELECT count(*)
           // if action is update and updated relationship do
           // not match with the existing
           // membership=>relationship then we need to
-          // delete the membership record created for
-          // previous relationship.
-          // CRM-16087 we need to pass ownerMembershipId to deleteRelatedMemberships function
+          // change the status of the membership record to expired for
+          // previous relationship -- CRM-12078.
+          // CRM-16087 we need to pass ownerMembershipId to isRelatedMembershipExpired function
           if (empty($params['relationship_ids']) && !empty($params['id'])) {
             $relIds = array($params['id']);
           }
           else {
             $relIds = CRM_Utils_Array::value('relationship_ids', $params);
           }
-          if (self::isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId,
+          if (self::isRelatedMembershipExpired($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId,
           $relIds) && !empty($membershipValues['owner_membership_id']
           ) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
-            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
+            $membershipValues['status_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', 'Expired', 'id', 'label');
+            $type = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipValues['membership_type_id'], 'name', 'id');
+            CRM_Member_BAO_Membership::add($membershipValues);
+            CRM_Core_Session::setStatus(ts("Inherited membership {$type} status was changed to Expired due to the change in relationship type."), ts('Record Updated'), 'alert');
           }
         }
       }
@@ -1667,10 +1656,10 @@ SELECT count(*)
   }
 
   /**
-   * Helper function to check whether to delete the membership or not.
+   * Helper function to check whether the membership is expired or not.
    *
    * Function takes a list of related membership types and if it is not also passed a
-   * relationship ID of that types evaluates whether the membership should be deleted.
+   * relationship ID of that types evaluates whether the membership status should be changed to expired.
    *
    * @param array $membershipTypeRelationshipTypeIDs
    *   Relation type IDs related to the given membership type.
@@ -1681,7 +1670,7 @@ SELECT count(*)
    *
    * @return bool
    */
-  public static function isDeleteRelatedMembership($membershipTypeRelationshipTypeIDs, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
+  public static function isRelatedMembershipExpired($membershipTypeRelationshipTypeIDs, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
     if (empty($membershipTypeRelationshipTypeIDs) || in_array($relTypeId, $membershipTypeRelationshipTypeIDs)) {
       return FALSE;
     }
@@ -1951,13 +1940,12 @@ AND cc.sort_name LIKE '%$name%'";
     }
     $mask = CRM_Core_Action::mask($permissions);
 
+    $permissionedContacts = TRUE;
     if ($params['context'] != 'user') {
       $links = CRM_Contact_Page_View_Relationship::links();
-      $permissionedContacts = FALSE;
     }
     else {
       $links = CRM_Contact_Page_View_UserDashBoard::links();
-      $permissionedContacts = TRUE;
       $mask = NULL;
     }
     // get contact relationships
@@ -1973,12 +1961,13 @@ AND cc.sort_name LIKE '%$name%'";
     $params['total'] = 0;
     if (!empty($relationships)) {
       // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
-      $params['total'] = $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+      $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
         $relationshipStatus,
-        0, 1, 0,
+        0, 0, 0,
         NULL, NULL,
         $permissionedContacts
       );
+      $params['total'] = count($permissionedRelationships);
 
       // format params
       foreach ($relationships as $relationshipId => $values) {

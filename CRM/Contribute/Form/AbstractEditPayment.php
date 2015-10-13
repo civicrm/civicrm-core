@@ -439,6 +439,11 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       }
       $this->_processors = array();
       foreach ($this->_paymentProcessors as $id => $processor) {
+        // @todo review this. The inclusion of this IF was to address test processors being incorrectly loaded.
+        // However the function $this->getValidProcessors() is expected to only return the processors relevant
+        // to the mode (using the actual id - ie. the id of the test processor for the test processor).
+        // for some reason there was a need to filter here per commit history - but this indicates a problem
+        // somewhere else.
         if ($processor['is_test'] == ($this->_mode == 'test')) {
           $this->_processors[$id] = ts($processor['name']);
           if (!empty($processor['description'])) {
@@ -687,10 +692,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
       $fields[$name] = 1;
     }
 
-    // also add location name to the array
-    $this->_params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
-    $this->_params["address_name-{$this->_bltID}"] = trim($this->_params["address_name-{$this->_bltID}"]);
-
     $fields["address_name-{$this->_bltID}"] = 1;
 
     //ensure we don't over-write the payer's email with the member's email
@@ -699,15 +700,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
 
     list($hasBillingField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
-    $nameFields = array('first_name', 'middle_name', 'last_name');
-
-    foreach ($nameFields as $name) {
-      $fields[$name] = 1;
-      if (array_key_exists("billing_$name", $this->_params)) {
-        $this->_params[$name] = $this->_params["billing_{$name}"];
-        $this->_params['preserveDBName'] = TRUE;
-      }
-    }
+    $fields = $this->formatParamsForPaymentProcessor($fields);
 
     if ($hasBillingField) {
       $addressParams = array_merge($this->_params, $addressParams);
@@ -717,13 +710,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         $this->_contributorContactID, NULL, NULL,
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type')
       );
-    }
-    // Add additional parameters that the payment processors are used to receiving.
-    if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-      $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-    }
-    if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
-      $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
     }
   }
 

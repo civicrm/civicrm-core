@@ -50,6 +50,12 @@ abstract class CRM_Utils_System_Base {
    */
   var $supports_form_extensions = FALSE;
 
+  public function initialize() {
+    if (\CRM_Utils_System::isSSL()) {
+      $this->mapConfigToSSL();
+    }
+  }
+
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb.
    *
@@ -284,6 +290,33 @@ abstract class CRM_Utils_System_Base {
     return 'left';
   }
 
+  public function getAbsoluteBaseURL() {
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      return FALSE;
+    }
+
+    $url = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/');
+
+    //format url for language negotiation, CRM-7803
+    $url = $this->languageNegotiationURL($url);
+
+    if (CRM_Utils_System::isSSL()) {
+      $url = str_replace('http://', 'https://', $url);
+    }
+
+    return $url;
+  }
+
+  public function getRelativeBaseURL() {
+    $absoluteBaseURL = $this->getAbsoluteBaseURL();
+    if ($absoluteBaseURL === FALSE) {
+      return FALSE;
+    }
+    $parts = parse_url($absoluteBaseURL);
+    return $parts['path'];
+    //$this->useFrameworkRelativeBase = empty($base['path']) ? '/' : $base['path'];
+  }
+
   /**
    * Get CMS Version.
    *
@@ -391,6 +424,10 @@ abstract class CRM_Utils_System_Base {
   public function getUfId($username) {
     $className = get_class($this);
     throw new CRM_Core_Exception("Not implemented: {$className}->getUfId");
+  }
+
+  public function setUFLocale($civicrm_language) {
+    return TRUE;
   }
 
   /**
@@ -541,10 +578,6 @@ abstract class CRM_Utils_System_Base {
       // we need to remove the administrator/ from the end
       $tempURL = str_replace("/administrator/", "/", $baseURL);
       $filesURL = $tempURL . "media/civicrm/";
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      //for standalone no need of sites/defaults directory
-      $filesURL = $baseURL . "wp-content/plugins/files/civicrm/";
     }
     elseif ($this->is_drupal) {
       $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);

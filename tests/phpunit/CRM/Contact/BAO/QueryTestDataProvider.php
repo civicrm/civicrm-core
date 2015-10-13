@@ -51,7 +51,7 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
   private $dataset = array(
     //  Include static group 3
     array(
-      'fv' => array('group' => array('3' => 1)),
+      'fv' => array('group' => '3'),
       'id' => array(
         '17',
         '18',
@@ -65,7 +65,7 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     ),
     //  Include static group 5
     array(
-      'fv' => array('group' => array('5' => 1)),
+      'fv' => array('group' => '5'),
       'id' => array(
         '13',
         '14',
@@ -78,6 +78,24 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
       ),
     ),
     //  Include static groups 3 and 5
+    array(
+      'fv' => array('group' => array('3', '5')),
+      'id' => array(
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+      ),
+    ),
+    //  Include static groups 3 and 5 in legacy format
     array(
       'fv' => array('group' => array('3' => 1, '5' => 1)),
       'id' => array(
@@ -97,7 +115,7 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     ),
     //  Include tag 7
     array(
-      'fv' => array('tag' => array('7' => 1)),
+      'fv' => array('tag' => '7'),
       'id' => array(
         '11',
         '12',
@@ -125,7 +143,7 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     ),
     //  Include tags 7 and 9
     array(
-      'fv' => array('tag' => array('7' => 1, '9' => 1)),
+      'fv' => array('tag' => array('7', '9')),
       'id' => array(
         '10',
         '11',

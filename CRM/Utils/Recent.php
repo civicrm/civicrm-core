@@ -26,7 +26,6 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
@@ -39,7 +38,7 @@ class CRM_Utils_Recent {
   /**
    * Max number of items in queue.
    *
-   * @int
+   * @var int
    */
   const MAX_ITEMS = 10, STORE_NAME = 'CRM_Utils_Recent';
 

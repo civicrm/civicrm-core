@@ -381,6 +381,15 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_createNew;
 
   /**
+   * SQL being run in this report.
+   *
+   * The sql in the report is stored in this variable in order to be displayed on the developer tab.
+   *
+   * @var string
+   */
+
+  protected $sql;
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -813,6 +822,10 @@ class CRM_Report_Form extends CRM_Core_Form {
               }
             }
             else {
+              if ((CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_INT) && is_array($field['default'])) {
+                $this->_defaults["{$fieldName}_min"] = CRM_Utils_Array::value('min', $field['default']);
+                $this->_defaults["{$fieldName}_max"] = CRM_Utils_Array::value('max', $field['default']);
+              }
               $this->_defaults["{$fieldName}_value"] = $field['default'];
             }
           }
@@ -1196,6 +1209,35 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * The intent is to add a tab for developers to view the sql.
+   *
+   * Currently using dpm.
+   *
+   * @param string $sql
+   */
+  protected function addToDeveloperTab($sql) {
+    if (!CRM_Core_Permission::check('view report sql')) {
+      return;
+    }
+    $this->tabs['Developer'] = array(
+      'title' => ts('Developer'),
+      'tpl' => 'Developer',
+      'div_label' => 'set-developer',
+    );
+
+    $this->assignTabs();
+    foreach (array('LEFT JOIN') as $term) {
+      $sql = str_replace($term, '<br>&nbsp&nbsp' . $term, $sql);
+    }
+    foreach (array('FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';') as $term) {
+      $sql = str_replace($term, '<br><br>' . $term, $sql);
+    }
+    $this->sql .= $sql . "<br>";
+
+    $this->assign('sql', $this->sql);
+  }
+
+  /**
    * Add options defined in $this->_options to the report.
    */
   public function addOptions() {
@@ -1367,7 +1409,9 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->addElement('submit', $this->_csvButtonName, $label);
     }
 
-    if (CRM_Core_Permission::check('administer Reports') &&
+    // CRM-16274 Determine if user has 'edit all contacts' or equivalent
+    $permission = CRM_Core_Permission::getPermission();
+    if ($permission == CRM_Core_Permission::EDIT &&
       $this->_add2groupSupported
     ) {
       $this->addElement('select', 'groups', ts('Group'),
@@ -1738,9 +1782,14 @@ class CRM_Report_Form extends CRM_Core_Form {
         // mhas == multiple has
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
+          foreach ($value as $key => $val) {
+            $val = str_replace('(', '[[.left-parenthesis.]]', $val);
+            $val = str_replace(')', '[[.right-parenthesis.]]', $val);
+            $value[$key] = $val;
+          }
+          $sp = CRM_Core_DAO::VALUE_SEPARATOR;
           $clause
-            = "{$field['dbAlias']} REGEXP '[[:cntrl:]]" . implode('|', $value) .
-            "[[:cntrl:]]'";
+            = "{$field['dbAlias']} REGEXP '$sp" . implode("$sp|$sp", $value) . "$sp'";
         }
         break;
 
@@ -1748,9 +1797,15 @@ class CRM_Report_Form extends CRM_Core_Form {
         // mnot == multiple is not one of
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
+          foreach ($value as $key => $val) {
+            $val = str_replace('(', '[[.left-parenthesis.]]', $val);
+            $val = str_replace(')', '[[.right-parenthesis.]]', $val);
+            $value[$key] = $val;
+          }
+          $sp = CRM_Core_DAO::VALUE_SEPARATOR;
           $clause
-            = "( {$field['dbAlias']} NOT REGEXP '[[:cntrl:]]" . implode('|', $value) .
-            "[[:cntrl:]]' OR {$field['dbAlias']} IS NULL )";
+            = "( {$field['dbAlias']} NOT REGEXP '$sp" . implode("$sp|$sp", $value) .
+            "$sp' OR {$field['dbAlias']} IS NULL )";
         }
         break;
 
@@ -2673,6 +2728,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);
 
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+    $this->addToDeveloperTab($sql);
     return $sql;
   }
 
@@ -2682,8 +2738,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   public function groupBy() {
     $groupBys = array();
     if (!empty($this->_params['group_bys']) &&
-      is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
+      is_array($this->_params['group_bys'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
@@ -4488,6 +4543,53 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $row["{$tablePrefix}_{$fieldName}_hover"] = ts("%1 for this %2.",
       array(1 => $linkText, 2 => $fieldLabel)
     );
+  }
+
+  /**
+   * Generate temporary table to hold all contributions with permissioned FTs.
+   *
+   * @param object $query
+   * @param string $alias
+   * @param bool $return
+   */
+  public function getPermissionedFTQuery(&$query, $alias = NULL, $return = FALSE) {
+    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      return FALSE;
+    }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    if (empty($financialTypes)) {
+      $contFTs = "0";
+      $liFTs = implode(',', array_keys(CRM_Contribute_Pseudoconstant::financialType()));
+    }
+    else {
+      $contFTs = $liFTs = implode(',', array_keys($financialTypes));
+    }
+    if ($alias) {
+      $temp = CRM_Utils_Array::value('civicrm_line_item', $query->_aliases);
+      $query->_aliases['civicrm_line_item'] = $alias;
+    }
+    if (empty($query->_where)) {
+      $query->_where = "WHERE {$query->_aliases['civicrm_contribution']}.id IS NOT NULL ";
+    }
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
+    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from} 
+              LEFT JOIN civicrm_line_item   {$query->_aliases['civicrm_line_item']}
+                      ON {$query->_aliases['civicrm_contribution']}.id = {$query->_aliases['civicrm_line_item']}.contribution_id AND
+                         {$query->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution' 
+                      AND {$query->_aliases['civicrm_line_item']}.financial_type_id NOT IN (" . $liFTs . ") 
+              {$query->_where} 
+                      AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ") 
+                      AND {$query->_aliases['civicrm_line_item']}.id IS NULL
+              GROUP BY {$query->_aliases['civicrm_contribution']}.id";
+    CRM_Core_DAO::executeQuery($sql);
+    if (isset($temp)) {
+      $query->_aliases['civicrm_line_item'] = $temp;
+    }
+    $from = " INNER JOIN civicrm_contribution_temp temp ON {$query->_aliases['civicrm_contribution']}.id = temp.id ";
+    if ($return) {
+      return $from;
+    }
+    $query->_from .= $from;
   }
 
 }

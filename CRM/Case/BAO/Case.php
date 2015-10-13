@@ -968,20 +968,21 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    */
   public static function getCaseRoles($contactID, $caseID, $relationshipID = NULL) {
     $query = '
-    SELECT  civicrm_relationship.id as civicrm_relationship_id,
-            civicrm_contact.sort_name as sort_name,
+    SELECT  rel.id as civicrm_relationship_id,
+            con.sort_name as sort_name,
             civicrm_email.email as email,
             civicrm_phone.phone as phone,
-            civicrm_relationship.contact_id_b as civicrm_contact_id,
-            civicrm_relationship.contact_id_a as client_id,
-            civicrm_relationship_type.label_a_b as relation,
-            civicrm_relationship_type.id as relation_type
-      FROM  civicrm_relationship
- INNER JOIN  civicrm_relationship_type ON civicrm_relationship.relationship_type_id = civicrm_relationship_type.id
- INNER JOIN  civicrm_contact ON civicrm_relationship.contact_id_b = civicrm_contact.id
- LEFT JOIN  civicrm_phone ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary = 1)
- LEFT JOIN  civicrm_email ON (civicrm_email.contact_id = civicrm_contact.id AND civicrm_email.is_primary = 1)
-     WHERE  civicrm_relationship.contact_id_a = %1 AND civicrm_relationship.case_id = %2';
+            con.id as civicrm_contact_id,
+            IF(rel.contact_id_a = %1, civicrm_relationship_type.label_a_b, civicrm_relationship_type.label_b_a) as relation,
+            civicrm_relationship_type.id as relation_type,
+            IF(rel.contact_id_a = %1, "a_b", "b_a") as relationship_direction
+      FROM  civicrm_relationship rel
+ INNER JOIN  civicrm_relationship_type ON rel.relationship_type_id = civicrm_relationship_type.id
+ INNER JOIN  civicrm_contact con ON ((con.id <> %1 AND con.id IN (rel.contact_id_a, rel.contact_id_b)) OR (con.id = %1 AND rel.contact_id_b = rel.contact_id_a AND rel.contact_id_a = %1))
+ LEFT JOIN  civicrm_phone ON (civicrm_phone.contact_id = con.id AND civicrm_phone.is_primary = 1)
+ LEFT JOIN  civicrm_email ON (civicrm_email.contact_id = con.id AND civicrm_email.is_primary = 1)
+     WHERE  (rel.contact_id_a = %1 OR rel.contact_id_b = %1) AND rel.case_id = %2
+       AND  rel.is_active = 1 AND (rel.end_date IS NULL OR rel.end_date > NOW())';
 
     $params = array(
       1 => array($contactID, 'Positive'),
@@ -1004,7 +1005,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $values[$rid]['phone'] = $dao->phone;
       $values[$rid]['relation_type'] = $dao->relation_type;
       $values[$rid]['rel_id'] = $dao->civicrm_relationship_id;
-      $values[$rid]['client_id'] = $dao->client_id;
+      $values[$rid]['client_id'] = $contactID;
+      $values[$rid]['relationship_direction'] = $dao->relationship_direction;
     }
 
     $dao->free();
@@ -1815,7 +1817,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         if ($results) {
           $groupInfo['id'] = $results['id'];
           $groupInfo['title'] = $results['title'];
-          $params = array(array('group', 'IN', array($groupInfo['id'] => 1), 0, 0));
+          $params = array(array('group', '=', $groupInfo['id'], 0, 0));
           $return = array('contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
           list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
 
@@ -3392,6 +3394,36 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     return $clients;
+  }
+
+  /**
+   * @param int $caseId
+   * @param string $direction
+   * @param int $cid
+   * @param int $relTypeId
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function endCaseRole($caseId, $direction, $cid, $relTypeId) {
+    // Validate inputs
+    if ($direction !== 'a' && $direction !== 'b') {
+      throw new CRM_Core_Exception('Invalid relationship direction');
+    }
+
+    // This case might have multiple clients, so we lookup by relationship instead of by id to get them all
+    $sql = "SELECT id FROM civicrm_relationship WHERE case_id = %1 AND contact_id_{$direction} = %2 AND relationship_type_id = %3";
+    $dao = CRM_Core_DAO::executeQuery($sql, array(
+      1 => array($caseId, 'Positive'),
+      2 => array($cid, 'Positive'),
+      3 => array($relTypeId, 'Positive'),
+    ));
+    while ($dao->fetch()) {
+      civicrm_api3('relationship', 'create', array(
+        'id' => $dao->id,
+        'is_active' => 0,
+        'end_date' => 'now',
+      ));
+    }
   }
 
   /**

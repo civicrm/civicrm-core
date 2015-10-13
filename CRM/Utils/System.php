@@ -39,7 +39,8 @@ class CRM_Utils_System {
   static $_callbacks = NULL;
 
   /**
-   * @var string Page title
+   * @var string
+   *   Page title
    */
   static $title = '';
 
@@ -114,7 +115,7 @@ class CRM_Utils_System {
           list($name, $value) = explode('=', $qs[$i]);
           if ($name != $urlVar) {
             $name = rawurldecode($name);
-            //check for arrays in parameters: site.php?foo[]=1&foo[]=2&foo[]=3
+            // check for arrays in parameters: site.php?foo[]=1&foo[]=2&foo[]=3
             if ((strpos($name, '[') !== FALSE) &&
               (strpos($name, ']') !== FALSE)
             ) {
@@ -347,7 +348,7 @@ class CRM_Utils_System {
    * Uses the referer if valid else uses the default.
    *
    * @param array $names
-   *   Refererer should match any str in this array.
+   *   Referrer should match any str in this array.
    * @param string $default
    *   (optional) The default userContext if no match found.
    */
@@ -798,7 +799,7 @@ class CRM_Utils_System {
     self::setHttpHeader('Content-Type', $mimeType);
     self::setHttpHeader('Expires', $now);
 
-    // lem9 & loic1: IE need specific headers
+    // lem9 & loic1: IE needs specific headers
     $isIE = strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE');
     if ($ext) {
       $fileString = "filename=\"{$name}.{$ext}\"";
@@ -862,7 +863,7 @@ class CRM_Utils_System {
     }
 
     // at some point we'll add code here to make sure the url is not
-    // something that will mess up up, so we need to clean it up here
+    // something that will mess up, so we need to clean it up here
     return $url;
   }
 
@@ -1110,8 +1111,6 @@ class CRM_Utils_System {
     return $headers;
   }
 
-  /**
-   */
   public static function getRequestHeaders() {
     if (function_exists('apache_request_headers')) {
       return apache_request_headers();
@@ -1134,8 +1133,6 @@ class CRM_Utils_System {
         strtolower($_SERVER['HTTPS']) != 'off') ? TRUE : FALSE;
   }
 
-  /**
-   */
   public static function redirectToSSL($abort = FALSE) {
     $config = CRM_Core_Config::singleton();
     $req_headers = self::getRequestHeaders();
@@ -1179,7 +1176,7 @@ class CRM_Utils_System {
 
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal && function_exists('ip_address')) {
-      //drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
+      // drupal function handles the server being behind a proxy securely. We still have legacy ipn methods
       // that reach this point without bootstrapping hence the check that the fn exists
       $address = ip_address();
     }
@@ -1331,7 +1328,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get the locale set in the hosting CMS.
+   * Get the locale of the hosting CMS.
    *
    * @return string
    *   The used locale or null for none.
@@ -1339,6 +1336,23 @@ class CRM_Utils_System {
   public static function getUFLocale() {
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->getUFLocale();
+  }
+
+  /**
+   * Set the locale of the hosting CMS.
+   *
+   * For example, a mailing will want to change the CMS language so that
+   * URLs are in the correct language (such as the Drupal language prefix).
+   *
+   * @param string $civicrm_language
+   *   An array of parameters (see CRM_Utils_System::docURL2 method for names)
+   *
+   * @return bool
+   *   Returns whether the locale was successfully changed.
+   */
+  public static function setUFLocale($civicrm_language) {
+    $config = CRM_Core_Config::singleton();
+    return $config->userSystem->setUFLocale($civicrm_language);
   }
 
   /**
@@ -1459,8 +1473,6 @@ class CRM_Utils_System {
     return $config->userSystem->getLoggedInUfID();
   }
 
-  /**
-   */
   public static function baseCMSURL() {
     static $_baseURL = NULL;
     if (!$_baseURL) {
@@ -1656,7 +1668,6 @@ class CRM_Utils_System {
     }
     return $file_list;
   }
-  // listIncludeFiles()
 
   /**
    * Get a list of all "plugins" (PHP classes that implement a piece of
@@ -1692,10 +1703,7 @@ class CRM_Utils_System {
     }
     return $plugins;
   }
-  // getPluginList()
 
-  /**
-   */
   public static function executeScheduledJobs() {
     $facility = new CRM_Core_JobManager();
     $facility->execute(FALSE);
@@ -1716,8 +1724,8 @@ class CRM_Utils_System {
    * @return string|FALSE
    */
   public static function evalUrl($url) {
-    if ($url === FALSE) {
-      return FALSE;
+    if (!$url || strpos($url, '{') === FALSE) {
+      return $url;
     }
     else {
       $config = CRM_Core_Config::singleton();
@@ -1725,18 +1733,31 @@ class CRM_Utils_System {
         '{ver}' => CRM_Utils_System::version(),
         '{uf}' => $config->userFramework,
         '{php}' => phpversion(),
-        '{sid}' => md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL),
+        '{sid}' => self::getSiteID(),
         '{baseUrl}' => $config->userFrameworkBaseURL,
         '{lang}' => $config->lcMessages,
         '{co}' => $config->defaultContactCountry,
       );
-      foreach (array_keys($vars) as $k) {
-        $vars[$k] = urlencode($vars[$k]);
-      }
-      return strtr($url, $vars);
+      return strtr($url, array_map('urlencode', $vars));
     }
   }
 
+  /**
+   * Returns the unique identifier for this site, as used by community messages.
+   *
+   * SiteID will be generated if it is not already stored in the settings table.
+   *
+   * @return string
+   */
+  public static function getSiteID() {
+    $sid = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'site_id');
+    if (!$sid) {
+      $config = CRM_Core_Config::singleton();
+      $sid = md5('sid_' . (defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : '') . '_' . $config->userFrameworkBaseURL);
+      civicrm_api3('Setting', 'create', array('domain_id' => 'all', 'site_id' => $sid));
+    }
+    return $sid;
+  }
 
   /**
    * Determine whether this is a developmental system.

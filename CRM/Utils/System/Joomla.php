@@ -155,7 +155,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       }
       if (strtolower($dbEmail) == strtolower($email)) {
         $resetUrl = str_replace('administrator/', '', $config->userFrameworkBaseURL) . 'index.php?option=com_users&view=reset';
-        $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
+        $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
           array(1 => $email, 2 => $resetUrl)
         );
       }
@@ -460,6 +460,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       return str_replace('-', '_', $locale);
     }
     return NULL;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    // TODO
+    return TRUE;
   }
 
   /**

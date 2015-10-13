@@ -87,10 +87,8 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       }
 
       self::$_singleton = new CRM_Core_Config();
-      self::$_singleton->getRuntime()->initialize($loadFromDB);
-      if ($loadFromDB && self::$_singleton->getRuntime()->dsn) {
-        CRM_Core_DAO::init(self::$_singleton->getRuntime()->dsn);
-
+      \Civi\Core\Container::boot($loadFromDB);
+      if ($loadFromDB && self::$_singleton->dsn) {
         $domain = \CRM_Core_BAO_Domain::getDomain();
         \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
 
@@ -384,17 +382,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     return FALSE;
   }
 
-
-  /**
-   * Wrapper function to allow unit tests to switch user framework on the fly.
-   *
-   * @param string $userFramework
-   *   One of 'Drupal', 'Joomla', etc.
-   * @deprecated
-   */
-  public function setUserFramework($userFramework) {
-    $this->getRuntime()->setUserFramework($userFramework);
-  }
   /**
    * Is back office credit card processing enabled for this site - ie are there any installed processors that support
    * it?

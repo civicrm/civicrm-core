@@ -431,7 +431,7 @@ WHERE  id = %1
     }
 
     // grab a lock so other processes dont compete and do the same query
-    $lock = Civi::service('lockManager')->acquire("data.core.group.{$groupID}");
+    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
     if (!$lock->isAcquired()) {
       // this can cause inconsistent results since we dont know if the other process
       // will fill up the cache before our calling routine needs it.
@@ -486,7 +486,14 @@ WHERE  id = %1
       }
       else {
         $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-
+        // CRM-17075 using the formValues in this way imposes extra logic and complexity.
+        // we have the where_clause and where tables stored in the saved_search table
+        // and should use these rather than re-processing the form criteria (which over-works
+        // the link between the form layer & the query layer too).
+        // It's hard to think of when you would want to use anything other than return
+        // properties = array('contact_id' => 1) here as the point would appear to be to
+        // generate the list of contact ids in the group.
+        // @todo review this to use values in saved_search table (preferably for 4.8).
         $query
           = new CRM_Contact_BAO_Query(
             $ssParams, $returnProperties, NULL,

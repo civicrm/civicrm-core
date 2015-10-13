@@ -46,6 +46,24 @@ function civicrm_api3_contribution_create(&$params) {
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
   $params = array_merge($params, $values);
 
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+    if (empty($params['id'])) {
+      $op = 'add';
+    }
+    else {
+      if (empty($params['financial_type_id'])) {
+        $params['financial_type_id'] = civicrm_api3('Contribution', 'getvalue', array(
+          'id' => $params['id'],
+          'return' => 'financial_type_id',
+        ));
+      }
+      $op = 'edit';
+    }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
+    if (!in_array($params['financial_type_id'], array_keys($types))) {
+      return civicrm_api3_create_error('You do not have permission to create this contribution');
+    }
+  }
   if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
     $error = array();
     //throw error for invalid status change such as setting completed back to pending
@@ -183,6 +201,15 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
 function civicrm_api3_contribution_delete($params) {
 
   $contributionID = !empty($params['contribution_id']) ? $params['contribution_id'] : $params['id'];
+  // First check contribution financial type
+  $financialType = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionID, 'financial_type_id');
+  // Now check permissioned lineitems & permissioned contribution
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+    && !CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($financialType)) ||
+      !CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE)
+  ) {
+    return civicrm_api3_create_error('You do not have permission to delete this contribution');
+  }
   if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionID)) {
     return civicrm_api3_create_success(array($contributionID => 1));
   }
@@ -473,6 +500,11 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
     'description' => 'If a fee has been charged then the amount',
     'type' => CRM_Utils_Type::T_FLOAT,
   );
+  $params['trxn_date'] = array(
+    'title' => 'Transaction Date',
+    'description' => 'Date this transaction occurred',
+    'type' => CRM_Utils_Type::T_DATE,
+  );
 }
 
 /**
@@ -547,6 +579,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
 
   if (isset($params['is_email_receipt'])) {
     $input['is_email_receipt'] = $params['is_email_receipt'];
+  }
+  if (!empty($params['trxn_date'])) {
+    $input['trxn_date'] = $params['trxn_date'];
   }
   if (empty($contribution->contribution_page_id)) {
     static $domainFromName;

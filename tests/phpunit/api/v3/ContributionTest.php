@@ -1542,9 +1542,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'receipt_date' => 'now'));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id']));
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id'], 'trxn_date' => date('Y-m-d')));
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1));
     $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
     $mut->checkMailLog(array(
       'Receipt - Contribution',
       'Please print this confirmation for your records.',
@@ -1668,6 +1669,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'price_field_id' => $priceField['id'],
         'label' => 'Long Haired Goat',
         'amount' => 20,
+        'financial_type_id' => 'Donation',
         'membership_type_id' => $membershipTypeID,
         'membership_num_terms' => 1,
       )
@@ -1678,6 +1680,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'price_field_id' => $priceField['id'],
         'label' => 'Shoe-eating Goat',
         'amount' => 10,
+        'financial_type_id' => 'Donation',
         'membership_type_id' => $membershipTypeID,
         'membership_num_terms' => 2,
       )
@@ -1987,7 +1990,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     }
     elseif ($context == 'cancelPending') {
       $compareParams = array(
-        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 7,
         'total_amount' => -100,
         'status_id' => 3,
       );

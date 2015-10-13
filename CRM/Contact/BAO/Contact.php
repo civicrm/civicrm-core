@@ -929,47 +929,6 @@ WHERE id={$id}; ";
   }
 
   /**
-   * Return relative path.
-   *
-   * @todo make this a method of $config->userSystem (i.e. UF classes) rather than a static function
-   *
-   * @param string $absolutePath
-   *   Absolute path.
-   *
-   * @return string
-   *   Relative url of uploaded image
-   */
-  public static function getRelativePath($absolutePath) {
-    $relativePath = NULL;
-    $config = CRM_Core_Config::singleton();
-    if ($config->userFramework == 'Joomla') {
-      $userFrameworkBaseURL = trim(str_replace('/administrator/', '', $config->userFrameworkBaseURL));
-      $customFileUploadDirectory = strstr(str_replace('\\', '/', $absolutePath), '/media');
-      $relativePath = $userFrameworkBaseURL . $customFileUploadDirectory;
-    }
-    elseif ($config->userSystem->is_drupal == '1') {
-      //ideally we would do a bigger re-factoring & move the getRelativePath onto the UF class
-      $rootPath = $config->userSystem->cmsRootPath();
-      $baseUrl = $config->userFrameworkBaseURL;
-
-      //format url for language negotiation, CRM-7135
-      $baseUrl = CRM_Utils_System::languageNegotiationURL($baseUrl, FALSE, TRUE);
-
-      $relativePath = str_replace("{$rootPath}/",
-        $baseUrl,
-        str_replace('\\', '/', $absolutePath)
-      );
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      $userFrameworkBaseURL = trim(str_replace('/wp-admin/', '', $config->userFrameworkBaseURL));
-      $customFileUploadDirectory = strstr(str_replace('\\', '/', $absolutePath), '/wp-content/');
-      $relativePath = $userFrameworkBaseURL . $customFileUploadDirectory;
-    }
-
-    return $relativePath;
-  }
-
-  /**
    * Return proportional height and width of the image.
    *
    * @param int $imageWidth
@@ -2300,8 +2259,8 @@ ORDER BY civicrm_email.is_primary DESC";
                 'suffix_id',
               )) &&
             ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0
-          ) {
+            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
+            ($key == 'current_employer' && empty($params['current_employer']))) {
             // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
             // to avoid update with empty values
             continue;
@@ -2593,11 +2552,15 @@ AND       civicrm_openid.is_primary = 1";
 
       case 'rel':
         $result = CRM_Contact_BAO_Relationship::getRelationship($contactId,
-          CRM_Contact_BAO_Relationship::CURRENT
+          CRM_Contact_BAO_Relationship::CURRENT,
+          0, 0, 0,
+          NULL, NULL,
+          TRUE
         );
         return count($result);
 
       case 'group':
+
         return CRM_Contact_BAO_GroupContact::getContactGroup($contactId, "Added", NULL, TRUE);
 
       case 'log':
