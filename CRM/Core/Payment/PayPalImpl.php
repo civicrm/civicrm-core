@@ -836,7 +836,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $paypalParams = array(
       'business' => $this->_paymentProcessor['user_name'],
       'notify_url' => $notifyURL,
-      'item_name' => $params['item_name'],
+      'item_name' => $this->getPaymentDescription(),
       'quantity' => 1,
       'undefined_quantity' => 0,
       'cancel_return' => $cancelURL,
