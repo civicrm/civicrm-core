@@ -75,7 +75,7 @@
                 {foreach from=$contactBlocks item="title" key="opId"}
                   <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
                       style="padding-left:1px;">
-                    <span class='ui-icon ui-icon-arrowthick-2-n-s' style="float:left;"></span>
+                    <i class='crm-i fa-arrows crm-grip' style="float:left;"></i>
                     <span>{$form.contact_edit_options.$opId.html}</span>
                   </li>
                 {/foreach}
@@ -87,7 +87,7 @@
                 {foreach from=$editOptions item="title" key="opId"}
                   <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
                       style="padding-left:1px;">
-                    <span class='ui-icon ui-icon-arrowthick-2-n-s' style="float:left;"></span>
+                    <i class='crm-i fa-arrows crm-grip' style="float:left;"></i>
                     <span>{$form.contact_edit_options.$opId.html}</span>
                   </li>
                 {/foreach}

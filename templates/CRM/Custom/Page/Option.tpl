@@ -99,8 +99,8 @@
                 var id = $('td:last', nRow).text().split(',')[0];
                 var cl = $('td:last', nRow).text().split(',')[1];
                 $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
-                $('td:eq(0)', nRow).wrapInner('<div style="margin-left: 10px;" class="crm-editable crmf-label" />');
-                $('td:eq(0)', nRow).prepend('<div style="cursor:move; position: relative; left: -7px;" class="icon ui-icon-arrowthick-2-n-s" />');
+                $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-label" />');
+                $('td:eq(0)', nRow).prepend('<span class="crm-i fa-arrows crm-grip" />');
                 $('td:eq(2)', nRow).addClass('crmf-default_value');
                 return nRow;
               },
@@ -127,7 +127,7 @@
         var gid = {/literal}'{$optionGroupID}'{literal};
 
         $("table.crm-option-selector tbody").sortable({
-          handle: ".ui-icon-arrowthick-2-n-s",
+          handle: ".fa-arrows",
           cursor: "move",
           start:function(event, ui) {
             var oSettings = $('table.crm-option-selector').dataTable().fnSettings();
