@@ -30,7 +30,7 @@
   <div id="contact-summary-relationship-tab" class="view-content">
     {if $permission EQ 'edit'}
       <div class="action-link">
-        {crmButton accesskey="N"  p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1" icon="circle-plus"}{ts}Add Relationship{/ts}{/crmButton}
+        {crmButton accesskey="N"  p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1" icon="plus-circle"}{ts}Add Relationship{/ts}{/crmButton}
       </div>
     {/if}
 
@@ -63,4 +63,3 @@
   </script>
   {/literal}
 {/if} {* close of custom data else*}
-

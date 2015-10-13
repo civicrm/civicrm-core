@@ -95,10 +95,10 @@
     var $row = $('tr:last-child', '#api-params');
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
-        return '<span class="icon ui-icon-link"></span> API ' +
+        return '<i class="crm-i fa-link"></i> API ' +
           ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
       },
-      placeholder: '<span class="icon ui-icon-link"></span> ' + ts('Entity'),
+      placeholder: '<i class="crm-i fa-link"></i> ' + ts('Entity'),
       escapeMarkup: function(m) {return m;}
     });
   }
@@ -527,7 +527,7 @@
         .addClass('crm-error')
         .css('width', '82%')
         .attr('title', msg)
-        .before('<div class="icon red-icon ui-icon-alert" title="'+msg+'"/>')
+        .before('<i class="crm-i fa-exclamation-triangle crm-i-red" title="'+msg+'"></i> ')
         .tooltip();
     }
   }
@@ -542,7 +542,7 @@
       .attr('title', '')
       .css('width', '85%')
       .tooltip('destroy')
-      .siblings('.ui-icon-alert').remove();
+      .siblings('.fa-exclamation-triangle').remove();
   }
 
   /**
@@ -714,12 +714,12 @@
     }
     checkBookKeepingEntity(entity, action);
   }
-    
+
   /**
    * Check if entity is Financial Trxn and Entity Financial Trxn
    * and Action is Create, delete, update etc then display warning
    */
-  function checkBookKeepingEntity(entity, action) {      
+  function checkBookKeepingEntity(entity, action) {
     if ($.inArray(entity, ['EntityFinancialTrxn', 'FinancialTrxn']) > -1 && $.inArray(action, ['delete', 'setvalue', 'replace', 'create']) > -1) {
       var msg = ts('Given the importance of auditability, extension developers are strongly discouraged from writing code to add, update or delete entries in the civicrm_financial_item, civicrm_entity_financial_trxn, and civicrm_financial_trxn tables. Before publishing an extension on civicrm.org that does any of this, please ask for a special bookkeeping code review for the extension.');
       CRM.alert(msg, 'warning');

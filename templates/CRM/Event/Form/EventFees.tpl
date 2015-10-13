@@ -54,7 +54,7 @@
             <tr>
               <td></td>
               <td>
-                <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><span class="icon ui-icon-pencil"></span> {ts}Change Selections{/ts}</a>
+                <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil"></i> {ts}Change Selections{/ts}</a>
               </td>
             </tr>
         {else} {* New participant *}

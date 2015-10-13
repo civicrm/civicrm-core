@@ -327,7 +327,7 @@
         .dialog(settings.dialog)
         .parent().find('.ui-dialog-titlebar')
         .append($('<a class="crm-dialog-titlebar-print ui-dialog-titlebar-close" title="'+ts('Print window')+'" target="_blank" style="right:3.8em;"/>')
-          .button({icons: {primary: 'ui-icon-print'}, text: false}));
+          .button({icons: {primary: 'fa-print'}, text: false}));
     }
     // Add handlers to new or existing dialog
     if ($(settings.target).data('uiDialog')) {
@@ -381,7 +381,7 @@
         var id = widget.attr('id') + '-unsaved-alert',
           title = widget.dialog('option', 'title'),
           alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), 'alert unsaved-dialog', {expires: 60000});
-        $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
+        $('#' + id).button({icons: {primary: 'fa-undo'}}).click(function(e) {
           widget.attr('data-unsaved-changes', 'false').dialog('open');
           e.preventDefault();
         });
@@ -487,8 +487,8 @@
             if ($icon.length) {
               button.icons = {primary: $icon.attr('class')};
             } else {
-              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'close' : 'check');
-              button.icons = {primary: 'ui-icon-' + action};
+              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'times' : 'check');
+              button.icons = {primary: 'fa-' + action};
             }
             buttons.push(button);
             added.push(identifier);

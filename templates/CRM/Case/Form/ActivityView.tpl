@@ -78,6 +78,6 @@
     {/if}
   {/if}
   <div class="crm-submit-buttons">
-    {crmButton p='civicrm/case' q="reset=1" class='cancel' icon='close'}{ts}Done{/ts}{/crmButton}
+    {crmButton p='civicrm/case' q="reset=1" class='cancel' icon='times'}{ts}Done{/ts}{/crmButton}
   </div>
 </div>

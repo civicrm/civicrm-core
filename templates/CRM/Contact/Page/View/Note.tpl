@@ -38,7 +38,7 @@
             {/if}
           </table>
           <div class="crm-submit-buttons">
-            {crmButton class="cancel" icon="close" p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}{ts}Done{/ts}{/crmButton}
+            {crmButton class="cancel" icon="times" p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}{ts}Done{/ts}{/crmButton}
           </div>
 
         {if $comments}
@@ -100,7 +100,7 @@
 
 {if $permission EQ 'edit' AND ($action eq 16)}
    <div class="action-link">
-   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Note{/ts}</span></a>
+   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><i class="crm-i fa-comment"></i> {ts}Add Note{/ts}</span></a>
    </div>
    <div class="clear"></div>
 {/if}
@@ -220,13 +220,13 @@
             <td class="crm-note-comment">
                 {if $note.comment_count}
                     <span id="{$note.id}_show" style="display:block" class="icon_comments_show">
-                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Show comments for this note.{/ts}"><span class="ui-icon dark-icon ui-icon-triangle-1-e"></span></a>
+                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Show comments for this note.{/ts}"><i class="crm-i fa-caret-right"></i></span></a>
                     </span>
                     <span id="{$note.id}_hide" style="display:none" class="icon_comments_hide">
-                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Hide comments for this note.{/ts}"><span class="ui-icon dark-icon ui-icon-triangle-1-s"></span></a>
+                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Hide comments for this note.{/ts}"><i class="crm-i fa-caret-down"></i></span></a>
                     </span>
                 {else}
-                    <span class="ui-icon ui-icon-triangle-1-e" id="{$note.id}_hide" style="display:none"></span>
+                    <span class="crm-i fa-caret-right" id="{$note.id}_hide" style="display:none"></span>
                 {/if}
             </td>
             <td class="crm-note-note">

@@ -29,15 +29,15 @@
 {$communityMessages}
 <div class="crm-submit-buttons">
 <a href="#" id="crm-dashboard-configure" class="crm-hover-button show-add">
-  <span class="icon ui-icon-wrench"></span> {ts}Configure Your Dashboard{/ts}
+  <i class="crm-i fa-wrench"></i> {ts}Configure Your Dashboard{/ts}
 </a>
 
 <a style="display:none;" href="{crmURL p="civicrm/dashboard" q="reset=1"}" class="button show-done" style="margin-left: 6px;">
-  <span><div class="icon ui-icon-check"></div> {ts}Done{/ts}</span>
+  <span><i class="crm-i fa-check"></i> {ts}Done{/ts}</span>
 </a>
 
 <a style="float:right;" href="{crmURL p="civicrm/dashboard" q="reset=1&resetCache=1"}" class="crm-hover-button show-refresh" style="margin-left: 6px;">
-  <span class="icon ui-icon-refresh"></span> {ts}Refresh Dashboard Data{/ts}
+  <i class="crm-i fa-refresh"></i> {ts}Refresh Dashboard Data{/ts}
 </a>
 
 </div>
