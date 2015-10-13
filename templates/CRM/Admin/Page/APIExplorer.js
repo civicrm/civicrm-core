@@ -95,10 +95,10 @@
     var $row = $('tr:last-child', '#api-params');
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
-        return '<span class="icon ui-icon-link"></span> API ' +
+        return '<i class="crm-i fa-link"></i> API ' +
           ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
       },
-      placeholder: '<span class="icon ui-icon-link"></span> ' + ts('Entity'),
+      placeholder: '<i class="crm-i fa-link"></i> ' + ts('Entity'),
       escapeMarkup: function(m) {return m;}
     });
   }
