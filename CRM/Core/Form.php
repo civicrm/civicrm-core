@@ -647,7 +647,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws CRM_Core_Exception
    */
   public function assignBillingType() {
-    $this->_bltID = CRM_Core_BAO_Location::getBillingLocationId();
+    $this->_bltID = CRM_Core_BAO_LocationType::getBilling();
     $this->set('bltID', $this->_bltID);
     $this->assign('bltID', $this->_bltID);
   }

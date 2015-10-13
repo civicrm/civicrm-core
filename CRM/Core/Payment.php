@@ -561,7 +561,13 @@ abstract class CRM_Core_Payment {
    *
    * @return array
    */
-  public function getBillingAddressFields($billingLocationID) {
+  public function getBillingAddressFields($billingLocationID = NULL) {
+    if (!$billingLocationID) {
+      // Note that although the billing id is passed around the forms the idea that it would be anything other than
+      // the result of the function below doesn't seem to have eventuated.
+      // So taking this as a param is possibly something to be removed in favour of the standard default.
+      $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
+    }
     if ($this->_paymentProcessor['billing_mode'] != 1 && $this->_paymentProcessor['billing_mode'] != 3) {
       return array();
     }
@@ -585,7 +591,13 @@ abstract class CRM_Core_Payment {
    * @return array
    *    Array of metadata for address fields.
    */
-  public function getBillingAddressFieldsMetadata($billingLocationID) {
+  public function getBillingAddressFieldsMetadata($billingLocationID = NULL) {
+    if (!$billingLocationID) {
+      // Note that although the billing id is passed around the forms the idea that it would be anything other than
+      // the result of the function below doesn't seem to have eventuated.
+      // So taking this as a param is possibly something to be removed in favour of the standard default.
+      $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
+    }
     $metadata = array();
     $metadata['billing_first_name'] = array(
       'htmlType' => 'text',
