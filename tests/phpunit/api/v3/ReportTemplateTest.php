@@ -197,6 +197,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'logging/contribute/detail' => '(likely to be test related) probably logging off DB Error: no such table',
       'survey/detail' => '(likely to be test related)  Undefined index: CiviCampaign civicrm CRM/Core/Component.php(196)',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
+      'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
     );
 
     $reports = civicrm_api3('report_template', 'get', array('return' => 'value', 'options' => array('limit' => 500)));

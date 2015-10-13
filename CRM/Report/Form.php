@@ -4444,7 +4444,15 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   public function add2group($groupID) {
     if (is_numeric($groupID) && isset($this->_aliases['civicrm_contact'])) {
       $select = "SELECT DISTINCT {$this->_aliases['civicrm_contact']}.id AS addtogroup_contact_id, ";
-      $select = str_ireplace('SELECT SQL_CALC_FOUND_ROWS ', $select, $this->_select);
+
+      // here are we are prepending / adding  contact id field that could be used for adding group
+      // so first check for "SELECT SQL_CALC_FOUND_ROWS" and if does not exist replace "SELECT"
+      if (preg_match('/^SELECT SQL_CALC_FOUND_ROWS/', $this->_select)) {
+        $select = str_ireplace('SELECT SQL_CALC_FOUND_ROWS ', $select, $this->_select);
+      }
+      else {
+        $select = str_ireplace('SELECT ', $select, $this->_select);
+      }
 
       $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy}";
       $sql = str_replace('WITH ROLLUP', '', $sql);
