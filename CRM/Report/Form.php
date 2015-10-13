@@ -4303,11 +4303,42 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $query->_where = "WHERE {$query->_aliases['civicrm_contribution']}.id IS NOT NULL ";
     }
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
+    // Handle custom fields for filters
+    $from = '';
+    $mapper = CRM_Core_BAO_CustomQuery::$extendsMap;
+    foreach ($query->_columns as $table => $prop) {
+      if (substr($table, 0, 13) == 'civicrm_value' ||
+        substr($table, 0, 12) == 'custom_value'
+      ) {
+        $extendsTable = $mapper[$prop['extends']];
+
+        // check field is in params
+        if (!$this->isFieldSelected($prop)) {
+          continue;
+        }
+        $baseJoin = CRM_Utils_Array::value($prop['extends'], $this->_customGroupExtendsJoin, "{$this->_aliases[$extendsTable]}.id");
+
+        $customJoin = is_array($this->_customGroupJoin) ? $this->_customGroupJoin[$table] : $this->_customGroupJoin;
+        $from .= " {$customJoin} {$table} {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$baseJoin}";
+        // handle for ContactReference
+        if (array_key_exists('fields', $prop)) {
+          foreach ($prop['fields'] as $fieldName => $field) {
+            if (CRM_Utils_Array::value('dataType', $field) ==
+              'ContactReference'
+            ) {
+              $columnName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', CRM_Core_BAO_CustomField::getKeyID($fieldName), 'column_name');
+              $from .= " LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_aliases[$table]}.{$columnName} ";
+            }
+          }
+        }
+      }
+    }
     $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from} 
               LEFT JOIN civicrm_line_item   {$query->_aliases['civicrm_line_item']}
                       ON {$query->_aliases['civicrm_contribution']}.id = {$query->_aliases['civicrm_line_item']}.contribution_id AND
                          {$query->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution' 
                       AND {$query->_aliases['civicrm_line_item']}.financial_type_id NOT IN (" . $liFTs . ") 
+              {$from}
               {$query->_where} 
                       AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ") 
                       AND {$query->_aliases['civicrm_line_item']}.id IS NULL
