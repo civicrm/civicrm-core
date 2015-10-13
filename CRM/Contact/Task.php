@@ -138,7 +138,7 @@ class CRM_Contact_Task {
           'result' => TRUE,
         ),
         self::BATCH_UPDATE => array(
-          'title' => ts('Batch update contacts via profile'),
+          'title' => ts('Update multiple contacts'),
           'class' => array(
             'CRM_Contact_Form_Task_PickProfile',
             'CRM_Contact_Form_Task_Batch',

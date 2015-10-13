@@ -421,7 +421,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Take sort name of contact during
-   * batch update member via profile
+   * Update multiple memberships
    */
   public function testsortName() {
     $contactId = Contact::createIndividual();
