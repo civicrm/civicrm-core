@@ -2237,6 +2237,10 @@ a.crm-i:hover {
   text-decoration: none;
 }
 
+.crm-container a:hover .crm-i.fa-trash,
+.crm-container .crm-button:hover .crm-i.fa-trash,
+.crm-container .crm-hover-button:hover .crm-i.fa-trash,
+.crm-container span:hover > .crm-i.fa-trash,
 .crm-i.crm-i-red {
   color: #8A1F11;
 }

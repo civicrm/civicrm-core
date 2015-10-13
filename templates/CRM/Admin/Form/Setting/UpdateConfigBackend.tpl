@@ -35,12 +35,12 @@
     </p>
 </div>
         <div>
-          <span class="crm-button crm-icon-button">
-            <span class="crm-button-icon ui-icon-trash"> </span>
+          <span class="crm-button crm-i-button">
+            <i class="crm-i fa-undo"></i>
             {$form._qf_UpdateConfigBackend_next_cleanup.html}
           </span>
-          <span class="crm-button crm-icon-button">
-            <span class="crm-button-icon ui-icon-trash"> </span>
+          <span class="crm-button crm-i-button">
+            <i class="crm-i fa-terminal"></i>
             {$form._qf_UpdateConfigBackend_next_resetpaths.html}
           </span>
         </div>
