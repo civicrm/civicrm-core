@@ -118,12 +118,12 @@ class CRM_Contact_Task {
           'class' => 'CRM_Activity_Form_Activity',
         ),
         self::SAVE_SEARCH => array(
-          'title' => ts('Smart group - create'),
+          'title' => ts('Group - create smart group'),
           'class' => 'CRM_Contact_Form_Task_SaveSearch',
           'result' => TRUE,
         ),
         self::SAVE_SEARCH_UPDATE => array(
-          'title' => ts('Smart group - update'),
+          'title' => ts('Group - update smart group'),
           'class' => 'CRM_Contact_Form_Task_SaveSearch_Update',
           'result' => TRUE,
         ),

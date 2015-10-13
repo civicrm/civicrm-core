@@ -106,12 +106,12 @@ class CRM_Event_Task {
           'result' => TRUE,
         ),
         13 => array(
-          'title' => ts('Smart group - create'),
+          'title' => ts('Group - create smart group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch',
           'result' => TRUE,
         ),
         14 => array(
-          'title' => ts('Smart group - update'),
+          'title' => ts('Group - update smart group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch_Update',
           'result' => TRUE,
         ),
