@@ -2739,4 +2739,51 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
   }
 
+  public function testGetByContactType() {
+    $individual = $this->callAPISuccess('Contact', 'create', array(
+      'email' => 'individual@test.com',
+      'contact_type' => 'Individual',
+    ));
+    $household = $this->callAPISuccess('Contact', 'create', array(
+      'household_name' => 'household@test.com',
+      'contact_type' => 'Household',
+    ));
+    $organization = $this->callAPISuccess('Contact', 'create', array(
+      'organization_name' => 'organization@test.com',
+      'contact_type' => 'Organization',
+    ));
+    // Test with id - getsingle will throw an exception if not found
+    $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $individual['id'],
+      'contact_type' => 'Individual',
+    ));
+    $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $individual['id'],
+      'contact_type' => array('IN' => array('Individual')),
+      'return' => 'id',
+    ));
+    $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $organization['id'],
+      'contact_type' => array('IN' => array('Individual', 'Organization')),
+    ));
+    // Test as array
+    $result = $this->callAPISuccess('Contact', 'get', array(
+      'contact_type' => array('IN' => array('Individual', 'Organization')),
+      'options' => array('limit' => 0),
+      'return' => 'id',
+    ));
+    $this->assertContains($organization['id'], array_keys($result['values']));
+    $this->assertContains($individual['id'], array_keys($result['values']));
+    $this->assertNotContains($household['id'], array_keys($result['values']));
+    // Test as string
+    $result = $this->callAPISuccess('Contact', 'get', array(
+      'contact_type' => 'Household',
+      'options' => array('limit' => 0),
+      'return' => 'id',
+    ));
+    $this->assertNotContains($organization['id'], array_keys($result['values']));
+    $this->assertNotContains($individual['id'], array_keys($result['values']));
+    $this->assertContains($household['id'], array_keys($result['values']));
+  }
+
 }
