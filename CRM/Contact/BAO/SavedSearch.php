@@ -89,7 +89,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    *   The id of the saved search.
    *
    * @return array
-   *   the values of the posted saved search
+   *   the values of the posted saved search used as default values in various Search Form
    */
   public static function &getFormValues($id) {
     $fv = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'form_values');
