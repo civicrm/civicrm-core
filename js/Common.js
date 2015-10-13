@@ -745,9 +745,23 @@ if (!CRM.vars) CRM.vars = {};
       createLinks = params.contact_type ? _.where(CRM.config.entityRef.contactCreate, {type: params.contact_type}) : CRM.config.entityRef.contactCreate;
     }
     _.each(createLinks, function(link) {
+      var icon;
+      switch (link.type) {
+        case 'Individual':
+          icon = 'fa-user';
+          break;
+
+        case 'Organization':
+          icon = 'fa-building';
+          break;
+
+        case 'Household':
+          icon = 'fa-home';
+          break;
+      }
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
-      if (link.type) {
-        markup += '<span class="icon ' + link.type + '-profile-icon"></span> ';
+      if (icon) {
+        markup += '<i class="crm-i ' + icon + '"></i> ';
       }
       markup += link.label + '</a>';
     });
