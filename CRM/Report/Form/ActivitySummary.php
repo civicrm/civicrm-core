@@ -522,7 +522,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
     // now build the query for duration sum
     $this->from(TRUE);
-    $this->customDataFrom();
     $this->where(TRUE);
 
     // build the query to calulate duration sum
@@ -556,6 +555,11 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
     // assign variables to templates
     $this->doTemplateAssignment($rows);
+
+    //reset the sql building to default, which is used / called during other actions like "add to group"
+    // now build the query for duration sum
+    $this->from();
+    $this->where();
 
     // do print / pdf / instance stuff if needed
     $this->endPostProcess($rows);
