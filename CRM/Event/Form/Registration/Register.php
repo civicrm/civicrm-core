@@ -34,7 +34,6 @@
 
 /**
  * This class generates form components for processing Event
- *
  */
 class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
@@ -73,8 +72,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -844,20 +841,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
+    // @todo - can we remove the 'is_monetary' concept?
     if ($self->_values['event']['is_monetary']) {
       if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 && !isset
         ($fields['payment_processor_id'])) {
         $errors['payment_processor_id'] = ts('Please select a Payment Method');
-      }
-      // return if this is express mode
-      if ($self->_paymentProcessor &&
-        $self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
-      ) {
-        if (!empty($fields[$self->_expressButtonName . '_x']) || !empty($fields[$self->_expressButtonName . '_y']) ||
-          CRM_Utils_Array::value($self->_expressButtonName, $fields)
-        ) {
-          return empty($errors) ? TRUE : $errors;
-        }
       }
 
       $isZeroAmount = $skipPaymentValidation = FALSE;
@@ -885,14 +873,19 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $skipPaymentValidation = TRUE;
       }
 
-      // also return if paylater mode or zero fees for valid members
-      if (!empty($fields['is_pay_later']) || !empty($fields['bypass_payment']) ||
+      // also return if zero fees for valid members
+      if (!empty($fields['bypass_payment']) ||
         $skipPaymentValidation ||
         (!$self->_allowConfirmation && ($self->_requireApproval || $self->_allowWaitlist))
       ) {
         return empty($errors) ? TRUE : $errors;
       }
-      CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessorID, $fields, $errors, $self);
+      CRM_Core_Payment_Form::validatePaymentInstrument(
+        $fields['payment_processor_id'],
+        $fields,
+        $errors,
+        (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
+      );
     }
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
