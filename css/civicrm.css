@@ -3218,16 +3218,6 @@ div.m ul#civicrm-menu,
 .select2-drop .crm-entityref-filters select.active {
   border: 1px solid #808080;
 }
-/* Icons used by entityRef create buttons */
-.crm-container .Individual-profile-icon {
-  background-position: -144px -96px;
-}
-.crm-container .Household-profile-icon {
-  background-position: 0 -112px;
-}
-.crm-container .Organization-profile-icon {
-  background-position: -112px -112px;
-}
 /* Style autocomplete results */
 .crm-container .select2-results {
   font-size: 12px;
