@@ -2313,7 +2313,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $defaults
    *   Defaults array.
    * @param bool $singleProfile
-   *   True for single profile else false(batch update).
+   *   True for single profile else false(Update multiple items).
    * @param int $componentId
    *   Id for specific components like contribute, event etc.
    * @param null $component
@@ -2335,7 +2335,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           continue;
         }
 
-        //set the field name depending upon the profile mode(single/batch)
+        //set the field name depending upon the profile mode(single/multiple)
         if ($singleProfile) {
           $fldName = $name;
         }

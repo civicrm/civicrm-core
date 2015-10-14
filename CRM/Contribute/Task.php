@@ -82,7 +82,7 @@ class CRM_Contribute_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Batch update contributions via profile'),
+          'title' => ts('Update multiple contributions'),
           'class' => array(
             'CRM_Contribute_Form_Task_PickProfile',
             'CRM_Contribute_Form_Task_Batch',

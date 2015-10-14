@@ -86,7 +86,7 @@ class CRM_Activity_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Batch update activities via profile'),
+          'title' => ts('Update multiple activities'),
           'class' => array(
             'CRM_Activity_Form_Task_PickProfile',
             'CRM_Activity_Form_Task_Batch',

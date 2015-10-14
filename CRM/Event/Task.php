@@ -88,7 +88,7 @@ class CRM_Event_Task {
           'result' => FALSE,
         ),
         4 => array(
-          'title' => ts('Batch update participants via profile'),
+          'title' => ts('Update multiple participants'),
           'class' => array(
             'CRM_Event_Form_Task_PickProfile',
             'CRM_Event_Form_Task_Batch',
@@ -106,17 +106,17 @@ class CRM_Event_Task {
           'result' => TRUE,
         ),
         13 => array(
-          'title' => ts('Smart group - create'),
+          'title' => ts('Group - create smart group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch',
           'result' => TRUE,
         ),
         14 => array(
-          'title' => ts('Smart group - update'),
+          'title' => ts('Group - update smart group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch_Update',
           'result' => TRUE,
         ),
         15 => array(
-          'title' => ts('Participant status - change'),
+          'title' => ts('Participant status - change (emails sent)'),
           'class' => 'CRM_Event_Form_Task_ParticipantStatus',
           'result' => TRUE,
         ),
@@ -148,7 +148,7 @@ class CRM_Event_Task {
     }
 
     CRM_Utils_Hook::searchTasks('event', self::$_tasks);
-    asort(self::$_tasks);
+
     return self::$_tasks;
   }
 
@@ -229,6 +229,7 @@ class CRM_Event_Task {
       // make the print task by default
       $value = 2;
     }
+    asort(self::$_tasks);
     return array(
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],
