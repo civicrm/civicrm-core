@@ -21,7 +21,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    */
   public function testCreateMissingReportMenuItemLink() {
     $reportCount = $this->getCountReportInstances();
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url = 'civicrm/report/instance/1?reset=1'");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/1?reset=1%'");
     $this->assertEquals($reportCount - 1, $this->getCountReportInstances());
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
 
@@ -34,6 +34,22 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that a link with output=criteria at the end is not duplicated.
+   */
+  public function testNoDuplicateReportMenuItemLink() {
+    CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
+    $reportCount = $this->getCountReportInstances();
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_navigation
+      SET url = CONCAT(url, '&output=critieria')
+      WHERE url LIKE 'civicrm/report/instance/%?reset=1'");
+    $this->assertEquals($reportCount, $this->getCountReportInstances());
+    CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
+
+    $this->assertEquals($reportCount, $this->getCountReportInstances());
+  }
+
+  /**
    * Test that an existing report link is rebuilt under it's parent.
    *
    * Function tests CRM_Core_BAO_Navigation::rebuildReportsNavigation.
@@ -42,6 +58,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $url = 'civicrm/report/instance/1';
     $url_params = 'reset=1';
     $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
+
     $this->assertNotEquals(FALSE, $existing_nav);
     $existing_nav->parent_id = 1;
     $existing_nav->save();
@@ -56,7 +73,6 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $changed_existing_nav->find(TRUE);
     $this->assertEquals($changed_existing_nav->parent_id, $parent_nav->id);
   }
-
 
   /**
    * Test that a navigation item can be retrieved by it's url.
@@ -78,6 +94,34 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     );
     CRM_Core_BAO_Navigation::add($params);
     $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
+    $this->assertObjectHasAttribute('id', $new_nav);
+    $this->assertNotNull($new_nav->id);
+    $new_nav->delete();
+  }
+
+  /**
+   * Test that a navigation item can be retrieved by it's url with a wildcard.
+   *
+   * We want to be able to get a report url with OR without the output=criteria since
+   * that is part of the navigation but not the instance.
+   */
+  public function testGetNavItemByUrlWildcard() {
+    $random_string = substr(sha1(rand()), 0, 7);
+    $name = "Test Menu Link {$random_string}";
+    $url = "civicrm/test/{$random_string}";
+    $url_params = "reset=1&output=criteria";
+    $params = array(
+      'name' => $name,
+      'label' => ts($name),
+      'url' => "{$url}?{$url_params}",
+      'parent_id' => NULL,
+      'is_active' => TRUE,
+      'permission' => array(
+        'access CiviCRM',
+      ),
+    );
+    CRM_Core_BAO_Navigation::add($params);
+    $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, 'reset=1%');
     $this->assertObjectHasAttribute('id', $new_nav);
     $this->assertNotNull($new_nav->id);
     $new_nav->delete();

@@ -914,7 +914,7 @@ ORDER BY parent_id, weight";
         "compid={$component_id}&reset=1", $reports_nav->id, $permission, $domain_id, TRUE);
       foreach ($component['reports'] as $report_id => $report) {
         // Create or update the report instance links.
-        $report_nav = self::createOrUpdateReportNavItem($report['title'], $report['url'], 'reset=1', $component_nav->id, $report['permission'], $domain_id);
+        $report_nav = self::createOrUpdateReportNavItem($report['title'], $report['url'], 'reset=1', $component_nav->id, $report['permission'], $domain_id, FALSE, TRUE);
         // Update the report instance to include the navigation id.
         $query = "UPDATE civicrm_report_instance SET navigation_id = %1 WHERE id = %2";
         $params = array(
@@ -956,6 +956,9 @@ ORDER BY parent_id, weight";
   /**
    * Retrieve a navigation item using it's url.
    *
+   * Note that we use LIKE to permit a wildcard as the calling code likely doesn't
+   * care about output params appended.
+   *
    * @param string $url
    * @param array $url_params
    *
@@ -966,8 +969,9 @@ ORDER BY parent_id, weight";
    */
   public static function getNavItemByUrl($url, $url_params, $parent_id = NULL) {
     $nav = new CRM_Core_BAO_Navigation();
-    $nav->url = "{$url}?{$url_params}";
     $nav->parent_id = $parent_id;
+    $nav->whereAdd("url LIKE '{$url}?{$url_params}'");
+
     if ($nav->find(TRUE)) {
       return $nav;
     }
@@ -1036,9 +1040,10 @@ ORDER BY parent_id, weight";
    * @return \CRM_Core_DAO_Navigation
    */
   protected static function createOrUpdateReportNavItem($name, $url, $url_params, $parent_id, $permission,
-                                                        $domain_id, $onlyMatchParentID = FALSE) {
+                                                        $domain_id, $onlyMatchParentID = FALSE, $useWildcard = TRUE) {
     $id = NULL;
-    $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params, ($onlyMatchParentID ? $parent_id : NULL));
+    $existing_url_params = $useWildcard ? $url_params . '%' : $url_params;
+    $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $existing_url_params, ($onlyMatchParentID ? $parent_id : NULL));
     if ($existing_nav) {
       $id = $existing_nav->id;
     }
