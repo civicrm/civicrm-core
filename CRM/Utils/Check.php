@@ -32,7 +32,7 @@
  */
 class CRM_Utils_Check {
   // How often to run checks and notify admins about issues.
-  const CHECK_TIMER = 86400;    
+  const CHECK_TIMER = 86400;
 
   /**
    * We only need one instance of this object, so we use the
@@ -108,7 +108,7 @@ class CRM_Utils_Check {
    * @param CRM_Utils_Check_Message $b
    * @return int
    */
-  public function severitySort($a, $b) {
+  public static function severitySort($a, $b) {
     $aSeverity = $a->getSeverity();
     $bSeverity = $b->getSeverity();
     if ($aSeverity == $bSeverity) {
@@ -177,11 +177,14 @@ class CRM_Utils_Check {
    * We might even expose the results of these checks on the Wordpress
    * plugin status page or the Drupal admin/reports/status path.
    *
+   * @param bool $max
+   *   Whether to return just the maximum non-hushed severity
+   *
    * @return array
    *   Array of messages
    * @link https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
-  public function checkAll() {
+  public static function checkAll($max = FALSE) {
     $checks = array();
     $checks[] = new CRM_Utils_Check_Security();
     $checks[] = new CRM_Utils_Check_Env();
@@ -210,7 +213,20 @@ class CRM_Utils_Check {
     }
     uasort($messages, array(__CLASS__, 'severitySort'));
 
-    return $messages;
+    $maxSeverity = 1;
+    foreach ($messages as $message) {
+      if (!$message->isVisible()) {
+        continue;
+      }
+      $maxSeverity = max(1, $message->getLevel());
+      break;
+    }
+
+    Civi::cache()->set('systemCheckSeverity', $maxSeverity);
+    $timestamp = time();
+    Civi::cache()->set('systemCheckDate', $timestamp);
+
+    return ($max) ? $maxSeverity : $messages;
   }
 
   /**
@@ -219,7 +235,7 @@ class CRM_Utils_Check {
    * @return bool
    *   TRUE means hush/snooze, FALSE means display.
    */
-  public function checkHushSnooze($message) {
+  public static function checkHushSnooze($message) {
     $statusPreferenceParams = array(
       'name' => $message->getName(),
       'domain_id' => CRM_Core_Config::domainID(),
