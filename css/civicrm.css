@@ -2273,16 +2273,8 @@ a.crm-i:hover {
   margin-right: 5px;
 }
 
-/* Same as fa-question-circle, plus coloring */
 .crm-container a.helpicon {
-  display: inline-block;
-  color: #F5F6F1;
-  font: normal normal normal 14px/1 FontAwesome;
-  font-size: inherit;
-  opacity: .7;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  opacity: .8;
 }
 
 .crm-container  a.helpicon:hover,
@@ -2290,8 +2282,13 @@ a.crm-i:hover {
   opacity: 1;
 }
 
+/* Same as fa-question-circle */
 .crm-container a.helpicon:before {
   content: "\f059";
+}
+
+div.crm-accordion-header a.helpicon {
+  color: inherit;
 }
 
 /* These .crm-icon classes use item_sprites.png */
