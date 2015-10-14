@@ -148,7 +148,7 @@ class CRM_Event_Task {
     }
 
     CRM_Utils_Hook::searchTasks('event', self::$_tasks);
-    //asort(self::$_tasks);
+
     return self::$_tasks;
   }
 
