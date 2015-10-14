@@ -235,7 +235,7 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
     $dataset[2] = array('id' => array(10, 11));
 
     $ssdao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_saved_search");
-    while($ssdao->fetch()) {
+    while ($ssdao->fetch()) {
       $fv = CRM_Contact_BAO_SavedSearch::getFormValues($ssdao->id);
       $obj = new CRM_Contact_Form_Search_Custom_Sample($fv);
       $sql = $obj->contactIDs();
