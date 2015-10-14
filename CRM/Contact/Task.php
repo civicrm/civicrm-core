@@ -252,7 +252,6 @@ class CRM_Contact_Task {
 
       CRM_Utils_Hook::searchTasks('contact', self::$_tasks);
 
-      asort(self::$_tasks);
     }
   }
 
@@ -285,7 +284,6 @@ class CRM_Contact_Task {
     ) {
       unset($titles[self::DELETE_PERMANENTLY]);
     }
-    asort($titles);
     return $titles;
   }
 

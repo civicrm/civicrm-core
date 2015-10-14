@@ -148,7 +148,7 @@ class CRM_Event_Task {
     }
 
     CRM_Utils_Hook::searchTasks('event', self::$_tasks);
-    asort(self::$_tasks);
+    //asort(self::$_tasks);
     return self::$_tasks;
   }
 
@@ -229,6 +229,7 @@ class CRM_Event_Task {
       // make the print task by default
       $value = 2;
     }
+    asort(self::$_tasks);
     return array(
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],
