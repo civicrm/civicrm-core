@@ -24,7 +24,7 @@
   angular.module('statuspage').service('statuspageGetStatuses', function(crmApi, statuspageSeverityList) {
     return function(apiFilter) {
       return crmApi('System', 'check', apiFilter)
-        .catch(function(obj){console.log(obj)});
+        .catch(function(obj){console.log(obj);})
         .then(function(apiResults){
           _.each(apiResults.values, function(status){
             status.severity_id = status.severity;
