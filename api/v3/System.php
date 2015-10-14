@@ -113,7 +113,7 @@ function civicrm_api3_system_check($params) {
     $returnValues[] = $msg->toArray() + array('id' => $id++);
   }
 
-  return _civicrm_api3_basic_array_get('systemCheck', $params, $returnValues, id, array('id', 'name', 'message', 'title', 'severity', 'is_visible'));
+  return _civicrm_api3_basic_array_get('systemCheck', $params, $returnValues, $id, array('id', 'name', 'message', 'title', 'severity', 'is_visible'));
 }
 
 /**
