@@ -107,7 +107,7 @@ class WebTest_ACL_AssignUsersToRolesTest extends CiviSeleniumTestCase {
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
     $this->click("edit-submit");
-    $this->Batch Update Participants Via PrwaitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForPageToLoad($this->getTimeoutMsec());
     $permissions = array("edit-{$roleId}-access-civicrm");
     $this->changePermissions($permissions);
 
