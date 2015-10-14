@@ -543,9 +543,12 @@ ORDER BY  cv.label
                   ON (eft.entity_id = {$this->_aliases['civicrm_contribution']}.id)
             LEFT JOIN civicrm_financial_account fa
                   ON (fa.account_type_code = 'AR')
+            LEFT JOIN civicrm_financial_account fae
+                  ON (fae.account_type_code = 'EXP')
             LEFT JOIN civicrm_financial_trxn ft
                   ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND
-                     (ft.to_financial_account_id != fa.id)
+                     (ft.to_financial_account_id != fa.id) AND
+                     (ft.to_financial_account_id != fae.id)
       ";
     }
   }
