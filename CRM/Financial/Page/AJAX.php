@@ -518,13 +518,20 @@ class CRM_Financial_Page_AJAX {
   public static function getBatchSummary() {
     $batchID = CRM_Utils_Type::escape($_REQUEST['batchID'], 'String');
     $params = array('id' => $batchID);
-    $batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);
+    
+    $batchSummary = makeBatchSummary($batchID, $params);
+
+    CRM_Utils_JSON::output($batchSummary);
+  }
+
+  public static function makeBatchSummary($batchID, $params) {
+  	$batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);
     $batchTotals = CRM_Batch_BAO_Batch::batchTotals(array($batchID));
-    $batchSummary = array(
+  	$batchSummary = array(
       'created_by' => CRM_Contact_BAO_Contact::displayName($batchInfo->created_id),
-      'status' => CRM_Core_OptionGroup::getLabel('batch_status', $batchInfo->status_id),
+      'status' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'batch_status_id', $batchInfo->status_id),
       'description' => $batchInfo->description,
-      'payment_instrument' => CRM_Core_OptionGroup::getLabel('payment_instrument', $batchInfo->payment_instrument_id),
+      'payment_instrument' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchInfo->payment_instrument_id),
       'item_count' => $batchInfo->item_count,
       'assigned_item_count' => $batchTotals[$batchID]['item_count'],
       'total' => CRM_Utils_Money::format($batchInfo->total),
@@ -532,7 +539,6 @@ class CRM_Financial_Page_AJAX {
       'opened_date' => CRM_Utils_Date::customFormat($batchInfo->created_date),
     );
 
-    CRM_Utils_JSON::output($batchSummary);
+    return $batchSummary;
   }
-
 }
