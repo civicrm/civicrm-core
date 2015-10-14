@@ -1507,12 +1507,13 @@ class CRM_Contact_BAO_Query {
 
     foreach ($formValues as $id => $values) {
 
-      self::legacyConvertFormValues($id, $values);
-
       if (self::isAlreadyProcessedForQueryFormat($values)) {
         $params[] = $values;
         continue;
       }
+
+      self::legacyConvertFormValues($id, $values);
+
       // The form uses 1 field to represent two db fields
       if ($id == 'contact_type' && $values && (!is_array($values) || !array_intersect(array_keys($values), CRM_Core_DAO::acceptedSQLOperators()))) {
         $contactType = array();
@@ -1611,12 +1612,25 @@ class CRM_Contact_BAO_Query {
    *
    */
   public static function legacyConvertFormValues($id, &$values) {
-    if (in_array($id, array('group', 'tag')) && is_array($values)) {
+    $legacyElements = array(
+      'group',
+      'tag',
+      'contact_tags',
+      'contact_type',
+      'membership_type_id',
+      'membership_status_id',
+    );
+    if (in_array($id, $legacyElements) && is_array($values)) {
       // prior to 4.7, formValues for some attributes (e.g. group, tag) are stored in array(id1 => 1, id2 => 1),
       // as per the recent Search fixes $values need to be in standard array(id1, id2) format
       $ids = array_keys($values, 1);
       if (count($ids) > 1 ||
-        (count($ids) == 1 && (key($values) > 1 || (key($values) == 1 && $values[1] == 1))) // handle (0 => 4), (1 => 1)
+        (count($ids) == 1 &&
+          (key($values) > 1 ||
+            is_string(key($values)) ||
+            (key($values) == 1 && $values[1] == 1) // handle (0 => 4), (1 => 1)
+          )
+        )
       ) {
         $values = $ids;
       }
@@ -4492,7 +4506,7 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @return bool;
    */
-  protected static function isAlreadyProcessedForQueryFormat($values) {
+  public static function isAlreadyProcessedForQueryFormat($values) {
     if (!is_array($values)) {
       return FALSE;
     }
