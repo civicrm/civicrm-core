@@ -47,7 +47,7 @@ class CRM_Utils_Check_Message {
   private $title;
 
   /**
-   * @var string
+   * @var int
    * @see Psr\Log\LogLevel
    */
   private $level;

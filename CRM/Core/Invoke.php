@@ -352,8 +352,43 @@ class CRM_Core_Invoke {
     if (CRM_Core_Config::isUpgradeMode()) {
       return;
     }
-    $statusSeverity = 0;
-    $statusMessage = ts('System status OK');
+    //  check date of last cache and compare to today's date
+    $systemCheckDate = Civi::cache()->get('systemCheckDate');
+    if ($systemCheckDate > strtotime("one day ago")) {
+      $statusSeverity = Civi::cache()->get('systemCheckSeverity');
+    }
+    //  calls helper function in CRM_Utils_Check
+    if (empty($statusSeverity)) {
+      $statusSeverity = CRM_Utils_Check::checkAll(TRUE);
+    }
+    switch ($statusSeverity) {
+      case 7:
+        $statusMessage = ts('System Status: Emergency');
+        break;
+
+      case 6:
+        $statusMessage = ts('System Status: Alert');
+        break;
+
+      case 5:
+        $statusMessage = ts('System Status: Critical');
+        break;
+
+      case 4:
+        $statusMessage = ts('System Status: Error');
+        break;
+
+      case 3:
+        $statusMessage = ts('System Status: Warning');
+        break;
+
+      case 2:
+        $statusMessage = ts('System Status: Notice');
+        break;
+
+      default:
+        $statusMessage = ts('System Status: Ok');
+    }
     // TODO: get status from CRM_Utils_Check, if cached
     $template->assign('footer_status_severity', $statusSeverity);
     $template->assign('footer_status_message', $statusMessage);
