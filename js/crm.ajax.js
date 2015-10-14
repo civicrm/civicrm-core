@@ -487,8 +487,8 @@
             if ($icon.length) {
               button.icons = {primary: $icon.attr('class')};
             } else {
-              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'times' : 'check');
-              button.icons = {primary: 'fa-' + action};
+              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'fa-times' : 'fa-check');
+              button.icons = {primary: action};
             }
             buttons.push(button);
             added.push(identifier);
