@@ -337,6 +337,7 @@ ORDER BY parent_id, weight";
 
     // run the Navigation  through a hook so users can modify it
     CRM_Utils_Hook::navigationMenu($navigations);
+    self::fixNavigationMenu($navigations);
 
     $i18n = CRM_Core_I18n::singleton();
 
@@ -461,6 +462,49 @@ ORDER BY parent_id, weight";
       }
     }
     return $navigationString;
+  }
+
+  /**
+   * Given a navigation menu, generate navIDs for any items which are
+   * missing them.
+   *
+   * @param array $nodes
+   *   Each key is a numeral; each value is a node in
+   *   the menu tree (with keys "child" and "attributes").
+   */
+  public static function fixNavigationMenu(&$nodes) {
+    $maxNavID = 1;
+    array_walk_recursive($nodes, function($item, $key) use (&$maxNavID) {
+      if ($key === 'navID') {
+        $maxNavID = max($maxNavID, $item);
+      }
+    });
+    self::_fixNavigationMenu($nodes, $maxNavID, NULL);
+  }
+
+  /**
+   * @param array $nodes
+   *   Each key is a numeral; each value is a node in
+   *   the menu tree (with keys "child" and "attributes").
+   */
+  private static function _fixNavigationMenu(&$nodes, &$maxNavID, $parentID) {
+    $origKeys = array_keys($nodes);
+    foreach ($origKeys as $origKey) {
+      if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
+        $nodes[$origKey]['attributes']['parentID'] = $parentID;
+      }
+      // If no navID, then assign navID and fix key.
+      if (!isset($nodes[$origKey]['attributes']['navID'])) {
+        $newKey = ++$maxNavID;
+        $nodes[$origKey]['attributes']['navID'] = $newKey;
+        $nodes[$newKey] = $nodes[$origKey];
+        unset($nodes[$origKey]);
+        $origKey = $newKey;
+      }
+      if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
+        self::_fixNavigationMenu($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
+      }
+    }
   }
 
   /**
