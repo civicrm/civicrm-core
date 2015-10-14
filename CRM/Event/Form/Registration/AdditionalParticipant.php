@@ -561,7 +561,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     // validate supplied payment instrument values (e.g. credit card number and cvv)
     $payment_processor_id = $self->_params[0]['payment_processor'];
-    CRM_Core_Payment_Form::validatePaymentInstrument($payment_processor_id, $self->_params[0], $errors, $self);
+    CRM_Core_Payment_Form::validatePaymentInstrument($payment_processor_id, $self->_params[0], $errors, (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing'));
 
     if (!empty($errors)) {
       return FALSE;

@@ -73,12 +73,17 @@ class System {
   }
 
   /**
+   * Get payment processor by it's ID.
+   *
    * @param int $id
    *
    * @return \Civi\Payment\CRM_Core_Payment|NULL
    * @throws \CiviCRM_API3_Exception
    */
   public function getById($id) {
+    if ($id == 0) {
+      return new \CRM_Core_Payment_Manual();
+    }
     $processor = civicrm_api3('payment_processor', 'getsingle', array('id' => $id, 'is_test' => NULL));
     return self::getByProcessor($processor);
   }
