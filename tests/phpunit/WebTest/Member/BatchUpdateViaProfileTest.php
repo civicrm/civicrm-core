@@ -100,11 +100,11 @@ class WebTest_Member_BatchUpdateViaProfileTest extends CiviSeleniumTestCase {
     $this->type('sort_name', $lastName);
     $this->click('_qf_Search_refresh');
 
-    // Batch Update Via Profile
+    // Update multiple memberships
     $this->waitForElementPresent("xpath=//div[@id='search-status']/table/tbody/tr[2]/td[2]/input");
     $this->click("xpath=//div[@id='search-status']/table/tbody/tr[2]/td[2]/input");
     //$this->click('CIVICRM_QFID_ts_all_10');
-    $this->select('task', "label=Batch Update Members Via Profile");
+    $this->select('task', "label=Update multiple memberships");
     $this->waitForElementPresent('_qf_PickProfile_back-bottom');
     $this->waitForElementPresent('uf_group_id');
     $this->select('uf_group_id', "label={$profileTitle}");
