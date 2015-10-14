@@ -42,6 +42,16 @@ class CRM_Extension_Browser {
   const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
 
   /**
+   * Relative path below remote repository URL for single extensions file.
+   */
+  const SINGLE_FILE_PATH = '/single';
+
+  /**
+   * The name of the single JSON extension cache file.
+   */
+  const CACHE_JSON_FILE = 'extensions.json';
+
+  /**
    * @param string $repoUrl
    *   URL of the remote repository.
    * @param string $indexPath
@@ -52,7 +62,7 @@ class CRM_Extension_Browser {
   public function __construct($repoUrl, $indexPath, $cacheDir) {
     $this->repoUrl = $repoUrl;
     $this->cacheDir = $cacheDir;
-    $this->indexPath = $indexPath;
+    $this->indexPath = empty($indexPath) ? self::SINGLE_FILE_PATH : $indexPath;
     if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
       CRM_Utils_File::createDir($cacheDir, FALSE);
     }
@@ -176,21 +186,16 @@ class CRM_Extension_Browser {
     $outdated = (int) $timestamp < (time() - 180) ? TRUE : FALSE;
 
     if (!$timestamp || $outdated) {
-      $remotes = $this->grabRemoteKeyList();
-      $cached = FALSE;
+      $remotes = json_decode($this->grabRemoteJson(), TRUE);
     }
     else {
-      $remotes = $this->grabCachedKeyList();
-      $cached = TRUE;
+      $remotes = json_decode($this->grabCachedJson(), TRUE);
     }
 
     $this->_remotesDiscovered = array();
-    foreach ($remotes as $id => $rext) {
-      $xml = $this->grabRemoteInfoFile($rext['key'], $cached);
-      if ($xml != FALSE) {
-        $ext = CRM_Extension_Info::loadFromString($xml);
-        $this->_remotesDiscovered[] = $ext;
-      }
+    foreach ($remotes as $id => $xml) {
+      $ext = CRM_Extension_Info::loadFromString($xml);
+      $this->_remotesDiscovered[] = $ext;
     }
 
     if (file_exists(dirname($tsPath))) {
@@ -201,29 +206,27 @@ class CRM_Extension_Browser {
   }
 
   /**
-   * @return array
+   * Loads the extensions data from the cache file. If it is empty
+   * or doesn't exist, try fetching from remote instead.
+   *
+   * @return string
    */
-  private function grabCachedKeyList() {
-    $result = array();
-    $cachedPath = $this->cacheDir . DIRECTORY_SEPARATOR;
-    $files = scandir($cachedPath);
-    foreach ($files as $dc => $fname) {
-      if (substr($fname, -4) == '.xml') {
-        $result[] = array('key' => substr($fname, 0, -4));
-      }
+  private function grabCachedJson() {
+    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE;
+    $json = file_get_contents($filename);
+    if (empty($json)) {
+      $json = $this->grabRemoteJson();
     }
-    return $result;
+    return $json;
   }
 
   /**
    * Connects to public server and grabs the list of publically available
    * extensions.
    *
-   *
-   * @return array
-   *   list of extension names
+   * @return string
    */
-  private function grabRemoteKeyList() {
+  private function grabRemoteJson() {
 
     ini_set('default_socket_timeout', CRM_Utils_VersionCheck::CHECK_TIMEOUT);
     set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
@@ -239,28 +242,19 @@ class CRM_Extension_Browser {
       return array();
     }
 
-    $exts = array();
-    list ($status, $extdir) = CRM_Utils_HttpClient::singleton()->get($this->getRepositoryUrl() . $this->indexPath);
-    if ($extdir === FALSE || $status !== CRM_Utils_HttpClient::STATUS_OK) {
+    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE;
+    $url = $this->getRepositoryUrl() . $this->indexPath;
+    $status = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
+    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       CRM_Core_Session::setStatus(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests or contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.<br />', array(1 => $this->getRepositoryUrl())), ts('Connection Error'), 'error');
     }
     else {
-      $lines = explode("\n", $extdir);
-
-      foreach ($lines as $ln) {
-        if (preg_match("@\<li\>(.*)\</li\>@i", $ln, $out)) {
-          // success
-          $extsRaw[] = $out;
-          $key = strip_tags($out[1]);
-          if (substr($key, -4) == '.xml') {
-            $exts[] = array('key' => substr($key, 0, -4));
-          }
-        }
-      }
+      // Don't call grabCachedJson here, that would risk infinite recursion
+      $json = file_get_contents($filename);
     }
 
     // CRM-13141 There may not be any compatible extensions available for the requested CiviCRM version + CMS. If so, $extdir is empty so just return a notification.
-    if (empty($exts)) {
+    if (empty($json)) {
       $config = CRM_Core_Config::singleton();
       CRM_Core_Session::setStatus(ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %2 (<a href="%1">requested extensions from here</a>). If you want to install an extension which is not marked as compatible, you may be able to <a href="%3">download and install extensions manually</a> (depending on access to your web server).<br />', array(
         1 => $this->getRepositoryUrl(),
@@ -274,47 +268,7 @@ class CRM_Extension_Browser {
 
     restore_error_handler();
 
-    return $exts;
-  }
-
-  /**
-   * Given the key, retrieves the info XML from a remote server
-   * and stores locally, returning the contents.
-   *
-   * @param string $key
-   *   Extension key.
-   * @param bool $cached
-   *   Whether to use cached data.
-   *
-   * @return string
-   *   Contents of info.xml, or null if info.xml cannot be retrieved or parsed.
-   */
-  private function grabRemoteInfoFile($key, $cached = FALSE) {
-    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . $key . '.xml';
-    $url = $this->getRepositoryUrl() . '/' . $key . '.xml';
-
-    if (!$cached || !file_exists($filename)) {
-      $fetchStatus = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
-      if ($fetchStatus != CRM_Utils_HttpClient::STATUS_OK) {
-        return NULL;
-      }
-    }
-
-    if (file_exists($filename)) {
-      $contents = file_get_contents($filename);
-
-      //parse just in case
-      $check = simplexml_load_string($contents);
-
-      if (!$check) {
-        foreach (libxml_get_errors() as $error) {
-          CRM_Core_Error::debug('xmlError', $error);
-        }
-        return;
-      }
-
-      return $contents;
-    }
+    return $json;
   }
 
   /**
