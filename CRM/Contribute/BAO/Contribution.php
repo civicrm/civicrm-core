@@ -2374,7 +2374,7 @@ WHERE  contribution_id = %1 ";
 
       $values['custom_pre_id'] = $custom_pre_id;
       $values['custom_post_id'] = $custom_post_ids;
-      //for tasks 'Change Participant Status' and 'Batch Update Participants Via Profile' case
+      //for tasks 'Change Participant Status' and 'Update multiple Contributions' case
       //and cases involving status updation through ipn
       // whatever that means!
       // total_amount appears to be the preferred input param & it is unclear why we support amount here
