@@ -433,7 +433,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Group',
       'GroupOrganization',
       'GroupNesting',
-      'Job',
       'File',
       'EntityTag',
       'CustomField',
