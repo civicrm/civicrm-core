@@ -93,26 +93,6 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   }
 
   /**
-   * Get the ID of the database billing location.
-   *
-   * @return int
-   *   Billing location type id.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function getBillingLocationId() {
-    static $billingTypeID = NULL;
-    if ($billingTypeID) {
-      return $billingTypeID;
-    }
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $billingTypeID = array_search('Billing', $locationTypes);
-    if (!$billingTypeID) {
-      throw new CRM_Core_Exception(ts('Please set a location type of %1', array(1 => 'Billing')));
-    }
-    return $billingTypeID;
-  }
-  /**
    * Creates the entry in the civicrm_loc_block.
    */
   public static function createLocBlock(&$location, &$entityElements) {

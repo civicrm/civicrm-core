@@ -47,7 +47,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param $paymentProcessor
+   * @param CRM_Core_Payment $paymentProcessor
    *
    * @return \CRM_Core_Payment_PayPalImpl
    */
@@ -68,7 +68,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Are back office payments supported - e.g paypal standard won't permit you to enter a credit card associated with someone else's login
+   * Are back office payments supported.
+   *
+   * E.g paypal standard won't permit you to enter a credit card associated
+   * with someone else's login.
+   *
    * @return bool
    */
   protected function supportsBackOffice() {
@@ -123,8 +127,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Billing mode button is basically synonymous with paypal express  - this is probably a good example of 'odds & sods' code we
-   * need to find a way for the payment processor to assign. A tricky aspect is that the payment processor may need to set the order
+   * Billing mode button is basically synonymous with paypal express.
+   *
+   * This is probably a good example of 'odds & sods' code we
+   * need to find a way for the payment processor to assign.
+   *
+   * A tricky aspect is that the payment processor may need to set the order
    *
    * @param CRM_Core_Form $form
    */
@@ -167,13 +175,16 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $errors
    */
   public function validatePaymentInstrument($values, &$errors) {
-    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Pro') {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && empty($values['token'])) {
       CRM_Core_Payment_Form::validateCreditCard($values, $errors);
+      CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     }
   }
 
   /**
-   * Express checkout code. Check PayPal documentation for more information
+   * Express checkout code.
+   *
+   * Check PayPal documentation for more information
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
@@ -232,7 +243,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Get details from paypal. Check PayPal documentation for more information
+   * Get details from paypal.
+   *
+   * Check PayPal documentation for more information
    *
    * @param string $token
    *   The key associated with this transaction.
@@ -273,14 +286,16 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * Do the express checkout at paypal. Check PayPal documentation for more information
+   * Do the express checkout at paypal.
+   *
+   * Check PayPal documentation for more information
    *
    * @param array $params
    *
-   * @internal param string $token the key associated with this transaction
-   *
    * @return array
-   *   the result in an nice formatted array (or an error object)
+   *   The result in an nice formatted array.
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doExpressCheckout(&$params) {
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
@@ -330,8 +345,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     return $params;
   }
 
-  //LCD add new function for handling recurring payments for PayPal Express
   /**
+   * Create recurring payments.
+   *
    * @param array $params
    *
    * @return mixed
@@ -389,8 +405,10 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     return $params;
   }
-  //LCD end
+
   /**
+   * Initialise.
+   *
    * @param $args
    * @param $method
    */
@@ -429,13 +447,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
-    if ($this->_paymentProcessor['payment_processor_type'] != 'PayPal_Express'
-    && (!empty($params['credit_card_number']) && empty($params['token']))
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal_Express'
+      || ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && !empty($params['token']))
     ) {
-      return parent::doPayment($params, $component);
+      $this->_component = $component;
+      return $this->doExpressCheckout($params);
+
     }
-    $this->_component = $component;
-    return $this->doExpressCheckout($params);
+    return parent::doPayment($params, $component);
   }
 
   /**
@@ -818,7 +837,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $paypalParams = array(
       'business' => $this->_paymentProcessor['user_name'],
       'notify_url' => $notifyURL,
-      'item_name' => $params['item_name'],
+      'item_name' => $this->getPaymentDescription(),
       'quantity' => 1,
       'undefined_quantity' => 0,
       'cancel_return' => $cancelURL,

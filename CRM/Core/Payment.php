@@ -92,6 +92,22 @@ abstract class CRM_Core_Payment {
   protected $baseReturnUrl;
 
   /**
+   * The profile configured to show on the billing form.
+   *
+   * Currently only the pseudo-profile 'billing' is supported but hopefully in time we will take an id and
+   * load that from the DB and the processor will be able to return a set of fields that combines it's minimum
+   * requirements with the configured requirements.
+   *
+   * Currently only the pseudo-processor 'manual' or 'pay-later' uses this setting to return a 'curated' set
+   * of fields.
+   *
+   * Note this change would probably include converting 'billing' to a reserved profile.
+   *
+   * @var int|string
+   */
+  protected $billingProfile;
+
+  /**
    * Set Base return URL.
    *
    * @param string $url
@@ -99,6 +115,15 @@ abstract class CRM_Core_Payment {
    */
   public function setBaseReturnUrl($url) {
     $this->baseReturnUrl = $url;
+  }
+
+  /**
+   * Set the configured payment profile.
+   *
+   * @param int|string $value
+   */
+  public function setBillingProfile($value) {
+    $this->billingProfile = $value;
   }
 
   /**
@@ -297,6 +322,7 @@ abstract class CRM_Core_Payment {
    * @param array $errors
    */
   public function validatePaymentInstrument($values, &$errors) {
+    CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     if ($this->_paymentProcessor['payment_type'] == 1) {
       CRM_Core_Payment_Form::validateCreditCard($values, $errors);
     }
@@ -388,6 +414,31 @@ abstract class CRM_Core_Payment {
     return $this->_paymentProcessor['payment_type'] == 1 ? $this->getCreditCardFormFields() : $this->getDirectDebitFormFields();
   }
 
+  /**
+   * Get the metadata for all required fields.
+   *
+   * @return array;
+   */
+  protected function getMandatoryFields() {
+    $mandatoryFields = array();
+    foreach ($this->getAllFields() as $field_name => $field_spec) {
+      if (!empty($field_spec['is_required'])) {
+        $mandatoryFields[$field_name] = $field_spec;
+      }
+    }
+    return $mandatoryFields;
+  }
+
+  /**
+   * Get the metadata of all the fields configured for this processor.
+   *
+   * @return array
+   */
+  protected function getAllFields() {
+    $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));
+    $billingFields = array_intersect_key($this->getBillingAddressFieldsMetadata(), array_flip($this->getBillingAddressFields()));
+    return array_merge($paymentFields, $billingFields);
+  }
   /**
    * Get array of fields that should be displayed on the payment form for credit cards.
    *
@@ -561,7 +612,13 @@ abstract class CRM_Core_Payment {
    *
    * @return array
    */
-  public function getBillingAddressFields($billingLocationID) {
+  public function getBillingAddressFields($billingLocationID = NULL) {
+    if (!$billingLocationID) {
+      // Note that although the billing id is passed around the forms the idea that it would be anything other than
+      // the result of the function below doesn't seem to have eventuated.
+      // So taking this as a param is possibly something to be removed in favour of the standard default.
+      $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
+    }
     if ($this->_paymentProcessor['billing_mode'] != 1 && $this->_paymentProcessor['billing_mode'] != 3) {
       return array();
     }
@@ -585,7 +642,13 @@ abstract class CRM_Core_Payment {
    * @return array
    *    Array of metadata for address fields.
    */
-  public function getBillingAddressFieldsMetadata($billingLocationID) {
+  public function getBillingAddressFieldsMetadata($billingLocationID = NULL) {
+    if (!$billingLocationID) {
+      // Note that although the billing id is passed around the forms the idea that it would be anything other than
+      // the result of the function below doesn't seem to have eventuated.
+      // So taking this as a param is possibly something to be removed in favour of the standard default.
+      $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
+    }
     $metadata = array();
     $metadata['billing_first_name'] = array(
       'htmlType' => 'text',
