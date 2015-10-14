@@ -70,7 +70,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('sort_name', "Smiths_x");
     $this->click('_qf_Basic_refresh');
 
-    // Batch Update Via Profile
+    // Update multiple contacts
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
@@ -152,7 +152,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
 
-    // Batch Update Via Profile
+    // Update multiple contacts
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
@@ -331,7 +331,7 @@ class WebTest_Profile_BatchUpdateTest extends CiviSeleniumTestCase {
     $this->type('sort_name', $lastName);
     $this->click('_qf_Basic_refresh');
 
-    // Batch Update Via Profile
+    // Update multiple contacts
     $this->waitForElementPresent('CIVICRM_QFID_ts_all_4');
     $this->click('CIVICRM_QFID_ts_all_4');
 
