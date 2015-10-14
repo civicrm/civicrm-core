@@ -90,7 +90,7 @@ class CRM_Member_Task {
           'result' => TRUE,
         ),
         5 => array(
-          'title' => ts('Batch update memberships via profile'),
+          'title' => ts('Update multiple memberships'),
           'class' => array(
             'CRM_Member_Form_Task_PickProfile',
             'CRM_Member_Form_Task_Batch',
