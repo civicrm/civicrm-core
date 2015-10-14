@@ -112,12 +112,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete CiviCRM Profile Group'),
         ),
-        CRM_Core_Action::PROFILE => array(
-          'name' => ts('HTML Form Snippet'),
-          'url' => 'civicrm/admin/uf/group',
-          'qs' => 'action=profile&gid=%%id%%',
-          'title' => ts('HTML Form Snippet for this Profile'),
-        ),
         CRM_Core_Action::COPY => array(
           'name' => ts('Copy Profile'),
           'url' => 'civicrm/admin/uf/group',
@@ -126,6 +120,15 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
         ),
       );
+      $allowHtmlSnippet = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'allow_profile_html_snippet');
+      if ($allowHtmlSnippet) {
+        self::$_actionLinks[CRM_Core_Action::PROFILE] = array(
+          'name' => ts('HTML Form Snippet'),
+          'url' => 'civicrm/admin/uf/group',
+          'qs' => 'action=profile&gid=%%id%%',
+          'title' => ts('HTML Form Snippet for this Profile'),
+        );
+      }
     }
     return self::$_actionLinks;
   }

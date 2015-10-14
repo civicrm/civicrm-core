@@ -100,11 +100,12 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
     }
 
     if ($secondArg == 'edit' || $secondArg == 'create') {
+      $allowHtmlSnippet = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'allow_profile_html_snippet');
       if ($secondArg == 'edit') {
         $controller = new CRM_Core_Controller_Simple('CRM_Profile_Form_Edit',
           ts('Create Profile'),
           CRM_Core_Action::UPDATE,
-          FALSE, FALSE, TRUE
+          FALSE, FALSE, $allowHtmlSnippet
         );
         $controller->set('edit', 1);
         $controller->process();
@@ -116,7 +117,7 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
           ts('Create Profile'),
           array(
             'mode' => CRM_Core_Action::ADD,
-            'ignoreKey' => TRUE,
+            'ignoreKey' => $allowHtmlSnippet,
           )
         );
       }

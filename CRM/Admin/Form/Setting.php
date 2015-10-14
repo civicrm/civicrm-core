@@ -108,6 +108,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       $this->_defaults['enableSSL'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL', NULL, 0);
       $this->_defaults['verifySSL'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, 1);
+      $this->_defaults['allow_profile_html_snippet'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'allow_profile_html_snippet', NULL, 0);
     }
 
     return $this->_defaults;
@@ -259,6 +260,14 @@ AND    time_format <> ''
         'enableSSL'
       );
       unset($params['enableSSL']);
+    }
+    // allow html snippet
+    if (isset($params['allow_profile_html_snippet'])) {
+      CRM_Core_BAO_Setting::setItem($params['allow_profile_html_snippet'],
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'allow_profile_html_snippet'
+      );
+      unset($params['allow_profile_html_snippet']);
     }
     $settings = array_intersect_key($params, $this->_settings);
     $result = civicrm_api('setting', 'create', $settings + array('version' => 3));

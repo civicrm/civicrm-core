@@ -60,6 +60,7 @@ VALUES
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'activity_assignee_notification_ics', '{serialize}0{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_autocomplete_options', '{serialize}12{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_reference_options', '{serialize}12{/serialize}' ),
+  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'allow_profile_html_snippet', '{serialize}0{/serialize}' ),
   ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_provider', NULL ),
   ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_userid', NULL ),
   ( @domainID, NULL, 1, 'Address Standardization Preferences', 'address_standardization_url', NULL ),
