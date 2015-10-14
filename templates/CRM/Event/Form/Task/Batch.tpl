@@ -42,7 +42,6 @@
     {/if}
     <p>{ts}Click <strong>Update Participant(s)</strong> below to save all your changes.{/ts}</p>
 </div>
-    <legend>{$profileTitle}</legend>
         <table class="crm-copy-fields">
        <thead class="sticky">
             <tr class="columnheader">
