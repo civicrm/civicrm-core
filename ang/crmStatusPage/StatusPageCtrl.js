@@ -11,7 +11,6 @@
     $scope.path = $location.path();
     $scope.navigator = crmNavigator;
     $scope.statuses = statuses;
-    console.log(preferences);
     $scope.preferences = preferences;
 
     // will "hush" a status - gets the severity level of the status that is being hushed, and hushes all alerts for that check at and below the level of the current check
