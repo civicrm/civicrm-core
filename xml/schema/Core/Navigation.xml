@@ -81,6 +81,11 @@
     <title>Navigation parent ID</title>
     <type>int unsigned</type>
     <comment>Parent navigation item, used for grouping</comment>
+    <pseudoconstant>
+      <table>civicrm_navigation</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+    </pseudoconstant>
     <add>3.0</add>
   </field>
   <foreignKey>

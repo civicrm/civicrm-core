@@ -926,7 +926,7 @@ ORDER BY parent_id, weight";
     }
 
     // Create or update the All Reports link.
-    self::createOrUpdateReportNavItem('All Reports', 'civicrm/report/list', 'reset=1', $reports_nav->id, 'access CiviReport', $domain_id);
+    self::createOrUpdateReportNavItem('All Reports', 'civicrm/report/list', 'reset=1', $reports_nav->id, 'access CiviReport', $domain_id, TRUE);
   }
 
   /**
