@@ -346,7 +346,7 @@ class CRM_Core_Payment_Form {
   public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
     // Set text version of state & country if present.
     if (isset($src["billing_state_province_id-{$id}"])) {
-      $src["billing_state_province-{$id}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation ($src["billing_state_province_id-{$id}"]);
+      $src["billing_state_province-{$id}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($src["billing_state_province_id-{$id}"]);
     }
     if (isset($src["billing_country_id-{$id}"])) {
       $src["billing_country-{$id}"] = CRM_Core_PseudoConstant::countryIsoCode($src["billing_country_id-{$id}"]);;

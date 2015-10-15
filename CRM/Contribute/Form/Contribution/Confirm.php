@@ -1568,14 +1568,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (isset($membershipContributionID)) {
       $form->_values['contribution_id'] = $membershipContributionID;
     }
-    // The concept of contributeMode is deprecated.
-    // the is_monetary concept probably should be too as it can be calculated from
-    // the existence of 'amount' & seems fragile.
-    if ($form->_contributeMode) {
+
+    if ($form->_paymentProcessor) {
+      // the is_monetary concept probably should be deprecated as it can be calculated from
+      // the existence of 'amount' & seems fragile.
       if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
         // call postProcess hook before leaving
         $form->postProcessHook();
       }
+
       $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
       $paymentActionResult = $payment->doPayment($form->_params, 'contribute');
       $this->completeTransaction($paymentActionResult, $paymentResult['contribution']->id);
