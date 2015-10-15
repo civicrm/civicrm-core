@@ -1094,12 +1094,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       $this->set('params', $this->_params);
       if ($this->_paymentProcessor &&
+        // Actually we don't really need to check if it supports pre-approval - we could just call
+        // it regardless as the function we call re-acts tot the rests of the preApproval call.
         $this->_paymentProcessor['object']->supports('preApproval')
         && !$this->_allowWaitlist &&
         !$this->_requireApproval
       ) {
 
-        $this->handlePreApproval($params);
         // The concept of contributeMode is deprecated - but still needs removal from the message templates.
         $this->set('contributeMode', 'express');
 
@@ -1124,16 +1125,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['invoiceID'] = $invoiceID;
 
         $params['component'] = 'event';
-        $token = $payment->doPreApproval($params);
-        if (is_a($token, 'CRM_Core_Error')) {
-          CRM_Core_Error::displaySessionError($token);
-          CRM_Utils_System::redirect($params['cancelURL']);
-        }
-
-        $this->set('token', $token);
-
-        $paymentURL = $this->_paymentProcessor['url_site'] . "/cgi-bin/webscr?cmd=_express-checkout&token=$token";
-        CRM_Utils_System::redirect($paymentURL);
+        $this->handlePreApproval($params);
       }
       elseif ($this->_paymentProcessor &&
         $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
