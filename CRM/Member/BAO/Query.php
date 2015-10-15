@@ -300,6 +300,12 @@ class CRM_Member_BAO_Query {
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
+      case 'member_is_override':
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.is_override", $op, $value, "Boolean");
+        $query->_qill[$grouping][] = $value ? ts("Is Membership Status overriden? Yes") : ts("Is Membership Status overriden? No");
+        $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
+        return;
+
       case 'member_campaign_id':
         if (CRM_Utils_Array::value($op, $value)) {
           $value = $value[$op];
@@ -385,6 +391,7 @@ class CRM_Member_BAO_Query {
         'max_related' => 1,
         'membership_recur_id' => 1,
         'member_campaign_id' => 1,
+        'member_is_override' => 1,
       );
 
       if ($includeCustomFields) {
@@ -433,6 +440,7 @@ class CRM_Member_BAO_Query {
     $form->addYesNo('member_pay_later', ts('Pay Later?'), TRUE);
     $form->addYesNo('member_auto_renew', ts('Auto-Renew?'), TRUE);
     $form->addYesNo('member_test', ts('Membership is a Test?'), TRUE);
+    $form->addYesNo('member_is_override', ts('Membership Status Is Override?'), TRUE);
 
     // add all the custom  searchable fields
     $extends = array('Membership');
