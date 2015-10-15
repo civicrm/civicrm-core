@@ -257,6 +257,16 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
 }
 
 /**
+ * Database time zone synchronization setting
+ * Set this to true if you cannot synchronize your database and PHP time zones.
+ * This may be the case if you share a database with a number of other tenants
+ * of the server, otherwise set to false.
+ */
+if (!defined('CIVICRM_DB_TIMEZONE_SYNC')) {
+  define ('CIVICRM_DB_TIMEZONE_SYNC', true);
+}
+
+/**
  * Settings to enable external caching using a Memcache server.  This is an
  * advanced feature, and you should read and understand the documentation
  * before you turn it on. We cannot store these settings in the DB since the
