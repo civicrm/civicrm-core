@@ -33,7 +33,7 @@
         {capture assign=newGrantURL}{crmURL p="civicrm/contact/view/grant" q="reset=1&action=add&cid=`$contactId`&context=grant"}{/capture}
     {/if}
 
-    <div id="help">
+    <div class="help">
         <p>{ts 1=$displayName}This page lists all grants for %1 since inception.{/ts}
         {if $permission EQ 'edit'}
           {capture assign=link}accesskey='N' href='{$newGrantURL}' class='action-item'{/capture}

@@ -25,7 +25,7 @@
 *}
 <div class="crm-block crm-form-block crm-recurcontrib-form-block">
   {if $isChangeSupported}
-    <div id="help">
+    <div class="help">
       {ts}Use this form to change the amount or number of installments for this recurring contribution. Changes will be automatically sent to the payment processor. You can not change the contribution frequency.{/ts}
   </div>
   {/if}

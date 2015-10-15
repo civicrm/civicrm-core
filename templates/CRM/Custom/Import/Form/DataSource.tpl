@@ -31,7 +31,7 @@
  {* WizardHeader.tpl provides visual display of steps thru the wizard as well as title for current step *}
  {include file="CRM/common/WizardHeader.tpl"}
 
- <div id="help">
+ <div class="help">
     {ts}The Multi-value Custom Data Import Wizard allows you to easily upload data to populate multi-value custom data records (such as employment or education history) for existing contacts.{/ts}
     {ts}Files to be imported must be in the 'comma-separated-values' format (CSV) and must contain data needed to match the incoming data to an existing contact record in your CiviCRM database.{/ts} {help id='upload'}
  </div>

@@ -30,7 +30,7 @@
 
 {if $action ne 2}
 {if $action ne 1 or $action ne 8}
-<div id="help">
+<div class="help">
 {capture assign=contribURL}{crmURL p='civicrm/admin/contribute' q="reset=1"}{/capture}
 <p>{ts}CiviContribute allows you to configure any number of <strong>Premiums</strong> which can be offered to contributors as incentives / thank-you gifts. Premiums may be tangible items (i.e. a coffee mug or t-shirt), or they may be a membership or subscription with a pre-determined duration.{/ts}</p>
 <p>{ts 1=$contribURL}Use this section to enter and update all premiums that you want to offer on any of your Online Contribution pages. Then you can assign one or more premiums to a specific Contribution page from <a href='%1'>Configure Online Contribution Pages</a> <strong>&raquo; Configure &raquo; Premiums</strong>.{/ts}</p>

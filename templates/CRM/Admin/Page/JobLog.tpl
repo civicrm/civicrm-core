@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
+<div class="help">
     {ts}This screen presents the list of most recent 1,000 scheduled jobs log entries.{/ts} {$docLink}
 </div>
 

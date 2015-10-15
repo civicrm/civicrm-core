@@ -53,7 +53,7 @@
         </div><br /><br />
     {/if}
 
-    <div id="help">
+    <div class="help">
         {if $isOnWaitlist}
             <p>
                 <span class="bold">{ts}You have been added to the WAIT LIST for this event.{/ts}</span>

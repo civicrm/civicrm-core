@@ -31,7 +31,7 @@
 {/if} {* action ne add or edit *}
 <div class="crm-block crm-content-block">
 {if $action eq 16}
-<div id="help">
+<div class="help">
     {ts}Use Groups to organize contacts (e.g. these contacts are part of our 'Steering Committee'). You can also create 'smart' groups based on contact characteristics (e.g. this group consists of all people in our database who live in a specific locality).{/ts} {help id="manage_groups"}
 </div>
 {/if}

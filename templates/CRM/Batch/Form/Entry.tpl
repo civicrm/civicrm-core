@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="batch-entry form-item">
-  <div id="help">
+  <div class="help">
     {ts}Click Validate & Process below when you've entered all items for the batch. You can also Save & Continue Later at any time. Go to Administer > Customize Data and Screens > Profiles > Reserved Profiles > to add, remove or change the order of columns.{/ts}
   </div>
   {if $batchAmountMismatch}

@@ -30,7 +30,7 @@
     {include file="CRM/Admin/Form/Tag.tpl"}
 {else}
 <div class="crm-content-block">
-    <div id="help">
+    <div class="help">
         {ts 1=$docLink}Tags can be assigned to any contact record, and are a convenient way to find contacts. You can create as many tags as needed to organize and segment your records.{/ts} {$docLink}
     </div>
 
