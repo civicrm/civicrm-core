@@ -42,7 +42,8 @@
     <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
     <div class="spacer"></div>
     <div>
-      <a href="{crmURL p="#"}" id='nav-reset'><span>{ts}Click here{/ts}</span></a> {ts}to reset the reports menu structure to the default.{/ts}
+      {* TODO: fa-broom would be better, but not implemented yet. https://github.com/FortAwesome/Font-Awesome/issues/239 *}
+      <a href="#" class="nav-reset crm-hover-button"><i class="crm-i fa-undo"></i> {ts}Cleanup reports menu{/ts}</a>
     </div>
     <div class="spacer"></div>
   </div>
@@ -57,10 +58,6 @@
   </style>
   <script type="text/javascript">
     CRM.$(function($) {
-      $('#nav-reset').on('click', function(e) {
-        e.preventDefault();
-        CRM.api3('Navigation', 'reset', {'for' : 'report'}, ts('Report menu reset. Changes will be visible when you refresh'))
-      });
       $("#navigation-tree").jstree({
         plugins: [ "themes", "json_data", "dnd","ui", "crrm","contextmenu" ],
         json_data: {
@@ -170,6 +167,18 @@
           $("#navigation-tree").jstree('refresh');
           $("#reset-menu").show();
         });
+
+      $('a.nav-reset').on('click', function(e) {
+        e.preventDefault();
+        CRM.confirm({message: '{/literal}{ts escape='js'}This will rebuild the "Reports" menu to include all currently active reports.{/ts}{literal}'})
+          .on('crmConfirm:yes', function () {
+            CRM.api3('Navigation', 'reset', {'for': 'report'}, true)
+              .done(function() {
+                $("#navigation-tree").jstree('refresh');
+                $("#reset-menu").show();
+              })
+          });
+      });
     });
 </script>
 {/literal}
