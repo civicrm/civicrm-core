@@ -395,7 +395,6 @@ class CRM_Utils_System {
     if (!$url) {
       $url = self::url('civicrm/dashboard', 'reset=1');
     }
-
     // replace the &amp; characters with &
     // this is kinda hackish but not sure how to do it right
     $url = str_replace('&amp;', '&', $url);

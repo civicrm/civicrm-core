@@ -175,7 +175,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $errors
    */
   public function validatePaymentInstrument($values, &$errors) {
-    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && empty($values['token'])) {
+    if ($this->_paymentProcessor['payment_processor_type'] == 'PayPal' && !$this->isPaypalExpress($values)) {
       CRM_Core_Payment_Form::validateCreditCard($values, $errors);
       CRM_Core_Form::validateMandatoryFields($this->getMandatoryFields(), $values, $errors);
     }
@@ -765,7 +765,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   - redirect_url (if set the browser will be redirected to this.
    */
   public function doPreApproval(&$params) {
-    if (!isset($params['button']) || !stristr($params['button'], 'express')) {
+    if (!$this->isPaypalExpress($params)) {
       return array();
     }
     $this->_component = $params['component'];
@@ -1079,6 +1079,40 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $params[$civicrmField] = isset($paypalParams[$paypalField]) ? $paypalParams[$paypalField] : NULL;
     }
     return $params;
+  }
+
+  /**
+   * Is this being processed by payment express.
+   *
+   * Either because it is payment express or because is pro with paypal express in use.
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  protected function isPaypalExpress($params) {
+    if ($this->_processorName == ts('PayPal Express')) {
+      return TRUE;
+    }
+
+    // This would occur postProcess.
+    if (!empty($params['token'])) {
+      return TRUE;
+    }
+    if (isset($params['button']) && stristr($params['button'], 'express')) {
+      return TRUE;
+    }
+
+    // The contribution form passes a 'button' but the event form might still set one of these fields.
+    // @todo more standardisation & get paypal fully out of the form layer.
+    $possibleExpressFields = array(
+      '_qf_Register_upload_express_x',
+      '_qf_Payment_upload_express_x',
+    );
+    if (array_intersect_key($params, array_fill_keys($possibleExpressFields, 1))) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
