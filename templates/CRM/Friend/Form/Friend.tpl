@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div id="form" class="crm-form-block crm-friend-manage-block">
-<div id="help">
+<div class="help">
   {if $context EQ 'Contribute'}
     {assign var=enduser value="contributor"}
     {assign var=pageType value="Online Contribution page"}

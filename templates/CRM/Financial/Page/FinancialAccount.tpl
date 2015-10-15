@@ -26,7 +26,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Financial/Form/FinancialAccount.tpl"}
 {else}
-  <div id="help">
+  <div class="help">
     {capture assign="typeLink"}{crmURL p="civicrm/admin/financial/financialType" q="reset=1"}{/capture}
     {capture assign="paymentLink"}{crmURL p="civicrm/admin/options/payment_instrument" q="reset=1"}{/capture}
     {capture assign="premiumLink"}{crmURL p="civicrm/admin/contribute/managePremiums" q="reset=1"}{/capture}

@@ -30,7 +30,7 @@
 {elseif $action eq 4}
   {* View a system default workflow template *}
 
-  <div id="help">
+  <div class="help">
     {ts}You are viewing the default message template for this system workflow.{/ts} {help id="id-view_system_default"}
   </div>
 

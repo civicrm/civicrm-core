@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="form-item crm-block crm-form-block crm-contribution-form-block">
-<div id="help">
+<div class="help">
     {ts}Use this form to record received payments for 'pay later' online contributions, membership signups and event registrations. You can use the Transaction ID field to record account+check number, bank transfer identifier, or other unique payment identifier.{/ts}
 </div>
 <fieldset>

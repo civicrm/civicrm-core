@@ -27,7 +27,7 @@
    {include file="CRM/SMS/Form/Provider.tpl"}
 {else}
   {capture assign=wikiLink}{docURL page="Setting up a SMS Provider for CiviSMS" text="(How to add a SMS Provider)" resource="wiki"}{/capture}
-  <div id="help">
+  <div class="help">
     {ts}You can configure one or more SMS Providers for your CiviCRM installation. To learn more about the procedure to install SMS extension and Provider, refer{/ts} {$wikiLink}
   </div>
 

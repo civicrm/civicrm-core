@@ -26,7 +26,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Contribute/Form/ContributionType.tpl"}
 {else}
-    <div id="help">
+    <div class="help">
         <p>{ts}Financial types are used to categorize contributions for reporting and accounting purposes. These are also referred to as <strong>Funds</strong>. You may set up as many types as needed. Each type can carry an accounting code which can be used to map contributions to codes in your accounting system. Commonly used financial types are: Donation, Campaign Contribution, Membership Dues...{/ts}</p>
     </div>
 

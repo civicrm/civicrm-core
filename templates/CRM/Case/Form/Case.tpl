@@ -47,7 +47,7 @@
 <table class="form-layout">
     {if $activityTypeDescription }
         <tr>
-            <div id="help">{$activityTypeDescription}</div>
+            <div class="help">{$activityTypeDescription}</div>
         </tr>
     {/if}
 {if $clientName}

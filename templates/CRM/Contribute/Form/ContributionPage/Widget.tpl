@@ -31,7 +31,7 @@
 </div>
 {/if}
 <div id="form" class="crm-block crm-form-block crm-contribution-contributionpage-widget-form-block">
-    <div id="help">
+    <div class="help">
         {ts}CiviContribute widgets allow you and your supporters to easily promote this fund-raising campaign. Widget code can be added to any web page - and will provide a real-time display of current contribution results, and a direct link to this contribution page.{/ts} {help id="id-intro"}
     </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

@@ -25,7 +25,7 @@
 *}
 {* Configure Membership signup/renewal block for an Online Contribution page *}
 <div id="form" class="crm-block crm-form-block crm-member-membershipblock-form-block">
-<div id="help">
+<div class="help">
     {ts}Use this form to enable and configure a Membership Signup and Renewal section for this Online Contribution Page. If you're not using this page for membership signup, leave the <strong>Enabled</strong> box un-checked..{/ts} {docURL page="user/membership/setup"}
 </div>
   {if $form.membership_type.html}

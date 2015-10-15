@@ -29,7 +29,7 @@
 {elseif $action eq 4}
     {include file="CRM/Pledge/Form/PledgeView.tpl"}
 {else}
-<div id="help">
+<div class="help">
     {ts 1=$displayName}Pledges received from %1 since inception.{/ts}
     {if $permission EQ 'edit'}
      {capture assign=newContribURL}{crmURL p="civicrm/contact/view/pledge" q="reset=1&action=add&cid=`$contactId`&context=pledge"}{/capture}

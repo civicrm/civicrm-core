@@ -26,7 +26,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/LocationType.tpl"}
 {else}
-  <div id="help">
+  <div class="help">
     {ts}Location types provide convenient labels to differentiate contacts' location(s). Administrators may define as many additional types as appropriate for your constituents (examples might be Main Office, School, Vacation Home...).{/ts}
   </div>
 
