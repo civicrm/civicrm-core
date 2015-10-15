@@ -257,7 +257,7 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
 }
 
 /**
- * Settings to enable external caching using a Memcache server.  This is an
+ * Settings to enable external caching using a cache server.  This is an
  * advanced feature, and you should read and understand the documentation
  * before you turn it on. We cannot store these settings in the DB since the
  * config could potentially also be cached and we need to avoid an infinite
@@ -267,8 +267,8 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
  */
 
 /**
- * If you have a memcache server configured and want CiviCRM to make use of it,
- * set the following constant.  You should only set this once you have your memcache
+ * If you have a cache server configured and want CiviCRM to make use of it,
+ * set the following constant.  You should only set this once you have your cache
  * server up and working, because CiviCRM will not start up if your server is
  * unavailable on the host and port that you specify. By default CiviCRM will use
  * an in-memory array cache
@@ -276,6 +276,7 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
  * To use the php extension memcache  use a value of 'Memcache'
  * To use the php extension memcached use a value of 'Memcached'
  * To use the php extension apc       use a value of 'APCcache'
+ * To use the php extension redis     use a value of 'Redis'
  * To not use any caching (not recommended), use a value of 'NoCache'
  *
  */
@@ -292,10 +293,18 @@ if (!defined('CIVICRM_DB_CACHE_HOST')) {
 }
 
 /**
- * Change this if you are not using the standard port for memcache or apccache (11211)
+ * Change this if you are not using the standard port for your cache server
  */
 if (!defined('CIVICRM_DB_CACHE_PORT')) {
   define('CIVICRM_DB_CACHE_PORT', 11211 );
+}
+
+/**
+ * Change this if your cache server requires a password (currently only works 
+ * with Redis)
+ */
+if (!defined('CIVICRM_DB_CACHE_PASSWORD')) {
+  define('CIVICRM_DB_CACHE_PASSWORD', '' );
 }
 
 /**
@@ -307,15 +316,15 @@ if (!defined('CIVICRM_DB_CACHE_TIMEOUT')) {
 }
 
 /**
- * If you are sharing the same memcache instance with more than one CiviCRM
+ * If you are sharing the same cache instance with more than one CiviCRM
  * database, you will need to set a different value for the following argument
  * so that each copy of CiviCRM will not interfere with other copies.  If you only
  * have one copy of CiviCRM, you may leave this set to ''.  A good value for
  * this if you have two servers might be 'server1_' for the first server, and
  * 'server2_' for the second server.
  */
-if (!defined('CIVICRM_MEMCACHE_PREFIX')) {
-  define('CIVICRM_MEMCACHE_PREFIX', '');
+if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
+  define('CIVICRM_DB_CACHE_PREFIX', '');
 }
 
 /**
