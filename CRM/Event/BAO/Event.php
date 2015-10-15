@@ -1151,6 +1151,7 @@ WHERE civicrm_event.is_active = 1
           'email' => $email,
           'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
           'isShowLocation' => CRM_Utils_Array::value('is_show_location', $values['event']),
+          // The concept of contributeMode is deprecated.
           'contributeMode' => CRM_Utils_Array::value('contributeMode', $template->_tpl_vars),
           'participantID' => $participantId,
           'conference_sessions' => $sessions,
@@ -1186,12 +1187,13 @@ WHERE civicrm_event.is_active = 1
         // address required during receipt processing (pdf and email receipt)
         if ($displayAddress = CRM_Utils_Array::value('address', $values)) {
           $sendTemplateParams['tplParams']['address'] = $displayAddress;
+          // The concept of contributeMode is deprecated.
           $sendTemplateParams['tplParams']['contributeMode'] = NULL;
         }
 
         // set lineItem details
         if ($lineItem = CRM_Utils_Array::value('lineItem', $values)) {
-          // check if additional prticipant, if so filter only to relevant ones
+          // check if additional participant, if so filter only to relevant ones
           // CRM-9902
           if (!empty($values['params']['additionalParticipant'])) {
             $ownLineItems = array();

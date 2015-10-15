@@ -215,12 +215,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // We may have fetched some billing details from the getPreApprovalDetails function so we
     // want to ensure we set this after that function has been called.
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $this->_params, FALSE);
-    if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-      $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
-    }
-    if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
-      $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
-    }
 
     $this->_params['is_pay_later'] = $this->get('is_pay_later');
     $this->assign('is_pay_later', $this->_params['is_pay_later']);
@@ -505,6 +499,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       );
     }
     else {
+      // The concept of contributeMode is deprecated.
+      // the is_monetary concept probably should be too as it can be calculated from
+      // the existence of 'amount' & seems fragile.
       if ($this->_contributeMode == 'notify' || !$this->_values['is_monetary'] ||
         $this->_amount <= 0.0 || $this->_params['is_pay_later'] ||
         ($this->_separateMembershipPayment && $this->_amount <= 0.0)
@@ -1571,11 +1568,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (isset($membershipContributionID)) {
       $form->_values['contribution_id'] = $membershipContributionID;
     }
-    if ($form->_contributeMode) {
+
+    if ($form->_paymentProcessor) {
+      // the is_monetary concept probably should be deprecated as it can be calculated from
+      // the existence of 'amount' & seems fragile.
       if ($form->_values['is_monetary'] && $form->_amount > 0.0 && !$form->_params['is_pay_later']) {
         // call postProcess hook before leaving
         $form->postProcessHook();
       }
+
       $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
       $paymentActionResult = $payment->doPayment($form->_params, 'contribute');
       $this->completeTransaction($paymentActionResult, $paymentResult['contribution']->id);
@@ -1701,10 +1702,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * We are moving towards always creating as pending and updating at the end (based on payment), so this should be
    * an interim refactoring. It was shared with another unrelated form & some parameters may not apply to this form.
    *
-   *
    * @return bool
    */
   protected function getIsPending() {
+    // The concept of contributeMode is deprecated.
+    // the is_monetary concept probably should be too as it can be calculated from
+    // the existence of 'amount' & seems fragile.
     if (((isset($this->_contributeMode)) || !empty
         ($this->_params['is_pay_later'])
       ) &&
@@ -1828,6 +1831,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_paymentProcessor = civicrm_api3('payment_processor', 'getsingle', array(
         'id' => $params['payment_processor_id'],
       ));
+      // The concept of contributeMode is deprecated as is the billing_mode concept.
       if ($form->_paymentProcessor['billing_mode'] == 1) {
         $form->_contributeMode = 'direct';
       }

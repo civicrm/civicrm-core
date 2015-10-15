@@ -344,22 +344,26 @@ class CRM_Core_Payment_Form {
    * @param bool $reverse
    */
   public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
-    static $map = NULL;
-    if (!$map) {
-      $map = array(
-        'first_name' => 'billing_first_name',
-        'middle_name' => 'billing_middle_name',
-        'last_name' => 'billing_last_name',
-        'email' => "email-$id",
-        'street_address' => "billing_street_address-$id",
-        'supplemental_address_1' => "billing_supplemental_address_1-$id",
-        'city' => "billing_city-$id",
-        'state_province' => "billing_state_province-$id",
-        'postal_code' => "billing_postal_code-$id",
-        'country' => "billing_country-$id",
-        'contactID' => 'contact_id',
-      );
+    // Set text version of state & country if present.
+    if (isset($src["billing_state_province_id-{$id}"])) {
+      $src["billing_state_province-{$id}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($src["billing_state_province_id-{$id}"]);
     }
+    if (isset($src["billing_country_id-{$id}"])) {
+      $src["billing_country-{$id}"] = CRM_Core_PseudoConstant::countryIsoCode($src["billing_country_id-{$id}"]);;
+    };
+    $map = array(
+      'first_name' => 'billing_first_name',
+      'middle_name' => 'billing_middle_name',
+      'last_name' => 'billing_last_name',
+      'email' => "email-$id",
+      'street_address' => "billing_street_address-$id",
+      'supplemental_address_1' => "billing_supplemental_address_1-$id",
+      'city' => "billing_city-$id",
+      'state_province' => "billing_state_province-$id",
+      'postal_code' => "billing_postal_code-$id",
+      'country' => "billing_country-$id",
+      'contactID' => 'contact_id',
+    );
 
     foreach ($map as $n => $v) {
       if (!$reverse) {
