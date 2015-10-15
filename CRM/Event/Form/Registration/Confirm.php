@@ -95,17 +95,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
           $params = array_merge($this->_params, $preApprovalParams);
         }
-
         CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, FALSE);
-
-        // fix state and country id if present
-        // @todo - this is duplicated further down.
-        if (isset($params["billing_state_province_id-{$this->_bltID}"])) {
-          $params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["billing_state_province_id-{$this->_bltID}"]);
-        }
-        if (isset($params['billing_country_id'])) {
-          $params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($params["billing_country_id-{$this->_bltID}"]);
-        }
 
         // set a few other parameters that are not really specific to this method because we don't know what
         // will break if we change this.
@@ -499,6 +489,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
       //unset the billing parameters if it is pay later mode
       //to avoid creation of billing location
+      // @todo - the reasoning for this is unclear - elsewhere we check what fields are provided by
+      // the form & if billing fields exist we create the address, relying on the form to collect
+      // only information we intend to store.
       if ($this->_allowWaitlist
         || $this->_requireApproval
         || (!empty($value['is_pay_later']) && !$this->_isBillingAddressRequiredForPayLater)
