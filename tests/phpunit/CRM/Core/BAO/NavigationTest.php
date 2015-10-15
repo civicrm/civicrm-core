@@ -50,6 +50,22 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that All reports link is not stolen.
+   *
+   * There are 2 All reports links by default. What we DON'T want to see is them
+   * both winding up under the Reports menu - since they already exist they should be unchanged
+   * by rebuilding reports.
+   */
+  public function testNoDuplicateAllReportsLink() {
+    $existing_links = $this->callAPISuccess('Navigation', 'get', array('label' => 'All Reports', 'sequential' => 1));
+    $this->assertNotEquals($existing_links['values'][0]['parent_id'], $existing_links['values'][1]['parent_id']);
+    CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
+    $new_links = $this->callAPISuccess('Navigation', 'get', array('label' => 'All Reports', 'sequential' => 1));
+    $this->assertEquals($existing_links['values'][0]['parent_id'], $new_links['values'][0]['parent_id']);
+    $this->assertEquals($existing_links['values'][1]['parent_id'], $new_links['values'][1]['parent_id']);
+  }
+
+  /**
    * Test that an existing report link is rebuilt under it's parent.
    *
    * Function tests CRM_Core_BAO_Navigation::rebuildReportsNavigation.
@@ -135,6 +151,17 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   protected function getCountReportInstances() {
     return CRM_Core_DAO::singleValueQuery(
       "SELECT count(*) FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/%'");
+  }
+
+  /**
+   * Get a count of navigation items that match the url.
+   * @param string $url
+   *
+   * @return int
+   */
+  protected function getCountURL($url) {
+    return CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_navigation WHERE url ='{$url}'");
   }
 
   /**
