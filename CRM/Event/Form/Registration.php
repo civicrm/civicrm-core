@@ -370,6 +370,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       CRM_Utils_System::redirect($url);
     }
+    // The concept of contributeMode is deprecated.
     $this->_contributeMode = $this->get('contributeMode');
     $this->assign('contributeMode', $this->_contributeMode);
 
@@ -491,6 +492,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::format($addressFields));
 
+    // The concept of contributeMode is deprecated.
     if ($this->_contributeMode == 'direct' && empty($params['is_pay_later'])) {
       $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $params));
       $date = CRM_Utils_Date::mysqlToIso($date);
@@ -767,6 +769,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     //set only primary participant's params for transfer checkout.
+    // The concept of contributeMode is deprecated.
     if (($this->_contributeMode == 'checkout' || $this->_contributeMode == 'notify') && !empty($this->_params['is_primary'])) {
       $this->_params['participantID'] = $participant->id;
       $this->set('primaryParticipant', $this->_params);

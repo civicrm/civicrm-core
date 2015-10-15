@@ -153,6 +153,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Contribution mode for event registration for offline mode.
+   *
+   * @deprecated
    */
   public $_contributeMode = 'direct';
 
@@ -1571,6 +1573,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           CRM_Utils_System::mungeCreditCard($params['credit_card_number'])
         );
         $this->assign('credit_card_type', $params['credit_card_type']);
+        // The concept of contributeMode is deprecated.
         $this->assign('contributeMode', 'direct');
         $this->assign('isAmountzero', 0);
         $this->assign('is_pay_later', 0);
