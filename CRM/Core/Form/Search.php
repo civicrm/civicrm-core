@@ -146,7 +146,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   public function addTaskMenu($tasks) {
     if (is_array($tasks) && !empty($tasks)) {
       $tasks = array('' => ts('Actions')) + $tasks;
-      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu huge crm-search-result-actions'));
+      $this->add('select', 'task', NULL, $tasks, FALSE, array('class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions'));
       $this->add('submit', $this->_actionButtonName, ts('Go'), array('class' => 'hiddenElement crm-search-go-button'));
 
       // Radio to choose "All items" or "Selected items only"
