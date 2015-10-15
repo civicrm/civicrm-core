@@ -40,6 +40,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
+    $contactID = $this->individualCreate();
 
     require_once 'CiviTest/CiviMailUtils.php';
     $this->mut = new CiviMailUtils($this, TRUE);
@@ -502,6 +503,36 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'month',
       'subject' => 'limit to none',
     );
+    $this->fixtures['sched_membership_join_add_manual'] = array(
+      'name' => 'sched_membership_join_2week',
+      'title' => 'sched_membership_join_2week',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_membership_join_day</p>',
+      'body_text' => 'body sched_membership_join_day',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => '',
+      'entity_value' => '',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 4,
+      'msg_template_id' => '',
+      'limit_to' => 0,
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => $contactID,
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_join_date',
+      'start_action_offset' => '0',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_membership_join_2day',
+    );
     $this->_setUp();
   }
 
@@ -605,8 +636,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   // TODO // function testActivityDateTime_NonMatch() { }
 
   /**
-   * For contacts/members which match schedule based on join date,
-   * an email should be sent.
+   * For contacts/members which match schedule based on join date an email should be sent.
    */
   public function testMembershipJoinDateMatch() {
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
@@ -635,6 +665,93 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         // After the 2-week mark, send an email.
         'time' => '2012-03-29 01:00:00',
         'recipients' => array(array('test-member@example.com')),
+      ),
+    ));
+  }
+
+  /**
+   * For contacts/members which match schedule based on join date an email should be sent.
+   *
+   * CRM-17044 discusses this issue. The scenario is that a scheduled reminder has been set to
+   * go out on the join date (ie. welcome to our org) and it has been configured to also include a manual
+   * recipient.
+   *
+   * It is unclear when the manual recipient should receive an email. Current behaviour is for them to
+   * be emailed every time the cron runs with exponentially more emails each time. Correct behaviour must be one of
+   *
+   * 1) one per cron run
+   * 2) one per cron run if at least one other contact is selected
+   * 3) once per cron run per contact (eg. like a bcc which is how I believe it has been attempted to be used
+   * by the customer.)
+   * or
+   * 4) it's not really a valid config & should be blocked.
+   *
+   * A secondary issue is that it appears that a contact who joins will receive an email every cron run until the
+   * condition no longer applies - which in practice means that if this cron runs more than daily they will get multiple reminders.
+   */
+  public function testMembershipJoinDateManualRecipient() {
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
+    $contact2 = $this->individualCreate(array('email' => 'gollum@middle-earth.net'));
+    $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array(
+      'status_id' => 1,
+      'membership_type_id' => 1,
+      'owner_membership_id' => 'null',
+      'contact_id' => $contact2,
+    )));
+    $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'test-member@example.com',
+      'location_type_id' => 1,
+    ));
+
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+    $actionSchedule = $this->fixtures['sched_membership_join_add_manual'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+
+    // start_date=2012-03-15 ; schedule is 2 weeks after start_date
+    $this->assertCronRuns(array(
+      array(
+        // Here we see that the manual recipient gets an email every time the cron
+        // runs, regardless of whether anything else matches the criteria.
+        'time' => '2012-03-14 01:00:00',
+        'recipients' => array(array('anthony_anderson@civicrm.org')),
+      ),
+      array(
+        // Here we see that the manual recipient gets an email when the cron runs
+        // for the first time on the join day & the
+        // joiners get their first email.
+        'time' => '2012-03-15 01:00:00',
+        'recipients' => array(
+          array('test-member@example.com'),
+          array('gollum@middle-earth.net'),
+          array('anthony_anderson@civicrm.org'),
+        ),
+      ),
+      array(
+        // Here we see that the manual recipient gets 2 emails when the cron runs
+        // for the second time on the join day & the
+        // joiners get their other first email.
+        'time' => '2012-03-15 01:00:00',
+        'recipients' => array(
+          array('test-member@example.com'),
+          array('gollum@middle-earth.net'),
+          array('anthony_anderson@civicrm.org'),
+          array('anthony_anderson@civicrm.org'),
+        ),
+      ),
+      array(
+        // Here it runs for the 3rd time on the join day & we start to lose count.
+        'time' => '2012-03-15 01:00:00',
+        'recipients' => array(
+          array('test-member@example.com'),
+          array('gollum@middle-earth.net'),
+          array('anthony_anderson@civicrm.org'),
+          array('anthony_anderson@civicrm.org'),
+          array('anthony_anderson@civicrm.org'),
+          array('anthony_anderson@civicrm.org'),
+          array('anthony_anderson@civicrm.org'),
+        ),
       ),
     ));
   }
@@ -1248,12 +1365,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * This is a wrapper for CRM_Core_DAO::createTestObject which tracks
-   * created entities and provides for brainless cleanup.
+   * This is a wrapper for CRM_Core_DAO::createTestObject.
+   *
+   * It tracks created entities and provides for brainless cleanup.
    *
    * @see CRM_Core_DAO::createTestObject
    *
-   * @param $daoName
+   * @param CRM_Core_DAO $daoName
    * @param array $params
    * @param int $numObjects
    * @param bool $createOnly
