@@ -599,10 +599,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           if (is_object($payment)) {
             try {
               $result = $payment->doPayment($value);
+              dpm($result);
               $value = array_merge($value, $result);
             }
             catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-              CRM_Core_Error::displaySessionError($result);
+              CRM_Core_Session::singleton()->setStatus($e->getMessage());
               CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
             }
           }
