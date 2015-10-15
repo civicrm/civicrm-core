@@ -81,6 +81,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('hookDiscount', $this->_params[0]['discount']);
     }
 
+    // The concept of contributeMode is deprecated.
     if ($this->_contributeMode == 'express') {
       $params = array();
       // rfp == redirect from paypal
@@ -597,6 +598,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
         if (!empty($value['is_pay_later']) ||
           $value['amount'] == 0 ||
+          // The concept of contributeMode is deprecated.
           $this->_contributeMode == 'checkout' ||
           $this->_contributeMode == 'notify'
         ) {
@@ -787,6 +789,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     // for Transfer checkout.
+    // The concept of contributeMode is deprecated.
     if (($this->_contributeMode == 'checkout' ||
         $this->_contributeMode == 'notify'
       ) && empty($params[0]['is_pay_later']) &&
@@ -1052,6 +1055,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     //create an contribution address
+    // The concept of contributeMode is deprecated. Elsewhere we use the function processBillingAddress() - although
+    // currently that is only inherited by back-office forms.
     if ($form->_contributeMode != 'notify' && empty($params['is_pay_later'])) {
       $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }

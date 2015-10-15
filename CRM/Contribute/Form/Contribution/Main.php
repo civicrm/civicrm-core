@@ -1163,6 +1163,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       !empty($this->_paymentProcessor) &&
       ((float ) $params['amount'] > 0.0 || $memFee > 0.0)
     ) {
+      // The concept of contributeMode is deprecated - as should be the 'is_monetary' setting.
       $this->setContributeMode();
       // Really this setting of $this->_params & params within it should be done earlier on in the function
       // probably the values determined here should be reused in confirm postProcess as there is no opportunity to alter anything

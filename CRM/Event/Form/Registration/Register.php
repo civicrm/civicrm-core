@@ -926,9 +926,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // get the submitted form values.
@@ -1103,7 +1100,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       ) {
 
         $this->handlePreApproval($params);
-
+        // The concept of contributeMode is deprecated - but still needs removal from the message templates.
         $this->set('contributeMode', 'express');
 
         // Send Event Name & Id in Params
@@ -1141,6 +1138,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       elseif ($this->_paymentProcessor &&
         $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
       ) {
+        // The concept of contributeMode is deprecated - but still needs removal from the message templates.
         $this->set('contributeMode', 'notify');
       }
     }
