@@ -39,7 +39,7 @@
   </div>
   {/if}
   {if $contributionMode}
-  <div id="help">
+  <div class="help">
     {if $contactId}
       {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
         %2 transaction will be submitted</strong> using the selected payment processor.{/ts}

@@ -41,7 +41,7 @@
   </td>
 {else}
 {assign var=eventID value=$id}
-  <div id="help">
+  <div class="help">
     {ts}If you want to provide an Online Registration page for this event, check the first box below and then complete the fields on this form.{/ts}
     {help id="id-event-reg"}
   </div>

@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
+<div class="help">
     {ts}Payment Processor configurations for all payment processors that can be used in this installation of CiviCRM.{/ts}
 </div>
 

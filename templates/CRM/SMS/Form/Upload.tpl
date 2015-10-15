@@ -26,7 +26,7 @@
 <div class="crm-block crm-form-block crm-mailing-upload-form-block">
 {include file="CRM/common/WizardHeader.tpl"}
 
-<div id="help">
+<div class="help">
     {ts}You can either <strong>upload</strong> the sms content from your computer OR <strong>compose</strong> the content on this screen.{/ts} {help id="content-intro"}
 </div>
 

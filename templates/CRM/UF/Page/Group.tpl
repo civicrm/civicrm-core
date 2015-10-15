@@ -31,7 +31,7 @@
     {include file="CRM/UF/Form/Preview.tpl"}
 {elseif $action eq 8192}
     {* Display HTML Form Snippet Code *}
-    <div id="help">
+    <div class="help">
         {ts}The HTML code below will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on your website where you want to collect contact information.{/ts} {help id='standalone'}
     </div>
     <br />
@@ -47,7 +47,7 @@
     </form>
 
 {else}
-    <div id="help">
+    <div class="help">
         {ts}CiviCRM Profile(s) allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features. They provide a powerful set of tools for you to collect information from constituents and selectively share contact information.{/ts} {help id='profile_overview'}
     </div>
 

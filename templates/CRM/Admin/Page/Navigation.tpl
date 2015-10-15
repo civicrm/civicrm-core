@@ -26,8 +26,8 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
   {include file="CRM/Admin/Form/Navigation.tpl"}
 {else}
-  <div id="help">
-  {ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}
+  <div class="help">
+    {ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}
   </div>
 
   <div class="crm-block crm-content-block">

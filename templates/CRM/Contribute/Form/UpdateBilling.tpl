@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
+<div class="help">
   <div class="icon inform-icon"></div>&nbsp;
   {if $mode eq 'auto_renew'}
       {ts}Use this form to update the credit card and billing name and address used with the auto-renewal option for your {$membershipType} membership.{/ts}
