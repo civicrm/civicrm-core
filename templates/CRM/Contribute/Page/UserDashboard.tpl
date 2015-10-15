@@ -87,7 +87,7 @@
     {if $honor}
         {if $honorRows}
             {strip}
-                <div id="help">
+                <div class="help">
                     {ts}Contributions made in your honor{/ts}:
                 </div>
                 <table class="selector">

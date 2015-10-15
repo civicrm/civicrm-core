@@ -26,8 +26,8 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
   {include file="CRM/Admin/Form/Navigation.tpl"}
 {else}
-  <div id="help">
-  {ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}
+  <div class="help">
+    {ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}
   </div>
 
   <div class="crm-block crm-content-block">
@@ -42,8 +42,10 @@
     <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
     <div class="spacer"></div>
     <div>
-      {* TODO: fa-broom would be better, but not implemented yet. https://github.com/FortAwesome/Font-Awesome/issues/239 *}
-      <a href="#" class="nav-reset crm-hover-button"><i class="crm-i fa-undo"></i> {ts}Cleanup reports menu{/ts}</a>
+      <a href="#" class="nav-reset crm-hover-button">
+        {* TODO: fa-broom would be better, but not implemented yet. https://github.com/FortAwesome/Font-Awesome/issues/239 *}
+        <i class="crm-i fa-undo"></i> {ts}Cleanup reports menu{/ts}
+      </a>
     </div>
     <div class="spacer"></div>
   </div>
@@ -170,10 +172,15 @@
 
       $('a.nav-reset').on('click', function(e) {
         e.preventDefault();
-        CRM.confirm({message: '{/literal}{ts escape='js'}This will rebuild the "Reports" menu to include all currently active reports.{/ts}{literal}'})
-          .on('crmConfirm:yes', function () {
+        CRM.confirm({
+          title: $(this).text(),
+          message: '{/literal}{ts escape='js'}This will rebuild the "Reports" menu to include all currently active reports.{/ts}{literal}'
+        })
+          .on('crmConfirm:yes', function() {
+            $('#crm-container').block();
             CRM.api3('Navigation', 'reset', {'for': 'report'}, true)
               .done(function() {
+                $('#crm-container').unblock();
                 $("#navigation-tree").jstree('refresh');
                 $("#reset-menu").show();
               })

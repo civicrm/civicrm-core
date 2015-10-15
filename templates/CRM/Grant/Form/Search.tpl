@@ -31,7 +31,7 @@
     </div><!-- /.crm-accordion-header -->
   <div class="crm-accordion-body">
       {strip}
-        <div id="help">
+        <div class="help">
             {ts}Use this form to find Grant(s) by Contact name, Grant Status, Grant Type, Total Amount , etc .{/ts}
         </div>
         <table class="form-layout">

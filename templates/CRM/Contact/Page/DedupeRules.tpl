@@ -28,7 +28,7 @@
 {elseif $action eq 4}
 {include file="CRM/Contact/Form/DedupeFind.tpl"}
 {else}
-    <div id="help">
+    <div class="help">
        {ts}Manage the rules used to identify potentially duplicate contact records. Scan for duplicates using a selected rule and merge duplicate contact data as needed.{/ts} {help id="id-dedupe-intro"}
     </div>
     {if $hasperm_administer_dedupe_rules}

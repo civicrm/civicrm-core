@@ -30,7 +30,7 @@
 {elseif $action eq 8 and !$usedBy}
     {include file="CRM/Price/Form/DeleteSet.tpl"}
 {else}
-    <div id="help">
+    <div class="help">
       {ts}Price sets allow you to set up flexible multi-option pricing schemes for your contribution, event and membership pages. Use a price set if the standard pricing options are insufficient for your needs.{/ts}
     </div>
 

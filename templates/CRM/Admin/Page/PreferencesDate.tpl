@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="help">
+<div class="help">
   {capture assign=crmURL}{crmURL p='civicrm/admin/setting/date' q='action=reset=1'}{/capture}
     {ts 1=$crmURL}Changing the parameters here affects the input and display for specific fields types. Setting the default date format for the entire site is a Localisation setting. See <a href="%1">Administer > Localization > Date Formats</a>{/ts}
 </div>

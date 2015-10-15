@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-contribution-contributionpage-thankyou-form-block">
-<div id="help">
+<div class="help">
     <p>{ts}Use this form to configure the thank-you message and receipting options.{/ts} {help id="id_thank"}</p>
 </div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>

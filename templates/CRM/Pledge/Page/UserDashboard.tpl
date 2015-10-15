@@ -74,7 +74,7 @@
 {*Display honor block*}
 {if $pledgeHonor && $pledgeHonorRows}
 {strip}
-<div id="help">
+<div class="help">
     <p>{ts}Pledges made in your honor.{/ts}</p>
 </div>
   <table class="selector">

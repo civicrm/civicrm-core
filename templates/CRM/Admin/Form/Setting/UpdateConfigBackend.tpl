@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-config-backend-form-block">
-<div id="help">
+<div class="help">
     <p>
     {ts}When migrating a site to a new server, the paths and URLs of your CiviCRM installation may change. {/ts}
     </p>

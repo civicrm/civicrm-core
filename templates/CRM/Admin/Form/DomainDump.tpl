@@ -25,7 +25,7 @@
 *}
 {* this template is for domain dump (backup data) *}
 
-<div id="help">
+<div class="help">
     <p>{ts}Backup Database{/ts}</p>
 </div>
 
