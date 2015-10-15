@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
@@ -24,7 +24,7 @@
 *}
 <div class="block-civicrm crm-container">
 <div id="crm-create-new-wrapper">
-  <a id="crm-create-new-link" class="button" href="#"><span><div class="icon ui-icon-arrow-1-se css_right"></div>{ts}Create New{/ts}</span></a>
+  <a id="crm-create-new-link" class="button" href="#"><span>{ts}Create New{/ts} <i class="crm-i fa-bars"></i></span></a>
     <div id="crm-create-new-list">
       <div class="crm-create-new-list-inner">
       <ul>

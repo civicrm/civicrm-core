@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -65,8 +65,12 @@
        </tr>
    </table>
 </fieldset>
-<fieldset><legend>{ts}Fiscal Year{/ts}</legend>
+<fieldset><legend>{ts}Calendar{/ts}</legend>
    <table class="form-layout-compressed">
+       <tr class="crm-date-form-block-weekBegins">
+         <td class="label">{$form.weekBegins.label}</td>
+         <td>{$form.weekBegins.html}</td>
+       </tr>
        <tr class="crm-date-form-block-fiscalYearStart">
           <td class="label">{$form.fiscalYearStart.label}</td>
           <td>{$form.fiscalYearStart.html}</td>

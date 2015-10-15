@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
@@ -795,7 +793,7 @@ LIMIT  1
       return FALSE;
     }
 
-    // next get activity set Informtion
+    // next get activity set Information
     $activitySet = array(
       'label' => $form->getActivitySetLabel($xml, $activitySetName),
       'includeActivities' => 'All',

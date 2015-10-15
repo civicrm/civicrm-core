@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -45,11 +45,6 @@
                 <td class="label">{$form.backtrace.label}</td>
                 <td>{$form.backtrace.html}<br />
                 <span class="description">{ts}<strong>This feature should NOT be enabled for production sites.</strong><br />Set this value to <strong>Yes</strong> if you want to display a backtrace listing when a fatal error is encountered.{/ts}</span></td>
-            </tr>
-            <tr class="crm-debugging-form-block-fatalErrorTemplate">
-                <td class="label">{$form.fatalErrorTemplate.label}</td>
-                <td>{$form.fatalErrorTemplate.html}<br />
-                <span class="description">{ts}Enter the path and filename for a custom Smarty template if you want to define your own screen for displaying fatal errors.{/ts}</span></td>
             </tr>
             <tr class="crm-debugging-form-block-fatalErrorHandler">
                 <td class="label">{$form.fatalErrorHandler.label}</td>

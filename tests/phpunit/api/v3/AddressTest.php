@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -74,8 +74,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   public function testCreateAddress() {
     $result = $this->callAPIAndDocument('address', 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], 'address');
   }
 
@@ -89,10 +89,10 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $subfile = "AddressParse";
     $description = "Demonstrates Use of address parsing param.";
     $result = $this->callAPIAndDocument('address', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals(54, $result['values'][$result['id']]['street_number'], 'In line ' . __LINE__);
-    $this->assertEquals('A', $result['values'][$result['id']]['street_number_suffix'], 'In line ' . __LINE__);
-    $this->assertEquals('Excelsior Ave.', $result['values'][$result['id']]['street_name'], 'In line ' . __LINE__);
-    $this->assertEquals('Apt 1C', $result['values'][$result['id']]['street_unit'], 'In line ' . __LINE__);
+    $this->assertEquals(54, $result['values'][$result['id']]['street_number']);
+    $this->assertEquals('A', $result['values'][$result['id']]['street_number_suffix']);
+    $this->assertEquals('Excelsior Ave.', $result['values'][$result['id']]['street_name']);
+    $this->assertEquals('Apt 1C', $result['values'][$result['id']]['street_unit']);
     $this->callAPISuccess('address', 'delete', array('id' => $result['id']));
 
   }
@@ -104,8 +104,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $params = $this->_params;
     unset($params['is_primary']);
     $result = $this->callAPISuccess('address', 'create', $params);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['values'][$result['id']]['is_primary'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $result['values'][$result['id']]['is_primary']);
     $this->getAndCheck($this->_params, $result['id'], 'address');
   }
 
@@ -211,7 +211,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('address', 'create', $this->_params);
 
     $result = $this->callAPIAndDocument('address', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('address', 'get', array(
       'location_type_id' => $this->_locationType->id,
     ));
@@ -244,7 +244,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     );
     $address = $this->callAPISuccess('Address', 'getsingle', ($params));
-    $this->assertEquals($address['location_type_id'], $this->_params['location_type_id'], 'In line ' . __LINE__);
+    $this->assertEquals($address['location_type_id'], $this->_params['location_type_id']);
     $this->callAPISuccess('address', 'delete', array('id' => $address['id']));
   }
 
@@ -281,8 +281,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'sequential' => 1,
     );
     $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals('Ambachtstraat 23', $result['values'][0]['street_address'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals('Ambachtstraat 23', $result['values'][0]['street_address']);
     $this->callAPISuccess('address', 'delete', array('id' => $result['id']));
   }
 
@@ -296,7 +296,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'sequential' => 1,
     );
     $result = $this->callAPISuccess('Address', 'Get', ($params));
-    $this->assertEquals(0, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $result['count']);
     $this->callAPISuccess('address', 'delete', array('id' => $create['id']));
   }
 
@@ -326,7 +326,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $params = $this->_params;
     unset($params['is_primary']);
     $address1 = $this->callAPISuccess('address', 'create', $params);
-    $this->assertApiSuccess($address1, 'In line ' . __LINE__);
+    $this->assertApiSuccess($address1);
     //now we check & make sure it has been set to primary
     $check = $this->callAPISuccess('address', 'getcount', array(
       'is_primary' => 1,

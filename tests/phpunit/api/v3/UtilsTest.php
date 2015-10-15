@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -261,7 +261,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $fields = civicrm_api3('Membership', 'getfields', array('action' => 'get'));
     _civicrm_api3_validate_fields('Membership', 'get', $params, $fields['values']);
     $this->assertEquals('2010-12-20', $params['start_date']);
-    $this->assertEquals('20101220000000', $params['membership_start_date'], 'in line ' . __LINE__);
+    $this->assertEquals('20101220000000', $params['membership_start_date']);
     $this->assertEquals('', $params['end_date']);
     $this->assertEquals('20101220000000', $params['join_date'], 'join_date not set in line ' . __LINE__);
   }
@@ -276,9 +276,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     );
     $fields = civicrm_api3('Event', 'getfields', array('action' => 'create'));
     _civicrm_api3_validate_fields('event', 'create', $params, $fields['values']);
-    $this->assertEquals('20101220000000', $params['start_date'], 'in line ' . __LINE__);
-    $this->assertEquals('20081015000000', $params['registration_end_date'], 'in line ' . __LINE__);
-    $this->assertEquals('', $params['end_date'], 'in line ' . __LINE__);
+    $this->assertEquals('20101220000000', $params['start_date']);
+    $this->assertEquals('20081015000000', $params['registration_end_date']);
+    $this->assertEquals('', $params['end_date']);
     $this->assertEquals('20080601000000', $params['registration_start_date']);
   }
 

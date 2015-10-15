@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,13 +24,16 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-localization-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"} </div>
+  <div class="help">
+    {ts}Configure CiviCRM for your country and language.{/ts}
+    {docURL page="i18n Administrator's Guide: Using CiviCRM in your own language" resource="wiki"}
+  </div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"} </div>
     <h3>{ts}Language and Currency{/ts}</h3>
         <table class="form-layout-compressed">
             <tr class="crm-localization-form-block-lcMessages">
                 <td class="label">{$form.lcMessages.label}</td>
-                <td>{$form.lcMessages.html}<br />
-                <span class="description">{ts}Default language used for this installation.{/ts}</span></td>
+                <td>{$form.lcMessages.html}</td>
             </tr>
            {if $form.languageLimit}
              <tr class="crm-localization-form-block-languageLimit">
@@ -45,14 +48,17 @@
              </tr>
           {/if}
             <tr class="crm-localization-form-block-inheritLocale">
-                <td class="label">{$form.inheritLocale.label}</td>
-                <td>{$form.inheritLocale.html}<br />
-                <span class="description">{ts}If checked, CiviCRM will follow CMS language changes.{/ts}</span></td>
+                <td class="label">{$form.inheritLocale.label} {help id='inheritLocale' title=$form.inheritLocale.label}</td>
+                <td>{$form.inheritLocale.html}</td>
             </tr>
+          <tr class="crm-localization-form-contact_default_language">
+            <td class="label">{$form.contact_default_language.label}</td>
+            <td>{$form.contact_default_language.html}<br />
+              <span class="description">{ts}Default language (if any) for contact records.{/ts}</span></td>
+          </tr>
             <tr class="crm-localization-form-block-defaultCurrency">
-                <td class="label">{$form.defaultCurrency.label}</td>
-                <td>{$form.defaultCurrency.html}<br />
-                <span class="description">{ts}Default currency assigned to contributions and other monetary transactions.{/ts}</span></td>
+                <td class="label">{$form.defaultCurrency.label} {help id='defaultCurrency' title=$form.defaultCurrency.label}</td>
+                <td>{$form.defaultCurrency.html}</td>
             </tr>
             <tr class="crm-localization-form-block-monetaryThousandSeparator">
                 <td class="label">{$form.monetaryThousandSeparator.label}</td>
@@ -67,52 +73,43 @@
                 <td>{$form.currencyLimit.html}</td>
             </tr>
             <tr class="crm-localization-form-block-moneyformat">
-                <td class="label">{$form.moneyformat.label}</td>
-                <td>{$form.moneyformat.html}<br />
-                <span class="description">{ts}Format for displaying monetary amounts.{/ts}</span></td>
+                <td class="label">{$form.moneyformat.label} {help id='moneyformat' title=$form.moneyformat.label}</td>
+                <td>{$form.moneyformat.html}</td>
             </tr>
             <tr class="crm-localization-form-block-moneyvalueformat">
-                <td class="label">{$form.moneyvalueformat.label}</td>
-                <td>{$form.moneyvalueformat.html}<br />
-                <span class="description">{ts}Format for displaying monetary values.{/ts}</span></td>
+                <td class="label">{$form.moneyvalueformat.label} {help id='moneyvalueformat' title=$form.moneyvalueformat.label}</td>
+                <td>{$form.moneyvalueformat.html}</td>
             </tr>
             <tr class="crm-localization-form-block-customTranslateFunction">
-                <td class="label">{$form.customTranslateFunction.label}</td>
-                <td>{$form.customTranslateFunction.html}<br />
-                <span class="description">{ts}Function name to use for translation inplace of the default CiviCRM translate function. {/ts}</span></td>
+                <td class="label">{$form.customTranslateFunction.label} {help id='customTranslateFunction' title=$form.customTranslateFunction.label}</td>
+                <td>{$form.customTranslateFunction.html}</td>
             </tr>
             <tr class="crm-localization-form-block-legacyEncoding">
-                <td class="label">{$form.legacyEncoding.label}</td>
-                <td>{$form.legacyEncoding.html}<br />
-                <span class="description">{ts}If import files are NOT encoded as UTF-8, specify an alternate character encoding for these files. The default of <strong>Windows-1252</strong> will work for Excel-created .CSV files on many computers.{/ts}</span></td>
+                <td class="label">{$form.legacyEncoding.label} {help id='legacyEncoding' title=$form.legacyEncoding.label}</td>
+                <td>{$form.legacyEncoding.html}</td>
             </tr>
             <tr class="crm-localization-form-block-fieldSeparator">
-                <td class="label">{$form.fieldSeparator.label}</td>
-                <td>{$form.fieldSeparator.html}<br />
-                <span class="description">{ts}Global CSV separator character. Modify this setting to enable import and export of different kinds of CSV files (for example: ',' ';' ':' '|' ).{/ts}</span></td>
+                <td class="label">{$form.fieldSeparator.label} {help id='fieldSeparator' title=$form.fieldSeparator.label}</td>
+                <td>{$form.fieldSeparator.html}</td>
             </tr>
         </table>
     <h3>{ts}Contact Address Fields - Selection Values{/ts}</h3>
         <table class="form-layout-compressed">
             <tr class="crm-localization-form-block-defaultContactCountry">
-                <td class="label">{$form.defaultContactCountry.label}</td>
-                <td>{$form.defaultContactCountry.html}<br />
-                <span class="description">{ts}This value is selected by default when adding a new contact address.{/ts}</span></td>
+                <td class="label">{$form.defaultContactCountry.label} {help id='defaultContactCountry' title=$form.defaultContactCountry.label}</td>
+                <td>{$form.defaultContactCountry.html}</td>
             </tr>
            <tr class="crm-localization-form-block-defaultContactStateProvince">
-                <td class="label">{$form.defaultContactStateProvince.label}</td>
-                <td>{$form.defaultContactStateProvince.html}<br />
-                <span class="description">{ts}This value is selected by default when adding a new contact address.{/ts}</span></td>
+                <td class="label">{$form.defaultContactStateProvince.label} {help id='defaultContactCountry' title=$form.defaultContactStateProvince.label}</td>
+                <td>{$form.defaultContactStateProvince.html}</td>
             </tr>
             <tr class="crm-localization-form-block-countryLimit">
-                <td class="label">{$form.countryLimit.label}</td>
-                <td>{$form.countryLimit.html}<br />
-                <span class="description">{ts}Which countries are available in the Country selection field when adding or editing contact addresses. Profile and Custom 'Country' fields also use this setting. To include ALL countries, leave the right-hand box empty.{/ts}</span></td>
+                <td class="label">{$form.countryLimit.label} {help id='countryLimit' title=$form.countryLimit.label}</td>
+                <td>{$form.countryLimit.html}</td>
             </tr>
             <tr class="crm-localization-form-block-provinceLimit">
-                <td class="label">{$form.provinceLimit.label}</td>
-                <td>{$form.provinceLimit.html}<br />
-                <span class="description">{ts}State/province listings are populated dynamically based on the selected Country for all standard contact address editing forms, as well as for <strong>Profile forms which include both a Country and a State/Province field</strong>.  This setting controls which countries' states and/or provinces are available in the State/Province selection field <strong>for Custom Fields</strong> or for Profile forms which do NOT include a Country field.{/ts}</span></td>
+                <td class="label">{$form.provinceLimit.label} {help id='provinceLimit' title=$form.provinceLimit.label}</td>
+                <td>{$form.provinceLimit.html}</td>
             </tr>
         </table>
     <h3>{ts}Multiple Languages Support{/ts}</h3>
@@ -137,7 +134,7 @@
         {else}
           <tr class="crm-localization-form-block-description">
               <td>
-              <span class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts} {ts}(Multilingual support currenly cannot be enabled on installations with enabled logging.){/ts}</span><br /><br />
+              <span class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts} {ts}(Multilingual support currently cannot be enabled on installations with enabled logging.){/ts}</span><br /><br />
               <span class="description" style="color:red">{$warning}</span></td>
           </tr>
         {/if}

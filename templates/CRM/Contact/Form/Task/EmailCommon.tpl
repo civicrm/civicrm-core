@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -33,7 +33,7 @@
  <div class="crm-accordion-body">
   <div class="helpIcon" id="helphtml">
     <input class="crm-token-selector big" data-field="html_message" />
-    {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
+    {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
   </div>
   <div class="clear"></div>
     <div class='html'>
@@ -79,3 +79,4 @@
 
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
 
+{include file="CRM/Activity/Form/FollowUp.tpl" type='email-'}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -39,7 +39,7 @@
  * @param array $params
  *
  * @return array
- *   Details of found Option Values
+ *   API result array
  */
 function civicrm_api3_option_value_get($params) {
 
@@ -62,6 +62,7 @@ function civicrm_api3_option_value_get($params) {
  *
  * @throws API_Exception
  * @return array
+ *   API result array
  */
 function civicrm_api3_option_value_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -100,7 +101,7 @@ function _civicrm_api3_option_value_create_spec(&$params) {
  * @param array $params
  *
  * @return array
- *   Api result
+ *   API result array
  */
 function civicrm_api3_option_value_delete($params) {
   // We will get the option group id before deleting so we can flush pseudoconstants.

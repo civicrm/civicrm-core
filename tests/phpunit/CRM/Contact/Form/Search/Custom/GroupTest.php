@@ -97,11 +97,12 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
+        dirname(__FILE__) . '/datasets/group-dataset.xml'
       )
     );
 
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
+
     $sql = $obj->all();
     $dao = CRM_Core_DAO::executeQuery($sql);
 
@@ -133,12 +134,12 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
+        dirname(__FILE__) . '/datasets/group-dataset.xml'
       )
     );
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
     $sql = $obj->all();
-    $this->assertTrue(is_string($sql), 'In line ' . __LINE__);
+    $this->assertTrue(is_string($sql));
     $dao = CRM_Core_DAO::executeQuery($sql);
     $all = array();
     while ($dao->fetch()) {
@@ -149,7 +150,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
       );
     }
     asort($all);
-    $this->assertEquals($full, $all, 'In line ' . __LINE__);
+    $this->assertEquals($full, $all);
   }
 
   /**
@@ -169,12 +170,12 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
+        dirname(__FILE__) . '/datasets/group-dataset.xml'
       )
     );
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
     $sql = $obj->contactIDs();
-    $this->assertTrue(is_string($sql), 'In line ' . __LINE__);
+    $this->assertTrue(is_string($sql));
     $dao = CRM_Core_DAO::executeQuery($sql);
     $contacts = array();
     while ($dao->fetch()) {
@@ -182,7 +183,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     }
     $contacts = array_keys($contacts);
     sort($contacts, SORT_NUMERIC);
-    $this->assertEquals($ids, $contacts, 'In line ' . __LINE__);
+    $this->assertEquals($ids, $contacts);
   }
 
   /**
@@ -193,10 +194,10 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $formValues = array();
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $columns = $obj->columns();
-    $this->assertTrue(is_array($columns), 'In line ' . __LINE__);
+    $this->assertTrue(is_array($columns));
     foreach ($columns as $key => $value) {
-      $this->assertTrue(is_string($key), 'In line ' . __LINE__);
-      $this->assertTrue(is_string($value), 'In line ' . __LINE__);
+      $this->assertTrue(is_string($key));
+      $this->assertTrue(is_string($value));
     }
   }
 
@@ -214,7 +215,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   public function testSummary() {
     $formValues = array();
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertNull($obj->summary(), 'In line ' . __LINE__);
+    $this->assertNull($obj->summary());
   }
 
   /**
@@ -225,9 +226,9 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     $formValues = array();
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $fileName = $obj->templateFile();
-    $this->assertTrue(is_string($fileName), 'In line ' . __LINE__);
+    $this->assertTrue(is_string($fileName));
     //FIXME: we would need to search the include path to do the following
-    //$this->assertTrue( file_exists( $fileName ), 'In line ' . __LINE__ );
+    //$this->assertTrue( file_exists( $fileName ) );
   }
 
   /**
@@ -240,7 +241,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
       CRM_Core_Form::CB_PREFIX . '23' => TRUE,
     );
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertEquals(' (1) ', $obj->where(), 'In line ' . __LINE__);
+    $this->assertEquals(' (1) ', $obj->where());
   }
 
   /**

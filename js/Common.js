@@ -201,8 +201,9 @@ function showHideRow(index) {
 
 /* jshint ignore:end */
 
-CRM.utils = CRM.utils || {};
-CRM.strings = CRM.strings || {};
+if (!CRM.utils) CRM.utils = {};
+if (!CRM.strings) CRM.strings = {};
+if (!CRM.vars) CRM.vars = {};
 
 (function ($, _, undefined) {
   "use strict";
@@ -607,7 +608,7 @@ CRM.strings = CRM.strings || {};
         $clearLink = $();
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><span class="icon ui-icon-close"></span></a>')
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ ts('Clear') +'"><i class="crm-i fa-times"></i></a>')
           .insertAfter($dataField);
       }
       if (settings.time !== false) {
@@ -681,6 +682,38 @@ CRM.strings = CRM.strings || {};
     });
   };
 
+  $.fn.crmAjaxTable = function() {
+    return $(this).each(function() {
+      //Declare the defaults for DataTables
+      var defaults = {
+        "processing": true,
+        "serverSide": true,
+        "dom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+        "pageLength": 25,
+        "drawCallback": function(settings) {
+          //Add data attributes to cells
+          $('thead th', settings.nTable).each( function( index ) {
+            $.each(this.attributes, function() {
+              if(this.name.match("^cell-")) {
+                var cellAttr = this.name.substring(5);
+                var cellValue = this.value;
+                $('tbody tr', settings.nTable).each( function() {
+                  $('td:eq('+ index +')', this).attr( cellAttr, cellValue );
+                });
+              }
+            });
+          });
+          //Reload table after draw
+          $(settings.nTable).trigger('crmLoad');
+        }
+      };
+      //Include any table specific data
+      var settings = $.extend(true, defaults, $(this).data('table'));
+      //Make the DataTables call
+      $(this).DataTable(settings);
+    });
+  };
+
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
@@ -712,9 +745,23 @@ CRM.strings = CRM.strings || {};
       createLinks = params.contact_type ? _.where(CRM.config.entityRef.contactCreate, {type: params.contact_type}) : CRM.config.entityRef.contactCreate;
     }
     _.each(createLinks, function(link) {
+      var icon;
+      switch (link.type) {
+        case 'Individual':
+          icon = 'fa-user';
+          break;
+
+        case 'Organization':
+          icon = 'fa-building';
+          break;
+
+        case 'Household':
+          icon = 'fa-home';
+          break;
+      }
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
-      if (link.type) {
-        markup += '<span class="icon ' + link.type + '-profile-icon"></span> ';
+      if (icon) {
+        markup += '<i class="crm-i ' + icon + '"></i> ';
       }
       markup += link.label + '</a>';
     });
@@ -843,6 +890,20 @@ CRM.strings = CRM.strings || {};
           }
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      $('table.crm-sortable', e.target).DataTable();
+      $('table.crm-ajax-table', e.target).each(function() {
+        var
+          $table = $(this),
+          $accordion = $table.closest('.crm-accordion-wrapper.collapsed, .crm-collapsible.collapsed');
+        // For tables hidden by collapsed accordions, wait.
+        if ($accordion.length) {
+          $accordion.one('crmAccordion:open', function() {
+            $table.crmAjaxTable();
+          });
+        } else {
+          $table.crmAjaxTable();
+        }
+      });
       if ($("input:radio[name=radio_ts]").size() == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }
@@ -853,6 +914,16 @@ CRM.strings = CRM.strings || {};
       $('form[data-warn-changes] :input', e.target).each(function() {
         $(this).data('crm-initial-value', $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val());
       });
+      $('textarea.crm-form-wysiwyg', e.target)
+        .not('.crm-wysiwyg-enabled')
+        .addClass('crm-wysiwyg-enabled')
+        .each(function() {
+          if ($(this).hasClass("collapsed")) {
+            CRM.wysiwyg.createCollapsed(this);
+          } else {
+            CRM.wysiwyg.create(this);
+          }
+        });
     })
     .on('dialogopen', function(e) {
       var $el = $(e.target);
@@ -863,7 +934,7 @@ CRM.strings = CRM.strings || {};
       }
       // Add resize button
       if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
-        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
+        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'fa-expand'}, text: false}));
         $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
           if ($el.data('origSize')) {
             $el.dialog('option', $el.data('origSize'));
@@ -903,8 +974,7 @@ CRM.strings = CRM.strings || {};
   $.fn.crmtooltip = function () {
     $(document)
       .on('mouseover', 'a.crm-summary-link:not(.crm-processed)', function (e) {
-        $(this).addClass('crm-processed');
-        $(this).addClass('crm-tooltip-active');
+        $(this).addClass('crm-processed crm-tooltip-active');
         var topDistance = e.pageY - $(window).scrollTop();
         if (topDistance < 300 || topDistance < $(this).children('.crm-tooltip-wrapper').height()) {
           $(this).addClass('crm-tooltip-down');
@@ -917,8 +987,7 @@ CRM.strings = CRM.strings || {};
         }
       })
       .on('mouseout', 'a.crm-summary-link', function () {
-        $(this).removeClass('crm-processed');
-        $(this).removeClass('crm-tooltip-active crm-tooltip-down');
+        $(this).removeClass('crm-processed crm-tooltip-active crm-tooltip-down');
       })
       .on('click', 'a.crm-summary-link', false);
   };
@@ -1094,7 +1163,7 @@ CRM.strings = CRM.strings || {};
         buttons.push({
           text: label,
           'data-op': op,
-          icons: {primary: op === 'no' ? 'ui-icon-close' : 'ui-icon-check'},
+          icons: {primary: op === 'no' ? 'fa-times' : 'fa-check'},
           click: function() {
             var event = $.Event('crmConfirm:' + op);
             $(this).trigger(event);
@@ -1273,15 +1342,6 @@ CRM.strings = CRM.strings || {};
       messagesFromMarkup.call($('#crm-container'));
     }
 
-    // Hide CiviCRM menubar when editor is fullscreen
-    if (window.CKEDITOR) {
-      CKEDITOR.on('instanceCreated', function (e) {
-        e.editor.on('maximize', function (e) {
-          $('#civicrm-menu').toggle(e.data === 2);
-        });
-      });
-    }
-
     $('body')
       // bind the event for image popup
       .on('click', 'a.crm-image-popup', function(e) {
@@ -1320,44 +1380,43 @@ CRM.strings = CRM.strings || {};
       })
       // Handle accordions
       .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+        var action = 'open';
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);
         }
         else {
           $(this).next().css('display', 'block').slideUp(200);
+          action = 'close';
         }
-        $(this).parent().toggleClass('collapsed');
+        $(this).parent().toggleClass('collapsed').trigger('crmAccordion:' + action);
         e.preventDefault();
       });
 
     $().crmtooltip();
   });
-  /**
-   * @deprecated
-   */
-  $.fn.crmAccordions = function () {
-    CRM.console('warn', 'Warning: $.crmAccordions was called. This function is deprecated and should not be used.');
-  };
+
   /**
    * Collapse or expand an accordion
    * @param speed
    */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
+      var action = 'open';
       if ($(this).hasClass('collapsed')) {
         $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
       }
       else {
         $('.crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
+        action = 'close';
       }
-      $(this).toggleClass('collapsed');
+      $(this).toggleClass('collapsed').trigger('crmAccordion:' + action);
     });
   };
 
   /**
    * Clientside currency formatting
    * @param number value
-   * @param [optional] boolean onlyNumber - if true, we return formated amount without currency sign
+   * @param [optional] boolean onlyNumber - if true, we return formatted amount without currency sign
    * @param [optional] string format - currency representation of the number 1234.56
    * @return string
    */

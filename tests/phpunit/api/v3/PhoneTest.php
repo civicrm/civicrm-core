@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -63,8 +63,8 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   public function testCreatePhone() {
 
     $result = $this->callAPIAndDocument('phone', 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
 
     $this->callAPISuccess('phone', 'delete', array('id' => $result['id']));
   }
@@ -74,7 +74,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('phone', 'create', $this->_params);
 
     $result = $this->callAPIAndDocument('phone', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('phone', 'get', array(
       'id' => $create['id'],
       'location_type_id' => $this->_locationType,
@@ -108,10 +108,10 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
       'phone' => $phone['values'][$phone['id']]['phone'],
     );
     $result = $this->callAPIAndDocument('Phone', 'Get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($phone['values'][$phone['id']]['location_type_id'], $result['values'][$phone['id']]['location_type_id'], 'In line ' . __LINE__);
-    $this->assertEquals($phone['values'][$phone['id']]['phone_type_id'], $result['values'][$phone['id']]['phone_type_id'], 'In line ' . __LINE__);
-    $this->assertEquals($phone['values'][$phone['id']]['is_primary'], $result['values'][$phone['id']]['is_primary'], 'In line ' . __LINE__);
-    $this->assertEquals($phone['values'][$phone['id']]['phone'], $result['values'][$phone['id']]['phone'], 'In line ' . __LINE__);
+    $this->assertEquals($phone['values'][$phone['id']]['location_type_id'], $result['values'][$phone['id']]['location_type_id']);
+    $this->assertEquals($phone['values'][$phone['id']]['phone_type_id'], $result['values'][$phone['id']]['phone_type_id']);
+    $this->assertEquals($phone['values'][$phone['id']]['is_primary'], $result['values'][$phone['id']]['is_primary']);
+    $this->assertEquals($phone['values'][$phone['id']]['phone'], $result['values'][$phone['id']]['phone']);
   }
 
   ///////////////// civicrm_phone_create methods

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-/* This class is instantiated everytime any notification or
+/* This class is instantiated every time any notification or
   * order processing commands are received.
   *
   * It has a SendReq function to post different requests to the Google Server

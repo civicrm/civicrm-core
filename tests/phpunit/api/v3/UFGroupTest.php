@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -117,8 +117,8 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument('uf_group', 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result);
-    $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group'], 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group'], 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group']);
+    $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group']);
     $this->params['created_date'] = date('YmdHis', strtotime($this->params['created_date']));
     foreach ($this->params as $key => $value) {
       if ($key == 'add_contact_to_group' or $key == 'group') {
@@ -171,16 +171,16 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
       $this->assertEquals($result['values'][$result['id']][$key], $params[$key], $key . " doesn't match  " . $value);
     }
 
-    $this->assertEquals($result['values'][$this->_ufGroupId]['add_to_group_id'], $params['add_contact_to_group'], 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $params['group'], 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$this->_ufGroupId]['add_to_group_id'], $params['add_contact_to_group']);
+    $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $params['group']);
   }
 
   public function testUFGroupGet() {
     $result = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = array('id' => $result['id']);
     $result = $this->callAPIAndDocument('uf_group', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group'], 'in line ' . __LINE__);
-    $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group'], 'in line ' . __LINE__);
+    $this->assertEquals($result['values'][$result['id']]['add_to_group_id'], $this->params['add_contact_to_group']);
+    $this->assertEquals($result['values'][$result['id']]['limit_listings_group_id'], $this->params['group']);
     foreach ($this->params as $key => $value) {
       // skip created date because it doesn't seem to be working properly & fixing date handling is for another day
       if ($key == 'add_contact_to_group' or $key == 'group' or $key == 'created_date') {

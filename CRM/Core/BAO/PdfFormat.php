@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -30,12 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains functions for managing PDF Page Formats
+ * This class contains functions for managing PDF Page Formats.
  */
 class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
 
@@ -144,8 +142,6 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    * @param array (reference) $list List of PDF Page Formats
    * @param string $returnURL
    *   URL of page calling this function.
-   *
-   * @return void
    */
   public static function addOrder(&$list, $returnURL) {
     $filter = "option_group_id = " . self::_getGid();
@@ -306,7 +302,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
       foreach (self::$optionValueFields as $name => $field) {
         if (!isset($values[$name])) {
           $values[$name] = $field['default'];
-          if (isset($field['metric']) && $field['metric']) {
+          if (!empty($field['metric'])) {
             $values[$name] = CRM_Utils_PDF_Utils::convertMetric($field['default'],
               self::$optionValueFields['metric']['default'],
               $values['metric'], 3
@@ -324,11 +320,9 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Save the PDF Page Format in the DB.
    *
-   * @param array (reference) $values associative array of name/value pairs
+   * @param array $values associative array of name/value pairs
    * @param int $id
    *   Id of the database record (null = new record).
-   *
-   * @return void
    */
   public function savePdfFormat(&$values, $id = NULL) {
     // get the Option Group ID for PDF Page Formats (create one if it doesn't exist)

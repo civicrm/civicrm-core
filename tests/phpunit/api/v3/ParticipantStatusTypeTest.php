@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -55,17 +55,17 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
 
   public function testCreateParticipantStatusType() {
     $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
   public function testGetParticipantStatusType() {
     $result = $this->callAPIAndDocument('participant_status_type', 'create', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
 
     $result = $this->callAPIAndDocument('participant_status_type', 'get', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->id = $result['id'];
   }
 
@@ -76,7 +76,7 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('participant_status_type', 'delete', array('id' => $ParticipantStatusType['id']), __FUNCTION__, __FILE__);
     $getCheck = $this->callAPISuccess('ParticipantStatusType', 'GET', array('id' => $ParticipantStatusType['id']));
     $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', array());
-    $this->assertEquals($entity['count'] - 1, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals($entity['count'] - 1, $checkDeleted['count']);
   }
 
 }

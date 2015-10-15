@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -240,7 +240,8 @@ class WebTest_Contribute_UpdateContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("product_name_0");
     $this->select('product_name_0', "value=0");
     // Clicking save.
-    $this->clickLink("_qf_Contribution_upload", "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[7][not(text())]", FALSE);
+    $this->click("_qf_Contribution_upload");
+    $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]//span/a[text()='View']");
 
     //Assertions
     $actualAmount = $this->_getPremiumActualCost($contId, $from, $to, NULL, "'civicrm_contribution'");

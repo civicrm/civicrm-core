@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -38,7 +38,7 @@
  *   Input parameters.
  *
  * @return array
- *   Details of found instances
+ *   API result array
  */
 function civicrm_api3_report_instance_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -50,6 +50,7 @@ function civicrm_api3_report_instance_get($params) {
  * @param array $params
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_report_instance_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -74,7 +75,7 @@ function _civicrm_api3_report_instance_create_spec(&$params) {
  * @param array $params
  *
  * @return array
- *   Api result
+ *   API result array
  */
 function civicrm_api3_report_instance_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

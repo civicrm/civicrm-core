@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
@@ -240,8 +238,10 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   }
 
   /**
+   * Retrieve instance.
+   *
    * @param array $params
-   * @param $defaults
+   * @param array $defaults
    *
    * @return CRM_Report_DAO_ReportInstance|null
    */

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -97,7 +97,9 @@ class CRM_Core_Smarty extends Smarty {
     else {
       $this->template_dir = $config->templateDir;
     }
-    $this->compile_dir = $config->templateCompileDir;
+    $this->compile_dir = CRM_Utils_File::addTrailingSlash(CRM_Utils_File::addTrailingSlash($config->templateCompileDir) . $this->getLocale());
+    CRM_Utils_File::createDir($this->compile_dir);
+    CRM_Utils_File::restrictAccess($this->compile_dir);
 
     // check and ensure it is writable
     // else we sometime suppress errors quietly and this results
@@ -128,11 +130,14 @@ class CRM_Core_Smarty extends Smarty {
       }
     }
 
+    $smartyDir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'packages' . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR;
+    $pluginsDir = __DIR__ . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
+
     if ($customPluginsDir) {
-      $this->plugins_dir = array($customPluginsDir, $config->smartyDir . 'plugins', $config->pluginsDir);
+      $this->plugins_dir = array($customPluginsDir, $smartyDir . 'plugins', $pluginsDir);
     }
     else {
-      $this->plugins_dir = array($config->smartyDir . 'plugins', $config->pluginsDir);
+      $this->plugins_dir = array($smartyDir . 'plugins', $pluginsDir);
     }
 
     // add the session and the config here
@@ -140,20 +145,6 @@ class CRM_Core_Smarty extends Smarty {
 
     $this->assign_by_ref('config', $config);
     $this->assign_by_ref('session', $session);
-
-    // check default editor and assign to template
-    $defaultWysiwygEditor = $session->get('defaultWysiwygEditor');
-    if (!$defaultWysiwygEditor && !CRM_Core_Config::isUpgradeMode()) {
-      $defaultWysiwygEditor = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'editor_id'
-      );
-      // For logged-in users, store it in session to reduce db calls
-      if ($session->get('userID')) {
-        $session->set('defaultWysiwygEditor', $defaultWysiwygEditor);
-      }
-    }
-
-    $this->assign('defaultWysiwygEditor', $defaultWysiwygEditor);
 
     global $tsLocale;
     $this->assign('tsLocale', $tsLocale);
@@ -324,6 +315,20 @@ class CRM_Core_Smarty extends Smarty {
       $this->assign($key, $value);
     }
     return $this;
+  }
+
+  private function getLocale() {
+    global $tsLocale;
+    if (!empty($tsLocale)) {
+      return $tsLocale;
+    }
+
+    $config = CRM_Core_Config::singleton();
+    if (!empty($config->lcMessages)) {
+      return $config->lcMessages;
+    }
+
+    return 'en_US';
   }
 
 }

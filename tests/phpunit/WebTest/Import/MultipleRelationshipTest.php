@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -108,7 +108,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'contact_relationships' =>
         array(
           '4_a_b' => array(
@@ -117,7 +117,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
             'organization_add' => 'Org Street Address',
             'organization_city' => 'Org City',
             'organization_state' => 'NY',
-            'organization_country' => 'United States',
+            'organization_country' => 'UNITED STATES',
           ),
           '7_a_b' => array(
             'household_name' => 'House ' . substr(sha1(rand()), 0, 7),
@@ -125,7 +125,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
             'household_add' => 'House Street Address',
             'household_city' => 'House City',
             'household_state' => 'NY',
-            'household_country' => 'United States',
+            'household_country' => 'UNITED STATES',
           ),
           '2_a_b' => array(
             'spouse_f_name' => substr(sha1(rand()), 0, 7),
@@ -134,7 +134,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
             'spouse_add' => 'Spouse Street Address',
             'spouse_city' => 'Spouse City',
             'spouse_state' => 'NY',
-            'spouse_country' => 'United States',
+            'spouse_country' => 'UNITED STATES',
           ),
         ),
       ),
@@ -148,7 +148,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
         'contact_relationships' =>
         array(
           '4_a_b' => array(
@@ -157,7 +157,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
             'organization_add' => 'Org Street Address',
             'organization_city' => 'Org City',
             'organization_state' => 'NY',
-            'organization_country' => 'United States',
+            'organization_country' => 'UNITED STATES',
           ),
           '7_a_b' => array(
             'household_name' => 'House ' . substr(sha1(rand()), 0, 7),
@@ -165,7 +165,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
             'household_add' => 'House Street Address',
             'household_city' => 'House City',
             'household_state' => 'NY',
-            'household_country' => 'United States',
+            'household_country' => 'UNITED STATES',
           ),
           '2_a_b' => array(
             'spouse_f_name' => substr(sha1(rand()), 0, 7),
@@ -174,7 +174,7 @@ class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase
             'spouse_add' => 'Spouse Street Address',
             'spouse_city' => 'Spouse City',
             'spouse_state' => 'NY',
-            'spouse_country' => 'United States',
+            'spouse_country' => 'UNITED STATES',
           ),
         ),
       ),

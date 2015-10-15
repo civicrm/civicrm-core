@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -97,6 +97,16 @@
       <td class="label">{$form.mode.label}</td>
       <td>{$form.mode.html}</td>
     </tr>
+    {if $multilingual}
+    <tr class="crm-scheduleReminder-form-block-filter-contact-language">
+      <td class="label">{$form.filter_contact_language.label}</td>
+      <td>{$form.filter_contact_language.html} {help id="filter_contact_language"}</td>
+    </tr>
+    <tr class="crm-scheduleReminder-form-block-communication-language">
+      <td class="label">{$form.communication_language.label}</td>
+      <td>{$form.communication_language.html} {help id="communication_language"}</td>
+    </tr>
+    {/if}
     <tr class="crm-scheduleReminder-form-block-active">
       <td class="label"></td>
       <td>{$form.is_active.html}&nbsp;{$form.is_active.label}</td>
@@ -184,17 +194,19 @@
       $('#mode', $form).change(loadMsgBox);
 
       function populateRecipient() {
+        var mappingID = $('#entity_0', $form).val();
         var recipient = $("#recipient", $form).val();
-        if ((recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role') && $('#limit_to').val() != '') {
-          CRM.api3('participant', 'getoptions', {field: recipientMapping[recipient] == 'participant_role' ? 'role_id' : 'status_id', sequential: 1})
-            .done(function(result) {
-              CRM.utils.setOptions($('#recipient_listing', $form), result.values);
-            });
-          $("#recipientList", $form).show();
+        $("#recipientList", $form).hide();
+        if ($('#limit_to').val() != '' ) {
+          $.getJSON(CRM.url('civicrm/ajax/recipientListing'), {mappingID: mappingID, recipientType: recipient},
+            function (result) {
+              if (!CRM._.isEmpty(result.recipients)) {
+                CRM.utils.setOptions($('#recipient_listing', $form), result.recipients);
+                $("#recipientList", $form).show();
+              }
+            }
+          );
         }
-        else {
-          $("#recipientList", $form).hide();
-	}
 
         showHideLimitTo();
       }

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -94,7 +94,7 @@
 <script type="text/javascript">
 CRM.$(function($) {
   // for CRM-11310 and CRM-10635 : processing just parent groups on initial display
-  // passing '1' for parentsOnlyArg to show parent child heirarchy structure display
+  // passing '1' for parentsOnlyArg to show parent child hierarchy structure display
   // on initial load of manage group page and
   // also to handle search filtering for initial load of same page.
   buildGroupSelector(true, 1);

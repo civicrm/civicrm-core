@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -46,7 +46,7 @@ class WebTest_Contact_AddContactsToEventAdvancedSearchTest extends CiviSeleniumT
     $this->waitForElementPresent("xpath=//div[@id='search-status']/table/tbody/tr[2]/td[2]/input[1]");
     $this->click("xpath=//div[@id='search-status']/table/tbody/tr[2]/td[2]/input[1]");
 
-    $this->select('task', "label=Add Contacts to Event");
+    $this->select('task', "label=Register participants for event");
 
     // Select event. Based on label for now.
     $this->waitForElementPresent('event_id');

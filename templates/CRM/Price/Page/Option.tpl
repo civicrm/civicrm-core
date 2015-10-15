@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -54,6 +54,10 @@
           <tr>
             <th>{ts}Option Label{/ts}</th>
             <th>{ts}Option Amount{/ts}</th>
+            {if $isEvent}
+              <th>{ts}Participant Count{/ts}</th>
+              <th>{ts}Maximum{/ts}</th>
+            {/if}
             <th>{ts}Default{/ts}</th>
             <th>{ts}Financial Type{/ts}</th>
             <th>{ts}Order{/ts}</th>
@@ -70,6 +74,10 @@
             <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
               <td class="crm-price-option-label crm-editable" data-field="label">{$row.label}</td>
               <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
+              {if $isEvent}
+                <td class="crm-price-option-count">{$row.count}</td>
+                <td class="crm-price-option-max">{$row.max_value}</td>
+              {/if}
               <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
               <td class="nowrap crm-price-option-order">{$row.weight}</td>
@@ -99,8 +107,8 @@
   {/if}
   {if $addMoreFields && !$isReserved}
     <div class="action-link">
-      {crmButton q="reset=1&action=add&fid=$fid&sid=$sid" icon="circle-plus"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
-      {crmButton p="civicrm/admin/price/field" q="reset=1&sid=$sid" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+      {crmButton q="reset=1&action=add&fid=$fid&sid=$sid" icon="plus-circle"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field" q="reset=1&sid=$sid" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

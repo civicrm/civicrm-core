@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -135,8 +135,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   protected $_ctype = NULL;
 
-  protected $_defaults = NULL;
-
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode
@@ -181,6 +179,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   protected $_currentUserID = NULL;
   protected $_session = NULL;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Profile';
+  }
 
   /**
    * Pre processing work done here.
@@ -320,7 +325,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
             $this->_recordId = NULL;
             $this->set('recordId', NULL);
           }
-          //record id is neccessary for _multiRecord view and update/edit action
+          //record id is necessary for _multiRecord view and update/edit action
           if (!$this->_recordId
             && ($this->_multiRecord == CRM_Core_Action::UPDATE || $this->_multiRecord == CRM_Core_Action::DELETE)
           ) {

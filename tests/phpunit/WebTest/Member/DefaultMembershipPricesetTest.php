@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -81,7 +81,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->assertType('numeric', $cid);
 
     //senario 1
-    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
 
     $this->_testDefaultSenarios("National_Membership_{$title}-section", 2);
     $this->contactInfoFill($firstName, $lastName, $email, $contactParams, $streetAddress);
@@ -90,7 +90,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 2
-    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
     // checking
     $this->checkOptions("National_Membership_{$title}-section", 2);
     // senario 1
@@ -102,7 +102,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 3
-    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
     // checking
     $this->checkOptions("Second_Membership_{$title}-section", 2);
     // senario 2
@@ -114,7 +114,7 @@ class WebTest_Member_DefaultMembershipPricesetTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //senario 4
-    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$membershipContributionPageId}&cid={$cid}&action=preview", "_qf_Main_upload-bottom");
     // checking senario 3
     $this->assertTrue($this->isTextPresent("You have a current Lifetime Membership which does not need to be renewed."));
 

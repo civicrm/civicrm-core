@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,8 +32,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
@@ -58,7 +56,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * Get AngularJS modules and their dependencies
+   * Get AngularJS modules and their dependencies.
    *
    * @return array
    *   list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
@@ -106,11 +104,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
-    // Get past mailings
-    // CRM-16155 - Limit to a reasonable number
+    // Get past mailings.
+    // CRM-16155 - Limit to a reasonable number.
     $civiMails = civicrm_api3('Mailing', 'get', array(
       'is_completed' => 1,
       'mailing_type' => array('IN' => array('standalone', 'winner')),
+      'domain_id' => CRM_Core_Config::domainID(),
       'return' => array('id', 'name', 'scheduled_date'),
       'sequential' => 1,
       'options' => array(
@@ -118,7 +117,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'sort' => 'is_archived asc, scheduled_date desc',
       ),
     ));
-    // Generic params
+    // Generic params.
     $params = array(
       'options' => array('limit' => 0),
       'sequential' => 1,

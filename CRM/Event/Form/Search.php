@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -67,8 +67,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * Prefix for the controller.
    */
   protected $_prefix = "event_";
-
-  protected $_defaults;
 
   /**
    * The saved search ID retrieved from the GET vars.

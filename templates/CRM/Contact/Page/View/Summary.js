@@ -7,19 +7,6 @@
     beforeSubmit: function(arr, $form, options) {
       $form.block();
     },
-    beforeSerialize: function(form, options) {
-      // Copied from crm.ajax.js
-      if (window.CKEDITOR && window.CKEDITOR.instances) {
-        $.each(CKEDITOR.instances, function() {
-          if (this.updateElement) this.updateElement();
-        });
-      }
-      if (window.tinyMCE && tinyMCE.editors) {
-        $.each(tinyMCE.editors, function() {
-          this.save();
-        });
-      }
-    },
     success: requestHandler,
     error: errorHandler
   };

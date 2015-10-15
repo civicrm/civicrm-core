@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 
   /**
    * called when action is browse.
-   *
    */
   public function listPledges() {
     $controller = new CRM_Core_Controller_Simple(
@@ -54,7 +51,7 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
     $controller->process();
     $controller->run();
 
-    //add honor block.
+    // add honor block.
     $honorParams = array();
     $honorParams = CRM_Pledge_BAO_Pledge::getHonorContacts($this->_contactId);
     if (!empty($honorParams)) {
@@ -70,7 +67,6 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
   /**
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
-   *
    */
   public function run() {
     parent::preProcess();

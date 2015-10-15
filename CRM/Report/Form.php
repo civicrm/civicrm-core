@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -89,8 +89,6 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @var array
    */
   protected $_options = array();
-
-  protected $_defaults = array();
 
   /**
    * By default most reports hide contact id.
@@ -382,6 +380,15 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   protected $_createNew;
 
+  /**
+   * SQL being run in this report.
+   *
+   * The sql in the report is stored in this variable in order to be displayed on the developer tab.
+   *
+   * @var string
+   */
+
+  protected $sql;
   /**
    * Class constructor.
    */
@@ -815,6 +822,10 @@ class CRM_Report_Form extends CRM_Core_Form {
               }
             }
             else {
+              if ((CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_INT) && is_array($field['default'])) {
+                $this->_defaults["{$fieldName}_min"] = CRM_Utils_Array::value('min', $field['default']);
+                $this->_defaults["{$fieldName}_max"] = CRM_Utils_Array::value('max', $field['default']);
+              }
               $this->_defaults["{$fieldName}_value"] = $field['default'];
             }
           }
@@ -1004,7 +1015,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             if (!$groupTitle && isset($table['group_title'])) {
               $groupTitle = $table['group_title'];
               // Having a group_title is secret code for being a custom group
-              // which cryptically translates to needing an accordian.
+              // which cryptically translates to needing an accordion.
               // here we make that explicit.
               $colGroups[$tableName]['use_accordian_for_field_selection'] = TRUE;
             }
@@ -1198,6 +1209,35 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * The intent is to add a tab for developers to view the sql.
+   *
+   * Currently using dpm.
+   *
+   * @param string $sql
+   */
+  protected function addToDeveloperTab($sql) {
+    if (!CRM_Core_Permission::check('view report sql')) {
+      return;
+    }
+    $this->tabs['Developer'] = array(
+      'title' => ts('Developer'),
+      'tpl' => 'Developer',
+      'div_label' => 'set-developer',
+    );
+
+    $this->assignTabs();
+    foreach (array('LEFT JOIN') as $term) {
+      $sql = str_replace($term, '<br>&nbsp&nbsp' . $term, $sql);
+    }
+    foreach (array('FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';') as $term) {
+      $sql = str_replace($term, '<br><br>' . $term, $sql);
+    }
+    $this->sql .= $sql . "<br>";
+
+    $this->assign('sql', $this->sql);
+  }
+
+  /**
    * Add options defined in $this->_options to the report.
    */
   public function addOptions() {
@@ -1369,7 +1409,9 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->addElement('submit', $this->_csvButtonName, $label);
     }
 
-    if (CRM_Core_Permission::check('administer Reports') &&
+    // CRM-16274 Determine if user has 'edit all contacts' or equivalent
+    $permission = CRM_Core_Permission::getPermission();
+    if ($permission == CRM_Core_Permission::EDIT &&
       $this->_add2groupSupported
     ) {
       $this->addElement('select', 'groups', ts('Group'),
@@ -1740,9 +1782,14 @@ class CRM_Report_Form extends CRM_Core_Form {
         // mhas == multiple has
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
+          foreach ($value as $key => $val) {
+            $val = str_replace('(', '[[.left-parenthesis.]]', $val);
+            $val = str_replace(')', '[[.right-parenthesis.]]', $val);
+            $value[$key] = $val;
+          }
+          $sp = CRM_Core_DAO::VALUE_SEPARATOR;
           $clause
-            = "{$field['dbAlias']} REGEXP '[[:cntrl:]]" . implode('|', $value) .
-            "[[:cntrl:]]'";
+            = "{$field['dbAlias']} REGEXP '$sp" . implode("$sp|$sp", $value) . "$sp'";
         }
         break;
 
@@ -1750,9 +1797,15 @@ class CRM_Report_Form extends CRM_Core_Form {
         // mnot == multiple is not one of
         if ($value !== NULL && count($value) > 0) {
           $sqlOP = $this->getSQLOperator($op);
+          foreach ($value as $key => $val) {
+            $val = str_replace('(', '[[.left-parenthesis.]]', $val);
+            $val = str_replace(')', '[[.right-parenthesis.]]', $val);
+            $value[$key] = $val;
+          }
+          $sp = CRM_Core_DAO::VALUE_SEPARATOR;
           $clause
-            = "( {$field['dbAlias']} NOT REGEXP '[[:cntrl:]]" . implode('|', $value) .
-            "[[:cntrl:]]' OR {$field['dbAlias']} IS NULL )";
+            = "( {$field['dbAlias']} NOT REGEXP '$sp" . implode("$sp|$sp", $value) .
+            "$sp' OR {$field['dbAlias']} IS NULL )";
         }
         break;
 
@@ -2675,6 +2728,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);
 
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+    $this->addToDeveloperTab($sql);
     return $sql;
   }
 
@@ -3196,7 +3250,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           //Load the image
           $chart = imagecreatefrompng($uploadUrl);
           //convert it into formatted png
-          header('Content-type: image/png');
+          CRM_Utils_System::setHttpHeader('Content-type', 'image/png');
           //overwrite with same image
           imagepng($chart, $uploadImg);
           //delete the object
@@ -3420,7 +3474,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
     $clause = "{$field['dbAlias']} IN (" . implode(', ', $value) . ")";
 
-    return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
+    $contactAlias = $this->_aliases['civicrm_contact'];
+    if (!empty($this->relationType) && $this->relationType == 'b_a') {
+      $contactAlias = $this->_aliases['civicrm_contact_b'];
+    }
+    return " {$contactAlias}.id {$sqlOp} (
                           SELECT DISTINCT {$this->_aliases['civicrm_group']}.contact_id
                           FROM civicrm_group_contact {$this->_aliases['civicrm_group']}
                           WHERE {$clause} AND {$this->_aliases['civicrm_group']}.status = 'Added'
@@ -4386,7 +4444,15 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   public function add2group($groupID) {
     if (is_numeric($groupID) && isset($this->_aliases['civicrm_contact'])) {
       $select = "SELECT DISTINCT {$this->_aliases['civicrm_contact']}.id AS addtogroup_contact_id, ";
-      $select = str_ireplace('SELECT SQL_CALC_FOUND_ROWS ', $select, $this->_select);
+
+      // here are we are prepending / adding  contact id field that could be used for adding group
+      // so first check for "SELECT SQL_CALC_FOUND_ROWS" and if does not exist replace "SELECT"
+      if (preg_match('/^SELECT SQL_CALC_FOUND_ROWS/', $this->_select)) {
+        $select = str_ireplace('SELECT SQL_CALC_FOUND_ROWS ', $select, $this->_select);
+      }
+      else {
+        $select = str_ireplace('SELECT ', $select, $this->_select);
+      }
 
       $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy}";
       $sql = str_replace('WITH ROLLUP', '', $sql);
@@ -4485,6 +4551,53 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $row["{$tablePrefix}_{$fieldName}_hover"] = ts("%1 for this %2.",
       array(1 => $linkText, 2 => $fieldLabel)
     );
+  }
+
+  /**
+   * Generate temporary table to hold all contributions with permissioned FTs.
+   *
+   * @param object $query
+   * @param string $alias
+   * @param bool $return
+   */
+  public function getPermissionedFTQuery(&$query, $alias = NULL, $return = FALSE) {
+    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      return FALSE;
+    }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    if (empty($financialTypes)) {
+      $contFTs = "0";
+      $liFTs = implode(',', array_keys(CRM_Contribute_Pseudoconstant::financialType()));
+    }
+    else {
+      $contFTs = $liFTs = implode(',', array_keys($financialTypes));
+    }
+    if ($alias) {
+      $temp = CRM_Utils_Array::value('civicrm_line_item', $query->_aliases);
+      $query->_aliases['civicrm_line_item'] = $alias;
+    }
+    if (empty($query->_where)) {
+      $query->_where = "WHERE {$query->_aliases['civicrm_contribution']}.id IS NOT NULL ";
+    }
+    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
+    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from} 
+              LEFT JOIN civicrm_line_item   {$query->_aliases['civicrm_line_item']}
+                      ON {$query->_aliases['civicrm_contribution']}.id = {$query->_aliases['civicrm_line_item']}.contribution_id AND
+                         {$query->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution' 
+                      AND {$query->_aliases['civicrm_line_item']}.financial_type_id NOT IN (" . $liFTs . ") 
+              {$query->_where} 
+                      AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ") 
+                      AND {$query->_aliases['civicrm_line_item']}.id IS NULL
+              GROUP BY {$query->_aliases['civicrm_contribution']}.id";
+    CRM_Core_DAO::executeQuery($sql);
+    if (isset($temp)) {
+      $query->_aliases['civicrm_line_item'] = $temp;
+    }
+    $from = " INNER JOIN civicrm_contribution_temp temp ON {$query->_aliases['civicrm_contribution']}.id = temp.id ";
+    if ($return) {
+      return $from;
+    }
+    $query->_from .= $from;
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -66,7 +66,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
       'id' => $this->batchCreate(),
     );
     $result = $this->callAPIAndDocument('batch', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals($params['id'], $result['id'], 'In line ' . __LINE__);
+    $this->assertEquals($params['id'], $result['id']);
   }
 
   /**
@@ -83,7 +83,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('batch', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'In line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $this->getAndCheck($params, $result['id'], $this->_entity);
   }
 
@@ -101,7 +101,7 @@ class api_v3_BatchTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIAndDocument('batch', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'In line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $this->getAndCheck($params, $result['id'], $this->_entity);
   }
 

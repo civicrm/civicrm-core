@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -502,7 +502,7 @@ class CRM_Core_Menu {
     while ($newPath = array_shift($pathElements)) {
       $currentPath = $currentPath ? ($currentPath . '/' . $newPath) : $newPath;
 
-      // when we come accross breadcrumb which involves ids,
+      // when we come across breadcrumb which involves ids,
       // we should skip now and later on append dynamically.
       if (isset($menu[$currentPath]['skipBreadcrumb'])) {
         continue;

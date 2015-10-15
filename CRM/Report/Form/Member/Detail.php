@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -222,7 +222,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         ),
         'order_bys' => array(
           'receive_date' => array(
-            'title' => ts('Receive Date'),
+            'title' => ts('Date Received'),
             'default_weight' => '2',
             'default_order' => 'DESC',
           ),

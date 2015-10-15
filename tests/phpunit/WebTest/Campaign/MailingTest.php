@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -58,6 +58,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     // We're using Quick Add block on the main page for this.
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Smith", "$firstName.smith@example.org");
+    $this->_contactNames = array("$firstName.smith@example.org" => "Smith, $firstName");
 
     // add contact to group
     // visit group tab
@@ -107,6 +108,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     //---- create mailing contact and add to mailing Group
     $firstName = substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, "Mailson", "mailino$firstName@mailson.co.in");
+    $this->_contactNames["mailino$firstName@mailson.co.in"] = "Mailson, $firstName";
 
     // go to group tab and add to mailing group
     $this->click("css=li#tab_group a");
@@ -259,6 +261,23 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     // verify email
     $this->assertElementContainsText('mailing_event', "mailino$firstName@mailson.co.in");
     //------end delivery verification---------
+
+    // Search Advanced Search for contacts associated with Campaign in the Mailings Tab.
+    $this->mailingCampaignAdvancedSearchTest($campaignTitle, $this->_contactNames);
+  }
+
+  public function mailingCampaignAdvancedSearchTest($campaignTitle, $contactNames) {
+    // Go directly to Advanced Search
+    $this->openCiviPage('contact/search/advanced', 'reset=1');
+
+    // Select the Mailing Tab
+    $this->clickAjaxLink("CiviMail", 'campaigns');
+    $this->multiselect2("campaigns", array("$campaignTitle"));
+    $this->click("_qf_Advanced_refresh");
+
+    // Check for contacts inserted while adding Campaing and Mailing
+    $this->waitForElementPresent('search-status');
+    $this->assertElementContainsText('search-status', '2 Contacts');
   }
 
 }

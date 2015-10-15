@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,10 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
-class CRM_Utils_Cache_APCcache {
+class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX = '';
 

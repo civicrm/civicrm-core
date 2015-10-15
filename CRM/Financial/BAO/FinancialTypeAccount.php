@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -114,7 +114,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id');
     //check dependencies
     // FIXME more table containing financial_type_id to come
-    $dependancy = array(
+    $dependency = array(
       array('Contribute', 'Contribution'),
       array('Contribute', 'ContributionPage'),
       array('Member', 'MembershipType'),
@@ -125,7 +125,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       array('Price', 'LineItem'),
     );
 
-    foreach ($dependancy as $name) {
+    foreach ($dependency as $name) {
       $daoString = 'CRM_' . $name[0] . '_DAO_' . $name[1];
       $dao = new $daoString();
       $dao->financial_type_id = $financialTypeId;
@@ -225,8 +225,9 @@ WHERE cog.name = 'payment_instrument' ";
    */
   public static function createDefaultFinancialAccounts($financialType) {
     $titles = array();
-    $financialAccountTypeID = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
-    $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
+    $financialAccountTypeID = CRM_Core_OptionGroup::values('financial_account_type', FALSE, FALSE, FALSE, NULL, 'name');
+    $accountRelationship    = CRM_Core_OptionGroup::values('account_relationship', FALSE, FALSE, FALSE, NULL, 'name');
+
     $relationships = array(
       array_search('Accounts Receivable Account is', $accountRelationship) => array_search('Asset', $financialAccountTypeID),
       array_search('Expense Account is', $accountRelationship) => array_search('Expenses', $financialAccountTypeID),

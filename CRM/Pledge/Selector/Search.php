@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
@@ -55,6 +54,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
 
   /**
    * Properties of contact we're interested in displaying
+   *
    * @var array
    */
   static $_properties = array(
@@ -294,10 +294,10 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
       FALSE, FALSE, FALSE, NULL, 'name', FALSE
     );
 
-    //get all campaigns.
+    // get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
-    //4418 check for view, edit and delete
+    // CRM-4418 check for view, edit and delete
     $permissions = array(CRM_Core_Permission::VIEW);
     if (CRM_Core_Permission::check('edit pledges')) {
       $permissions[] = CRM_Core_Permission::EDIT;
@@ -316,7 +316,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         }
       }
 
-      //carry campaign on selectors.
+      // carry campaign on selectors.
       $row['campaign'] = CRM_Utils_Array::value($result->pledge_campaign_id, $allCampaigns);
       $row['campaign_id'] = $result->pledge_campaign_id;
 

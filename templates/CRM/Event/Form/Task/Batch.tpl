@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -42,7 +42,6 @@
     {/if}
     <p>{ts}Click <strong>Update Participant(s)</strong> below to save all your changes.{/ts}</p>
 </div>
-    <legend>{$profileTitle}</legend>
         <table class="crm-copy-fields">
        <thead class="sticky">
             <tr class="columnheader">

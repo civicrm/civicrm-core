@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This is class to handle address related functions
+ * This is class to handle address related functions.
  */
 class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
@@ -64,7 +62,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     if (!$entity) {
       $contactId = $params['contact_id'];
       //get all the addresses for this contact
-      $addresses = self::allAddress($contactId, $updateBlankLocInfo);
+      $addresses = self::allAddress($contactId);
     }
     else {
       // get all address from location block
@@ -84,15 +82,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       $addressExists = self::dataExists($value);
       if (empty($value['id'])) {
-        if ($updateBlankLocInfo) {
-          if ((!empty($addresses) || !$addressExists) && array_key_exists($key, $addresses)) {
-            $value['id'] = $addresses[$key];
-          }
-        }
-        else {
-          if (!empty($addresses) && array_key_exists(CRM_Utils_Array::value('location_type_id', $value), $addresses)) {
-            $value['id'] = $addresses[CRM_Utils_Array::value('location_type_id', $value)];
-          }
+        if (!empty($addresses) && array_key_exists(CRM_Utils_Array::value('location_type_id', $value), $addresses)) {
+          $value['id'] = $addresses[CRM_Utils_Array::value('location_type_id', $value)];
         }
       }
 
@@ -170,7 +161,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       }
       if (!empty($customFields)) {
         $addressCustom = CRM_Core_BAO_CustomField::postProcess($params,
-          $customFields,
           $address->id,
           'Address',
           TRUE
@@ -201,12 +191,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return void
    */
   public static function fixAddress(&$params) {
     if (!empty($params['billing_street_address'])) {
-      //Check address is comming from online contribution / registration page
+      //Check address is coming from online contribution / registration page
       //Fixed :CRM-5076
       $billing = array(
         'street_address' => 'billing_street_address',
@@ -560,11 +548,10 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   }
 
   /**
-   * Add the formatted address to $this-> display
+   * Add the formatted address to $this-> display.
    *
    * @param bool $microformat
-   *
-   * @return void
+   *   Unexplained parameter that I've always wondered about.
    */
   public function addDisplay($microformat = FALSE) {
     $fields = array(
@@ -1006,8 +993,6 @@ SELECT is_primary,
    *   Address id.
    * @param array $params
    *   Associated array of address params.
-   *
-   * @return void
    */
   public static function processSharedAddress($addressId, $params) {
     $query = 'SELECT id FROM civicrm_address WHERE master_id = %1';
@@ -1111,8 +1096,6 @@ SELECT is_primary,
    *   Master address id.
    * @param array $params
    *   Associated array of submitted values.
-   *
-   * @return void
    */
   public static function processSharedAddressRelationship($masterAddressId, $params) {
     // get the contact type of contact being edited / created
@@ -1299,6 +1282,8 @@ SELECT is_primary,
 
       // Not a real field in this entity
       case 'world_region':
+      case 'worldregion':
+      case 'worldregion_id':
         return CRM_Core_PseudoConstant::worldRegion();
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);

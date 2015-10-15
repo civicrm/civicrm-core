@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -193,7 +193,7 @@ LIMIT 1;";
    *   Id of the entity usually the contactID.
    *
    * @return array
-   *   array of catagory id's the contact belongs to.
+   *   array of category id's the contact belongs to.
    *
    */
   public static function getFinancialTrxnTotal($entity_id) {
@@ -269,7 +269,7 @@ WHERE  ef2.financial_trxn_id =%1
    *   Name of the entity table usually 'civicrm_contact'.
    *
    * @return array
-   *   array of catagory id's the contact belongs to.
+   *   array of category id's the contact belongs to.
    *
    */
   public static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
@@ -314,6 +314,13 @@ WHERE ceft.entity_id = %1";
   /**
    * Create financial transaction for premium.
    *
+   * @param array $params
+   *   - oldPremium
+   *   - financial_type_id
+   *   - contributionId
+   *   - isDeleted
+   *   - cost
+   *   - currency
    */
   public static function createPremiumTrxn($params) {
     if ((empty($params['financial_type_id']) || empty($params['contributionId'])) && empty($params['oldPremium'])) {

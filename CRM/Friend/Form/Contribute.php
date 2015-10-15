@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -58,9 +58,6 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @return void
    */
   public function setDefaultValues() {
-    $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-    CRM_Utils_System::setTitle(ts('Tell a Friend') . " ($title)");
-
     $defaults = array();
 
     if (isset($this->_id)) {

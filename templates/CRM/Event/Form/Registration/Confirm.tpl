@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -201,7 +201,7 @@
                     <td class="description">{ts}Click the Google Checkout button to continue.{/ts}</td>
                   </tr>
                   <tr>
-                    <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span></td>
+                    <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">{ts}Checkout securely. Pay without sharing your financial information.{/ts}</span></td>
                   </tr>
                 </table>
             </div>

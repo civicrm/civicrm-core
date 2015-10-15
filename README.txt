@@ -29,6 +29,9 @@ website:
 
 https://civicrm.org/download
 
+Installation instruction can be found on the wiki:
+http://wiki.civicrm.org/
+
 
 *************************
 3. Documentation
@@ -36,8 +39,8 @@ https://civicrm.org/download
 Documentation, as well as the project bug tracker and mailing lists,
 can be found at https://civicrm.org/ Just click on the appropriate link.
 
-Our main documentation site is the wiki at http://wiki.civicrm.org/
-- particularly http://docs.civicrm.org/
+Our main documentation site is the CiviCRM wiki:
+http://wiki.civicrm.org/
 
 
 *************************

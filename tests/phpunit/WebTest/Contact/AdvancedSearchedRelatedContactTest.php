@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
@@ -92,10 +92,10 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->openCiviPage('contact/search', 'reset=1', '_qf_Basic_refresh');
     $this->type("sort_name", $sortName);
     $this->select("contact_type", "value=Individual");
-    $this->clickLink("_qf_Basic_refresh", "xpath=//form[@id='Basic']/div[3]/div/div[2]/table/tbody/tr/");
+    $this->clickLink("_qf_Basic_refresh", "xpath=//form[@id='Basic']//div/div//div/table/tbody/tr/");
 
     // click through to the Relationship view screen
-    $this->click("xpath=//form[@id='Basic']/div[3]/div/div[2]/table/tbody/tr/td[11]/span/a[text()='View']");
+    $this->click("xpath=//form[@id='Basic']//div/div//div/table/tbody/tr/td[11]/span/a[text()='View']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=li#tab_participant a");
 
@@ -125,7 +125,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->waitForElementPresent('search-status');
     $this->assertElementContainsText('search-status', '2 Contact');
 
-    $this->select("task", "label=Add Contacts to Group");
+    $this->select("task", "label=Group - add contacts");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -184,7 +184,7 @@ class WebTest_Contact_AdvancedSearchedRelatedContactTest extends CiviSeleniumTes
     $this->type("address_1_street_address", $streetAddress);
     $this->type("address_1_city", "San Francisco");
     $this->type("address_1_postal_code", "94117");
-    $this->select('address_1_country_id', 'United States');
+    $this->select('address_1_country_id', 'UNITED STATES');
     $this->select("address_1_state_province_id", "value=1004");
     $this->type("email_1_email", "info@civicrm.org");
 

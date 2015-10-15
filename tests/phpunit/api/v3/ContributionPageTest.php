@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -150,6 +150,54 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test process with instant payment when more than one configured for the page.
+   *
+   * CRM-16923
+   */
+  public function testSubmitRecurMultiProcessorInstantPayment() {
+    $this->setUpContributionPage();
+    $this->setupPaymentProcessor();
+    $paymentProcessor2ID = $this->paymentProcessorCreate(array(
+      'payment_processor_type_id' => 'Dummy',
+      'name' => 'processor 2',
+      'class_name' => 'Payment_Dummy',
+      'billing_mode' => 1,
+    ));
+    $dummyPP = Civi\Payment\System::singleton()->getById($paymentProcessor2ID);
+    $dummyPP->setDoDirectPaymentResult(array(
+      'payment_status_id' => 1,
+      'trxn_id' => 'create_first_success',
+      'fee_amount' => .85,
+    ));
+    $this->callAPISuccess('ContributionPage', 'create', array(
+      'id' => $this->_ids['contribution_page'],
+      'payment_processor' => array($paymentProcessor2ID, $this->_ids['payment_processor']),
+    ));
+
+    $priceFieldID = reset($this->_ids['price_field']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
+    $submitParams = array(
+      'price_' . $priceFieldID => $priceFieldValueID,
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'is_recur' => 1,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $paymentProcessor2ID,
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 1,
+    ));
+    $this->assertEquals('create_first_success', $contribution['trxn_id']);
+    $this->assertEquals(10, $contribution['total_amount']);
+    $this->assertEquals(.85, $contribution['fee_amount']);
+    $this->assertEquals(9.15, $contribution['net_amount']);
+  }
+
+  /**
    * Test submit with a membership block in place.
    */
   public function testSubmitMembershipBlockNotSeparatePayment() {
@@ -225,9 +273,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * We are expecting a separate payment for the membership vs the contribution.
    */
-  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessor() {
+  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow() {
     $this->setUpMembershipContributionPage(TRUE);
+    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
+    $processor->setDoDirectPaymentResult(array('fee_amount' => .72));
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
@@ -236,7 +288,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor' => 1,
+      'payment_processor_id' => $this->_paymentProcessor['id'],
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
@@ -253,6 +305,45 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+    foreach ($contributions['values'] as $contribution) {
+      $this->assertEquals(.72, $contribution['fee_amount']);
+      $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
+    }
+  }
+
+  /**
+   * Test that when a transaction fails the pending contribution remains.
+   *
+   * An activity should also be created. CRM-16417.
+   */
+  public function testSubmitPaymentProcessorFailure() {
+    $this->setUpContributionPage();
+    $this->setupPaymentProcessor();
+    $this->createLoggedInUser();
+    $priceFieldID = reset($this->_ids['price_field']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
+    $submitParams = array(
+      'price_' . $priceFieldID => $priceFieldValueID,
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'payment_processor_id' => 1,
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2008),
+      'cvv2' => 123,
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 2,
+    ));
+
+    $this->callAPISuccessGetSingle('activity', array(
+      'source_record_id' => $contribution['id'],
+      'activity_type_id' => 'Failed Payment',
+    ));
+
   }
 
   /**
@@ -264,10 +355,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment() {
     $this->params['is_recur'] = 1;
-    $var = array();
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
-    $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
 
     $submitParams = array(
@@ -279,7 +369,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
       'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor' => 1,
+      'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
@@ -294,6 +384,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
     ));
+
+    $this->assertEquals('create_first_success', $contribution['trxn_id']);
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
@@ -318,72 +410,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit recurring membership with immediate confirmation (IATS style).
-   *
-   * Per CRM-16737 we are deprecating the use of contribution_status_id to indicate success in favour of
-   * payment_status_id.
-   *
-   * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
-   * processor (IATS style - denoted by returning trxn_id)
-   * - the first creates a new membership, completed contribution, in progress recurring. Check these
-   * - create another - end date should be extended
-   */
-  public function testLegacySubmitMembershipPriceSetPaymentPaymentProcessorRecur() {
-    $this->params['is_recur'] = 1;
-    $var = array();
-    $this->params['recur_frequency_unit'] = 'month';
-    $this->setUpMembershipContributionPage();
-    $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_first_success'));
-
-    $submitParams = array(
-      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
-      'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruff',
-      'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor' => 1,
-      'credit_card_number' => '4111111111111111',
-      'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
-      'cvv2' => 123,
-      'is_recur' => 1,
-      'frequency_interval' => 1,
-      'frequency_unit' => 'month',
-    );
-
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
-      'contribution_page_id' => $this->_ids['contribution_page'],
-      'contribution_status_id' => 1,
-    ));
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
-    $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
-    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
-    $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
-    $this->assertEquals(1, $membership['status_id']);
-    $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
-    //@todo - check with Joe about these not existing
-    //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
-    //renew it with processor setting completed - should extend membership
-    $submitParams['contact_id'] = $contribution['contact_id'];
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 1, 'trxn_id' => 'create_second_success'));
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $this->callAPISuccess('contribution', 'getsingle', array(
-      'id' => array('NOT IN' => array($contribution['id'])),
-      'contribution_page_id' => $this->_ids['contribution_page'],
-      'contribution_status_id' => 1,
-    ));
-    $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
-    $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
-    $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
-    $this->assertEquals(2, $recurringContribution['contribution_status_id']);
-  }
-
-  /**
    * Test submit recurring membership with delayed confirmation (Authorize.net style)
    * - we process 2 membership transactions against with a recurring contribution against a contribution page with a delayed
    * processor (Authorize.net style - denoted by NOT returning trxn_id)
@@ -395,7 +421,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->params['is_recur'] = 1;
     $this->params['recur_frequency_unit'] = 'month';
     $this->setUpMembershipContributionPage();
-    $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
+    $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
 
     $submitParams = array(
@@ -407,7 +433,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
       'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor' => 1,
+      'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
@@ -432,6 +458,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'completetransaction', array(
       'id' => $contribution['id'],
       'trxn_id' => 'ipn_called',
+      'payment_processor_id' => $this->_paymentProcessor['id'],
     ));
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership
@@ -443,87 +470,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       )
     );
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $newContribution = $this->callAPISuccess('contribution', 'getsingle', array(
-        'id' => array(
-          'NOT IN' => array($contribution['id']),
-        ),
-        'contribution_page_id' => $this->_ids['contribution_page'],
-        'contribution_status_id' => 2,
-      )
-    );
-
-    $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
-    //no renewal as the date hasn't changed
-    $this->assertEquals($membership['end_date'], $renewedMembership['end_date']);
-    $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $newContribution['contribution_recur_id']));
-    $this->assertEquals(2, $recurringContribution['contribution_status_id']);
-  }
-
-  /**
-   * Test submit recurring membership with delayed confirmation (Authorize.net style)
-   * - we process 2 membership transactions against with a recurring contribution against a contribution page with a delayed
-   * processor (Authorize.net style - denoted by NOT returning trxn_id)
-   *
-   * Per CRM-16737 we are deprecating the use of contribution_status_id to indicate success in favour of
-   * payment_status_id.
-   *
-   * - the first creates a pending membership, pending contribution, pending recurring. Check these
-   * - complete the transaction
-   * - create another - end date should NOT be extended
-   */
-  public function testLegacySubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed() {
-    $this->params['is_recur'] = 1;
-    $this->params['recur_frequency_unit'] = 'month';
-    $this->setUpMembershipContributionPage();
-    $dummyPP = CRM_Core_Payment::singleton('live', $this->_paymentProcessor);
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2));
-
-    $submitParams = array(
-      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
-      'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruff',
-      'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->_ids['membership_type'],
-      'payment_processor' => 1,
-      'credit_card_number' => '4111111111111111',
-      'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
-      'cvv2' => 123,
-      'is_recur' => 1,
-      'frequency_interval' => 1,
-      'frequency_unit' => 'month',
-    );
-
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
-      'contribution_page_id' => $this->_ids['contribution_page'],
-      'contribution_status_id' => 2,
-    ));
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', array());
-    $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
-    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
-    $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
-    $this->assertEquals(5, $membership['status_id']);
-    //@todo - check with Joe about these not existing
-    //$this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
-    $this->callAPISuccess('contribution', 'completetransaction', array(
-      'id' => $contribution['id'],
-      'trxn_id' => 'ipn_called',
-    ));
-    $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
-    //renew it with processor setting completed - should extend membership
-    $submitParams = array_merge($submitParams, array(
-        'contact_id' => $contribution['contact_id'],
-        'is_recur' => 1,
-        'frequency_interval' => 1,
-        'frequency_unit' => 'month',
-      )
-    );
-    $dummyPP->setDoDirectPaymentResult(array('contribution_status_id' => 2));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $newContribution = $this->callAPISuccess('contribution', 'getsingle', array(
         'id' => array(
@@ -547,12 +493,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function setUpMembershipContributionPage($isSeparatePayment = FALSE) {
     $this->setUpMembershipBlockPriceSet();
-    $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate(array(
-      'payment_processor_type_id' => 'Dummy',
-      'class_name' => 'Payment_Dummy',
-      'billing_mode' => 1,
-    ));
-    $this->_paymentProcessor = $this->callAPISuccess('payment_processor', 'getsingle', array('id' => $this->params['payment_processor_id']));
+    $this->setupPaymentProcessor();
     $this->setUpContributionPage();
 
     $this->callAPISuccess('membership_block', 'create', array(
@@ -590,7 +531,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'name' => 'membership_amount',
         'label' => 'Membership Amount',
         'amount' => 1,
-        'financial_type_id' => 1,
+        'financial_type_id' => 'Donation',
         'format.only_id' => TRUE,
         'membership_type_id' => $membershipTypeID,
         'price_field_id' => $priceField['id'],
@@ -624,14 +565,18 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'price_set_id' => $priceSetID,
           'price_field_id' => $priceField['id'],
           'label' => 'Long Haired Goat',
+          'financial_type_id' => 'Donation',
           'amount' => 20,
+          'financial_type_id' => 'Donation',
         )
       );
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
           'price_set_id' => $priceSetID,
           'price_field_id' => $priceField['id'],
           'label' => 'Shoe-eating Goat',
+          'financial_type_id' => 'Donation',
           'amount' => 10,
+          'financial_type_id' => 'Donation',
         )
       );
       $this->_ids['price_field_value'] = array($priceFieldValue['id']);
@@ -652,6 +597,18 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     );
     $unitTest = new CiviUnitTestCase();
     $unitTest->quickCleanup($tablesToTruncate);
+  }
+
+  /**
+   * Create a payment processor instance.
+   */
+  protected function setupPaymentProcessor() {
+    $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate(array(
+      'payment_processor_type_id' => 'Dummy',
+      'class_name' => 'Payment_Dummy',
+      'billing_mode' => 1,
+    ));
+    $this->_paymentProcessor = $this->callAPISuccess('payment_processor', 'getsingle', array('id' => $this->params['payment_processor_id']));
   }
 
 }

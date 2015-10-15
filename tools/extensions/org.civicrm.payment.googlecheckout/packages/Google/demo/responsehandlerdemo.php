@@ -83,7 +83,7 @@ $status = $response->HttpAuthentication($headers);
 /* Commands to send the various order processing APIs
    * Send charge order : $response->SendChargeOrder($data[$root]
    *    ['google-order-number']['VALUE'], <amount>, $message_log);
-   * Send proces order : $response->SendProcessOrder($data[$root]
+   * Send process order : $response->SendProcessOrder($data[$root]
    *    ['google-order-number']['VALUE'], $message_log);
    * Send deliver order: $response->SendDeliverOrder($data[$root]
    *    ['google-order-number']['VALUE'], <carrier>, <tracking-number>,

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -107,7 +107,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $params['id'] = $customField['id'];
     $customField = $this->callAPISuccess('custom_field', 'create', $params);
 
-    $this->assertNotNull($customField['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($customField['id']);
   }
 
   /**
@@ -407,14 +407,14 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   public function testCustomFieldDelete() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group'));
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id']));
-    $this->assertNotNull($customField['id'], 'in line ' . __LINE__);
+    $this->assertNotNull($customField['id']);
 
     $params = array(
       'id' => $customField['id'],
     );
     $result = $this->callAPIAndDocument('custom_field', 'delete', $params, __FUNCTION__, __FILE__);
 
-    $this->assertAPISuccess($result, 'in line ' . __LINE__);
+    $this->assertAPISuccess($result);
   }
 
   /**

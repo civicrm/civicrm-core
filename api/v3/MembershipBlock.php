@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -38,7 +38,7 @@
  *   An associative array of name/value property values of MembershipBlock.
  *
  * @return array
- *   newly created or updated membership block property values.
+ *   API result array
  */
 function civicrm_api3_membership_block_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -68,7 +68,7 @@ function _civicrm_api3_membership_block_create_spec(&$params) {
  * {getfields MembershipBlock_get}
  *
  * @return array
- *   api result array of all found membership block property values.
+ *   API result array
  */
 function civicrm_api3_membership_block_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -83,7 +83,7 @@ function civicrm_api3_membership_block_get($params) {
  * @param array $params
  *
  * @return array
- *   api result array
+ *   API result array
  */
 function civicrm_api3_membership_block_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

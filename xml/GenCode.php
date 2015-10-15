@@ -19,6 +19,7 @@ if ($memLimit >= 0 and $memLimit < 536870912) {
 date_default_timezone_set('UTC'); // avoid php warnings if timezone is not set - CRM-10844
 
 define('CIVICRM_UF', 'Drupal');
+define('CIVICRM_UF_BASEURL', '/');
 
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();

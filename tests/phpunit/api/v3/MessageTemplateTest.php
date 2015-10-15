@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -74,8 +74,8 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
    */
   public function testGet() {
     $result = $this->callAPIAndDocument('MessageTemplate', 'get', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
   /**
@@ -87,7 +87,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', array(
       'id' => $entity['id'],
     ));
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $checkDeleted['count']);
   }
 
 }

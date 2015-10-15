@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,17 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to save a search
+ * This class provides the functionality to save a search.
+ *
  * Saved Searches are used for saving frequently used queries
  */
 class CRM_Contact_Form_Task_HookSample extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -72,10 +69,7 @@ AND    c.id IN ( $contactIDs )";
   }
 
   /**
-   * Build the form object - it consists of
-   *
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     $this->addDefaultButtons(ts('Back to Search'), 'done');
@@ -83,9 +77,6 @@ AND    c.id IN ( $contactIDs )";
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
   }

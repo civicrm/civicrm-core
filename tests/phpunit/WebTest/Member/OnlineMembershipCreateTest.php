@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
@@ -124,7 +124,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
 
     //Find Member
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
-
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->type("sort_name", "$lastName $firstName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='memberSearch']/table/tbody/tr");
     $this->click("xpath=//div[@id='memberSearch']/table/tbody/tr/td[11]/span/a[text()='View']");
@@ -148,7 +148,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     // Click View action link on associated contribution record
     $this->waitForElementPresent("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[1][text()='View']");
     $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[1][text()='View']");
-    $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']/button[3]/span[2]");
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
     //View Contribution Record
     $verifyData = array(
       'From' => $firstName . ' ' . $lastName,
@@ -192,6 +192,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName $firstName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->click("_qf_Search_refresh");
 
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -209,7 +210,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
    */
   public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE, $amountSection = TRUE, $freeMembership = FALSE) {
     //Open Live Contribution Page
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
     // Select membership type 1
     $this->waitForElementPresent("xpath=//div[@class='crm-section membership_amount-section']/div[2]//span/label");
     if ($memTypeId != 'No thank you') {
@@ -343,6 +344,7 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
 
     $this->type("sort_name", "$lastName $firstName");
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 

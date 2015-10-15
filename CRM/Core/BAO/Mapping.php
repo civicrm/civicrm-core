@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
@@ -255,8 +253,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $blockCount
    *   (no of blocks shown).
    * @param NULL $exportMode
-   *
-   * @return void
    */
   public static function buildMappingForm(&$form, $mappingType = 'Export', $mappingId = NULL, $columnNo, $blockCount = 3, $exportMode = NULL) {
     if ($mappingType == 'Export') {
@@ -319,7 +315,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     $contactType = array('Individual', 'Household', 'Organization');
     foreach ($contactType as $value) {
-      $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required);
+      if ($mappingType == 'Search Builder') {
+        // get multiple custom group fields in this context
+        $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required, FALSE, TRUE);
+      }
+      else {
+        $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, $required);
+      }
       $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
 
       // exclude the address options disabled in the Address Settings
@@ -396,9 +398,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT)) {
       if (CRM_Core_Permission::access('CiviContribute')) {
         $fields['Contribution'] = CRM_Contribute_BAO_Contribution::exportableFields();
-        foreach (array('contribution_contact_id', 'contribution_soft_credit_name', 'contribution_soft_credit_amount', 'contribution_soft_credit_type', 'contribution_soft_credit_contribution_id') as $element) {
-          unset($fields['Contribution'][$element]);
-        }
+        unset($fields['Contribution']['contribution_contact_id']);
         $compArray['Contribution'] = ts('Contribution');
       }
     }
@@ -557,7 +557,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
-        // sort everything BUT the contactType which is sorted seperately by
+        // sort everything BUT the contactType which is sorted separately by
         // an initial commit of CRM-13278 (check ksort above)
         if (!in_array($key, $contactType)) {
           asort($mapperFields[$key]);
@@ -1016,15 +1016,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
 
           $value = $params['value'][$key][$k];
-          if ($fldName == 'group' || $fldName == 'tag') {
-            $value = trim($value);
-
-            $v = explode(',', $value);
-            $value = array();
-            foreach ($v as $i) {
-              $value[$i] = 1;
-            }
-          }
 
           if ($v[0] == 'Contribution' && substr($fldName, 0, 7) != 'custom_'
             && substr($fldName, 0, 10) != 'financial_'

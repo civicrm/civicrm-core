@@ -89,6 +89,10 @@
     <type>varchar</type>
     <length>255</length>
     <comment>subject of note description</comment>
+    <html>
+      <type>Text</type>
+      <size>60</size>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -98,5 +102,8 @@
     <length>255</length>
     <comment>Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)</comment>
     <add>3.3</add>
+    <pseudoconstant>
+      <optionGroupName>note_privacy</optionGroupName>
+    </pseudoconstant>
   </field>
 </table>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -75,7 +75,7 @@ class CRM_Core_InnoDBIndexer {
           array('name'),
         ),
       );
-      $active = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME, 'enable_innodb_fts', NULL, FALSE);
+      $active = Civi::settings()->get('enable_innodb_fts');
       self::$singleton = new self($active, $indices);
     }
     return self::$singleton;

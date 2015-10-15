@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing a contribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   protected $_crid = NULL;
@@ -57,8 +54,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
@@ -111,13 +106,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     }
     $this->assign('paymentProcessor', $this->_paymentProcessor);
 
-    // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $this->_bltID = array_search('Billing', $locationTypes);
-    $this->assign('bltID', $this->_bltID);
-    if (!$this->_bltID) {
-      CRM_Core_Error::fatal(ts('Please set a location type of %1', array(1 => 'Billing')));
-    }
+    $this->assignBillingType();
 
     $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
     $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
@@ -191,8 +180,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $type = 'next';
@@ -235,15 +222,13 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // validate the payment instrument values (e.g. credit card number)
-    CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, $self);
+    CRM_Core_Payment_Form::validatePaymentInstrument($self->_paymentProcessor['id'], $fields, $errors, NULL);
 
     return empty($errors) ? TRUE : $errors;
   }
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

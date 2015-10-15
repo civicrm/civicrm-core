@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -198,6 +198,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that test contributions can be retrieved.
+   */
+  public function testGetTestContribution() {
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, array('is_test' => 1)));
+    $this->callAPISuccessGetSingle('Contribution', array('is_test' => 1));
+  }
+
+  /**
    * We need to ensure previous tested behaviour still works as part of the api contract.
    */
   public function testGetContributionLegacyBehaviour() {
@@ -214,7 +222,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
     );
-    $this->_contribution = $this->callAPISuccess('contribution', 'create', $p);
+    $this->_contribution = $this->callAPISuccess('Contribution', 'create', $p);
 
     $params = array(
       'contribution_id' => $this->_contribution['id'],
@@ -1142,7 +1150,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateUpdateContribution() {
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'idofsh', 212355);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId,
+    'idofsh', 212355);
     $old_params = array(
       'contribution_id' => $contributionID,
 
@@ -1233,7 +1242,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   public function testDeleteContribution() {
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'dfsdf', 12389);
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId, 'dfsdf', 12389);
     $params = array(
       'id' => $contributionID,
     );
@@ -1356,6 +1365,28 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'Please print this confirmation for your records.',
     ));
     $mut->stop();
+  }
+
+  /**
+   * Test completing a transaction via the API.
+   *
+   * Note that we are creating a logged in user because email goes out from
+   * that person
+   */
+  public function testCompleteTransactionFeeAmount() {
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 2));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+      'fee_amount' => '.56',
+      'trxn_id' => '7778888',
+    ));
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $contribution['id'], 'sequential' => 1));
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals('7778888', $contribution['trxn_id']);
+    $this->assertEquals('.56', $contribution['fee_amount']);
+    $this->assertEquals('99.44', $contribution['net_amount']);
   }
 
   /**
@@ -1511,9 +1542,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = array_merge($this->_params, array('contribution_status_id' => 2, 'receipt_date' => 'now'));
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id']));
+    $this->callAPISuccess('contribution', 'completetransaction', array('id' => $contribution['id'], 'trxn_date' => date('Y-m-d')));
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1));
     $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
     $mut->checkMailLog(array(
       'Receipt - Contribution',
       'Please print this confirmation for your records.',
@@ -1554,10 +1586,29 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCompleteTransactionMembershipPriceSet() {
     $this->createPriceSetWithPage('membership');
+    $stateOfGrace = $this->callAPISuccess('MembershipStatus', 'getvalue', array(
+      'name' => 'Grace',
+      'return' => 'id')
+    );
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
+    $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
+    $logs = $this->callAPISuccess('MembershipLog', 'get', array(
+      'membership_id' => $this->_ids['membership'],
+    ));
+    $this->assertEquals(1, $logs['count']);
+    $this->assertEquals($stateOfGrace, $membership['status_id']);
     $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 1 year')), $membership['end_date']);
+    $this->callAPISuccessGetSingle('LineItem', array(
+      'entity_id' => $this->_ids['membership'],
+      'entity_table' => 'civicrm_membership',
+    ));
+    $logs = $this->callAPISuccess('MembershipLog', 'get', array(
+      'membership_id' => $this->_ids['membership'],
+    ));
+    $this->assertEquals(2, $logs['count']);
+    $this->assertNotEquals($stateOfGrace, $logs['values'][2]['status_id']);
     $this->cleanUpAfterPriceSets();
   }
 
@@ -1576,7 +1627,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function cleanUpAfterPriceSets() {
     $this->quickCleanUpFinancialEntities();
     $this->contactDelete($this->_ids['contact']);
-    $this->callAPISuccess('price_set', 'delete', array('id' => $this->_ids['price_set']));
   }
 
 
@@ -1619,6 +1669,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'price_field_id' => $priceField['id'],
         'label' => 'Long Haired Goat',
         'amount' => 20,
+        'financial_type_id' => 'Donation',
         'membership_type_id' => $membershipTypeID,
         'membership_num_terms' => 1,
       )
@@ -1629,6 +1680,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'price_field_id' => $priceField['id'],
         'label' => 'Shoe-eating Goat',
         'amount' => 10,
+        'financial_type_id' => 'Donation',
         'membership_type_id' => $membershipTypeID,
         'membership_num_terms' => 2,
       )
@@ -1653,6 +1705,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'membership_type_id' => $this->_ids['membership_type'],
       'start_date' => 'yesterday - 1 year',
       'end_date' => 'yesterday',
+      'join_date' => 'yesterday - 1 year',
     ));
     $contribution = $this->callAPISuccess('contribution', 'create', array(
       'domain_id' => 1,
@@ -1908,8 +1961,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $contribution
-   * @param $context
+   * @param array $contribution
+   * @param string $context
    * @param int $instrumentId
    */
   public function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {

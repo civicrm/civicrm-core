@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for an Phone object
+ * Form helper class for an Phone object.
  */
 class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
 
@@ -63,8 +61,6 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements for phone object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -156,8 +152,6 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -165,6 +159,12 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     // Process / save phones
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['phone']['isIdSet'] = TRUE;
+    foreach ($this->_phones as $count => $value) {
+      if (!empty($value['id']) && isset($params['phone'][$count])) {
+        $params['phone'][$count]['id'] = $value['id'];
+      }
+    }
     CRM_Core_BAO_Block::create('phone', $params);
 
     $this->log();

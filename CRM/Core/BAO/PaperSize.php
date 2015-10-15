@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -30,12 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains functions for managing Paper Sizes
+ * This class contains functions for managing Paper Sizes.
  */
 class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
 
@@ -268,8 +266,6 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @param array (reference) $values associative array of name/value pairs
    * @param int $id
    *   Id of the database record (null = new record).
-   *
-   * @return void
    */
   public function savePaperSize(&$values, $id) {
     // get the Option Group ID for Paper Sizes (create one if it doesn't exist)

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -38,6 +38,7 @@
  *   Array per getfields metadata.
  *
  * @return array
+ *   API result array
  */
 function civicrm_api3_address_create(&$params) {
   /**
@@ -123,7 +124,7 @@ function _civicrm_api3_address_get_spec(&$params) {
  *   Array per getfields metadata.
  *
  * @return array
- *   api result array
+ *   API result array
  */
 function civicrm_api3_address_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -136,7 +137,7 @@ function civicrm_api3_address_delete($params) {
  *   Array per getfields metadata.
  *
  * @return array
- *   details of found addresses else error
+ *   API result array
  */
 function civicrm_api3_address_get(&$params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');

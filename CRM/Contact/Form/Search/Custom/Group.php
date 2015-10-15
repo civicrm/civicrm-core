@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -44,7 +42,9 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
   protected $_aclWhere = NULL;
 
   /**
-   * @param $formValues
+   * Class constructor.
+   *
+   * @param array $formValues
    */
   public function __construct(&$formValues) {
     $this->_formValues = $formValues;
@@ -148,26 +148,6 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
      * are part of the search criteria
      */
     $form->assign('elements', array('includeGroups', 'excludeGroups', 'andOr', 'includeTags', 'excludeTags'));
-  }
-
-  /**
-   * Set search form field defaults here.
-   * @return array
-   */
-  public function setDefaultValues() {
-    $defaults = array('andOr' => '1');
-
-    if (!empty($this->_formValues)) {
-      $defaults['andOr'] = CRM_Utils_Array::value('andOr', $this->_formValues, '1');
-
-      $defaults['includeGroups'] = CRM_Utils_Array::value('includeGroups', $this->_formValues);
-      $defaults['excludeGroups'] = CRM_Utils_Array::value('excludeGroups', $this->_formValues);
-
-      $defaults['includeTags'] = CRM_Utils_Array::value('includeTags', $this->_formValues);
-      $defaults['excludeTags'] = CRM_Utils_Array::value('excludeTags', $this->_formValues);
-    }
-
-    return $defaults;
   }
 
   /**
@@ -611,6 +591,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
+   * Define columns.
+   *
    * @return array
    */
   public function &columns() {
@@ -618,6 +600,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
+   * Get summary.
+   *
    * @return NULL
    */
   public function summary() {
@@ -625,6 +609,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
+   * Get template file.
+   *
    * @return string
    */
   public function templateFile() {
@@ -632,7 +618,9 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
-   * @param $title
+   * Set title on search.
+   *
+   * @param string $title
    */
   public function setTitle($title) {
     if ($title) {
@@ -644,6 +632,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
+   * Build ACL clause.
+   *
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact') {

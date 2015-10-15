@@ -59,12 +59,12 @@
 
       <span crm-ui-wizard-buttons style="float:right;">
         <button
-          crm-icon="trash"
+          crm-icon="fa-trash"
           ng-show="checkPerm('delete in CiviMail')"
           ng-disabled="block.check()"
           crm-confirm="{title:ts('Delete Draft'), message:ts('Are you sure you want to permanently delete this mailing?')}"
           on-yes="delete()">{{ts('Delete Draft')}}</button>
-        <button crm-icon="disk" ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
+        <button crm-icon="fa-floppy-o" ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
       </span>
     </div>
   </div>

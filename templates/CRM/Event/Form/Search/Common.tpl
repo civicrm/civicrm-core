@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -37,6 +37,12 @@
 </tr>
 <tr>
 {include file="CRM/Core/DateRange.tpl" fieldName="event" from='_start_date_low' to='_end_date_high'}
+</tr>
+<tr>
+  <td><label>{ts}Registration Date{/ts}</label></td>
+</tr>
+<tr>
+{include file="CRM/Core/DateRange.tpl" fieldName="participant" from='_register_date_low' to='_register_date_high'}
 </tr>
 <tr>
   <td class="crm-event-form-block-participant_status"><label>{$form.participant_status_id.label}</label>

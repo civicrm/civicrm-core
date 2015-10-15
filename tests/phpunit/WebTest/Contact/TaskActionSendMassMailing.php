@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -52,7 +52,7 @@ class WebTest_Contact_TaskActionSendMassMailing extends CiviSeleniumTestCase {
     // Click "check all" box and act on "Add to group" action
     $this->click("//form[@id='Advanced']/div[3]/div/div[2]/table/thead/tr/th[1]/input");
     $this->waitForText('search-status', "50 Selected records only");
-    $this->select("task", "label=Schedule/Send a Mass Mailing");
+    $this->select("task", "label=Email - schedule/send via CiviMail");
     $this->clickLink("Go");
 
     //-------select recipients----------

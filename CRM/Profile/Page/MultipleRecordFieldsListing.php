@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -302,7 +302,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
             if (is_numeric($fieldId)) {
               $customValue = &$val;
               if (!empty($dateFields) && array_key_exists($fieldId, $dateFields)) {
-                // formated date capture value capture
+                // formatted date capture value capture
                 $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
 
                 //set date and time format

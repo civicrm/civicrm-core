@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,10 +29,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_GroupNestingCache {
+
+  /**
+   * Update cache.
+   *
+   * @throws \Exception
+   */
   static public function update() {
     // lets build the tree in memory first
 
@@ -69,7 +73,7 @@ WHERE  n.child_group_id  = gc.id
     }
 
     if (self::checkCyclicGraph($tree)) {
-      CRM_Core_Error::fatal(ts('We detected a cycle which we cant handle. aborting'));
+      CRM_Core_Error::fatal(ts("We detected a cycle which we can't handle. aborting"));
     }
 
     // first reset the current cache entries
@@ -105,7 +109,7 @@ WHERE  id = $id
    * @return bool
    */
   public static function checkCyclicGraph(&$tree) {
-    // lets keep this simple, we should probably use a graph algoritm here at some stage
+    // lets keep this simple, we should probably use a graph algorithm here at some stage
 
     // foreach group that has a parent or a child, ensure that
     // the ancestors and descendants dont intersect

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -41,7 +41,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   public function testCreate() {
     $contactId = $this->individualCreate();
     $financialTypeId = 1;
-    $contributionId = $this->contributionCreate($contactId, $financialTypeId);
+    $this->contributionCreate(array('contact_id' => $contactId), $financialTypeId);
     $params = array(
       'contribution_id' => $financialTypeId,
       'to_financial_account_id' => 1,

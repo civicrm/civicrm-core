@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -80,6 +80,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'name' => 'rye grass',
       'label' => 'juicy and healthy',
       'amount' => 1,
+      'financial_type_id' => 1,
     );
 
     $membershipOrgId = $this->organizationCreate(NULL);
@@ -137,9 +138,9 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
 
   public function testCreatePriceFieldValue() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertAPISuccess($result);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 
@@ -151,7 +152,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'name' => 'contribution_amount',
     );
     $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $getResult['count']);
     $this->callAPISuccess('price_field_value', 'delete', array('id' => $createResult['id']));
   }
 
@@ -162,7 +163,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
 
     $endCount = $this->callAPISuccess($this->_entity, 'getcount', array());
-    $this->assertEquals($startCount, $endCount, 'In line ' . __LINE__);
+    $this->assertEquals($startCount, $endCount);
   }
 
   public function testGetFieldsPriceFieldValue() {
@@ -183,7 +184,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
 
@@ -211,7 +212,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $result1 = $this->callAPISuccess($this->_entity, 'create', $params1);
     $result2 = $this->callAPISuccess($this->_entity, 'create', $params2);
     $result = $this->callAPISuccess($this->_entity, 'get', array('price_field_id' => $this->priceFieldID1));
-    $this->assertEquals(2, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(2, $result['count']);
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result1['id']));
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result2['id']));
   }

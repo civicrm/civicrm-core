@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- *
+ * UF group BAO class.
  */
 class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   const PUBLIC_VISIBILITY = 1,
@@ -952,8 +950,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param bool $absolute
    *   Return urls in absolute form (useful when sending an email).
    * @param null $additionalWhereClause
-   *
-   * @return void
    */
   public static function getValues(
     $cid, &$fields, &$values,
@@ -1494,8 +1490,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *   (reference) an assoc array of name/value pairs.
    * @param int $ufGroupId
    *   Ufgroup id.
-   *
-   * @return void
    */
   public static function createUFJoin(&$params, $ufGroupId) {
     $groupTypes = CRM_Utils_Array::value('uf_group_type', $params);
@@ -1627,8 +1621,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
-   *
-   * @return void
    */
   public static function delUFJoin(&$params) {
     $ufJoin = new CRM_Core_DAO_UFJoin();
@@ -2098,16 +2090,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif (substr($fieldName, 0, 4) === 'url-') {
-      $form->add('text', $name, $title,
-        array_merge(CRM_Core_DAO::getAttribute('CRM_Core_DAO_Website', 'url'),
-          array(
-            'onfocus' => "if (!this.value) {  this.value='http://';} else return false",
-            'onblur' => "if ( this.value == 'http://') {  this.value='';} else return false",
-          )
-        ), $required
-      );
-
-      $form->addRule($name, ts('Enter a valid Website.'), 'url');
+      $form->add('text', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Website', 'url'), $required);
+      $form->addRule($name, ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
     }
     // Note should be rendered as textarea
     elseif (substr($fieldName, -4) == 'note') {
@@ -2249,7 +2233,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title, CRM_Core_PseudoConstant::worldRegion(), $required, $selectAttributes);
     }
     elseif ($fieldName == 'signature_html') {
-      $form->addWysiwyg($name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
+      $form->add('wysiwyg', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
     }
     elseif ($fieldName == 'signature_text') {
       $form->add('textarea', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', $fieldName));
@@ -2267,7 +2251,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     elseif ($fieldName == 'activity_details') {
-      $form->addWysiwyg($fieldName, $title, array('rows' => 4, 'cols' => 60), $required);
+      $form->add('wysiwyg', $fieldName, $title, array('rows' => 4, 'cols' => 60), $required);
     }
     elseif ($fieldName == 'activity_duration') {
       $form->add('text', $name, $title, $attributes, $required);
@@ -2329,7 +2313,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $defaults
    *   Defaults array.
    * @param bool $singleProfile
-   *   True for single profile else false(batch update).
+   *   True for single profile else false(Update multiple items).
    * @param int $componentId
    *   Id for specific components like contribute, event etc.
    * @param null $component
@@ -2351,7 +2335,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           continue;
         }
 
-        //set the field name depending upon the profile mode(single/batch)
+        //set the field name depending upon the profile mode(single/multiple)
         if ($singleProfile) {
           $fldName = $name;
         }
@@ -2713,7 +2697,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $id
    *   The profile id to copy.
    *
-   * @return void
+   * @return \CRM_Core_DAO
    */
   public static function copy($id) {
     $fieldsFix = array('prefix' => array('title' => ts('Copy of ')));
@@ -2772,8 +2756,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   Contact id.
    * @param array $values
    *   Associative array of name/value pair.
-   *
-   * @return void
    */
   public static function commonSendMail($contactID, &$values) {
     if (!$contactID || !$values) {
@@ -2867,8 +2849,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   Group id.
    * @param array $values
    * @param CRM_Core_Smarty $template
-   *
-   * @return void
    */
   public function profileDisplay($gid, $values, $template) {
     $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'title');
@@ -2886,7 +2866,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param int $contactId
    *
    * @return array
-   *   assoicated formatted array
+   *   associated formatted array
    */
   public static function formatFields($params, $contactId = NULL) {
     if ($contactId) {
@@ -3212,8 +3192,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *   An array of default values.
    *
    * @param bool $isStandalone
-   *
-   * @return void
    */
   public static function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
     if (!$componentId ||

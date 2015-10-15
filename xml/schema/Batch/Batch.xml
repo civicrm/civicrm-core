@@ -193,7 +193,7 @@
   </field>
   <field>
     <name>payment_instrument_id</name>
-    <title>Batch Payment Instrument</title>
+    <title>Batch Payment Method</title>
     <type>int unsigned</type>
     <comment>fk to Payment Instrument options in civicrm_option_values</comment>
     <pseudoconstant>

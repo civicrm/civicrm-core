@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -58,16 +58,16 @@ class api_v3_ImTest extends CiviUnitTestCase {
 
   public function testCreateIm() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
   public function testGetIm() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPIAndDocument($this->_entity, 'get', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
 
@@ -76,7 +76,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $deleteParams = array('id' => $result['id']);
     $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $checkDeleted['count']);
   }
 
   public function testDeleteImInvalid() {
@@ -84,7 +84,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $deleteParams = array('id' => 600);
     $result = $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
-    $this->assertEquals(1, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $checkDeleted['count']);
   }
 
 }

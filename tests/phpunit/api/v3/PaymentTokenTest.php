@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -40,6 +40,8 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
 
   public function setUp() {
     $this->_apiversion = 3;
+    $this->useTransaction(TRUE);
+    parent::setUp();
     $contactID = $this->individualCreate();
     $paymentProcessor = $this->processorCreate();
     $this->params = array(
@@ -48,8 +50,6 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
       'created_id' => $contactID,
       'payment_processor_id' => $paymentProcessor->id,
     );
-    parent::setUp();
-    $this->useTransaction(TRUE);
   }
 
   public function testCreatePaymentToken() {

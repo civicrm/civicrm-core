@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -53,10 +51,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
   protected $_tags;
 
   /**
-   * Build the form object
-   *
-   *
-   * @return void
+   * Build the form object.
    */
   public function buildQuickForm() {
     // add select for tag
@@ -91,9 +86,6 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     //get the submitted values in an array

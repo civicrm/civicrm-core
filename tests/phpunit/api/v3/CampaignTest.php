@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -53,16 +53,16 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
     $description = "Create a campaign - Note use of relative dates here:
       @link http://www.php.net/manual/en/datetime.formats.relative.php.";
     $result = $this->callAPIAndDocument('campaign', 'create', $this->params, __FUNCTION__, __FILE__, $description);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck(array_merge($this->params, array('created_date' => '2008-07-05 00:00:00')), $result['id'], 'campaign', TRUE);
   }
 
   public function testGetCampaign() {
     $result = $this->callAPISuccess('campaign', 'create', $this->params);
     $result = $this->callAPIAndDocument('campaign', 'get', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
   public function testDeleteCampaign() {
@@ -72,7 +72,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('campaign', 'delete', $delete, __FUNCTION__, __FILE__);
 
     $checkDeleted = $this->callAPISuccess('campaign', 'get', array());
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $checkDeleted['count']);
   }
 
 }

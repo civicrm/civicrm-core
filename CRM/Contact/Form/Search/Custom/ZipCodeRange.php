@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,14 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
   /**
-   * @param $formValues
+   * Class constructor.
+   *
+   * @param array $formValues
    */
   public function __construct(&$formValues) {
     parent::__construct($formValues);
@@ -176,13 +176,6 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
       $where .= " AND {$this->_aclWhere} ";
     }
     return $this->whereClause($where, $params);
-  }
-
-  /**
-   * @return array
-   */
-  public function setDefaultValues() {
-    return array();
   }
 
   /**

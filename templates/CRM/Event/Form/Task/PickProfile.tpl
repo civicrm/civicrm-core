@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-event-pickprofile-form-block">
-    <legend>{ts}Batch Update Event via Profile{/ts}</legend>
     <table class="form-layout">
         <tr class="crm-event-pickprofile-form-block-uf_group_id">
            <td class="label">{$form.uf_group_id.label}</td>

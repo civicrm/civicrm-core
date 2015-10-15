@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Links for scheduling/logging meetings and calls and Sending Email *}
-{if $cdType eq false }
+
 {if $contact_id }
 {assign var = "contactId" value= $contact_id }
 {/if}
@@ -75,7 +75,5 @@
 {/if}
 
 </ul>
-
-{/if}
 
 {/if}

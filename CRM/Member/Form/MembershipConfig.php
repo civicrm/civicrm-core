@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -52,6 +52,13 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
    * @var string
    */
   protected $_BAOName;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'MembershipType';
+  }
 
   public function preProcess() {
     $this->_id = $this->get('id');

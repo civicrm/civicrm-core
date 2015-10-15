@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -99,8 +99,8 @@
                 var id = $('td:last', nRow).text().split(',')[0];
                 var cl = $('td:last', nRow).text().split(',')[1];
                 $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
-                $('td:eq(0)', nRow).wrapInner('<div style="margin-left: 10px;" class="crm-editable crmf-label" />');
-                $('td:eq(0)', nRow).prepend('<div style="cursor:move; position: relative; left: -7px;" class="icon ui-icon-arrowthick-2-n-s" />');
+                $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-label" />');
+                $('td:eq(0)', nRow).prepend('<span class="crm-i fa-arrows crm-grip" />');
                 $('td:eq(2)', nRow).addClass('crmf-default_value');
                 return nRow;
               },
@@ -127,7 +127,7 @@
         var gid = {/literal}'{$optionGroupID}'{literal};
 
         $("table.crm-option-selector tbody").sortable({
-          handle: ".ui-icon-arrowthick-2-n-s",
+          handle: ".fa-arrows",
           cursor: "move",
           start:function(event, ui) {
             var oSettings = $('table.crm-option-selector').dataTable().fnSettings();
@@ -158,8 +158,8 @@
       {/literal}
 
       <div class="action-link">
-          {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="circle-plus"}{ts}Add Option{/ts}{/crmButton}
-          {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+          {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+          {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="times"}{ts}Done{/ts}{/crmButton}
       </div>
     </div>
   </div>

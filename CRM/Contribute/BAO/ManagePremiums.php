@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
 
@@ -76,7 +74,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     if (!$is_active) {
@@ -102,7 +100,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
     // CRM-14283 - strip protocol and domain from image URLs
     $image_type = array('image', 'thumbnail');
     foreach ($image_type as $key) {
-      if (isset($params[$key])) {
+      if (isset($params[$key]) && $params[$key]) {
         $parsedURL = explode('/', $params[$key]);
         $pathComponents = array_slice($parsedURL, 3);
         $params[$key] = '/' . implode('/', $pathComponents);

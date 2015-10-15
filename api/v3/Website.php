@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -37,7 +37,7 @@
  * @param array $params
  *
  * @return array
- *   API result array.
+ *   API result array
  * @todo convert to using basic create - BAO function non-std
  */
 function civicrm_api3_website_create($params) {
@@ -69,7 +69,7 @@ function _civicrm_api3_website_create_spec(&$params) {
  * @param array $params
  *
  * @return array
- *   API result
+ *   API result array
  * @throws \API_Exception
  */
 function civicrm_api3_website_delete($params) {
@@ -95,7 +95,7 @@ function civicrm_api3_website_delete($params) {
  * @param array $params
  *
  * @return array
- *   details of found websites
+ *   API result array
  */
 function civicrm_api3_website_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Website');

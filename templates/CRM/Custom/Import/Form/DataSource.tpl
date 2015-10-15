@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -75,6 +75,11 @@
                 </span>
               </td>
   </tr>
+
+   <tr class="crm-import-datasource-form-block-fieldSeparator">
+     <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+     <td>{$form.fieldSeparator.html}</td>
+   </tr>
   <tr class="crm-custom-import-uploadfile-form-block-date_format">
             {include file="CRM/Core/Date.tpl"}
   </tr>

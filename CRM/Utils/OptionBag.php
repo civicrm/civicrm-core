@@ -1,7 +1,38 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
 
 /**
- * Class CRM_Utils_OptionBag
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
+ * Class CRM_Utils_OptionBag.
  */
 class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   protected $data;
@@ -55,17 +86,15 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   }
 
   /**
-   * (PHP 5 &gt;= 5.0.0)<br/>
+   * (PHP 5 &gt;= 5.0.0)
    * Whether a offset exists
    * @link http://php.net/manual/en/arrayaccess.offsetexists.php
+   *
    * @param mixed $offset
-   *   <p>.
-   * An offset to check for.
-   * </p>
+   *   An offset to check for.
+   *
    * @return bool
    *   true on success or false on failure.
-   *   </p>
-   *   <p>
    *   The return value will be casted to boolean if non-boolean was returned.
    */
   public function offsetExists($offset) {
@@ -73,13 +102,13 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   }
 
   /**
-   * (PHP 5 &gt;= 5.0.0)<br/>
+   * (PHP 5 &gt;= 5.0.0)
    * Offset to retrieve
    * @link http://php.net/manual/en/arrayaccess.offsetget.php
+   *
    * @param mixed $offset
-   *   <p>.
-   * The offset to retrieve.
-   * </p>
+   *   The offset to retrieve.
+   *
    * @return mixed
    *   Can return all value types.
    */
@@ -88,57 +117,52 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   }
 
   /**
-   * (PHP 5 &gt;= 5.0.0)<br/>
+   * (PHP 5 &gt;= 5.0.0)
    * Offset to set
    * @link http://php.net/manual/en/arrayaccess.offsetset.php
+   *
    * @param mixed $offset
-   *   <p>.
-   * The offset to assign the value to.
-   * </p>
+   *   The offset to assign the value to.
+   *
    * @param mixed $value
-   *   <p>.
-   * The value to set.
-   * </p>
-   * @return void
+   *   The value to set.
    */
   public function offsetSet($offset, $value) {
     $this->data[$offset] = $value;
   }
 
   /**
-   * (PHP 5 &gt;= 5.0.0)<br/>
+   * (PHP 5 &gt;= 5.0.0)
    * Offset to unset
    * @link http://php.net/manual/en/arrayaccess.offsetunset.php
+   *
    * @param mixed $offset
-   *   <p>.
-   * The offset to unset.
-   * </p>
-   * @return void
+   *   The offset to unset.
    */
   public function offsetUnset($offset) {
     unset($this->data[$offset]);
   }
 
   /**
-   * (PHP 5 &gt;= 5.0.0)<br/>
+   * (PHP 5 &gt;= 5.0.0)
    * Retrieve an external iterator
    * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
+   *
    * @return Traversable
-   *   An instance of an object implementing <b>Iterator</b> or
-   *   <b>Traversable</b>
+   *   An instance of an object implementing Iterator or
+   *   Traversable
    */
   public function getIterator() {
     return new ArrayIterator($this->data);
   }
 
   /**
-   * (PHP 5 &gt;= 5.1.0)<br/>
+   * (PHP 5 &gt;= 5.1.0)
    * Count elements of an object
    * @link http://php.net/manual/en/countable.count.php
+   *
    * @return int
    *   The custom count as an integer.
-   *   </p>
-   *   <p>
    *   The return value is cast to an integer.
    */
   public function count() {

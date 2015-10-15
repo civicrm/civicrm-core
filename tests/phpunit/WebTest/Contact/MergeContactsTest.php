@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -704,7 +704,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
       $this->click("_qf_Contact_upload_view-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->waitForText('crm-notification-container', "Contact Saved");
-      $mainId = explode("CiviCRM ID:", trim($this->getText("xpath=//div[@id='crm-record-log']/span[@class='col1']")));
+      $mainId = explode("Contact ID:", trim($this->getText("xpath=//div[@id='crm-record-log']/span[@class='col1']")));
       $mainId = trim($mainId[1]);
 
       //Duplicate of above contact.
@@ -724,7 +724,7 @@ class WebTest_Contact_MergeContactsTest extends CiviSeleniumTestCase {
       $this->click("_qf_Contact_upload_duplicate");
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $this->waitForText('crm-notification-container', "Contact Saved");
-      $duplicateId = explode("CiviCRM ID:", trim($this->getText("xpath=//div[@id='crm-record-log']/span[@class='col1']")));
+      $duplicateId = explode("Contact ID:", trim($this->getText("xpath=//div[@id='crm-record-log']/span[@class='col1']")));
       $duplicateId = trim($duplicateId[1]);
 
       return array(

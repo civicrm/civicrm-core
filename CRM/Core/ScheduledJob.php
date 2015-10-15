@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -67,7 +67,7 @@ class CRM_Core_ScheduledJob {
 
       foreach ($lines as $line) {
         $pair = explode("=", $line);
-        if (empty($pair[0]) || empty($pair[1])) {
+        if ($pair === FALSE || count($pair) != 2 || trim($pair[0]) == '' || trim($pair[1]) == '') {
           $this->remarks[] .= 'Malformed parameters!';
           break;
         }
@@ -107,6 +107,29 @@ class CRM_Core_ScheduledJob {
       case 'Daily':
         $format = 'Ymd';
         break;
+
+      case 'Mondays':
+        $now = CRM_Utils_Date::currentDBDate();
+        $dayAgo = strtotime('-1 day', strtotime($now));
+        $lastRun = strtotime($this->last_run);
+        $nowDayOfWeek = date('l', strtotime($now));
+        return ($lastRun < $dayAgo && $nowDayOfWeek == 'Monday');
+
+      case '1stOfMth':
+        $now = CRM_Utils_Date::currentDBDate();
+        $dayAgo = strtotime('-1 day', strtotime($now));
+        $lastRun = strtotime($this->last_run);
+        $nowDayOfMonth = date('j', strtotime($now));
+        return ($lastRun < $dayAgo && $nowDayOfMonth == '1');
+
+      case '1stOfQtr':
+        $now = CRM_Utils_Date::currentDBDate();
+        $dayAgo = strtotime('-1 day', strtotime($now));
+        $lastRun = strtotime($this->last_run);
+        $nowDayOfMonth = date('j', strtotime($now));
+        $nowMonth = date('n', strtotime($now));
+        $qtrMonths = array('1', '4', '7', '10');
+        return ($lastRun < $dayAgo && $nowDayOfMonth == '13' && in_array($nowMonth, $qtrMonths));
     }
 
     $now = CRM_Utils_Date::currentDBDate();

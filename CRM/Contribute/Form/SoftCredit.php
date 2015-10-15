@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class build form elements for select existing or create new soft block
+ * This class build form elements for select existing or create new soft block.
  */
 class CRM_Contribute_Form_SoftCredit {
 
@@ -42,8 +40,6 @@ class CRM_Contribute_Form_SoftCredit {
    * Set variables up before form is built.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function preProcess(&$form) {
     $contriDAO = new CRM_Contribute_DAO_Contribution();
@@ -65,13 +61,12 @@ class CRM_Contribute_Form_SoftCredit {
     }
   }
 
-
   /**
    * Function used to build form element for soft credit block.
    *
    * @param CRM_Core_Form $form
    *
-   * @return void
+   * @return \CRM_Core_Form
    */
   public static function buildQuickForm(&$form) {
     if (!empty($form->_honor_block_is_active)) {
@@ -79,7 +74,7 @@ class CRM_Contribute_Form_SoftCredit {
       $ufJoinDAO->module = 'soft_credit';
       $ufJoinDAO->entity_id = $form->_id;
       if ($ufJoinDAO->find(TRUE)) {
-        $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($ufJoinDAO->module_data, TRUE);
+        $jsonData = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoinDAO->module_data, TRUE, 'soft_credit');
         if ($jsonData) {
           foreach (array('honor_block_title', 'honor_block_text') as $name) {
             $form->assign($name, $jsonData[$name]);

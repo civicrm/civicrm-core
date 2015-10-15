@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -219,7 +219,7 @@ class WebTest_Case_AddCaseTest extends CiviSeleniumTestCase {
     // check that open case subject is present
     $this->assertText("case_id_$id", $subject);
     // click open case activity pop-up dialog
-    $this->click("link=$subject");
+    $this->click("xpath=//table[@id='case_id_{$id}']/tbody//tr/td[2]/div[text()='{$subject}']/../../td[8]/a[text()='View']");
     $this->waitForElementPresent("ActivityView");
     $this->waitForElementPresent("css=tr.crm-case-activity-view-Activity");
     // set page location of table containing activity view data

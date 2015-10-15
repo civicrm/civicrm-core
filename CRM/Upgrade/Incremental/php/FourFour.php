@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,25 +26,10 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * Upgrade logic for 4.4
  */
-class CRM_Upgrade_Incremental_php_FourFour {
-  const BATCH_SIZE = 5000;
-
+class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base {
   const MAX_WORD_REPLACEMENT_SIZE = 255;
-
-  /**
-   * @param $errors
-   *
-   * @return bool
-   */
-  public function verifyPreDBstate(&$errors) {
-    return TRUE;
-  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.
@@ -121,7 +106,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    */
   public function upgrade_4_4_alpha1($rev) {
     // task to process sql
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'runSql', $rev);
 
     // Consolidate activity contacts CRM-12274.
     $this->addTask('Consolidate activity contacts', 'activityContacts');
@@ -133,7 +118,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    * @param $rev
    */
   public function upgrade_4_4_beta1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'runSql', $rev);
 
     // add new 'data' column in civicrm_batch
     $query = 'ALTER TABLE civicrm_batch ADD data LONGTEXT NULL COMMENT "cache entered data"';
@@ -202,8 +187,17 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
     // CRM-12578 - Prior to this version a CSS file under drupal would disable core css
     if (!empty($config->customCSSURL) && strpos($config->userFramework, 'Drupal') === 0) {
       // The new setting doesn't exist yet - need to create it first
-      CRM_Core_BAO_Setting::updateSettingsFromMetaData();
-      CRM_Core_BAO_Setting::setItem('1', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css');
+      $sql = '
+        INSERT INTO civicrm_setting (group_name, name , value , domain_id , is_domain , created_date)
+        VALUES (%1, %2, %3, %4, %5, now())';
+      CRM_Core_DAO::executeQuery($sql, array(
+        1 => array(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'String'),
+        2 => array('disable_core_css', 'String'),
+        3 => array(serialize(1), 'String'),
+        4 => array(CRM_Core_Config::domainID(), 'Positive'),
+        5 => array(1, 'Int'),
+      ));
+      Civi::service('settings_manager')->flush();
     }
 
     // CRM-13701 - Fix $config->timeInputFormat
@@ -254,7 +248,7 @@ VALUES {$insertStatus}";
       CRM_Core_DAO::executeQuery($sql, $p);
     }
 
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'runSql', $rev);
     $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
 
@@ -297,7 +291,7 @@ WHERE a.id IS NULL;
     }
 
     // task to process sql
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'runSql', $rev);
 
     // CRM-13892 : add `name` column to dashboard schema
     $query = "
@@ -307,7 +301,6 @@ ALTER TABLE civicrm_dashboard
 
     $dashboard = new CRM_Core_DAO_Dashboard();
     $dashboard->find();
-    $values = '';
     while ($dashboard->fetch()) {
       $urlElements = explode('/', $dashboard->url);
       if ($urlElements[1] == 'dashlet') {
@@ -436,7 +429,10 @@ ALTER TABLE civicrm_dashboard
     $dao = new CRM_Contact_DAO_SavedSearch();
     $dao->find();
     while ($dao->fetch()) {
-      $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($dao->id);
+      $formValues = NULL;
+      if (!empty($dao->form_values)) {
+        $formValues = unserialize($dao->form_values);
+      }
       if (!empty($formValues['mapper'])) {
         foreach ($formValues['mapper'] as $key => $value) {
           foreach ($value as $k => $v) {
@@ -698,16 +694,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement ADD CONSTRAINT UI_domain_find UNIQUE KEY `UI_domain_find` (`domain_id`,`find_word`);");
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement ADD CONSTRAINT FK_civicrm_word_replacement_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain` (`id`);");
     }
-    return TRUE;
-  }
-
-  /**
-   * (Queue Task Callback)
-   */
-  public static function task_4_4_x_runSql(CRM_Queue_TaskContext $ctx, $rev) {
-    $upgrade = new CRM_Upgrade_Form();
-    $upgrade->processSQL($rev);
-
     return TRUE;
   }
 

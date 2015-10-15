@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,16 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Files required
- */
-
-/**
- * This file is for activity search
+ * This file is for activity search.
  */
 class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
@@ -68,8 +62,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_prefix = "activity_";
 
-  protected $_defaults;
-
   /**
    * The saved search ID retrieved from the GET vars.
    *
@@ -79,8 +71,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Processing needed for buildForm and later.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
@@ -160,9 +150,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -390,6 +377,22 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['activity_date_relative'] = 0;
       $this->_formValues['activity_date_high'] = $dateHigh;
       $this->_defaults['activity_date_high'] = $dateHigh;
+    }
+
+    // Enable search activity by custom value
+    $requestParams = CRM_Utils_Request::exportValues();
+    foreach (array_keys($requestParams) as $key) {
+      if (substr($key, 0, 7) != 'custom_') {
+        continue;
+      }
+      elseif (empty($requestParams[$key])) {
+        continue;
+      }
+      $customValue = CRM_Utils_Request::retrieve($key, 'String', $this);
+      if ($customValue) {
+        $this->_formValues[$key] = $customValue;
+        $this->_defaults[$key] = $customValue;
+      }
     }
 
     if (!empty($this->_defaults)) {

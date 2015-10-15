@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -114,6 +114,12 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     $dao->find();
 
     while ($dao->fetch()) {
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+        && !CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))
+      ) {
+        continue;
+      }
+      $links = self::links();
       $membershipType[$dao->id] = array();
       CRM_Core_DAO::storeValues($dao, $membershipType[$dao->id]);
 
@@ -137,6 +143,12 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
         }
         $membershipType[$dao->id]['maxRelated'] = CRM_Utils_Array::value('max_related', $membershipType[$dao->id]);
       }
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
+        unset($links[CRM_Core_Action::UPDATE], $links[CRM_Core_Action::ENABLE], $links[CRM_Core_Action::DISABLE]);
+      }
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
+        unset($links[CRM_Core_Action::DELETE]);
+      }
       // form all action links
       $action = array_sum(array_keys($this->links()));
 
@@ -149,7 +161,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
         $membershipType[$dao->id]['order'] = $membershipType[$dao->id]['weight'];
-        $membershipType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
+        $membershipType[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
           array('id' => $dao->id),
           ts('more'),
           FALSE,

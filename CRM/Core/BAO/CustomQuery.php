@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,8 +30,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_BAO_CustomQuery {
   const PREFIX = 'custom_value_';
@@ -254,9 +252,6 @@ SELECT label, value
 
   /**
    * Generate the select clause and the associated tables.
-   * for the from clause
-   *
-   * @return void
    */
   public function select() {
     if (empty($this->_fields)) {
@@ -318,15 +313,12 @@ SELECT label, value
   }
 
   /**
-   * Generate the where clause and also the english language.
-   * equivalent
-   *
-   * @return void
+   * Generate the where clause and also the english language equivalent.
    */
   public function where() {
     foreach ($this->_ids as $id => $values) {
 
-      // Fixed for Isuue CRM 607
+      // Fixed for Issue CRM 607
       if (CRM_Utils_Array::value($id, $this->_fields) === NULL ||
         !$values
       ) {
@@ -395,20 +387,27 @@ SELECT label, value
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
               if ($isSerialized && !empty($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
+                $sp = CRM_Core_DAO::VALUE_SEPARATOR;
                 if (strstr($op, 'IN')) {
-                  $value = str_replace(",", "[[:cntrl:]]*|[[:cntrl:]]*", $value);
+                  $value = str_replace(",", "$sp|$sp", $value);
                   $value = str_replace('(', '[[.left-parenthesis.]]', $value);
                   $value = str_replace(')', '[[.right-parenthesis.]]', $value);
                 }
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
-                $value = "[[:cntrl:]]*" . $value . "[[:cntrl:]]*";
+                $value = $sp . $value . $sp;
                 if (!$wildcard) {
-                  $value = str_replace("[[:cntrl:]]*|", '', $value);
+                  foreach (explode("|", $value) as $val) {
+                    $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $val, 'String');
+                  }
+                }
+                else {
+                  $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
                 }
               }
-
-              //FIX for custom data query fired against no value(NULL/NOT NULL)
-              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+              else {
+                //FIX for custom data query fired against no value(NULL/NOT NULL)
+                $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+              }
               $this->_qill[$grouping][] = "$field[label] $qillOp $qillValue";
             }
             break;
@@ -472,6 +471,14 @@ SELECT label, value
             break;
 
           case 'Date':
+            if (in_array($op, CRM_Core_DAO::acceptedSQLOperators())) {
+              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+              list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value,
+                $op, array(), CRM_Utils_Type::T_DATE);
+              $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
+              break;
+            }
+
             $fromValue = CRM_Utils_Array::value('from', $value);
             $toValue = CRM_Utils_Array::value('to', $value);
             $value = CRM_Utils_Array::value($op, $value, $value);

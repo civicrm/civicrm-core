@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -39,7 +37,6 @@
  * It delegates the work to lower level subclasses and integrates the changes
  * back in. It also uses a lot of functionality with the CRM API's, so any change
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
@@ -126,11 +123,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
 
@@ -144,8 +139,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
   /**
    * Actually build the components of the form.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     // CRM-16398: If current recurring contribution got > 1 lineitems then make amount field readonly
@@ -185,10 +178,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   }
 
   /**
-   * called after the user submits the form.
-   *
-   *
-   * @return void
+   * Called after the user submits the form.
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -228,7 +218,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
       $msgTitle = ts('Update Success');
       $msgType = 'success';
-
+      $msg = ts('Recurring Contribution Updated');
       $contactID = $this->_subscriptionDetails->contact_id;
 
       if ($this->_subscriptionDetails->amount != $params['amount']) {
@@ -237,6 +227,12 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
               1 => CRM_Utils_Money::format($this->_subscriptionDetails->amount, $this->_subscriptionDetails->currency),
               2 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
             )) . ' ';
+        if ($this->_subscriptionDetails->amount < $params['amount']) {
+          $msg = ts('Recurring Contribution Updated - increased installment amount');
+        }
+        else {
+          $msg = ts('Recurring Contribution Updated - decreased installment amount');
+        }
       }
 
       if ($this->_subscriptionDetails->installments != $params['installments']) {
@@ -252,7 +248,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
           'Update Recurring Contribution',
           'name'
         ),
-        'subject' => ts('Recurring Contribution Updated'),
+        'subject' => $msg,
         'details' => $message,
         'activity_date_time' => date('YmdHis'),
         'status_id' => CRM_Core_OptionGroup::getValue('activity_status',

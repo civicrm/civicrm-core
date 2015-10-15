@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_Contact_Utils {
 
   /**
-   * Given a contact type, get the contact image
+   * Given a contact type, get the contact image.
    *
    * @param string $contactType
    *   Contact type.
@@ -203,11 +201,7 @@ WHERE  id IN ( $idString )
     }
 
     if (!$live) {
-      $days = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'checksum_timeout',
-        NULL,
-        7
-      );
+      $days = Civi::settings()->get('checksum_timeout');
       $live = 24 * $days;
     }
 
@@ -811,8 +805,6 @@ Group By  componentId";
    *
    * @param array $address
    *   This is associated array which contains submitted form values.
-   *
-   * @return void
    */
   public static function processSharedAddress(&$address) {
     if (!is_array($address)) {
@@ -908,8 +900,6 @@ Group By  componentId";
    *
    * @param $contactID
    *   The contactID that was edited / deleted.
-   *
-   * @return void
    */
   public static function clearContactCaches($contactID = NULL) {
     // clear acl cache if any.
@@ -1122,17 +1112,37 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $templateString
    *   The greeting template string with contact tokens + Smarty syntax.
    *
-   * @param $contactDetails
+   * @param array $contactDetails
    * @param int $contactID
    * @param string $className
-   *
-   * @return void
    */
   public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
     CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
 
     $smarty = CRM_Core_Smarty::singleton();
     $templateString = $smarty->fetch("string:$templateString");
+  }
+
+  /**
+   * Determine if a contact ID is real/valid.
+   *
+   * @param int $contactId
+   *   The hypothetical contact ID
+   * @return bool
+   */
+  public static function isContactId($contactId) {
+    if ($contactId) {
+      // ensure that this is a valid contact id (for session inconsistency rules)
+      $cid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+        $contactId,
+        'id',
+        'id'
+      );
+      if ($cid) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

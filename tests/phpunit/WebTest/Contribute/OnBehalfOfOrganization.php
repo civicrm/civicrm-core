@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
@@ -421,7 +421,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("onbehalf_city-3", "Test City");
     $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
     $this->click("onbehalf_country-3");
-    $this->select("onbehalf_country-3", "label=United States");
+    $this->select("onbehalf_country-3", "label=UNITED STATES");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
 
@@ -455,7 +455,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("onbehalf_city-3", "Test City");
     $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
     $this->click("onbehalf_country-3");
-    $this->select("onbehalf_country-3", "label=United States");
+    $this->select("onbehalf_country-3", "label=UNITED STATES");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
 
@@ -496,7 +496,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("onbehalf_city-3", "Test City");
     $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
     $this->click("onbehalf_country-3");
-    $this->select("onbehalf_country-3", "label=United States");
+    $this->select("onbehalf_country-3", "label=UNITED STATES");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
 
@@ -691,7 +691,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", "{$orgName1} street address");
     $this->type("address_1_city", "{$orgName1} city");
     $this->type("address_1_postal_code", substr(sha1(rand()), 0, 4));
-    $this->assertTrue($this->isTextPresent("- select - United States"));
+    $this->assertTrue($this->isTextPresent("- select - UNITED STATES"));
     $this->select("address_1_state_province_id", "value=1019");
     $this->type("address_1_geo_code_1", "1234");
     $this->type("address_1_geo_code_2", "5678");
@@ -942,7 +942,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", "{$orgName1} street address");
     $this->type("address_1_city", "{$orgName1} city");
     $this->type("address_1_postal_code", "9999999999");
-    $this->assertTrue($this->isTextPresent("- select - United States"));
+    $this->assertTrue($this->isTextPresent("- select - UNITED STATES"));
     $this->select("address_1_state_province_id", "value=1019");
     $this->type("address_1_geo_code_1", "1234");
     $this->type("address_1_geo_code_2", "5678");
@@ -975,7 +975,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("address_1_street_address", "{$orgName2} street address");
     $this->type("address_1_city", "{$orgName2} city");
     $this->type("address_1_postal_code", "7777777777");
-    $this->assertTrue($this->isTextPresent("- select - United States"));
+    $this->assertTrue($this->isTextPresent("- select - UNITED STATES"));
     $this->select("address_1_state_province_id", "value=1019");
     $this->type("address_1_geo_code_1", "1224");
     $this->type("address_1_geo_code_2", "5628");
@@ -1287,7 +1287,7 @@ class WebTest_Contribute_OnBehalfOfOrganization extends CiviSeleniumTestCase {
     $this->type("onbehalf_city-3", "Test City");
     $this->type("onbehalf_postal_code-3", substr(sha1(rand()), 0, 6));
     $this->click("onbehalf_country-3");
-    $this->select("onbehalf_country-3", "label=United States");
+    $this->select("onbehalf_country-3", "label=UNITED STATES");
     $this->click("onbehalf_state_province-3");
     $this->select("onbehalf_state_province-3", "label=Alabama");
 

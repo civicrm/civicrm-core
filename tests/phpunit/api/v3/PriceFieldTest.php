@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -84,8 +84,8 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
 
   public function testCreatePriceField() {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 
@@ -97,7 +97,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
       'name' => 'contribution_amount',
     );
     $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $getResult['count']);
     $this->callAPISuccess('price_field', 'delete', array('id' => $createResult['id']));
   }
 
@@ -106,9 +106,9 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $deleteParams = array('id' => $createResult['id']);
     $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($deleteResult, 'In line ' . __LINE__);
+    $this->assertAPISuccess($deleteResult);
     $endCount = $this->callAPISuccess($this->_entity, 'getcount', array());
-    $this->assertEquals($startCount, $endCount, 'In line ' . __LINE__);
+    $this->assertEquals($startCount, $endCount);
   }
 
   public function testGetFieldsPriceField() {

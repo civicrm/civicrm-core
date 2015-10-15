@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -96,7 +96,7 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
         'address_2' => 'Add 2',
         'city' => 'Watson',
         'state' => 'NY',
-        'country' => 'United States',
+        'country' => 'UNITED STATES',
       ),
     );
     foreach ($customDataParams['rows'][0] as $key => $values) {

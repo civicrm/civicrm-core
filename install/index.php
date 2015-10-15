@@ -3,11 +3,38 @@
 /**
  * Note that this installer has been based of the SilverStripe installer.
  * You can get more information from the SilverStripe Website at
- * http://www.silverstripe.com/. Please check
- * http://www.silverstripe.com/licensing for licensing details.
+ * http://www.silverstripe.com/.
  *
  * Copyright (c) 2006-7, SilverStripe Limited - www.silverstripe.com
  * All rights reserved.
+ *
+ * License: BSD-3-clause
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ *  Redistributions of source code must retain the above copyright notice,
+ *  this list of conditions and the following disclaimer.
+ *
+ *  Redistributions in binary form must reproduce the above copyright
+ *  notice, this list of conditions and the following disclaimer in the
+ *  documentation and/or other materials provided with the distribution.
+ *
+ *  Neither the name of SilverStripe nor the names of its contributors may
+ *  be used to endorse or promote products derived from this software
+ *  without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Changes and modifications (c) 2007-2015 by CiviCRM LLC
  *
@@ -80,12 +107,15 @@ if (isset($_REQUEST['mysql'])) {
   $databaseConfig = $_REQUEST['mysql'];
 }
 else {
-  $databaseConfig = array(
-    "server" => "localhost",
-    "username" => "civicrm",
-    "password" => "",
-    "database" => "civicrm",
-  );
+  if ($installType == 'wordpress') {
+    //WP Database Data
+    $databaseConfig = array(
+      "server" => DB_HOST,
+      "username" => DB_USER,
+      "password" => DB_PASSWORD,
+      "database" => DB_NAME,
+    );
+  }
 }
 
 if ($installType == 'drupal') {
@@ -143,7 +173,6 @@ $config = CRM_Core_Config::singleton(FALSE);
 $GLOBALS['civicrm_default_error_scope'] = NULL;
 
 // The translation files are in the parent directory (l10n)
-$config->gettextResourceDir = '..' . DIRECTORY_SEPARATOR . $config->gettextResourceDir;
 $i18n = CRM_Core_I18n::singleton();
 
 global $cmsPath;
@@ -161,9 +190,16 @@ if ($installType == 'drupal') {
 }
 elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
-  $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
-    'civicrm.settings.php'
-  );
+  $upload_dir = wp_upload_dir();
+  $files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
+  $wp_civi_settings = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm.settingsphp';
+  $wp_civi_settings_deprectated = CIVICRM_PLUGIN_DIR . 'civicrm.settings.php';
+  if (file_exists($wp_civi_settings_deprectated)) {
+    $alreadyInstalled = $wp_civi_settings_deprectated;
+  }
+  elseif (file_exists($wp_civi_settings)) {
+    $alreadyInstalled = $wp_civi_settings;
+  }
 }
 
 if ($installType == 'drupal') {
@@ -419,7 +455,7 @@ class InstallRequirements {
 
     $this->errors = NULL;
 
-    $this->requirePHPVersion('5.3.3', array(
+    $this->requirePHPVersion('5.3.4', array(
       ts("PHP Configuration"),
       ts("PHP5 installed"),
       NULL,
@@ -475,8 +511,13 @@ class InstallRequirements {
       );
     }
     elseif ($installType == 'wordpress') {
-      // make sure that we can write to plugins/civicrm  and plugins/files/
-      $writableDirectories = array(WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'files', $cmsPath);
+      // make sure that we can write to uploads/civicrm/
+      $upload_dir = wp_upload_dir();
+      $files_dirname = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm';
+      if (!file_exists($files_dirname)) {
+        wp_mkdir_p($files_dirname);
+      }
+      $writableDirectories = array($files_dirname);
     }
 
     foreach ($writableDirectories as $dir) {
@@ -1431,6 +1472,10 @@ class Installer extends InstallRequirements {
 
         $c = CRM_Core_Config::singleton(FALSE);
         $c->free();
+        $wpInstallRedirect = admin_url("?page=CiviCRM&q=civicrm&reset=1");
+        echo "<script>
+         window.location = '$wpInstallRedirect';
+        </script>";
       }
     }
 

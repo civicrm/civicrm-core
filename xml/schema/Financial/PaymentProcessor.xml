@@ -67,7 +67,7 @@
     <pseudoconstant>
       <table>civicrm_payment_processor_type</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <labelColumn>title</labelColumn>
     </pseudoconstant>
     <length>10</length>
     <add>4.3</add>
@@ -164,7 +164,7 @@
   </field>
   <field>
     <name>class_name</name>
-    <title>Suffix for PHP clas name implementation</title>
+    <title>Suffix for PHP class name implementation</title>
     <type>varchar</type>
     <length>255</length>
     <add>1.8</add>
@@ -174,7 +174,7 @@
     <title>Processor Billing Mode</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Billing Mode</comment>
+    <comment>Billing Mode (deprecated)</comment>
     <add>1.8</add>
   </field>
   <field>
@@ -189,7 +189,18 @@
     <title>Payment Type</title>
     <type>int unsigned</type>
     <default>1</default>
-    <comment>Payment Type: Credit or Debit</comment>
+    <comment>Payment Type: Credit or Debit (deprecated)</comment>
     <add>3.0</add>
+  </field>
+  <field>
+    <name>payment_instrument_id</name>
+    <title>Payment Method</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>Payment Instrument ID</comment>
+    <pseudoconstant>
+      <optionGroupName>payment_instrument</optionGroupName>
+    </pseudoconstant>
+    <add>4.7</add>
   </field>
 </table>

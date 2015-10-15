@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -149,7 +149,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("subject");
     $this->type("subject", "test note");
     $this->type("note", "this is a test note contact webtest");
-    $this->assertElementContainsText('notesBlock', "Subject\n Notes");
+    $this->assertElementContainsText('notesBlock', "Subject\n Note");
 
     //Demographics section
     $this->click("//div[@class='crm-accordion-header' and contains(.,'Demographics')]");

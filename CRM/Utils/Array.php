@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -407,7 +407,7 @@ class CRM_Utils_Array {
 
     $look = $reverse ? array_flip($lookup) : $lookup;
 
-    //trim lookup array, ignore . ( fix for CRM-1514 ), eg for prefix/suffix make sure Dr. and Dr both are valid
+    // trim lookup array, ignore . ( fix for CRM-1514 ), eg for prefix/suffix make sure Dr. and Dr both are valid
     $newLook = array();
     foreach ($look as $k => $v) {
       $newLook[trim($k, ".")] = $v;
@@ -608,6 +608,35 @@ class CRM_Utils_Array {
         else {
           $result[$key] = $record[$prop];
         }
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Iterates over a list of objects and executes some method on each.
+   *
+   * Comparison:
+   *   - This is like array_map(), except it executes the objects' method
+   *     instead of a free-form callable.
+   *   - This is like Array::collect(), except it uses a method
+   *     instead of a property.
+   *
+   * @param string $method
+   *   The method to execute.
+   * @param array|Traversable $objects
+   *   A list of objects.
+   * @param array $args
+   *   An optional list of arguments to pass to the method.
+   *
+   * @return array
+   *   Keys are the original keys of $objects; values are the method results.
+   */
+  public static function collectMethod($method, $objects, $args = array()) {
+    $result = array();
+    if (is_array($objects)) {
+      foreach ($objects as $key => $object) {
+        $result[$key] = call_user_func_array(array($object, $method), $args);
       }
     }
     return $result;
@@ -837,7 +866,7 @@ class CRM_Utils_Array {
 
   /**
    * Diff multidimensional arrays
-   * ( array_diff does not support multidimensional array)
+   * (array_diff does not support multidimensional array)
    *
    * @param array $array1
    * @param array $array2
@@ -962,6 +991,31 @@ class CRM_Utils_Array {
       $r = &$r[$part];
     }
     $r[$last] = $value;
+  }
+
+  /**
+   * Convert a simple dictionary into separate key+value records.
+   *
+   * @param array $array
+   *   Ex: array('foo' => 'bar').
+   * @param string $keyField
+   *   Ex: 'key'.
+   * @param string $valueField
+   *   Ex: 'value'.
+   * @return array
+   *   Ex: array(
+   *     0 => array('key' => 'foo', 'value' => 'bar')
+   *   ).
+   */
+  public static function toKeyValueRows($array, $keyField = 'key', $valueField = 'value') {
+    $result = array();
+    foreach ($array as $key => $value) {
+      $result[] = array(
+        $keyField => $key,
+        $valueField => $value,
+      );
+    }
+    return $result;
   }
 
 }

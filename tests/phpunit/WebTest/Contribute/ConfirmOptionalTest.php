@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -98,7 +98,7 @@ class WebTest_Contribute_ConfirmOptionalTest extends CiviSeleniumTestCase {
 
   protected function _fillOutContributionPage() {
     // load contribution page
-    $this->openCiviPage("contribute/transact", "reset=1&id={$this->pageId}", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id={$this->pageId}&action=preview", "_qf_Main_upload-bottom");
 
     // fill out info
     $this->type("xpath=//div[@class='crm-section other_amount-section']//div[2]/input", "30");

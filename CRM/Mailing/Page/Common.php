@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Page_Common extends CRM_Core_Page {
   protected $_type = NULL;
@@ -121,7 +119,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
         "reset=1&jid={$job_id}&qid={$queue_id}&h={$hash}&confirm=1"
       );
       $this->assign('confirmURL', $confirmURL);
-      //push context for further process CRM-4431
+      // push context for further process CRM-4431
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($confirmURL);
     }

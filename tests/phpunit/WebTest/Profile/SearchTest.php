@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -173,7 +173,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('CIVICRM_QFID_Edu_2');
 
     // fill country, state, county
-    $this->select('country-Primary', "United States");
+    $this->select('country-Primary', "UNITED STATES");
 
     // wait for state data to be populated
     $this->waitForElementPresent("xpath=//select[@id='state_province-Primary']/option[text()='California']");
@@ -200,7 +200,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->type('email-Primary', "jhon@$lastName.com");
 
     // Fill state, county, country
-    $this->select('country-Primary', "United States");
+    $this->select('country-Primary', "UNITED STATES");
 
     // wait for state data to be populated
     $this->waitForElementPresent("xpath=//select[@id='state_province-Primary']/option[text()='California']");
@@ -219,7 +219,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[3][text()='$lastName']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[4][text()='jhon@$lastName.com']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[5][text()='Education']"));
-    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[6][text()='United States']"));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[6][text()='UNITED STATES']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[7][text()='CA']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[8][text()='Alameda']"));
 

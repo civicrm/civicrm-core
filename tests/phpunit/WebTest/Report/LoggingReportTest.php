@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -152,12 +152,13 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->click("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr//td//span/a[text()='Edit']");
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");
     $this->select("status_id", "value=2");
+    $this->waitForAjaxContent();
     $this->click('_qf_Activity_upload-bottom');
     $this->waitForText("crm-notification-container", "Activity has been saved.");
-    $this->waitForElementPresent("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody/tr/td[7][text()='Completed']");
+    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/div");
+    $this->verifyText("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr/td[7]/div", 'Completed');
 
     //add a case
-    $this->waitForAjaxContent();
     $this->click("xpath=//li[@id='tab_case']/a");
     $this->waitForElementPresent("xpath=//form[@id='Search']//div/div//div[@class='action-link']/a");
     $this->click("xpath=//form[@id='Search']//div/div//div[@class='action-link']/a");
@@ -165,8 +166,8 @@ class WebTest_Report_LoggingReportTest extends CiviSeleniumTestCase {
     $this->type('activity_subject', "subject" . rand());
     $this->select('case_type_id', 'value=1');
     $this->click('_qf_Case_upload-bottom');
-    $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[9]//span/a[text()='Manage']");
-    $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[9]//span/a[text()='Manage']");
+    $this->waitForElementPresent("xpath=//table[@class='caseSelector']/tbody//tr/td[9]//span/a[1][text()='Manage']");
+    $this->click("xpath=//table[@class='caseSelector']/tbody//tr/td[9]//span/a[1][text()='Manage']");
     $this->waitForElementPresent("xpath=//form[@id='CaseView']/div[2]/table/tbody/tr/td[4]/a");
     $this->click("xpath=//form[@id='CaseView']/div[2]/table/tbody/tr/td[4]/a");
     $this->waitForElementPresent("_qf_Activity_cancel-bottom");

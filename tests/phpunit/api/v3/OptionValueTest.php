@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -45,14 +45,14 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
   public function testGetOptionValueByID() {
     $result = $this->callAPISuccess('option_value', 'get', array('id' => 1));
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $result['id']);
   }
 
   public function testGetOptionValueByValue() {
     $result = $this->callAPISuccess('option_value', 'get', array('option_group_id' => 1, 'value' => '1'));
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $result['id']);
   }
 
   /**
@@ -133,7 +133,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   public function testGetOptionGroup() {
     $params = array('option_group_id' => 1);
     $result = $this->callAPIAndDocument('option_value', 'get', $params, __FUNCTION__, __FILE__);
-    $this->assertGreaterThan(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertGreaterThan(1, $result['count']);
   }
 
   /**
@@ -144,13 +144,13 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $params = array('option.limit' => 100);
     $activityTypes = $this->callAPISuccess('option_value', 'get', $activityTypesParams);
     $result = $this->callAPISuccess('option_value', 'get', $params);
-    $this->assertGreaterThan(1, $activityTypes['count'], 'In line ' . __LINE__);
-    $this->assertGreaterThan($activityTypes['count'], $result['count'], 'In line ' . __LINE__);
+    $this->assertGreaterThan(1, $activityTypes['count']);
+    $this->assertGreaterThan($activityTypes['count'], $result['count']);
   }
 
   public function testGetOptionDoesNotExist() {
     $result = $this->callAPISuccess('option_value', 'get', array('label' => 'FSIGUBSFGOMUUBSFGMOOUUBSFGMOOBUFSGMOOIIB'));
-    $this->assertEquals(0, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(0, $result['count']);
   }
 
   /**
@@ -302,7 +302,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
 
   /**
-   * Update option value with 'id' paramter and the value to update
+   * Update option value with 'id' parameter and the value to update
    * and not passing option group id
    */
   public function testUpdateOptionValueNoGroupId() {
@@ -322,7 +322,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * Update option value with 'id' paramter and the value to update
+   * Update option value with 'id' parameter and the value to update
    * and as well as option group id
    */
   public function testUpdateOptionValueWithGroupId() {

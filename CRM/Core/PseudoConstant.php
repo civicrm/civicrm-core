@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -44,8 +44,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_PseudoConstant {
 
@@ -191,6 +189,11 @@ class CRM_Core_PseudoConstant {
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
    * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
+   *
+   * NOTE: If someone undertakes a refactoring of this, please consider the use-case of
+   * the Setting.getoptions API. There is no DAO/field, but it would be nice to use the
+   * same 'pseudoconstant' struct in *.settings.php. This means loosening the coupling
+   * between $field lookup and the $pseudoconstant evaluation.
    *
    * @param string $daoName
    * @param string $fieldName
@@ -544,11 +547,11 @@ class CRM_Core_PseudoConstant {
    * @param string $condition
    *   The condition that gets passed to the final query as the WHERE clause.
    *
-   * @param null $orderby
+   * @param bool $orderby
    * @param string $key
-   * @param null $force
+   * @param bool $force
    *
-   * @return void
+   * @return array
    */
   public static function populate(
     &$var,
@@ -704,10 +707,9 @@ class CRM_Core_PseudoConstant {
   public static function &stateProvince($id = FALSE, $limit = TRUE) {
     if (($id && !CRM_Utils_Array::value($id, self::$stateProvince)) || !self::$stateProvince || !$id) {
       $whereClause = FALSE;
-      $config = CRM_Core_Config::singleton();
       if ($limit) {
         $countryIsoCodes = self::countryIsoCode();
-        $limitCodes = $config->provinceLimit();
+        $limitCodes = CRM_Core_BAO_Country::provinceLimit();
         $limitIds = array();
         foreach ($limitCodes as $code) {
           $limitIds = array_merge($limitIds, array_keys($countryIsoCodes, $code));
@@ -756,7 +758,7 @@ class CRM_Core_PseudoConstant {
    * @return array
    *   array reference of all State/Province abbreviations.
    */
-  public static function &stateProvinceAbbreviation($id = FALSE, $limit = TRUE) {
+  public static function stateProvinceAbbreviation($id = FALSE, $limit = TRUE) {
     if ($id > 1) {
       $query = "
 SELECT abbreviation
@@ -776,9 +778,8 @@ WHERE  id = %1";
       $whereClause = FALSE;
 
       if ($limit) {
-        $config = CRM_Core_Config::singleton();
         $countryIsoCodes = self::countryIsoCode();
-        $limitCodes = $config->provinceLimit();
+        $limitCodes = CRM_Core_BAO_Country::provinceLimit();
         $limitIds = array();
         foreach ($limitCodes as $code) {
           $tmpArray = array_keys($countryIsoCodes, $code);
@@ -833,7 +834,7 @@ WHERE  id = %1";
         // limit the country list to the countries specified in CIVICRM_COUNTRY_LIMIT
         // (ensuring it's a subset of the legal values)
         // K/P: We need to fix this, i dont think it works with new setting files
-        $limitCodes = $config->countryLimit();
+        $limitCodes = CRM_Core_BAO_Country::countryLimit();
         if (!is_array($limitCodes)) {
           $limitCodes = array(
             $config->countryLimit => 1,
@@ -1425,7 +1426,7 @@ WHERE  id = %1";
    * @return array
    *   array of all payment processors
    */
-  public static function &paymentProcessor($all = FALSE, $test = FALSE, $additionalCond = NULL) {
+  public static function paymentProcessor($all = FALSE, $test = FALSE, $additionalCond = NULL) {
     $condition = "is_test = ";
     $condition .= ($test) ? '1' : '0';
 
@@ -1433,7 +1434,7 @@ WHERE  id = %1";
       $condition .= " AND ( $additionalCond ) ";
     }
 
-    // CRM-7178. Make sure we only include payment processors valid in ths
+    // CRM-7178. Make sure we only include payment processors valid in this
     // domain
     $condition .= " AND domain_id = " . CRM_Core_Config::domainID();
 

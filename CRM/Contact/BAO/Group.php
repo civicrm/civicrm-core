@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -29,13 +29,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
-   * Class constructor
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -65,11 +63,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Delete the group and all the object that connect to
-   * this group. Incredibly destructive
+   * Delete the group and all the object that connect to this group.
    *
-   * @param int $id
-   *   Group id.
+   * Incredibly destructive.
+   *
+   * @param int $id Group id.
    */
   public static function discard($id) {
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
@@ -203,7 +201,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    *   this array contains the list of members for this group id
    */
   public static function &getMember($groupID, $useCache = TRUE) {
-    $params = array(array('group', 'IN', array($groupID => 1), 0, 0));
+    $params = array(array('group', '=', $groupID, 0, 0));
     $returnProperties = array('contact_id');
     list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, 0, $useCache);
 
@@ -506,7 +504,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * and store it for future use
    */
   public function buildClause() {
-    $params = array(array('group', 'IN', array($this->id => 1), 0, 0));
+    $params = array(array('group', 'IN', array($this->id), 0, 0));
 
     if (!empty($params)) {
       $tables = $whereTables = array();
@@ -637,7 +635,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * This function create the hidden smart group when user perform
-   * contact seach and want to send mailing to search contacts.
+   * contact search and want to send mailing to search contacts.
    *
    * @param array $params
    *   ( reference ) an assoc array of name/value pairs.
@@ -1029,10 +1027,10 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // need to return id, title (w/ spacer), description, visibility
 
     // We need to build a list of tags ordered by hierarchy and sorted by
-    // name. The heirarchy will be communicated by an accumulation of
+    // name. The hierarchy will be communicated by an accumulation of
     // separators in front of the name to give it a visual offset.
     // Instead of recursively making mysql queries, we'll make one big
-    // query and build the heirarchy with the algorithm below.
+    // query and build the hierarchy with the algorithm below.
     $groups = array();
     $args = array(1 => array($groupIdString, 'String'));
     $query = "

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -122,7 +122,7 @@
           }
 
         if ( showError ) {
-          cj('#validate_pricefield').show().html("<span class='icon red-icon ui-icon-alert'></span>{/literal}{ts escape='js'}This Option is already full for this event.{/ts}{literal}");
+          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
         }
         else {
           cj('#validate_pricefield').hide( ).html('');
@@ -169,10 +169,6 @@
   {/if}
 
   {include file="CRM/Event/Form/EventFees.tpl"}
-
-{* Ajax callback for custom data snippet *}
-{elseif $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
 
 {* Main event form template *}
 {else}
@@ -465,4 +461,3 @@
 </script>
 
 {/if} {* end of main event block*}
-

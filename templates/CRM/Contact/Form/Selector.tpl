@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,7 @@
 {include file="CRM/common/pager.tpl" location="top"}
 
 {include file="CRM/common/pagerAToZ.tpl"}
-<a href="#" class="crm-selection-reset crm-hover-button"><span class="icon ui-icon-close"></span> {ts}Reset all selections{/ts}</a>
+<a href="#" class="crm-selection-reset crm-hover-button"><i class="crm-i fa-times-circle-o"></i> {ts}Reset all selections{/ts}</a>
 
 <table summary="{ts}Search results listings.{/ts}" class="selector row-highlight">
   <thead class="sticky">

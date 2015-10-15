@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,15 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class is used to retrieve and display a range of
- * contacts that match the given criteria (specifically for
- * results of advanced search options.
+ * Class is to retrieve and display a range of contacts that match the given criteria.
  *
+ * It is specifically for results of advanced search options.
  */
 class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Selector_API {
 
@@ -630,13 +627,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $links = self::links($this->_context, $this->_contextMenu, $this->_key);
 
     //check explicitly added contact to a Smart Group.
-    $groupID = CRM_Utils_Array::key('1', $this->_formValues['group']);
+    $groupID = CRM_Utils_Array::value('group', $this->_formValues);
 
     $pseudoconstants = array();
     // for CRM-3157 purposes
     if (in_array('world_region', $names)) {
       $pseudoconstants['world_region'] = array(
-        'dbName' => 'world_region_id',
+        'dbName' => 'worldregion_id',
         'values' => CRM_Core_PseudoConstant::worldRegion(),
       );
     }
@@ -787,7 +784,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           );
         }
         elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
-          ($config->mapGeoCoding && !empty($row['city']) &&
+          (!empty($row['city']) &&
             CRM_Utils_Array::value('state_province', $row)
           )
         ) {
@@ -956,7 +953,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         );
       }
       elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
-        ($config->mapGeoCoding && !empty($row['city']) &&
+        (!empty($row['city']) &&
           CRM_Utils_Array::value('state_province', $row)
         )
       ) {
@@ -1072,8 +1069,6 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
    * @param CRM_Utils_Sort $sort
    * @param string $cacheKey
    *   Cache key.
-   *
-   * @return void
    */
   public function rebuildPreNextCache($start, $end, $sort, $cacheKey) {
     // generate full SQL

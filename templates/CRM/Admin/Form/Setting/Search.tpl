@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -63,13 +63,13 @@
                 <span class="description">{ts}The number of minutes to cache smart group contacts. We strongly recommend that this value be greater than zero, since a value of zero means no caching at all. If your contact data changes frequently, you should set this value to at least 5 minutes.{/ts}</span></td>
         </tr>
         <tr class="crm-search-setting-form-block-autocompleteContactSearch">
-            <td class="label">{$form.autocompleteContactSearch.label}</td>
-            <td>{$form.autocompleteContactSearch.html}<br/>
+            <td class="label">{$form.contact_autocomplete_options.label}</td>
+            <td>{$form.contact_autocomplete_options.html}<br/>
             <span class="description">{ts}Selected fields will be displayed in back-office autocomplete dropdown search results (Quick Search, etc.). Contact Name is always included.{/ts}</span></td>
         </tr>
         <tr class="crm-search-setting-form-block-autocompleteContactReference">
-            <td class="label">{$form.autocompleteContactReference.label}</td>
-            <td>{$form.autocompleteContactReference.html}<br/>
+            <td class="label">{$form.contact_reference_options.label}</td>
+            <td>{$form.contact_reference_options.html}<br/>
             <span class="description">{ts}Selected fields will be displayed in autocomplete dropdown search results for 'Contact Reference' custom fields. Contact Name is always included. NOTE: You must assign 'access contact reference fields' permission to the anonymous role if you want to use custom contact reference fields in profiles on public pages. For most situations, you should use the 'Limit List to Group' setting when configuring a contact reference field which will be used in public forms to prevent exposing your entire contact list.{/ts}</span></td>
         </tr>
         <tr class="crm-search-setting-form-block-search_autocomplete_count">

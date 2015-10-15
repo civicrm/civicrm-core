@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -34,12 +34,15 @@
     {/if}
     {if !empty($form.address.$blockId.postal_code)}
        <td>
-          {$form.address.$blockId.postal_code.label}{if !empty($form.address.$blockId.postal_code_suffix)}&nbsp;<span>{ts}Suffix{/ts}</span>{/if}<br />
-          {$form.address.$blockId.postal_code.html}&nbsp;&nbsp;
-          {if !empty($form.address.$blockId.postal_code_suffix)}
-            {$form.address.$blockId.postal_code_suffix.html} {help id="id-postal-code-suffix" file="CRM/Contact/Form/Contact.hlp"}
-          {/if}
+          {$form.address.$blockId.postal_code.label}<br />
+          {$form.address.$blockId.postal_code.html}
        </td>
+      {if !empty($form.address.$blockId.postal_code_suffix)}
+          <td>
+            {$form.address.$blockId.postal_code_suffix.label} {help id="id-postal-code-suffix" file="CRM/Contact/Form/Contact.hlp"}<br/>
+            {$form.address.$blockId.postal_code_suffix.html}
+          <td>
+      {/if}
     {/if}
     <td colspan="2">&nbsp;&nbsp;</td>
 </tr>

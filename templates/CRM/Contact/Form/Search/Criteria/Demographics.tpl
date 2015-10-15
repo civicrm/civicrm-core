@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6
+ | CiviCRM version 4.7
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,27 +24,43 @@
  +--------------------------------------------------------------------+
 *}
 <div id="demographics" class="form-item">
-    <table class="form-layout">
-       <tr>
-           <tr><td><label>{ts}Birth Dates{/ts}</label></td></tr>
-    {include file="CRM/Core/DateRange.tpl" fieldName="birth_date" from='_low' to='_high'}
-       </tr>
-       <tr>
-   <td>
-            {$form.is_deceased.label}<br />
-           {$form.is_deceased.html}
-         </td>
-      </tr>
-      <tr>
-          <tr><td><label>{ts}Deceased Dates{/ts}</label></td></tr>
-    {include file="CRM/Core/DateRange.tpl" fieldName="deceased_date" from='_low' to='_high'}
-      </tr>
-      <tr>
-         <td>
-            {$form.gender_id.label}<br />
-            {$form.gender_id.html}
-         </td>
-      </tr>
-    </table>
+  <table class="form-layout">
+    <tr>
+      <td>
+        <label>{ts}Birth Dates{/ts}</label>
+      </td>
+    </tr>
+    <tr>
+      {include file="CRM/Core/DateRange.tpl" fieldName="birth_date" from='_low' to='_high'}
+    </tr>
+    <tr>
+      <td>
+        <label>{ts}Age{/ts}</label>
+      </td>
+    </tr>
+    <tr>
+      {include file="CRM/Core/AgeRange.tpl" fieldName="age" from='_low' to='_high' date='_asof_date'}
+    </tr>
+    <tr>
+      <td>
+        {$form.is_deceased.label}<br />
+        {$form.is_deceased.html}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <label>{ts}Deceased Dates{/ts}</label>
+      </td>
+    </tr>
+    <tr>
+      {include file="CRM/Core/DateRange.tpl" fieldName="deceased_date" from='_low' to='_high'}
+    </tr>
+    <tr>
+      <td>
+        {$form.gender_id.label}<br />
+        {$form.gender_id.html}
+      </td>
+    </tr>
+  </table>
 </div>
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -100,7 +100,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Select the task action to export.
     $this->click("task");
-    $this->select("task", "label=Export Contacts");
+    $this->select("task", "label=Export contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $csvFile = $this->downloadCSV("_qf_Select_next-bottom");
@@ -212,12 +212,12 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     // Is contact present in search result?
     $this->assertElementContainsText('css=div.crm-search-results', $childSortName, "Contact did not found in search result!");
 
-    // select to export all the contasct from search result.
+    // select to export all the contacts from search result.
     $this->click("CIVICRM_QFID_ts_all_4");
 
     // Select the task action to export.
     $this->click("task");
-    $this->select("task", "label=Export Contacts");
+    $this->select("task", "label=Export contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $csvFile = $this->downloadCSV("_qf_Select_next-bottom");
@@ -282,7 +282,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     $this->type("address_1_street_address", "121A Sherman St. Apt. 12");
     $this->type("address_1_city", "Dumfries");
     $this->type("address_1_postal_code", "1234");
-    $this->select("address_1_country_id", "United States");
+    $this->select("address_1_country_id", "UNITED STATES");
     $this->select("address_1_state_province_id", "value=1019");
 
     $this->click('_qf_Contact_upload_view');
@@ -370,7 +370,7 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
 
     // Select the task action to export.
     $this->click("task");
-    $this->select("task", "label=Export Contacts");
+    $this->select("task", "label=Export contacts");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->click("CIVICRM_QFID_2_10");
@@ -472,6 +472,91 @@ class WebTest_Export_ContactTest extends ExportCiviSeleniumTestCase {
     );
     $optionLabel = $this->webtest_civicrm_api("OptionValue", "getvalue", $params);
     return $optionLabel;
+  }
+
+  /**
+   *  CRM-17286 - Test Contribution Export for Soft Credit fields.
+   */
+  public function testContributionExport() {
+    $this->webtestLogin();
+
+    // Create a contact to be used as soft creditor
+    $softCreditFname = substr(sha1(rand()), 0, 7);
+    $softCreditLname = substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
+    $softContactId = $this->urlArg('cid');
+
+    $firstName = 'a' . substr(sha1(rand()), 0, 7);
+    $this->openCiviPage('contribute/add', 'reset=1&action=add&context=standalone', '_qf_Contribution_upload-bottom');
+    $this->webtestNewDialogContact($firstName);
+    // select financial type
+    $this->select("financial_type_id", "value=1");
+
+    // fill in Received Date
+    $this->webtestFillDate('receive_date');
+
+    // source
+    $this->type("source", "Mailer 1");
+
+    // total amount
+    $this->type("total_amount", "100");
+
+    // create first soft credit
+    $this->click("softCredit");
+    $this->waitForElementPresent("soft_credit_amount_1");
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 's2id_soft_credit_contact_id_1');
+    $this->type("soft_credit_amount_1", "50");
+
+    // Clicking save.
+    $this->clickLink("_qf_Contribution_upload");
+
+    $this->openCiviPage("contribute/search", "reset=1", "_qf_Search_refresh");
+    $this->type("sort_name", $firstName);
+    $this->clickLink("_qf_Search_refresh");
+    // Is contact present in search result?
+    $this->assertElementContainsText('css=div.crm-search-results', $firstName, "Contact did not found in search result!");
+    $contributionID = $this->urlArg('id', $this->getAttribute("xpath=//div[@id='contributionSearch']/table/tbody/tr/td[11]/span/a[text()='Edit']@href"));
+    // select to export all the contacts from search result.
+    $this->click("toggleSelect");
+
+    // Select the task action to export.
+    $this->click("task");
+    $this->select("task", "label=Export contributions");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->click('CIVICRM_QFID_2_4');
+    $this->clickLink('_qf_Select_next-bottom');
+
+    $this->select("mapper_1_0_0", 'Contribution');
+    $this->select("mapper_1_0_1", 'Soft Credit Amount');
+
+    $this->select("mapper_1_1_0", 'Contribution');
+    $this->select("mapper_1_1_1", 'Soft Credit For');
+
+    $this->select("mapper_1_2_0", 'Contribution');
+    $this->select("mapper_1_2_1", 'Soft Credit For Contribution ID');
+
+    $this->select("mapper_1_3_0", 'Contribution');
+    $this->select("mapper_1_3_1", 'Soft Credit Type');
+
+    $this->select("mapper_1_4_0", 'Contribution');
+    $this->select("mapper_1_4_1", 'Soft Credit For Contact ID');
+
+    $csvFile = $this->downloadCSV("_qf_Map_next-bottom", 'CiviCRM_Contribution_Search.csv');
+
+    // All other rows to be check.
+    $checkRows = array(
+      1 => array(
+        'Soft Credit Amount' => 50.00,
+        'Soft Credit For' => "{$softCreditLname}, {$softCreditFname}",
+        'Soft Credit For Contribution ID' => $contributionID,
+        'Soft Credit Type' => 'Solicited',
+        'Soft Credit For Contact ID' => $softContactId,
+      ),
+    );
+
+    // Read CSV and fire assertions.
+    $this->reviewCSV($csvFile, array(), $checkRows, 1);
+
   }
 
 }

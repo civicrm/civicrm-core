@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -136,13 +136,12 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     // expected calc'd end date
     $endDate = date('Y-m-d', mktime(0, 0, 0, 3, 31, $nextYear));
 
-    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
                'joinDate',
                'startDate',
                'endDate',
              ) as $date) {
-      $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
+      $$date = CRM_Utils_Date::customFormat($$date, $this->webtestGetSetting('dateformatFull'));
     }
 
     $query = "
@@ -295,13 +294,12 @@ SELECT end_event_adjust_interval
 
     // expected calc'd end date
     $endDate = date('Y-m-d', mktime(0, 0, 0, 8, 31, $currentYear + 2));
-    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
                'joinDate',
                'startDate',
                'endDate',
              ) as $date) {
-      $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
+      $$date = CRM_Utils_Date::customFormat($$date, $this->webtestGetSetting('dateformatFull'));
     }
 
     $query = "
@@ -447,13 +445,12 @@ SELECT end_event_adjust_interval
     $joinDate = date('Y-m-d', mktime(0, 0, 0, 11, 15, $currentYear));
     $startDate = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
     $endDate = date('Y-m-d', mktime(0, 0, 0, 12, 31, $nextYear));
-    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
                'joinDate',
                'startDate',
                'endDate',
              ) as $date) {
-      $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
+      $$date = CRM_Utils_Date::customFormat($$date, $this->webtestGetSetting('dateformatFull'));
     }
 
     $query = "
@@ -601,13 +598,12 @@ SELECT end_event_adjust_interval
     // expected calc'd start and end dates
     $startDate = date('Y-m-d', mktime(0, 0, 0, 1, 1, $currentYear));
     $endDate = date('Y-m-d', mktime(0, 0, 0, 12, 31, $currentYear));
-    $configVars = new CRM_Core_Config_Variables();
     foreach (array(
                'joinDate',
                'startDate',
                'endDate',
              ) as $date) {
-      $$date = CRM_Utils_Date::customFormat($$date, $configVars->dateformatFull);
+      $$date = CRM_Utils_Date::customFormat($$date, $this->webtestGetSetting('dateformatFull'));
     }
 
     $query = "

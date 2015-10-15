@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -51,10 +51,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'component' => 'CiviCase',
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $entityId = $result['id'];
-    $this->assertTrue(is_numeric($entityId), 'In line ' . __LINE__);
-    $this->assertEquals(7, $result['values'][$entityId]['component_id'], 'In line ' . __LINE__);
+    $this->assertTrue(is_numeric($entityId));
+    $this->assertEquals(7, $result['values'][$entityId]['component_id']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -67,7 +67,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'component' => '',
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -81,7 +81,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'is_active' => 0,
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -94,7 +94,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'is_active' => 1,
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -105,7 +105,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'id' => $entityId,
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       ');
@@ -197,6 +197,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'logging/contribute/detail' => '(likely to be test related) probably logging off DB Error: no such table',
       'survey/detail' => '(likely to be test related)  Undefined index: CiviCampaign civicrm CRM/Core/Component.php(196)',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
+      'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
     );
 
     $reports = civicrm_api3('report_template', 'get', array('return' => 'value', 'options' => array('limit' => 500)));

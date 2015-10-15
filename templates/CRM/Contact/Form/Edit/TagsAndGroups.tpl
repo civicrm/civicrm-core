@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -97,7 +97,7 @@
             {$form.group.html}
           </td>
         {/if}
-        {if !$type || $type eq 'tag'}
+        {if (!$type || $type eq 'tag') && $tree}
           <td width="70%">{if $title}<span class="label">{$form.tag.label}</span>{/if}
             <div id="tagtree">
               {include file="CRM/Contact/Form/Edit/Tagtree.tpl" level=1}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -108,8 +108,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @param $amount
    * @param $transactionReference
    *
-   * @internal param \xml $dataRoot response send by google in xml format
-   * @return void
+   * @return bool
    */
   public function newOrderNotify($success, $privateData, $component, $amount, $transactionReference) {
     $ids = $input = $params = array();
@@ -297,23 +296,32 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
       ));
       $success = FALSE;
       if ($response = curl_exec($curl)) {
-        fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"),
-          $response
-        ));
-        curl_close($curl);
+        $info = curl_getinfo($curl);
+        if ($info['http_code'] < 200 || $info['http_code'] > 299) {
+          $log_message = "DPS error: HTTP %1 retrieving %2.";
+          CRM_Core_Error::fatal(ts($log_message, array(1 => $info['http_code'], 2 => $info['url'])));
+        }
+        else {
+          fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"), $response));
+          curl_close($curl);
 
-        // Assign the returned XML values to variables
-        $valid = CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute($response, 'valid');
-        $success = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'Success');
-        $txnId = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'TxnId');
-        $responseText = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'ResponseText');
-        $authCode = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'AuthCode');
-        $DPStxnRef = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'DpsTxnRef');
-        $qfKey = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData1");
-        $privateData = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData2");
-        list($component, $paymentProcessorID,) = explode(',', CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData3"));
-        $amount = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "AmountSettlement");
-        $merchantReference = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "MerchantReference");
+          // Assign the returned XML values to variables
+          $valid = CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute($response, 'valid');
+          // CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute() returns NULL if preg fails.
+          if (is_null($valid)) {
+            CRM_Core_Error::fatal(ts("DPS error: Unable to parse XML response from DPS.", array(1 => $valid)));
+          }
+          $success = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'Success');
+          $txnId = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'TxnId');
+          $responseText = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'ResponseText');
+          $authCode = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'AuthCode');
+          $DPStxnRef = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'DpsTxnRef');
+          $qfKey = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData1");
+          $privateData = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData2");
+          list($component, $paymentProcessorID,) = explode(',', CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "TxnData3"));
+          $amount = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "AmountSettlement");
+          $merchantReference = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, "MerchantReference");
+        }
       }
       else {
         // calling DPS failed

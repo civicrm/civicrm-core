@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -362,7 +362,7 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Check confirmation alert.
-    $this->assertTrue((bool) preg_match("/^Are you sure you want to Import now[\s\S]$/", $this->getConfirmation()));
+    $this->assertTrue((bool) preg_match("/^Backing up your database before importing is recommended, as there is no Undo for this. Are you sure you want to Import now[\s\S]$/", $this->getConfirmation()));
     $this->chooseOkOnNextConfirmation();
     $this->waitForPageToLoad($this->getTimeoutMsec());
 

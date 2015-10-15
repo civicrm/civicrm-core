@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -39,8 +37,6 @@
 class CRM_Report_Page_Instance extends CRM_Core_Page {
   /**
    * Run this page (figure out the action needed and perform it).
-   *
-   * @return void
    */
   public function run() {
     $instanceId = CRM_Report_Utils_Report::getInstanceID();

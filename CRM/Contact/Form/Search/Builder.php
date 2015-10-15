@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class if for search builder processing
+ * This class is for search builder processing.
  */
 class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
@@ -54,8 +52,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->set('searchFormName', 'Builder');
@@ -124,9 +120,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Search_Builder', 'formRule'), $this);
@@ -135,9 +128,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   /**
    * Global validation rules for the form.
    *
-   * @param $values
-   * @param $files
-   * @param $self
+   * @param array $values
+   * @param array $files
+   * @param CRM_Core_Form $self
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -162,31 +155,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
           !empty($v[2])
         ) {
           $errorMsg["value[$v[3]][$v[4]]"] = ts('Please clear your value if you want to use %1 operator.', array(1 => $v[1]));
-        }
-        elseif (($v[0] == 'group' || $v[0] == 'tag') && !empty($v[2])) {
-          $grpId = array_keys($v[2]);
-          if (!key($v[2])) {
-            $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a value.");
-          }
-
-          if (count($grpId) > 1) {
-            if ($v[1] != 'IN' && $v[1] != 'NOT IN') {
-              $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a valid value.");
-            }
-            foreach ($grpId as $val) {
-              $error = CRM_Utils_Type::validate($val, 'Integer', FALSE);
-              if ($error != $val) {
-                $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a valid value.");
-                break;
-              }
-            }
-          }
-          else {
-            $error = CRM_Utils_Type::validate($grpId[0], 'Integer', FALSE);
-            if ($error != $grpId[0]) {
-              $errorMsg["value[$v[3]][$v[4]]"] = ts('Please enter valid %1 id.', array(1 => $v[0]));
-            }
-          }
         }
         elseif (substr($v[0], 0, 7) === 'do_not_' or substr($v[0], 0, 3) === 'is_') {
           if (isset($v[2])) {
@@ -334,8 +302,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
   /**
    * Process the uploaded file.
-   *
-   * @return void
    */
   public function postProcess() {
     $this->set('isAdvanced', '2');

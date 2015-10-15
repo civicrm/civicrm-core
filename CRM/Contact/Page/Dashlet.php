@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * CiviCRM Dashlet
- *
+ * CiviCRM Dashlet.
  */
 class CRM_Contact_Page_Dashlet extends CRM_Core_Page {
 
   /**
    * Run dashboard.
-   *
-   * @return void
    */
   public function run() {
     CRM_Utils_System::setTitle(ts('Dashlets'));

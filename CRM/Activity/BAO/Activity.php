@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 
 /**
@@ -2496,80 +2495,89 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
       $mask = CRM_Core_Action::mask($permissions);
 
       foreach ($activities as $activityId => $values) {
-        $contactActivities[$activityId]['activity_type'] = $values['activity_type'];
-        $contactActivities[$activityId]['subject'] = $values['subject'];
+        $activity = array();
+        // add class to this row if overdue
+        $activity['DT_RowClass'] = 'crm-entity';
+        if (CRM_Utils_Date::overdue(CRM_Utils_Array::value('activity_date_time', $values))
+          && CRM_Utils_Array::value('status_id', $values) == 1
+        ) {
+          $activity['DT_RowClass'] .= ' status-overdue';
+        }
+        else {
+          $activity['DT_RowClass'] .= ' status-ontime';
+        }
+
+        $activity['DT_RowData'] = array();
+        $activity['DT_RowData']['entity'] = 'activity';
+        $activity['DT_RowData']['id'] = $activityId;
+
+        $activity['activity_type'] = $values['activity_type'];
+        $activity['subject'] = $values['subject'];
+
+        $activity['source_contact_name'] = '';
         if ($params['contact_id'] == $values['source_contact_id']) {
-          $contactActivities[$activityId]['source_contact'] = $values['source_contact_name'];
+          $activity['source_contact_name'] = $values['source_contact_name'];
         }
         elseif ($values['source_contact_id']) {
-          $contactActivities[$activityId]['source_contact'] = CRM_Utils_System::href($values['source_contact_name'],
+          $activity['source_contact_name'] = CRM_Utils_System::href($values['source_contact_name'],
             'civicrm/contact/view', "reset=1&cid={$values['source_contact_id']}");
         }
         else {
-          $contactActivities[$activityId]['source_contact'] = '<em>n/a</em>';
+          $activity['source_contact_name'] = '<em>n/a</em>';
         }
 
+        $activity['target_contact_name'] = '';
         if (isset($values['mailingId']) && !empty($values['mailingId'])) {
-          $contactActivities[$activityId]['target_contact'] = CRM_Utils_System::href($values['recipients'],
+          $activity['target_contact'] = CRM_Utils_System::href($values['recipients'],
             'civicrm/mailing/report/event',
             "mid={$values['source_record_id']}&reset=1&event=queue&cid={$params['contact_id']}&context=activitySelector");
         }
         elseif (!empty($values['recipients'])) {
-          $contactActivities[$activityId]['target_contact'] = $values['recipients'];
+          $activity['target_contact_name'] = $values['recipients'];
         }
         elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
-          $contactActivities[$activityId]['target_contact'] = '';
+          $activity['target_contact_name'] = '';
           foreach ($values['target_contact_name'] as $tcID => $tcName) {
-            $contactActivities[$activityId]['target_contact'] .= CRM_Utils_System::href($tcName,
+            $activity['target_contact_name'] .= CRM_Utils_System::href($tcName,
               'civicrm/contact/view', "reset=1&cid={$tcID}");
           }
 
           if ($extraCount = $values['target_contact_counter'] - 1) {
-            $contactActivities[$activityId]['target_contact'] .= ";<br />" . "(" . ts('%1 more', array(1 => $extraCount)) . ")";
+            $activity['target_contact_name'] .= ";<br />" . "(" . ts('%1 more', array(1 => $extraCount)) . ")";
           }
         }
         elseif (!$values['target_contact_name']) {
-          $contactActivities[$activityId]['target_contact'] = '<em>n/a</em>';
+          $activity['target_contact_name'] = '<em>n/a</em>';
         }
 
+        $activity['assignee_contact_name'] = '';
         if (empty($values['assignee_contact_name'])) {
-          $contactActivities[$activityId]['assignee_contact'] = '<em>n/a</em>';
+          $activity['assignee_contact_name'] = '<em>n/a</em>';
         }
         elseif (!empty($values['assignee_contact_name'])) {
           $count = 0;
-          $contactActivities[$activityId]['assignee_contact'] = '';
+          $activity['assignee_contact_name'] = '';
           foreach ($values['assignee_contact_name'] as $acID => $acName) {
             if ($acID && $count < 5) {
-              $contactActivities[$activityId]['assignee_contact'] .= CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
+              $activity['assignee_contact_name'] .= CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
               $count++;
               if ($count) {
-                $contactActivities[$activityId]['assignee_contact'] .= ";&nbsp;";
+                $activity['assignee_contact_name'] .= ";&nbsp;";
               }
 
               if ($count == 4) {
-                $contactActivities[$activityId]['assignee_contact'] .= "(" . ts('more') . ")";
+                $activity['assignee_contact_name'] .= "(" . ts('more') . ")";
                 break;
               }
             }
           }
         }
 
-        $contactActivities[$activityId]['activity_date'] = CRM_Utils_Date::customFormat($values['activity_date_time']);
-        $contactActivities[$activityId]['status'] = $activityStatus[$values['status_id']];
-
-        // add class to this row if overdue
-        $contactActivities[$activityId]['class'] = '';
-        if (CRM_Utils_Date::overdue(CRM_Utils_Array::value('activity_date_time', $values))
-          && CRM_Utils_Array::value('status_id', $values) == 1
-        ) {
-          $contactActivities[$activityId]['class'] = 'status-overdue';
-        }
-        else {
-          $contactActivities[$activityId]['class'] = 'status-ontime';
-        }
+        $activity['activity_date_time'] = CRM_Utils_Date::customFormat($values['activity_date_time']);
+        $activity['status_id'] = $activityStatus[$values['status_id']];
 
         // build links
-        $contactActivities[$activityId]['links'] = '';
+        $activity['links'] = '';
         $accessMailingReport = FALSE;
         if (!empty($values['mailingId'])) {
           $accessMailingReport = TRUE;
@@ -2584,7 +2592,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
 
         $actionMask = array_sum(array_keys($actionLinks)) & $mask;
 
-        $contactActivities[$activityId]['links'] = CRM_Core_Action::formLink($actionLinks,
+        $activity['links'] = CRM_Core_Action::formLink($actionLinks,
           $actionMask,
           array(
             'id' => $values['activity_id'],
@@ -2602,10 +2610,17 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         if ($values['is_recurring_activity']) {
           $contactActivities[$activityId]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getPositionAndCount($values['activity_id'], 'civicrm_activity');
         }
+
+        array_push($contactActivities, $activity);
       }
     }
 
-    return $contactActivities;
+    $activitiesDT = array();
+    $activitiesDT['data'] = $contactActivities;
+    $activitiesDT['recordsTotal'] = $params['total'];
+    $activitiesDT['recordsFiltered'] = $params['total'];
+
+    return $activitiesDT;
   }
 
   /**
@@ -2644,7 +2659,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           }
         }
       }
-      CRM_Core_BAO_CustomValueTable::postProcess($customParams, CRM_Core_DAO::$_nullArray, 'civicrm_activity',
+      CRM_Core_BAO_CustomValueTable::postProcess($customParams, 'civicrm_activity',
         $params['mainActivityId'], 'Activity'
       );
     }
@@ -2709,6 +2724,31 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
       $this->selectAdd('civicrm_activity.*');
       $this->whereAdd(" civicrm_activity_contact.contact_id = {$params['target_contact_id']} AND civicrm_activity_contact.record_type_id = {$targetID}");
     }
+  }
+
+  /**
+   * Send activity as attachment
+   *
+   * @param object $activity
+   * @param array $mailToContacts
+   * @param array $params
+   *
+   * @return bool
+   */
+  public static function sendToAssignee($activity, $mailToContacts, $params = array()) {
+    if (!CRM_Utils_Array::crmIsEmptyArray($mailToContacts)) {
+      $clientID = CRM_Utils_Array::value('client_id', $params);
+      $caseID = CRM_Utils_Array::value('case_id', $params);
+
+      $ics = new CRM_Activity_BAO_ICalendar($activity);
+      $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $activity->id);
+      $ics->addAttachment($attachments, $mailToContacts);
+
+      $result = CRM_Case_BAO_Case::sendActivityCopy($clientID, $activity->id, $mailToContacts, $attachments, $caseID);
+      $ics->cleanup();
+      return $result;
+    }
+    return FALSE;
   }
 
 }

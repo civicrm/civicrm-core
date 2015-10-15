@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -100,7 +100,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       CRM_Core_Error::fatal('ufGroupId is missing');
     }
 
-    $this->_title = ts('Batch Update for Events') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
+    $this->_title = ts('Update multiple participants') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);
     $this->addDefaultButtons(ts('Save'));
     $this->_fields = array();
@@ -221,7 +221,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_Batch_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Batch Update."), ts('Unsupported Field Type'), 'info');
+      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple participants."), ts('Unsupported Field Type'), 'info');
     }
 
     $this->addDefaultButtons(ts('Update Participant(s)'));
@@ -278,7 +278,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          CRM_Core_DAO::$_nullObject,
           $key,
           'Participant'
         );
@@ -384,13 +383,133 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       'componentName' => 'Event',
       'contribution_id' => $contributionId,
       'contribution_status_id' => $contributionStatusId,
-      'skipComponentSync' => 1,
+      'IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved' => 1,
     );
 
     //change related contribution status.
-    $updatedStatusId = CRM_Core_Payment_BaseIPN::updateContributionStatus($params);
+    $updatedStatusId = self::updateContributionStatus($params);
 
     return $updatedStatusId;
+  }
+
+  /**
+   * Update contribution status.
+   *
+   * @deprecated
+   * This is only called from one place in the code &
+   * it is unclear whether it is a function on the way in or on the way out
+   *
+   * @param array $params
+   *
+   * @return NULL|int
+   */
+  public static function updateContributionStatus($params) {
+    // get minimum required values.
+    $statusId = CRM_Utils_Array::value('contribution_status_id', $params);
+    $componentId = CRM_Utils_Array::value('component_id', $params);
+    $componentName = CRM_Utils_Array::value('componentName', $params);
+    $contributionId = CRM_Utils_Array::value('contribution_id', $params);
+
+    if (!$contributionId || !$componentId || !$componentName || !$statusId) {
+      return NULL;
+    }
+
+    $input = $ids = $objects = array();
+
+    //get the required ids.
+    $ids['contribution'] = $contributionId;
+
+    if (!$ids['contact'] = CRM_Utils_Array::value('contact_id', $params)) {
+      $ids['contact'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
+        $contributionId,
+        'contact_id'
+      );
+    }
+
+    if ($componentName == 'Event') {
+      $name = 'event';
+      $ids['participant'] = $componentId;
+
+      if (!$ids['event'] = CRM_Utils_Array::value('event_id', $params)) {
+        $ids['event'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+          $componentId,
+          'event_id'
+        );
+      }
+    }
+
+    if ($componentName == 'Membership') {
+      $name = 'contribute';
+      $ids['membership'] = $componentId;
+    }
+    $ids['contributionPage'] = NULL;
+    $ids['contributionRecur'] = NULL;
+    $input['component'] = $name;
+
+    $baseIPN = new CRM_Core_Payment_BaseIPN();
+    $transaction = new CRM_Core_Transaction();
+
+    // reset template values.
+    $template = CRM_Core_Smarty::singleton();
+    $template->clearTemplateVars();
+
+    if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
+      CRM_Core_Error::fatal();
+    }
+
+    $contribution = &$objects['contribution'];
+
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
+    $input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] = CRM_Utils_Array::value('IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved', $params);
+    if ($statusId == $contributionStatuses['Cancelled']) {
+      $baseIPN->cancelled($objects, $transaction, $input);
+      $transaction->commit();
+      return $statusId;
+    }
+    elseif ($statusId == $contributionStatuses['Failed']) {
+      $baseIPN->failed($objects, $transaction, $input);
+      $transaction->commit();
+      return $statusId;
+    }
+
+    // status is not pending
+    if ($contribution->contribution_status_id != $contributionStatuses['Pending']) {
+      $transaction->commit();
+      return;
+    }
+
+    //set values for ipn code.
+    foreach (array(
+               'fee_amount',
+               'check_number',
+               'payment_instrument_id',
+             ) as $field) {
+      if (!$input[$field] = CRM_Utils_Array::value($field, $params)) {
+        $input[$field] = $contribution->$field;
+      }
+    }
+    if (!$input['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params)) {
+      $input['trxn_id'] = $contribution->invoice_id;
+    }
+    if (!$input['amount'] = CRM_Utils_Array::value('total_amount', $params)) {
+      $input['amount'] = $contribution->total_amount;
+    }
+    $input['is_test'] = $contribution->is_test;
+    $input['net_amount'] = $contribution->net_amount;
+    if (!empty($input['fee_amount']) && !empty($input['amount'])) {
+      $input['net_amount'] = $input['amount'] - $input['fee_amount'];
+    }
+
+    //complete the contribution.
+    $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
+
+    // reset template values before processing next transactions
+    $template->clearTemplateVars();
+
+    return $statusId;
   }
 
 }

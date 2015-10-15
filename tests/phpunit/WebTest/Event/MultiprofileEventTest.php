@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
@@ -91,6 +91,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find Main Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $firstName);
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Participant is a Test?')]/../label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
@@ -104,6 +105,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find additional  Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname);
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Participant is a Test?')]/../label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
@@ -194,6 +196,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find Main Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $firstName);
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Participant is a Test?')]/../label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
@@ -207,6 +210,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find additional  Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname);
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Participant is a Test?')]/../label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
@@ -232,6 +236,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find Main Participant
     $this->openCiviPage('event/search', "reset=1");
     $this->type("sort_name", $firstName2);
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Participant is a Test?')]/../label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
@@ -245,6 +250,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     // Find additional  Participant
     $this->openCiviPage("event/search", "reset=1");
     $this->type("sort_name", $participantfname2);
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Participant is a Test?')]/../label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='participantSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ParticipantView_cancel-top", FALSE);
 
@@ -646,13 +652,14 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $eventPageId, $customId, $firstName, $lastName,
     $participantfname, $participantlname, $email1, $email2
   ) {
-    $this->openCiviPage("event/register", "id={$eventPageId}&reset=1", "_qf_Register_upload-bottom");
+    $this->openCiviPage("event/register", "id={$eventPageId}&reset=1&action=preview", "_qf_Register_upload-bottom");
+    $this->waitForElementPresent("_qf_Register_upload-bottom");
     $this->select("additional_participants", "value=1");
 
     $this->type("email-Primary", $email1);
     $this->type("first_name", $firstName);
     $this->type("last_name", $lastName);
-    $this->type("street_address-1", "Test street addres");
+    $this->type("street_address-1", "Test street address");
     $this->type("city-1", "Mumbai");
     $this->type("postal_code-1", "2354");
     $this->select("state_province-1", "value=1001");
@@ -673,6 +680,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->select("billing_state_province_id-5", "value=1004");
     $this->type("billing_postal_code-5", "94129");
 
+    $this->waitForElementPresent("current_employer");
     $this->type("current_employer", "ABCD");
     $this->type("job_title", "Painter");
     $this->waitForElementPresent('nick_name');
@@ -696,15 +704,15 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
 
     $this->click("_qf_Register_upload-bottom");
     $this->waitForElementPresent("_qf_Participant_1_next-Array");
-
     $this->type("email-Primary", $email2);
     $this->type("first_name", $participantfname);
     $this->type("last_name", $participantlname);
-    $this->type("street_address-1", "participant street addres");
+    $this->type("street_address-1", "participant street address");
     $this->type("city-1", "pune");
     $this->type("postal_code-1", "2354");
     $this->select("state_province-1", "value=1001");
 
+    $this->waitForElementPresent("current_employer");
     $this->type("current_employer", "ABCD");
     $this->type("job_title", "Potato picker");
 
@@ -737,13 +745,13 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
    * @param $email4
    */
   public function _testEventRegistrationAfterRemoving($eventPageId, $customId, $firstName2, $lastName2, $participantfname2, $participantlname2, $email3, $email4) {
-    $this->openCiviPage("event/register", "id={$eventPageId}&reset=1", "_qf_Register_upload-bottom");
+    $this->openCiviPage("event/register", "id={$eventPageId}&reset=1&action=preview", "_qf_Register_upload-bottom");
     $this->select("additional_participants", "value=1");
 
     $this->type("email-Primary", $email4);
     $this->type("first_name", $firstName2);
     $this->type("last_name", $lastName2);
-    $this->type("street_address-1", "Test street addres");
+    $this->type("street_address-1", "Test street address");
     $this->type("city-1", "Mumbai");
     $this->type("postal_code-1", "2354");
     $this->select("state_province-1", "value=1001");
@@ -789,7 +797,7 @@ class WebTest_Event_MultiprofileEventTest extends CiviSeleniumTestCase {
     $this->type("email-Primary", $email3);
     $this->type("first_name", $participantfname2);
     $this->type("last_name", $participantlname2);
-    $this->type("street_address-1", "participant street addres");
+    $this->type("street_address-1", "participant street address");
     $this->type("city-1", "pune");
     $this->type("postal_code-1", "2354");
     $this->select("state_province-1", "value=1001");

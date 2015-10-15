@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
@@ -74,10 +72,6 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *   Id of the database record.
    * @param bool $is_active
    *   Value we want to set the is_active field.
-   *
-   * @return void
-   *   DAO object on sucess, null otherwise
-   *
    */
   public static function setIsActive($id, $is_active) {
     CRM_Core_Error::fatal();
@@ -87,10 +81,35 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    * Delete preference dates.
    *
    * @param int $id
-   *
    */
   public static function del($id) {
     CRM_Core_Error::fatal();
+  }
+
+  /**
+   * (Setting Callback - On Change)
+   * Respond to changes in the "timeInputFormat" setting.
+   *
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
+   */
+  public static function onChangeSetting($oldValue, $newValue, $metadata) {
+    if ($oldValue == $newValue) {
+      return;
+    }
+
+    $query = "
+UPDATE civicrm_preferences_date
+SET    time_format = %1
+WHERE  time_format IS NOT NULL
+AND    time_format <> ''
+";
+    $sqlParams = array(1 => array($newValue, 'String'));
+    CRM_Core_DAO::executeQuery($query, $sqlParams);
   }
 
 }

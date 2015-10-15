@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Extensions
- *
+ * This class generates form components for Extensions.
  */
 class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
-   * For pre-processing
-   *
-   * @return void
+   * Form pre-processing.
    */
   public function preProcess() {
     parent::preProcess();
@@ -84,10 +79,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
    * Set default values for the form.
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -96,8 +87,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     switch ($this->_action) {
@@ -173,9 +162,6 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     CRM_Utils_System::flushCache();

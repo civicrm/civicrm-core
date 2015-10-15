@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -418,7 +418,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
    */
   public function getPriceLevels() {
     $query = "
-SELECT CONCAT(cv.label, ' (', ps.title, ')') label, cv.id
+SELECT CONCAT(cv.label, ' (', ps.title, ' - ', cf.label , ')') label, cv.id
 FROM civicrm_price_field_value cv
 LEFT JOIN civicrm_price_field cf
   ON cv.price_field_id = cf.id
@@ -543,9 +543,12 @@ ORDER BY  cv.label
                   ON (eft.entity_id = {$this->_aliases['civicrm_contribution']}.id)
             LEFT JOIN civicrm_financial_account fa
                   ON (fa.account_type_code = 'AR')
+            LEFT JOIN civicrm_financial_account fae
+                  ON (fae.account_type_code = 'EXP')
             LEFT JOIN civicrm_financial_trxn ft
                   ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND
-                     (ft.to_financial_account_id != fa.id)
+                     (ft.to_financial_account_id != fa.id) AND
+                     (ft.to_financial_account_id != fae.id)
       ";
     }
   }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -217,9 +217,16 @@ class CRM_Core_BAO_CustomValueTable {
             default:
               break;
           }
-          $set[$field['column_name']] = "%{$count}";
-          $params[$count] = array($value, $type);
-          $count++;
+          if (strtolower($value) === "null") {
+            // when unsetting a value to null, we don't need to validate the type
+            // https://projectllr.atlassian.net/browse/VGQBMP-20
+            $set[$field['column_name']] = $value;
+          }
+          else {
+            $set[$field['column_name']] = "%{$count}";
+            $params[$count] = array($value, $type);
+            $count++;
+          }
         }
 
         if (!empty($set)) {
@@ -361,14 +368,12 @@ class CRM_Core_BAO_CustomValueTable {
    * Post process function.
    *
    * @param array $params
-   * @param $customFields
    * @param $entityTable
    * @param int $entityID
    * @param $customFieldExtends
    */
-  public static function postProcess(&$params, &$customFields, $entityTable, $entityID, $customFieldExtends) {
+  public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
-      $customFields,
       $entityID,
       $customFieldExtends
     );
@@ -623,7 +628,7 @@ AND    cf.id IN ( $fieldIDList )
    * To get the values of custom fields with IDs 13 and 43 for contact ID 1327, use:
    * $params = array( 'entityID' => 1327, 'custom_13' => 1, 'custom_43' => 1 );
    *
-   * Entity Type will be infered by the custom fields you request
+   * Entity Type will be inferred by the custom fields you request
    * Specify $params['entityType'] if you do not supply any custom fields to return
    * and entity type is other than Contact
    *

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -193,7 +193,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
 
     //Check for SoftCredit
     $softCreditor = "{$firstName} {$lastName}";
-    $this->verifyText("xpath=//div['PCPView']/div[2]/table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a", preg_quote($softCreditor), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//div['PCPView']/div[2]/table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a", preg_quote($softCreditor));
 
     // Check PCP Summary Report
     $this->openCiviPage('report/instance/16', 'reset=1');

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
@@ -514,8 +512,6 @@ SELECT    *
    *
    * @param bool $visibility
    * @param string $method
-   *
-   * @return void
    */
   public static function create(&$params, $contactId, $visibility = FALSE, $method = 'Admin') {
     $contactIds = array();
@@ -602,9 +598,6 @@ SELECT    *
    * @see CRM_Dedupe_Merger::cpTables()
    *
    * TODO: use the 3rd $sqls param to append sql statements rather than executing them here
-   *
-   * @return void
-   *
    */
   public static function mergeGroupContact($mainContactId, $otherContactId) {
     $params = array(

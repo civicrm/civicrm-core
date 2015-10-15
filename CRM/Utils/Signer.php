@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -99,7 +97,8 @@ class CRM_Utils_Signer {
           $params[$paramName] = (string) $params[$paramName];
         }
       }
-      else {// $paramName is not included or ===NULL
+      else {
+        // $paramName is not included or ===NULL
         $params[$paramName] = '';
       }
       $message['payload'][$paramName] = $params[$paramName];

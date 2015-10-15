@@ -33,7 +33,7 @@
     <title>Contribution Page Introduction Text</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
@@ -249,7 +249,7 @@
     <title>Thank-you Text</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>8</rows>
       <cols>60</cols>
     </html>
@@ -262,34 +262,13 @@
     <title>Thank-you Footer</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>8</rows>
       <cols>60</cols>
     </html>
     <localizable>true</localizable>
     <comment>Text and html allowed. displayed at the bottom of the success page. Common usage is to include link(s) to other pages such as tell-a-friend, etc.</comment>
     <add>1.3</add>
-  </field>
-  <field>
-    <name>is_for_organization</name>
-    <title>Allow For Organization</title>
-    <type>boolean</type>
-    <comment>if true, signup is done on behalf of an organization</comment>
-    <default>0</default>
-    <add>2.1</add>
-  </field>
-  <field>
-    <name>for_organization</name>
-    <title>On Behalf Of Organization</title>
-    <type>text</type>
-    <html>
-      <type>TextArea</type>
-      <rows>2</rows>
-      <cols>50</cols>
-    </html>
-    <localizable>true</localizable>
-    <comment>This text field is shown when is_for_organization is checked. For example - I am contributing on behalf on an organization.</comment>
-    <add>2.1</add>
   </field>
   <field>
     <name>is_email_receipt</name>
@@ -357,7 +336,7 @@
     <title>Footer Text</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>

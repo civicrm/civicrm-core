@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,21 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Smtp Server
- *
+ * This class generates form components for Smtp Server.
  */
 class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   protected $_testButtonName;
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
 
@@ -76,9 +71,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     // flush caches so we reload details for future requests
@@ -189,7 +181,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     );
 
     if (!empty($mailingBackend)) {
-      CRM_Core_BAO_ConfigSetting::formatParams($formValues, $mailingBackend);
+      $formValues = array_merge($mailingBackend, $formValues);
     }
 
     // if password is present, encrypt it
@@ -243,10 +235,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
   /**
    * Set default values for the form.
-   * default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
     if (!$this->_defaults) {

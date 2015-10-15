@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -392,20 +392,39 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         }
 
         $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported($row['membership_id']);
-        $row['action'] = CRM_Core_Action::formLink(self::links('all',
+        if (!isset($result->owner_membership_id)) {
+          $links = self::links('all',
             $this->_isPaymentProcessor,
             $this->_accessContribution,
             $this->_key,
             $this->_context,
             $isCancelSupported
-          ),
+          );
+        }
+        else {
+          $links = self::links('view');
+        }
+        // check permissions
+        $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $result->membership_type_id, 'financial_type_id');
+        $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
+        if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+          && !CRM_Core_Permission::check('edit contributions of type ' . $finType)
+        ) {
+          unset($links[CRM_Core_Action::UPDATE]);
+        }
+        if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() &&
+          !CRM_Core_Permission::check('delete contributions of type ' . $finType)
+        ) {
+          unset($links[CRM_Core_Action::DELETE]);
+        }
+        $row['action'] = CRM_Core_Action::formLink($links,
           $currentMask,
           array(
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
           ),
-          ts('more'),
+          ts('Renew') . '...',
           FALSE,
           'membership.selector.row',
           'Membership',
@@ -413,7 +432,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         );
       }
       else {
-        $row['action'] = CRM_Core_Action::formLink(self::links('view'), $mask,
+        $row['action'] = CRM_Core_Action::formLink($links, $mask,
           array(
             'id' => $result->membership_id,
             'cid' => $result->contact_id,

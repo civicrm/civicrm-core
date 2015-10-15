@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -196,10 +196,10 @@ class WebTest_Campaign_ActivityTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', $subject);
 
-    $this->waitForElementPresent("xpath=//div[@class='dataTables_wrapper no-footer']/table/tbody/tr[1]/td[8]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='crm-activity-selector-activity']/div[2]/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//table[@class='contact-activity-selector-activity dataTable no-footer']/tbody//tr[2]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='crm-activity-selector-activity']/div[2]/table/tbody/tr[2]/td[8]/span[1]/a[1][text()='View']");
     $this->waitForElementPresent("xpath=//button//span[contains(text(),'Done')]");
 
     // verify Activity created

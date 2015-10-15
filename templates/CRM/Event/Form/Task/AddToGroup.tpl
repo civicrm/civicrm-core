@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -35,7 +35,7 @@
         <tr id="id_existing_group">
             <td>
                 <table class="form-layout">
-                <tr><td class="label">{$form.group_id.label}<span class="marker">*</span></td><td>{$form.group_id.html}</td></tr>
+                <tr><td class="label">{$form.group_id.label}<span class="crm-marker">*</span></td><td>{$form.group_id.html}</td></tr>
                 </table>
             </td>
         </tr>
@@ -43,7 +43,7 @@
             <td>
                 <table class="form-layout">
                 <tr class="crm-contact-task-addtogroup-form-block-title">
-                   <td class="label">{$form.title.label}<span class="marker">*</span></td>
+                   <td class="label">{$form.title.label}<span class="crm-marker">*</span></td>
                    <td>{$form.title.html}</td>
                 <tr>
                 <tr class="crm-contact-task-addtogroup-form-block-description">

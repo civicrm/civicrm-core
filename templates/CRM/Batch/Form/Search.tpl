@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -38,7 +38,7 @@
   </table>
 </div>
 <div class="crm-submit-buttons">
-  <a accesskey="N" href="{crmURL p='civicrm/batch/add' q='reset=1&action=add'}" id="newBatch" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}New Data Entry Batch{/ts}</span></a><br/>
+  {crmButton accesskey="N" p="civicrm/batch/add" q="reset=1&action=add" id="newBatch" icon="crm-i fa-plus-circle"}{ts}New Data Entry Batch{/ts}{/crmButton}<br/>
 </div>
 <table class="crm-batch-selector">
   <thead>

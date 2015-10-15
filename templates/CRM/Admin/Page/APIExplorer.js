@@ -24,7 +24,7 @@
     NO_OPERATORS = ['create', 'update', 'delete', 'setvalue', 'getoptions', 'getactions', 'getfields'],
 
     // Actions that don't support multiple values
-    NO_MULTI = ['delete', 'getoptions', 'getactions', 'getfields', 'setvalue'],
+    NO_MULTI = ['delete', 'getoptions', 'getactions', 'getfields',  'getfield', 'setvalue'],
 
     // Operators with special properties
     BOOL = ['IS NULL', 'IS NOT NULL'],
@@ -95,10 +95,10 @@
     var $row = $('tr:last-child', '#api-params');
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
-        return '<span class="icon ui-icon-link"></span> API ' +
+        return '<i class="crm-i fa-link"></i> API ' +
           ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
       },
-      placeholder: '<span class="icon ui-icon-link"></span> ' + ts('Entity'),
+      placeholder: '<i class="crm-i fa-link"></i> ' + ts('Entity'),
       escapeMarkup: function(m) {return m;}
     });
   }
@@ -527,7 +527,7 @@
         .addClass('crm-error')
         .css('width', '82%')
         .attr('title', msg)
-        .before('<div class="icon red-icon ui-icon-alert" title="'+msg+'"/>')
+        .before('<i class="crm-i fa-exclamation-triangle crm-i-red" title="'+msg+'"></i> ')
         .tooltip();
     }
   }
@@ -542,7 +542,7 @@
       .attr('title', '')
       .css('width', '85%')
       .tooltip('destroy')
-      .siblings('.ui-icon-alert').remove();
+      .siblings('.fa-exclamation-triangle').remove();
   }
 
   /**
@@ -559,22 +559,25 @@
     };
     smartyPhp = [];
     $.each(params, function(key, value) {
-      var js = JSON.stringify(value);
+      var json = JSON.stringify(value),
+        // Encourage 'return' to be an array - at least in php & js
+        js = key === 'return' ? JSON.stringify(evaluate(value, true)) : json,
+        php = key === 'return' ? phpFormat(evaluate(value, true)) : phpFormat(value);
       if (!(i++)) {
         q.php += ", array(\n";
         q.json += ", {\n";
       } else {
         q.json += ",\n";
       }
-      q.php += "  '" + key + "' => " + phpFormat(value) + ",\n";
+      q.php += "  '" + key + "' => " + php + ",\n";
       q.json += "  \"" + key + '": ' + js;
       // smarty already defaults to sequential
       if (key !== 'sequential') {
-        q.smarty += ' ' + key + '=' + smartyFormat(value, js, key);
+        q.smarty += ' ' + key + '=' + smartyFormat(value, json, key);
       }
       // FIXME: This is not totally correct cli syntax
-      q.drush += key + '=' + js + ' ';
-      q.wpcli += key + '=' + js + ' ';
+      q.drush += key + '=' + json + ' ';
+      q.wpcli += key + '=' + json + ' ';
     });
     if (i) {
       q.php += ")";
@@ -617,6 +620,7 @@
    * Note: We have to manually execute the ajax in order to add the secret extra "prettyprint" param
    */
   function execute() {
+    var footer;
     $('#api-result').html('<div class="crm-loading-element"></div>');
     $.ajax({
       url: CRM.url('civicrm/ajax/rest'),
@@ -629,8 +633,17 @@
       type: _.includes(action, 'get') ? 'GET' : 'POST',
       dataType: 'text'
     }).done(function(text) {
+      // There may be debug information appended to the end of the json string
+      var footerPos = text.indexOf("\n}<");
+      if (footerPos) {
+        footer = text.substr(footerPos + 2);
+        text = text.substr(0, footerPos + 2);
+      }
       $('#api-result').text(text);
       prettyPrint('#api-result');
+      if (footer) {
+        $('#api-result').append(footer);
+      }
     });
   }
 
@@ -699,6 +712,18 @@
       $('#doc-result').html(entityDoc);
       prettyPrint('#doc-result pre');
     }
+    checkBookKeepingEntity(entity, action);
+  }
+
+  /**
+   * Check if entity is Financial Trxn and Entity Financial Trxn
+   * and Action is Create, delete, update etc then display warning
+   */
+  function checkBookKeepingEntity(entity, action) {
+    if ($.inArray(entity, ['EntityFinancialTrxn', 'FinancialTrxn']) > -1 && $.inArray(action, ['delete', 'setvalue', 'replace', 'create']) > -1) {
+      var msg = ts('Given the importance of auditability, extension developers are strongly discouraged from writing code to add, update or delete entries in the civicrm_financial_item, civicrm_entity_financial_trxn, and civicrm_financial_trxn tables. Before publishing an extension on civicrm.org that does any of this, please ask for a special bookkeeping code review for the extension.');
+      CRM.alert(msg, 'warning');
+    }
   }
 
   $(document).ready(function() {
@@ -737,7 +762,8 @@
           $('#api-params').html('<tr><td colspan="4" class="crm-loading-element"></td></tr>');
           $('#api-params-table thead').show();
           getFields(this);
-          buildParams();
+	  buildParams();
+	  checkBookKeepingEntity(entity, action);
         } else {
           $('#api-params, #api-generated pre').empty();
           $('#api-param-buttons, #api-params-table thead').hide();

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -51,10 +51,14 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @throws \CRM_Core_Exception
    */
   public static function create(&$params) {
-    $params = self::loadExistingRelationshipDetails($params);
-    if (self::checkDuplicateRelationship($params, $params['contact_id_a'], $params['contact_id_b'], CRM_Utils_Array::value('id', $params, 0))) {
+
+    $extendedParams = self::loadExistingRelationshipDetails($params);
+    // When id is specified we always wan't to update, so we don't need to
+    // check for duplicate relations.
+    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, $extendedParams['contact_id_a'], $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
+    $params = $extendedParams;
     if (self::checkValidRelationship($params, $params, 0)) {
       throw new CRM_Core_Exception('Invalid Relationship');
     }
@@ -561,7 +565,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $value['contact_type_b'] == $otherContactType
         ) &&
         (in_array($value['contact_sub_type_a'], $contactSubType) ||
-          in_array($value['contact_sub_type_b'], $contactSubType) ||
           (!$value['contact_sub_type_a'] && !$onlySubTypeRelationTypes)
         )
       ) {
@@ -576,7 +579,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $value['contact_type_a'] == $otherContactType
         ) &&
         (in_array($value['contact_sub_type_b'], $contactSubType) ||
-          in_array($value['contact_sub_type_a'], $contactSubType) ||
           (!$value['contact_sub_type_b'] && !$onlySubTypeRelationTypes)
         )
       ) {
@@ -1614,19 +1616,6 @@ SELECT relationship_type_id, relationship_direction
               }
             }
 
-            if ($action & CRM_Core_Action::UPDATE) {
-              //if updated relationship is already related to contact don't delete existing inherited membership
-              if (in_array($relTypeId, $relTypeIds
-              ) && !empty($values[$relatedContactId]['memberships']) && !empty($ownerMemIds
-              ) && in_array($membershipValues['owner_membership_id'], $ownerMemIds[$relatedContactId])) {
-                continue;
-              }
-
-              //delete the membership record for related
-              //contact before creating new membership record.
-              CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $relatedContactId);
-            }
-
             // check whether we have some related memberships still available
             $query = "
 SELECT count(*)
@@ -1644,19 +1633,22 @@ SELECT count(*)
           // if action is update and updated relationship do
           // not match with the existing
           // membership=>relationship then we need to
-          // delete the membership record created for
-          // previous relationship.
-          // CRM-16087 we need to pass ownerMembershipId to deleteRelatedMemberships function
+          // change the status of the membership record to expired for
+          // previous relationship -- CRM-12078.
+          // CRM-16087 we need to pass ownerMembershipId to isRelatedMembershipExpired function
           if (empty($params['relationship_ids']) && !empty($params['id'])) {
             $relIds = array($params['id']);
           }
           else {
             $relIds = CRM_Utils_Array::value('relationship_ids', $params);
           }
-          if (self::isDeleteRelatedMembership($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId,
+          if (self::isRelatedMembershipExpired($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId,
           $relIds) && !empty($membershipValues['owner_membership_id']
           ) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
-            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
+            $membershipValues['status_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', 'Expired', 'id', 'label');
+            $type = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipValues['membership_type_id'], 'name', 'id');
+            CRM_Member_BAO_Membership::add($membershipValues);
+            CRM_Core_Session::setStatus(ts("Inherited membership {$type} status was changed to Expired due to the change in relationship type."), ts('Record Updated'), 'alert');
           }
         }
       }
@@ -1664,10 +1656,10 @@ SELECT count(*)
   }
 
   /**
-   * Helper function to check whether to delete the membership or not.
+   * Helper function to check whether the membership is expired or not.
    *
    * Function takes a list of related membership types and if it is not also passed a
-   * relationship ID of that types evaluates whether the membership should be deleted.
+   * relationship ID of that types evaluates whether the membership status should be changed to expired.
    *
    * @param array $membershipTypeRelationshipTypeIDs
    *   Relation type IDs related to the given membership type.
@@ -1678,7 +1670,7 @@ SELECT count(*)
    *
    * @return bool
    */
-  public static function isDeleteRelatedMembership($membershipTypeRelationshipTypeIDs, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
+  public static function isRelatedMembershipExpired($membershipTypeRelationshipTypeIDs, $contactId, $mainRelatedContactId, $relTypeId, $relIds) {
     if (empty($membershipTypeRelationshipTypeIDs) || in_array($relTypeId, $membershipTypeRelationshipTypeIDs)) {
       return FALSE;
     }
@@ -1739,71 +1731,63 @@ WHERE id IN ( {$contacts} )
   }
 
   /**
-   * Return list of permissioned employer for a given contact.
-   *
-   * @param int $contactID
-   *   contact id whose employers.
-   *   are to be found.
-   * @param string $name
-   *   employers sort name.
-   *
-   * @return array
-   *   array of employers.
-   */
-  public static function getPermissionedEmployer($contactID, $name = NULL) {
-    //get the relationship id
-    $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
-      'Employee of', 'id', 'name_a_b'
-    );
-
-    return self::getPermissionedContacts($contactID, $relTypeId, $name);
-  }
-
-
-  /**
    * Function to return list of permissioned contacts for a given contact and relationship type.
    *
    * @param int $contactID
    *   contact id whose permissioned contacts are to be found.
-   * @param string $relTypeId
+   * @param int $relTypeId
    *   one or more relationship type id's.
    * @param string $name
+   * @param string $contactType
    *
    * @return array
    *   Array of contacts
    */
-  public static function getPermissionedContacts($contactID, $relTypeId, $name = NULL) {
+  public static function getPermissionedContacts($contactID, $relTypeId = NULL, $name = NULL, $contactType = NULL) {
     $contacts = array();
+    $args = array(1 => array($contactID, 'Integer'));
+    $relationshipTypeClause = $contactTypeClause = '';
 
     if ($relTypeId) {
-      $query = "
+      // @todo relTypeId is only ever passed in as an int. Change this to reflect that -
+      // probably being overly conservative by not doing so but working on stable release.
+      $relationshipTypeClause = 'AND cr.relationship_type_id IN (%2) ';
+      $args[2] = array($relTypeId, 'String');
+    }
+
+    if ($contactType) {
+      $contactTypeClause = ' AND cr.relationship_type_id = crt.id AND crt.contact_type_b = %3 ';
+      $args[3] = array($contactType, 'String');
+    }
+
+    $query = "
 SELECT cc.id as id, cc.sort_name as name
-FROM civicrm_relationship cr, civicrm_contact cc
+FROM civicrm_relationship cr, civicrm_contact cc, civicrm_relationship_type crt
 WHERE
 cr.contact_id_a         = %1 AND
-cr.relationship_type_id IN (%2) AND
 cr.is_permission_a_b    = 1 AND
 IF(cr.end_date IS NULL, 1, (DATEDIFF( CURDATE( ), cr.end_date ) <= 0)) AND
 cr.is_active = 1 AND
 cc.id = cr.contact_id_b AND
-cc.is_deleted = 0";
+cc.is_deleted = 0
+$relationshipTypeClause
+$contactTypeClause
+";
 
-      if (!empty($name)) {
-        $name = CRM_Utils_Type::escape($name, 'String');
-        $query .= "
+    if (!empty($name)) {
+      $name = CRM_Utils_Type::escape($name, 'String');
+      $query .= "
 AND cc.sort_name LIKE '%$name%'";
-      }
-
-      $args = array(1 => array($contactID, 'Integer'), 2 => array($relTypeId, 'String'));
-      $dao = CRM_Core_DAO::executeQuery($query, $args);
-
-      while ($dao->fetch()) {
-        $contacts[$dao->id] = array(
-          'name' => $dao->name,
-          'value' => $dao->id,
-        );
-      }
     }
+
+    $dao = CRM_Core_DAO::executeQuery($query, $args);
+    while ($dao->fetch()) {
+      $contacts[$dao->id] = array(
+        'name' => $dao->name,
+        'value' => $dao->id,
+      );
+    }
+
     return $contacts;
   }
 
@@ -1987,17 +1971,28 @@ AND cc.sort_name LIKE '%$name%'";
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
+        $relationship = array();
+
+        $relationship['DT_RowClass'] = 'crm-entity';
+        if ($values['is_active'] == 0) {
+          $relationship['DT_RowClass'] .= ' disabled';
+        }
+
+        $relationship['DT_RowData'] = array();
+        $relationship['DT_RowData']['entity'] = 'relationship';
+        $relationship['DT_RowData']['id'] = $values['id'];
+
         //Add image icon for related contacts: CRM-14919
         $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],
           FALSE,
           $values['cid']
         );
-        $contactRelationships[$relationshipId]['name'] = $icon . ' ' . CRM_Utils_System::href(
+        $relationship['sort_name'] = $icon . ' ' . CRM_Utils_System::href(
             $values['name'],
             'civicrm/contact/view',
             "reset=1&cid={$values['cid']}");
 
-        $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
+        $relationship['relation'] = CRM_Utils_System::href(
           $values['relation'],
           'civicrm/contact/view/rel',
           "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
@@ -2006,32 +2001,38 @@ AND cc.sort_name LIKE '%$name%'";
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
-            $contactRelationships[$relationshipId]['name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
+            $relationship['sort_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
           }
 
           if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
-            $contactRelationships[$relationshipId]['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
+            $relationship['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
           }
         }
 
         if (!empty($values['description'])) {
-          $contactRelationships[$relationshipId]['relation'] .= "<p class='description'>{$values['description']}</p>";
+          $relationship['relation'] .= "<p class='description'>{$values['description']}</p>";
         }
 
-        $contactRelationships[$relationshipId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
-        $contactRelationships[$relationshipId]['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
-        $contactRelationships[$relationshipId]['city'] = $values['city'];
-        $contactRelationships[$relationshipId]['state'] = $values['state'];
-        $contactRelationships[$relationshipId]['email'] = $values['email'];
-        $contactRelationships[$relationshipId]['phone'] = $values['phone'];
-        $contactRelationships[$relationshipId]['links'] = $values['action'];
-        $contactRelationships[$relationshipId]['id'] = $values['id'];
-        $contactRelationships[$relationshipId]['is_active'] = $values['is_active'];
+        $relationship['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
+        $relationship['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
+        $relationship['city'] = $values['city'];
+        $relationship['state'] = $values['state'];
+        $relationship['email'] = $values['email'];
+        $relationship['phone'] = $values['phone'];
+        $relationship['links'] = $values['action'];
+
+        array_push($contactRelationships, $relationship);
       }
     }
-    return $contactRelationships;
+
+    $relationshipsDT = array();
+    $relationshipsDT['data'] = $contactRelationships;
+    $relationshipsDT['recordsTotal'] = $params['total'];
+    $relationshipsDT['recordsFiltered'] = $params['total'];
+
+    return $relationshipsDT;
   }
 
 }

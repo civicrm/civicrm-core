@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- *
  */
 
 /**
@@ -67,8 +66,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
@@ -139,9 +136,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
@@ -184,7 +178,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
     }
 
-    $this->addWysiwyg('email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array(
+    $this->add('wysiwyg', 'email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), array(
       'rows' => 2,
       'cols' => 40,
     ));
@@ -223,9 +217,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -233,8 +224,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Process the PDf and email with activity and attachment.
-   * on click of Print Invoices
+   * Process the PDf and email with activity and attachment on click of Print Invoices.
    *
    * @param array $contribIDs
    *   Contribution Id.

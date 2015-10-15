@@ -9,6 +9,7 @@
   <add>1.5</add>
   <field>
     <name>id</name>
+    <title>Membership Log ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <add>1.5</add>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
     <name>membership_id</name>
+    <title>Membership ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Membership table</comment>
@@ -48,6 +50,7 @@
   </foreignKey>
   <field>
     <name>start_date</name>
+    <title>Membership Log Start Date</title>
     <type>date</type>
     <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
     <comment>New membership period start date</comment>
@@ -55,6 +58,7 @@
   </field>
   <field>
     <name>end_date</name>
+    <title>Membership Log End Date</title>
     <type>date</type>
     <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
     <comment>New membership period expiration date.</comment>
@@ -62,6 +66,7 @@
   </field>
   <field>
     <name>modified_id</name>
+    <title>Membership Log modified By</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID of person under whose credentials this data modification was made.</comment>
     <add>1.5</add>
@@ -83,6 +88,7 @@
   </field>
   <field>
     <name>membership_type_id</name>
+    <title>Membership Type ID</title>
     <type>int unsigned</type>
     <comment>FK to Membership Type.</comment>
     <add>3.4</add>
@@ -96,6 +102,7 @@
   </foreignKey>
   <field>
     <name>max_related</name>
+    <title>Maximum Related Memberships</title>
     <type>int</type>
     <comment>Maximum number of related memberships.</comment>
     <add>4.3</add>

@@ -6,7 +6,7 @@
   angular.module('crmUi', [])
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
-    // WISHLIST: crmCollapsed should support two-way/continous binding
+    // WISHLIST: crmCollapsed should support two-way/continuous binding
     .directive('crmUiAccordion', function() {
       return {
         scope: {
@@ -361,31 +361,13 @@
     // Example:
     //   <a ng-click="$broadcast('my-insert-target', 'some new text')>Insert</a>
     //   <textarea crm-ui-insert-rx='my-insert-target'></textarea>
-    // TODO Consider ways to separate the plain-text/rich-text implementations
     .directive('crmUiInsertRx', function() {
       return {
         link: function(scope, element, attrs) {
           scope.$on(attrs.crmUiInsertRx, function(e, tokenName) {
-            var id = element.attr('id');
-            if (CKEDITOR.instances[id]) {
-              CKEDITOR.instances[id].insertText(tokenName);
-              $(element).select2('close').select2('val', '');
-              CKEDITOR.instances[id].focus();
-            }
-            else {
-              var crmForEl = $('#' + id);
-              var origVal = crmForEl.val();
-              var origPos = crmForEl[0].selectionStart;
-              var newVal = origVal.substring(0, origPos) + tokenName + origVal.substring(origPos, origVal.length);
-              crmForEl.val(newVal);
-              var newPos = (origPos + tokenName.length);
-              crmForEl[0].selectionStart = newPos;
-              crmForEl[0].selectionEnd = newPos;
-
-              $(element).select2('close').select2('val', '');
-              crmForEl.triggerHandler('change');
-              crmForEl.focus();
-            }
+            CRM.wysiwyg.insert(element, tokenName);
+            $(element).select2('close').select2('val', '');
+            CRM.wysiwyg.focus(element);
           });
         }
       };
@@ -397,50 +379,22 @@
       return {
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
-          var ck = CKEDITOR.replace(elm[0]);
 
-          if (ck) {
-            _.extend(ck.config, {
-              width: '94%',
-              height: '400',
-              filebrowserBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=files',
-              filebrowserImageBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=images',
-              filebrowserFlashBrowseUrl: CRM.crmUi.browseUrl + '?cms=civicrm&type=flash',
-              filebrowserUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=files',
-              filebrowserImageUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=images',
-              filebrowserFlashUploadUrl: CRM.crmUi.uploadUrl + '?cms=civicrm&type=flash',
-            });
-          }
-
+          var editor = CRM.wysiwyg.create(elm);
           if (!ngModel) {
             return;
           }
 
           if (attr.ngBlur) {
-            ck.on('blur', function(){
-              $timeout(function(){
+            $(elm).on('blur', function() {
+              $timeout(function() {
                 scope.$eval(attr.ngBlur);
               });
             });
           }
 
-          // CRM-16445 - When one inserts an image, none of these events seem to fire at the right time:
-          // afterCommandExec, afterInsertHtml, afterPaste, afterSetData, change, insertElement,
-          // insertHtml, insertText, pasteState. It seems that 'pasteState' is the general equivalent of
-          // what 'change' should be, except (in the case of image insertion) it fires too soon.
-          // The 'key' event is needed to detect changes in "Source" mode.
-          var debounce = null;
-          angular.forEach(['key', 'pasteState'], function(evName){
-            ck.on(evName, function(evt) {
-              $timeout.cancel(debounce);
-              debounce = $timeout(function() {
-                ngModel.$setViewValue(ck.getData());
-              }, 50);
-            });
-          });
-
-          ngModel.$render = function (value) {
-            ck.setData(ngModel.$viewValue);
+          ngModel.$render = function(value) {
+            CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
           };
         }
       };
@@ -475,20 +429,20 @@
           var titleLocked = parse(attrs.titleLocked, ts('Locked'));
           var titleUnlocked = parse(attrs.titleUnlocked, ts('Unlocked'));
 
-          $(element).addClass('ui-icon lock-button');
+          $(element).addClass('crm-i lock-button');
           var refresh = function () {
             var locked = binding(scope);
             if (locked) {
               $(element)
-                .removeClass('ui-icon-unlocked')
-                .addClass('ui-icon-locked')
+                .removeClass('fa-unlock')
+                .addClass('fa-lock')
                 .prop('title', titleLocked(scope))
               ;
             }
             else {
               $(element)
-                .removeClass('ui-icon-locked')
-                .addClass('ui-icon-unlocked')
+                .removeClass('fa-lock')
+                .addClass('fa-unlock')
                 .prop('title', titleUnlocked(scope))
               ;
             }
@@ -883,13 +837,19 @@
       };
     })
 
-    // Example: <button crm-icon="check">Save</button>
+    // Example for Font Awesome: <button crm-icon="fa-check">Save</button>
+    // Example for jQuery UI (deprecated): <button crm-icon="check">Save</button>
     .directive('crmIcon', function() {
       return {
         restrict: 'EA',
         scope: {},
         link: function (scope, element, attrs) {
-          $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          if (attrs.crmIcon.substring(0,3) == 'fa-') {
+            $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '"></i> ');
+          }
+          else {
+            $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
+          }
           if ($(element).is('button')) {
             $(element).addClass('crm-button');
           }

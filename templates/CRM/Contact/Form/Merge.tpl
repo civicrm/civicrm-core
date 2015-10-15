@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -30,20 +30,20 @@
 
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="top"}
-  {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><span class="icon ui-icon-triangle-1-w"></span> {ts}Previous{/ts}</a>{/if}
-  {if $next}<a href="{$next}" class="crm-hover-button action-item">{ts}Next{/ts} <span class="icon ui-icon-triangle-1-e"></span></a>{/if}
+  {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><i class="crm-i fa-chevron-left"></i> {ts}Previous{/ts}</a>{/if}
+  {if $next}<a href="{$next}" class="crm-hover-button action-item">{ts}Next{/ts} <i class="crm-i fa-chevron-right"></i></a>{/if}
 </div>
 
 <div class="action-link">
   <a href="{$flip}" class="action-item crm-hover-button">
-    <span class="icon ui-icon-shuffle"></span>
+    <i class="crm-i fa-random"></i>
     {ts}Flip between original and duplicate contacts.{/ts}
   </a>
 </div>
 
 <div class="action-link">
   <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">
-    <span class="icon ui-icon-circle-close"></span>
+    <i class="crm-i fa-times-circle"></i>
     {ts}Mark this pair as not a duplicate.{/ts}
   </a>
 </div>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -98,6 +98,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'is_active' => array('1' => 1),
       'price_set_id' => $priceset->id,
       'is_enter_qty' => 1,
+      'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
     );
 
     $ids = array();

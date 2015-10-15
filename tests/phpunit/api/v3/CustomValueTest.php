@@ -1,7 +1,7 @@
 <?php
 /**
  * +--------------------------------------------------------------------+
- * | CiviCRM version 4.6                                                |
+ * | CiviCRM version 4.7                                                |
  * +--------------------------------------------------------------------+
  * | Copyright CiviCRM LLC (c) 2004-2015                                |
  * +--------------------------------------------------------------------+
@@ -39,11 +39,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-
-    $this->_populateOptionAndCustomGroup();
   }
 
-  public function _populateOptionAndCustomGroup() {
+  public function _populateOptionAndCustomGroup($type = NULL) {
     $dataValues = array(
       'integer' => array(1, 2, 3),
       'number' => array(10.11, 20.22, 30.33),
@@ -54,6 +52,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'contact' => NULL,
       'boolean' => NULL,
     );
+
+    $dataValues = !empty($type) ? array($type => $dataValues[$type]) : $dataValues;
 
     foreach ($dataValues as $dataType => $values) {
       $this->optionGroup[$dataType] = array('values' => $values);
@@ -89,9 +89,20 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
+
+    // cleanup created option group for each custom-set before running next test
+    if (!empty($this->optionGroup)) {
+      foreach ($this->optionGroup as $type => $value) {
+        if (!empty($value['id'])) {
+          $this->callAPISuccess('OptionGroup', 'delete', array('id' => $value['id']));
+        }
+      }
+    }
   }
 
   public function testCreateCustomValue() {
+    $this->_populateOptionAndCustomGroup();
+
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
     $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
     $count = 0;
@@ -297,6 +308,83 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     }
 
     $this->callAPISuccess('Contact', 'delete', array('id' => $contactId));
+  }
+
+  /**
+   * Ensure custom data is updated when option values are modified
+   *
+   * @link https://issues.civicrm.org/jira/browse/CRM-11856
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testAlterOptionValue() {
+    $this->_populateOptionAndCustomGroup('string');
+
+    $selectField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->ids['string']['custom_group_id'],
+      'label' => 'Custom Select',
+      'html_type' => 'Select',
+      'option_group_id' => $this->optionGroup['string']['id'],
+    ));
+    $selectField = civicrm_api3('customField', 'getsingle', array('id' => $selectField['id']));
+    $radioField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->ids['string']['custom_group_id'],
+      'label' => 'Custom Radio',
+      'html_type' => 'Radio',
+      'option_group_id' => $selectField['option_group_id'],
+    ));
+    $multiSelectField = $this->customFieldCreate(array(
+      'custom_group_id' => $this->ids['string']['custom_group_id'],
+      'label' => 'Custom Multi-Select',
+      'html_type' => 'Multi-Select',
+      'option_group_id' => $selectField['option_group_id'],
+    ));
+    $selectName = 'custom_' . $selectField['id'];
+    $radioName = 'custom_' . $radioField['id'];
+    $multiSelectName = 'custom_' . $multiSelectField['id'];
+    $controlFieldName = 'custom_' . $this->ids['string']['custom_field_id'];
+
+    $params = array(
+      'first_name' => 'abc4',
+      'last_name' => 'xyz4',
+      'contact_type' => 'Individual',
+      'email' => 'man4@yahoo.com',
+      $selectName => $this->optionGroup['string']['values'][0],
+      $multiSelectName => $this->optionGroup['string']['values'],
+      $radioName => $this->optionGroup['string']['values'][1],
+      // The control group in a science experiment should be unaffected
+      $controlFieldName => $this->optionGroup['string']['values'][2],
+    );
+
+    $contact = $this->callAPISuccess('Contact', 'create', $params);
+
+    $result = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $contact['id'],
+      'return' => array($selectName, $multiSelectName),
+    ));
+    $this->assertEquals($params[$selectName], $result[$selectName]);
+    $this->assertEquals($params[$multiSelectName], $result[$multiSelectName]);
+
+    $this->callAPISuccess('OptionValue', 'create', array(
+      'value' => 'one-modified',
+      'option_group_id' => $selectField['option_group_id'],
+      'name' => 'string 1',
+      'options' => array(
+        'match-mandatory' => array('option_group_id', 'name'),
+      ),
+    ));
+
+    $result = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $contact['id'],
+      'return' => array($selectName, $multiSelectName, $controlFieldName, $radioName),
+    ));
+    // Ensure the relevant fields have been updated
+    $this->assertEquals('one-modified', $result[$selectName]);
+    $this->assertEquals(array('one-modified', $params[$radioName], $params[$controlFieldName]), $result[$multiSelectName]);
+    // This field should not have changed because we didn't alter this option
+    $this->assertEquals($params[$radioName], $result[$radioName]);
+    // This should not have changed because this field doesn't use the affected option group
+    $this->assertEquals($params[$controlFieldName], $result[$controlFieldName]);
   }
 
 }

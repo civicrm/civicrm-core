@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -44,7 +44,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     //Online Pay Later Contribution
     $this->_testOnlineContribution($contact);
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->type("sort_name", $contact['sort_name']);
     $this->click("_qf_Search_refresh");
 
@@ -153,7 +153,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
       'Financial Type' => 'Donation',
       'Total Amount' => '100.00',
       'Contribution Status' => 'Pending',
-      'Paid By' => 'Check',
+      'Payment Method' => 'Check',
       'Check Number' => 'check #1041',
     );
     $this->webtestVerifyTabularData($expected);
@@ -228,7 +228,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     //logout
     $this->webtestLogout();
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
 
     $this->type("email-5", $contact['email']);
 
@@ -255,7 +255,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->type("sort_name", $contact['sort_name']);
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[2]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);

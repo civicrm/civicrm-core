@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -50,5 +50,26 @@ return array(
     'is_contact' => 0,
     'description' => 'Is the CVV code required for back office credit card transactions',
     'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
+  ),
+  'contribution_invoice_settings' => array(
+    'group_name' => 'Contribute Preferences',
+    'group' => 'contribute',
+    'name' => 'contribution_invoice_settings',
+    'type' => 'Array',
+    'default' => array(
+      'invoice_prefix' => 'INV_',
+      'credit_notes_prefix' => 'CN_',
+      'due_date' => '10',
+      'due_date_period' => 'days',
+      'notes' => '',
+      'tax_term' => 'Sales Tax',
+      'tax_display_settings' => 'Inclusive',
+    ),
+    'add' => '4.7',
+    'title' => 'Contribution Invoice Settings',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => NULL,
+    'help_text' => NULL,
   ),
 );

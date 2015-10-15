@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -28,7 +28,7 @@
    <ul id="actions">
       <li><div id="crm-contribpage-links-wrapper">
             <a id="crm-contribpage-links-link" class="button">
-              <span><div class="icon ui-icon-arrow-1-se css_right"></div>{ts}Contribution Links{/ts}</span>
+              <span>{ts}Contribution Links{/ts} <i class="crm-i fa-bars"></i></span>
             </a>
               <div class="ac_results" id="crm-contribpage-links-list">
                  <div class="crm-contribpage-links-list-inner">

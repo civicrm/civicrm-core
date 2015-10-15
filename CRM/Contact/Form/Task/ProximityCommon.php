@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class provides the functionality to support Proximity Searches
+ * This class provides the functionality to support Proximity Searches.
  */
 class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
 
@@ -61,8 +59,6 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @return void
    */
   public function preProcess() {
     // initialize the task and row fields
@@ -72,11 +68,8 @@ class CRM_Contact_Form_Task_ProximityCommon extends CRM_Contact_Form_Task {
   /**
    * Build the form object.
    *
-   *
    * @param CRM_Core_Form $form
-   * @param $proxSearch
-   *
-   * @return void
+   * @param int $proxSearch
    */
   public function buildQuickForm($form, $proxSearch) {
     // is proximity search required (2) or optional (1)?

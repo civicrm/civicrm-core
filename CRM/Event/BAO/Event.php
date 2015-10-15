@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -70,7 +70,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $id, 'is_active', $is_active);
@@ -440,7 +440,9 @@ $event_summary_limit
     );
 
     $params = array(1 => array($optionGroupId, 'Integer'));
-    $mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'civicrm_event', 'id', 'entity_value');
+    $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+      'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+    )));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
       foreach ($properties as $property => $name) {
@@ -463,7 +465,7 @@ $event_summary_limit
               $params = array('entity_id' => $dao->id, 'entity_table' => 'civicrm_event');
               $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
               if (is_numeric(CRM_Utils_Array::value('geo_code_1', $values['location']['address'][1])) ||
-                ($config->mapGeoCoding &&
+                (
                   !empty($values['location']['address'][1]['city']) &&
                   !empty($values['location']['address'][1]['state_province_id'])
                 )
@@ -473,7 +475,8 @@ $event_summary_limit
             }
 
             $eventSummary['events'][$dao->id][$property] = $set;
-            if (in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
+            if (is_array($permissions[CRM_Core_Permission::EDIT])
+              && in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
               $eventSummary['events'][$dao->id]['configure'] = CRM_Utils_System::url('civicrm/admin/event', "action=update&id=$dao->id&reset=1");
             }
             break;
@@ -544,7 +547,7 @@ $event_summary_limit
       $eventSummary['events'][$dao->id]['is_show_location'] = $dao->is_show_location;
       $eventSummary['events'][$dao->id]['is_subevent'] = $dao->slot_label_id;
       $eventSummary['events'][$dao->id]['is_pcp_enabled'] = $dao->is_pcp_enabled;
-      $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
+      $eventSummary['events'][$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->getId());
       $eventSummary['events'][$dao->id]['is_repeating_event'] = $dao->is_repeating_event;
 
       $statusTypes = CRM_Event_PseudoConstant::participantStatus();
@@ -983,25 +986,15 @@ WHERE civicrm_event.is_active = 1
       array('replace' => array('target_entity_id' => $copyEvent->id))
     );
 
-    if ($eventValues['is_template']) {
-      $field = 'event_template';
-    }
-    else {
-      $field = 'civicrm_event';
-    }
-    $mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', $field, 'id', 'entity_value');
-    $oldData = array('entity_value' => $id, 'mapping_id' => $mappingId);
-    if ($copyEvent->is_template == 1) {
-      $field = 'event_template';
-    }
-    else {
-      $field = 'civicrm_event';
-    }
-    $copyMappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', $field, 'id', 'entity_value');
-    $newData = array('entity_value' => $copyEvent->id, 'mapping_id' => $copyMappingId);
+    $oldMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+      'id' => ($eventValues['is_template'] ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID),
+    )));
+    $copyMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+      'id' => ($copyEvent->is_template == 1 ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID),
+    )));
     $copyReminder = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_ActionSchedule',
-      $oldData,
-      $newData
+      array('entity_value' => $id, 'mapping_id' => $oldMapping->getId()),
+      array('entity_value' => $copyEvent->id, 'mapping_id' => $copyMapping->getId())
     );
 
     if (!$afterCreate) {
@@ -1173,7 +1166,7 @@ WHERE civicrm_event.is_active = 1
         // CRM-13890 : NOTE wait list condition need to be given so that
         // wait list message is shown properly in email i.e. WRT online event registration template
         if (empty($tplParams['participant_status']) && empty($values['params']['isOnWaitlist'])) {
-          $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id');
+          $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id', TRUE);
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
         }
         //CRM-15754 - if participant_status contains status ID

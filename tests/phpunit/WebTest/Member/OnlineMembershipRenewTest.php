@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.6                                                |
+   | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2015                                |
    +--------------------------------------------------------------------+
@@ -99,7 +99,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     //Go to online membership signup page
-    $this->openCiviPage("contribute/transact", "reset=1&id=2", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=2&action=preview", "_qf_Main_upload-bottom");
 
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div[2]/span/label/span[1][contains(text(),'Student')]");
 
@@ -136,6 +136,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName $firstName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -156,7 +157,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     //logout
     $this->webtestLogout();
 
-    $this->openCiviPage("contribute/transact", "reset=1&id=2", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=2&action=preview", "_qf_Main_upload-bottom");
 
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div[2]/span/label/span[1][contains(text(),'Student')]");
 
@@ -191,6 +192,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName $firstName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -269,7 +271,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
 
     //Go to online membership signup page
-    $this->openCiviPage("contribute/transact", "reset=1&id=2", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=2&action=preview", "_qf_Main_upload-bottom");
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div[1]/span/label/span[1][contains(text(),'General')]");
     //Type first name and last name
     $this->type("first_name", $firstName);
@@ -301,6 +303,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName $firstName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -321,7 +324,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
         preg_quote($value)
       );
     }
-    $this->openCiviPage("contribute/transact", "reset=1&id=2", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=2&action=preview", "_qf_Main_upload-bottom");
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div[2]/span/label/span[1][contains(text(),'Student')]");
 
     //Credit Card Info
@@ -338,6 +341,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName $firstName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -478,7 +482,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     //get Url for Live Contribution Page
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", '_qf_Main_upload-bottom');
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", '_qf_Main_upload-bottom');
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div/span/label/span[1][contains(text(),'$membershipTypeTitle')]");
     $firstName = 'Eia' . substr(sha1(rand()), 0, 4);
     $lastName = 'Ande' . substr(sha1(rand()), 0, 4);
@@ -530,6 +534,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$organisationName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -551,6 +556,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName, $firstName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -572,7 +578,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     //logout
     $this->webtestLogout();
 
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
 
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div/span/label/span[1][contains(text(),'$membershipTypeTitle')]");
     $this->type("email-5", $email);
@@ -620,6 +626,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$organisationName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -640,6 +647,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName, $firstName");
+    $this->click("xpath=//tr/td[1]/p/label[contains(text(),'Membership is a Test?')]/../label[contains(text(),'Yes')]/preceding-sibling::input[1]");
     $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
@@ -822,7 +830,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $lastName = 'Ande' . substr(sha1(rand()), 0, 4);
     $email = $firstName . '@test.com';
 
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
 
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div/span/label/span[1][contains(text(),'$membershipTypeTitle')]");
     $this->waitForElementPresent("auto_renew");
@@ -901,7 +909,7 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->click('is_recur');//disable recurring contribution
     $this->clickLink('_qf_Amount_next', '_qf_Amount_next-bottom');
 
-    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId", "_qf_Main_upload-bottom");
+    $this->openCiviPage("contribute/transact", "reset=1&id=$pageId&action=preview", "_qf_Main_upload-bottom");
     $this->click("xpath=//div[@class='crm-section membership_amount-section']/div[2]/div/span/label/span[1][contains(text(),'$membershipTypeTitle')]");
     $this->type("xpath=//div[@class='content other_amount-content']/input[@type='text']", '30');
     $this->click("is_recur");

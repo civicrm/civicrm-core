@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -361,7 +361,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -575,7 +575,7 @@ class CRM_Campaign_Page_AJAX {
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (isset($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -662,7 +662,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -767,7 +767,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -867,7 +867,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
-    header('Content-Type: application/json');
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

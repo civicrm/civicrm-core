@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -53,6 +53,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("group_id");
 
     // add to group
+    $this->waitForElementPresent("group_id");
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
     $this->waitForElementPresent('link=Remove');
@@ -113,7 +114,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
    * @param int $id
    */
   public function memberAddTest($campaignTitle, $id) {
-    //Add new memebershipType
+    //Add new membershipType
     $memTypeParams = $this->webtestAddMembershipType();
 
     // Adding Adding contact with randomized first name for test testContactContextActivityAdd
@@ -162,7 +163,7 @@ class WebTest_Campaign_MembershipTest extends CiviSeleniumTestCase {
     );
 
     // click through to the membership view screen
-    $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='memberships']//table//tbody/tr[1]/td[9]//span/a[text()='View']");
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     $this->webtestVerifyTabularData(array('Campaign' => $campaignTitle));

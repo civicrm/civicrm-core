@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
@@ -62,7 +60,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
       return $successfulForward;
     }
 
-    /* Find the email address/contact, if it exists */
+    // Find the email address/contact, if it exists.
 
     $contact = CRM_Contact_BAO_Contact::getTableName();
     $location = CRM_Core_BAO_Location::getTableName();
@@ -100,8 +98,8 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     if (isset($dao->queue_id) ||
       (isset($dao->do_not_email) && $dao->do_not_email == 1)
     ) {
-      /* We already sent this mailing to $forward_email, or we should
-       * never email this contact.  Give up. */
+      // We already sent this mailing to $forward_email, or we should
+      // never email this contact.  Give up.
 
       return $successfulForward;
     }
@@ -115,7 +113,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $count = $contactValues['count'];
 
     if ($count == 0) {
-      /* If the contact does not exist, create one. */
+      // If the contact does not exist, create one.
 
       $formatted = array(
         'contact_type' => 'Individual',
@@ -144,7 +142,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
       $contact_id = $email->contact_id;
     }
 
-    /* Create a new queue event */
+    // Create a new queue event.
 
     $queue_params = array(
       'email_id' => $email_id,
@@ -172,7 +170,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $mailing_obj->find(TRUE);
 
     $config = CRM_Core_Config::singleton();
-    $mailer = $config->getMailer();
+    $mailer = \Civi::service('pear_mail');
 
     $recipient = NULL;
     $attachments = NULL;
@@ -203,7 +201,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
       'hash' => $queue->hash,
     );
     if (is_a($result, 'PEAR_Error')) {
-      /* Register the bounce event */
+      // Register the bounce event.
 
       $params = array_merge($params,
         CRM_Mailing_BAO_BouncePattern::match($result->getMessage())
@@ -212,7 +210,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     }
     else {
       $successfulForward = TRUE;
-      /* Register the delivery event */
+      // Register the delivery event.
 
       CRM_Mailing_Event_BAO_Delivered::create($params);
     }

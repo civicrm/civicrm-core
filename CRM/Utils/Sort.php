@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,23 +27,15 @@
 
 /**
  *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
+ * Base class to provide generic sort functionality.
  *
- */
-
-/**
+ * Note that some ideas have been borrowed from the drupal tablesort.inc code.
  *
- * Base class to provide generic sort functionality. Note that some ideas
- * have been borrowed from the drupal tablesort.inc code. Also note that
- * since the Pager and Sort class are similar, do match the function names
+ * Also note that since the Pager and Sort class are similar, do match the function names
  * if introducing additional functionality
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_Sort {
 
@@ -188,8 +180,6 @@ class CRM_Utils_Sort {
    *
    * @param string $defaultSortOrder
    *   The sort order to use by default.
-   *
-   * @return void
    */
   public function initSortID($defaultSortOrder) {
     $url = CRM_Utils_Array::value(self::SORT_ID, $_GET, $defaultSortOrder);
@@ -200,7 +190,7 @@ class CRM_Utils_Sort {
 
     list($current, $direction) = explode('_', $url);
 
-    // if current is wierd and does not exist in the vars array, skip
+    // if current is weird and does not exist in the vars array, skip
     if (!array_key_exists($current, $this->_vars)) {
       return;
     }
@@ -225,8 +215,6 @@ class CRM_Utils_Sort {
    *
    * @param string $defaultSortOrder
    *   The sort order to use by default.
-   *
-   * @return void
    */
   public function initialize($defaultSortOrder) {
     $this->initSortID($defaultSortOrder);
@@ -261,7 +249,6 @@ class CRM_Utils_Sort {
    *
    * @return int
    *   returns of the current sort id
-   * @acccess public
    */
   public function getCurrentSortID() {
     return $this->_currentSortID;
@@ -272,7 +259,6 @@ class CRM_Utils_Sort {
    *
    * @return int
    *   returns of the current sort direction
-   * @acccess public
    */
   public function getCurrentSortDirection() {
     return $this->_currentSortDirection;
@@ -299,7 +285,7 @@ class CRM_Utils_Sort {
         } // else: $a and $b are equal wrt to this attribute, try next...
       }
     }
-    // if we get here, $a and $b es equal for all we know
+    // if we get here, $a and $b are equal for all we know
     // however, as I understand we don't want equality here:
     return -1;
   }

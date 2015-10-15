@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -73,7 +73,7 @@
 
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      {crmButton p='civicrm/admin/member/membershipType/add' q="action=add&reset=1" id="newMembershipType"  icon="circle-plus"}{ts}Add Membership Type{/ts}{/crmButton}
+      {crmButton p='civicrm/admin/member/membershipType/add' q="action=add&reset=1" id="newMembershipType"  icon="plus-circle"}{ts}Add Membership Type{/ts}{/crmButton}
     </div>
   {/if}
 </div>

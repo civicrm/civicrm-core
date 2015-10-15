@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<tr><td><label>{ts}Contribution Dates{/ts}</label></td></tr>
+<tr><td><label>{ts}Date Received{/ts}</label></td></tr>
 <tr>
 {include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
 </tr>
@@ -125,6 +125,10 @@
   <td>
     {$form.contribution_source.label} <br />
     {$form.contribution_source.html|crmAddClass:twenty}
+  </td>
+  <td>
+    {$form.contribution_product_id.label} <br />
+    {$form.contribution_product_id.html|crmAddClass:twenty}
   </td>
 </tr>
 <tr>

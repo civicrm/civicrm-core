@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -39,10 +37,9 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   protected $_aclWhere = NULL;
 
   /**
-   * @param $formValues
-   */
-  /**
-   * @param $formValues
+   * Class constructor.
+   *
+   * @param array $formValues
    */
   public function __construct(&$formValues) {
     parent::__construct($formValues);
@@ -89,42 +86,10 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   }
 
   /**
-   * Normalize the form values to make it look similar to the advanced form values
-   * this prevents a ton of work downstream and allows us to use the same code for
-   * multiple purposes (queries, save/edit etc)
-   *
-   * @return void
-   */
-  public function normalize() {
-    $contactType = CRM_Utils_Array::value('contact_type', $this->_formValues);
-    if ($contactType && !is_array($contactType)) {
-      unset($this->_formValues['contact_type']);
-      $this->_formValues['contact_type'][$contactType] = 1;
-    }
-
-    $group = CRM_Utils_Array::value('group', $this->_formValues);
-    if ($group && !is_array($group)) {
-      unset($this->_formValues['group']);
-      $this->_formValues['group'][$group] = 1;
-    }
-
-    $tag = CRM_Utils_Array::value('tag', $this->_formValues);
-    if ($tag && !is_array($tag)) {
-      unset($this->_formValues['tag']);
-      $this->_formValues['tag'][$tag] = 1;
-    }
-
-    return NULL;
-  }
-
-  /**
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
-    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
-    // this is loaded onto then replace with something like '__' & test
-    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
-    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
+    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
     $form->add('select', 'contact_type', ts('Find...'), $contactTypes, FALSE, array('class' => 'crm-select2 huge'));
 
     // add select for groups

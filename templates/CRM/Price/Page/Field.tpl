@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -45,9 +45,9 @@
 {if $action NEQ 8 and $priceField}
   <div class="action-link">
     {if !$isReserved}
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="circle-plus"}{ts}Add Price Field{/ts}{/crmButton}
+      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
     {/if}
-      {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="zoomin"}{ts}Preview (all fields){/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
   </div>
   <div id="field_page">
   {strip}
@@ -96,9 +96,9 @@
   </div>
   <div class="action-link">
     {if !$isReserved}
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="circle-plus"}{ts}Add Price Field{/ts}{/crmButton}
+      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
     {/if}
-    {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="zoomin"}{ts}Preview (all fields){/ts}{/crmButton}
+    {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
   </div>
 
 {else}
@@ -108,7 +108,7 @@
       {ts}None found.{/ts}
     </div>
     <div class="action-link">
-      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="circle-plus"}{ts}Add Price Field{/ts}{/crmButton}
+      {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

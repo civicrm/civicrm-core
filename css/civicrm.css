@@ -649,6 +649,12 @@ input.crm-form-entityref {
   padding: 4px;
 }
 
+.crm-container .status.crm-ok {
+  border-color: #B0D730;
+  background-color: #F1F8EB;
+  color: #3E3E3E;
+}
+
 .crm-container .crm-footer {
   font-size: 0.8em;
 }
@@ -1295,6 +1301,7 @@ input.crm-form-entityref {
   background-color: #fafafa;
   border: 1px solid #9d9fca;
   height: 220px;
+  overflow: hidden;
 }
 
 #crm-container .thermometer-wrapper,
@@ -1661,23 +1668,6 @@ input.crm-form-entityref {
   padding: 3px;
 }
 
-/* class for text area resizer jquery plugin*/
-div.grippie {
-  background: #EEEEEE url('../i/grippie.png') no-repeat scroll center 2px;
-  border-color: #DDDDDD;
-  border-style: solid;
-  border-width: 0pt 1px 1px;
-  cursor: s-resize;
-  height: 9px;
-  overflow: hidden;
-}
-.crm-container .resizable-textarea textarea {
-  display: block;
-  margin-bottom: 0pt;
-  width: 95%;
-  height: 20%;
-}
-
 .crm-container ul li.crm-tab-button {
   border-bottom: 0 none;
   float: left;
@@ -1789,6 +1779,15 @@ div.grippie {
 
 #crm-container div.crm-case-dashboard-switch-view-buttons {
   float: right;
+}
+
+.crm-container a.crm-event-feed-link {
+  margin: 0 1ex;
+  color: #52534D;
+}
+
+.crm-container a.crm-event-feed-link:hover {
+  color: #2786c2;
 }
 
 .crm-container table.criteria-group {
@@ -2078,9 +2077,10 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
 
-/* No button styling for PayPal Express buttons */
-#crm-container input#_qf_Register_upload_express,
-#crm-container input#_qf_Main_upload_express {
+/* No crm-button styling for PayPal Express buttons */
+.crm-container input#_qf_Register_upload_express,
+.crm-container input#_qf_Payment_upload_express,
+.crm-container input#_qf_Main_upload_express {
   background: none;
   margin: 0;
   padding: 0;
@@ -2187,6 +2187,14 @@ div.grippie {
   padding-left: 18px;
 }
 
+.crm-container .crm-button.button-crm-i {
+  padding: 2px 0 1px 5px;
+}
+
+.crm-container .crm-button.button-crm-i input {
+  padding-left: 0;
+}
+
 .crm-container .crm-button-icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
   height: 16px;
@@ -2210,9 +2218,77 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
 
+/* Font Awesome */
+
+.crm-container a .crm-i,
+.crm-container a:link .crm-i,
+.crm-container a:visited .crm-i,
+.crm-container a:active .crm-i,
+.crm-container a:hover .crm-i,
+.crm-container a .ui-icon[class*=" fa-"],
+.crm-container a:link .ui-icon[class*=" fa-"],
+.crm-container a:visited .ui-icon[class*=" fa-"],
+.crm-container a:active .ui-icon[class*=" fa-"],
+.crm-container a:hover .ui-icon[class*=" fa-"] {
+  color: inherit;
+}
+
+a.crm-i:hover {
+  text-decoration: none;
+}
+
+.crm-container a:hover .crm-i.fa-trash,
+.crm-container .crm-button:hover .crm-i.fa-trash,
+.crm-container .crm-hover-button:hover .crm-i.fa-trash,
+.crm-container span:hover > .crm-i.fa-trash,
+.crm-i.crm-i-red {
+  color: #8A1F11;
+}
+
+.crm-i.crm-i-blue {
+  color: #6177D5;
+}
+
+.crm-i-button>.crm-i {
+  padding-left: 2px;
+  line-height: inherit;
+}
+
+.crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"] {
+  background: none repeat scroll 0 0 transparent !important;
+  color: #F5F6F1;
+}
+
+.crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"]:hover {
+
+}
+
+.crm-container .crm-button.crm-i-button input[type="button"],
+.crm-container .crm-button.crm-i-button input.crm-form-submit {
+  padding-left: 0;
+}
+
 .crm-container .inform-icon {
   background-position: -16px -144px;
   margin-right: 5px;
+}
+
+.crm-container a.helpicon {
+  opacity: .8;
+}
+
+.crm-container  a.helpicon:hover,
+.crm-container  a.helpicon:focus {
+  opacity: 1;
+}
+
+/* Same as fa-question-circle */
+.crm-container a.helpicon:before {
+  content: "\f059";
+}
+
+div.crm-accordion-header a.helpicon {
+  color: inherit;
 }
 
 /* These .crm-icon classes use item_sprites.png */
@@ -2437,32 +2513,6 @@ div.grippie {
   background: rgba(255, 7, 0, 0.7);
 }
 
-/* Pop-up help icon - eliminate forced line break */
-.crm-container a.helpicon,
-.crm-container .crm-master-accordion-header a.helpicon {
-  background-color: #6177D5;
-  background-image: url("../i/icons/jquery-ui-F5F6F1.png");
-  background-position: -50px -146px;
-  border-radius: 6px;
-  display: inline-block;
-  height: 12px;
-  width: 12px;
-  opacity: .7;
-  position: relative;
-  top: 2px;
-  padding: 0;
-}
-
-div.crm-accordion-header a.helpicon {
-  background-color: #F5F6F1;
-  background-image: url(../i/icons/jquery-ui-2786C2.png);
-}
-
-div a.helpicon:hover,
-div a.helpicon:focus {
-  opacity: 1;
-}
-
 .crm-container .crm-summary-link {
   position: relative;
   z-index: 16;
@@ -2658,18 +2708,15 @@ div.crm-container form {
 
 .crm-container .dataTables_processing {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 250px;
-  height: 30px;
-  margin-left: -125px;
-  margin-top: -15px;
-  padding: 14px 0 2px 0;
-  border: 1px solid #ddd;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-  background-color: white;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: url("../i/loading-overlay.gif") center center no-repeat white;
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .crm-container .dataTables_length {
@@ -3168,16 +3215,6 @@ div.m ul#civicrm-menu,
 .select2-drop .crm-entityref-filters select.active {
   border: 1px solid #808080;
 }
-/* Icons used by entityRef create buttons */
-.crm-container .Individual-profile-icon {
-  background-position: -144px -96px;
-}
-.crm-container .Household-profile-icon {
-  background-position: 0 -112px;
-}
-.crm-container .Organization-profile-icon {
-  background-position: -112px -112px;
-}
 /* Style autocomplete results */
 .crm-container .select2-results {
   font-size: 12px;
@@ -3357,33 +3394,6 @@ div.m ul#civicrm-menu,
 
 #crm-container .crm-fb-tweet-buttons {
   width: 93%;
-}
-#crm-container div.finalconf-button {
-  float: right;
-  padding: 5px 0 0 0;
-}
-#crm-container div.finalconf-button input {
-  margin: 0;
-}
-#crm-container div.finalconf-intro {
-  padding-bottom: 12px;
-  font-style: italic;
-}
-#crm-container h4.finalconf-item {
-  border-top: 1px solid #ccc;
-  padding: 8px 0 8px 10px;
-  margin: 0;
-}
-#crm-container div.finalconf-itemdesc {
-  font-style: italic;
-  padding: 6px 12px 6px 12px;
-  color: #666;
-  float: right;
-  width: 60%;
-}
-#crm-container h4.finalconf-btm {
-  border-bottom: 1px solid #ccc;
-  margin-bottom: 20px;
 }
 
 /* classes related to batch entry operation */
@@ -3683,6 +3693,9 @@ div.m ul#civicrm-menu,
   border: 0 none;
   font-size: 11px;
 }
+.crm-container div.ui-notify-message table {
+  margin: 10px 0;
+}
 .crm-container div.ui-notify-message td {
   background: rgba(255,255,255,0.1);
   border: 1px solid #111;
@@ -3693,6 +3706,9 @@ div.m ul#civicrm-menu,
   border: 1px solid #111;
   color: #eee;
   font-size: 11px;
+}
+.crm-container div.ui-notify-message table a.action-item {
+  margin-right: 5px;
 }
 .crm-container div.ui-notify-message ul,
 .crm-container div.ui-notify-message ol {
@@ -4022,4 +4038,8 @@ span.crm-status-icon {
 }
 .crm-container .crm-ui-datetime.ng-dirty input.incomplete {
   border: 1px solid red;
+}
+
+.crm-container .crm-grip {
+  cursor: move;
 }

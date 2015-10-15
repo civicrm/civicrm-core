@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -129,7 +129,7 @@
 {/htxt}
 
 {htxt id="id-internal-id-title"}
-  {ts}CiviCRM ID{/ts}
+  {ts}Contact ID{/ts}
 {/htxt}
 {htxt id="id-internal-id"}
 <p>{ts}Every contact in CiviCRM has a unique ID number. This number will never change and is the most accurate way of identifying a contact.{/ts}</p>
@@ -192,6 +192,3 @@
 <p>{ts}Use this field to store a description of how/why this contact was added to the database. This field is usually auto-filled when a contact is created from a public form i.e. Event Registration.{/ts}</p>
 {/htxt}
 
-{htxt id="id-financial-owner"}
-<p>{ts}Normally the owner of a financial account is the organization implementing CiviCRM so there is no need to change this. Some organizations that maintain accounts for groups, chapters, regions, constiuency associations or other parts of the main CiviCRM organization may need to change the owner to one of these sub-entities or sibling entities.{/ts}</p>
-{/htxt}

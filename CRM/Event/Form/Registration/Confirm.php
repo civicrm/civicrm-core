@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -90,7 +90,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       //we lost rfp in case of additional participant. So set it explicitly.
       if ($rfp || CRM_Utils_Array::value('additional_participants', $this->_params[0], FALSE)) {
-        $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+        $payment = $this->_paymentProcessor['object'];
         $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
         if (is_object($payment)) {
           $expressParams = $payment->getExpressCheckoutDetails($this->get('token'));
@@ -126,7 +126,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
         $params['amount_level'] = $this->_params[0]['amount_level'];
         $params['currencyID'] = $this->_params[0]['currencyID'];
-        $params['payment_action'] = 'Sale';
 
         // also merge all the other values from the profile fields
         $values = $this->controller->exportValues('Register');
@@ -175,7 +174,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($this->_values['event']['is_monetary']) {
         $registerParams['ip_address'] = CRM_Utils_System::ipAddress();
         $registerParams['currencyID'] = $this->_params[0]['currencyID'];
-        $registerParams['payment_action'] = 'Sale';
       }
       //assign back primary participant params.
       $this->_params[0] = $registerParams;
@@ -331,6 +329,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //consider total amount.
     $this->assign('isAmountzero', ($this->_totalAmount <= 0) ? TRUE : FALSE);
 
+    // @todo this needs to GO! We are getting rid of references to processor types in the code base in favour of
+    // over-ride-able functions on them.
+    // The processor effectively has a 'buildForm' hook it can use if it needs to.
+    // The tricky thing is that we have no way of testing this code out - perhaps it hasn't worked for years!
     if ($this->_paymentProcessor['payment_processor_type'] == 'Google_Checkout' && empty($this->_params[0]['is_pay_later']) && !($this->_params[0]['amount'] == 0) &&
       !$this->_allowWaitlist && !$this->_requireApproval
     ) {
@@ -585,7 +587,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // required only if paid event
       if ($this->_values['event']['is_monetary'] && !($this->_allowWaitlist || $this->_requireApproval)) {
         if (is_array($this->_paymentProcessor)) {
-          $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+          $payment = $this->_paymentProcessor['object'];
+        }
+        if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
+          $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
+          $value = array_merge($value, $preApprovalParams);
         }
         $result = NULL;
 
@@ -602,14 +608,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $value['participant_status_id'] = $value['participant_status'] = array_search($status, $pendingStatuses);
           }
         }
-        elseif ($this->_contributeMode == 'express' && !empty($value['is_primary'])) {
-          if (is_object($payment)) {
-            $result = $payment->doExpressCheckout($value);
-          }
-          else {
-            CRM_Core_Error::fatal($paymentObjError);
-          }
-        }
         elseif (!empty($value['is_primary'])) {
           CRM_Core_Payment_Form::mapParams($this->_bltID, $value, $value, TRUE);
           // payment email param can be empty for _bltID mapping
@@ -619,20 +617,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           if (is_object($payment)) {
-            $result = $payment->doDirectPayment($value);
+            try {
+              $result = $payment->doPayment($value);
+              $value = array_merge($value, $result);
+            }
+            catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+              CRM_Core_Error::displaySessionError($result);
+              CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
+            }
           }
           else {
             CRM_Core_Error::fatal($paymentObjError);
           }
-        }
-
-        if (is_a($result, 'CRM_Core_Error')) {
-          CRM_Core_Error::displaySessionError($result);
-          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
-        }
-
-        if ($result) {
-          $value = array_merge($value, $result);
         }
 
         $value['receive_date'] = $now;
@@ -777,7 +773,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    //update status and send mail to cancelled additonal participants, CRM-4320
+    //update status and send mail to cancelled additional participants, CRM-4320
     if ($this->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
       $cancelledId = array_search('Cancelled',
         CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")
@@ -870,7 +866,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // call postprocess hook before leaving
           $this->postProcessHook();
           // this does not return
-          $payment->doTransferCheckout($primaryParticipant, 'event');
+          $payment->doPayment($primaryParticipant, 'event');
         }
         else {
           CRM_Core_Error::fatal($paymentObjError);
@@ -1060,24 +1056,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }
 
-    // Prepare soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
-    if (!empty($params['pcp_made_through_id']) || !empty($params['soft_credit_to'])) {
-
-      // if its due to pcp
-      if (!empty($params['pcp_made_through_id'])) {
-        $contribSoftContactId = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
-          $params['pcp_made_through_id'],
-          'contact_id'
-        );
-      }
-      else {
-        $contribSoftContactId = CRM_Utils_Array::value('soft_credit_to', $params);
-      }
-
-      // Pass these details onto with the contribution to make them
-      // available at hook_post_process, CRM-8908
-      $contribParams['soft_credit_to'] = $params['soft_credit_to'] = $contribSoftContactId;
-    }
     $contribParams['payment_processor'] = CRM_Utils_Array::value('payment_processor', $params);
     $contribParams['skipLineItem'] = 1;
     // create contribution record
@@ -1086,7 +1064,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, CRM_Utils_Array::value('amount_priceset_level_radio', $params, NULL));
 
     // process soft credit / pcp pages
-    CRM_Contribute_Form_Contribution_Confirm::processPcpSoft($params, $contribution);
+    if (!empty($params['pcp_made_through_id'])) {
+      CRM_Contribute_Form_Contribution_Confirm::formatSoftCreditParams($params, $form);
+      CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
+    }
 
     $transaction->commit();
 

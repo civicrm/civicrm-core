@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -49,7 +49,7 @@
     </tr>
     </thead>
     {foreach from=$rows item=row}
-    <tr id="location_type-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
+    <tr id="location_type-{$row.id}"  data-action="setvalue" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crmf-name">{$row.name}</td>
         <td class="crmf-display_name crm-editable">{$row.display_name}</td>
         <td class="crmf-vcard_name crm-editable">{$row.vcard_name}</td>
@@ -69,7 +69,7 @@
     </div>
   {/if}
   <div class="action-link">
-    {crmButton q="action=add&reset=1" id="newLocationType" icon="circle-plus"}{ts}Add Option{/ts}{/crmButton}
-    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+    {crmButton q="action=add&reset=1" id="newLocationType" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
   </div>
 {/if}

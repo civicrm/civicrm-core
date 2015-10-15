@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -219,7 +219,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'financial_type_id' => array(
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
           ),
         ),
         'order_bys' => array(
@@ -268,7 +268,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'default' => TRUE,
           ),
           'payment_instrument_id' => array(
-            'title' => ts('Payment Instrument'),
+            'title' => ts('Payment Method'),
             'default' => TRUE,
           ),
           'currency' => array(
@@ -287,7 +287,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         ),
         'filters' => array(
           'payment_instrument_id' => array(
-            'title' => ts('Payment Instrument'),
+            'title' => ts('Payment Method'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
           ),
@@ -305,7 +305,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           ),
         ),
         'order_bys' => array(
-          'payment_instrument_id' => array('title' => ts('Payment Instrument')),
+          'payment_instrument_id' => array('title' => ts('Payment Method')),
         ),
       ),
       'civicrm_entity_financial_trxn' => array(
@@ -410,6 +410,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
                     ON fitem.financial_account_id = {$this->_aliases['civicrm_financial_account']}_credit_2.id
               LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
                     ON  fitem.entity_id = {$this->_aliases['civicrm_line_item']}.id AND fitem.entity_table = 'civicrm_line_item' ";
+    $this->getPermissionedFTQuery($this, "civicrm_line_item_1");
   }
 
   public function orderBy() {

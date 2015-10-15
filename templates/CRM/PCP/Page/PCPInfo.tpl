@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -47,7 +47,7 @@
       </tr>
         {/foreach}
        </table>
-     <div class="icon ui-icon-lightbulb"></div>
+     <i class="crm-i fa-lightbulb-o"></i>
      <strong>{ts}Tip{/ts}</strong> - <span class="description">{ts}You must be logged in to your account to access the editing options above. (If you visit this page without logging in, you will be viewing the page in "live" mode - as your visitors and friends see it.){/ts}</span>
 </div>
 {/if}
@@ -82,7 +82,7 @@
       <div class="honor-roll-wrapper">
         <div class="honor-roll-title">{ts}HONOR ROLL{/ts}</div>
           <div class="honor_roll">
-              <marquee behavior="scroll" direction="up" id="pcp_roll"  scrolldelay="200" bgcolor="#fafafa">
+              <marquee behavior="scroll" direction="up" id="pcp_roll"  scrolldelay="200"  height="200" bgcolor="#fafafa">
                 {foreach from = $honor item = v}
                 <div class="pcp_honor_roll_entry">
                     <div class="pcp-honor_roll-nickname">{$v.nickname}</div>

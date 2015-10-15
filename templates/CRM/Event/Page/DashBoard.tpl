@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,15 +32,15 @@
 {capture assign=htmlFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&html=1" fe=1 a=1}{/capture}
 
 {if $eventSummary.total_events}
-    <div class="float-right">
-  <table class="form-layout-compressed">
-     <tr>
-    <td><a href="{$configPagesURL}" class="button no-popup"><span>{ts}Manage Events{/ts}</span></a></td>
-    <td><a href="{$newEventURL}" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}New Event{/ts}</span></a></td>
-     </tr>
-  </table>
-    </div>
-    <h3>{ts}Event Summary{/ts}  {help id="id-event-intro"}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}"><img src="{$config->resourceBase}i/applications-internet.png" alt="{ts}HTML listing of current and future public events.{/ts}" /></a>&nbsp;&nbsp;<a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}"><img src="{$config->resourceBase}i/feed-icon.png" alt="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" /></a>&nbsp;&nbsp;<a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}"><img src="{$config->resourceBase}i/office-calendar.png" alt="{ts}Download iCalendar file for current and future public events.{/ts}" /></a>&nbsp;&nbsp;<a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}"><img src="{$config->resourceBase}i/ical_feed.gif" alt="{ts}Get iCalendar feed for current and future public events.{/ts}" /></a></h3>
+    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list"></i> {ts}Manage Events{/ts}</span></a>
+    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o"></i> {ts}New Event{/ts}</span></a>
+    <div class="clear">&nbsp;</div>
+    <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
+      {help id="id-event-intro"}
+      <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar"></i></a>
+      <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-rss"></i></a>
+      <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-download"></i></a>
+      <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar-o"></i></a></h3>
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>

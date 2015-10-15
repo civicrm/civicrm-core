@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2008                 |
  +--------------------------------------------------------------------+
@@ -111,7 +111,7 @@ class civicrm_cli {
       $result = civicrm_api($this->_entity, $this->_action, $this->_params);
     }
 
-    if ($result['is_error'] != 0) {
+    if (!empty($result['is_error'])) {
       $this->_log($result['error_message']);
       return FALSE;
     }

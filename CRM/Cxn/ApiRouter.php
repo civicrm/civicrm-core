@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -75,8 +75,7 @@ class CRM_Cxn_ApiRouter {
     }
 
     $whitelist = \Civi\API\WhitelistRule::createAll($cxn['perm']['api']);
-    Civi\Core\Container::singleton()
-      ->get('dispatcher')
+    \Civi::service('dispatcher')
       ->addSubscriber(new \Civi\API\Subscriber\WhitelistSubscriber($whitelist));
     CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
     if ($cxn['perm']['grant'] === '*') {

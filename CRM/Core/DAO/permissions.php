@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -95,6 +95,16 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
+  // CRM-16963 - Permissions for country.
+  $permissions['country'] = array(
+    'get' => array(
+      'access CiviCRM',
+    ),
+    'default' => array(
+      'administer CiviCRM',
+    ),
+  );
+
   // Contact-related data permissions.
   // CRM-14094 - Users can edit and delete contact-related objects using inline edit with 'edit all contacts' permission
   $permissions['address'] = array(
@@ -131,7 +141,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
     'delete' => array(
       'access CiviCRM',
-      'delete contacts',
+      'edit all contacts',
     ),
     'default' => array(
       'access CiviCRM',
@@ -166,6 +176,15 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'access all cases and activities',
     ),
   );
+
+  // Campaign permissions
+  $permissions['campaign'] = array(
+    'get' => array('access CiviCRM'),
+    'create' => array(array('administer CiviCampaign', 'manage campaign')),
+    'update' => array(array('administer CiviCampaign', 'manage campaign')),
+    'delete' => array(array('administer CiviCampaign', 'manage campaign')),
+  );
+  $permissions['survey'] = $permissions['campaign'];
 
   // Financial permissions
   $permissions['contribution'] = array(

@@ -327,7 +327,7 @@
         .dialog(settings.dialog)
         .parent().find('.ui-dialog-titlebar')
         .append($('<a class="crm-dialog-titlebar-print ui-dialog-titlebar-close" title="'+ts('Print window')+'" target="_blank" style="right:3.8em;"/>')
-          .button({icons: {primary: 'ui-icon-print'}, text: false}));
+          .button({icons: {primary: 'fa-print'}, text: false}));
     }
     // Add handlers to new or existing dialog
     if ($(settings.target).data('uiDialog')) {
@@ -381,7 +381,7 @@
         var id = widget.attr('id') + '-unsaved-alert',
           title = widget.dialog('option', 'title'),
           alert = CRM.alert('<p>' + ts('%1 has not been saved.', {1: title}) + '</p><p><a href="#" id="' + id + '">' + ts('Restore') + '</a></p>', ts('Unsaved Changes'), 'alert unsaved-dialog', {expires: 60000});
-        $('#' + id).button({icons: {primary: 'ui-icon-arrowreturnthick-1-w'}}).click(function(e) {
+        $('#' + id).button({icons: {primary: 'fa-undo'}}).click(function(e) {
           widget.attr('data-unsaved-changes', 'false').dialog('open');
           e.preventDefault();
         });
@@ -448,18 +448,6 @@
             }
           }
         },
-        beforeSerialize: function(form, options) {
-          if (window.CKEDITOR && window.CKEDITOR.instances) {
-            $.each(CKEDITOR.instances, function() {
-              if (this.updateElement) this.updateElement();
-            });
-          }
-          if (window.tinyMCE && tinyMCE.editors) {
-            $.each(tinyMCE.editors, function() {
-              this.save();
-            });
-          }
-        },
         beforeSubmit: function(submission) {
           $.each(formErrors, function() {
             if (this && this.close) this.close();
@@ -499,8 +487,8 @@
             if ($icon.length) {
               button.icons = {primary: $icon.attr('class')};
             } else {
-              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'close' : 'check');
-              button.icons = {primary: 'ui-icon-' + action};
+              var action = $el.attr('crm-icon') || ($el.hasClass('cancel') ? 'fa-times' : 'fa-check');
+              button.icons = {primary: action};
             }
             buttons.push(button);
             added.push(identifier);
@@ -509,15 +497,6 @@
           $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
         });
         $el.dialog('option', 'buttons', buttons);
-
-        // Show done button for non-ajax dialogs (e.g. file downloads)
-        $(this).on('submit', "form[data-no-ajax-submit=true]", function() {
-          $el.dialog('option', 'buttons', [{
-            text: ts('Done'),
-            icons: {primary: 'ui-icon-close'},
-            click: function() {$(this).dialog('close');}
-          }]);
-        });
       }
       // Allow a button to prevent ajax submit
       $('input[data-no-ajax-submit=true]').click(function() {
@@ -595,6 +574,12 @@
       // Destroy old unsaved dialog
       .on('dialogcreate', function(e) {
         $('.ui-dialog-content.crm-ajax-container:hidden[data-unsaved-changes=true]').crmSnippet('destroy').dialog('destroy').remove();
+      })
+      // Ensure wysiwyg content is updated prior to ajax submit
+      .on('form-pre-serialize', function(e) {
+        $('.crm-wysiwyg-enabled', e.target).each(function() {
+          CRM.wysiwyg.updateElement(this);
+        });
       })
       // Auto-resize dialogs when loading content
       .on('crmLoad dialogopen', 'div.ui-dialog.ui-resizable.crm-container', function(e) {

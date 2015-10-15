@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates task actions for CiviEvent
- *
+ * This class generates task actions for CiviEvent.
  */
 class CRM_Case_Form_Task extends CRM_Core_Form {
 
@@ -69,10 +66,6 @@ class CRM_Case_Form_Task extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
-   *
-   * @param
-   *
-   * @return void
    */
   public function preProcess() {
     self::preProcessCommon($this);
@@ -158,8 +151,6 @@ class CRM_Case_Form_Task extends CRM_Core_Form {
    *   Button type for the form after processing.
    * @param string $backType
    * @param bool $submitOnce
-   *
-   * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons(array(

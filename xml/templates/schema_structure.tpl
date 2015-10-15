@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -81,6 +81,26 @@ class CRM_Core_I18n_SchemaStructure
         static $result = null;
         if (!$result) {ldelim}
             $result = array_keys(self::columns());
+        {rdelim}
+        return $result;
+    {rdelim}
+    static function &widgets()
+    {ldelim}
+        static $result = null;
+        if (!$result) {ldelim}
+          $result = array(
+            {foreach from=$widgets key=table item=columns}
+              '{$table}' => array(
+                {foreach from=$columns key=column item=widget}
+                  '{$column}' => array(
+                    {foreach from=$widget key=name item=value}
+                      '{$name}' => "{$value}",
+                    {/foreach}
+                  ),
+                {/foreach}
+              ),
+            {/foreach}
+          );
         {rdelim}
         return $result;
     {rdelim}

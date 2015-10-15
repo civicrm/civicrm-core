@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -102,4 +102,25 @@ function civicrm_api3_contribution_page_delete($params) {
 function civicrm_api3_contribution_page_submit($params) {
   $result = CRM_Contribute_Form_Contribution_Confirm::submit($params);
   return civicrm_api3_create_success($result, $params, 'ContributionPage', 'submit');
+}
+
+
+/**
+ * Set default getlist parameters.
+ *
+ * @see _civicrm_api3_generic_getlist_defaults
+ *
+ * @param array $request
+ *
+ * @return array
+ */
+function _civicrm_api3_contribution_page_getlist_defaults(&$request) {
+  return array(
+    'description_field' => array(
+      'intro_text',
+    ),
+    'params' => array(
+      'is_active' => 1,
+    ),
+  );
 }

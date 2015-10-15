@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -36,12 +36,12 @@
      {else}
       <table class="form-layout-compressed">
             <tr class="crm-relationship-type-form-block-label_a_b">
-                <td class="label">{$form.label_a_b.label}</td>
+                <td class="label">{$form.label_a_b.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_relationship_type' field='label_a_b' id=$relationship_type_id}{/if}</td>
                 <td>{$form.label_a_b.html}<br />
                 <span class="description">{ts}Label for the relationship from Contact A to Contact B. EXAMPLE: Contact A is 'Parent of' Contact B.{/ts}</span></td>
             </tr>
             <tr class="crm-relationship-type-form-block-label_b_a">
-                <td class="label">{$form.label_b_a.label}</td>
+                <td class="label">{$form.label_b_a.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_relationship_type' field='label_b_a' id=$relationship_type_id}{/if}</td>
                 <td>{$form.label_b_a.html}<br />
                 <span class="description">{ts}Label for the relationship from Contact B to Contact A. EXAMPLE: Contact B is 'Child of' Contact A. You may leave this blank for relationships where the name is the same in both directions (e.g. Spouse).{/ts}</span></td>
             </tr>
@@ -54,7 +54,7 @@
                 <td>{$form.contact_types_b.html}</td>
             </tr>
             <tr class="crm-relationship-type-form-block-description">
-                <td class="label">{$form.description.label}</td>
+                <td class="label">{$form.description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_relationship_type' field='description' id=$relationship_type_id}{/if}</td>
                 <td>{$form.description.html}</td>
             </tr>
             <tr class="crm-relationship-type-form-block-is_active">

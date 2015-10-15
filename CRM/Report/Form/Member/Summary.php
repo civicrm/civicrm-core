@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -244,7 +244,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['group_by'] = $this->_params['group_bys_freq'][$fieldName];
 
-              // just to make sure these values are transfered to rows.
+              // just to make sure these values are transferred to rows.
               // since we need that for calculation purpose,
               // e.g making subtotals look nicer or graphs
               $this->_columnHeaders["{$tableName}_{$fieldName}_interval"] = array('no_display' => TRUE);

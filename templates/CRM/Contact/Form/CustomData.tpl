@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for building tabbed custom data *}
-{if $cdType || $postedInfo}
+{if $postedInfo}
    {include file="CRM/Custom/Form/CustomData.tpl"}
    {if $multiRecordDisplay eq 'single'}
      <div class="crm-submit-buttons">{$form.buttons.html}</div>

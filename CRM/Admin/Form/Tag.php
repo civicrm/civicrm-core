@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,21 +29,23 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Tag
- *
+ * This class generates form components for Tag.
  */
 class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   protected $_isTagSet;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Tag';
+  }
+
+  /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
@@ -130,9 +132,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $ids = array();

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -30,12 +30,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * Page for displaying list of Label Formats
+ * Page for displaying list of Label Formats.
  */
 class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
@@ -128,8 +126,6 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    * Browse all Label Format settings.
    *
    * @param null $action
-   *
-   * @return void
    */
   public function browse($action = NULL) {
     // Get list of configured Label Formats

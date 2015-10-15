@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -142,7 +142,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
         'expected' => $expectedCsvArray[$intKey],
         'actual' => $actualCsvArray[$intKey],
       ), TRUE);
-      $this->assertNotNull($expectedCsvArray[$intKey], 'In line ' . __LINE__);
+      $this->assertNotNull($expectedCsvArray[$intKey]);
       $this->assertEquals(
         count($actualCsvArray[$intKey]),
         count($expectedCsvArray[$intKey]),

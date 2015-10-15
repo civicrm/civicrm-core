@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
@@ -306,12 +305,13 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $config = CRM_Core_Config::singleton();
 
     // CRM-6942: set preferred language to the current language if it’s unset (and we’re creating a contact).
-    if (empty($params['contact_id']) && empty($params['preferred_language'])) {
-      $params['preferred_language'] = $config->lcMessages;
-    }
-
-    // CRM-9739: set greeting & addressee if unset and we’re creating a contact.
     if (empty($params['contact_id'])) {
+      // A case could be made for checking isset rather than empty but this is more consistent with previous behaviour.
+      if (empty($params['preferred_language']) && ($language = CRM_Core_I18n::getContactDefaultLanguage()) != FALSE) {
+        $params['preferred_language'] = $language;
+      }
+
+      // CRM-9739: set greeting & addressee if unset and we’re creating a contact.
       foreach (self::$_greetingTypes as $greeting) {
         if (empty($params[$greeting . '_id'])) {
           if ($defaultGreetingTypeId
@@ -327,7 +327,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     $contact = self::add($params);
     if (!$contact) {
-      // Not dying here is stupid, since we get into wierd situation and into a bug that
+      // Not dying here is stupid, since we get into weird situation and into a bug that
       // is impossible to figure out for the user or for us
       // CRM-7925
       CRM_Core_Error::fatal();
@@ -364,6 +364,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $blocks = CRM_Core_BAO_Location::create($params, $fixAddress);
     foreach ($blocks as $name => $value) {
       $contact->$name = $value;
+    }
+    if (!empty($params['updateBlankLocInfo'])) {
+      $skipDelete = TRUE;
     }
 
     //add website
@@ -779,7 +782,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       return FALSE;
     }
     // If trash is disabled in system settings then we always skip
-    if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'contact_undelete', NULL, 1)) {
+    if (!Civi::settings()->get('contact_undelete')) {
       $skipUndelete = TRUE;
     }
 
@@ -923,47 +926,6 @@ SET image_URL=NULL
 WHERE id={$id}; ";
     CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     return TRUE;
-  }
-
-  /**
-   * Return relative path.
-   *
-   * @todo make this a method of $config->userSystem (i.e. UF classes) rather than a static function
-   *
-   * @param string $absolutePath
-   *   Absolute path.
-   *
-   * @return string
-   *   Relative url of uploaded image
-   */
-  public static function getRelativePath($absolutePath) {
-    $relativePath = NULL;
-    $config = CRM_Core_Config::singleton();
-    if ($config->userFramework == 'Joomla') {
-      $userFrameworkBaseURL = trim(str_replace('/administrator/', '', $config->userFrameworkBaseURL));
-      $customFileUploadDirectory = strstr(str_replace('\\', '/', $absolutePath), '/media');
-      $relativePath = $userFrameworkBaseURL . $customFileUploadDirectory;
-    }
-    elseif ($config->userSystem->is_drupal == '1') {
-      //ideally we would do a bigger re-factoring & move the getRelativePath onto the UF class
-      $rootPath = $config->userSystem->cmsRootPath();
-      $baseUrl = $config->userFrameworkBaseURL;
-
-      //format url for language negotiation, CRM-7135
-      $baseUrl = CRM_Utils_System::languageNegotiationURL($baseUrl, FALSE, TRUE);
-
-      $relativePath = str_replace("{$rootPath}/",
-        $baseUrl,
-        str_replace('\\', '/', $absolutePath)
-      );
-    }
-    elseif ($config->userFramework == 'WordPress') {
-      $userFrameworkBaseURL = trim(str_replace('/wp-admin/', '', $config->userFrameworkBaseURL));
-      $customFileUploadDirectory = strstr(str_replace('\\', '/', $absolutePath), '/wp-content/');
-      $relativePath = $userFrameworkBaseURL . $customFileUploadDirectory;
-    }
-
-    return $relativePath;
   }
 
   /**
@@ -1864,6 +1826,14 @@ ORDER BY civicrm_email.is_primary DESC";
       $params['uf_group_id'] = $ufGroupId;
     }
 
+    // If a user has logged in, or accessed via a checksum
+    // Then deliberately 'blanking' a value in the profile should remove it from their record
+    $session = CRM_Core_Session::singleton();
+    $params['updateBlankLocInfo'] = TRUE;
+    if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
+      $params['updateBlankLocInfo'] = FALSE;
+    }
+
     if ($contactID) {
       $editHook = TRUE;
       CRM_Utils_Hook::pre('edit', 'Profile', $contactID, $params);
@@ -2003,7 +1973,11 @@ ORDER BY civicrm_email.is_primary DESC";
       !empty($params['contact_sub_type_hidden'])
     ) {
       // if profile was used, and had any subtype, we obtain it from there
-      $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $params['contact_sub_type_hidden']) . CRM_Core_DAO::VALUE_SEPARATOR;
+      //CRM-13596 - add to existing contact types, rather than overwriting
+      $data_contact_sub_type_arr = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR));
+      if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
+        $data['contact_sub_type'] = $data['contact_sub_type'] . implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $params['contact_sub_type_hidden']) . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
     }
 
     if ($ctype == 'Organization') {
@@ -2026,9 +2000,7 @@ ORDER BY civicrm_email.is_primary DESC";
       $defaultLocationId = $defaultLocation->id;
     }
 
-    // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-    $billingLocationTypeId = array_search('Billing', $locationTypes);
+    $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
 
     $blocks = array('email', 'phone', 'im', 'openid');
 
@@ -2228,14 +2200,20 @@ ORDER BY civicrm_email.is_primary DESC";
             }
           }
 
-          $type = $data['contact_type'];
-          if (!empty($data['contact_sub_type'])) {
-            $type = $data['contact_sub_type'];
-            $type = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($type, CRM_Core_DAO::VALUE_SEPARATOR));
-            // generally a contact even if, has multiple subtypes the parent-type is going to be one only
-            // and since formatCustomField() would be interested in parent type, lets consider only one subtype
-            // as the results going to be same.
-            $type = $type[0];
+          //CRM-13596 - check for contact_sub_type_hidden first
+          if (array_key_exists('contact_sub_type_hidden', $params)) {
+            $type = $params['contact_sub_type_hidden'];
+          }
+          else {
+            $type = $data['contact_type'];
+            if (!empty($data['contact_sub_type'])) {
+              $type = $data['contact_sub_type'];
+              $type = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($type, CRM_Core_DAO::VALUE_SEPARATOR));
+              // generally a contact even if, has multiple subtypes the parent-type is going to be one only
+              // and since formatCustomField() would be interested in parent type, lets consider only one subtype
+              // as the results going to be same.
+              $type = $type[0];
+            }
           }
 
           CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
@@ -2279,8 +2257,8 @@ ORDER BY civicrm_email.is_primary DESC";
                 'suffix_id',
               )) &&
             ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0
-          ) {
+            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
+            ($key == 'current_employer' && empty($params['current_employer']))) {
             // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
             // to avoid update with empty values
             continue;
@@ -3350,6 +3328,13 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       case 'tag':
         $props['entity_table'] = 'civicrm_contact';
         return CRM_Core_BAO_EntityTag::buildOptions('tag_id', $context, $props);
+
+      case 'state_province_id':
+      case 'country_id':
+      case 'county_id':
+      case 'worldregion':
+      case 'worldregion_id':
+        return CRM_Core_BAO_Address::buildOptions($fieldName, 'get', $props);
 
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);

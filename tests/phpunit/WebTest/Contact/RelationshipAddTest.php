@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -337,8 +337,8 @@ class WebTest_Contact_RelationshipAddTest extends CiviSeleniumTestCase {
     //check the status message
     $this->waitForText('crm-notification-container', 'Relationship created.');
 
-    $this->waitForElementPresent("xpath=//table[@class='crm-contact-relationship-selector-current dataTable no-footer']/tbody/tr/td[9]/span/a[1][text()='View']");
-    $this->click("xpath=//table[@class='crm-contact-relationship-selector-current dataTable no-footer']/tbody/tr/td[9]/span/a[1][text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='contact-summary-relationship-tab']/div[2]/div[1]/table/tbody/tr/td[9]/span[1]/a[1]");
+    $this->click("xpath=//div[@id='contact-summary-relationship-tab']/div[2]/div[1]/table/tbody/tr/td[9]/span[1]/a[1]");
 
     $this->webtestVerifyTabularData(
       array(

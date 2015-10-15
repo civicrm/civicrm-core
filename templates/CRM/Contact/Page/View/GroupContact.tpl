@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -152,8 +152,8 @@
               </a>
             </td>
             <td class="status-removed">{ts 1=$row.out_method}Removed (by %1){/ts}</td>
-            <td>{$row.date_added|crmDate}</td>
-            <td>{$row.out_date|crmDate}</td>
+            <td data-order="{$row.date_added}">{$row.date_added|crmDate}</td>
+            <td data-order="{$row.out_date}">{$row.out_date|crmDate}</td>
             <td>{if $permission EQ 'edit'}
                 <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
                   {ts}Rejoin Group{/ts}</a>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -289,7 +289,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
           'bodyLocator' => 'select#financial_type_id',
           'title' => 'Contributions',
           'fields' => array(
-            'Contribution Dates' => array(
+            'Date Received' => array(
               'type' => 'select',
               'locator' => 'contribution_date_relative',
               'values' => array('Today'),
@@ -301,7 +301,7 @@ class WebTest_Contact_SearchbyDateFilterTest extends CiviSeleniumTestCase {
           'bodyLocator' => 'select#pledge_payment_date_relative',
           'title' => 'Pledges',
           'fields' => array(
-            'Contribution Dates' => array(
+            'Date Received' => array(
               'type' => 'select',
               'locator' => 'pledge_payment_date_relative',
               'values' => array('Prior to Previous Month'),

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -78,7 +78,7 @@
 {if $action eq 2 or $action eq 4} {* Update or View*}
     <p></p>
     <div class="action-link">
-      {crmButton p='civicrm/admin/custom/group/field' q="action=browse&reset=1&gid=$gid"}{ts}Custom Fields for this Set{/ts}{/crmButton}
+      {crmButton p='civicrm/admin/custom/group/field' q="action=browse&reset=1&gid=$gid" icon="th-list"}{ts}Custom Fields for this Set{/ts}{/crmButton}
     </div>
 {/if}
 {$initHideBlocks}

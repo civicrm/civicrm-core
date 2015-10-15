@@ -1,5 +1,5 @@
 <h2>This is an example of a template you can call inline</h2>
-<p>If you call it from an <a href='#' id="dialog">ajax call</a>, it's ready to be embeded in your page. </p><p>You can pass an <a href="?id=42">id as param</a> and access it in {ldelim}$id{rdelim}.
+<p>If you call it from an <a href='#' id="dialog">ajax call</a>, it's ready to be embedded in your page. </p><p>You can pass an <a href="?id=42">id as param</a> and access it in {ldelim}$id{rdelim}.
 {if $id}
 <p><b>Well done, you have an id as param ( {$id} )</b></p>
 {/if}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                               |
+ | CiviCRM version 4.7                                               |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -85,8 +83,6 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
   /**
    * Browse all event templates.
-   *
-   * @return void
    */
   public function browse() {
     //get all event templates.

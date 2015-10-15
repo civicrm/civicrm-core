@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,7 +32,7 @@
 
   <div class="crm-block crm-content-block">
     <div id="new-menu-item">
-      <a href="{crmURL p="civicrm/admin/menu" q="action=add&reset=1"}" class="button" style="margin-left: 6px;"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Menu Item{/ts}</span></a>&nbsp;&nbsp;&nbsp;&nbsp;
+      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="crm-i fa-plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}&nbsp;&nbsp;&nbsp;&nbsp;
         <span id="reset-menu" class="status" style="display:none">
         {capture assign=rebuildURL}{crmURL p='civicrm/admin/menu' q="reset=1"}{/capture}
           {ts 1=$rebuildURL}<a href='%1' title="Reload page"><strong>Click here</strong></a> to reload the page and see your changes in the menu bar above.{/ts}
@@ -40,6 +40,10 @@
     </div>
     <div class="spacer"></div>
     <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
+    <div class="spacer"></div>
+    <div>
+      <a href="{crmURL p="#"}" id='nav-reset'><span>{ts}Click here{/ts}</span></a> {ts}to reset the reports menu structure to the default.{/ts}
+    </div>
     <div class="spacer"></div>
   </div>
   {literal}
@@ -53,6 +57,10 @@
   </style>
   <script type="text/javascript">
     CRM.$(function($) {
+      $('#nav-reset').on('click', function(e) {
+        e.preventDefault();
+        CRM.api3('Navigation', 'reset', {'for' : 'report'}, ts('Report menu reset. Changes will be visible when you refresh'))
+      });
       $("#navigation-tree").jstree({
         plugins: [ "themes", "json_data", "dnd","ui", "crrm","contextmenu" ],
         json_data: {

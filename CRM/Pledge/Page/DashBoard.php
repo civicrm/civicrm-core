@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,16 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This is page is for Pledge Dashboard
+ * This page is for the Pledge Dashboard.
  */
 class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
 
   /**
-   * Heart of the viewing process. The runner gets all the meta data for
+   * Heart of the viewing process: The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
-   *
-   * @return void
    */
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviPledge'));
@@ -94,7 +90,7 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
 
   /**
    * the main function that is called when the page loads,
-   * it decides the which action has to be taken for the page.
+   * it decides which action has to be taken for the page.
    *
    * @return null
    */

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -184,6 +184,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     // Financial Type
     $financialType = CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+    foreach ($financialType as $finTypeId => $type) {
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+        && !CRM_Core_Permission::check('add contributions of type ' . $type)
+      ) {
+        unset($financialType[$finTypeId]);
+      }
+    }
     if (count($financialType)) {
       $this->assign('financialType', $financialType);
     }

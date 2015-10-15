@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -301,6 +301,27 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       $expectedRecipients,
       $recipients,
       "Incorrect recipients: " . print_r(array('expected' => $expectedRecipients, 'actual' => $recipients), TRUE)
+    );
+  }
+
+  /**
+   * Assert that $expectedSubjects (and no other subjects) were sent.
+   *
+   * @param array $expectedSubjects
+   *   Array(string $subj).
+   */
+  public function assertSubjects($expectedSubjects) {
+    $subjects = array();
+    foreach ($this->getAllMessages('ezc') as $message) {
+      /** @var ezcMail $message */
+      $subjects[] = $message->subject;
+    }
+    sort($subjects);
+    sort($expectedSubjects);
+    $this->_ut->assertEquals(
+      $expectedSubjects,
+      $subjects,
+      "Incorrect subjects: " . print_r(array('expected' => $expectedSubjects, 'actual' => $subjects), TRUE)
     );
   }
 

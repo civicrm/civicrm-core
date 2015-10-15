@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * defines a simple implemenation of a drupal block.
- * blocks definitions and html are in a smarty template file
+ * Defines a simple implementation of a drupal block.
  *
+ * Blocks definitions and html are in a smarty template file.
  */
 class CRM_Core_Block {
 
@@ -67,8 +65,6 @@ class CRM_Core_Block {
 
   /**
    * Initialises the $_properties array
-   *
-   * @return void
    */
   public static function initProperties() {
     if (!defined('BLOCK_CACHE_GLOBAL')) {
@@ -206,8 +202,6 @@ class CRM_Core_Block {
    *   The desired property.
    * @param string $value
    *   The value of the desired property.
-   *
-   * @return void
    */
   public static function setProperty($id, $property, $value) {
     if (!(self::$_properties)) {
@@ -217,7 +211,7 @@ class CRM_Core_Block {
   }
 
   /**
-   * Returns the whole $_properties array
+   * Returns the whole $_properties array.
    *
    * @return array
    *   the $_properties array
@@ -288,8 +282,6 @@ class CRM_Core_Block {
    * hence this hack
    *
    * @param int $id
-   *
-   * @return void
    */
   private static function setTemplateValues($id) {
     switch ($id) {
@@ -347,8 +339,6 @@ class CRM_Core_Block {
 
   /**
    * Create the list of options to create New objects for the application and format is as a block.
-   *
-   * @return void
    */
   private static function setTemplateShortcutValues() {
     $config = CRM_Core_Config::singleton();
@@ -459,7 +449,7 @@ class CRM_Core_Block {
       $value['url'] = CRM_Utils_System::url($short['path'], $short['query'], FALSE);
     }
     $value['title'] = $short['title'];
-    $value['ref'] = $short['ref'];
+    $value['ref'] = isset($short['ref']) ? $short['ref'] : '';
     if (!empty($short['shortCuts'])) {
       foreach ($short['shortCuts'] as $shortCut) {
         $value['shortCuts'][] = self::setShortcutValues($shortCut);
@@ -470,8 +460,6 @@ class CRM_Core_Block {
 
   /**
    * Create the list of dashboard links.
-   *
-   * @return void
    */
   private static function setTemplateDashboardValues() {
     static $dashboardLinks = array();
@@ -507,8 +495,6 @@ class CRM_Core_Block {
 
   /**
    * Create the list of mail urls for the application and format is as a block.
-   *
-   * @return void
    */
   private static function setTemplateMailValues() {
     static $shortCuts = NULL;
@@ -540,8 +526,6 @@ class CRM_Core_Block {
 
   /**
    * Create the list of shortcuts for the application and format is as a block.
-   *
-   * @return void
    */
   private static function setTemplateMenuValues() {
     $config = CRM_Core_Config::singleton();
@@ -555,8 +539,6 @@ class CRM_Core_Block {
 
   /**
    * Create the event blocks for upcoming events.
-   *
-   * @return void
    */
   private static function setTemplateEventValues() {
     $config = CRM_Core_Config::singleton();
@@ -638,7 +620,7 @@ class CRM_Core_Block {
 
     // Suppress Language switcher if language is inherited from CMS - CRM-9971
     $config = CRM_Core_Config::singleton();
-    if ($id == self::LANGSWITCH && property_exists($config, "inheritLocale") && $config->inheritLocale) {
+    if ($id == self::LANGSWITCH && $config->inheritLocale) {
       return NULL;
     }
 

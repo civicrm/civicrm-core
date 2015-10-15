@@ -34,6 +34,7 @@
     <length>64</length>
     <comment>label for relationship of contact_a to contact_b.</comment>
     <add>3.0</add>
+    <localizable>true</localizable>
   </field>
   <field>
     <name>name_b_a</name>
@@ -50,6 +51,7 @@
     <length>64</length>
     <comment>Optional label for relationship of contact_b to contact_a.</comment>
     <add>3.0</add>
+    <localizable>true</localizable>
   </field>
   <field>
     <name>description</name>
@@ -58,6 +60,7 @@
     <length>255</length>
     <comment>Optional verbose description of the relationship type.</comment>
     <add>1.1</add>
+    <localizable>true</localizable>
   </field>
   <field>
     <name>contact_type_a</name>

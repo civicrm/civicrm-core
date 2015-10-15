@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -147,27 +147,6 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($copycontributionpage->goal_amount, 400, 'Check for goal amount.');
     ContributionPage::delete($contributionpage->id);
     ContributionPage::delete($copycontributionpage->id);
-  }
-
-  /**
-   * Test checkRecurPaymentProcessor() method
-   */
-  public function testcheckRecurPaymentProcessor() {
-    //@todo paypalpro create seems to fail silently without causing this class to fail
-    // $this->paymentProcessorCreate may be a better option
-    $paymentProcessor = PaypalPro::create();
-    $params = array(
-      'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_financialTypeID,
-      'is_active' => 1,
-      'payment_processor_id' => $paymentProcessor,
-    );
-
-    $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
-    $id = $contributionpage->id;
-    $checkRecurring = CRM_Contribute_BAO_ContributionPage::checkRecurPaymentProcessor($id);
-    $this->assertEquals($checkRecurring, FALSE, 'Check for false return.');
-    ContributionPage::delete($contributionpage->id);
   }
 
 }

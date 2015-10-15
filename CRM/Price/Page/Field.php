@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -133,6 +133,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     while ($priceFieldBAO->fetch()) {
       $priceField[$priceFieldBAO->id] = array();
       CRM_Core_DAO::storeValues($priceFieldBAO, $priceField[$priceFieldBAO->id]);
@@ -143,8 +144,11 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         $params = array('price_field_id' => $priceFieldBAO->id);
 
         CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
-
         $financialTypeId = $optionValues['financial_type_id'];
+        if (!array_key_exists($financialTypeId, $financialTypes)) {
+          unset($priceField[$priceFieldBAO->id]);
+          continue;
+        }
         $priceField[$priceFieldBAO->id]['price'] = CRM_Utils_Array::value('amount', $optionValues);
         if ($invoicing && isset($taxRate[$financialTypeId])) {
           $priceField[$priceFieldBAO->id]['tax_rate'] = $taxRate[$financialTypeId];

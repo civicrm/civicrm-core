@@ -15,7 +15,7 @@
       var buttons = [
         {
           text: ts('Submit final mailing'),
-          icons: {primary: 'ui-icon-check'},
+          icons: {primary: 'fa-paper-plane'},
           click: function() {
             crmMailingMgr.mergeInto(abtest.mailings.c, abtest.mailings[mailingName], [
               'name',
@@ -37,7 +37,7 @@
         },
         {
           text: ts('Cancel'),
-          icons: {primary: 'ui-icon-close'},
+          icons: {primary: 'fa-times'},
           click: function() {
             dialogService.cancel('selectWinnerDialog');
           }

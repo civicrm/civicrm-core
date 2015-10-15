@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contain function for Website handling
+ * This class contain function for Website handling.
  */
 class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
@@ -66,9 +64,9 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param int $contactID
    *   Contact id.
    *
-   * @param $skipDelete
+   * @param bool $skipDelete
    *
-   * @return void
+   * @return bool
    */
   public static function create(&$params, $contactID, $skipDelete) {
     if (empty($params)) {
@@ -77,35 +75,20 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
     $ids = self::allWebsites($contactID);
     foreach ($params as $key => $values) {
-      $websiteId = CRM_Utils_Array::value('id', $values);
-      if ($websiteId) {
-        if (array_key_exists($websiteId, $ids)) {
-          unset($ids[$websiteId]);
-        }
-        else {
-          unset($values['id']);
-        }
-      }
-
-      if (empty($values['id']) &&
-        is_array($ids) && !empty($ids)
-      ) {
+      if (empty($values['id']) && is_array($ids) && !empty($ids)) {
         foreach ($ids as $id => $value) {
-          if (($value['website_type_id'] == $values['website_type_id']) && !empty($values['url'])) {
+          if (($value['website_type_id'] == $values['website_type_id'])) {
             $values['id'] = $id;
-            unset($ids[$id]);
-            break;
           }
         }
       }
-      $values['contact_id'] = $contactID;
       if (!empty($values['url'])) {
+        $values['contact_id'] = $contactID;
         self::add($values);
       }
-    }
-
-    if ($skipDelete && !empty($ids)) {
-      self::del(array_keys($ids));
+      elseif ($skipDelete && !empty($values['id'])) {
+        self::del(array($values['id']));
+      }
     }
   }
 
@@ -115,7 +98,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param array $ids
    *   Website ids.
    *
-   * @return void
+   * @return bool
    */
   public static function del($ids) {
     $query = 'DELETE FROM civicrm_website WHERE id IN ( ' . implode(',', $ids) . ')';

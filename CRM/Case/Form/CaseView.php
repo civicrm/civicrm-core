@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates view mode for CiviCase
- *
+ * This class generates view mode for CiviCase.
  */
 class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
@@ -46,8 +43,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $this->_showRelatedCases = CRM_Utils_Array::value('relatedCases', $_GET);
@@ -88,6 +83,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     $this->assign('caseID', $this->_caseID);
     $this->assign('contactID', $this->_contactID);
+    $this->assign('contactType', CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactID, 'contact_type'));
 
     //validate case id.
     $this->_userCases = array();
@@ -194,11 +190,9 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * @return array;
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -207,8 +201,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     //this call is for show related cases.
@@ -216,9 +208,12 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       return;
     }
 
+    $allowedRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactID);
+
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header')
-      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js', 2, 'html-header');
+      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js', 2, 'html-header')
+      ->addVars('relationshipTypes', CRM_Contact_Form_Relationship::getRelationshipTypeMetadata($allowedRelationshipTypes));
 
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($this->_caseType, 'CaseRoles');
@@ -377,14 +372,14 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo);
     $this->assign('globalGroupInfo', $globalGroupInfo);
 
-    // List of relationship types
-    $baoRel = new CRM_Contact_BAO_Relationship();
-    $relType = $baoRel->getRelationType('Individual');
-    $roleTypes = array();
-    foreach ($relType as $k => $v) {
-      $roleTypes[substr($k, 0, strpos($k, '_'))] = $v;
-    }
-    $this->add('select', 'role_type', ts('Relationship Type'), array('' => ts('- select type -')) + $roleTypes, FALSE, array('class' => 'crm-select2 twenty'));
+    // List relationship types for adding an arbitrary new role to the case
+    $this->add('select',
+      'role_type',
+      ts('Relationship Type'),
+      array('' => ts('- select type -')) + $allowedRelationshipTypes,
+      FALSE,
+      array('class' => 'crm-select2 twenty', 'data-select-params' => '{"allowClear": false}')
+    );
 
     $hookCaseSummary = CRM_Utils_Hook::caseSummary($this->_caseID);
     if (is_array($hookCaseSummary)) {
@@ -444,8 +439,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

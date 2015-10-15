@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_Migrate_ImportJSON {
 
@@ -38,8 +36,6 @@ class CRM_Utils_Migrate_ImportJSON {
 
   protected $_saveMapping;
 
-  /**
-   */
   public function __construct() {
     $this->_lookupCache = array();
     $this->_saveMapping = array();
@@ -53,7 +49,7 @@ class CRM_Utils_Migrate_ImportJSON {
 
     $decodedContacts = json_decode($json);
 
-    //migrate contact data
+    // migrate contact data
     $this->contact($decodedContacts->civicrm_contact);
     $this->email($decodedContacts->civicrm_email);
     $this->phone($decodedContacts->civicrm_phone);

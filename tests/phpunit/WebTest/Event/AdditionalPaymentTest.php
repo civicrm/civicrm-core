@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -138,7 +138,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
         'Financial Type' => 'Event Fee',
         'Total Amount' => '$ 800.00',
         'Contribution Status' => 'Partially paid',
-        'Paid By' => 'Check',
+        'Payment Method' => 'Check',
         'Check Number' => '1044',
       )
     );
@@ -190,7 +190,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
         'Financial Type' => 'Event Fee',
         'Total Amount' => '$ 800.00',
         'Contribution Status' => 'Completed',
-        'Paid By' => 'Check',
+        'Payment Method' => 'Check',
         'Check Number' => '1044',
       )
     );
@@ -200,7 +200,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a");
     $this->clickAjaxLink("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a");
     $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[contains(text(), 'Amount')]/../../tr[2]/td[contains(text(), '$ 400.00')]/../../tr[3]/td[contains(text(), '$ 400.00')]");
-    $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[3][contains(text(), 'Paid By')]/../../tr[2]/td[3][contains(text(), 'Check')]/../../tr[3]/td[3][contains(text(), 'Cash')]");
+    $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[3][contains(text(), 'Payment Method')]/../../tr[2]/td[3][contains(text(), 'Check')]/../../tr[3]/td[3][contains(text(), 'Cash')]");
     $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[6][contains(text(), 'Status')]/../../tr[2]/td[6][contains(text(), 'Completed')]/../../tr[3]/td[6][contains(text(), 'Completed')]");
   }
 

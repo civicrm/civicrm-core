@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -70,9 +68,20 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       // load post ids in $ids
       $this->getIDs($ids, $input);
 
-      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
+      // This is an unreliable method as there could be more than one instance.
+      // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
+      // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
+      // entirely). The only thing the IPN class should really do is extract data from the request, validate it
+      // & call completetransaction or call fail? (which may not exist yet).
+      $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
         'AuthNet', 'id', 'name'
       );
+      $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
+        'is_test' => 0,
+        'options' => array('limit' => 1),
+        'payment_processor_type_id' => $paymentProcessorTypeID,
+         'return' => 'id',
+      ));
 
       if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
         return FALSE;
@@ -101,6 +110,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   public function recur(&$input, &$ids, &$objects, $first) {
     $this->_isRecurring = TRUE;
     $recur = &$objects['contributionRecur'];
+    $paymentProcessorObject = $objects['contribution']->_relatedObjects['paymentProcessor']['object'];
 
     // do a subscription check
     if ($recur->processor_id != $input['subscription_id']) {
@@ -152,9 +162,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $objects['contribution']->total_amount = $input['amount'];
     $objects['contribution']->trxn_id = $input['trxn_id'];
 
-    // since we have processor loaded for sure at this point,
-    // check and validate gateway MD5 response if present
-    $this->checkMD5($ids, $input);
+    $this->checkMD5($paymentProcessorObject, $input);
 
     if ($input['response_code'] == 1) {
       // Approved
@@ -331,17 +339,14 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
   }
 
   /**
-   * @param $ids
-   * @param $input
+   * Check and validate gateway MD5 response if present.
+   *
+   * @param CRM_Core_Payment_AuthorizeNet $paymentObject
+   * @param array $input
    *
    * @return bool
    */
-  public function checkMD5($ids, $input) {
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ids['paymentProcessor'],
-      $input['is_test'] ? 'test' : 'live'
-    );
-    $paymentObject = CRM_Core_Payment::singleton($input['is_test'] ? 'test' : 'live', $paymentProcessor);
-
+  public function checkMD5($paymentObject, $input) {
     if (!$paymentObject->checkMD5($input['MD5_Hash'], $input['trxn_id'], $input['amount'], TRUE)) {
       CRM_Core_Error::debug_log_message("MD5 Verification failed.");
       echo "Failure: Security verification failed<p>";

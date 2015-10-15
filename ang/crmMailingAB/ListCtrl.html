@@ -52,12 +52,12 @@ Required vars: mailingABList
 </div>
 
 <div ng-show="$.isEmptyObject(mailingABList)" class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  <i class="crm-i fa-info-circle"></i>
   {{ts('You have no A/B mailings')}}
 </div>
 
 
 <div class="crm-submit-buttons">
   <br>
-  <a ng-href="#/abtest/new" class="button"><span><div class="icon ui-icon-circle-plus"></div>{{ts('New A/B Test')}}</span></a>
+  <a ng-href="#/abtest/new" class="button"><span><i class="crm-i fa-bar-chart"></i> {{ts('New A/B Test')}}</span></a>
 </div>

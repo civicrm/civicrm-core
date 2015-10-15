@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Core_Form_Date {
 
@@ -40,11 +38,10 @@ class CRM_Core_Form_Date {
   const DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
 
   /**
-   * build the date-format form
+   * Build the date-format form.
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
-   *
    */
   public static function buildAllowedDateFormats(&$form) {
 
@@ -70,8 +67,7 @@ class CRM_Core_Form_Date {
 
 
   /**
-   * retrieve the date range - relative or absolute
-   * and assign it to the form
+   * Retrieve the date range - relative or absolute and assign it to the form.
    *
    * @param CRM_Core_Form $form
    *   The form the dates should be added to.
@@ -85,7 +81,6 @@ class CRM_Core_Form_Date {
    *   Additional value pairs to add.
    * @param string $dateFormat
    * @param bool|string $displayTime
-   *
    */
   public static function buildDateRange(
     &$form, $fieldName, $count = 1,
@@ -108,8 +103,9 @@ class CRM_Core_Form_Date {
   }
 
   /**
-   * build the date range array that will provide the form option values.
-   * It can be - relative or absolute
+   * Build the date range array that will provide the form option values.
+   *
+   * It can be - relative or absolute.
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
@@ -123,6 +119,7 @@ class CRM_Core_Form_Date {
    *   Additional Operator Selections to add.
    * @param string $dateFormat
    * @param bool $displayTime
+   *
    * @return array
    *   Values for Selector
    */
@@ -135,66 +132,9 @@ class CRM_Core_Form_Date {
     $selector = array(
       '' => ts('- any -'),
       0 => ts('Choose Date Range'),
-      'previous_2.year' => ts('Previous 2 Years'),
-      'previous_2.quarter' => ts('Previous 2 Quarters'),
-      'previous_2.month' => ts('Previous 2 Months'),
-      'previous_2.week' => ts('Previous 2 Weeks'),
-      'previous_2.day' => ts('Previous 2 Days'),
-      'previous_before.year' => ts('Prior to Previous Year'),
-      'previous_before.quarter' => ts('Prior to Previous Quarter'),
-      'previous_before.month' => ts('Prior to Previous Month'),
-      'previous_before.week' => ts('Prior to Previous Week'),
-      'previous_before.day' => ts('Prior to Previous Day'),
-      'previous.year' => ts('Previous Year'),
-      'previous.fiscal_year' => ts('Previous Fiscal Year'),
-      'previous.quarter' => ts('Previous Quarter'),
-      'previous.month' => ts('Previous Month'),
-      'previous.week' => ts('Previous Week'),
-      'earlier.year' => ts('To End of Previous Year'),
-      'earlier.quarter' => ts('To End of Previous Quarter'),
-      'earlier.month' => ts('To End of Previous Month'),
-      'earlier.week' => ts('To End of Previous Week'),
-      'earlier.day' => ts('To End of Previous Day'),
-      'greater_previous.year' => ts('From End of Previous Year'),
-      'greater_previous.quarter' => ts('From End of Previous Quarter'),
-      'greater_previous.month' => ts('From End of Previous Month'),
-      'greater_previous.week' => ts('From End of Previous Week'),
-      'greater.year' => ts('From Start of Current Year'),
-      'greater.quarter' => ts('From Start of Current Quarter'),
-      'greater.month' => ts('From Start of Current Month'),
-      'greater.week' => ts('From Start of Current Week'),
-      'greater.day' => ts('From Start of Current Day'),
-      'current.year' => ts('Current Year to-date'),
-      'current.quarter' => ts('Current Quarter to-date'),
-      'current.month' => ts('Current Month to-date'),
-      'current.week' => ts('Current Week to-date'),
-      'ending_3.year' => ts('Last 3 Years'),
-      'ending_2.year' => ts('Last 2 Years'),
-      'ending.year' => ts('Last 12 Months'),
-      'ending.quarter' => ts('Last 3 Months'),
-      'ending.month' => ts('Last 30 days'),
-      'ending.week' => ts('Last 7 days'),
-      'previous.day' => ts('Yesterday'),
-      'this.year' => ts('This Year'),
-      'this.fiscal_year' => ts('This Fiscal Year'),
-      'this.quarter' => ts('This Quarter'),
-      'this.month' => ts('This Month'),
-      'this.week' => ts('This Week'),
-      'this.day' => ts('Today'),
-      'starting.day' => ts('Tomorrow'),
-      'starting.week' => ts('Upcoming 7 days'),
-      'starting.month' => ts('Upcoming Month'),
-      'starting.year' => ts('Upcoming 12 Months'),
-      'less.year' => ts('To End of Current Year'),
-      'less.quarter' => ts('To End of Current Quarter'),
-      'less.month' => ts('To End of Current Month'),
-      'less.week' => ts('To End of Current Week'),
-      'next.week' => ts('Next Week'),
-      'next.month' => ts('Next Month'),
-      'next.quarter' => ts('Next Quarter'),
-      'next.fiscal_year' => ts('Next Fiscal Year'),
-      'next.year' => ts('Next Year'),
     );
+    // CRM-16195 Pull relative date filters from an option group
+    $selector = $selector + CRM_Core_OptionGroup::values('relative_date_filters');
 
     if (is_array($operators)) {
       $selector = array_merge($selector, $operators);
@@ -211,7 +151,7 @@ class CRM_Core_Form_Date {
   }
 
   /**
-   * build the date range - relative or absolute
+   * Build the date range - relative or absolute.
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
@@ -220,7 +160,7 @@ class CRM_Core_Form_Date {
    *   Array of option values to add.
    * @param string $from
    *   Label.
-   * @param string|\stringe $to
+   * @param string $to
    * @param string $fromLabel
    * @param bool $required
    * @param string $dateFormat

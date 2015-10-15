@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class contains the functions for Case Type management
- *
+ * This class contains the functions for Case Type management.
  */
 class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
@@ -109,7 +106,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @param string $name
    * @param array $definition
-   *   The case-type defintion expressed as an array-tree.
+   *   The case-type definition expressed as an array-tree.
    * @return string
    *   XML
    */

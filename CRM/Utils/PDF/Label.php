@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,12 +26,11 @@
  */
 
 /**
- *  Class to print labels in Avery or custom formats
+ * Class to print labels in Avery or custom formats
  * functionality and smarts to the base PDF_Label.
  *
+ * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- *
- *
  */
 
 require_once 'tcpdf/tcpdf.php';

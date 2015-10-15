@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -39,17 +37,20 @@
 class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage {
 
   /**
-   * Takes an associative array and creates a contribution page object.
+   * Creates a contribution page.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Contribute_DAO_ContributionPage
    */
-  public static function &create(&$params) {
+  public static function create($params) {
     $financialTypeId = NULL;
     if (!empty($params['id']) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
+    }
+
+    if (isset($params['payment_processor']) && is_array($params['payment_processor'])) {
+      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
     }
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'ContributionPage', CRM_Utils_Array::value('id', $params), $params);
@@ -66,6 +67,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Update the is_active flag in the db.
    *
+   * @deprecated - this bypasses hooks.
+   *
    * @param int $id
    *   Id of the database record.
    * @param bool $is_active
@@ -79,34 +82,57 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
+   * Load values for a contribution page.
+   *
    * @param int $id
-   * @param $values
+   * @param array $values
    */
   public static function setValues($id, &$values) {
-    $params = array(
-      'id' => $id,
-    );
+    $modules = array('CiviContribute', 'soft_credit', 'on_behalf');
+    $values['custom_pre_id'] = $values['custom_post_id'] = NULL;
 
+    $params = array('id' => $id);
     CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage', $params, $values);
 
     // get the profile ids
     $ufJoinParams = array(
-      'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $id,
     );
-    list($values['custom_pre_id'], $customPostIds) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
-    if (!empty($customPostIds)) {
-      $values['custom_post_id'] = $customPostIds[0];
+    // retrieve profile id as also unserialize module_data corresponding to each $module
+    foreach ($modules as $module) {
+      $ufJoinParams['module'] = $module;
+      $ufJoin = new CRM_Core_DAO_UFJoin();
+      $ufJoin->copyValues($ufJoinParams);
+      if ($module == 'CiviContribute') {
+        $ufJoin->orderBy('weight asc');
+        $ufJoin->find();
+        while ($ufJoin->fetch()) {
+          if ($ufJoin->weight == 1) {
+            $values['custom_pre_id'] = $ufJoin->uf_group_id;
+          }
+          else {
+            $values['custom_post_id'] = $ufJoin->uf_group_id;
+          }
+        }
+      }
+      else {
+        $ufJoin->find(TRUE);
+        if (!$ufJoin->is_active) {
+          continue;
+        }
+        $params = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoin->module_data, TRUE, $module);
+        $values = array_merge($params, $values);
+        if ($module == 'soft_credit') {
+          $values['honoree_profile_id'] = $ufJoin->uf_group_id;
+          $values['honor_block_is_active'] = $ufJoin->is_active;
+        }
+        else {
+          $values['onbehalf_profile_id'] = $ufJoin->uf_group_id;
+        }
+      }
     }
-    else {
-      $values['custom_post_id'] = '';
-    }
-    // // add an accounting code also
-    // if ($values ['financial_type_id']) {
-    //   $values ['accountingCode'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $values ['financial_type_id'], 'accounting_code' );
-    // }
   }
 
   /**
@@ -121,9 +147,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param bool $returnMessageText
    *   Return the message text instead of sending the mail.
    *
-   * @param null $fieldTypes
-   *
-   * @return void
+   * @param array $fieldTypes
    */
   public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = $params = array();
@@ -250,8 +274,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
       // get the billing location type
       if (!array_key_exists('related_contact', $values)) {
-        $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
-        $billingLocationTypeId = array_search('Billing', $locationTypes);
+        $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
       }
       else {
         // presence of related contact implies onbehalf of org case,
@@ -302,10 +325,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
       if (isset($values['honor'])) {
         $honorValues = $values['honor'];
+        $template->_values = array('honoree_profile_id' => $values['honoree_profile_id']);
         CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields(
           $template,
           $honorValues['honor_profile_values'],
-          $honorValues['honor_profile_id'],
           $honorValues['honor_id']
         );
       }
@@ -363,15 +386,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['onBehalfName'] = $displayName;
         $tplParams['onBehalfEmail'] = $email;
 
-        $ufJoinParams = array(
-          'module' => 'onBehalf',
-          'entity_table' => 'civicrm_contribution_page',
-          'entity_id' => $values['id'],
-        );
-        $OnBehalfProfile = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-        $profileId = $OnBehalfProfile[0];
-        $userID = $contactID;
-        self::buildCustomDisplay($profileId, 'onBehalfProfile', $userID, $template, $params['onbehalf_profile'], $fieldTypes);
+        if (!empty($values['onbehalf_profile_id'])) {
+          self::buildCustomDisplay($values['onbehalf_profile_id'], 'onBehalfProfile', $contactID, $template, $params['onbehalf_profile'], $fieldTypes);
+        }
       }
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
@@ -431,36 +448,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * Construct the message to be sent by the send function.
-   *
-   * @param array $tplParams
-   * @param int $contactID
-   * @param $isTest
-   *
-   * @return array
-   */
-  public function composeMessage($tplParams, $contactID, $isTest) {
-    $sendTemplateParams = array(
-      'groupName' => $tplParams['membershipID'] ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-      'valueName' => $tplParams['membershipID'] ? 'membership_online_receipt' : 'contribution_online_receipt',
-      'contactId' => $contactID,
-      'tplParams' => $tplParams,
-      'isTest' => $isTest,
-      'PDFFilename' => 'receipt.pdf',
-    );
-    if ($returnMessageText) {
-      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-      return array(
-        'subject' => $subject,
-        'body' => $message,
-        'to' => $displayName,
-        'html' => $html,
-      );
-    }
-  }
-
-  /**
-   * Send the emails for Recurring Contribution Notication.
+   * Send the emails for Recurring Contribution Notification.
    *
    * @param string $type
    *   TxnType.
@@ -486,12 +474,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       ));
       $isEmailReceipt = CRM_Utils_Array::value('is_email_receipt', $value[$pageID]);
     }
-
-    $isOfflineRecur = FALSE;
-    if (!$pageID && $recur->id) {
-      $isOfflineRecur = TRUE;
+    elseif ($recur->id) {
+      // This means we are coming from back-office - ie. no page ID, but recurring.
+      // Ideally this information would be passed into the function clearly rather than guessing by convention.
+      $isEmailReceipt = TRUE;
     }
-    if ($isEmailReceipt || $isOfflineRecur) {
+
+    if ($isEmailReceipt) {
       if ($pageID) {
         $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$pageID]) . '" <' . $value[$pageID]['receipt_from_email'] . '>';
 
@@ -547,7 +536,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $template->assign('updateSubscriptionUrl', $url);
       }
 
-      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($templatesParams);
+      list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($templatesParams);
 
       if ($sent) {
         CRM_Core_Error::debug_log_message('Success: mail sent for recurring notification.');
@@ -570,11 +559,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $params
    *   Params to build component whereclause.
    *
-   * @param null $fieldTypes
-   *
-   * @return void
+   * @param array $fieldTypes
    */
-  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
+  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = array()) {
     if ($gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = array();
@@ -612,8 +599,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   }
 
   /**
-   * make a copy of a contribution page, including
-   * all the blocks in the page
+   * Make a copy of a contribution page, including all the blocks in the page.
    *
    * @param int $id
    *   The contribution page id to copy.
@@ -691,7 +677,7 @@ WHERE entity_table = 'civicrm_contribution_page'
     $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery, CRM_Core_DAO::$_nullArray);
     while ($premiumDao->fetch()) {
       if ($premiumDao->id) {
-        $copyPremiumProduct = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
+        CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', array(
           'premiums_id' => $premiumDao->id,
         ), array(
           'premiums_id' => $copyPremium->id,
@@ -704,34 +690,6 @@ WHERE entity_table = 'civicrm_contribution_page'
     CRM_Utils_Hook::copy('ContributionPage', $copy);
 
     return $copy;
-  }
-
-  /**
-   * Check if contribution page contains payment
-   * processor that supports recurring payment
-   *
-   * @param int $contributionPageId
-   *   Contribution Page Id.
-   *
-   * @return bool
-   *   true if payment processor supports recurring
-   *   else false
-   *
-   */
-  public static function checkRecurPaymentProcessor($contributionPageId) {
-    //FIXME
-    $sql = "
-  SELECT pp.is_recur
-  FROM   civicrm_contribution_page  cp,
-         civicrm_payment_processor  pp
-  WHERE  cp.payment_processor = pp.id
-    AND  cp.id = {$contributionPageId}
-";
-
-    if ($recurring = &CRM_Core_DAO::singleValueQuery($sql, CRM_Core_DAO::$_nullArray)) {
-      return TRUE;
-    }
-    return FALSE;
   }
 
   /**
@@ -830,79 +788,101 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * Get or Set multilingually affected honor params for processing module_data or setting default values.
+   * Get or Set honor/on_behalf params for processing module_data or setting default values.
    *
-   * @param string $params :
+   * @param array $params :
    * @param bool $setDefault : If yes then returns array to used for setting default value afterward
+   * @param string $module : processing module_data for which module? e.g. soft_credit, on_behalf
    *
    * @return array|string
    */
-  public static function formatMultilingualHonorParams($params, $setDefault = FALSE) {
+  public static function formatModuleData($params, $setDefault = FALSE, $module) {
     global $tsLocale;
     $config = CRM_Core_Config::singleton();
-
-    $sctJson = $sctJsonDecode = NULL;
+    $json = $jsonDecode = NULL;
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
+
+    $moduleDataFormat = array(
+      'soft_credit' => array(
+        1 => 'soft_credit_types',
+        'multilingual' => array(
+          'honor_block_title',
+          'honor_block_text',
+        ),
+      ),
+      'on_behalf' => array(
+        1 => 'is_for_organization',
+        'multilingual' => array(
+          'for_organization',
+        ),
+      ),
+    );
 
     //When we are fetching the honor params respecting both multi and mono lingual state
     //and setting it to default param of Contribution Page's Main and Setting form
     if ($setDefault) {
-      $sctJsonDecode = json_decode($params);
-      $sctJsonDecode = (array) $sctJsonDecode->soft_credit;
-      if (!$domain->locales && !empty($sctJsonDecode['default'])) {
+      $jsonDecode = json_decode($params);
+      $jsonDecode = (array) $jsonDecode->$module;
+      if (!$domain->locales && !empty($jsonDecode['default'])) {
         //monolingual state
-        $sctJsonDecode += (array) $sctJsonDecode['default'];
+        $jsonDecode += (array) $jsonDecode['default'];
+        unset($jsonDecode['default']);
       }
-      elseif (!empty($sctJsonDecode[$tsLocale])) {
+      elseif (!empty($jsonDecode[$tsLocale])) {
         //multilingual state
-        foreach ($sctJsonDecode[$tsLocale] as $column => $value) {
-          $sctJsonDecode[$column] = $value;
+        foreach ($jsonDecode[$tsLocale] as $column => $value) {
+          $jsonDecode[$column] = $value;
         }
-        unset($sctJsonDecode[$tsLocale]);
+        unset($jsonDecode[$tsLocale]);
       }
-      return $sctJsonDecode;
+      return $jsonDecode;
     }
 
     //check and handle multilingual honoree params
     if (!$domain->locales) {
       //if in singlelingual state simply return the array format
-      $sctJson = json_encode(
-        array(
-          'soft_credit' => array(
-            'soft_credit_types' => $params['soft_credit_types'],
-            'default' => array(
-              'honor_block_title' => $params['honor_block_title'],
-              'honor_block_text' => $params['honor_block_text'],
-            ),
-          ),
-        )
-      );
+      $json = array($module => NULL);
+      foreach ($moduleDataFormat[$module] as $key => $attribute) {
+        if ($key === 'multilingual') {
+          $json[$module]['default'] = array();
+          foreach ($attribute as $attr) {
+            $json[$module]['default'][$attr] = $params[$attr];
+          }
+        }
+        else {
+          $json[$module][$attribute] = $params[$attribute];
+        }
+      }
+      $json = json_encode($json);
     }
     else {
       //if in multilingual state then retrieve the module_data against this contribution and
       //merge with earlier module_data json data to current so not to lose earlier multilingual module_data information
-      $sctJson = array(
-        'soft_credit' => array(
-          'soft_credit_types' => $params['soft_credit_types'],
-          $config->lcMessages => array(
-            'honor_block_title' => $params['honor_block_title'],
-            'honor_block_text' => $params['honor_block_text'],
-          ),
-        ),
-      );
+      $json = array($module => NULL);
+      foreach ($moduleDataFormat[$module] as $key => $attribute) {
+        if ($key === 'multilingual') {
+          $json[$module][$config->lcMessages] = array();
+          foreach ($attribute as $attr) {
+            $json[$module][$config->lcMessages][$attr] = $params[$attr];
+          }
+        }
+        else {
+          $json[$module][$attribute] = $params[$attribute];
+        }
+      }
 
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
-      $ufJoinDAO->module = 'soft_credit';
+      $ufJoinDAO->module = $module;
       $ufJoinDAO->entity_id = $params['id'];
       $ufJoinDAO->find(TRUE);
       $jsonData = json_decode($ufJoinDAO->module_data);
       if ($jsonData) {
-        $sctJson['soft_credit'] = array_merge((array) $jsonData->soft_credit, $sctJson['soft_credit']);
+        $json[$module] = array_merge((array) $jsonData->$module, $json[$module]);
       }
-      $sctJson = json_encode($sctJson);
+      $json = json_encode($json);
     }
-    return $sctJson;
+    return $json;
   }
 
   /**

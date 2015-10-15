@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,17 +26,13 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * class to represent the actions that can be performed on a group of contacts
- * used by the search forms
- *
+ * used by the search forms.
  */
 class CRM_Pledge_Task {
   const DELETE_PLEDGES = 1, PRINT_PLEDGES = 2, EXPORT_PLEDGES = 3;
@@ -66,17 +62,17 @@ class CRM_Pledge_Task {
     if (!self::$_tasks) {
       self::$_tasks = array(
         1 => array(
-          'title' => ts('Delete Pledges'),
+          'title' => ts('Delete pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
         ),
         2 => array(
-          'title' => ts('Print Selected Rows'),
+          'title' => ts('Print selected rows'),
           'class' => 'CRM_Pledge_Form_Task_Print',
           'result' => FALSE,
         ),
         3 => array(
-          'title' => ts('Export Pledges'),
+          'title' => ts('Export pledges'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
@@ -85,7 +81,7 @@ class CRM_Pledge_Task {
         ),
       );
 
-      //CRM-4418, check for delete
+      // CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviPledge')) {
         unset(self::$_tasks[1]);
       }
@@ -151,7 +147,7 @@ class CRM_Pledge_Task {
 
   /**
    * These tasks are the core set of tasks that the user can perform
-   * on pledges
+   * on pledges.
    *
    * @param int $value
    *

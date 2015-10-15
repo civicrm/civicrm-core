@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,27 +29,21 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Error Handling and Debugging
- *
+ * This class generates form components for Error Handling and Debugging.
  */
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
     'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
-    'fatalErrorTemplate' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
   );
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts(' Settings - Debugging and Error Handling '));

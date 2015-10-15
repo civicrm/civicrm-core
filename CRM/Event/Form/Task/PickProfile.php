@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -67,12 +67,12 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
 
-    CRM_Utils_System::setTitle(ts('Batch Update for Event Participants'));
+    CRM_Utils_System::setTitle(ts('Update multiple participants'));
 
     $validate = FALSE;
     //validations
     if (count($this->_participantIds) > $this->_maxParticipations) {
-      CRM_Core_Session::setStatus("The maximum number of event participations you can select for Batch Update is {$this->_maxParticipations}. You have selected " . count($this->_participantIds) . ". Please select fewer participantions from your search results and try again.");
+      CRM_Core_Session::setStatus("The maximum number of records you can select for Update multiple participants is {$this->_maxParticipations}. You have selected " . count($this->_participantIds) . ". Please select fewer participantions from your search results and try again.");
       $validate = TRUE;
     }
 
@@ -93,7 +93,7 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
     if (empty($profiles)) {
-      CRM_Core_Session::setStatus("To use Batch Update for event participants, you need to configure a profile containing only Participant fields (e.g. Participant Status, Participant Role, etc.). Configure a profile at 'Administer CiviCRM >> Customize >> CiviCRM Profile'.");
+      CRM_Core_Session::setStatus("To use Update multiple participants, you need to configure a profile containing only Participant fields (e.g. Participant Status, Participant Role, etc.). Configure a profile at 'Administer CiviCRM >> Customize >> CiviCRM Profile'.");
       CRM_Utils_System::redirect($this->_userContext);
     }
 

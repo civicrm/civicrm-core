@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -35,8 +35,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Utils_HttpClient {
 
@@ -50,7 +48,8 @@ class CRM_Utils_HttpClient {
   protected static $singleton;
 
   /**
-   * @var int|NULL seconds; or NULL to use system default
+   * @var int|NULL
+   *   seconds; or NULL to use system default
    */
   protected $connectionTimeout;
 
@@ -135,7 +134,7 @@ class CRM_Utils_HttpClient {
     list($ch, $caConfig) = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
-      //CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
+      // CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
       return array(self::STATUS_DL_ERROR, NULL);
     }
 
@@ -171,7 +170,7 @@ class CRM_Utils_HttpClient {
     list($ch, $caConfig) = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
-      //CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
+      // CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
       return array(self::STATUS_DL_ERROR, NULL);
     }
 
@@ -197,7 +196,7 @@ class CRM_Utils_HttpClient {
    */
   protected function createCurl($remoteFile) {
     $caConfig = CA_Config_Curl::probe(array(
-      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, TRUE),
+      'verify_peer' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'),
     ));
 
     $ch = curl_init();

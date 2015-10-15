@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -70,12 +70,12 @@ class WebTest_Contact_UpdateProfileTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Confirm save was done.
-    $this->assertTrue($this->isTextPresent("Thank you. Your information has been saved."), 'In line ' . __LINE__);
-    $this->assertTrue($this->isTextPresent($firstName), 'In line ' . __LINE__);
-    $this->assertTrue($this->isTextPresent($lastName), 'In line ' . __LINE__);
-    $this->assertTrue($this->isTextPresent($street), 'In line ' . __LINE__);
-    $this->assertTrue($this->isTextPresent($city), 'In line ' . __LINE__);
-    $this->assertTrue($this->isTextPresent($postalCode), 'In line ' . __LINE__);
+    $this->assertTrue($this->isTextPresent("Thank you. Your information has been saved."));
+    $this->assertTrue($this->isTextPresent($firstName));
+    $this->assertTrue($this->isTextPresent($lastName));
+    $this->assertTrue($this->isTextPresent($street));
+    $this->assertTrue($this->isTextPresent($city));
+    $this->assertTrue($this->isTextPresent($postalCode));
     $this->assertTrue($this->isElementPresent("//div[@id='profilewrap1']/div[@id='crm-container']/div/div[7]/div[2][contains(text(), 'AR')]"));
   }
 

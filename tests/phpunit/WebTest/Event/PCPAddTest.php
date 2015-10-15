@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -509,7 +509,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       )
     );
     $softCreditor = "{$firstNameCreator} {$lastNameCreator}";
-    $this->verifyText("xpath=//div[@id='PCPView']/div[2]//table[@class='crm-info-panel']/tbody/tr[2]/td[2]", preg_quote($softCreditor), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//div[@id='PCPView']/div[2]//table[@class='crm-info-panel']/tbody/tr[2]/td[2]", preg_quote($softCreditor));
   }
 
   /**
@@ -551,7 +551,7 @@ class WebTest_Event_PCPAddTest extends CiviSeleniumTestCase {
       )
     );
     $softCreditor = "{$pcpCreatorFirstName} {$pcpCreatorLastName}";
-    $this->verifyText("xpath=//div[@id='PCPView']/div[2]//table[@class='crm-info-panel']/tbody/tr[2]/td[2]", preg_quote($softCreditor), 'In line ' . __LINE__);
+    $this->verifyText("xpath=//div[@id='PCPView']/div[2]//table[@class='crm-info-panel']/tbody/tr[2]/td[2]", preg_quote($softCreditor));
   }
 
 }

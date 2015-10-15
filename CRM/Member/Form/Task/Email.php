@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -98,6 +98,16 @@ class CRM_Member_Form_Task_Email extends CRM_Member_Form_Task {
    */
   public function postProcess() {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
+  }
+
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokens = CRM_Core_SelectValues::contactTokens();
+    return $tokens;
   }
 
 }

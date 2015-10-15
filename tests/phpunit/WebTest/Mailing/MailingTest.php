@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -253,7 +253,7 @@ class WebTest_Mailing_MailingTest extends CiviSeleniumTestCase {
     //------end delivery verification---------
 
     // //------ check with unsubscribe -------
-    // // FIX ME: there is an issue with DSN setting for Webtest, need to handle by seperate DSN setting for Webtests
+    // // FIX ME: there is an issue with DSN setting for Webtest, need to handle by separate DSN setting for Webtests
     // // build unsubscribe link
     // require_once 'CRM/Mailing/Event/DAO/Queue.php';
     // $eventQueue = new CRM_Mailing_Event_DAO_Queue( );

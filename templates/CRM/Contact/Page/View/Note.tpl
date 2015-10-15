@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -38,7 +38,7 @@
             {/if}
           </table>
           <div class="crm-submit-buttons">
-            {crmButton class="cancel" icon="close" p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}{ts}Done{/ts}{/crmButton}
+            {crmButton class="cancel" icon="times" p='civicrm/contact/view' q="selectedChild=note&reset=1&cid=`$contactId`"}{ts}Done{/ts}{/crmButton}
           </div>
 
         {if $comments}
@@ -100,7 +100,7 @@
 
 {if $permission EQ 'edit' AND ($action eq 16)}
    <div class="action-link">
-   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Note{/ts}</span></a>
+   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><i class="crm-i fa-comment"></i> {ts}Add Note{/ts}</span></a>
    </div>
    <div class="clear"></div>
 {/if}
@@ -202,36 +202,16 @@
 {* show browse table for any action *}
 <div id="notes">
     {strip}
-    {include file="CRM/common/jsortable.tpl"}
-
-    <script type="text/javascript">
-    {literal}
-      CRM.$(function($) {
-        var tabId = $('.dataTable').attr('id');
-
-        $('table#'+ tabId).dataTable().fnSettings().aoDrawCallback.push( {
-          "fn": function () {
-            $('#'+ tabId +' tr').each( function() {
-              drawCommentRows(this.id)
-            });
-          },
-          "sName": "user"
-        } );
-      });
-
-    {/literal}
-    </script>
-
-        <table id="options" class="display">
+        <table id="options" class="display crm-sortable" data-order='[[3,"desc"]]'>
         <thead>
         <tr>
-          <th></th>
+          <th data-orderable="false"></th>
           <th>{ts}Note{/ts}</th>
           <th>{ts}Subject{/ts}</th>
           <th>{ts}Date{/ts}</th>
           <th>{ts}Created By{/ts}</th>
-          <th>{ts}Attachment(s){/ts}</th>
-          <th></th>
+          <th data-orderable="false">{ts}Attachment(s){/ts}</th>
+          <th data-orderable="false"></th>
         </tr>
         </thead>
 
@@ -240,13 +220,13 @@
             <td class="crm-note-comment">
                 {if $note.comment_count}
                     <span id="{$note.id}_show" style="display:block" class="icon_comments_show">
-                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Show comments for this note.{/ts}"><span class="ui-icon dark-icon ui-icon-triangle-1-e"></span></a>
+                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Show comments for this note.{/ts}"><i class="crm-i fa-caret-right"></i></span></a>
                     </span>
                     <span id="{$note.id}_hide" style="display:none" class="icon_comments_hide">
-                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Hide comments for this note.{/ts}"><span class="ui-icon dark-icon ui-icon-triangle-1-s"></span></a>
+                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Hide comments for this note.{/ts}"><i class="crm-i fa-caret-down"></i></span></a>
                     </span>
                 {else}
-                    <span class="ui-icon ui-icon-triangle-1-e" id="{$note.id}_hide" style="display:none"></span>
+                    <span class="crm-i fa-caret-right" id="{$note.id}_hide" style="display:none"></span>
                 {/if}
             </td>
             <td class="crm-note-note">
@@ -258,7 +238,7 @@
                 {/if}
             </td>
             <td class="crm-note-subject">{$note.subject}</td>
-            <td class="crm-note-modified_date">{$note.modified_date|crmDate}</td>
+            <td class="crm-note-modified_date" data-order="{$note.modified_date}">{$note.modified_date|crmDate}</td>
             <td class="crm-note-createdBy">
                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$note.contact_id`"}">{$note.createdBy}</a>
             </td>

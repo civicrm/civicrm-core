@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -62,8 +62,8 @@
 
   {if $action ne 1 and $action ne 2}
     <div class="action-link">
-      {crmButton q="action=add&reset=1" icon="circle-plus"}{ts}Add Participant Status{/ts}{/crmButton}
-      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="close"}{ts}Done{/ts}{/crmButton}
+      {crmButton q="action=add&reset=1" icon="plus-circle"}{ts}Add Participant Status{/ts}{/crmButton}
+      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 </div>

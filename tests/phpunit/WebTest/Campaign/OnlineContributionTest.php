@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -256,7 +256,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->webtestLogout();
 
     //Open Live Contribution Page
-    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId", '_qf_Main_upload-bottom');
+    $this->openCiviPage('contribute/transact', "reset=1&id=$pageId&action=preview", '_qf_Main_upload-bottom');
 
     $firstName = 'Ma' . substr(sha1(rand()), 0, 4);
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
@@ -296,7 +296,7 @@ class WebTest_Campaign_OnlineContributionTest extends CiviSeleniumTestCase {
 
     //Find Contribution
     $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
-
+    $this->click("xpath=//tr/td[1]/label[contains(text(), 'Contribution is a Test?')]/../../td[2]/label[contains(text(), 'Yes')]/preceding-sibling::input[1]");
     $this->type("sort_name", "$lastName $firstName");
     $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);

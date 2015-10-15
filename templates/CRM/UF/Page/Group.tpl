@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -32,7 +32,7 @@
 {elseif $action eq 8192}
     {* Display HTML Form Snippet Code *}
     <div id="help">
-        {ts}The HTML code below will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on ANY website where you want to collect contact information.{/ts} {help id='standalone'}
+        {ts}The HTML code below will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on your website where you want to collect contact information.{/ts} {help id='standalone'}
     </div>
     <br />
     <form name="html_code" action="{crmURL p='civicrm/admin/uf/group' q="action=profile&gid=$gid"}">
@@ -53,7 +53,7 @@
 
     {if NOT ($action eq 1 or $action eq 2)}
     <div class="crm-submit-buttons">
-        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
+        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
     </div>
     {/if}
     {if $rows}
@@ -83,7 +83,7 @@
             <tbody>
             {foreach from=$rows item=row}
             {if !$row.is_reserved }
-              <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
+              <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td class="crmf-title crm-editable">{$row.title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
@@ -103,7 +103,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
@@ -146,7 +146,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon ui-icon-circle-plus"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>

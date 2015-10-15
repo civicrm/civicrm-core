@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -317,9 +317,9 @@ class CRM_Event_BAO_Query {
             $value,
             "Boolean"
           );
-          if ($value) {
-            $query->_qill[$grouping][] = ts("Participant is a Test");
-          }
+
+          $isTest = $value ? 'a Test' : 'not a Test';
+          $query->_qill[$grouping][] = ts("Participant is %1", array(1 => $isTest));
           $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         }
         return;
@@ -352,6 +352,8 @@ class CRM_Event_BAO_Query {
       case 'participant_is_pay_later':
       case 'participant_fee_amount':
       case 'participant_fee_level':
+      case 'participant_campaign_id':
+
         $qillName = $name;
         if (in_array($name, array(
               'participant_status_id',
@@ -361,6 +363,7 @@ class CRM_Event_BAO_Query {
               'participant_fee_amount',
               'participant_fee_level',
               'participant_is_pay_later',
+              'participant_campaign_id',
             ))) {
           $name = str_replace('participant_', '', $name);
           if ($name == 'is_pay_later') {
@@ -405,6 +408,8 @@ class CRM_Event_BAO_Query {
         return;
 
       case 'participant_register_date':
+      case 'participant_register_date_high':
+      case 'participant_register_date_low':
         $query->dateQueryBuilder($values,
           'civicrm_participant', 'participant_register_date', 'register_date', 'Register Date'
         );
@@ -434,19 +439,6 @@ class CRM_Event_BAO_Query {
         }
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
-        return;
-
-      case 'participant_campaign_id':
-        if (CRM_Utils_Array::value($op, $value)) {
-          $value = $value[$op];
-        }
-        $campParams = array(
-          'op' => $op,
-          'campaign' => $value,
-          'grouping' => $grouping,
-          'tableName' => 'civicrm_participant',
-        );
-        CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         return;
     }
   }
@@ -589,6 +581,8 @@ class CRM_Event_BAO_Query {
     $form->add('text', 'participant_fee_id', ts('Fee Level'), array('class' => 'big crm-ajax-select'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
+
+    CRM_Core_Form_Date::buildDateRange($form, 'participant', 1, '_register_date_low', '_register_date_high', ts('From'), FALSE);
 
     $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', array(1 => '<em>%1</em>')));
 

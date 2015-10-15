@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -64,8 +64,7 @@
       {/strip}
 
       <div class="action-link">
-        <a href="{crmURL q="action=add&reset=1"}" id="newLabelFormat" class="button"><span><div
-              class="icon ui-icon-circle-plus"></div>{ts}Add Label Format{/ts}</span></a>
+        {crmButton q="action=add&reset=1" id="newLabelFormat" icon="crm-i fa-plus-circle"}{ts}Add Label Format{/ts}{/crmButton}
       </div>
     </div>
   {else}

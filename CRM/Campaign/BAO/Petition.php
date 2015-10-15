@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,11 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   /**
+   * Class constructor.
    */
   public function __construct() {
     parent::__construct();
@@ -544,10 +543,9 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @param $sendEmailMode
+   * @param int $sendEmailMode
    *
    * @throws Exception
-   * @return void
    */
   public static function sendEmail($params, $sendEmailMode) {
 

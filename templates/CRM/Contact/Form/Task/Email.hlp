@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -68,21 +68,14 @@ be an equal sign and a number (=12). The number (12 in this example) is the id o
 {if $params.tplFile EQ 'CRM/Mailing/Form/Upload.tpl'}
     <p>
     {ts}You will also use tokens to insert Unsubscribe, Opt out and Forwarding links in your message.{/ts}
-    {if $params.editor NEQ 'textarea'}
         {ts}Use these steps to insert clickable action links:{/ts}
         <ul>
             <li>{ts}Select the action token from the Insert Tokens pop-up list - e.g. Unsubscribe via web page - and insert into your message.{/ts}</li>
             <li>{ts 1='&#123;action.unsubscribeUrl&#125;}'}Highlight the token and copy it to your clipboard - e.g. %1.{/ts}</li>
             <li>{ts}Replace the token in your message with the text you want for the link - e.g. Click here to unsubscribe.{/ts}</li>
             <li>{ts}With the text highlighted, click the Insert/Edit Link icon in the editor toolbar.{/ts}</li>
-            {if $params.editor EQ 'fckeditor'}
-                <li>{ts}In the Link pop-up window select &lt;other&gt; for the &quot;Protocol&quot; (selecting &quot;http://&quot; will result in an invalid link).{/ts}</li>
-                <li>{ts}Paste the action token into the URL field and click OK.{/ts}</li>
-            {else}
-                <li>{ts}Paste the action token into the URL field and click Insert (or Update).{/ts}</li>
-            {/if}
+            <li>{ts}Paste the action token into the URL field and click Insert (or Update).{/ts}</li>
         </ul>
-    {/if}
     </p>
 {/if}
 <p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,

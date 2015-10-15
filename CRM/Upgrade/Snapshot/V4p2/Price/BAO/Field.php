@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -176,7 +176,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
    *   Value we want to set the is_active field.
    *
    * @return Object
-   *   DAO object on sucess, null otherwise
+   *   DAO object on success, null otherwise
    *
    */
   public static function setIsActive($id, $is_active) {
@@ -273,7 +273,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           $extra = array('onclick' => 'useAmountOther();');
         }
 
-        // if seperate membership payment is used with quick config priceset then change the other amount label
+        // if separate membership payment is used with quick config priceset then change the other amount label
         if (property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf, '_contributionAmount')) {
           $label = ts('Additional Contribution');
           $useRequired = 0;

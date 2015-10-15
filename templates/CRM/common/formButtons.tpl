@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -36,9 +36,17 @@
           {assign var='html' value=$form.buttons.$key.html}
         {/if}
         {crmGetAttribute html=$html attr='crm-icon' assign='icon'}
+        {capture assign=iconPrefix}{$icon|truncate:3:"":true}{/capture}
+        {if $icon && $iconPrefix eq 'fa-'}
+          {assign var='buttonClass' value=' crm-i-button'}
+          {capture assign=iconDisp}<i class="crm-i {$icon}"></i>{/capture}
+        {elseif $icon}
+          {assign var='buttonClass' value=' crm-icon-button'}
+          {capture assign=iconDisp}<span class="crm-button-icon ui-icon-{$icon}"> </span>{/capture}
+        {/if}
         {crmGetAttribute html=$html attr='disabled' assign='disabled'}
-        <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{if $icon} crm-icon-button{/if}{if $disabled} crm-button-disabled{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
-          {if $icon}<span class="crm-button-icon ui-icon-{$icon}"> </span>{/if}
+        <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{$buttonClass}{if $disabled} crm-button-disabled{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
+          {$iconDisp}
           {$html}
         </span>
     {/if}

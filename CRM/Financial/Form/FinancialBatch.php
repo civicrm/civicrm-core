@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -137,7 +137,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
     $this->add('textarea', 'description', ts('Description'), $attributes['description']);
 
-    $this->add('select', 'payment_instrument_id', ts('Payment Instrument'),
+    $this->add('select', 'payment_instrument_id', ts('Payment Method'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
       FALSE
     );

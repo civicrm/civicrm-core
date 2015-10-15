@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -48,8 +48,8 @@
   {/if}
   {if $layout neq 'overlay'}
   <div class="action-link">
-      <a href="{$backURL}"   class="button"><span><div class="icon ui-icon-arrowreturnthick-1-w"></div>{ts}Back to Logging Summary{/ts}</span></a>
-      <a href="{$revertURL}" class="button" onclick="return confirm('{$revertConfirm}');"><span><div class="icon delete-icon"></div>{ts}Revert These Changes{/ts}</span></a>
+      <a href="{$backURL}"   class="button"><span><i class="crm-i fa-chevron-left"></i> {ts}Back to Logging Summary{/ts}</span></a>
+      <a href="{$revertURL}" class="button" onclick="return confirm('{$revertConfirm}');"><span><i class="crm-i fa-undo"></i> {ts}Revert These Changes{/ts}</span></a>
   </div>
   {/if}
 </div>

@@ -1,7 +1,5 @@
 {include file="CRM/common/TrackingFields.tpl"}
 
-{capture assign='reqMark'}<span class="marker"  title="{ts}This field is required.{/ts}">*</span>{/capture}
-
 <h3>{ts 1=$mer_participant->display_name 2=$mer_participant->email}Choose Events For %1 (%2){/ts}</h3>
 
 {foreach from=$slot_fields key=slot_name item=field_name}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CiviContributeProcessor {
   static $_paypalParamsMapper = array(
@@ -213,7 +211,7 @@ class CiviContributeProcessor {
             continue;
           }
 
-          $params = CRM_Contribute_BAO_Contribution_Utils::formatAPIParams($trxnDetails,
+          $params = self::formatAPIParams($trxnDetails,
             self::$_paypalParamsMapper,
             'paypal'
           );
@@ -224,7 +222,7 @@ class CiviContributeProcessor {
             $params['transaction']['is_test'] = 0;
           }
 
-          if (CRM_Contribute_BAO_Contribution_Utils::processAPIContribution($params)) {
+          if (self::processAPIContribution($params)) {
             CRM_Core_Error::debug_log_message("Processed - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
           }
           else {
@@ -291,7 +289,7 @@ class CiviContributeProcessor {
           // append amount information as well
           $response[] = $amtData;
 
-          $params = CRM_Contribute_BAO_Contribution_Utils::formatAPIParams($response,
+          $params = self::formatAPIParams($response,
             self::$_googleParamsMapper,
             'google'
           );
@@ -301,7 +299,7 @@ class CiviContributeProcessor {
           else {
             $params['transaction']['is_test'] = 0;
           }
-          if (CRM_Contribute_BAO_Contribution_Utils::processAPIContribution($params)) {
+          if (self::processAPIContribution($params)) {
             CRM_Core_Error::debug_log_message("Processed - {$params['email']}, {$amtData['total-charge-amount']['VALUE']}, {$amtData['google-order-number']['VALUE']} ..<p>", TRUE);
           }
           else {
@@ -331,11 +329,11 @@ class CiviContributeProcessor {
     while (($data = fgetcsv($handle, 1000, $delimiter)) !== FALSE) {
       if ($row !== 1) {
         $data['header'] = $header;
-        $params = CRM_Contribute_BAO_Contribution_Utils::formatAPIParams($data,
+        $params = self::formatAPIParams($data,
           self::$_csvParamsMapper,
           'csv'
         );
-        if (CRM_Contribute_BAO_Contribution_Utils::processAPIContribution($params)) {
+        if (self::processAPIContribution($params)) {
           CRM_Core_Error::debug_log_message("Processed - line $row of csv file .. {$params['email']}, {$params['transaction']['total_amount']}, {$params['transaction']['trxn_id']} ..<p>", TRUE);
         }
         else {
@@ -399,6 +397,293 @@ class CiviContributeProcessor {
     }
   }
 
+  /**
+   * @param array $apiParams
+   * @param $mapper
+   * @param string $type
+   * @param bool $category
+   *
+   * @return array
+   */
+  public static function formatAPIParams($apiParams, $mapper, $type = 'paypal', $category = TRUE) {
+    $type = strtolower($type);
+
+    if (!in_array($type, array(
+      'paypal',
+      'google',
+      'csv',
+    ))
+    ) {
+      // return the params as is
+      return $apiParams;
+    }
+    $params = $transaction = array();
+
+    if ($type == 'paypal') {
+      foreach ($apiParams as $detail => $val) {
+        if (isset($mapper['contact'][$detail])) {
+          $params[$mapper['contact'][$detail]] = $val;
+        }
+        elseif (isset($mapper['location'][$detail])) {
+          $params['address'][1][$mapper['location'][$detail]] = $val;
+        }
+        elseif (isset($mapper['transaction'][$detail])) {
+          switch ($detail) {
+            case 'l_period2':
+              // Sadly, PayPal seems to send two distinct data elements in a single field,
+              // so we break them out here.  This is somewhat ugly and tragic.
+              $freqUnits = array(
+                'D' => 'day',
+                'W' => 'week',
+                'M' => 'month',
+                'Y' => 'year',
+              );
+              list($frequency_interval, $frequency_unit) = explode(' ', $val);
+              $transaction['frequency_interval'] = $frequency_interval;
+              $transaction['frequency_unit'] = $freqUnits[$frequency_unit];
+              break;
+
+            case 'subscriptiondate':
+            case 'timestamp':
+              // PayPal dates are in  ISO-8601 format.  We need a format that
+              // MySQL likes
+              $unix_timestamp = strtotime($val);
+              $transaction[$mapper['transaction'][$detail]] = date('YmdHis', $unix_timestamp);
+              break;
+
+            case 'note':
+            case 'custom':
+            case 'l_number0':
+              if ($val) {
+                $val = "[PayPal_field:{$detail}] {$val}";
+                $transaction[$mapper['transaction'][$detail]] = !empty($transaction[$mapper['transaction'][$detail]]) ? $transaction[$mapper['transaction'][$detail]] . " <br/> " . $val : $val;
+              }
+              break;
+
+            default:
+              $transaction[$mapper['transaction'][$detail]] = $val;
+          }
+        }
+      }
+
+      if (!empty($transaction) && $category) {
+        $params['transaction'] = $transaction;
+      }
+      else {
+        $params += $transaction;
+      }
+
+      CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+
+      return $params;
+    }
+
+    if ($type == 'csv') {
+      $header = $apiParams['header'];
+      unset($apiParams['header']);
+      foreach ($apiParams as $key => $val) {
+        if (isset($mapper['contact'][$header[$key]])) {
+          $params[$mapper['contact'][$header[$key]]] = $val;
+        }
+        elseif (isset($mapper['location'][$header[$key]])) {
+          $params['address'][1][$mapper['location'][$header[$key]]] = $val;
+        }
+        elseif (isset($mapper['transaction'][$header[$key]])) {
+          $transaction[$mapper['transaction'][$header[$key]]] = $val;
+        }
+        else {
+          $params[$header[$key]] = $val;
+        }
+      }
+
+      if (!empty($transaction) && $category) {
+        $params['transaction'] = $transaction;
+      }
+      else {
+        $params += $transaction;
+      }
+
+      CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+
+      return $params;
+    }
+
+    if ($type == 'google') {
+      // return if response smell invalid
+      if (!array_key_exists('risk-information-notification', $apiParams[1][$apiParams[0]]['notifications'])) {
+        return FALSE;
+      }
+      $riskInfo = &$apiParams[1][$apiParams[0]]['notifications']['risk-information-notification'];
+
+      if (array_key_exists('new-order-notification', $apiParams[1][$apiParams[0]]['notifications'])) {
+        $newOrder = &$apiParams[1][$apiParams[0]]['notifications']['new-order-notification'];
+      }
+
+      if ($riskInfo['google-order-number']['VALUE'] == $apiParams[2]['google-order-number']['VALUE']) {
+        foreach ($riskInfo['risk-information']['billing-address'] as $field => $info) {
+          if (!empty($mapper['location'][$field])) {
+            $params['address'][1][$mapper['location'][$field]] = $info['VALUE'];
+          }
+          elseif (!empty($mapper['contact'][$field])) {
+            if ($newOrder && !empty($newOrder['buyer-billing-address']['structured-name'])) {
+              foreach ($newOrder['buyer-billing-address']['structured-name'] as $namePart => $nameValue) {
+                $params[$mapper['contact'][$namePart]] = $nameValue['VALUE'];
+              }
+            }
+            else {
+              $params[$mapper['contact'][$field]] = $info['VALUE'];
+            }
+          }
+          elseif (!empty($mapper['transaction'][$field])) {
+            $transaction[$mapper['transaction'][$field]] = $info['VALUE'];
+          }
+        }
+
+        // Response is an huge array. Lets pickup only those which we ineterested in
+        // using a local mapper, rather than traversing the entire array.
+        $localMapper = array(
+          'google-order-number' => $riskInfo['google-order-number']['VALUE'],
+          'total-charge-amount' => $apiParams[2]['total-charge-amount']['VALUE'],
+          'currency' => $apiParams[2]['total-charge-amount']['currency'],
+          'item-name' => $newOrder['shopping-cart']['items']['item']['item-name']['VALUE'],
+          'timestamp' => $apiParams[2]['timestamp']['VALUE'],
+        );
+        if (array_key_exists('latest-charge-fee', $apiParams[2])) {
+          $localMapper['latest-charge-fee'] = $apiParams[2]['latest-charge-fee']['total']['VALUE'];
+          $localMapper['net-amount'] = $localMapper['total-charge-amount'] - $localMapper['latest-charge-fee'];
+        }
+
+        // This is a subscription (recurring) donation.
+        if (array_key_exists('subscription', $newOrder['shopping-cart']['items']['item'])) {
+          $subscription = $newOrder['shopping-cart']['items']['item']['subscription'];
+          $localMapper['amount'] = $newOrder['order-total']['VALUE'];
+          $localMapper['times'] = $subscription['payments']['subscription-payment']['times'];
+          // Convert Google's period to one compatible with the CiviCRM db field.
+          $freqUnits = array(
+            'DAILY' => 'day',
+            'WEEKLY' => 'week',
+            'MONHTLY' => 'month',
+            'YEARLY' => 'year',
+          );
+          $localMapper['period'] = $freqUnits[$subscription['period']];
+          // Unlike PayPal, Google has no concept of freq. interval, it is always 1.
+          $localMapper['frequency_interval'] = '1';
+          // Google Checkout dates are in ISO-8601 format. We need a format that
+          // MySQL likes
+          $unix_timestamp = strtotime($localMapper['timestamp']);
+          $mysql_date = date('YmdHis', $unix_timestamp);
+          $localMapper['modified_date'] = $mysql_date;
+          $localMapper['start_date'] = $mysql_date;
+          // This is PayPal's nomenclature, but just use it for Google as well since
+          // we act on the value of trxn_type in processAPIContribution().
+          $localMapper['trxn_type'] = 'subscrpayment';
+        }
+
+        foreach ($localMapper as $localKey => $localVal) {
+          if (!empty($mapper['transaction'][$localKey])) {
+            $transaction[$mapper['transaction'][$localKey]] = $localVal;
+          }
+        }
+
+        if (empty($params) && empty($transaction)) {
+          continue;
+        }
+
+        if (!empty($transaction) && $category) {
+          $params['transaction'] = $transaction;
+        }
+        else {
+          $params += $transaction;
+        }
+
+        CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+      }
+      return $params;
+    }
+  }
+
+  /**
+   * @param array $params
+   *
+   * @return bool
+   */
+  public static function processAPIContribution($params) {
+    if (empty($params) || array_key_exists('error', $params)) {
+      return FALSE;
+    }
+
+    // add contact using dedupe rule
+    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
+    $dedupeParams['check_permission'] = FALSE;
+    $dupeIds = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
+    // if we find more than one contact, use the first one
+    if (!empty($dupeIds[0])) {
+      $params['contact_id'] = $dupeIds[0];
+    }
+    $contact = CRM_Contact_BAO_Contact::create($params);
+    if (!$contact->id) {
+      return FALSE;
+    }
+
+    // only pass transaction params to contribution::create, if available
+    if (array_key_exists('transaction', $params)) {
+      $params = $params['transaction'];
+      $params['contact_id'] = $contact->id;
+    }
+
+    // handle contribution custom data
+    $customFields = CRM_Core_BAO_CustomField::getFields('Contribution',
+      FALSE,
+      FALSE,
+      CRM_Utils_Array::value('financial_type_id',
+        $params
+      )
+    );
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      CRM_Utils_Array::value('id', $params, NULL),
+      'Contribution'
+    );
+    // create contribution
+
+    // if this is a recurring contribution then process it first
+    if ($params['trxn_type'] == 'subscrpayment') {
+      // see if a recurring record already exists
+      $recurring = new CRM_Contribute_BAO_ContributionRecur();
+      $recurring->processor_id = $params['processor_id'];
+      if (!$recurring->find(TRUE)) {
+        $recurring = new CRM_Contribute_BAO_ContributionRecur();
+        $recurring->invoice_id = $params['invoice_id'];
+        $recurring->find(TRUE);
+      }
+
+      // This is the same thing the CiviCRM IPN handler does to handle
+      // subsequent recurring payments to avoid duplicate contribution
+      // errors due to invoice ID. See:
+      // ./CRM/Core/Payment/PayPalIPN.php:200
+      if ($recurring->id) {
+        $params['invoice_id'] = md5(uniqid(rand(), TRUE));
+      }
+
+      $recurring->copyValues($params);
+      $recurring->save();
+      if (is_a($recurring, 'CRM_Core_Error')) {
+        return FALSE;
+      }
+      else {
+        $params['contribution_recur_id'] = $recurring->id;
+      }
+    }
+
+    $contribution = &CRM_Contribute_BAO_Contribution::create($params,
+      CRM_Core_DAO::$_nullArray
+    );
+    if (!$contribution->id) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
 }
 
 // bootstrap the environment and run the processor
@@ -412,7 +697,7 @@ CRM_Utils_System::authenticateScript(TRUE);
 //log the execution of script
 CRM_Core_Error::debug_log_message('ContributionProcessor.php');
 
-$lock = Civi\Core\Container::singleton()->get('lockManager')->acquire('worker.contribute.CiviContributeProcessor');
+$lock = Civi::lockManager()->acquire('worker.contribute.CiviContributeProcessor');
 
 if ($lock->isAcquired()) {
   // try to unset any time limits

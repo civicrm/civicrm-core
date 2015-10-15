@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -242,7 +242,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
 
     $this->waitForElementPresent("xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='Edit']");
     $this->click("xpath=id('participantSearch')/table/tbody/tr/td[11]/span/a[text()='Edit']");
-    $this->waitForTextPresent("Edit Event Registration");
+    $this->waitForElementPresent("xpath=//button//span[contains(text(),'Save')]");
 
     // ensure we get to particpant view
     $stringsToCheck = array(

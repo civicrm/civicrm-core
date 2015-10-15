@@ -60,6 +60,9 @@
     <default>0</default>
     <comment>Is this the primary address.</comment>
     <add>2.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <index>
     <name>index_is_primary</name>
@@ -73,6 +76,9 @@
     <default>0</default>
     <comment>Is this the billing address.</comment>
     <add>2.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <index>
     <name>index_is_billing</name>
@@ -92,6 +98,9 @@
       delivery, etc.).
     </comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>street_number</name>
@@ -100,6 +109,9 @@
     <export>true</export>
     <comment>Numeric portion of address number on the street, e.g. For 112A Main St, the street_number = 112.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>street_number_suffix</name>
@@ -110,6 +122,9 @@
     <comment>Non-numeric portion of address number on the street, e.g. For 112A Main St, the street_number_suffix = A
     </comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>street_number_predirectional</name>
@@ -118,6 +133,9 @@
     <length>8</length>
     <comment>Directional prefix, e.g. SE Main St, SE is the prefix.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>street_name</name>
@@ -127,6 +145,9 @@
     <export>true</export>
     <comment>Actual street name, excluding St, Dr, Rd, Ave, e.g. For 112 Main St, the street_name = Main.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <index>
     <name>index_street_name</name>
@@ -140,6 +161,9 @@
     <length>8</length>
     <comment>St, Rd, Dr, etc.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>street_number_postdirectional</name>
@@ -148,6 +172,9 @@
     <length>8</length>
     <comment>Directional prefix, e.g. Main St S, S is the suffix.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>street_unit</name>
@@ -157,6 +184,9 @@
     <export>true</export>
     <comment>Secondary unit designator, e.g. Apt 3 or Unit # 14, or Bldg 1200</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>supplemental_address_1</name>
@@ -168,6 +198,9 @@
     <dataPattern>/unit|ap(ar)?t(ment)?\s(\d|\w)+/i</dataPattern>
     <comment>Supplemental Address Information, Line 1</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>supplemental_address_2</name>
@@ -179,6 +212,9 @@
     <dataPattern>/unit|ap(ar)?t(ment)?\s(\d|\w)+/i</dataPattern>
     <comment>Supplemental Address Information, Line 2</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>supplemental_address_3</name>
@@ -187,6 +223,9 @@
     <length>96</length>
     <comment>Supplemental Address Information, Line 3</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>city</name>
@@ -198,6 +237,9 @@
     <dataPattern>/^[A-Za-z]+(\.?)(\s?[A-Za-z]+){0,2}$/</dataPattern>
     <comment>City, Town or Village Name.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <index>
     <name>index_city</name>
@@ -266,6 +308,10 @@
     <dataPattern>/\d?\d{4}(-\d{4})?/</dataPattern>
     <comment>Store the suffix, like the +4 part in the USPS system.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+      <size>3</size>
+    </html>
   </field>
   <field>
     <name>postal_code</name>
@@ -275,10 +321,12 @@
     <import>true</import>
     <headerPattern>/postal|zip/i</headerPattern>
     <dataPattern>/\d?\d{4}(-\d{4})?/</dataPattern>
-    <comment>Store both US (zip5) AND international postal codes. App is responsible for country/region appropriate
-      validation.
-    </comment>
+    <comment>Store both US (zip5) AND international postal codes. App is responsible for country/region appropriate validation.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+      <size>6</size>
+    </html>
   </field>
   <field>
     <name>usps_adc</name>
@@ -322,6 +370,10 @@
     <headerPattern>/geo/i</headerPattern>
     <comment>Latitude</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+      <size>9</size>
+    </html>
   </field>
   <field>
     <name>geo_code_2</name>
@@ -331,6 +383,10 @@
     <import>true</import>
     <headerPattern>/geo/i</headerPattern>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+      <size>9</size>
+    </html>
   </field>
   <field>
     <name>manual_geo_code</name>
@@ -339,6 +395,9 @@
     <default>0</default>
     <comment>Is this a manually entered geo code</comment>
     <add>4.3</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <field>
     <name>timezone</name>
@@ -347,6 +406,9 @@
     <length>8</length>
     <comment>Timezone expressed as a UTC offset - e.g. United States CST would be written as "UTC-6".</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>name</name>
@@ -358,6 +420,9 @@
     <headerPattern>/^location|(l(ocation\s)?name)$/i</headerPattern>
     <dataPattern>/^\w+$/</dataPattern>
     <add>2.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>master_id</name>

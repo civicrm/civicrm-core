@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.6                                                |
+| CiviCRM version 4.7                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
@@ -30,10 +30,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Class CRM_Extension_Container_CollectionTest
  */
 class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
 
   public function setUp() {
     parent::setUp();

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -341,7 +341,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     );
     $participant = $this->callAPISuccess('participant', 'get', $params);
 
-    $this->assertEquals($participant['count'], 2, 'in line ' . __LINE__);
+    $this->assertEquals($participant['count'], 2);
   }
 
   ///////////////// civicrm_participant_create methods
@@ -574,7 +574,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   public function testUpdateWrongParamsType() {
     $params = 'a string';
     $result = $this->callAPIFailure('participant', 'create', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message'], 'In line ' . __LINE__);
+    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
   }
 
   /**

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -144,7 +144,7 @@ class WebTest_Contact_TagSetSearchTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "The tag '$tagSetName' has been saved.");
 
     // sort by ID desc
-    $this->click("xpath=//table//tr/th[text()=\"ID\"]");
+    $this->click("xpath=//div[@id='cat']/div/table/thead/tr/th[2]/div[text()='ID']");
     $this->waitForElementPresent("css=table.display tbody tr td");
 
     // verify text

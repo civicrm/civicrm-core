@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -88,6 +88,8 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
       // make sure we have right permission to edit this user
       $session = CRM_Core_Session::singleton();
       $userID = $session->get('userID');
+
+      // Set the ID from the query string, otherwise default to the current user
       $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, $userID);
 
       if ($id) {
@@ -106,6 +108,12 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
           $this->_isPermissionedChecksum = TRUE;
         }
       }
+
+      // CRM-16784: If there is no ID then this can't be an 'edit'
+      else {
+        CRM_Core_Error::fatal(ts('No user/contact ID was specified, so the Profile cannot be used in edit mode.'));
+      }
+
     }
 
     parent::preProcess();

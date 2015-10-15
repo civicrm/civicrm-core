@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.6                                                |
+  | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2015                                |
   +--------------------------------------------------------------------+
@@ -46,7 +46,7 @@ class CRM_Utils_Weight {
    * @param array $fieldValues
    *   Field => value to be used in the WHERE.
    * @param string $weightField
-   *   Field which contains the weight value,.
+   *   Field which contains the weight value.
    *   defaults to 'weight'
    *
    * @return bool
@@ -70,7 +70,7 @@ class CRM_Utils_Weight {
     }
 
     if ($minDupeID->dupeId && $status) {
-      //recursive call to correct all duplicate weight entries.
+      // recursive call to correct all duplicate weight entries.
       return CRM_Utils_Weight::correctDuplicateWeights($daoName, $fieldValues, $weightField);
     }
     elseif (!$minDupeID->dupeId) {
@@ -93,7 +93,7 @@ class CRM_Utils_Weight {
    * @param array $fieldValues
    *   Field => value to be used in the WHERE.
    * @param string $weightField
-   *   Field which contains the weight value,.
+   *   Field which contains the weight value.
    *   defaults to 'weight'
    *
    * @return bool
@@ -146,10 +146,10 @@ class CRM_Utils_Weight {
     }
 
     if ($newWeight > $maxWeight) {
-      //calculate new weight, CRM-4133
+      // calculate new weight, CRM-4133
       $calNewWeight = CRM_Utils_Weight::getNewWeight($daoName, $fieldValues, $weightField);
 
-      //no need to update weight for other fields.
+      // no need to update weight for other fields.
       if ($calNewWeight > $maxWeight) {
         return $calNewWeight;
       }
@@ -217,7 +217,7 @@ class CRM_Utils_Weight {
     if ($sameWeightCount) {
       $newWeight = max($weights) + 1;
 
-      //check for max wt should not greater than cal max wt.
+      // check for max wt, should not greater than cal max wt.
       $calMaxWt = min($weights) + count($weights) - 1;
       if ($newWeight > $calMaxWt) {
         $newWeight = $calMaxWt;
@@ -238,7 +238,7 @@ class CRM_Utils_Weight {
    * @param array $fieldValues
    *   Field => value to be used in the WHERE.
    * @param string $weightField
-   *   Field which contains the weight value,.
+   *   Field which contains the weight value.
    *   defaults to 'weight'
    *
    * @return int
@@ -261,7 +261,7 @@ class CRM_Utils_Weight {
    * @param array $fieldValues
    *   Field => value to be used in the WHERE.
    * @param string $weightField
-   *   Field which contains the weight value,.
+   *   Field which contains the weight value.
    *   defaults to 'weight'
    *
    * @return int

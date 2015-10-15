@@ -21,9 +21,9 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
       'class_name' => 'CRM_Contact_Form_Search_Custom_Examplez',
     ));
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $entityId = $result['id'];
-    $this->assertTrue(is_numeric($entityId), 'In line ' . __LINE__);
+    $this->assertTrue(is_numeric($entityId));
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
       AND label = "CRM_Contact_Form_Search_Custom_Examplez"
@@ -37,7 +37,7 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
       'is_active' => 0,
     ));
 
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
       AND label = "CRM_Contact_Form_Search_Custom_Examplez"
@@ -51,7 +51,7 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
       'is_active' => 1,
     ));
 
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
       AND label = "CRM_Contact_Form_Search_Custom_Examplez"
@@ -62,7 +62,7 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CustomSearch', 'delete', array(
       'id' => $entityId,
     ));
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
       OR label = "CRM_Contact_Form_Search_Custom_Examplez"

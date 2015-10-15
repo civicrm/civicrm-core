@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -290,7 +290,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Display sort name during.
-   * contribution batch update through profile
+   * Update multiple contributions
    * sortName();
    */
   public function testsortName() {
@@ -333,7 +333,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($param['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
     $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
 
-    //display sort name during batch update
+    //display sort name during Update multiple contributions
     $sortName = CRM_Contribute_BAO_Contribution::sortName($contribution->id);
 
     $this->assertEquals('Whatson, Shane', $sortName, 'Check for sort name.');

@@ -24,7 +24,7 @@ This contains two files cartdemo.php and responsehandlerdemo.php
   URL in Settings->Integration of the merchant's seller account.
   This file can be used as is and modified by the merchant as per their
   business workflow details.
-  Some of the intial steps performed in this file include collecting the
+  Some of the initial steps performed in this file include collecting the
   XML response, request that has been received and get a parsed result in a
   PHP associative array for easy accesibility
   (For details of parse output refer xmlparser.php which has an

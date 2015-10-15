@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -24,9 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting pledge *}
-{if $cdType}
-  {include file="CRM/Custom/Form/CustomData.tpl"}
-{elseif $showAdditionalInfo and $formType }
+{if $showAdditionalInfo and $formType }
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 {if !$email and $action neq 8 and $context neq 'standalone'}

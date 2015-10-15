@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,20 +29,15 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class previews the uploaded file and returns summary
- * statistics
+ * This class previews the uploaded file and returns summary statistics.
  */
 class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
@@ -110,10 +105,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
   }
 
   /**
-   * Process the mapped fields and map it into the uploaded file
-   * preview the file and extract some summary statistics
-   *
-   * @return void
+   * Process the mapped fields and map it into the uploaded file preview the file and extract some summary statistics.
    */
   public function postProcess() {
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -171,12 +171,12 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     );
     $contact = $this->callAPISuccess('contact', 'create', $params);
 
-    $this->assertNotNull($contact['id'], 'In line ' . __LINE__);
+    $this->assertNotNull($contact['id']);
     $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($this->individual);
     $elements["custom_{$this->IndividualField['id']}"] = $entityValues["{$this->IndividualField['id']}"];
 
     // Check the Value in Database
-    $this->assertEquals($elements["custom_{$this->IndividualField['id']}"], 'Test String', 'In line ' . __LINE__);
+    $this->assertEquals($elements["custom_{$this->IndividualField['id']}"], 'Test String');
   }
 
   /**
@@ -209,12 +209,12 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('contact', 'create', $params);
 
-    $this->assertNotNull($result['id'], 'In line ' . __LINE__);
+    $this->assertNotNull($result['id']);
     $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($this->individualStudent);
     $elements["custom_{$this->IndiStudentField['id']}"] = $entityValues["{$this->IndiStudentField['id']}"];
 
     // Check the Value in Database
-    $this->assertEquals($elements["custom_{$this->IndiStudentField['id']}"], 'Test String', 'in line ' . __LINE__);
+    $this->assertEquals($elements["custom_{$this->IndiStudentField['id']}"], 'Test String');
   }
 
   /**
@@ -257,7 +257,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     $getContact = $this->callAPISuccess('contact', 'get', $params);
 
-    $this->assertEquals($getContact['values'][$this->individual]["custom_" . $this->IndividualField['id']], 'Test String', 'In line ' . __LINE__);
+    $this->assertEquals($getContact['values'][$this->individual]["custom_" . $this->IndividualField['id']], 'Test String');
   }
 
   /**
@@ -283,7 +283,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     $getContact = $this->callAPISuccess('contact', 'get', $params);
 
-    $this->assertEquals($getContact['values'][$this->individualStudent]["custom_{$this->IndiStudentField['id']}"], 'Test String', 'In line ' . __LINE__);
+    $this->assertEquals($getContact['values'][$this->individualStudent]["custom_{$this->IndiStudentField['id']}"], 'Test String');
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -160,7 +160,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'Financial Type' => 'Donation',
       'Total Amount' => '100.00',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Check',
+      'Payment Method' => 'Check',
       'Check Number' => 'check #1041',
       'Non-deductible Amount' => '10.00',
       'Received Into' => $financialAccount,
@@ -427,7 +427,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'Financial Type' => 'Donation',
       'Total Amount' => '0.00',
       'Contribution Status' => 'Completed',
-      'Paid By' => 'Credit Card',
+      'Payment Method' => 'Credit Card',
     );
     $this->webtestVerifyTabularData($expected);
   }

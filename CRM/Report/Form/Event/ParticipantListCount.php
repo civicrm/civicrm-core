@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -276,12 +276,12 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
             'options' => CRM_Core_OptionGroup::values('event_type'),
           ),
           'event_start_date' => array(
-            'name' => 'start_date',
+            'name' => 'event_start_date',
             'title' => ts('Event Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
           'event_end_date' => array(
-            'name' => 'end_date',
+            'name' => 'event_end_date',
             'title' => ts('Event End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for Activity
- *
+ * This class generates form components for Activity.
  */
 class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
@@ -123,6 +120,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   protected $unsavedWarn = TRUE;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Activity';
+  }
+
+  /**
    * The _fields var can be used by sub class to set/unset/edit the
    * form fields based on their requirement
    */
@@ -150,8 +154,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'details' => array(
         'type' => 'wysiwyg',
         'label' => ts('Details'),
-        // forces a smaller edit window
-        'attributes' => array('rows' => 4, 'cols' => 60),
+        'attributes' => array('class' => 'huge'),
         'required' => FALSE,
       ),
       'status_id' => array(
@@ -215,16 +218,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function preProcess() {
-    $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-    $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
-    }
     CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
     $this->_atypefile = CRM_Utils_Array::value('atypefile', $_GET);
     $this->assign('atypefile', FALSE);
@@ -513,16 +508,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   }
 
   /**
-   * Set default values for the form. For edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   *
-   * @return void
+   * For edit/view mode the default values are retrieved from the database.
    */
   public function setDefaultValues() {
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
 
     $defaults = $this->_values + CRM_Core_Form_RecurringEntity::setDefaultValues();
     // if we're editing...
@@ -574,7 +564,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $defaults['target_contact_id'] = $this->_contactIds;
     }
 
-    // CRM-15472 - 50 is around the practial limit of how many items a select2 entityRef can handle
+    // CRM-15472 - 50 is around the practical limit of how many items a select2 entityRef can handle
     if (!empty($defaults['target_contact_id'])) {
       $count = count(is_array($defaults['target_contact_id']) ? $defaults['target_contact_id'] : explode(',', $defaults['target_contact_id']));
       if ($count > 50) {
@@ -624,10 +614,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       return;
     }
 
-    if ($this->_cdType) {
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
-
     //build other activity links
     CRM_Activity_Form_ActivityLinks::commonBuildQuickForm($this);
 
@@ -657,10 +643,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $attribute = CRM_Utils_Array::value('attributes', $values);
         $required = !empty($values['required']);
 
-        if ($values['type'] == 'wysiwyg') {
-          $this->addWysiwyg($field, $values['label'], $attribute, $required);
-        }
-        elseif ($values['type'] == 'select' && empty($attribute)) {
+        if ($values['type'] == 'select' && empty($attribute)) {
           $this->addSelect($field, array('entity' => 'activity'), $required);
         }
         elseif ($values['type'] == 'entityRef') {
@@ -905,7 +888,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         )
       );
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $customFields,
         $this->_activityId,
         'Activity'
       );
@@ -1087,18 +1069,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           }
         }
 
-        if (!CRM_Utils_array::crmIsEmptyArray($mailToContacts)) {
-          //include attachments while sending a copy of activity.
-          $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $activity->id);
-
-          $ics = new CRM_Activity_BAO_ICalendar($activity);
-          $ics->addAttachment($attachments, $mailToContacts);
-
-          // CRM-8400 add param with _currentlyViewedContactId for URL link in mail
-          CRM_Case_BAO_Case::sendActivityCopy(NULL, $activity->id, $mailToContacts, $attachments, NULL);
-
-          $ics->cleanup();
-
+        $sent = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
+        if ($sent) {
           $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
         }
       }
@@ -1112,15 +1084,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           }
         }
 
-        if (!CRM_Utils_array::crmIsEmptyArray($mailToFollowupContacts)) {
-          $ics = new CRM_Activity_BAO_ICalendar($followupActivity);
-          $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $followupActivity->id);
-          $ics->addAttachment($attachments, $mailToFollowupContacts);
-
-          CRM_Case_BAO_Case::sendActivityCopy(NULL, $followupActivity->id, $mailToFollowupContacts, $attachments, NULL);
-
-          $ics->cleanup();
-
+        $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
+        if ($sentFollowup) {
           $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
         }
       }

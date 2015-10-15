@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * form helper class for an Demographics object
+ * Form helper class for an Demographics object.
  */
 class CRM_Contact_Form_Edit_CustomData {
 
@@ -42,8 +40,6 @@ class CRM_Contact_Form_Edit_CustomData {
    * Build all the data structures needed to build the form.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function preProcess(&$form) {
     $form->_type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
@@ -70,8 +66,6 @@ class CRM_Contact_Form_Edit_CustomData {
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     if (!empty($form->_submitValues)) {
@@ -105,9 +99,7 @@ class CRM_Contact_Form_Edit_CustomData {
    *
    *
    * @param CRM_Core_Form $form
-   * @param $defaults
-   *
-   * @return void
+   * @param array $defaults
    */
   public static function setDefaultValues(&$form, &$defaults) {
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);

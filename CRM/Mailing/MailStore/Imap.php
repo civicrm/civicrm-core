@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 require_once 'ezc/Base/src/ezc_bootstrap.php';
@@ -103,8 +101,6 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
    *
    * @param int $nr
    *   Number of the message to move.
-   *
-   * @return void
    */
   public function markIgnored($nr) {
     if ($this->_debug) {
@@ -120,8 +116,6 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
    *
    * @param int $nr
    *   Number of the message to move.
-   *
-   * @return void
    */
   public function markProcessed($nr) {
     if ($this->_debug) {

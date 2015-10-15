@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,9 @@
  */
 
 /**
- * BAO object for civicrm_cache table. This is a database cache and is persisted across sessions. Typically we use
+ * BAO object for civicrm_cache table.
+ *
+ * This is a database cache and is persisted across sessions. Typically we use
  * this to store meta data (like profile fields, custom fields etc).
  *
  * The group_name column is used for grouping together all cache elements that logically belong to the same set.
@@ -151,7 +153,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     // get a lock so that multiple ajax requests on the same page
     // dont trample on each other
     // CRM-11234
-    $lock = Civi\Core\Container::singleton()->get('lockManager')->acquire("cache.{$group}_{$path}._{$componentID}");
+    $lock = Civi::lockManager()->acquire("cache.{$group}_{$path}._{$componentID}");
     if (!$lock->isAcquired()) {
       CRM_Core_Error::fatal();
     }
@@ -159,7 +161,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $dao->find(TRUE);
     $dao->data = serialize($data);
     $dao->created_date = date('YmdHis');
-    $dao->save();
+    $dao->save(FALSE);
 
     $lock->release();
 
@@ -262,8 +264,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *   Array of session values that should be persisted.
    *                     This is either a form name + qfKey or just a form name
    *                     (in the case of profile)
-   *
-   * @return void
    */
 
   /**

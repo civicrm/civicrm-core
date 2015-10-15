@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
   <base href="{$config->resourceBase}" />
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
-    @import url({$config->resourceBase}bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css);
+    @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
   </style>
 </head>
 <body>
@@ -43,10 +43,10 @@
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
-    @import url({$config->resourceBase}bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css);
+    @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
   </style>
 {/if}
-<div class="messages status no-popup">  <div class="icon red-icon ui-icon-alert"></div>
+<div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red"></i>
  <span class="status-fatal">{ts}Sorry but we are not able to provide this at the moment.{/ts}</span>
     <div class="crm-section crm-error-message">{$message}</div>
     {if $error.message && $message != $error.message}
@@ -54,8 +54,8 @@
         <div class="crm-section crm-error-message">{$error.message}</div>
     {/if}
     {if ($code OR $mysql_code OR $errorDetails) AND $config->debug}
-        <div class="crm-accordion-wrapper collapsed crm-fatal-error-details-block" onclick="toggle(this);";>
-         <div class="crm-accordion-header">
+        <div class="crm-accordion-wrapper collapsed crm-fatal-error-details-block">
+         <div class="crm-accordion-header" onclick="toggle(this);";>
           {ts}Error Details{/ts}
          </div><!-- /.crm-accordion-header -->
          <div class="crm-accordion-body">
@@ -77,11 +77,12 @@
 {literal}
 <script language="JavaScript">
 function toggle( element ) {
-    var className = element.className;
+    var parent = element.parentNode;
+    var className = parent.className;
     if ( className  == 'crm-accordion-wrapper collapsed crm-fatal-error-details-block') {
-        element.className = 'crm-accordion-wrapper  crm-fatal-error-details-block';
+        parent.className = 'crm-accordion-wrapper  crm-fatal-error-details-block';
     } else {
-        element.className = 'crm-accordion-wrapper collapsed crm-fatal-error-details-block';
+        parent.className = 'crm-accordion-wrapper collapsed crm-fatal-error-details-block';
     }
 }
 </script>

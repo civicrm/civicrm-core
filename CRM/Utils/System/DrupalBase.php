@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -160,10 +160,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       $fragment = '#' . $fragment;
     }
 
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
     $separator = $htmlize ? '&amp;' : '&';
@@ -430,6 +426,29 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    global $language;
+
+    $langcode = substr($civicrm_language, 0, 2);
+    $languages = language_list();
+
+    if (isset($languages[$langcode])) {
+      $language = $languages[$langcode];
+
+      // Config must be re-initialized to reset the base URL
+      // otherwise links will have the wrong language prefix/domain.
+      $config = CRM_Core_Config::singleton();
+      $config->free();
+
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Perform any post login activities required by the UF -
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
    * calls hook_user op 'login' and generates a new session.
@@ -515,6 +534,29 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getUserObject($userID) {
     return user_load($userID);
+  }
+
+  public function parseDrupalSiteName($civicrm_root) {
+    $siteName = NULL;
+    if (strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules'
+      ) === FALSE
+    ) {
+      $startPos = strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
+      );
+      $endPos = strpos($civicrm_root,
+        DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR
+      );
+      if ($startPos && $endPos) {
+        // if component is in sites/SITENAME/modules
+        $siteName = substr($civicrm_root,
+          $startPos + 7,
+          $endPos - $startPos - 7
+        );
+      }
+    }
+    return $siteName;
   }
 
 }

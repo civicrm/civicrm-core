@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -66,7 +66,7 @@
 {/if}
 
 {if $action neq 1028}
-    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><span class="icon ui-icon-close"></span></a>
+    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
 {/if}
 
 <script type="text/javascript">
@@ -131,4 +131,3 @@
 
     {/literal}
 </script>
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for OpenCase Activity
- *
+ * This class generates form components for OpenCase Activity.
  */
 class CRM_Case_Form_Activity_OpenCase {
 
@@ -94,8 +91,6 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function setDefaultValues(&$form) {
     $defaults = array();
@@ -189,7 +184,7 @@ class CRM_Case_Form_Activity_OpenCase {
     // calling this field activity_location to prevent conflict with contact location fields
     $form->add('text', 'activity_location', ts('Location'), CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'));
 
-    $form->addWysiwyg('activity_details', ts('Details'), array('rows' => 4, 'cols' => 60), FALSE);
+    $form->add('wysiwyg', 'activity_details', ts('Details'), array('rows' => 4, 'cols' => 60), FALSE);
 
     $form->addButtons(array(
         array(
@@ -216,8 +211,6 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @param CRM_Core_Form $form
    * @param array $params
-   *
-   * @return void
    */
   public static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
@@ -272,11 +265,8 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * Process the form submission.
    *
-   *
-   * @param $form
+   * @param CRM_Core_Form $form
    * @param array $params
-   *
-   * @return void
    */
   public static function endPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {

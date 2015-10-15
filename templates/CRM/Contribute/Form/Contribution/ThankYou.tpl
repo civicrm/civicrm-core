@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -118,7 +118,7 @@
             {if $totalTaxAmount}
               {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
             {/if}
-            {ts}Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level} - {$amount_level} {/if}</strong><br />
+            {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if} : <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
           {/if}
         {/if}
         {if $receive_date}
@@ -188,7 +188,13 @@
     </div>
   {/if}
 
-  {if $honor_block_is_active}
+  {if $onbehalfProfile|@count}
+    <div class="crm-group onBehalf_display-group label-left crm-profile-view">
+      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+     </div>
+  {/if}
+
+  {if $honoreeProfileFields|@count}
     <div class="crm-group honor_block-group">
       <div class="header-dark">
         {$soft_credit_type}
@@ -231,17 +237,6 @@
         {/if}
         <br />
       </div>
-    </div>
-  {/if}
-
-  {if $onbehalfProfile}
-    <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
-      <div class="crm-section organization_email-section">
-        <div class="label">{ts}Organization Email{/ts}</div>
-        <div class="content">{$onBehalfEmail}</div>
-        <div class="clear"></div>
-       </div>
     </div>
   {/if}
 

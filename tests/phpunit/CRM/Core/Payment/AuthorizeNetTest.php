@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,6 @@
 
 
 require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/AuthorizeNet.php';
 
 /**
  * Class CRM_Core_Payment_AuthorizeNetTest
@@ -36,17 +35,9 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->paymentProcessor = new AuthorizeNet();
-    $this->processorParams = $this->paymentProcessor->create();
+    $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
 
-    $paymentProcessor = array(
-      'user_name' => $this->processorParams->user_name,
-      'password' => $this->processorParams->password,
-      'url_recur' => $this->processorParams->url_recur,
-      'signature' => '',
-    );
-
-    $this->processor = new CRM_Core_Payment_AuthorizeNet('Contribute', $paymentProcessor);
+    $this->processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
     $this->_financialTypeId = 1;
 
     // for some strange unknown reason, in batch mode this value gets set to null
@@ -55,7 +46,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   public function tearDown() {
-    $this->paymentProcessor->delete($this->processorParams->id);
     $this->quickCleanUpFinancialEntities();
   }
 
@@ -85,7 +75,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
     );
     $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams);
 
@@ -129,7 +119,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => date('Ymd'),
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
@@ -176,7 +166,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
-    $this->processor->doDirectPayment($params);
+    $this->processor->doPayment($params);
     // turn verifySSL on
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
 
@@ -219,7 +209,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'invoice_id' => $invoiceID,
       'contribution_status_id' => 2,
       'is_test' => 1,
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
     );
     $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams, $ids);
 
@@ -264,7 +254,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => $start_date,
       'receipt_date_time' => '',
-      'payment_processor_id' => $this->processorParams->id,
+      'payment_processor_id' => $this->_paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
@@ -317,7 +307,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
-    $result = $this->processor->doDirectPayment($params);
+    $result = $this->processor->doPayment($params);
     // turn verifySSL on
     CRM_Core_BAO_Setting::setItem('0', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL');
 

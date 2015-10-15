@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -69,7 +69,7 @@
      {/if}
        &nbsp;&nbsp;
      {if $row.case_upcoming_activity_editable}
-       <a class="action-item crm-hover-button" href="{crmURL p="civicrm/case/activity" q="reset=1&cid=`$row.contact_id`&caseid=`$row.case_id`&action=update&id=`$row.case_scheduled_activity_id`"}" title="{ts}Edit activity{/ts}"><span class="icon ui-icon-pencil"></span></a>
+       <a class="action-item crm-hover-button" href="{crmURL p="civicrm/case/activity" q="reset=1&cid=`$row.contact_id`&caseid=`$row.case_id`&action=update&id=`$row.case_scheduled_activity_id`"}" title="{ts}Edit activity{/ts}"><i class="crm-i fa-pencil"></i></a>
      {/if}
      <br />
      {$row.case_scheduled_activity_date|crmDate}
@@ -82,7 +82,7 @@
     {else}
        {$row.case_recent_activity_type}
     {/if}
-    {if $row.case_recent_activity_editable and $row.case_recent_activity_type_name != 'Inbound Email' && $row.case_recent_activity_type_name != 'Email'}&nbsp;&nbsp;<a href="{crmURL p="civicrm/case/activity" q="reset=1&cid=`$row.contact_id`&caseid=`$row.case_id`&action=update&id=`$row.case_recent_activity_id`"}" title="{ts}Edit activity{/ts}" class="crm-hover-button crm-popup"><span class="icon ui-icon-pencil"></span></a>
+    {if $row.case_recent_activity_editable and $row.case_recent_activity_type_name != 'Inbound Email' && $row.case_recent_activity_type_name != 'Email'}&nbsp;&nbsp;<a href="{crmURL p="civicrm/case/activity" q="reset=1&cid=`$row.contact_id`&caseid=`$row.case_id`&action=update&id=`$row.case_recent_activity_id`"}" title="{ts}Edit activity{/ts}" class="crm-hover-button crm-popup"><i class="crm-i fa-pencil"></i></a>
     {/if}<br />
           {$row.case_recent_activity_date|crmDate}
    </td>

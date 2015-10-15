@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -76,7 +76,7 @@
 
         {if NOT ($action eq 1 or $action eq 2) }
         <div class="action-link">
-            {crmButton p='civicrm/admin/price' q="action=add&reset=1" id="newPriceSet"  icon="circle-plus"}{ts}Add Set of Price Fields{/ts}{/crmButton}
+            {crmButton p='civicrm/admin/price' q="action=add&reset=1" id="newPriceSet"  icon="plus-circle"}{ts}Add Set of Price Fields{/ts}{/crmButton}
         </div>
         {/if}
 

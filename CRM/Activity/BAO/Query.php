@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,14 +29,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
  */
 class CRM_Activity_BAO_Query {
 
   /**
    * Build select for Case.
    *
-   * @param $query
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function select(&$query) {
     if (!empty($query->_returnProperties['activity_id'])) {
@@ -156,12 +155,9 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
-   * Given a list of conditions in query generate the required.
-   * where clause
+   * Given a list of conditions in query generate the required where clause.
    *
    * @param $query
-   *
-   * @return void
    */
   public static function where(&$query) {
     foreach (array_keys($query->_params) as $id) {
@@ -178,9 +174,8 @@ class CRM_Activity_BAO_Query {
   /**
    * Where clause for a single field.
    *
-   * @param $values
-   * @param $query
-   * @return void
+   * @param array $values
+   * @param CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping) = $values;
@@ -197,6 +192,8 @@ class CRM_Activity_BAO_Query {
       case 'activity_engagement_level':
       case 'activity_subject':
       case 'activity_id':
+      case 'activity_campaign_id':
+
         $qillName = $name;
         if (in_array($name, array('activity_engagement_level', 'activity_id'))) {
           $name = $qillName = str_replace('activity_', '', $name);
@@ -205,6 +202,10 @@ class CRM_Activity_BAO_Query {
           $name = str_replace('activity_', '', $name);
           $qillName = str_replace('_id', '', $qillName);
         }
+        if ($name == 'activity_campaign_id') {
+          $name  = 'campaign_id';
+        }
+
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.$name", $op, $value, $dataType);
@@ -298,19 +299,6 @@ class CRM_Activity_BAO_Query {
         $query->_where[$grouping][] = "civicrm_activity_tag.tag_id IN (" . implode(",", $value) . ")";
         $query->_qill[$grouping][] = ts('Activity Tag %1', array(1 => $op)) . ' ' . implode(' ' . ts('OR') . ' ', $names);
         $query->_tables['civicrm_activity_tag'] = $query->_whereTables['civicrm_activity_tag'] = 1;
-        break;
-
-      case 'activity_campaign_id':
-        if (CRM_Utils_Array::value($op, $value)) {
-          $value = $value[$op];
-        }
-        $campParams = array(
-          'op' => $op,
-          'campaign' => $value,
-          'grouping' => $grouping,
-          'tableName' => 'civicrm_activity',
-        );
-        CRM_Campaign_BAO_Query::componentSearchClause($campParams, $query);
         break;
 
       case 'activity_result':
@@ -416,9 +404,7 @@ class CRM_Activity_BAO_Query {
   /**
    * Add all the elements shared between case activity search and advanced search.
    *
-   *
    * @param CRM_Core_Form $form
-   * @return void
    */
   public static function buildSearchForm(&$form) {
     $activityOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);

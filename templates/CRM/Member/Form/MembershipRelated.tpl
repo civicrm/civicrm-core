@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -47,8 +47,8 @@
                             <td>
                                 <a href="{crmURL p='civicrm/contact/view/rel' q="action=view&reset=1&selectedChild=rel&cid=`$rel.cid`&id=`$rel.id`"}">{$rel.relation}</a>
                             </td>
-                            <td>{$rel.start_date|crmDate}</td>
-                            <td>{$rel.end_date|crmDate}</td>
+                            <td data-order="{$rel.start_date}">{$rel.start_date|crmDate}</td>
+                            <td data-order="{$rel.end_date}">{$rel.end_date|crmDate}</td>
                             <td class="bold">
                                 <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$rel.cid`"}">{$rel.name}</a>
                             </td>

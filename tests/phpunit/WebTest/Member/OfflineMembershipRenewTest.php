@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -83,10 +83,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='Renew...']/ul/li/a[text()='Renew']");
 
     // click through to the Membership Renewal Link
-    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='Renew...']/ul/li/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
 
@@ -185,10 +185,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
-    $this->waitForElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[9]//span[text()='more']/ul/li[1]/a[text()='Renew']");
+    $this->waitForElementPresent("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[9]//span[text()='Renew...']/ul/li[1]/a[text()='Renew']");
 
     // click through to the Membership Renewal Link
-    $this->click("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[9]//span[text()='more']/ul/li[1]/a[text()='Renew']");
+    $this->click("xpath=//table[@class='display dataTable no-footer']/tbody/tr/td[9]//span[text()='Renew...']/ul/li[1]/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
 
@@ -270,10 +270,10 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added.");
 
-    $this->waitForElementPresent("xpath=//div[@id='inactive-memberships']//table/tbody/tr/td[7]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->waitForElementPresent("xpath=//div[@id='inactive-memberships']//table/tbody/tr/td[7]/span[2][text()='Renew...']/ul/li/a[text()='Renew']");
 
     // click through to the Membership Renewal Link
-    $this->click("xpath=//div[@id='inactive-memberships']//table/tbody/tr/td[7]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->click("xpath=//div[@id='inactive-memberships']//table/tbody/tr/td[7]/span[2][text()='Renew...']/ul/li/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
 
@@ -374,9 +374,9 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "{$membershipTypes['membership_type']} membership for $firstName Memberson has been added. The new membership End Date is {$endDate}. A membership confirmation and receipt has been sent to {$firstName}@memberson.com.");
 
-    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='Renew...']/ul/li/a[text()='Renew']");
     // click through to the Membership Renewal Link
-    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='more']/ul/li/a[text()='Renew']");
+    $this->click("xpath=//div[@id='memberships']//table/tbody/tr/td[9]/span[2][text()='Renew...']/ul/li/a[text()='Renew']");
 
     $this->waitForElementPresent('_qf_MembershipRenewal_cancel-bottom');
     // Record contribution and set number of terms to 2

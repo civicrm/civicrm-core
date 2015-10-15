@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -56,8 +56,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * @var boolean
    */
   protected $_limit = NULL;
-
-  protected $_defaults;
 
   /**
    * Prefix for the controller.
@@ -263,7 +261,10 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'contribution_status_id',
         'contribution_source',
         'contribution_trxn_id',
+        'contribution_page_id',
+        'contribution_product_id',
         'invoice_id',
+        'payment_instrument_id',
       );
       foreach ($specialParams as $element) {
         $value = CRM_Utils_Array::value($element, $this->_formValues);
@@ -290,7 +291,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         }
       }
 
-      if (!$config->groupTree) {
+      if (!defined('CIVICRM_GROUPTREE')) {
         $group = CRM_Utils_Array::value('group', $this->_formValues);
         if ($group && !is_array($group)) {
           unset($this->_formValues['group']);

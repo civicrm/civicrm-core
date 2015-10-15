@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -37,7 +37,7 @@
 
 {if $showLinks}
     <div class="action-link">
-      {crmButton accesskey="N"  p=$newMassUrl q='reset=1' icon="mail-closed"}{ts}{$linkTitle}{/ts}{/crmButton}<br/><br/>
+      {crmButton accesskey="N"  p=$newMassUrl q='reset=1' icon="envelope"}{ts}{$linkTitle}{/ts}{/crmButton}<br/><br/>
     </div>
 {/if}
 {include file="CRM/Mailing/Form/Search.tpl"}
@@ -84,7 +84,7 @@
     {include file="CRM/common/pager.tpl" location="bottom"}
     {if $showLinks}
       <div class="action-link">
-            {crmButton accesskey="N"  p=$newMassUrl q='reset=1' icon="mail-closed"}{ts}{$linkTitle}{/ts}{/crmButton}<br/>
+            {crmButton accesskey="N"  p=$newMassUrl q='reset=1' icon="envelope"}{ts}{$linkTitle}{/ts}{/crmButton}<br/>
       </div>
     {/if}
 

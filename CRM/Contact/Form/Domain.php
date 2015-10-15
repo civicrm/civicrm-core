@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class is to build the form for adding Group
+ * This class is to build the form for adding Group.
  */
 class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
@@ -73,6 +71,20 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @const
    */
   const LOCATION_BLOCKS = 1;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Domain';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
 
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Organization Address and Contact Info'));
@@ -140,16 +152,11 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
-
-    $this->add('text', 'name', ts('Organization Name'), array('size' => 25), TRUE);
-    $this->add('text', 'description', ts('Description'), array('size' => 25));
-
+    $this->addField('name', array('label' => ts('Organization Name')), TRUE);
+    $this->addField('description', array('label' => ts('Description'), 'size' => 30));
     $this->add('text', 'email_name', ts('FROM Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', 'email'), TRUE);
-
     $this->add('text', 'email_address', ts('FROM Email Address'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', 'email'), TRUE);
     $this->addRule('email_address', ts('Domain Email Address must use a valid email address format (e.g. \'info@example.org\').'), 'email');
 
@@ -177,9 +184,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   /**
    * Add local and global form rules.
-   *
-   *
-   * @return void
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Contact_Form_Domain', 'formRule'));
@@ -198,7 +202,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     // check for state/country mapping
     $errors = CRM_Contact_Form_Edit_Address::formRule($fields, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullObject);
     // $errors === TRUE means no errors from above formRule excution,
-    // so declaring $errors to array for futher processing
+    // so declaring $errors to array for further processing
     if ($errors === TRUE) {
       $errors = array();
     }
@@ -222,8 +226,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
   /**
    * Process the form when submitted.
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

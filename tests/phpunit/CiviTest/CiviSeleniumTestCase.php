@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
@@ -47,6 +47,8 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   // Current logged-in user
   protected $loggedInAs = NULL;
+
+  private $settingCache;
 
   /**
    *  Constructor.
@@ -101,6 +103,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     if (property_exists($this->settings, 'rcPort') && $this->settings->rcPort) {
       $this->setPort($this->settings->rcPort);
     }
+    $this->settingCache = array();
   }
 
   /**
@@ -416,6 +419,20 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
+   * @param string $field
+   * @return mixed
+   */
+  public function webtestGetSetting($field) {
+    if (!isset($this->settingCache[$field])) {
+      $result = $this->webtest_civicrm_api("Setting", "getsingle", array(
+        'return' => $field,
+      ));
+      $this->settingCache[$field] = $result[$field];
+    }
+    return $this->settingCache[$field];
+  }
+
+  /**
    * Ensures the required CiviCRM components are enabled.
    * @param $components
    */
@@ -608,11 +625,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     foreach ($expected as $label => $value) {
       if ($xpathPrefix) {
         $this->waitForElementPresent("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td");
-        $this->verifyText("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td", preg_quote($value), 'In line ' . __LINE__);
+        $this->verifyText("xpath=//table{$tableLocator}/tbody/tr/td{$xpathPrefix}[text()='{$label}']/../following-sibling::td", preg_quote($value));
       }
       else {
         $this->waitForElementPresent("xpath=//table{$tableLocator}/tbody/tr/td[text()='{$label}']/following-sibling::td");
-        $this->verifyText("xpath=//table{$tableLocator}/tbody/tr/td[text()='{$label}']/following-sibling::td", preg_quote($value), 'In line ' . __LINE__);
+        $this->verifyText("xpath=//table{$tableLocator}/tbody/tr/td[text()='{$label}']/following-sibling::td", preg_quote($value));
       }
     }
   }
@@ -635,7 +652,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->fireEvent($fieldName, 'focus');
     if ($editor == 'CKEditor') {
       if ($compressed) {
-        $this->click("{$fieldName}-plain");
+        $this->click("xpath=//textarea[@id='{$fieldName}']/../div[1]");
       }
       $this->waitForElementPresent("xpath=//div[@id='cke_{$fieldName}']//iframe");
       $this->runScript("CKEDITOR.instances['{$fieldName}'].setData('<p>{$text}</p>');");
@@ -856,6 +873,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         'user_name' => '3HcY62mY',
         'password' => '69943NrwaQA92b8J',
         'test_user_name' => '5ULu56ex',
+        'password' => '7ARxW575w736eF5p',
         'test_password' => '7ARxW575w736eF5p',
       );
     }
@@ -941,7 +959,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     $this->type('billing_street_address-5', '234 Lincoln Ave');
     $this->type('billing_city-5', 'San Bernadino');
-    $this->select2('billing_country_id-5', 'United States');
+    $this->select2('billing_country_id-5', 'UNITED STATES');
     $this->select2('billing_state_province_id-5', 'California');
     $this->type('billing_postal_code-5', '93245');
 
@@ -1357,13 +1375,23 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
       $text = "'Premium' information has been saved.";
       $this->assertTrue($this->isTextPresent($text), 'Missing text: ' . $text);
+      $this->openCiviPage("admin/contribute", "reset=1");
+      $this->waitForAjaxContent();
+      $this->click("xpath=//table['dataTables_wrapper no-footer']/tbody//tr/td[1]/strong[text()='$pageTitle']/../../td[4]/div[1]/span/ul/li[8]/a[text()='Premiums']");
+      $this->waitForElementPresent('_qf_Premium_cancel-bottom');
+      $this->click("xpath=//div[@class='messages status no-popup']/a[text()='add one']");
+      $this->waitForElementPresent('_qf_AddProduct_cancel-bottom');
+      $this->select('product_id', "value=1");
+      $this->click('_qf_AddProduct_next-bottom');
+      $this->waitForElementPresent('_qf_Premium_cancel-bottom');
+      $this->click('_qf_Premium_next-bottom');
+      $this->waitForPageToLoad($this->getTimeoutMsec());
     }
 
     if ($widget) {
       // fill in step 8 (Widget Settings)
       $this->click('link=Widgets');
       $this->waitForElementPresent('_qf_Widget_next-bottom');
-
       $this->click('is_active');
       $this->type('url_logo', "URL to Logo Image $hash");
       $this->type('button_title', "Button Title $hash");
@@ -2261,7 +2289,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   /**
-   * Type and select first occurance of autocomplete.
+   * Type and select first occurrence of autocomplete.
    * @param $fieldName
    * @param $label
    * @param bool $multiple
