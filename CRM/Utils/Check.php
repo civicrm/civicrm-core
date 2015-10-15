@@ -91,7 +91,7 @@ class CRM_Utils_Check {
         if (count($statusMessages)) {
           if (count($statusMessages) > 1) {
             $statusTitle = ts('Multiple Alerts');
-            $statusMessage = ts('Please check your <a href="../civicrm/a/#/status">status page</a> for a full list and further details. <ul><li>') . implode('</li><li>', $statusMessages) . '</li></ul>';
+            $statusMessage = ts('Please check your <a href="%1">status page</a> for a full list and further details.', array(1 => CRM_Utils_System::url('civicrm/a/#/status'))) . '<ul><li>' . implode('</li><li>', $statusMessages) . '</li></ul>';
           }
 
           // @todo add link to status page
