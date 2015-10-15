@@ -3264,31 +3264,6 @@ div.m ul#civicrm-menu,
 .crm-container .crm-action-menu .select2-default span.select2-chosen {
   color: #2786C2;
 }
-.crm-container .crm-action-menu .select2-default span.select2-chosen:before {
-  background: url("../i/icons/jquery-ui-2786C2.png") no-repeat scroll -64px -112px;
-  content: "";
-  display: inline-block;
-  height: 16px;
-  width: 16px;
-  margin-right: 3px;
-  position: relative;
-  top: 3px;
-}
-.crm-container .crm-action-menu.action-icon-plus .select2-default span.select2-chosen:before {
-  background-position: 0 -192px;
-}
-.crm-container .crm-action-menu.action-icon-play .select2-default span.select2-chosen:before {
-  background-position: -48px -192px;
-}
-.crm-container .crm-action-menu.action-icon-clipboard .select2-default span.select2-chosen:before {
-  background-position: -160px -128px;
-}
-.crm-container .crm-action-menu.action-icon-token .select2-default span.select2-chosen:before {
-  background-position: -144px 0;
-}
-.crm-container .crm-action-menu.action-icon-mail-closed .select2-default span.select2-chosen:before {
-  background-position: -80px -96px;
-}
 /* Restore this property otherwise our css overrides it */
 .select2-search input {
   box-sizing: border-box;

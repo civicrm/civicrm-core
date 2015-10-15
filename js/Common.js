@@ -373,6 +373,7 @@ if (!CRM.vars) CRM.vars = {};
     return $(this).each(function () {
       var
         $el = $(this),
+        iconClass,
         settings = {allowClear: !$el.hasClass('required')};
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
@@ -383,6 +384,12 @@ if (!CRM.vars) CRM.vars = {};
       // quickform does not support disabled option, so yet another hack to
       // add disabled property for option values
       $('option[value^=crm_disabled_opt]', this).attr('disabled', 'disabled');
+
+      // Placeholder icon
+      if ($el.is('[class*=fa-]')) {
+        iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
+        $el.removeClass(iconClass);
+      }
 
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
@@ -396,6 +403,11 @@ if (!CRM.vars) CRM.vars = {};
         $el.addClass('crm-ajax-select');
       }
       $el.select2(settings);
+      if (iconClass) {
+        window.setTimeout(function() {
+          $el.select2('container').find('span.select2-chosen').prepend('<i class="crm-i ' + iconClass + '"></i>&nbsp;');
+        }, 10);
+      }
     });
   };
 
