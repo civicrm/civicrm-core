@@ -67,11 +67,15 @@ class CRM_Core_Payment_Form {
     $form->assign('paymentTypeName', $paymentTypeName);
     $form->assign('paymentTypeLabel', $paymentTypeLabel);
     $form->_paymentFields = $form->billingFieldSets[$paymentTypeName]['fields'] = self::getPaymentFieldMetadata($processor);
-    $form->_paymentFields = array_merge($form->_paymentFields, self::getBillingAddressMetadata($processor, $form->_bltID));
     $form->assign('paymentFields', self::getPaymentFields($processor));
-    self::setBillingAddressFields($form, $processor);
-    // @todo - this may be obsolete - although potentially it could be used to re-order things in the form.
-    $form->billingFieldSets['billing_name_address-group']['fields'] = array();
+    // return without adding billing fields if billing_mode = 4 (@todo - more the ability to set that to the payment processor)
+    // or payment processor is NULL (pay later)
+    if (CRM_Utils_Array::value('billing_mode', $processor) != 4) {
+      $form->_paymentFields = array_merge($form->_paymentFields, self::getBillingAddressMetadata($processor, $form->_bltID));
+      self::setBillingAddressFields($form, $processor);
+      // @todo - this may be obsolete - although potentially it could be used to re-order things in the form.
+      $form->billingFieldSets['billing_name_address-group']['fields'] = array();
+    }
   }
 
   /**
