@@ -20,6 +20,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         <select
           crm-ui-id="subform.msg_template_id"
           name="msg_template_id"
+          class="fa-clipboard"
           crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
           ng-model="abtest.mailings.a.msg_template_id"
           ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
@@ -35,6 +36,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         <select
           crm-ui-id="subform.msg_template_idA"
           name="msg_template_idA"
+          class="fa-clipboard"
           crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
           ng-model="abtest.mailings.a.msg_template_id"
           ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
@@ -50,6 +52,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
         <select
           crm-ui-id="subform.msg_template_idB"
           name="msg_template_idB"
+          class="fa-clipboard"
           crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
           ng-model="abtest.mailings.b.msg_template_id"
           ng-change="loadTemplate(abtest.mailings.b, abtest.mailings.b.msg_template_id)"

@@ -11,6 +11,7 @@ It could perhaps be thinned by 30-60% by making more directives.
         <select
           crm-ui-id="subform.msg_template_id"
           name="msg_template_id"
+          class="fa-clipboard"
           crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
           ng-model="mailing.msg_template_id"
           ng-change="loadTemplate(mailing, mailing.msg_template_id)"
