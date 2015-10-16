@@ -3740,73 +3740,12 @@ WHERE  $smartGroupClause
   public function stateProvince(&$values, $status = NULL) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    // quick escape for IS NULL
-    if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-      $value = NULL;
-    }
-    elseif (!is_array($value)) {
-      // force the state to be an array
-      // check if its in the mapper format!
-      $values = self::parseSearchBuilderString($value);
-      if (is_array($values)) {
-        $value = $values;
-      }
-      else {
-        $value = array($value);
-      }
-    }
-
-    // check if the values are ids OR names of the states
-    $inputFormat = 'id';
-    if ($value) {
-      foreach ($value as $v) {
-        if (!is_numeric($v)) {
-          $inputFormat = 'name';
-          break;
-        }
-      }
-    }
-
-    $names = array();
-    if ($op == '=') {
-      $op = 'IN';
-    }
-    elseif ($op == '!=') {
-      $op = 'NOT IN';
-    }
-    else {
-      // this converts IS (NOT)? EMPTY to IS (NOT)? NULL
-      $op = str_replace('EMPTY', 'NULL', $op);
-    }
-    if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
-      $stateClause = "civicrm_address.state_province_id $op";
-    }
-    elseif ($inputFormat == 'id') {
-      if ($op != 'NOT IN') {
-        $op = 'IN';
-      }
-      $stateClause = "civicrm_address.state_province_id $op (" . implode(',', $value) . ')';
-
-      foreach ($value as $id) {
-        $names[] = CRM_Core_PseudoConstant::stateProvince($id, FALSE);
-      }
-    }
-    else {
-      $inputClause = array();
-      $stateProvince = CRM_Core_PseudoConstant::stateProvince();
-      foreach ($value as $name) {
-        $name = trim($name);
-        $inputClause[] = CRM_Utils_Array::key($name, $stateProvince);
-      }
-      $stateClause = "civicrm_address.state_province_id $op (" . implode(',', $inputClause) . ')';
-      $names = $value;
-    }
+    $stateClause = self::buildClause('civicrm_address.state_province_id', $op, $value, 'Positive');
     $this->_tables['civicrm_address'] = 1;
     $this->_whereTables['civicrm_address'] = 1;
 
     $countryValues = $this->getWhereValues('country', $grouping);
     list($countryClause, $countryQill) = $this->country($countryValues, TRUE);
-
     if ($countryClause) {
       $clause = "( $stateClause AND $countryClause )";
     }
@@ -3815,11 +3754,12 @@ WHERE  $smartGroupClause
     }
 
     $this->_where[$grouping][] = $clause;
+    list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_Address', "state_province_id", $value, $op);
     if (!$status) {
-      $this->_qill[$grouping][] = ts('State/Province') . " $op " . implode(' ' . ts('or') . ' ', $names) . $countryQill;
+      $this->_qill[$grouping][] = ts("State/Province %1 %2 %3", array(1 => $qillop, 2 => $qillVal, 3 => $countryQill));
     }
     else {
-      return implode(' ' . ts('or') . ' ', $names) . $countryQill;
+      return implode(' ' . ts('or') . ' ', $qillVal) . $countryQill;
     }
   }
 
