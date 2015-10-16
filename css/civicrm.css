@@ -2290,6 +2290,9 @@ a.crm-i:hover {
 div.crm-accordion-header a.helpicon {
   color: inherit;
 }
+div.crm-master-accordion-header a.helpicon {
+  color: #2786c2;
+}
 
 /* These .crm-icon classes use item_sprites.png */
 
