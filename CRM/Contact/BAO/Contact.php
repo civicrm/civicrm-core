@@ -3330,7 +3330,10 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
         return CRM_Core_BAO_EntityTag::buildOptions('tag_id', $context, $props);
 
       case 'state_province_id':
+      case 'state_province':
+      case 'state_province_name':
       case 'country_id':
+      case 'country':
       case 'county_id':
       case 'worldregion':
       case 'worldregion_id':
