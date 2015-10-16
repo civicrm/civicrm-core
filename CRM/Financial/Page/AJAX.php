@@ -524,12 +524,20 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_JSON::output($batchSummary);
   }
 
+  /**
+   * Makes an array of the batch's summary and returns array to parent getBatchSummary() function.
+   *
+   * @param $batchID
+   * @param $params
+   *
+   * @return array
+   */
   public static function makeBatchSummary($batchID, $params) {
   	$batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);
     $batchTotals = CRM_Batch_BAO_Batch::batchTotals(array($batchID));
   	$batchSummary = array(
       'created_by' => CRM_Contact_BAO_Contact::displayName($batchInfo->created_id),
-      'status' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'batch_status_id', $batchInfo->status_id),
+      'status' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'status_id', $batchInfo->status_id),
       'description' => $batchInfo->description,
       'payment_instrument' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchInfo->payment_instrument_id),
       'item_count' => $batchInfo->item_count,
