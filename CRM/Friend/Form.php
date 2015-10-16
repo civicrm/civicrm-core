@@ -179,6 +179,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
+    $this->applyFilter('__ALL__', 'trim');
     // Details of User
     $name = &$this->add('text',
       'from_name',
