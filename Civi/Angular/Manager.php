@@ -136,6 +136,14 @@ class Manager {
         'js' => array('bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'),
       );
 
+      $angularModules['statuspage'] = array(
+        'ext' => 'civicrm',
+        'js' => array('ang/crmStatusPage.js', 'ang/crmStatusPage/*.js'),
+        'css' => array('ang/crmStatusPage.css'),
+        'partials' => array('ang/crmStatusPage'),
+        'settings' => array(),
+      );
+
       foreach (\CRM_Core_Component::getEnabledComponents() as $component) {
         $angularModules = array_merge($angularModules, $component->getAngularModules());
       }

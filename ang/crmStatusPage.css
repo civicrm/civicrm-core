@@ -1,0 +1,70 @@
+/* Add any CSS rules for Angular module "statuspage" */
+
+/* Error Severity */
+#crm-status-list .crm-severity-emergency,
+#crm-status-list .crm-severity-alert,
+#crm-status-list .crm-severity-critical,
+#crm-status-list .crm-severity-error{
+  background-color: #E43D2B;
+  color: white;
+}
+
+#crm-status-list .crm-severity-emergency:hover,
+#crm-status-list .crm-severity-alert:hover,
+#crm-status-list .crm-severity-critical:hover,
+#crm-status-list .crm-severity-error:hover {
+  background-color: #DD0000;
+  color: white;
+}
+
+/* Warning Severity */
+#crm-status-list .crm-severity-warning
+{
+  background-color: #EDA737;
+  color: white;
+}
+
+#crm-status-list .crm-severity-warning:hover
+{
+  background-color: #F09E1A;
+  color: white;
+}
+
+
+/* Not Okay - Not Warning */
+#crm-status-list .crm-severity-notice
+{
+  background-color: #4A88DF;
+  color: white;
+}
+
+#crm-status-list .crm-severity-notice :hover
+{
+  background-color: #41477E;
+  color: white;
+}
+
+/* All OK Severity */
+#crm-status-list .crm-severity-info,
+#crm-status-list .crm-severity-debug {
+  background-color: #00994D;
+  color: white;
+}
+
+
+#crm-status-list .crm-severity-info:hover,
+#crm-status-list .crm-severity-debug:hover {
+  background-color: #006633;
+  color: white;
+}
+
+/* over-riding divs for snooze-options so that inline-block looks better */
+
+.crm-container .status-snooze-options .crm-section .content,
+.crm-container .status-snooze-options .crm-section .label {
+  margin-left: inherit;
+  text-align: inherit;
+  float: inherit;
+  width: inherit;
+  display: inline-block;
+}
