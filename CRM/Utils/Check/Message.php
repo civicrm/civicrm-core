@@ -47,7 +47,7 @@ class CRM_Utils_Check_Message {
   private $title;
 
   /**
-   * @var string
+   * @var int
    * @see Psr\Log\LogLevel
    */
   private $level;
@@ -57,6 +57,13 @@ class CRM_Utils_Check_Message {
    *   help text (to be presented separately from the message)
    */
   private $help;
+
+  /**
+   *
+   * @var bool
+   *      This is used for Admin Status Page to determine hushed statuses.
+   */
+  private $isVisible;
 
   /**
    * @param string $name
@@ -135,11 +142,20 @@ class CRM_Utils_Check_Message {
       'message' => $this->message,
       'title' => $this->title,
       'severity' => $this->level,
+      'is_visible' => $this->isVisible,
     );
     if (!empty($this->help)) {
       $array['help'] = $this->help;
     }
     return $array;
+  }
+
+  public function isVisible() {
+    return $this->isVisible;
+  }
+
+  public function setVisible($isVisible) {
+    $this->isVisible = $isVisible ? 1 : 0;
   }
 
 }
