@@ -155,6 +155,7 @@
 <td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
 <td>{$row.rate|string_format:"%0.2f"}%</td>
 <td><a href="{$row.url}">{$row.url}</a></td>
+<td><a href="{$row.report"}>Report</a></td>
 </tr>
 {/foreach}
 </table>
