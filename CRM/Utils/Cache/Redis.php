@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,7 +42,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    * The host name of the redisd server
    *
    * @var string
-  */
+   */
   protected $_host = self::DEFAULT_HOST;
 
   /**
@@ -80,7 +80,8 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   /**
    * Constructor
    *
-   * @param array   $config  an array of configuration params
+   * @param array $config
+   *   An array of configuration params.
    *
    * @return \CRM_Utils_Cache_Redis
    */
@@ -148,4 +149,5 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   public function flush() {
     return $this->_cache->flush();
   }
+
 }
