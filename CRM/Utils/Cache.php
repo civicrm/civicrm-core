@@ -180,7 +180,7 @@ class CRM_Utils_Cache {
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
-          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, array('Memcache', 'Memcached'))) {
+          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, array('Memcache', 'Memcached', 'Redis'))) {
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
             $settings['prefix'] = $settings['prefix'] . '_' . $params['name'];
