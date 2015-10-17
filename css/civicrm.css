@@ -454,7 +454,6 @@ input.crm-form-entityref {
 }
 
 .crm-container table.form-layout,
-.crm-container table.control-panel,
 .crm-container table.no-border {
   margin: 0;
   border-collapse: collapse;
@@ -510,14 +509,6 @@ input.crm-form-entityref {
   vertical-align: text-top;
   padding: 2px 5px;
   border: none;
-}
-
-.crm-container .control-panel td {
-  padding: 3px;
-  width: 25%;
-  white-space: nowrap;
-  border: 0 none;
-  text-align: center;
 }
 
 .crm-container .form-layout td.label,
@@ -764,7 +755,7 @@ input.crm-form-entityref {
 }
 
 /* But allow them for the help at the top of forms */
-.crm-container #help ul li {
+.crm-container .help ul li {
   background-image: url(menu-leaf.png);
 }
 
@@ -1138,50 +1129,6 @@ input.crm-form-entityref {
   color: #494949;
 }
 
-/* alpha filter styles */
-#crm-recently-viewed ul,
-#crm-container #alpha-filter ul {
-  border-collapse: collapse;
-  padding: 0;
-  list-style-type: none;
-  margin: 3px;
-  height: auto;
-  width: auto;
-}
-
-.crm-container div#alpha-filter {
-  background-color: #CDE8FE;
-  margin: 4px 0 5px;
-  padding: 2px;
-  text-align: left;
-}
-
-.crm-container #alpha-filter li {
-  background-color: transparent;
-  background-image: none;
-  border: none;
-  color: #AAAAAA;
-  display: inline;
-  font-size: 15px;
-  font-weight: normal;
-  height: auto;
-  margin: 0 1px;
-  padding: 2px 5px;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.crm-container #alpha-filter a {
-  border-bottom: 1px dotted #2A71B4;
-  color: #2A71B4;
-  font-weight: normal;
-}
-
-.crm-container #lang-switch {
-  float: right;
-  z-index: 2;
-  margin: -24px 30px 0 0;
-}
-
 /* Boxes of checkbox elements (e.g. Advanced Search page) */
 .crm-container .listing-box,
 .crm-container .listing-box-tall {
@@ -1231,35 +1178,11 @@ input.crm-form-entityref {
   content: "\00BB";
 }
 
-/* editor specific classes */
-#crm-container dd.editor {
-  margin-top: 0.7em;
-  margin-left: 0;
-  float: left;
-  vertical-align: top;
-  width: 58em;
-}
-
 #crm-container.clear,
 .crm-container .crm-group-summary .clear {
   /* generic container (i.e. div) for floating buttons */
   overflow: hidden;
   width: 100%;
-}
-
-/* class for tinymce buttons display */
-#crm-container table.mceLayout td,
-#crm-container table.mceLayout table {
-  padding: 0;
-  background: #EDEDED;
-  border: 2px solid #EDEDED;
-  font-size: 0;
-  vertical-align: top;
-  width: auto;
-}
-
-#crm-container tr.mceLast {
-  border: 1px solid #EDEDED;
 }
 
 #location .form-layout table,
@@ -1467,24 +1390,6 @@ input.crm-form-entityref {
 #crm-container #activities-selector tr.trOver td.sorted,
 #crm-container #activities-selector tr.trOver td {
   background: transparent;
-}
-
-/* Styles for Config Task List */
-#crm-container td.tasklist a {
-  font-weight: bold;
-}
-
-#crm-container table.selector td.tasklist {
-  border-right: 1px solid #DDDDDD;
-  width: 20%;
-}
-
-#crm-container td.tasklist a:link {
-  color: #FF0105;
-}
-
-#crm-container td.tasklist a:visited {
-  color: green;
 }
 
 /* Styles for Actions Ribbon */
@@ -1886,20 +1791,10 @@ input.crm-form-entityref {
   margin-top: -4px;
 }
 
-/* This is the style for the trigger icon. The margin-bottom value causes the icon to shift down to center it. */
-.crm-container .ui-datepicker-trigger {
-  margin-top: 4px;
-  margin-bottom: -6px;
-}
-
 .crm-container .ui-datepicker {
   width: 17em;
   padding: .2em .2em 0;
   z-index: 9999 !important;
-}
-
-#crm-container .cke_editor {
-  border: 0 none;
 }
 
 /* Set/alter ICONS */
@@ -1960,9 +1855,6 @@ input.crm-form-entityref {
 }
 
 .crm-container a.button,
-.crm-container a.crm-invoiceButton,
-.crm-container a.crm-invoiceButton:link,
-.crm-container a.crm-invoiceButton:visited,
 .crm-container a.button:link,
 .crm-container a.button:visited,
 .crm-container input.crm-form-submit,
@@ -2012,30 +1904,11 @@ input.crm-form-entityref {
 }
 
 .crm-container a.button,
-.crm-container a.crm-invoiceButton,
-.crm-container a.crm-invoiceButton:link,
-.crm-container a.crm-invoiceButton:visited,
 .crm-container a.button:link,
 .crm-container a.button:visited {
   display: block;
   float: left;
   line-height: 135%;
-}
-
-.crm-container a.button .crm-container a.crm-invoiceButton span {
-  display: block;
-  line-height: 14px;
-  padding: 2px 0;
-}
-
-.crm-container .button .red .crm-invoiceButton{
-  background-image: url(../i/icons/jquery-ui-FFFFFF.png);
-}
-
-.crm-container a.button:active .crm-container a.crm-invoiceButton:active,{
-  color: #000;
-  outline: none;
-  /* hide dotted outline in Firefox */
 }
 
 .crm-container .crm-button:hover,
@@ -2045,8 +1918,6 @@ input.crm-form-entityref {
 .crm-container .ui-dialog-buttonset .ui-button:hover,
 .crm-container .ui-dialog-buttonset .ui-button:focus,
 .crm-container a.button:hover,
-.crm-container a.crm-invoiceButton:hover,
-.crm-container a.crm-invoiceButton:focus,
 .crm-container a.button:focus {
   background-position: 0 -25px;
 }
@@ -2204,9 +2075,6 @@ input.crm-form-entityref {
   pointer-events: none;
 }
 
-.crm-container .dark-icon {
-  background-image: url("../bower_components/jquery-ui/themes/smoothness/images/ui-icons_222222_256x240.png")
-}
 .crm-container .delete-icon {
   background-position: -176px -96px;
 }
@@ -2945,8 +2813,6 @@ tbody.scrollContent tr.alternateRow {
   border-bottom: 1px solid #FFF;
 }
 
-#crm-container div.contactCardLeft .label,
-#crm-container div.contactCardRight .label,
 .crm-container table.crm-info-panel .label {
   color: #2f2f2f;
   font-weight: normal;
@@ -3001,18 +2867,6 @@ tbody.scrollContent tr.alternateRow {
   color: #3e3e3e;
 }
 
-.crm-container div.contact_panel td.grouplabel {
-  border-bottom: 2px solid #D7D7D0 !important;
-}
-
-#tagGroup table .label {
-  color: #FFF;
-}
-#tagGroup table {
-  color: #000;
-}
-
-
 /* search results */
 .crm-container .crm-search-tasks,
 .crm-container .crm-tasks {
@@ -3046,8 +2900,6 @@ tbody.scrollContent tr.alternateRow {
 /* rounded corners */
 .crm-container .crm-button,
 .crm-container a.button,
-.crm-container a.crm-invoiceButton,
-.crm-container a.crm-invoiceButton:link,
 .crm-container a.button:link,
 .crm-container input.crm-form-submit,
 .crm-container input[type=button] {
@@ -3301,34 +3153,11 @@ div.m ul#civicrm-menu,
   color: #555;
 }
 
-/*Needed for jstree contextmenu */
-#vakata-contextmenu.jstree-default-context li {
-  background: none repeat scroll 0 0 transparent;
-}
-
 /* unset the styling for the li in jstree */
 #tagtree ul {
   list-style: none;
   margin: 0px;
   padding: 0px;
-}
-
-/* Class for successful upgrade */
-.crm-container .upgrade-success {
-  background-color: #00CC00;
-  color: white;
-}
-
-.crm-container .extension-upgradable {
-  background-color: #FFFFCC !important;
-}
-
-.crm-container .extension-installed {
-  background-color: #DDFFDD !important;
-}
-
-.crm-container .extension-missing {
-  color: #E43D2B !important;
 }
 
 /* table row highlightng */
@@ -3341,16 +3170,6 @@ div.m ul#civicrm-menu,
 .crm-container .even-row.crm-row-selected,
 .crm-container .even.crm-row-selected {
   background-color: #fffdb2;
-}
-
-#crm-container .civicrm-drupal-wysiwyg .collapsed {
-  background: transparent;
-  padding-left: 0;
-}
-
-#manageTags {
-  position: static;
-  z-index: -100;
 }
 
 #crm-container .crm-socialnetwork {
@@ -3904,11 +3723,6 @@ span.crm-status-icon {
   font-weight: normal !important;
   font-size: 15px;
   color: #666 !important;
-}
-#crm-container .crm-extensions-upgrade {
-  background: #ffb;
-  border: 1px solid #000;
-  text-align: center;
 }
 
 /* Styles for credit card payment logos */

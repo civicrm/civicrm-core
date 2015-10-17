@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* success.tpl: Display page for Upgrades. Provides complete HTML doc.*}
+{* Display page for Upgrades. *}
 {if $config->userSystem->is_drupal neq '1'}
     <h2>{$pageTitle}</h2>
 {/if}
