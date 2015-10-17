@@ -43,6 +43,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       set_time_limit(0);
     }
 
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+
     $upgrade = new CRM_Upgrade_Form();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
 
