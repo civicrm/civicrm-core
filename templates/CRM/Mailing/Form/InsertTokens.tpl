@@ -244,7 +244,7 @@ CRM.$(function($) {
   // Initialize token selector widgets
   var form = $('form.{/literal}{$form.formClass}{literal}');
   $('input.crm-token-selector', form)
-    .addClass('crm-action-menu action-icon-token')
+    .addClass('crm-action-menu fa-code')
     .change(insertToken)
     .crmSelect2({
       data: form.data('tokens'),
