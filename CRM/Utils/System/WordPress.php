@@ -85,9 +85,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $upload_dir      = wp_upload_dir();
     $settingsDir     = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
     $settingsURL     = $upload_dir['baseurl'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR;
-    if (is_dir(ABSPATH . 'wp-content/plugins/files/civicrm/')) {
+    if (is_dir(WP_PLUGIN_DIR . '/files/civicrm/')) {
       //for legacy path
-      $filesURL = $baseURL . "wp-content/plugins/files/civicrm/";
+      $filesURL = WP_PLUGIN_URL . "/files/civicrm/";
     }
     elseif (is_dir($settingsDir)) {
       $filesURL = $settingsURL;
