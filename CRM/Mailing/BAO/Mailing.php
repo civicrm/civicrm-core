@@ -2416,7 +2416,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // if they dont have universal access
     $groupNames = civicrm_api3('group', 'get', array(
       'is_active' => 1,
-      'check_permission' => TRUE,
+      'check_permissions' => TRUE,
       'return' => array('title', 'id'),
       'options' => array('limit' => 0),
     ));
