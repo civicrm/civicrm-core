@@ -28,7 +28,7 @@
     <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">
       <ul id="actions">
       <li><div id="crm-event-links-wrapper">
-            <a id="crm-event-links-link" class="button"><span>{ts}Event Links{/ts} <i class="crm-i fa-bars"></i></span></a>
+            <a id="crm-event-links-link" class="button"><span><i class="crm-i fa-bars"></i> {ts}Event Links{/ts}</span></a>
             <div class="ac_results" id="crm-event-links-list">
                  <div class="crm-event-links-list-inner">
                    <ul>
@@ -44,7 +44,7 @@
         </div></li>
 
       <li><div id="crm-participant-wrapper">
-            <a id="crm-participant-link" class="button"><span>{ts}Find Participants{/ts} <i class="crm-i fa-bars"></i></span></a>
+            <a id="crm-participant-link" class="button"><span><i class="crm-i fa-bars"></i> {ts}Find Participants{/ts}</span></a>
             <div class="ac_results" id="crm-participant-list">
                  <div class="crm-participant-list-inner">
                    <ul>
