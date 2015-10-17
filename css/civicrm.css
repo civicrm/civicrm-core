@@ -3445,10 +3445,11 @@ div.m ul#civicrm-menu,
 }
 
 .crm-container .replace-plain:before {
-  content: "";
+  content: "\f040";
   position: absolute;
   top: .4em;
   right: .5em;
+  opacity: .5;
 }
 
 /* in place edit  */
@@ -3478,21 +3479,14 @@ div.m ul#civicrm-menu,
   display: inline-block !important;
 }
 
-.crm-container .crm-editable-placeholder,
-.crm-container .replace-plain:before {
-  background: url("../i/icons/jquery-ui-3E3E3E.png") -66px -114px no-repeat;
-  text-indent: -10000px;
-  display: block;
-  height: 16px;
-  width: 16px;
+.crm-container .crm-editable-enabled .crm-i {
   opacity: .5;
 }
 
 .crm-container .replace-plain a:active:before,
 .crm-container .replace-plain:focus:before,
 .crm-container .replace-plain:hover:before,
-.crm-container .crm-editable-enabled:hover .crm-editable-placeholder {
-  background-image: url("../i/icons/jquery-ui-2786C2.png");
+.crm-container .crm-editable-enabled:hover .crm-i {
   opacity: 1;
 }
 
