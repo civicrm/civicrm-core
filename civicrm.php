@@ -799,7 +799,7 @@ class CiviCRM_For_WordPress {
       'index.php';
 
     // Notice: Undefined variable: siteDir in:
-    // wp-content/plugins/civicrm/civicrm/install/index.php on line 456
+    // CIVICRM_PLUGIN_DIR/civicrm/install/index.php on line 456
     include ( $installFile );
 
   }

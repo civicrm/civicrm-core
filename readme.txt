@@ -28,7 +28,7 @@ CiviCRM is localized in over 20 languages including: Chinese (Taiwan, China), Du
 
 1. Download CiviCRM for WordPress from the [CiviCRM website](https://civicrm.org/download)
 1. Extract the plugin archive 
-1. Upload plugin files to your `/wp-content/plugins/` directory
+1. Upload plugin files to your plugins directory, normally `/wp-content/plugins/`
 1. Follow the instructions on the [CiviCRM website](http://wiki.civicrm.org/confluence/display/CRMDOC/WordPress+Installation+Guide+for+CiviCRM+4.5)
 
 
