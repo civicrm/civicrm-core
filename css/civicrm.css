@@ -2254,15 +2254,6 @@ a.crm-i:hover {
   line-height: inherit;
 }
 
-.crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"] {
-  background: none repeat scroll 0 0 transparent !important;
-  color: #F5F6F1;
-}
-
-.crm-container .ui-dialog-titlebar .ui-button .ui-icon[class*=" fa-"]:hover {
-
-}
-
 .crm-container .crm-button.crm-i-button input[type="button"],
 .crm-container .crm-button.crm-i-button input.crm-form-submit {
   padding-left: 0;
@@ -3303,15 +3294,11 @@ div.m ul#civicrm-menu,
   background-color: transparent;
   background-image: none;
   border: 1px none;
-}
-.crm-container .ui-dialog-titlebar .ui-button .ui-icon {
-  background-image: url("../i/icons/jquery-ui-F5F6F1.png");
+  color: inherit;
 }
 .crm-container .ui-dialog-titlebar .ui-button:hover {
   background-color: #cdcdcd;
-}
-.crm-container .ui-dialog-titlebar .ui-button:hover .ui-icon {
-  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
+  color: #555;
 }
 
 /*Needed for jstree contextmenu */
