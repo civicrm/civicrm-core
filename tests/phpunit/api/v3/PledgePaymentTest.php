@@ -214,8 +214,12 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'sequential' => 1,
     );
 
-    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId,
-      45, 45);
+    $contributionID = $this->contributionCreate(array(
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => $this->_financialTypeId,
+      'invoice_id' => 45,
+      'trxn_id' => 45,
+    ));
     $pledge = $this->callAPISuccess('Pledge', 'Create', $pledgeParams);
 
     //test the pledge_payment_create function
