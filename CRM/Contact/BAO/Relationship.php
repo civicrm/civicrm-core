@@ -1021,9 +1021,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       while ($relationship->fetch()) {
         $rid = $relationship->civicrm_relationship_id;
         $cid = $relationship->civicrm_contact_id;
-        if (($permissionedContact &&
-            (!CRM_Contact_BAO_Contact_Permission::relationship($cid, $contactId))
-          ) ||
+
+        if ($permissionedContact &&
           (!CRM_Contact_BAO_Contact_Permission::allow($cid))
         ) {
           continue;
@@ -1635,5 +1634,117 @@ AND cc.sort_name LIKE '%$name%'";
       }
     }
   }
+
+  /**
+   * Wrapper for contact relationship selector.
+   *
+   * @param array $params
+   *   Associated array for params record id.
+   *
+   * @return array
+   *   associated array of contact relationships
+   */
+  public static function getContactRelationshipSelector(&$params) {
+    // format the params
+    $params['offset'] = ($params['page'] - 1) * $params['rp'];
+    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+
+    if ($params['context'] == 'past') {
+      $relationshipStatus = CRM_Contact_BAO_Relationship::INACTIVE;
+    }
+    elseif ($params['context'] == 'all') {
+      $relationshipStatus = CRM_Contact_BAO_Relationship::ALL;
+    }
+    else {
+      $relationshipStatus = CRM_Contact_BAO_Relationship::CURRENT;
+    }
+
+    // check logged in user for permission
+    $page = new CRM_Core_Page();
+    CRM_Contact_Page_View::checkUserPermission($page, $params['contact_id']);
+    $permissions = array($page->_permission);
+    if ($page->_permission == CRM_Core_Permission::EDIT) {
+      $permissions[] = CRM_Core_Permission::DELETE;
+    }
+    $mask = CRM_Core_Action::mask($permissions);
+
+    $permissionedContacts = TRUE;
+    if ($params['context'] != 'user') {
+      $links = CRM_Contact_Page_View_Relationship::links();
+    }
+    else {
+      $links = CRM_Contact_Page_View_UserDashBoard::links();
+      $mask = NULL;
+    }
+    // get contact relationships
+    $relationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+      $relationshipStatus,
+      $params['rp'], 0, 0,
+      $links, $mask,
+      $permissionedContacts,
+      $params
+    );
+
+    $contactRelationships = array();
+    $params['total'] = 0;
+    if (!empty($relationships)) {
+      // FIXME: we cannot directly determine total permissioned relationship, hence re-fire query
+      $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+        $relationshipStatus,
+        0, 0, 0,
+        NULL, NULL,
+        $permissionedContacts
+      );
+      $params['total'] = count($permissionedRelationships);
+
+      // format params
+      foreach ($relationships as $relationshipId => $values) {
+        //Add image icon for related contacts: CRM-14919
+        $icon = CRM_Contact_BAO_Contact_Utils::getImage($values['contact_type'],
+          FALSE,
+          $values['cid']
+        );
+        $contactRelationships[$relationshipId]['name'] = $icon . ' ' . CRM_Utils_System::href(
+            $values['name'],
+            'civicrm/contact/view',
+            "reset=1&cid={$values['cid']}");
+
+        $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
+          $values['relation'],
+          'civicrm/contact/view/rel',
+          "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
+
+        if ($params['context'] == 'current') {
+          if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
+            ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
+          ) {
+            $contactRelationships[$relationshipId]['name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
+          }
+
+          if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
+            ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
+          ) {
+            $contactRelationships[$relationshipId]['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
+          }
+        }
+
+        if (!empty($values['description'])) {
+          $contactRelationships[$relationshipId]['relation'] .= "<p class='description'>{$values['description']}</p>";
+        }
+
+        $contactRelationships[$relationshipId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
+        $contactRelationships[$relationshipId]['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
+        $contactRelationships[$relationshipId]['city'] = $values['city'];
+        $contactRelationships[$relationshipId]['state'] = $values['state'];
+        $contactRelationships[$relationshipId]['email'] = $values['email'];
+        $contactRelationships[$relationshipId]['phone'] = $values['phone'];
+        $contactRelationships[$relationshipId]['links'] = $values['action'];
+        $contactRelationships[$relationshipId]['id'] = $values['id'];
+        $contactRelationships[$relationshipId]['is_active'] = $values['is_active'];
+      }
+    }
+    return $contactRelationships;
+  }
+
 }
 
