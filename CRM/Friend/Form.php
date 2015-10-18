@@ -206,6 +206,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
       $this->add('text', "friend[$i][first_name]", ts("Friend's First Name"));
       $this->add('text', "friend[$i][last_name]", ts("Friend's Last Name"));
       $this->add('text', "friend[$i][email]", ts("Friend's Email"));
+      $this->applyFilter("friend[$i][email]", 'trim');
       $this->addRule("friend[$i][email]", ts('The format of this email address is not valid.'), 'email');
     }
 
