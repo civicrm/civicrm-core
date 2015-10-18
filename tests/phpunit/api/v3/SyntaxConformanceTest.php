@@ -423,7 +423,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'SurveyRespondant',
       'UFMatch',
       'UFJoin',
-      'UFField',
       'OptionValue',
       'Relationship',
       'RelationshipType',
