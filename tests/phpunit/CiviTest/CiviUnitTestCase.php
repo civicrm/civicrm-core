@@ -1544,6 +1544,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create a sample batch.
+   */
+  public function batchCreate() {
+    $params = $this->_params;
+    $params['name'] = $params['title'] = 'Batch_433397';
+    $params['status_id'] = 1;
+    $result = $this->callAPISuccess('batch', 'create', $params);
+    return $result['id'];
+  }
+
+  /**
    * Create Tag.
    *
    * @param array $params
