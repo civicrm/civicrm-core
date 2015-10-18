@@ -520,14 +520,19 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test deleting a contribution.
    *
+   * (It is unclear why this is in this class - it seems like maybe it doesn't test anything not
+   * on the contribution test class & might be copy and paste....).
    */
   public function testDeleteContribution() {
-    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->financialtypeID, 'dfsdf', 12389);
-    $params = array(
-      'id' => $contributionID,
-    );
-    $this->callAPIAndDocument('contribution', 'delete', $params, __FUNCTION__, __FILE__);
+    $contributionID = $this->contributionCreate(array(
+      'contact_id' => $this->_individualId,
+      'trxn_id' => 12389,
+      'financial_type_id' => $this->financialtypeID,
+      'invoice_id' => 'dfsdf',
+    ));
+    $this->callAPISuccess('contribution', 'delete', array('id' => $contributionID));
   }
 
 }

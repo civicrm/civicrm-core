@@ -1636,17 +1636,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param array $params
    *   Array of parameters.
-   * @param int $cTypeID
-   *   Id of financial type.
-   * @param int $invoiceID
-   * @param int $trxnID
-   * @param int $paymentInstrumentID
    *
    * @return int
    *   id of created contribution
    */
-  public function contributionCreate($params, $cTypeID = 1, $invoiceID = 67890, $trxnID = 12345,
-    $paymentInstrumentID = 1) {
+  public function contributionCreate($params) {
 
     $params = array_merge(array(
       'domain_id' => 1,
@@ -1654,45 +1648,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'total_amount' => 100.00,
       'fee_amount' => 5.00,
       'net_ammount' => 95.00,
-      'financial_type_id' => $cTypeID,
-      'payment_instrument_id' => empty($paymentInstrumentID) ? 1 : $paymentInstrumentID,
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
-      'trxn_id' => $trxnID,
-      'invoice_id' => $invoiceID,
+      'trxn_id' => 12345,
+      'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ), $params);
 
     $result = $this->callAPISuccess('contribution', 'create', $params);
-    return $result['id'];
-  }
-
-  /**
-   * Create online contribution.
-   *
-   * @param array $params
-   * @param int $financialType
-   *   Id of financial type.
-   * @param int $invoiceID
-   * @param int $trxnID
-   *
-   * @return int
-   *   id of created contribution
-   */
-  public function onlineContributionCreate($params, $financialType, $invoiceID = 67890, $trxnID = 12345) {
-    $contribParams = array(
-      'contact_id' => $params['contact_id'],
-      'receive_date' => date('Ymd'),
-      'total_amount' => 100.00,
-      'financial_type_id' => $financialType,
-      'contribution_page_id' => $params['contribution_page_id'],
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
-      'source' => 'SSF',
-    );
-    $contribParams = array_merge($contribParams, $params);
-    $result = $this->callAPISuccess('contribution', 'create', $contribParams);
-
     return $result['id'];
   }
 
@@ -3231,8 +3196,11 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     //create a contribution so our membership & contribution don't both have id = 1
     $this->contributionCreate(array(
       'contact_id' => $this->_contactID,
-      'is_test' => 1),
-      1, 'abcd', '345j');
+      'is_test' => 1,
+      'financial_type_id' => 1,
+      'invoice_id' => 'abcd',
+      'trxn_id' => 345,
+    ));
     $this->setupRecurringPaymentProcessorTransaction();
 
     $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(

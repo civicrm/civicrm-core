@@ -1150,15 +1150,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateUpdateContribution() {
 
-    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId,
-    'idofsh', 212355);
+    $contributionID = $this->contributionCreate(array(
+      'contact_id' => $this->_individualId,
+      'trxn_id' => 212355,
+      'financial_type_id' => $this->_financialTypeId,
+      'invoice_id' => 'old_invoice',
+    ));
     $old_params = array(
       'contribution_id' => $contributionID,
-
     );
     $original = $this->callAPISuccess('contribution', 'get', $old_params);
-    // Make sure it came back.
-    $this->assertAPISuccess($original);
     $this->assertEquals($original['id'], $contributionID);
     //set up list of old params, verify
 
@@ -1176,7 +1177,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($old_fee_amount, 5.00);
     $this->assertEquals($old_source, 'SSF');
     $this->assertEquals($old_trxn_id, 212355);
-    $this->assertEquals($old_invoice_id, 'idofsh');
+    $this->assertEquals($old_invoice_id, 'old_invoice');
     $params = array(
       'id' => $contributionID,
       'contact_id' => $this->_individualId,
@@ -1241,8 +1242,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   public function testDeleteContribution() {
-
-    $contributionID = $this->contributionCreate(array('contact_id' => $this->_individualId), $this->_financialTypeId, 'dfsdf', 12389);
+    $contributionID = $this->contributionCreate(array(
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => $this->_financialTypeId,
+    ));
     $params = array(
       'id' => $contributionID,
     );

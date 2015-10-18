@@ -44,6 +44,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $_participantPaymentID;
   protected $_financialTypeId;
 
+  /**
+   * Set up for tests.
+   */
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -206,8 +209,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'contribution_page_id' => $contributionPage['id'],
       'payment_processor' => $paymentProcessor->id,
+      'financial_type_id' => 1,
     );
-    $contributionID = $this->onlineContributionCreate($contributionParams, 1);
+    $contributionID = $this->contributionCreate($contributionParams);
 
     $this->_participantPaymentID = $this->participantPaymentCreate($this->_participantID, $contributionID);
     $params = array(
@@ -225,7 +229,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
     );
-    $deletePayment = $this->callAPISuccess('participant_payment', 'delete', $params);
+    $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
   /**
@@ -242,8 +246,9 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'contribution_page_id' => $contributionPage['id'],
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
+      'financial_type_id' => 1,
     );
-    $contributionID = $this->onlineContributionCreate($contributionParams, 1);
+    $contributionID = $this->contributionCreate($contributionParams);
 
     $this->_participantPaymentID = $this->participantPaymentCreate($this->_participantID, $contributionID);
     $params = array(
@@ -261,7 +266,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => $this->_participantPaymentID,
     );
-    $deletePayment = $this->callAPISuccess('participant_payment', 'delete', $params);
+    $this->callAPISuccess('participant_payment', 'delete', $params);
   }
 
 
