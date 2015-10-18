@@ -401,77 +401,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /**
    * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
-   * @param bool $sequential
+   *
    * @return array
    */
-  public static function toBeSkipped_updatesingle($sequential = FALSE) {
-    $entitiesWithout = array(
-      'Attachment',
-      // pseudo-entity; testUpdateSingleValueAlter doesn't introspect properly on it. Multiple magic fields
-      'Mailing',
-      'MailingGroup',
-      'MailingJob',
-      'Address',
-      'MailingEventUnsubscribe',
-      'MailingEventSubscribe',
-      'Constant',
-      'Entity',
-      'Location',
-      'Domain',
-      'Profile',
-      'CustomValue',
-      'SurveyRespondant',
-      'UFMatch',
-      'UFJoin',
-      'UFField',
-      'OptionValue',
-      'Relationship',
-      'RelationshipType',
-      'Note',
-      'OptionGroup',
-      'Membership',
-      'Group',
-      'GroupOrganization',
-      'GroupNesting',
-      'File',
-      'EntityTag',
-      'CustomField',
-      'CustomGroup',
-      'Contribution',
+  public static function toBeSkipped_updatesingle() {
+    return array(
+      // Pseudo-api
       'ActivityType',
-      'MailingEventConfirm',
-      'Case',
-      'Contact',
-      'ContactType',
-      'MailingEventResubscribe',
-      'UFGroup',
-      'Activity',
-      'Event',
-      'GroupContact',
-      'MembershipPayment',
-      'Participant',
-      'ParticipantPayment',
-      'LineItem',
-      'PledgePayment',
-      'ContributionPage',
-      'Phone',
-      'PaymentProcessor',
-      'Setting',
+      'Constant',
       'MailingContact',
-      'SystemLog',
+      'SurveyRespondant',
       //skip this because it doesn't make sense to update logs,
+      'SystemLog',
     );
-    if ($sequential === TRUE) {
-      return $entitiesWithout;
-    }
-    $entities = array();
-    foreach ($entitiesWithout as $e) {
-      $entities[] = array(
-        $e,
-      );
-    }
-    return array('pledge');
-    return $entities;
   }
 
   /**
