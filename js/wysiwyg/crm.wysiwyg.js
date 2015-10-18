@@ -4,7 +4,9 @@
   // A wysiwyg implementation can extend this by overriding as many of these functions as needed
   CRM.wysiwyg = {
     supportsFileUploads: false,
-    create: _.noop,
+    create: function() {
+      return $.Deferred().resolve();
+    },
     destroy: _.noop,
     updateElement: _.noop,
     getVal: function(item) {
