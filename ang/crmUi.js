@@ -394,7 +394,9 @@
           }
 
           ngModel.$render = function(value) {
-            CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
+            editor.done(function() {
+              CRM.wysiwyg.setVal(elm, ngModel.$viewValue);
+            });
           };
         }
       };

@@ -13,6 +13,7 @@
   CRM.wysiwyg.supportsFileUploads =  true;
   CRM.wysiwyg.create = function(item) {
     var editor,
+      deferred = $.Deferred(),
       browseUrl = CRM.config.userFrameworkResourceURL + "packages/kcfinder/browse.php?cms=civicrm",
       uploadUrl = CRM.config.userFrameworkResourceURL + "packages/kcfinder/upload.php?cms=civicrm";
     if ($(item).length) {
@@ -23,7 +24,12 @@
         filebrowserUploadUrl: uploadUrl + '&type=files',
         filebrowserImageUploadUrl: uploadUrl + '&type=images',
         filebrowserFlashUploadUrl: uploadUrl + '&type=flash',
-        customConfig: CRM.config.CKEditorCustomConfig
+        customConfig: CRM.config.CKEditorCustomConfig,
+        on: {
+          instanceReady: function() {
+            deferred.resolve();
+          }
+        }
       });
     }
     if (editor) {
@@ -55,7 +61,10 @@
       editor.on('maximize', function (e) {
         $('#civicrm-menu').toggle(e.data === 2);
       });
+    } else {
+      deferred.reject();
     }
+    return deferred;
   };
   CRM.wysiwyg.destroy = function(item) {
     var editor = getInstance(item);
