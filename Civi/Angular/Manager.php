@@ -101,10 +101,6 @@ class Manager {
         'ext' => 'civicrm',
         'js' => array('ang/crmUi.js'),
         'partials' => array('ang/crmUi'),
-        'settings' => array(
-          'browseUrl' => $config->userFrameworkResourceURL . 'packages/kcfinder/browse.php',
-          'uploadUrl' => $config->userFrameworkResourceURL . 'packages/kcfinder/upload.php',
-        ),
       );
       $angularModules['crmUtil'] = array(
         'ext' => 'civicrm',
