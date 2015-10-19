@@ -219,10 +219,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             ),
             'type' => CRM_Utils_Type::T_INT,
           ),
-          /*
-           * This is a pseudo field to allow search for relationships
-           * that are expired or not yet started as well.
-           */
           'is_valid' => array(
             'title' => ts('Relationship Dates Validity'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
@@ -442,8 +438,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                 }
               }
               else {
-                if ($fieldName == "is_valid") {
-                  //We have a pseudofilter which we shall translate
+                if ($fieldName == 'is_valid') {
                   $clause = $this->buildValidityQuery(CRM_Utils_Array::value("{$fieldName}_value", $this->_params));
                 }
                 else {
@@ -664,11 +659,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function buildValidityQuery($valid) {
     $clause = NULL;
     if ($valid == '1') {
-      // We are asking that the dates are in the valid range
+      // relationships dates are not expired
       $clause = "((start_date <= CURDATE() OR start_date is null) AND (end_date >= CURDATE() OR end_date is null))";
     }
     elseif ($valid == '0') {
-      // We are asking that the dates are outside the valid range.
+      // relationships dates are expired or has not started yet
       $clause = "(start_date >= CURDATE() OR end_date < CURDATE())";
     }
     return $clause;
