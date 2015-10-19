@@ -518,7 +518,7 @@ class CRM_Financial_Page_AJAX {
   public static function getBatchSummary() {
     $batchID = CRM_Utils_Type::escape($_REQUEST['batchID'], 'String');
     $params = array('id' => $batchID);
-    
+
     $batchSummary = makeBatchSummary($batchID, $params);
 
     CRM_Utils_JSON::output($batchSummary);
@@ -533,9 +533,9 @@ class CRM_Financial_Page_AJAX {
    * @return array
    */
   public static function makeBatchSummary($batchID, $params) {
-  	$batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);
+    $batchInfo = CRM_Batch_BAO_Batch::retrieve($params, $value);
     $batchTotals = CRM_Batch_BAO_Batch::batchTotals(array($batchID));
-  	$batchSummary = array(
+    $batchSummary = array(
       'created_by' => CRM_Contact_BAO_Contact::displayName($batchInfo->created_id),
       'status' => CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'status_id', $batchInfo->status_id),
       'description' => $batchInfo->description,
@@ -549,4 +549,5 @@ class CRM_Financial_Page_AJAX {
 
     return $batchSummary;
   }
+
 }
