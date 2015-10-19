@@ -220,7 +220,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           /*
-           * This is a pseudo field to allow search for relationships 
+           * This is a pseudo field to allow search for relationships
            * that are expired or not yet started as well.
            */
           'is_valid' => array(
@@ -657,11 +657,11 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   }
 
   /**
-   * @param $valid bool - set to 1 if we are looking for a valid relationship, 0 if not 
+   * @param $valid bool - set to 1 if we are looking for a valid relationship, 0 if not
    *
    * @return array
    */
-  function buildValidityQuery($valid) {
+  public function buildValidityQuery($valid) {
     $clause = NULL;
     if ($valid == '1') {
       // We are asking that the dates are in the valid range
@@ -673,4 +673,5 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
     return $clause;
   }
+
 }
