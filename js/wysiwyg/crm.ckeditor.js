@@ -63,8 +63,8 @@
     
     function initialize() {
       var
-        browseUrl = CRM.config.userFrameworkResourceURL + "packages/kcfinder/browse.php?cms=civicrm",
-        uploadUrl = CRM.config.userFrameworkResourceURL + "packages/kcfinder/upload.php?cms=civicrm";
+        browseUrl = CRM.config.resourceBase + "packages/kcfinder/browse.php?cms=civicrm",
+        uploadUrl = CRM.config.resourceBase + "packages/kcfinder/upload.php?cms=civicrm";
 
       CKEDITOR.replace($(item)[0], {
         filebrowserBrowseUrl: browseUrl + '&type=files',
@@ -86,7 +86,7 @@
         initialize();
       } else {
         if (scriptLoaded === false) {
-          scriptLoaded = loadScript(CRM.config.userFrameworkResourceURL + 'bower_components/ckeditor/ckeditor.js');
+          scriptLoaded = loadScript(CRM.config.resourceBase + 'bower_components/ckeditor/ckeditor.js');
         }
         scriptLoaded.done(initialize);
       }
