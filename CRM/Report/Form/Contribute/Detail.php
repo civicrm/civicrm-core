@@ -673,7 +673,7 @@ UNION ALL
               $fld = $fldName;
             }
           }
-          $rest = $fld . " " . $order;
+          $rest = "{$fld} {$order}";
         }
         $orderClause[] = $aliases[$alias] . "_" . $rest;
       }
