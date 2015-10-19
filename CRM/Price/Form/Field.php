@@ -634,10 +634,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       if ($this->_fid) {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'weight', 'id');
       }
-      else {
-        //CRM-17396, fetch name from label only on adding price field, not on update
-        $params['name'] = CRM_Utils_String::titleToVar($params['label']);
-      }
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceField', $oldWeight, $params['weight'], $fieldValues);
     }
 
