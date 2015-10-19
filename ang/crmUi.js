@@ -601,7 +601,7 @@
 
           function init() {
             // TODO watch select2-options
-            element.select2(scope.crmUiSelect || {});
+            element.crmSelect2(scope.crmUiSelect || {});
             if (ngModel) {
               element.on('change', refreshModel);
               $timeout(ngModel.$render);
