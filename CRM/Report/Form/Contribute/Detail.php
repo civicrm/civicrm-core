@@ -668,7 +668,7 @@ UNION ALL
         $grp->table_name = $aliases[$alias];
         if ($grp->find()) {
           list($fld, $order) = explode(' ', $rest);
-          foreach($this->_columns[$aliases[$alias]]['fields'] as $fldName => $value) {
+          foreach ($this->_columns[$aliases[$alias]]['fields'] as $fldName => $value) {
             if ($value['name'] == $fld) {
               $fld = $fldName;
             }
