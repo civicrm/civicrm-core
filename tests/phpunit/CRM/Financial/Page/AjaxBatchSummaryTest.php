@@ -30,20 +30,21 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * Test for CRM_Financial_Page_Ajax class.
  */
 class CRM_Financial_Page_AjaxBatchSummaryTest extends CiviUnitTestCase {
-	/**
-	 * Test the makeBatchSummary function.
-	 *
-	 * We want to ensure changing the meethod of obtaining status and payment_instrument
-	 * does not cause any regression.
-	 */
-    public function testMakeBatchSummary() {
-    	$batch = $this->callAPISuccess('Batch', 'create', array('title' => 'test', 'status_id' => 'Open', 'payment_instrument_id' => 'Cash'));
+  /**
+   * Test the makeBatchSummary function.
+   *
+   * We want to ensure changing the method of obtaining status and payment_instrument
+   * does not cause any regression.
+   */
+  public function testMakeBatchSummary() {
+    $batch = $this->callAPISuccess('Batch', 'create', array('title' => 'test', 'status_id' => 'Open', 'payment_instrument_id' => 'Cash'));
 
-    	$batchID = $batch['id'];
-    	$params = array('id' => $batchID);
-    	$makeBatchSummary = CRM_Financial_Page_AJAX::makeBatchSummary($batchID,$params);
+    $batchID = $batch['id'];
+    $params = array('id' => $batchID);
+    $makeBatchSummary = CRM_Financial_Page_AJAX::makeBatchSummary($batchID, $params);
 
-    	$this->assertEquals('Open', $makeBatchSummary['status']);
-    	$this->assertEquals('Cash', $makeBatchSummary['payment_instrument']);
-    }
+    $this->assertEquals('Open', $makeBatchSummary['status']);
+    $this->assertEquals('Cash', $makeBatchSummary['payment_instrument']);
+  }
+
 }
