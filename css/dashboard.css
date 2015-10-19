@@ -95,16 +95,17 @@
 }
 
 #crm-container .widget-controls .crm-i {
-  font-size: 16px;
+  font-size: 14px;
   padding: 0 6px;
+  font-weight: normal;
   float: left;
-  border-radius: 2px;
   cursor: pointer;
   color: #222222;
+  opacity: .7;
 }
 
 #crm-container .widget-controls .crm-i:hover {
-  color: rgba(34, 34, 34, 0.8);
+  opacity: 1;
 }
 
 #crm-container .widget-controls .crm-i.fa-expand,
