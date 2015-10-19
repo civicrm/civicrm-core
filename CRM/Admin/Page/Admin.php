@@ -41,6 +41,8 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
    * @return string
    */
   public function run() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+
     $groups = array(
       'Customize Data and Screens' => ts('Customize Data and Screens'),
       'Communications' => ts('Communications'),

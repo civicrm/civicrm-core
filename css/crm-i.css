@@ -3,6 +3,7 @@ This is separate to avoid conflict with a site theme's implementation of FA.  It
 is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
 .ui-icon[class*=" fa-"],
 .crm-container a.helpicon,
+.crm-container .replace-plain:before,
 .crm-i {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;

@@ -41,6 +41,7 @@ class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
    * @return string
    */
   public function run() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 
     CRM_Utils_System::setTitle(ts("Configuration Checklist"));
     $this->assign('recentlyViewed', FALSE);
