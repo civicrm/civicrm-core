@@ -76,19 +76,19 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->_paymentProcessorId,
     );
     $contributionRecur = $this->callAPISuccess($this->_entity, 'create', $params);
-    
+
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
-    
+
     // Update amount
     $newParams = array(
       'id' => $result['id'],
       'amount' => '100',
     );
     $contributionRecur = $this->callAPISuccess($this->_entity, 'create', $newParams);
-    
+
     // Test get by contact id works.
     $contributionRecur = $this->callAPISuccess($this->_entity, 'get', array('contact_id' => $this->_individualId));
   }
@@ -144,13 +144,13 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
-  
+
   /**
    * Function tests creating recurring contribution record with custom data
    */
   public function testCreateWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
-    
+
     $params = array(
       'contact_id' => $this->_individualId,
       'installments' => '12',
@@ -170,7 +170,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
     ));
-    
+
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
   }

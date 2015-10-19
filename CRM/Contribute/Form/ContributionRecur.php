@@ -369,7 +369,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
    * @return None
    */
   public function postProcess() {
-    
+
     $session = CRM_Core_Session::singleton();
     if ($this->_action & CRM_Core_Action::DELETE) {
       // Delete the linked contributions
@@ -394,7 +394,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
     // get the required field value only.
     $formValues = $submittedValues;
     $ids = array();
-    
+
     if ($this->_contactID) {
       $params['contact_id'] = $this->_contactID;
     }

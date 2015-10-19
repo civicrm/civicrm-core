@@ -642,7 +642,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->_paymentProcessors = $this->getValidProcessors();
     $offlinePaymentProcessors = array();
-    foreach($this->_paymentProcessors as $key => $value) {
+    foreach ($this->_paymentProcessors as $key => $value) {
       $offlinePaymentProcessors[$value['id']] = $value['name'];
     }
     if ($this->_context == 'standalone') {
