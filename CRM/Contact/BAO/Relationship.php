@@ -942,7 +942,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       'version' => 3,
     ));
 
-    if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Relationship already exists') {
+    if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Duplicate Relationship') {
       throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
     }
 
