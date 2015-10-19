@@ -726,7 +726,6 @@ class CRM_Core_Resources {
     $editor = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'editor_id');
     $items[] = "js/wysiwyg/crm.wysiwyg.js";
     if ($editor == "CKEditor") {
-      $items[] = "bower_components/ckeditor/ckeditor.js";
       $items[] = "js/wysiwyg/crm.ckeditor.js";
       $ckConfig = CRM_Admin_Page_CKEditorConfig::getConfigUrl();
       if ($ckConfig) {
