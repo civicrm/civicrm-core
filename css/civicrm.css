@@ -3110,6 +3110,10 @@ div.m ul#civicrm-menu,
 .crm-container .crm-action-menu .select2-default span.select2-chosen {
   color: #2786C2;
 }
+.crm-container .select2-container[class*=" fa-"]:before {
+  display: none;
+}
+
 /* Restore this property otherwise our css overrides it */
 .select2-search input {
   box-sizing: border-box;
