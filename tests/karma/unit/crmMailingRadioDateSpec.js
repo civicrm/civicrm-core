@@ -87,24 +87,25 @@ describe('crmMailingRadioDate', function() {
       expect(element.find('.crm-form-time').timeEntry('getTime').getMinutes()).toBe(3);
 
       var now = new Date();
-      now.setDate(now.getDate() + 1);
       var month = '' + (now.getMonth() + 1);
-      var day = '' + now.getDate();
-      var year = now.getFullYear();
-      var hours = '' + now.getHours();
-      var minutes = '' + now.getMinutes();
+      var day = '' + (now.getDate() + 1);
+      var year = (now.getFullYear() + 1);
+      var hours = '03';
+      var minutes = '30';
       if (month.length < 2) month = '0' + month;
       if (day.length < 2) day = '0' + day;
       var datenow = [year, month, day].join('-');
       var time = [hours, minutes, "00"].join(':');
       var currentDate = datenow + ' ' + time;
-      var n = now.toDateString();
+      var ndate = new Date(datenow);
+      var n = ndate.toDateString();
       model.the_date = currentDate;
       $rootScope.$digest();
       expect($rootScope.myForm.$valid).toBe(true);
       expect(element.find('.radio-now').prop('checked')).toBe(false);
       expect(element.find('.radio-at').prop('checked')).toBe(true);
       expect(element.find('.crm-form-date').datepicker('getDate').toDateString()).toEqual(n);
+      expect(element.find('.crm-hidden-date').val()).toEqual(currentDate);
     });
 
     it('should update the model after changing the date and time', function() {
