@@ -385,10 +385,17 @@ if (!CRM.vars) CRM.vars = {};
       // add disabled property for option values
       $('option[value^=crm_disabled_opt]', this).attr('disabled', 'disabled');
 
-      // Placeholder icon
+      // Placeholder icon - total hack hikacking the escapeMarkup function but select2 3.5 dosn't have any other callbacks for this :(
       if ($el.is('[class*=fa-]')) {
-        iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
-        $el.removeClass(iconClass);
+        settings.escapeMarkup = function (m) {
+          var out = _.escape(m),
+            placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
+          if (m.length && placeholder === m) {
+            iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
+            out = '<i class="crm-i ' + iconClass + '"></i> ' + out;
+          }
+          return out;
+        };
       }
 
       // Defaults for single-selects
@@ -403,11 +410,6 @@ if (!CRM.vars) CRM.vars = {};
         $el.addClass('crm-ajax-select');
       }
       $el.select2(settings);
-      if (iconClass) {
-        window.setTimeout(function() {
-          $el.select2('container').find('span.select2-chosen').prepend('<i class="crm-i ' + iconClass + '"></i>&nbsp;');
-        }, 10);
-      }
     });
   };
 
