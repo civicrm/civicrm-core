@@ -219,6 +219,20 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             ),
             'type' => CRM_Utils_Type::T_INT,
           ),
+          /*
+           * This is a pseudo field to allow search for relationships 
+           * that are expired or not yet started as well.
+           */
+          'is_valid' => array(
+            'title' => ts('Relationship Dates Validity'),
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => array(
+              NULL => ts('- Any -'),
+              1 => ts('Not expired'),
+              0 => ts('Expired'),
+            ),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
           'relationship_type_id' => array(
             'title' => ts('Relationship'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
@@ -227,6 +241,14 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             ) +
             CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
+          ),
+          'start_date' => array(
+            'title' => ts('Start Date'),
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
+          'end_date' => array(
+            'title' => ts('End Date'),
+            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
         'grouping' => 'relation-fields',
@@ -420,13 +442,18 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                 }
               }
               else {
-
-                $clause = $this->whereClause($field,
-                  $op,
-                  CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                  CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-                );
+                if ($fieldName == "is_valid") {
+                  //We have a pseudofilter which we shall translate
+                  $clause = $this->buildValidityQuery(CRM_Utils_Array::value("{$fieldName}_value", $this->_params));
+                }
+                else {
+                  $clause = $this->whereClause($field,
+                    $op,
+                    CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
+                    CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
+                    CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                  );
+                }
               }
             }
           }
@@ -629,4 +656,21 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
   }
 
+  /**
+   * @param $valid bool - set to 1 if we are looking for a valid relationship, 0 if not 
+   *
+   * @return array
+   */
+  function buildValidityQuery($valid) {
+    $clause = NULL;
+    if ($valid == '1') {
+      // We are asking that the dates are in the valid range
+      $clause = "((start_date <= CURDATE() OR start_date is null) AND (end_date >= CURDATE() OR end_date is null))";
+    }
+    elseif ($valid == '0') {
+      // We are asking that the dates are outside the valid range.
+      $clause = "(start_date >= CURDATE() OR end_date < CURDATE())";
+    }
+    return $clause;
+  }
 }
