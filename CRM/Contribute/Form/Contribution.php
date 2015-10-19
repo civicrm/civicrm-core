@@ -641,13 +641,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->_paymentProcessors = $this->getValidProcessors();
-    if (!$this->_mode) {
-      $this->_mode = 'live';
+    $offlinePaymentProcessors = array();
+    foreach($this->_paymentProcessors as $key => $value) {
+      $offlinePaymentProcessors[$value['id']] = $value['name'];
     }
-    $this->assignProcessors();
     if ($this->_context == 'standalone') {
       $this->assign('showRecurringField', 1);
-      $this->assign('backOfficePaymentProcessors', json_encode($this->_recurPaymentProcessors));
+      $this->assign('backOfficePaymentProcessors', json_encode($offlinePaymentProcessors));
       $recurringContribution = $this->add('select', 'contribution_recur_id', ts('Recurring Contribution'), FALSE, NULL);
     }
     else {
@@ -656,8 +656,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // Get all backoffice payment processors
       if (!empty($existingRecurContributions)) {
         foreach ($existingRecurContributions as $ids => $recur) {
-          if (array_key_exists($recur['payment_processor_id'], $this->_recurPaymentProcessors)) {
-            $recurContributions[$ids] = CRM_Utils_Money::format($recur['amount']) . ' / ' . $this->_recurPaymentProcessors[$recur['payment_processor_id']] . ' / ' . CRM_Contribute_PseudoConstant::contributionStatus($recur['contribution_status_id']) . ' / ' . CRM_Utils_Date::customFormat($recur['start_date']);
+          if (array_key_exists($recur['payment_processor_id'], $offlinePaymentProcessors)) {
+            $recurContributions[$ids] = CRM_Utils_Money::format($recur['amount']) . ' / ' . $offlinePaymentProcessors[$recur['payment_processor_id']] . ' / ' . CRM_Contribute_PseudoConstant::contributionStatus($recur['contribution_status_id']) . ' / ' . CRM_Utils_Date::customFormat($recur['start_date']);
           }
         }
       }

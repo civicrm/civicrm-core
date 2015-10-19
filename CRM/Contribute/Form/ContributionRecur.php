@@ -369,7 +369,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
    * @return None
    */
   public function postProcess() {
-
+    
     $session = CRM_Core_Session::singleton();
     if ($this->_action & CRM_Core_Action::DELETE) {
       // Delete the linked contributions
@@ -393,9 +393,11 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
 
     // get the required field value only.
     $formValues = $submittedValues;
-    $params = $ids = array();
-
-    $params['contact_id'] = $this->_contactID;
+    $ids = array();
+    
+    if ($this->_contactID) {
+      $params['contact_id'] = $this->_contactID;
+    }
 
     $params['currency'] = CRM_Contribute_Form_AbstractEditPayment::getCurrency($submittedValues);
 
@@ -437,8 +439,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
 
     // build custom data getFields array
     $customFields = CRM_Core_BAO_CustomField::getFields('ContributionRecur', FALSE, FALSE, NULL, NULL, TRUE);
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      //$customFields,
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($_POST,
       $this->_id,
       'ContributionRecur'
     );
@@ -474,9 +475,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
 
   public function moveRecurringRecord($submittedValues) {
     // Move recurring record to another contact
-    if (!empty($submittedValues['selected_cid']) && $submittedValues['selected_cid'] != $this->_contactID) {
+    if (!empty($submittedValues['contact_id']) && $submittedValues['contact_id'] != $this->_contactID) {
 
-      $selected_cid = $submittedValues['selected_cid'];
+      $selected_cid = $submittedValues['contact_id'];
 
       // FIXME: Not getting the below value in $submittedValues
       // So taking the value from $_POST
@@ -486,7 +487,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Contribute_Form_Abstract
 
       // Update contact id in civicrm_contribution_recur table
       $recurring = new CRM_Contribute_BAO_ContributionRecur();
-      $recurring->$this->_id;
+      $recurring->id = $this->_id;
       if ($recurring->find(TRUE)) {
         $recurParams = (array) $recurring;
         $recurParams['contact_id'] = $selected_cid;
