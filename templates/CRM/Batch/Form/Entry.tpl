@@ -100,11 +100,12 @@
           {elseif $n eq 'soft_credit_type'}
             <div class="compressed crm-grid-cell">
               {$form.soft_credit_type.$rowNumber.html}
-              {$form.pcp_made_through_id.$rowNumber.label}&nbsp;{$form.pcp_made_through_id.$rowNumber.html}{$form.pcp_made_through.$rowNumber.html}
-              {$form.pcp_display_in_roll.$rowNumber.label}&nbsp;{$form.pcp_display_in_roll.$rowNumber.html}
-              {$form.pcp_roll_nickname.$rowNumber.label}&nbsp;{$form.pcp_roll_nickname.$rowNumber.html}
-              {$form.pcp_personal_note.$rowNumber.label}&nbsp;{$form.pcp_personal_note.$rowNumber.html}
             </div>
+          {elseif $n eq 'contribution_soft_credit_pcp_id'}
+            <div>{$form.pcp_made_through_id.$rowNumber.html}{$form.pcp_made_through.$rowNumber.html}</div>
+            <div>{$form.pcp_display_in_roll.$rowNumber.label}&nbsp;{$form.pcp_display_in_roll.$rowNumber.html}</div>
+            <div>{$form.pcp_roll_nickname.$rowNumber.label}&nbsp;{$form.pcp_roll_nickname.$rowNumber.html}</div>
+            <div>{$form.pcp_personal_note.$rowNumber.label}&nbsp;{$form.pcp_personal_note.$rowNumber.html}</div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
           {elseif $n eq 'total_amount'}
