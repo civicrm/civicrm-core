@@ -102,7 +102,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js', 1, 'html-header')
-      ->addScriptFile('civicrm', 'templates/CRM/Contribute/Form/PCP.js.tpl', 1, 'html-header')
       ->addSetting(array('batch' => array('type_id' => $this->_batchInfo['type_id'])))
       ->addSetting(array('setting' => array('monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator)))
       ->addSetting(array('setting' => array('monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint)));
@@ -307,6 +306,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $errors["soft_credit_amount[$key]"] = ts('Soft credit amount should not be greater than the total amount');
       }
 
+      // TODO: validate for PCP
+
       //membership type is required for membership batch entry
       if ($self->_batchInfo['type_id'] == $batchTypes['Membership']) {
         if (empty($value['membership_type'][1])) {
@@ -464,6 +465,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
           else {
             $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_OptionGroup::getDefaultValue("soft_credit_type");
+          }
+        }
+
+        // Build PCP params
+        if (!empty($params['pcp_made_through_id'][$key])) {
+          $value['pcp']['pcp_made_through_id'] = $params['pcp_made_through_id'][$key];
+          $value['pcp']['pcp_display_in_roll'] = !empty($params['pcp_display_in_roll'][$key]);
+          if (!empty($params['pcp_roll_nickname'][$key])) {
+            $value['pcp']['pcp_roll_nickname'] = $params['pcp_roll_nickname'][$key];
+          }
+          if (!empty($params['pcp_personal_note'][$key])) {
+            $value['pcp']['pcp_personal_note'] = $params['pcp_personal_note'][$key];
           }
         }
 
