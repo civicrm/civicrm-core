@@ -403,7 +403,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     // This is a solution to not throw fatal errors when there is a column in order-by, not present in select/display columns.
     foreach ($this->_orderByFields as $orderBy) {
       if (!array_key_exists($orderBy['name'], $this->_params['fields']) &&
-        empty($orderBy['section'])
+        empty($orderBy['section']) && (strpos($this->_select, $orderBy['dbAlias']) === FALSE)
       ) {
         $this->_select .= ", {$orderBy['dbAlias']} as {$orderBy['tplField']}";
       }
@@ -662,6 +662,19 @@ UNION ALL
       $orderClause = array();
       foreach ($this->_orderByArray as $clause) {
         list($alias, $rest) = explode('.', $clause);
+        // CRM-17280 -- In case, we are ordering by custom fields
+        // modify $rest to match the alias used for them in temp3 table
+        $grp = new CRM_Core_DAO_CustomGroup();
+        $grp->table_name = $aliases[$alias];
+        if ($grp->find()) {
+          list($fld, $order) = explode(' ', $rest);
+          foreach ($this->_columns[$aliases[$alias]]['fields'] as $fldName => $value) {
+            if ($value['name'] == $fld) {
+              $fld = $fldName;
+            }
+          }
+          $rest = "{$fld} {$order}";
+        }
         $orderClause[] = $aliases[$alias] . "_" . $rest;
       }
       $orderBy = (!empty($orderClause)) ? "ORDER BY " . implode(', ', $orderClause) : '';
