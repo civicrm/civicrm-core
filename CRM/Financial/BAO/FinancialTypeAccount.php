@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFinancialAccount {
 
@@ -107,12 +105,12 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    *
    */
   public static function del($financialTypeAccountId, $accountId = NULL) {
-    //checking if financial type is present
+    // check if financial type is present
     $check = FALSE;
     $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
 
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id');
-    //check dependencies
+    // check dependencies
     // FIXME more table containing financial_type_id to come
     $dependency = array(
       array('Contribute', 'Contribution'),
@@ -146,7 +144,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$accountId}"));
     }
 
-    //delete from financial Type table
+    // delete from financial Type table
     $financialType = new CRM_Financial_DAO_EntityFinancialAccount();
     $financialType->id = $financialTypeAccountId;
     $financialType->find(TRUE);

@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -56,14 +54,14 @@ class CRM_Financial_Page_AJAX {
     }
     else {
       $financialAccountType = array(
-        '5' => 5, //expense
-        '3' => 1, //AR relation
-        '1' => 3, //revenue
+        '5' => 5, // expense
+        '3' => 1, // AR relation
+        '1' => 3, // revenue
         '6' => 1, // asset
-        '7' => 4, //cost of sales
-        '8' => 1, //premium inventory
-        '9' => 3, //discount account is
-        '10' => 2, //sales tax liability
+        '7' => 4, // cost of sales
+        '8' => 1, // premium inventory
+        '9' => 3, // discount account is
+        '10' => 2, // sales tax liability
       );
       $financialAccountType = CRM_Utils_Array::value($_GET['_value'], $financialAccountType);
       $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
