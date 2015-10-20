@@ -128,25 +128,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->_defaults = array_merge($this->_defaults, $billingDefaults);
     }
 
-    //set custom field defaults set by admin if value is not set
-    if (!empty($this->_fields)) {
-      //load default campaign from page.
-      if (array_key_exists('contribution_campaign_id', $this->_fields)) {
-        $this->_defaults['contribution_campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values);
-      }
-
-      //set custom field defaults
-      foreach ($this->_fields as $name => $field) {
-        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
-          if (!isset($this->_defaults[$name])) {
-            CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $this->_defaults,
-              NULL, CRM_Profile_Form::MODE_REGISTER
-            );
-          }
-        }
-      }
-    }
-
     /*
      * hack to simplify credit card entry for testing
      *
@@ -223,6 +204,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
     }
 
+    $entityId = NULL;
     if ($this->_priceSetId) {
       if (($this->_useForMember && !empty($this->_currentMemberships)) || $this->_defaultMemTypeId) {
         $selectedCurrentMemTypes = array();
@@ -256,9 +238,30 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             }
           }
         }
+        $memtypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_defaults[$priceFieldName] , 'membership_type_id');
+        $entityId = CRM_Utils_Array::value('id', CRM_Member_BAO_Membership::getContactMembership($contactID, $memtypeID, NULL));
       }
       else {
         CRM_Price_BAO_PriceSet::setDefaultPriceSet($this, $this->_defaults);
+      }
+    }
+
+    //set custom field defaults set by admin if value is not set
+    if (!empty($this->_fields)) {
+      //load default campaign from page.
+      if (array_key_exists('contribution_campaign_id', $this->_fields)) {
+        $this->_defaults['contribution_campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->_values);
+      }
+
+      //set custom field defaults
+      foreach ($this->_fields as $name => $field) {
+        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
+          if (!isset($this->_defaults[$name])) {
+            CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $this->_defaults,
+              $entityId, CRM_Profile_Form::MODE_REGISTER
+            );
+          }
+        }
       }
     }
 
