@@ -306,8 +306,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $errors["soft_credit_amount[$key]"] = ts('Soft credit amount should not be greater than the total amount');
       }
 
-      // TODO: validate for PCP
-
       //membership type is required for membership batch entry
       if ($self->_batchInfo['type_id'] == $batchTypes['Membership']) {
         if (empty($value['membership_type'][1])) {
