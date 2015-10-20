@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class generates form components for Financial Account
- *
  */
 class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
@@ -49,8 +46,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     parent::preProcess();
@@ -76,8 +71,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -175,10 +168,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
   /**
    * Set default values for the form.
-   * the default values are retrieved from the database
-   *
-   *
-   * @return void
+   * the default values are retrieved from the database.
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
@@ -190,8 +180,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
   /**
    * Process the form submission.
-   *
-   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

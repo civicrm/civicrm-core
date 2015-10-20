@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -105,14 +103,6 @@ class CRM_Financial_BAO_ExportFormat {
   }
 
   /**
-   * Override this if appropriate.
-   * @return null
-   */
-  public function getTemplateFileName() {
-    return NULL;
-  }
-
-  /**
    * @return object
    */
   public static function &getTemplate() {
@@ -150,7 +140,7 @@ class CRM_Financial_BAO_ExportFormat {
 
   public function initiateDownload() {
     $config = CRM_Core_Config::singleton();
-    //zip files if more than one.
+    // zip files if more than one.
     if (count($this->_downloadFile) > 1) {
       $zip = $config->customFileUploadDir . 'Financial_Transactions_' . date('YmdHis') . '.zip';
       $result = $this->createZip($this->_downloadFile, $zip, TRUE);
@@ -204,7 +194,7 @@ class CRM_Financial_BAO_ExportFormat {
       $subject .= ' ' . ts('Count') . '[' . $values['item_count'] . '],';
     }
 
-    //create activity.
+    // create activity.
     $subject .= ' ' . ts('Batch') . '[' . $values['title'] . ']';
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
     $activityParams = array(
@@ -235,14 +225,14 @@ class CRM_Financial_BAO_ExportFormat {
    * @return bool
    */
   public function createZip($files = array(), $destination = NULL, $overwrite = FALSE) {
-    //if the zip file already exists and overwrite is false, return false
+    // if the zip file already exists and overwrite is false, return false
     if (file_exists($destination) && !$overwrite) {
       return FALSE;
     }
     $valid_files = array();
     if (is_array($files)) {
       foreach ($files as $file) {
-        //make sure the file exists
+        // make sure the file exists
         if (file_exists($file)) {
           $validFiles[] = $file;
         }
