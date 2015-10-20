@@ -6,13 +6,17 @@ set -e
 # "Protected by an electric fence and copyright control."
 # Thanks to Kleptones for moral support when writing this.
 
-# Make sure that you have distmaker.conf file
-# in the same directory containing following lines:
+# You need to ensure the following variables are defined. They are traditionally defined
+# in distmaker.conf but you can also defined them as an environment variable or by
+# calling the script with env DM_REF_CORE=4.7 (for example).
 #
 # DM_SOURCEDIR=/home/user/svn/civicrm           <- sources
 # DM_GENFILESDIR=/home/user/generated           <- generated files
 # DM_TMPDIR=/tmp                                <- temporary files (will be deleted afterwards)
 # DM_TARGETDIR=/tmp/outdir                      <- target dir for tarballs
+# DM_REF_CORE=master                            <- Git branch/tag name
+#
+# Optional variables
 # DM_PHP=/opt/php5/bin/php                      <- php5 binary
 # DM_RSYNC=/usr/bin/rsync                       <- rsync binary
 # DM_VERSION=trunk.r1234                        <- what the version number should be
@@ -34,6 +38,7 @@ source "$P/dists/common.sh"
 BPACK=0
 D5PACK=0
 D56PACK=0
+D7DIR=0
 J5PACK=0
 WP5PACK=0
 SK5PACK=0
@@ -52,26 +57,71 @@ display_usage()
   echo "  Backdrop       - generate Backdrop PHP5 module"
   echo "  Drupal|d5      - generate Drupal7 PHP5 module"
   echo "  Drupal6|d5.6   - generate Drupal6 PHP5 module"
+  echo "  d7_dir         - generate Drupal7 PHP5 module, but output to a directory, no tarball"
   echo "  Joomla|j5      - generate Joomla PHP5 module"
   echo "  WordPress|wp5  - generate Wordpress PHP5 module"
   echo "  sk             - generate Drupal StarterKit module"
   echo
   echo "You also need to have distmaker.conf file in place."
   echo "See distmaker.conf.dist for example contents."
+  echo "Alternatively you can set the required variables as "
+  echo "environment variables, eg. for your machine or by calling "
+  echo "this script using "
   echo
+  echo "env DM_TARGETDIR=/path/to/output/dir/for/files/or/tarball distmaker.sh all"
+  echo
+  echo "optional environmentals:"
+  echo "   DM_SOURCEDIR "
+  echo "   DM_GENFILESDIR (default $TMPDIR/genfiles)"
+  echo "   DM_TARGETDIR= (default $TMPDIR/civicrm)"
+  echo "   DM_OUTPUTDIR= (default $DM_TARGETDIR/civicrm_files)"
+  echo
+
 }
 
+THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 # Check if config is ok.
 check_conf()
 {
+  if [ -f $P/distmaker.conf ] ; then
+    source "$P/distmaker.conf"
+  fi
+
+  if [ -z $DM_SOURCEDIR ] ; then
+    DM_SOURCEDIR="$THIS_DIR/..";
+    echo "Setting source dir to $DM_SOURCEDIR";
+  fi
+
+  if [ -z $DM_TMPDIR ] && [ -e $TMPDIR ] ; then
+    DM_TMPDIR=$TMPDIR/civicrm
+  fi
+
+  if [ -z $DM_GENFILESDIR ] && [ -e $TMPDIR ] ; then
+    DM_GENFILESDIR=$TMPDIR/genfiles
+  fi
+
+  if [ -z $DM_PACKAGESDIR ] ; then
+    DM_PACKAGESDIR="$DM_SOURCEDIR/packages"
+  fi
+
+  if [ -z $DM_OUTPUTDIR ] ; then
+    DM_OUTPUTDIR="$DM_TARGETDIR/civicrm_files"
+  fi
+
   # Test for distmaker.conf file availability, cannot proceed without it anyway
-  if [ ! -f $P/distmaker.conf ] ; then
-    echo; echo "ERROR! No distmaker.conf file available!"; echo;
+  if [ -z $DM_GENFILESDIR ] || [ -z $DM_TMPDIR ] || [ -z $DM_TARGETDIR ]; then
+    echo; echo "Required variables not defined!"; echo;
     display_usage
+    echo "your variables"
+    echo "DM_SOURCEDIR : $DM_SOURCEDIR";
+    echo "DM_TARGETDIR : $DM_TARGETDIR (required)";
+    echo "DM_TMPDIR : $DM_TMPDIR";
+    echo "DM_GENFILESDIR : $DM_GENFILESDIR";
+    echo "DM_PACKAGESDIR : $DM_PACKAGESDIR";
+    echo "Current directory is : $THIS_DIR";
     exit 1
   else
-    source "$P/distmaker.conf"
     export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
     if [ ! -d "$DM_SOURCEDIR" ]; then
       echo; echo "ERROR! " DM_SOURCEDIR "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
@@ -85,15 +135,6 @@ check_conf()
         mkdir -p "$k"
       fi
     done
-  fi
-}
-
-# Check if PHP4 converstion happened
-check_php4()
-{
-  if [ ! $PHP4GENERATED = 1 ]; then
-    echo; echo "ERROR! Cannot package PHP4 version without running conversion!"; echo;
-    exit 1
   fi
 }
 
@@ -119,6 +160,12 @@ case $1 in
   d5|Drupal)
   echo; echo "Generating Drupal7 PHP5 module"; echo;
   D5PACK=1
+  ;;
+
+  # Drupal 7 - Output to directory
+  d7_dir)
+  echo; echo "Generating Drupal7 Directory"; echo;
+  D7DIR=1
   ;;
 
   # DRUPAL7 PHP5 StarterKit package
@@ -147,7 +194,7 @@ case $1 in
 
   # ALL
   all)
-  echo; echo "Generating all we've got."; echo;
+  echo; echo "Generating all the tarballs we've got (not the directories). "; echo;
   BPACK=1
   D5PACK=1
   D56PACK=1
@@ -167,7 +214,7 @@ esac
 
 ## Make sure we have the right branch or tag
 dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
-dm_git_checkout "$DM_SOURCEDIR/packages" "$DM_REF_PACKAGES"
+dm_git_checkout "$DM_PACKAGESDIR" "$DM_REF_PACKAGES"
 
 ## in theory, this shouldn't matter, but GenCode is CMS-dependent, and we've been doing our past builds based on D7
 GENCODE_CMS=
@@ -212,6 +259,12 @@ if [ "$D5PACK" = 1 ]; then
   echo; echo "Packaging for Drupal7, PHP5 version"; echo;
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
   bash $P/dists/drupal_php5.sh
+fi
+
+if [ "$D7DIR" = 1 ]; then
+  echo; echo "Packaging for Drupal7, Directory not tarball, PHP5 version"; echo;
+  dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
+  bash $P/dists/drupal7_dir_php5.sh
 fi
 
 if [ "$SKPACK" = 1 ]; then
