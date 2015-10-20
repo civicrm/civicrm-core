@@ -103,10 +103,11 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
+      $grantTypeId = empty($_POST['grant_type_id']) ? NULL : $_POST['grant_type_id'];
       $this->set('type', 'Grant');
-      $this->set('subType', CRM_Utils_Array::value('grant_type_id', $_POST));
+      $this->set('subType', $grantTypeId);
       $this->set('entityId', $this->_id);
-      CRM_Custom_Form_CustomData::preProcess($this);
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, $grantTypeId, 1, 'Grant', $this->_id);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
