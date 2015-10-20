@@ -4304,30 +4304,32 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     }
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
     // Handle custom fields for filters
-    $from = '';
-    $mapper = CRM_Core_BAO_CustomQuery::$extendsMap;
-    foreach ($query->_columns as $table => $prop) {
-      if (substr($table, 0, 13) == 'civicrm_value' ||
-        substr($table, 0, 12) == 'custom_value'
-      ) {
-        $extendsTable = $mapper[$prop['extends']];
-
-        // check field is in params
-        if (!$this->isFieldSelected($prop)) {
-          continue;
-        }
-        $baseJoin = CRM_Utils_Array::value($prop['extends'], $this->_customGroupExtendsJoin, "{$this->_aliases[$extendsTable]}.id");
-
-        $customJoin = is_array($this->_customGroupJoin) ? $this->_customGroupJoin[$table] : $this->_customGroupJoin;
-        $from .= " {$customJoin} {$table} {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$baseJoin}";
-        // handle for ContactReference
-        if (array_key_exists('fields', $prop)) {
-          foreach ($prop['fields'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value('dataType', $field) ==
-              'ContactReference'
+    if (!empty($this->_customGroupExtends)) {
+      $from = '';
+      $mapper = CRM_Core_BAO_CustomQuery::$extendsMap;
+      foreach ($query->_columns as $table => $prop) {
+        if (substr($table, 0, 13) == 'civicrm_value' ||
+            substr($table, 0, 12) == 'custom_value'
             ) {
-              $columnName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', CRM_Core_BAO_CustomField::getKeyID($fieldName), 'column_name');
-              $from .= " LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_aliases[$table]}.{$columnName} ";
+          $extendsTable = $mapper[$prop['extends']];
+
+          // check field is in params
+          if (!$this->isFieldSelected($prop)) {
+            continue;
+          }
+          $baseJoin = CRM_Utils_Array::value($prop['extends'], $this->_customGroupExtendsJoin, "{$this->_aliases[$extendsTable]}.id");
+
+          $customJoin = is_array($this->_customGroupJoin) ? $this->_customGroupJoin[$table] : $this->_customGroupJoin;
+          $from .= " {$customJoin} {$table} {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$baseJoin}";
+          // handle for ContactReference
+          if (array_key_exists('fields', $prop)) {
+            foreach ($prop['fields'] as $fieldName => $field) {
+              if (CRM_Utils_Array::value('dataType', $field) ==
+                  'ContactReference'
+                  ) {
+                $columnName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', CRM_Core_BAO_CustomField::getKeyID($fieldName), 'column_name');
+                $from .= " LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_aliases[$table]}.{$columnName} ";
+              }
             }
           }
         }

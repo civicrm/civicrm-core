@@ -433,6 +433,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->where();
     $this->groupBy();
     $this->getPermissionedFTQuery($this);
+    $this->customDataFrom();
 
     $rows = $contactIds = array();
     if (empty($this->_params['charts'])) {

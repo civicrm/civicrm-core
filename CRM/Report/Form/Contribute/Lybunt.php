@@ -431,6 +431,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->groupBy();
 
     $this->getPermissionedFTQuery($this);
+    $this->customDataFrom();
 
     $rows = $contactIds = array();
     if (empty($this->_params['charts'])) {
