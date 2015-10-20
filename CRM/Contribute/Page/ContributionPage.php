@@ -389,6 +389,8 @@ AND         cp.page_type = 'contribute'
    *   Unused parameter.
    */
   public function browse($action = NULL) {
+    Civi::resources()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
