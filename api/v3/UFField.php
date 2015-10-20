@@ -43,10 +43,15 @@
  *   Newly created $ufFieldArray
  */
 function civicrm_api3_uf_field_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('field_name', 'uf_group_id'));
-  $groupId = CRM_Utils_Array::value('uf_group_id', $params);
-  if ((int) $groupId < 1) {
-    throw new API_Exception('Params must be a field_name-carrying array and a positive integer.');
+  // CRM-14756: kind of a hack-ish fix. If the user gives the id, uf_group_id is retrieved and then set.
+  if(isset($params['id'])) {
+    $groupId = civicrm_api3('UFField', 'getvalue', array(
+      'return' => 'uf_group_id',
+      'id' => $params['id'],
+    ));
+  }
+  else {
+    $groupId = CRM_Utils_Array::value('uf_group_id', $params);
   }
 
   $field_type       = CRM_Utils_Array::value('field_type', $params);
@@ -106,6 +111,9 @@ function civicrm_api3_uf_field_create($params) {
  * @param array $params
  */
 function _civicrm_api3_uf_field_create_spec(&$params) {
+  $params['field_name']['api.required'] = TRUE;
+  $params['uf_group_id']['api.required'] = TRUE;
+
   $params['option.autoweight'] = array(
     'title' => "Auto Weight",
     'description' => "Automatically adjust weights in UFGroup to align with UFField",
