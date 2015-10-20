@@ -189,14 +189,11 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
           $formValues[$key] = array('IN' => $formValues[$key]);
         }
       }
-      elseif (($htmlType == 'TextArea' ||
+      elseif (stristr($formValues[$key], '%') && ($htmlType == 'TextArea' ||
           ($htmlType == 'Text' && $dataType == 'String')
-        ) &&
-        !((substr($formValues[$key], 0, 1) == '%') ||
-          (substr($formValues[$key], -1, 1) == '%')
         )
       ) {
-        $formValues[$key] = array('LIKE' => '%' . $formValues[$key] . '%');
+        $formValues[$key] = array('LIKE' => $formValues[$key]);
       }
     }
   }
