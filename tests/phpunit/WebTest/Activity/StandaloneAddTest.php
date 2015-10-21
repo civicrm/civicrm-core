@@ -162,6 +162,15 @@ class WebTest_Activity_StandaloneAddTest extends CiviSeleniumTestCase {
       ),
       "/label"
     );
+
+    //CRM-17395 -- Test Activity Report for Target Contact Filter
+    $this->openCiviPage('report/instance/3', 'reset=1', '_qf_Activity_submit');
+    $this->click("//a[contains(text(),'Filters')]");
+    $this->waitForElementPresent('contact_target_value');
+    $this->select('activity_date_time_relative', '- any -');
+    $this->type('contact_target_value', $firstName1);
+    $this->clickLink('_qf_Activity_submit');
+    $this->assertElementContainsText("//table[@class='report-layout display']/tbody/tr//td[@class='crm-report-civicrm_contact_contact_target']/a", "Anderson, {$firstName1}");
   }
 
   public function testAjaxCustomGroupLoad() {
