@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount {
 
@@ -121,7 +119,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @param int $financialAccountId
    */
   public static function del($financialAccountId) {
-    //checking if financial type is present
+    // checking if financial type is present
     $check = FALSE;
 
     //check dependencies
@@ -144,7 +142,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialAccount', "reset=1&action=browse"));
     }
 
-    //delete from financial Type table
+    // delete from financial Type table
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->id = $financialAccountId;
     $financialAccount->delete();

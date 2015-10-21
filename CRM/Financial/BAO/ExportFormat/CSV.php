@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -38,8 +36,12 @@
  */
 class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat {
 
-  // For this phase, we always output these records too so that there isn't data referenced in the journal entries that isn't defined anywhere.
-  // Possibly in the future this could be selected by the user.
+  /**
+   * For this phase, we always output these records too so that there isn't data
+   * referenced in the journal entries that isn't defined anywhere.
+   *
+   * Possibly in the future this could be selected by the user.
+   */
   public static $complementaryTables = array(
     'ACCNT',
     'CUST',
@@ -58,16 +60,13 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
   public function export($exportParams) {
     $export = parent::export($exportParams);
 
-    // Save the file in the public directory
+    // Save the file in the public directory.
     $fileName = self::putFile($export);
 
     foreach (self::$complementaryTables as $rct) {
       $func = "export{$rct}";
       $this->$func();
     }
-
-    // now do general journal entries
-    $this->exportTRANS();
 
     $this->output($fileName);
   }
@@ -241,15 +240,6 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    */
   public function getFileExtension() {
     return 'csv';
-  }
-
-  public function exportACCNT() {
-  }
-
-  public function exportCUST() {
-  }
-
-  public function exportTRANS() {
   }
 
 }

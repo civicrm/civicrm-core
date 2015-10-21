@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
  * This class generates form components for Financial Type
- *
  */
 class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   static $_links = NULL;
@@ -77,8 +74,6 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
-   *
-   * @return void
    */
   public function buildQuickForm() {
     if ($this->_batchStatusId == 2) {

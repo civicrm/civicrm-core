@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
 
@@ -144,7 +142,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     // tables to ingore checks for financial_type_id
     $ignoreTables = array('CRM_Financial_DAO_EntityFinancialAccount');
 
-    //TODO: if (!$financialType->find(true)) {
+    // TODO: if (!$financialType->find(true)) {
 
     // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
     $occurrences = $financialType->findReferences();
@@ -166,7 +164,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       }
     }
 
-    //delete from financial Type table
+    // delete from financial Type table
     $financialType->delete();
 
     $entityFinancialType = new CRM_Financial_DAO_EntityFinancialAccount();
