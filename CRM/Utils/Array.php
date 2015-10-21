@@ -1029,9 +1029,9 @@ class CRM_Utils_Array {
     $keys = array_keys($array, 1);
     if (count($keys) > 1 ||
       (count($keys) == 1 &&
-        (key($array) > 1 ||
-          is_string(key($array)) ||
-          (key($array) == 1 && $array[1] == 1) // handle (0 => 4), (1 => 1)
+        (current($keys) > 1 ||
+          is_string(current($keys)) ||
+          (current($keys) == 1 && $array[1] == 1) // handle (0 => 4), (1 => 1)
         )
       )
     ) {
