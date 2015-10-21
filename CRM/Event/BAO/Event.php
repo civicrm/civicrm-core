@@ -1674,6 +1674,10 @@ WHERE  id = $cfID
                 $query = new CRM_Contact_BAO_Query($params, $returnProperties, $fields);
                 $options = &$query->_options;
                 if (!$skip) {
+                  if ($dao->html_type == 'CheckBox') {
+                    $customVal = array_filter($customVal);
+                    $customVal = array_keys($customVal);
+                  }
                   $displayValue = CRM_Core_BAO_CustomField::getDisplayValue($customVal, $cfID, $options);
                 }
                 //Hack since we dont have function to check empty.
