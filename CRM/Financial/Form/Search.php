@@ -29,8 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ */
+
+/**
+ * @todo Add comments if possible.
  */
 class CRM_Financial_Form_Search extends CRM_Core_Form {
 
