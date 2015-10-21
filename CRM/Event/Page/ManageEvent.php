@@ -248,6 +248,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @return void
    */
   public function browse() {
+    Civi::resources()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
