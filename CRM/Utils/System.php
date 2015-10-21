@@ -1074,6 +1074,16 @@ class CRM_Utils_System {
   }
 
   /**
+   * Gives the first two parts of the version string E.g. 6.1
+   *
+   * @return string
+   */
+  public static function majorVersion() {
+    list($a, $b) = explode('.', self::version());
+    return "$a.$b";
+  }
+
+  /**
    * Determines whether a string is a valid CiviCRM version string.
    *
    * @param string $version
