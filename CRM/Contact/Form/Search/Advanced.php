@@ -360,8 +360,8 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
           }
           $this->_formValues[$element] = array('IN' => $value);
         }
-        else {
-          $this->_formValues[$element] = array('LIKE' => "%$value%");
+        elseif (strstr($value, '%')) {
+          $this->_formValues[$element] = array('LIKE' => $value);
         }
       }
     }
