@@ -192,15 +192,13 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @param array $params
    *   (reference) array containing the values submitted by the form.
-   * @param array $ids
-   *   Array containing the id.
    *
    * @return CRM_Core_BAO_UFField
-   *
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params) {
     // set values for uf field properties and save
     $ufField = new CRM_Core_DAO_UFField();
+    $ufField->copyValues($params);
     $ufField->field_type = $params['field_name'][0];
     $ufField->field_name = $params['field_name'][1];
 
@@ -221,24 +219,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     }
 
     $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
-    $ufField->listings_title = CRM_Utils_Array::value('listings_title', $params);
-    $ufField->visibility = CRM_Utils_Array::value('visibility', $params);
-    $ufField->help_pre = CRM_Utils_Array::value('help_pre', $params);
-    $ufField->help_post = CRM_Utils_Array::value('help_post', $params);
-    $ufField->label = CRM_Utils_Array::value('label', $params);
-    $ufField->is_required = CRM_Utils_Array::value('is_required', $params, FALSE);
-    $ufField->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $ufField->in_selector = CRM_Utils_Array::value('in_selector', $params, FALSE);
-    $ufField->is_view = CRM_Utils_Array::value('is_view', $params, FALSE);
-    $ufField->is_registration = CRM_Utils_Array::value('is_registration', $params, FALSE);
-    $ufField->is_match = CRM_Utils_Array::value('is_match', $params, FALSE);
-    $ufField->is_searchable = CRM_Utils_Array::value('is_searchable', $params, FALSE);
-    $ufField->is_multi_summary = CRM_Utils_Array::value('is_multi_summary', $params, FALSE);
-    $ufField->weight = CRM_Utils_Array::value('weight', $params, 0);
-
-    // need the FKEY - uf group id
-    $ufField->uf_group_id = CRM_Utils_Array::value('uf_group', $ids, FALSE);
-    $ufField->id = CRM_Utils_Array::value('uf_field', $ids, FALSE);
 
     return $ufField->save();
   }

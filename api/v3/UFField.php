@@ -44,7 +44,7 @@
  */
 function civicrm_api3_uf_field_create($params) {
   // CRM-14756: kind of a hack-ish fix. If the user gives the id, uf_group_id is retrieved and then set.
-  if(isset($params['id'])) {
+  if (isset($params['id'])) {
     $groupId = civicrm_api3('UFField', 'getvalue', array(
       'return' => 'uf_group_id',
       'id' => $params['id'],
@@ -95,7 +95,7 @@ function civicrm_api3_uf_field_create($params) {
   if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
     $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
   }
-  $ufField = CRM_Core_BAO_UFField::add($params, $ids);
+  $ufField = CRM_Core_BAO_UFField::add($params);
 
   $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($groupId, TRUE);
   CRM_Core_BAO_UFGroup::updateGroupTypes($groupId, $fieldsType);
