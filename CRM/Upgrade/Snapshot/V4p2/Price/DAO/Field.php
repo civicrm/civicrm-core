@@ -427,7 +427,6 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO {
    *
    * @param array $values
    *   (reference) the array up for enhancing.
-   * @return void
    */
   public static function addDisplayEnums(&$values) {
     $enumFields = &Snapshot_v4p2_Price_DAO_Field::getEnums();

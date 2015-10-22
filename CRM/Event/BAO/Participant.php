@@ -27,12 +27,8 @@
  */
 
 /**
- *
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
@@ -817,8 +813,6 @@ WHERE  civicrm_participant.id = {$participantId}
    *   (reference) the default values, some of which need to be resolved.
    * @param bool $reverse
    *   True if we want to resolve the values in the reverse direction (value -> name).
-   *
-   * @return void
    */
   public static function resolveDefaults(&$defaults, $reverse = FALSE) {
     self::lookupValue($defaults, 'event', CRM_Event_PseudoConstant::event(), $reverse);
@@ -827,8 +821,7 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * convert associative array names to values
-   * and vice-versa.
+   * Convert associative array names to values and vice-versa.
    *
    * This function is used by both the web form layer and the api. Note that
    * the api needs the name => value conversion, also the view layer typically
@@ -856,12 +849,12 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * Delete the record that are associated with this participation.
+   * Delete the records that are associated with this participation.
    *
    * @param int $id
    *   Id of the participation to delete.
    *
-   * @return void
+   * @return \CRM_Event_DAO_Participant
    */
   public static function deleteParticipant($id) {
     CRM_Utils_Hook::pre('delete', 'Participant', $id, CRM_Core_DAO::$_nullArray);
@@ -967,10 +960,7 @@ WHERE  civicrm_participant.id = {$participantId}
    * separated string before using fee_level in view mode.
    *
    * @param string $eventLevel
-   *   Event_leval string from db.
-   *
-   *
-   * @return void
+   *   Event_level string from db.
    */
   public static function fixEventLevel(&$eventLevel) {
     if ((substr($eventLevel, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR) &&

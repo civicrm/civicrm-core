@@ -40,9 +40,7 @@ class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base 
    * @param $preUpgradeMessage
    * @param string $rev
    *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
-   * @param null $currentVer
-   *
-   * @return void
+   * @param string $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.4.beta1') {
@@ -68,7 +66,6 @@ class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base 
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.4.1') {
@@ -352,11 +349,11 @@ ALTER TABLE civicrm_dashboard
   }
 
   /**
-   * @param $rev
-   * @param $originalVer
-   * @param $latestVer
+   * Upgrade script for 4.4.7.
    *
-   * @return void
+   * @param string $rev
+   * @param string $originalVer
+   * @param string $latestVer
    */
   public function upgrade_4_4_7($rev, $originalVer, $latestVer) {
     // For WordPress/Joomla(?), cleanup broken image_URL from 4.4.6 upgrades - https://issues.civicrm.org/jira/browse/CRM-14971
