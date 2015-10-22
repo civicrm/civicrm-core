@@ -904,6 +904,7 @@ WHERE  id = %1";
         // But, in the interests of being careful when capacity is low - avoiding the known default value
         // will get us by.
         // Crucially a test has been added so a better solution can be implemented later with some comfort.
+        // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
         if ($values['label'] != ts('Contribution Amount')) {
           $amount_level[] = $values['label'] . ' - ' . (float) $values['qty'];
         }
@@ -914,6 +915,7 @@ WHERE  id = %1";
     if ($totalParticipant > 0) {
       $displayParticipantCount = ' Participant Count -' . $totalParticipant;
     }
+    // @todo - stop setting amount level in this function & call the getAmountLevel function to retrieve it.
     if (!empty($amount_level) && !empty($displayParticipantCount)) {
       $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     }
@@ -929,6 +931,89 @@ WHERE  id = %1";
         $params['autoRenew'] = $autoRenew;
       }
     }
+  }
+
+  /**
+   * Get the text to record for amount level.
+   *
+   * @param array $params
+   *   Submitted parameters
+   *   - priceSetId is required to be set in the calling function
+   *     (we don't e-notice check it to enforce that - all payments DO have a price set - even if it is the
+   *     default one & this function asks that be set if it is the case).
+   *
+   * @return string
+   *   Text for civicrm_contribution.amount_level field.
+   */
+  public static function getAmountLevelText($params) {
+    $priceSetID = $params['priceSetId'];
+    $priceFieldSelection = self::filterPriceFieldsFromParams($priceSetID, $params);
+    $priceFieldMetadata = self::getCachedPriceSetDetail($priceSetID);
+    $displayParticipantCount = null;
+    $amount_level = array();
+    foreach ($priceFieldMetadata['fields'] as $field) {
+      if (!empty($priceFieldSelection[$field['id']])) {
+        if ($field['is_enter_qty']) {
+          $qtyString = ' - ' . (float) $params['price_' . $field['id']];
+        }
+        // We deliberately & specifically exclude contribution amount as it has a specific meaning.
+        // ie. it represents the default price field for a contribution. Another approach would be not
+        // to give it a label if we don't want it to show.
+        if ($field['label'] != ts('Contribution Amount')) {
+          $amount_level[] = $field['label'] . $qtyString;
+        }
+      }
+    }
+    return CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+  }
+
+  /**
+   * Get the fields relevant to the price field from the parameters.
+   *
+   * E.g we are looking for price_5 => 7 out of a big array of input parameters.
+   *
+   * @param int $priceSetID
+   * @param array $params
+   *
+   * @return array
+   *   Price fields found in the params array
+   */
+  public static function filterPriceFieldsFromParams($priceSetID, $params) {
+    $priceSet = self::getCachedPriceSetDetail($priceSetID);
+    $return = array();
+    foreach ($priceSet['fields'] as $field) {
+      if (!empty($params['price_' . $field['id']])) {
+        $return[$field['id']] = $params['price_' . $field['id']];
+      }
+    }
+    return $return;
+  }
+
+  /**
+   * Wrapper for getSetDetail with caching.
+   *
+   * We seem to be passing this array around in a painful way - presumably to avoid the hit
+   * of loading it - so lets make it callable with caching.
+   *
+   * Why not just add caching to the other function? We could do - it just seemed a bit unclear the best caching pattern
+   * & the function was already pretty fugly. Also, I feel like we need to migrate the interaction with price-sets into
+   * a more granular interaction - ie. retrieve specific data using specific functions on this class & have the form
+   * think less about the price sets.
+   *
+   * @param int $priceSetID
+   *
+   * @return array
+   */
+  public static function getCachedPriceSetDetail($priceSetID) {
+    $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID;
+    $cache = CRM_Utils_Cache::singleton();
+    $values = (array) $cache->get($cacheKey);
+    if (empty($values)) {
+      $data = self::getSetDetail($priceSetID);
+      $values = $data[$priceSetID];
+      $cache->set($cacheKey, $values);
+    }
+    return $values;
   }
 
   /**

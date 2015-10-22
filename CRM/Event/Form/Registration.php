@@ -1499,4 +1499,23 @@ WHERE  v.option_group_id = g.id
     }
   }
 
+  /**
+   * Get the amount level for the event payment.
+   *
+   * The amount level is the string stored on the contribution record that describes the purchase.
+   *
+   * @param array $params
+   * @param int|null $discountID
+   *
+   * @return string
+   */
+  protected function getAmountLevel($params, $discountID) {
+    // @todo move handling of discount ID to the BAO function - preferably by converting it to a price_set with
+    // time settings.
+    if (!empty($this->_values['discount'][$discountID])) {
+      return $this->_values['discount'][$discountID][$params['amount']]['label'];
+    }
+    return CRM_Price_BAO_PriceSet::getAmountLevelText($params);
+  }
+
 }
