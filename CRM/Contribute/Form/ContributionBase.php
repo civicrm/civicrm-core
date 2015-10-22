@@ -302,7 +302,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           CRM_Utils_Array::value('payment_processor', $this->_values)
         );
 
-        $this->assignPaymentProcessor();
+        $this->assignPaymentProcessor($isPayLater);
       }
 
       // get price info

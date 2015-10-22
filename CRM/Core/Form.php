@@ -93,12 +93,35 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Available payment processors (IDS).
    *
    * As part of trying to consolidate various payment pages we store processors here & have functions
-   * at this level to manage them.
+   * at this level to manage them. An alternative would be to have a separate Form that is inherited
+   * by all forms that allow payment processing.
    *
    * @var array
    *   An array of the IDS available on this form.
    */
   public $_paymentProcessorIDs;
+
+  /**
+   * Default or selected processor id.
+   *
+   * As part of trying to consolidate various payment pages we store processors here & have functions
+   * at this level to manage them. An alternative would be to have a separate Form that is inherited
+   * by all forms that allow payment processing.
+   *
+   * @var int
+   */
+  protected $_paymentProcessorID;
+
+  /**
+   * Is pay later enabled for the form.
+   *
+   * As part of trying to consolidate various payment pages we store processors here & have functions
+   * at this level to manage them. An alternative would be to have a separate Form that is inherited
+   * by all forms that allow payment processing.
+   *
+   * @var int
+   */
+  protected $_is_pay_later_enabled;
 
   /**
    * The renderer used for this form
@@ -657,15 +680,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * It would be good to sync it with the back-end function on abstractEditPayment & use one everywhere.
    *
+   * @param bool $is_pay_later_enabled
+   *
    * @throws \CRM_Core_Exception
    */
-  protected function assignPaymentProcessor() {
+  protected function assignPaymentProcessor($is_pay_later_enabled) {
     $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(
       array(ucfirst($this->_mode) . 'Mode'),
       $this->_paymentProcessorIDs
     );
 
     if (!empty($this->_paymentProcessors)) {
+      if ($is_pay_later_enabled) {
+        $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
+      }
       foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
         if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
         ) {
@@ -734,7 +762,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function preProcessPaymentOptions() {
     $this->_paymentProcessorID = NULL;
-    $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
     if ($this->_paymentProcessors) {
       if (!empty($this->_submitValues)) {
         $this->_paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $this->_submitValues);
