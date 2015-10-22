@@ -27,6 +27,11 @@
  */
 
 /**
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * Class CRM_Member_Tokens
  *
  * Generate "activity.*" tokens.
@@ -62,9 +67,9 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       return;
     }
 
-    // The join expression for activities needs some extra nuance to handle
-    // multiple revisions of the activity. Q: Could we simplify & move the
-    // extra AND clauses into `where(...)`?
+    // The joint expression for activities needs some extra nuance to handle.
+    // Multiple revisions of the activity.
+    // Q: Could we simplify & move the extra AND clauses into `where(...)`?
     $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
 
     $e->query->select('e.*'); // FIXME: seems too broad.

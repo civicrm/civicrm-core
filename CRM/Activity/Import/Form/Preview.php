@@ -42,14 +42,14 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
   public function preProcess() {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
-    //get the data from the session
+    // Get the data from the session.
     $dataValues = $this->get('dataValues');
     $mapper = $this->get('mapper');
     $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
     $mismatchCount = $this->get('unMatchCount');
 
-    //get the mapping name displayed if the mappingId is set
+    // Get the mapping name displayed if the mappingId is set.
     $mappingId = $this->get('loadMappingId');
     if ($mappingId) {
       $mapDAO = new CRM_Core_DAO_Mapping();

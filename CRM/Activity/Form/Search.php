@@ -326,7 +326,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     );
 
     if ($signupType) {
-      //$this->_formValues['activity_type_id'] = array();
       $this->_formValues['activity_role'] = 1;
       $this->_defaults['activity_role'] = 1;
       $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');

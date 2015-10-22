@@ -111,7 +111,7 @@ class CRM_Activity_BAO_ICalendar {
   }
 
   /**
-   * TODO: Is there a better way to do this?
+   * @todo Is there a better way to do this?
    * @return string
    */
   private function getPrimaryEmail() {

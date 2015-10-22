@@ -92,7 +92,7 @@ class CRM_Activity_Form_Task_AddToTag extends CRM_Activity_Form_Task {
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    //get the submitted values in an array
+    // Get the submitted values in an array.
     $params = $this->controller->exportValues($this->_name);
     $activityTags = $tagList = array();
 
