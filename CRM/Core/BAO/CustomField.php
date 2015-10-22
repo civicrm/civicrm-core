@@ -1214,8 +1214,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'AdvMulti-Select':
       case 'Multi-Select':
         if (is_array($value)) {
-          // CRM-12989 fix
-          CRM_Utils_Array::formatArrayKeys($value);
+          if ($html_type == 'CheckBox') {
+            // CRM-12989 fix
+            CRM_Utils_Array::formatArrayKeys($value);
+          }
 
           $checkedData = $value;
         }
