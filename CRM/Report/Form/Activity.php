@@ -668,6 +668,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     // fixme: add when required
     $tempQuery = "
   ALTER TABLE  civireport_activity_temp_target
+  MODIFY COLUMN civicrm_contact_contact_target_id VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_assignee VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_source VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_assignee_id VARCHAR(128),
