@@ -37,7 +37,6 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.6.alpha1') {

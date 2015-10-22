@@ -26,14 +26,12 @@
  */
 
 /**
- *
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
 
 /**
- * This class generates form components for processing Event
+ * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
@@ -48,11 +46,17 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   protected $_waitlistMsg = NULL;
   protected $_requireApprovalMsg = NULL;
 
+  /**
+   * Deprecated parameter that we hope to remove.
+   *
+   * @var bool
+   */
   public $_quickConfig = NULL;
 
   /**
-   * Allow developer to use hook_civicrm_buildForm()
-   * to override the registration dupe check
+   * Skip duplicate check.
+   *
+   * This can be set using hook_civicrm_buildForm() to override the registration dupe check.
    * CRM-7604
    */
   public $_skipDupeRegistrationCheck = FALSE;
@@ -60,12 +64,17 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_paymentProcessorID;
 
   /**
+   * Show fee block or not.
+   *
    * @var boolean determines if fee block should be shown or hidden
    */
   public $_noFees;
 
   /**
-   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
+   * Array of payment related fields to potentially display on this form (generally credit card or debit card fields).
+   *
+   * This is rendered via billingBlock.tpl.
+   *
    * @var array
    */
   public $_paymentFields = array();
@@ -266,6 +275,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * Build the form object.
+   *
+   * @return void
    */
   public function buildQuickForm() {
     // build profiles first so that we can determine address fields etc

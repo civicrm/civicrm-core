@@ -43,8 +43,6 @@ class CRM_Event_Form_EventFees {
    * Set variables up before form is built.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function preProcess(&$form) {
     //as when call come from register.php
@@ -69,10 +67,7 @@ class CRM_Event_Form_EventFees {
    * This function sets the default values for the form in edit/view mode
    * the default values are retrieved from the database
    *
-   *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function setDefaultValues(&$form) {
     $defaults = array();
@@ -259,7 +254,7 @@ class CRM_Event_Form_EventFees {
    * @param int $eventID
    * @param bool $includeQtyZero
    *
-   * @return void
+   * @return array
    */
   public static function setDefaultPriceSet($participantID, $eventID = NULL, $includeQtyZero = TRUE) {
     $defaults = array();
@@ -342,8 +337,6 @@ SELECT  id, html_type
    * Build the form object.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildQuickForm(&$form) {
     if ($form->_eventId) {

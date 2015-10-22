@@ -64,7 +64,13 @@ class CRM_Utils_Network {
   }
 
   /**
-   * Check whether a TCP service is available on $host and $port
+   * Check whether a TCP service is available on $host and $port.
+   *
+   * @param string $host
+   * @param string $port
+   * @param string $serverConnectionTimeOut
+   *
+   * @return bool
    */
   public static function checkService($host, $port, $serverConnectionTimeOut) {
     $old_error_reporting = error_reporting();

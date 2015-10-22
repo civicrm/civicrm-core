@@ -38,12 +38,12 @@ class CRM_Upgrade_Incremental_php_FourTwo extends CRM_Upgrade_Incremental_Base {
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $preUpgradeMessage
+   * @param string $preUpgradeMessage
    * @param string $rev
    *   a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'.
    * @param null $currentVer
    *
-   * @return void
+   * @return bool
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.2.alpha1') {
@@ -139,7 +139,6 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.2.beta5') {
