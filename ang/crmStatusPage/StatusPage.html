@@ -2,11 +2,7 @@
   <div crm-ui-debug="statuses"></div>
   <div crm-ui-debug="preferences"></div>
 
-  <form name="myForm" crm-ui-id-scope>
-
-    <div class="help">
-      <p>{{ts('Help messages will be displayed here')}}</p>
-    </div>
+  <form name="crm-system-status" crm-ui-id-scope>
 
     <div>
       <h1>Status Page</h1><br />
@@ -14,7 +10,9 @@
       <button ng-if="(path === '/status')" ng-click="navigator.redirect('#/status/hushed')">Show snoozed and hushed</button>
     </div>
     <div id="crm-status-list" ng-repeat="status in statuses.values track by status.name" >
-      <h3 class="crm-severity-{{status.severity}}">{{status.title}}
+      <h3 class="crm-severity-{{status.severity}}">
+        <i ng-if="status.icon" class="crm-i {{status.icon}}"></i>
+        {{status.title}}
         <span class="status-snooze-options" ng-show="status.snoozeOptions.show" style="display: inline-block">
           <div crm-snooze-options style="display: inline"></div>
         </span>
