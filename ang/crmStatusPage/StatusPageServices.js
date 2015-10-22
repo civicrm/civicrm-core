@@ -1,26 +1,10 @@
 (function(angular, $, _) {
 
-/**
- * get status messages
- * build snooze options object reconciled with preferences
- *
- */
-  angular.module('statuspage').service('statuspageStatusModel', function(crmApi, statuspageGetStatuses, statuspageGetPreferences){
-    return function() {
-      var statusModel = {
-        hushed: false,
-        getStatuses: statuspageGetStatuses,
-        getPreferences: statuspageGetPreferences,
-      };
-      statusModel.statuses = statusModel
-        .getStatuses(statusModel.hushed)
-          .then(function(result){
-            result.preferences = statuspageGetPreferences();
-            return result;
-          });
-    };
-  });
-
+ /**
+  * get status messages
+  * build snooze options object reconciled with preferences
+  *
+  */
   angular.module('statuspage').service('statuspageGetStatuses', function(crmApi, statuspageSeverityList) {
     return function(apiFilter) {
       return crmApi('System', 'check', apiFilter)
