@@ -13,24 +13,7 @@
 
       resolve: {
         statuses: function(statuspageGetStatuses) {
-          return statuspageGetStatuses({is_visible: 1});
-        },
-        statusModel: function(statuspageStatusModel) {
-          return statuspageStatusModel();
-        },
-        preferences: function(statuspageGetPreferences){
-          return statuspageGetPreferences();
-        }
-      }
-    });
-
-    $routeProvider.when('/status/hushed', {
-      controller: 'statuspageStatusPage',
-      templateUrl: '~/statuspage/StatusPage.html',
-
-      resolve: {
-        statuses: function(statuspageGetStatuses) {
-          return statuspageGetStatuses({is_visible: 0});
+          return statuspageGetStatuses({sequential: 1});
         },
         statusModel: function(statuspageStatusModel) {
           return statuspageStatusModel();

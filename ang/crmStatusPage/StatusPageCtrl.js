@@ -3,13 +3,9 @@
   // controller
 
   angular.module('statuspage').controller('statuspageStatusPage',
-    function($scope, $location, crmApi, crmStatus, crmUiHelp, statuses, crmNavigator, preferences) {
-    // The ts() and hs() functions help load strings for this module.
-    var ts = $scope.ts = CRM.ts('statuspage');
-    // var hs = $scope.hs = crmUiHelp({file: 'CRM/statuspage/StatusPage'}); // See: templates/CRM/statuspage/StatusPage.hlp
+    function($scope, crmApi, crmStatus, crmUiHelp, statuses, preferences) {
 
-    $scope.path = $location.path();
-    $scope.navigator = crmNavigator;
+    var ts = $scope.ts = CRM.ts();
     $scope.statuses = statuses;
     $scope.preferences = preferences;
     $scope.alert = CRM.alert;
@@ -33,7 +29,6 @@
       return  crmStatus(
         { start: ts('Saving Status Preference...')      , success: ts('Preference Saved') },
         crmApi('StatusPreference', 'create', {
-          "sequential": 1,
           "name": name,
           "ignore_severity": 0,
           "hush_until": ""
@@ -48,7 +43,6 @@
       return crmStatus(
         { status: ts('Saving Status Preference...')   , success: ts('Preference Saved') },
           crmApi('StatusPreference', 'create', {
-            "sequential": 1,
             "name": status.name,
             "ignore_severity": status.snoozeOptions.severity,
             "hush_until": status.snoozeOptions.until
