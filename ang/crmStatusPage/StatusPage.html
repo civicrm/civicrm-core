@@ -5,38 +5,46 @@
   <form name="crm-system-status" crm-ui-id-scope>
 
     <div>
-      <h1>Status Page</h1><br />
-      <button ng-if="(path === '/status/hushed')" ng-click="navigator.redirect('#/status')">Return home</button>
-      <button ng-if="(path === '/status')" ng-click="navigator.redirect('#/status/hushed')">Show snoozed and hushed</button>
+      <h1>Status Page</h1>
     </div>
-    <div id="crm-status-list" ng-repeat="status in statuses.values track by status.name" >
-      <h3 class="crm-severity-{{status.severity}}">
-        <i ng-if="status.icon" class="crm-i {{status.icon}}"></i>
-        {{status.title}}
-        <span class="status-snooze-options" ng-show="status.snoozeOptions.show" style="display: inline-block">
-          <div crm-snooze-options style="display: inline"></div>
-        </span>
-          <a  ng-if="(path === '/status')"  ng-click="showSnoozeOptions(status)" ng-show="!status.snoozeOptions.show" class="crm-hover-button" crm-icon="fa-clock-o" title="{{ts('Snooze')}}"></a>
-          <a ng-click="showSnoozeOptions(status)" ng-show="status.snoozeOptions.show" class="crm-hover-button" crm-icon="fa-times" style="display: inline" title="{{ts('Close')}}"></a>
-          <a ng-if="(path === '/status')" ng-click="hush(status.name, status.severity)" class="crm-hover-button" crm-icon="fa-bell-slash-o" title="{{ts('Hush')}}"></a>
-          <a ng-if="(path === '/status/hushed')" ng-click="unhush(status.name)" class="crm-hover-button" crm-icon="fa-bell-o" title="{{ts('Unhush And Unsnooze')}}"></a>
-      </h3>
-      <h4>
-        <div class="crm-block">
-          <div class="crm-group">
-            <div class="crm-status-message-body">
-              <span ng-bind-html="status.message | trusted"></span>
-              <a
-                ng-if="status.help"
-                class="helpicon"
-                ng-click="alert(status.help, status.title, 'info');"
-                href="javascript:void(0)"
-                >
-              </a>
+
+    <div crm-ui-tab-set>
+      <div
+        ng-repeat="tab in [{is_visible: 1, name: 'visible'}, {is_visible: 0, name: 'hidden'}]"
+        crm-ui-tab id="tab-{{tab.name}}"
+        crm-title="tab.is_visible ? ts('Active') : ts('Hushed/Snoozed')"
+        >
+        <div id="crm-status-list" ng-repeat="status in statuses.values | filter:{is_visible: tab.is_visible}" >
+          <h3 class="crm-severity-{{status.severity}}">
+            <i ng-if="status.icon" class="crm-i {{status.icon}}"></i>
+            {{status.title}}
+            <span class="status-snooze-options" ng-show="status.snoozeOptions.show" style="display: inline-block">
+              <div crm-snooze-options style="display: inline"></div>
+            </span>
+            <a  ng-if="status.is_visible"  ng-click="showSnoozeOptions(status)" ng-show="!status.snoozeOptions.show" class="crm-hover-button" crm-icon="fa-clock-o" title="{{ts('Snooze')}}"></a>
+            <a ng-click="showSnoozeOptions(status)" ng-show="status.snoozeOptions.show" class="crm-hover-button" crm-icon="fa-times" style="display: inline" title="{{ts('Close')}}"></a>
+            <a ng-if="status.is_visible" ng-click="hush(status.name, status.severity)" class="crm-hover-button" crm-icon="fa-bell-slash-o" title="{{ts('Hush')}}"></a>
+            <a ng-if="!status.is_visible" ng-click="unhush(status.name)" class="crm-hover-button" crm-icon="fa-bell-o" title="{{ts('Unhush And Unsnooze')}}"></a>
+          </h3>
+          <h4>
+            <div class="crm-block">
+              <div class="crm-group">
+                <div class="crm-status-message-body">
+                  <span ng-bind-html="status.message | trusted"></span>
+                  <a
+                    ng-if="status.help"
+                    class="helpicon"
+                    ng-click="alert(status.help, status.title, 'info');"
+                    href="javascript:void(0)"
+                    >
+                  </a>
+                </div>
+              </div>
             </div>
-          </div>
+          </h4><br/>
         </div>
-      </h4><br/>
+
+      </div>
     </div>
 
   </form>

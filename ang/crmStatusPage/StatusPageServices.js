@@ -29,7 +29,6 @@
           _.each(apiResults.values, function(status){
             status.severity_id = status.severity;
             status.severity = statuspageSeverityList[status.severity];
-            status.displayTitle = status.name+' - '+status.title +' - '+status.severity.toUpperCase();
             status.snoozeOptions = {
               show: false,
               severity: status.severity
