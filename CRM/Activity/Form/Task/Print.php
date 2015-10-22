@@ -69,9 +69,8 @@ class CRM_Activity_Form_Task_Print extends CRM_Activity_Form_Task {
    *    - displaying elements for saving the search
    */
   public function buildQuickForm() {
-    //
+
     // just need to add a javacript to popup the window for printing
-    //
     $this->addButtons(array(
         array(
           'type' => 'next',
@@ -85,13 +84,6 @@ class CRM_Activity_Form_Task_Print extends CRM_Activity_Form_Task {
         ),
       )
     );
-  }
-
-  /**
-   * Process the form after the input has been submitted and validated.
-   */
-  public function postProcess() {
-    // redirect to the main search page after printing is over
   }
 
 }

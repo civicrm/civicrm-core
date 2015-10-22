@@ -26,6 +26,11 @@
  */
 
 /**
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2015
+ */
+
+/**
  * This class provides the functionality to sms a group of contacts.
  */
 class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
@@ -58,7 +63,7 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    //enable form element
+    // Enable form element.
     $this->assign('SMSTask', TRUE);
     CRM_Contact_Form_Task_SMSCommon::buildQuickForm($this);
   }
