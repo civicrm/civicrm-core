@@ -273,7 +273,15 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   }
 
   /**
-   * @param $rows
+   * Initialise basic row.
+   *
+   * @param array $rows
+   *
+   * @param bool $entryFound
+   * @param array $row
+   * @param int $rowId
+   * @param int $rowNum
+   * @param array $types
    *
    * @return bool
    */

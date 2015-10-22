@@ -80,6 +80,7 @@ function civicrm_api3_generic_getList($apiRequest) {
  * @param string $entity
  * @param array $request
  * @param array $apiDefaults
+ * @param array $fields
  */
 function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults, $fields) {
   $config = CRM_Core_Config::singleton();

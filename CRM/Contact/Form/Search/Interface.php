@@ -48,7 +48,9 @@ interface CRM_Contact_Form_Search_Interface {
   public function buildTaskList(CRM_Core_Form_Search $form);
 
   /**
-   * Builds the quickform for this search
+   * Builds the quickform for this search.
+   *
+   * @param CRM_Core_Form $form
    */
   public function buildForm(&$form);
 

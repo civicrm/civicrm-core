@@ -48,6 +48,10 @@ class CRM_Event_Controller_Search extends CRM_Core_Controller {
 
   /**
    * Class constructor.
+   *
+   * @param string $title
+   * @param bool|int $action
+   * @param bool $modal
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
 

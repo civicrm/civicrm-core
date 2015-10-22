@@ -26,17 +26,12 @@
  */
 
 /**
- *
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing Event
- *
+ * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration extends CRM_Core_Form {
 
@@ -427,8 +422,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
    * Assign the minimal set of variables to the template.
-   *
-   * @return void
    */
   public function assignToTemplate() {
     //process only primary participant params
@@ -531,8 +524,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $id
    * @param string $name
    * @param bool $viewOnly
-   *
-   * @return void
    */
   public function buildCustom($id, $name, $viewOnly = FALSE) {
     if ($id) {
@@ -629,6 +620,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Initiate event fee.
+   *
    * @param CRM_Core_Form $form
    * @param int $eventID
    *
@@ -712,8 +705,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    * @param null $contribution
    * @param null $payment
-   *
-   * @return void
    */
   public function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {
     // add/update contact information
@@ -815,6 +806,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param CRM_Core_Form $form
    * @param int $contactID
+   *
    * @return \CRM_Event_BAO_Participant
    */
   public static function addParticipant(&$form, $contactID) {
@@ -915,19 +907,15 @@ WHERE  v.option_group_id = g.id
     return $participant;
   }
 
-  /* Calculate the total participant count as per params.
-   *
-   * @param array $params
-   *   User params.
-   *
-   * @return $totalCount total participant count.
-   */
   /**
+   * Calculate the total participant count as per params.
+   *
    * @param CRM_Core_Form $form
    * @param array $params
+   *   User params.
    * @param bool $skipCurrent
    *
-   * @return int|string
+   * @return int
    */
   public static function getParticipantCount(&$form, $params, $skipCurrent = FALSE) {
     $totalCount = 0;
@@ -1012,21 +1000,17 @@ WHERE  v.option_group_id = g.id
     return $totalCount;
   }
 
-  /* Format user submitted price set params.
+  /**
+   * Format user submitted price set params.
+   *
    * Convert price set each param as an array.
    *
+   * @param CRM_Core_Form $form
    * @param array $params
    *   An array of user submitted params.
    *
-   *
    * @return array
-   *   , formatted price set params.
-   */
-  /**
-   * @param CRM_Core_Form $form
-   * @param array $params
-   *
-   * @return mixed
+   *   Formatted price set params.
    */
   public static function formatPriceSetParams(&$form, $params) {
     if (!is_array($params) || empty($params)) {
@@ -1063,20 +1047,16 @@ WHERE  v.option_group_id = g.id
     return $params;
   }
 
-  /* Calculate total count for each price set options.
-   * those are currently selected by user.
+  /**
+   * Calculate total count for each price set options.
    *
-   * @param $form
+   * - currently selected by user.
+   *
+   * @param CRM_Core_Form $form
    *   Form object.
    *
-   *
    * @return array
-   *   , array of each option w/ count total.
-   */
-  /**
-   * @param $form
-   *
-   * @return array
+   *   array of each option w/ count total.
    */
   public static function getPriceSetOptionCount(&$form) {
     $params = $form->get('params');
@@ -1144,6 +1124,8 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * Check if template file exists.
+   *
    * @param string $suffix
    *
    * @return null|string
@@ -1165,6 +1147,8 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * Get template file name.
+   *
    * @return null|string
    */
   public function getTemplateFileName() {
@@ -1173,6 +1157,8 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * Override extra template name.
+   *
    * @return null|string
    */
   public function overrideExtraTemplateFileName() {
@@ -1184,7 +1170,7 @@ WHERE  v.option_group_id = g.id
    * Reset values for all options those are full.
    *
    * @param array $optionFullIds
-   * @param $form
+   * @param CRM_Core_Form $form
    */
   public static function resetElementValue($optionFullIds = array(), &$form) {
     if (!is_array($optionFullIds) ||
@@ -1253,6 +1239,8 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * Reset submitted value.
+   *
    * @param string $elementName
    * @param array $optionIds
    * @param CRM_Core_form $form
@@ -1298,8 +1286,9 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * Validate price set submitted params for price option limit,
-   * as well as user should select at least one price field option.
+   * Validate price set submitted params for price option limit.
+   *
+   * User should select at least one price field option.
    *
    * @param CRM_Core_Form $form
    * @param array $params
@@ -1433,7 +1422,9 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
-   * set the first participant ID if not set, CRM-10032
+   * Set the first participant ID if not set.
+   *
+   * CRM-10032.
    *
    * @param int $participantID
    */
@@ -1458,6 +1449,8 @@ WHERE  v.option_group_id = g.id
   }
 
   /**
+   * Check if event is valid.
+   *
    * @todo - combine this with CRM_Event_BAO_Event::validRegistrationRequest
    * (probably extract relevant values here & call that with them & handle bounces & redirects here -as
    * those belong in the form layer)
