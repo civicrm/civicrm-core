@@ -6,12 +6,13 @@
     function($scope, $location, crmApi, crmStatus, crmUiHelp, statuses, crmNavigator, preferences) {
     // The ts() and hs() functions help load strings for this module.
     var ts = $scope.ts = CRM.ts('statuspage');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/statuspage/StatusPage'}); // See: templates/CRM/statuspage/StatusPage.hlp
+    // var hs = $scope.hs = crmUiHelp({file: 'CRM/statuspage/StatusPage'}); // See: templates/CRM/statuspage/StatusPage.hlp
 
     $scope.path = $location.path();
     $scope.navigator = crmNavigator;
     $scope.statuses = statuses;
     $scope.preferences = preferences;
+    $scope.alert = CRM.alert;
 
     // will "hush" a status - gets the severity level of the status that is being hushed, and hushes all alerts for that check at and below the level of the current check
     $scope.hush = function(name, severity) {
