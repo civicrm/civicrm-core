@@ -72,7 +72,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->_apiversion = 3;
     $this->_individualId = $this->individualCreate();
-    $paymentProcessor = $this->processorCreate();
     $this->_params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -100,7 +99,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'currency' => 'USD',
       'financial_account_id' => 1,
-      'payment_processor' => $paymentProcessor->id,
+      'payment_processor' => $this->processorCreate(),
       'is_active' => 1,
       'is_allow_other_amount' => 1,
       'min_amount' => 10,

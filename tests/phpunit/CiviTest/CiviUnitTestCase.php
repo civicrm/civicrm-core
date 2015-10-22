@@ -1488,14 +1488,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Create Payment Processor.
    *
-   * @return CRM_Financial_DAO_PaymentProcessor
-   *   instance of Payment Processor
+   * @return int
+   *   Id Payment Processor
    */
   public function processorCreate() {
     $processorParams = array(
       'domain_id' => 1,
       'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
+      'payment_processor_type_id' => 'Dummy',
       'financial_account_id' => 12,
       'is_test' => TRUE,
       'is_active' => 1,
@@ -1503,8 +1503,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'url_site' => 'http://dummy.com',
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
+      'sequential' => 1,
     );
-    return CRM_Financial_BAO_PaymentProcessor::create($processorParams);
+    $processor = $this->callAPISuccess('PaymentProcessor', 'create', $processorParams);
+    return $processor['id'];
   }
 
   /**
@@ -1516,8 +1518,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *    Instance of Dummy Payment Processor
    */
   public function dummyProcessorCreate($processorParams = array()) {
-    $paymentProcessor = $this->processorCreate($processorParams);
-    return Civi\Payment\System::singleton()->getById($paymentProcessor->id);
+    $paymentProcessorID = $this->processorCreate($processorParams);
+    return Civi\Payment\System::singleton()->getById($paymentProcessorID);
   }
 
   /**

@@ -72,7 +72,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $this->_softIndividual2Id = $this->individualCreate();
     $this->_contributionId = $this->contributionCreate(array('contact_id' => $this->_individualId));
 
-    $paymentProcessor = $this->processorCreate();
+    $this->processorCreate();
     $this->_params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
