@@ -202,13 +202,12 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentOnline() {
 
-    $paymentProcessor = $this->processorCreate();
-    $pageParams['processor_id'] = $paymentProcessor->id;
+    $pageParams['processor_id'] = $this->processorCreate();
     $contributionPage = $this->contributionPageCreate($pageParams);
     $contributionParams = array(
       'contact_id' => $this->_contactID,
       'contribution_page_id' => $contributionPage['id'],
-      'payment_processor' => $paymentProcessor->id,
+      'payment_processor' => $pageParams['processor_id'],
       'financial_type_id' => 1,
     );
     $contributionID = $this->contributionCreate($contributionParams);
@@ -236,9 +235,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    * Check financial records for online Participant pay later scenario.
    */
   public function testPaymentPayLaterOnline() {
-
-    $paymentProcessor = $this->processorCreate();
-    $pageParams['processor_id'] = $paymentProcessor->id;
+    $pageParams['processor_id'] = $this->processorCreate();
     $pageParams['is_pay_later'] = 1;
     $contributionPage = $this->contributionPageCreate($pageParams);
     $contributionParams = array(

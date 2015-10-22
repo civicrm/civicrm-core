@@ -43,12 +43,11 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
     parent::setUp();
     $contactID = $this->individualCreate();
-    $paymentProcessor = $this->processorCreate();
     $this->params = array(
       'token' => "fancy-token-xxxx",
       'contact_id' => $contactID,
       'created_id' => $contactID,
-      'payment_processor_id' => $paymentProcessor->id,
+      'payment_processor_id' => $this->processorCreate(),
     );
   }
 
