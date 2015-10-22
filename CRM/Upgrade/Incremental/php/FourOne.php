@@ -60,8 +60,6 @@ class CRM_Upgrade_Incremental_php_FourOne {
    *   alterable.
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
-   *
-   * @return void
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.1.alpha1') {

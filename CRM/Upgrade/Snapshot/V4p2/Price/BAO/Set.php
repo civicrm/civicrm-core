@@ -764,8 +764,6 @@ WHERE  id = %1";
    * Build the price set form.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function buildPriceSet(&$form) {
     $priceSetId = $form->get('priceSetId');

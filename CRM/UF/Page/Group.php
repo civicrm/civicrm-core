@@ -379,9 +379,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param int $id
    *   Uf group id.
    *
-   * @param $action
-   *
-   * @return void
+   * @param int $action
    */
   public function preview($id, $action) {
     $controller = new CRM_Core_Controller_Simple('CRM_UF_Form_Preview', ts('CiviCRM Profile Group Preview'), NULL);

@@ -468,8 +468,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Core function that builds the form. We redefine this function
-   * here and expect all CRM forms to build their form in the function
+   * Core function that builds the form.
+   *
+   * We redefine this function here and expect all CRM forms to build their form in the function
    * buildQuickForm.
    */
   public function buildForm() {
@@ -523,7 +524,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add default Next / Back buttons
+   * Add default Next / Back buttons.
    *
    * @param array $params
    *   Array of associative arrays in the order in which the buttons should be
@@ -623,7 +624,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for title. Should be over-ridden by derived class
+   * Getter function for title.
+   *
+   * Should be over-ridden by derived class.
    *
    * @return string
    */
@@ -872,8 +875,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for renderer. If renderer is not set
-   * create one and initialize it
+   * Getter function for renderer.
+   *
+   * If renderer is not set create one and initialize it.
    *
    * @return object
    */
@@ -908,8 +912,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * A wrapper for getTemplateFileName that includes calling the hook to
-   * prevent us from having to copy & paste the logic of calling the hook
+   * A wrapper for getTemplateFileName.
+   *
+   * This includes calling the hook to prevent us from having to copy & paste the logic of calling the hook.
    */
   public function getHookedTemplateFileName() {
     $pageTemplateFile = $this->getTemplateFileName();
@@ -918,8 +923,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Default extra tpl file basically just replaces .tpl with .extra.tpl
-   * i.e. we dont override
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl.
+   *
+   * i.e. we do not override.
    *
    * @return string
    */
@@ -1759,6 +1765,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add a currency and money element to the form.
+   *
+   * @param string $name
+   * @param string $label
+   * @param bool $required
+   * @param null $attributes
+   * @param bool $addCurrency
+   * @param string $currencyName
+   * @param null $defaultCurrency
+   * @param bool $freezeCurrency
+   *
+   * @return \HTML_QuickForm_Element
    */
   public function addMoney(
     $name,
@@ -1920,7 +1937,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Helper function to verify that required fields have been filled.
+   *
    * Typically called within the scope of a FormRule function
+   *
+   * @param array $fields
+   * @param array $values
+   * @param array $errors
    */
   public static function validateMandatoryFields($fields, $values, &$errors) {
     foreach ($fields as $name => $fld) {
@@ -1991,6 +2013,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return is_numeric($userID) ? $userID : NULL;
   }
 
+  /**
+   * Get the contact id that the form is being submitted for.
+   *
+   * @return int|NULL
+   */
   public function getContactID() {
     return $this->setContactID();
   }

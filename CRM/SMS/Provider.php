@@ -92,7 +92,15 @@ abstract class CRM_SMS_Provider {
   abstract public function send($recipients, $header, $message, $dncID = NULL);
 
   /**
-   * Return message text. Child class could override this function to have better control over the message being sent.
+   * Return message text.
+   *
+   * Child class could override this function to have better control over the message being sent.
+   *
+   * @param string $message
+   * @param int $contactID
+   * @param array $contactDetails
+   *
+   * @return string
    */
   public function getMessage($message, $contactID, $contactDetails) {
     $html = $message->getHTMLBody();
@@ -102,8 +110,10 @@ abstract class CRM_SMS_Provider {
   }
 
   /**
-   * @param $fields
-   * @param $additionalDetails
+   * Get recipient details.
+   *
+   * @param array $fields
+   * @param array $additionalDetails
    *
    * @return mixed
    */

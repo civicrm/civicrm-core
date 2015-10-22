@@ -5557,8 +5557,8 @@ AND   displayRelType.is_active = 1
    *   depends on the operator and who's calling the query builder.
    * @param int $grouping
    *   the index where to place the where clause.
-   * @param $selectValues
-   *   The key value pairs for this element. This allows us to use this function for things besides option-value pairs.
+   * @param string $daoName
+   *   DAO Name.
    * @param array $field
    *   an array that contains various properties of the field identified by $name.
    * @param string $label

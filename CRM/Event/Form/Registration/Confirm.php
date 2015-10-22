@@ -26,17 +26,12 @@
  */
 
 /**
- *
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
- * This class generates form components for processing Event
- *
+ * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
@@ -58,7 +53,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * Set variables up before form is built.
    */
   public function preProcess() {
-
     parent::preProcess();
 
     // lineItem isn't set until Register postProcess
@@ -187,8 +181,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Overwrite action, since we are only showing elements in frozen mode
-   * no help display needed
+   * Overwrite action, since we are only showing elements in frozen mode no help display needed.
    *
    * @return int
    */
@@ -388,9 +381,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * @param $fields
-   * @param $files
-   * @param $self
+   * Apply form rule.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $self
    *
    * @return array|bool
    */
@@ -805,7 +800,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $participantNum = NULL;
             $participantNum = $participantID;
             if ($participantID == $registerByID) {
-              $participantNum = 0;  // is primary particpant
+              // This is the is primary participant.
+              $participantNum = 0;
             }
             else {
               if ($participantNum = array_search('participant', $copyParticipantCountLines)) {
@@ -955,12 +951,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @param CRM_Core_Form $form
    * @param array $params
-   * @param $result
+   * @param array $result
    * @param int $contactID
    * @param bool $pending
    * @param bool $isAdditionalAmount
    *
-   * @return void
+   * @return \CRM_Contribute_BAO_Contribution
    */
   public static function processContribution(
     &$form, $params, $result, $contactID,
@@ -1061,10 +1057,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * Fix the Location Fields.
    *
    * @param array $params
-   * @param $fields
+   * @param array $fields
    * @param CRM_Core_Form $form
-   *
-   * @return void
    */
   public static function fixLocationFields(&$params, &$fields, &$form) {
     if (!empty($form->_fields)) {
@@ -1110,10 +1104,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @param int $contactID
    * @param array $params
-   * @param $fields
+   * @param array $fields
    * @param CRM_Core_Form $form
    *
-   * @return void
+   * @return int
    */
   public static function updateContactFields($contactID, $params, $fields, &$form) {
     //add the contact to group, if add to group is selected for a
@@ -1205,7 +1199,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * @param $form
+   * Assign Profiles.
+   *
+   * @param CRM_Core_Form $form
    */
   public static function assignProfiles(&$form) {
     $participantParams = $form->_params;
