@@ -24,7 +24,16 @@
       <h4>
         <div class="crm-block">
           <div class="crm-group">
-            <div class="crm-status-message-body" ng-bind-html="status.message | trusted"></div>
+            <div class="crm-status-message-body">
+              <span ng-bind-html="status.message | trusted"></span>
+              <a
+                ng-if="status.help"
+                class="helpicon"
+                ng-click="alert(status.help, status.title, 'info');"
+                href="javascript:void(0)"
+                >
+              </a>
+            </div>
           </div>
         </div>
       </h4><br/>
