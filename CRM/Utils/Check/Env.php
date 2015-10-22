@@ -349,7 +349,6 @@ class CRM_Utils_Check_Env {
     $extensionSystem = CRM_Extension_System::singleton();
     $mapper = $extensionSystem->getMapper();
     $manager = $extensionSystem->getManager();
-    $remotes = $extensionSystem->getBrowser()->getExtensions();
 
     if ($extensionSystem->getDefaultContainer()) {
       $basedir = $extensionSystem->getDefaultContainer()->baseDir;
@@ -395,6 +394,43 @@ class CRM_Utils_Check_Env {
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1'))),
         ts('Extensions directory not writable'),
         \Psr\Log\LogLevel::ERROR
+      );
+      return $messages;
+    }
+
+    if (!$extensionSystem->getBrowser()->isEnabled()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkExtensions',
+        ts('Not checking remote URL for extensions since ext_repo_url is set to false.'),
+        ts('Extensions check disabled'),
+        \Psr\Log\LogLevel::NOTICE
+      );
+      return $messages;
+    }
+
+    try {
+      $remotes = $extensionSystem->getBrowser()->getExtensions();
+    }
+    catch (CRM_Extension_Exception $e) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkExtensions',
+        $e->getMessage(),
+        ts('Extension download error'),
+        \Psr\Log\LogLevel::ERROR
+      );
+      return $messages;
+    }
+
+    if (!$remotes) {
+      // CRM-13141 There may not be any compatible extensions available for the requested CiviCRM version + CMS. If so, $extdir is empty so just return a notice.
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkExtensions',
+        ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %1. If you want to install an extension which is not marked as compatible, you may be able to <a %2>download and install extensions manually</a> (depending on access to your web server).', array(
+          1 => CRM_Utils_System::majorVersion(),
+          2 => 'href="http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions"',
+        )),
+        ts('No Extensions Available for this Version'),
+        \Psr\Log\LogLevel::NOTICE
       );
       return $messages;
     }
@@ -449,10 +485,6 @@ class CRM_Utils_Check_Env {
     }
 
     // OK, return several data rows
-    // $returnValues = array(
-    //   array('status' => $return, 'message' => $msg),
-    // );
-
     $messages[] = new CRM_Utils_Check_Message(
       'checkExtensions',
       $msg,
