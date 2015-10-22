@@ -15,9 +15,6 @@
         statuses: function(statuspageGetStatuses) {
           return statuspageGetStatuses({sequential: 1});
         },
-        statusModel: function(statuspageStatusModel) {
-          return statuspageStatusModel();
-        },
         preferences: function(statuspageGetPreferences){
           return statuspageGetPreferences();
         }
