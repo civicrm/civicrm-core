@@ -370,6 +370,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param bool $test
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
+    // @todo remove this function (some or all) in favour or CRM_Financial_BAO_PaymentProcessor::create.
     $dao = new CRM_Financial_DAO_PaymentProcessor();
 
     $dao->id = $test ? $this->_testID : $this->_id;

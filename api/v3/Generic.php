@@ -350,6 +350,7 @@ function civicrm_api3_generic_getvalue($apiRequest) {
  * Get count of contact references.
  *
  * @param array $params
+ * @param array $apiRequest
  */
 function _civicrm_api3_generic_getrefcount_spec(&$params, $apiRequest) {
   $params['id']['api.required'] = 1;

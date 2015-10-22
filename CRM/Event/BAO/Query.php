@@ -58,8 +58,6 @@ class CRM_Event_BAO_Query {
    * Build select for CiviEvent.
    *
    * @param $query
-   *
-   * @return void
    */
   public static function select(&$query) {
     if (($query->_mode & CRM_Contact_BAO_Query::MODE_EVENT) ||

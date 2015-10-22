@@ -80,7 +80,10 @@ class WebTest_Utils_RedirectTest extends CiviUnitTestCase {
   }
 
   /**
+   * Try redirect.
    *
+   * @param string $input_url
+   * @param string $expected_url
    */
   private function tryRedirect($input_url, $expected_url) {
     // file_put_contents('php://stderr', $input_url . "\n", FILE_APPEND);
