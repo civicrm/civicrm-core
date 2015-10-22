@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
@@ -222,10 +220,11 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Delete the location block associated with an event,
-   * if not being used by any other event.
+   * Delete the location block associated with an event.
    *
-   * @param $locBlockId
+   * Function checks that it is not being used by any other event.
+   *
+   * @param int $locBlockId
    *   Location block id to be deleted.
    * @param int $eventId
    *   Event with which loc block is associated.
@@ -246,7 +245,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   }
 
   /**
-   * Get current/future Events
+   * Get current/future Events.
    *
    * @param int $all
    *   0 returns current and future events.
@@ -320,7 +319,6 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
 
   /**
    * Get events Summary.
-   *
    *
    * @return array
    *   Array of event summary values
@@ -911,8 +909,9 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * make a copy of a Event, including
-   * all the fields in the event Wizard
+   * Make a copy of a Event.
+   *
+   * Include all the fields in the event Wizard.
    *
    * @param int $id
    *   The event id to copy.
@@ -1030,8 +1029,9 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * This is sometimes called in a loop (during event search)
-   * hence we cache the values to prevent repeated calls to the db
+   * This is sometimes called in a loop (during event search).
+   *
+   * We cache the values to prevent repeated calls to the db.
    */
   public static function isMonetary($id) {
     static $isMonetary = array();
@@ -1045,8 +1045,9 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * This is sometimes called in a loop (during event search)
-   * hence we cache the values to prevent repeated calls to the db
+   * This is sometimes called in a loop (during event search).
+   *
+   * We cache the values to prevent repeated calls to the db.
    */
   public static function usesPriceSet($id) {
     static $usesPriceSet = array();
@@ -1057,15 +1058,13 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * Process that send e-mails
+   * Send e-mails.
    *
    * @param int $contactID
-   * @param $values
+   * @param array $values
    * @param int $participantId
    * @param bool $isTest
    * @param bool $returnMessageText
-   *
-   * @return void
    */
   public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
@@ -1260,8 +1259,6 @@ WHERE civicrm_event.is_active = 1
    * @param $isTest
    * @param bool $isCustomProfile
    * @param array $participantParams
-   *
-   * @return void
    */
   public static function buildCustomDisplay(
     $id,
@@ -1447,8 +1444,6 @@ WHERE civicrm_event.is_active = 1
    *   Formatted array of key value.
    *
    * @param array $profileFields
-   *
-   * @return void
    */
   public static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = array()) {
     if ($gid) {

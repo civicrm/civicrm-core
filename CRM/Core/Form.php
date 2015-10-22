@@ -229,11 +229,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
   }
 
+  /**
+   * Generate ID for some reason & purpose that is unknown & undocumented.
+   */
   public static function generateID() {
   }
 
   /**
-   * Add one or more css classes to the form
+   * Add one or more css classes to the form.
+   *
    * @param string $className
    */
   public function addClass($className) {
@@ -280,8 +284,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Simple easy to use wrapper around addElement. Deal with
-   * simple validation rules
+   * Simple easy to use wrapper around addElement.
+   *
+   * Deal with simple validation rules.
    *
    * @param string $type
    * @param string $name
@@ -291,7 +296,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $extra
    *   (attributes for select elements).
    *
-   * @return HTML_QuickForm_Element could be an error object
+   * @return HTML_QuickForm_Element
+   *   Could be an error object
    */
   public function &add(
     $type, $name, $label = '',
@@ -345,6 +351,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $name
    * @param string $label
+   *
    * @return HTML_QuickForm_Element
    */
   public function addMonthDay($name, $label) {
@@ -354,8 +361,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * called before buildForm. Any pre-processing that
-   * needs to be done for buildForm should be done here
+   * Preprocess form.
+   *
+   * This is called before buildForm. Any pre-processing that
+   * needs to be done for buildForm should be done here.
    *
    * This is a virtual function and should be redefined if needed.
    */
@@ -375,7 +384,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * just a wrapper, so that we can call all the hook functions
+   * Main process wrapper.
+   *
+   * Implemented so that we can call all the hook functions.
+   *
    * @param bool $allowAjax
    *   FIXME: This feels kind of hackish, ideally we would take the json-related code from this function.
    *                          and bury it deeper down in the controller
@@ -401,6 +413,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * The postProcess hook is typically called by the framework.
+   *
    * However in a few cases, the form exits or redirects early in which
    * case it needs to call this function so other modules can do the needful
    * Calling this function directly should be avoided if possible. In general a
@@ -468,8 +481,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Core function that builds the form. We redefine this function
-   * here and expect all CRM forms to build their form in the function
+   * Core function that builds the form.
+   *
+   * We redefine this function here and expect all CRM forms to build their form in the function
    * buildQuickForm.
    */
   public function buildForm() {
@@ -523,7 +537,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Add default Next / Back buttons
+   * Add default Next / Back buttons.
    *
    * @param array $params
    *   Array of associative arrays in the order in which the buttons should be
@@ -623,7 +637,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for title. Should be over-ridden by derived class
+   * Getter function for title.
+   *
+   * Should be over-ridden by derived class.
    *
    * @return string
    */
@@ -872,8 +888,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Getter function for renderer. If renderer is not set
-   * create one and initialize it
+   * Getter function for renderer.
+   *
+   * If renderer is not set create one and initialize it.
    *
    * @return object
    */
@@ -908,8 +925,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * A wrapper for getTemplateFileName that includes calling the hook to
-   * prevent us from having to copy & paste the logic of calling the hook
+   * A wrapper for getTemplateFileName.
+   *
+   * This includes calling the hook to prevent us from having to copy & paste the logic of calling the hook.
    */
   public function getHookedTemplateFileName() {
     $pageTemplateFile = $this->getTemplateFileName();
@@ -918,8 +936,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Default extra tpl file basically just replaces .tpl with .extra.tpl
-   * i.e. we dont override
+   * Default extra tpl file basically just replaces .tpl with .extra.tpl.
+   *
+   * i.e. we do not override.
    *
    * @return string
    */
@@ -1991,6 +2010,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return is_numeric($userID) ? $userID : NULL;
   }
 
+  /**
+   * Get the contact id that the form is being submitted for.
+   *
+   * @return int|NULL
+   */
   public function getContactID() {
     return $this->setContactID();
   }

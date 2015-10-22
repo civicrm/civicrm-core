@@ -36,12 +36,12 @@ class CRM_Upgrade_Incremental_php_FourThree extends CRM_Upgrade_Incremental_Base
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $preUpgradeMessage
+   * @param string $preUpgradeMessage
    * @param string $rev
    *   a version number, e.g. '4.3.alpha1', '4.3.beta3', '4.3.0'.
    * @param null $currentVer
    *
-   * @return void|bool
+   * @return bool
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.3.beta3') {
