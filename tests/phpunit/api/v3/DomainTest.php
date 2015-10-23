@@ -176,6 +176,29 @@ class api_v3_DomainTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test if Domain.create does not touch the version of the domain.
+   *
+   * See CRM-17430.
+   */
+  public function testUpdateDomainName() {
+    // First create a domain.
+    $domain_result = $this->callAPISuccess('domain', 'create', $this->params);
+    $domain_before = $this->callAPISuccess('Domain', 'getsingle', array('id' => $domain_result['id']));
+
+    // Change domain name.
+    $this->callAPISuccess('Domain', 'create', array(
+      'id' => $domain_result['id'],
+      'name' => 'B-Team domain',
+    ));
+
+    // Get domain again.
+    $domain_after = $this->callAPISuccess('Domain', 'getsingle', array('id' => $domain_result['id']));
+
+    // Version should still be the same.
+    $this->assertEquals($domain_before['version'], $domain_after['version']);
+  }
+
+  /**
    * Test civicrm_domain_create with empty params.
    *
    * Error expected.
