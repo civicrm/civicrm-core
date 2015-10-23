@@ -29,10 +29,12 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
+
+  /**
+   * Pre-process.
+   */
   public function preProcess() {
     parent::preProcess();
   }
@@ -85,7 +87,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
   }
 
   /**
-   * Display an introductory screen with any pre-upgrade messages
+   * Display an introductory screen with any pre-upgrade messages.
    */
   public function runIntro() {
     $upgrade = new CRM_Upgrade_Form();
