@@ -3,12 +3,20 @@
   // controller
 
   angular.module('statuspage').controller('statuspageStatusPage',
-    function($scope, crmApi, crmStatus, crmUiHelp, statuses, preferences) {
+    function($scope, crmApi, crmStatus, statusData, statuspageSeverityList) {
 
-    var ts = $scope.ts = CRM.ts();
-    $scope.statuses = statuses;
-    $scope.preferences = preferences;
-    $scope.alert = CRM.alert;
+      var ts = $scope.ts = CRM.ts();
+      $scope.alert = CRM.alert;
+      $scope.statuses = statusData.values;
+
+      _.each($scope.statuses, function(status) {
+        status.severity_id = status.severity;
+        status.severity = statuspageSeverityList[status.severity];
+        status.snoozeOptions = {
+          show: false,
+          severity: status.severity
+        };
+      });
 
     // will "hush" a status - gets the severity level of the status that is being hushed, and hushes all alerts for that check at and below the level of the current check
     $scope.hush = function(name, severity) {

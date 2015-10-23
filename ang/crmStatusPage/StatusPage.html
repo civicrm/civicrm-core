@@ -1,6 +1,5 @@
 <div class="crm-container">
   <div crm-ui-debug="statuses"></div>
-  <div crm-ui-debug="preferences"></div>
 
   <form name="crm-system-status" crm-ui-id-scope>
 
@@ -14,7 +13,7 @@
         crm-ui-tab id="tab-{{tab.name}}"
         crm-title="tab.is_visible ? ts('Active') : ts('Hushed/Snoozed')"
         >
-        <div id="crm-status-list" ng-repeat="status in statuses.values | filter:{is_visible: tab.is_visible}" >
+        <div id="crm-status-list" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
           <h3 class="crm-severity-{{status.severity}}">
             <i ng-if="status.icon" class="crm-i {{status.icon}}"></i>
             {{status.title}}
