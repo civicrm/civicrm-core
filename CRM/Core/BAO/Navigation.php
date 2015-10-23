@@ -486,6 +486,8 @@ ORDER BY parent_id, weight";
    * @param array $nodes
    *   Each key is a numeral; each value is a node in
    *   the menu tree (with keys "child" and "attributes").
+   * @param int $maxNavID
+   * @param int $parentID
    */
   private static function _fixNavigationMenu(&$nodes, &$maxNavID, $parentID) {
     $origKeys = array_keys($nodes);

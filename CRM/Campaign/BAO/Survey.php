@@ -301,6 +301,9 @@ SELECT  survey.id    as id,
 
   /**
    * Get Survey activity types.
+   *
+   * @param string $returnColumn
+   * @param bool $includePetitionActivityType
    */
   public static function getSurveyActivityType($returnColumn = 'label', $includePetitionActivityType = FALSE) {
     static $activityTypes;
@@ -914,6 +917,10 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
   /**
    * Decides the contact type for given survey.
+   *
+   * @param int $surveyId
+   *
+   * @return null|string
    */
   public static function getSurveyContactType($surveyId) {
     $contactType = NULL;

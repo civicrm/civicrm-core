@@ -1032,6 +1032,10 @@ WHERE civicrm_event.is_active = 1
    * This is sometimes called in a loop (during event search).
    *
    * We cache the values to prevent repeated calls to the db.
+   *
+   * @param int $id
+   *
+   * @return
    */
   public static function isMonetary($id) {
     static $isMonetary = array();

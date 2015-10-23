@@ -200,13 +200,17 @@ class WebTest_Member_OnlineMembershipCreateTest extends CiviSeleniumTestCase {
   }
 
   /**
+   * Test online membership signup.
+   *
    * @param int $pageId
    * @param int $memTypeId
    * @param string $firstName
    * @param string $lastName
-   * @param $payLater
-   * @param $hash
+   * @param bool $payLater
+   * @param string $hash
    * @param bool $otherAmount
+   * @param bool $amountSection
+   * @param bool $freeMembership
    */
   public function _testOnlineMembershipSignup($pageId, $memTypeId, $firstName, $lastName, $payLater, $hash, $otherAmount = FALSE, $amountSection = TRUE, $freeMembership = FALSE) {
     //Open Live Contribution Page

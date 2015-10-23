@@ -559,6 +559,11 @@ AND    u.status = 1
   }
 
   /**
+   * Get CMS root path.
+   *
+   * @param string $scriptFilename
+   *
+   * @return null|string
    */
   public function cmsRootPath($scriptFilename = NULL) {
     $cmsRoot = $valid = NULL;

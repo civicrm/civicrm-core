@@ -278,6 +278,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Append Drupal js to coreResourcesList.
+   *
+   * @param array $list
    */
   public function appendCoreResources(&$list) {
     $list[] = 'js/crm.drupal.js';
