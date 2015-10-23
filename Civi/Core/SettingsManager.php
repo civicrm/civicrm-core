@@ -339,8 +339,8 @@ class SettingsManager {
           'imageUploadDir' => '[civicrm.files]/persist/contribute/',
           'uploadDir' => '[civicrm.files]/upload/',
           'imageUploadURL' => '[civicrm.files]/persist/contribute/',
-          'extensionsDir' => '[civicrm.files]/extensions/',
-          'extensionsURL' => '[civicrm.files]/extensions/',
+          'extensionsDir' => '[civicrm.files]/ext/',
+          'extensionsURL' => '[civicrm.files]/ext/',
           'resourceBase' => '[civicrm.root]/',
           'userFrameworkResourceURL' => '[civicrm.root]/',
         );
