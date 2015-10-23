@@ -634,6 +634,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @param string $html
    *   Content for pdf in html format.
    *
+   * @param string $name
+   *
    * @return string
    *   Name of file which is in pdf format
    */

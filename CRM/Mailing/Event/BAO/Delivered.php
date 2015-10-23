@@ -85,6 +85,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Optional ID of a job to filter on.
    * @param bool $is_distinct
    *   Group by queue ID?.
+   * @param string $toDate
    *
    * @return int
    *   Number of rows in result set
@@ -150,6 +151,8 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Number of rows.
    * @param array $sort
    *   Sort array.
+   *
+   * @param int $is_test
    *
    * @return array
    *   Result set

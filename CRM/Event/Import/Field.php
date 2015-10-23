@@ -90,8 +90,9 @@ class CRM_Event_Import_Field {
   }
 
   /**
-   * The value is in string format. convert the value to the type of this field
-   * and set the field value with the appropriate type
+   * Convert the value to the type of this field and set the field value with the appropriate type.
+   *
+   * @param string $value
    */
   public function setValue($value) {
     $this->_value = $value;

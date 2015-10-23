@@ -154,6 +154,8 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
    * To perform a bulk lookup before rendering tokens, override this
    * function and return the prefetched data.
    *
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   *
    * @return mixed
    */
   public function prefetch(TokenValueEvent $e) {

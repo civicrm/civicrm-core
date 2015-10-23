@@ -150,8 +150,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * When a user accesses their dashboard for the first time, set up
    * the default dashlets.
    *
+   * @param bool $flatFormat
+   *
    * @return array
-   *   Array of dashboard_id's
+   *    Array of dashboard_id's
+   * @throws \CiviCRM_API3_Exception
    */
   public static function initializeDashlets($flatFormat = FALSE) {
     $dashlets = array();

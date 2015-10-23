@@ -137,6 +137,15 @@ class CRM_Utils_SoapServer {
 
   /**
    * MAILER API.
+   *
+   * @param string $key
+   * @param int $job
+   * @param int $queue
+   * @param string $hash
+   * @param string $body
+   *
+   * @return array|int
+   * @throws \SoapFault
    */
   public function mailer_event_bounce($key, $job, $queue, $hash, $body) {
     $this->verify($key);
@@ -152,10 +161,12 @@ class CRM_Utils_SoapServer {
   }
 
   /**
-   * @param $key
-   * @param $job
-   * @param $queue
-   * @param $hash
+   * Mailer event unsubscribe.
+   *
+   * @param string $key
+   * @param int $job
+   * @param int $queue
+   * @param string $hash
    *
    * @return array|int
    * @throws SoapFault

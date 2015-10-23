@@ -120,6 +120,10 @@ class SettingsMetadata {
 
   /**
    * Load up settings metadata from files.
+   *
+   * @param array $metaDataFolder
+   *
+   * @return array
    */
   protected static function loadSettingsMetadata($metaDataFolder) {
     $settingMetaData = array();

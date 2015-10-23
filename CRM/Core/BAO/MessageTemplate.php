@@ -125,6 +125,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    * @param bool $all
    *
+   * @param bool $isSMS
+   *
    * @return object
    */
   public static function getMessageTemplates($all = TRUE, $isSMS = FALSE) {

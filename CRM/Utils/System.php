@@ -510,6 +510,12 @@ class CRM_Utils_System {
   }
 
   /**
+   * Authenticate or abort.
+   *
+   * @param string $message
+   * @param bool $abort
+   *
+   * @return bool
    */
   public static function authenticateAbort($message, $abort) {
     if ($abort) {
@@ -753,6 +759,11 @@ class CRM_Utils_System {
 
   /**
    * Get a setting from a loaded PHP module.
+   *
+   * @param string $pModuleName
+   * @param string $pSetting
+   *
+   * @return mixed
    */
   public static function getModuleSetting($pModuleName, $pSetting) {
     $vModules = self::parsePHPModules();

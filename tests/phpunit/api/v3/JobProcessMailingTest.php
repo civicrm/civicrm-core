@@ -273,8 +273,11 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Create contacts in group.
+   *
    * @param int $count
    * @param int $groupID
+   * @param string $domain
    */
   public function createContactsInGroup($count, $groupID, $domain = 'nul.example.com') {
     for ($i = 1; $i <= $count; $i++) {

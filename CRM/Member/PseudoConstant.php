@@ -89,8 +89,10 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * @param string $column
    * @param bool $force
    *
+   * @param bool $allStatus
+   *
    * @return array
-   *   array reference of all membership statuss if any
+   *    array reference of all membership statuses if any
    */
   public static function &membershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE, $allStatus = FALSE) {
     if (self::$membershipStatus === NULL) {

@@ -3316,7 +3316,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
-   * @param $exists
+   * Assert the attachment exists.
+   *
+   * @param bool $exists
    * @param array $apiResult
    */
   protected function assertAttachmentExistence($exists, $apiResult) {

@@ -1966,6 +1966,10 @@ abstract class CRM_Utils_Hook {
 
   /**
    * This hook is called when a query string of the CSV Batch export is generated.
+   *
+   * @param string $query
+   *
+   * @return mixed
    */
   public static function batchQuery(&$query) {
     return self::singleton()->invoke(1, $query, self::$_nullObject,
@@ -1976,6 +1980,11 @@ abstract class CRM_Utils_Hook {
 
   /**
    * This hook is called when the entries of the CSV Batch export are mapped.
+   *
+   * @param array $results
+   * @param array $items
+   *
+   * @return mixed
    */
   public static function batchItems(&$results, &$items) {
     return self::singleton()->invoke(2, $results, $items,

@@ -356,7 +356,8 @@ class RecipientBuilder {
   }
 
   /**
-   * @param $actionSchedule
+   * Parse repetition interval.
+   *
    * @return int|string
    */
   protected function parseRepetitionInterval() {
@@ -411,8 +412,9 @@ class RecipientBuilder {
   }
 
   /**
-   * @param $actionSchedule
-   * @param $contactTableAlias
+   * Prepare language filter.
+   *
+   * @param string $contactTableAlias
    * @return string
    */
   protected function prepareLanguageFilter($contactTableAlias) {

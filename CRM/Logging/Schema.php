@@ -187,6 +187,8 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   /**
    * Drop triggers for all logged tables.
+   *
+   * @param string $tableName
    */
   public function dropTriggers($tableName = NULL) {
     $dao = new CRM_Core_DAO();

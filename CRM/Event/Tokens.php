@@ -89,10 +89,12 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
    *
    * @param \Civi\Token\TokenRow $row
    *   The record for which we want token values.
+   * @param string $entity
    * @param string $field
    *   The name of the token field.
    * @param mixed $prefetch
    *   Any data that was returned by the prefetch().
+   *
    * @return mixed
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {

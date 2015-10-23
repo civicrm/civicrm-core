@@ -94,6 +94,14 @@ class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_S
 
   /**
    * Construct the search query.
+   *
+   * @param int $offset
+   * @param int $rowcount
+   * @param string $sort
+   * @param bool $includeContactIDs
+   * @param bool $onlyIDs
+   *
+   * @return string
    */
   public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,

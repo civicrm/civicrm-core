@@ -107,6 +107,10 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   /**
    * Retrieve surveys for dashboard.
    *
+   * @param array $params
+   * @param bool $onlyCount
+   *
+   * @return array|int
    */
   public static function getSurveySummary($params = array(), $onlyCount = FALSE) {
     //build the limit and order clause.
@@ -860,6 +864,10 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
   /**
    * Retrieve survey associated profile id.
+   *
+   * @param int $surveyId
+   *
+   * @return mixed|null
    */
   public static function getSurveyProfileId($surveyId) {
     if (!$surveyId) {

@@ -79,6 +79,11 @@ class CRM_Utils_Number {
 
   /**
    * Some kind of numbery-looky-printy thing.
+   *
+   * @param string $size
+   * @param bool $checkForPostMax
+   *
+   * @return int
    */
   public static function formatUnitSize($size, $checkForPostMax = FALSE) {
     if ($size) {

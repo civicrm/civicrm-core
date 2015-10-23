@@ -267,6 +267,8 @@ class ResolverGlobalCallback {
   /**
    * Invoke function.
    *
+   * @param mixed $arg1
+   *
    * @return mixed
    */
   public function __invoke($arg1 = NULL) {

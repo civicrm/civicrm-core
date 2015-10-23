@@ -133,6 +133,8 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *   The schedule as configured by the administrator.
    * @param string $phase
    *   See, e.g., RecipientBuilder::PHASE_RELATION_FIRST.
+   * @param array $defaultParams
+   *
    * @return \CRM_Utils_SQL_Select
    * @see RecipientBuilder
    */
