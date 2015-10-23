@@ -1111,7 +1111,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Gives the first two parts of the version string E.g. 6.1
+   * Gives the first two parts of the version string E.g. 6.1.
    *
    * @return string
    */
@@ -1125,6 +1125,7 @@ class CRM_Utils_System {
    *
    * @param string $version
    *   Version string to be checked.
+   *
    * @return bool
    */
   public static function isVersionFormatValid($version) {
@@ -1157,6 +1158,11 @@ class CRM_Utils_System {
     return $headers;
   }
 
+  /**
+   * Get request headers.
+   *
+   * @return array|false
+   */
   public static function getRequestHeaders() {
     if (function_exists('apache_request_headers')) {
       return apache_request_headers();
@@ -1179,6 +1185,13 @@ class CRM_Utils_System {
         strtolower($_SERVER['HTTPS']) != 'off') ? TRUE : FALSE;
   }
 
+  /**
+   * Redirect to SSL.
+   *
+   * @param bool|FALSE $abort
+   *
+   * @throws \Exception
+   */
   public static function redirectToSSL($abort = FALSE) {
     $config = CRM_Core_Config::singleton();
     $req_headers = self::getRequestHeaders();
@@ -1488,7 +1501,7 @@ class CRM_Utils_System {
    * @param bool $loadUser
    *   Boolean load user or not.
    * @param bool $throwError
-   * @param $realPath
+   * @param string $realPath
    */
   public static function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     if (!is_array($params)) {
@@ -1569,6 +1582,7 @@ class CRM_Utils_System {
    * Given a URL, return a relative URL if possible.
    *
    * @param string $url
+   *
    * @return string
    */
   public static function relativeURL($url) {
@@ -1617,7 +1631,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Clean url, replaces first '&' with '?'
+   * Clean url, replaces first '&' with '?'.
    *
    * @param string $url
    *
@@ -1657,8 +1671,9 @@ class CRM_Utils_System {
   }
 
   /**
-   * Append the contents of an 'extra' smarty template file if it is present in
-   * the custom template directory. This does not work if there are
+   * Append the contents of an 'extra' smarty template file.
+   *
+   * It must be present in the custom template directory. This does not work if there are
    * multiple custom template directories
    *
    * @param string $fileName
@@ -1688,8 +1703,9 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get a list of all files that are found within the directories
-   * that are the result of appending the provided relative path to
+   * Get a list of all files that are found within the directories.
+   *
+   * Files must be the result of appending the provided relative path to
    * each component of the PHP include path.
    *
    * @author Ken Zalewski
@@ -1721,7 +1737,9 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get a list of all "plugins" (PHP classes that implement a piece of
+   * Get a list of all "plugins".
+   *
+   * (PHP classes that implement a piece of
    * functionality using a well-defined interface) that are found in a
    * particular CiviCRM directory (both custom and core are searched).
    *
@@ -1755,6 +1773,9 @@ class CRM_Utils_System {
     return $plugins;
   }
 
+  /**
+   * Execute scheduled jobs.
+   */
   public static function executeScheduledJobs() {
     $facility = new CRM_Core_JobManager();
     $facility->execute(FALSE);
@@ -1772,6 +1793,7 @@ class CRM_Utils_System {
    * Evaluate any tokens in a URL.
    *
    * @param string|FALSE $url
+   *
    * @return string|FALSE
    */
   public static function evalUrl($url) {
@@ -1825,6 +1847,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * Is in upgrade mode.
+   *
    * @return bool
    */
   public static function isInUpgradeMode() {
@@ -1849,6 +1873,7 @@ class CRM_Utils_System {
    *   - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
    *   - entity_table: string, eg "civicrm_contact"
    *   - entity_id: int
+   *
    * @return array|NULL
    *   NULL if unavailable, or an array. array has keys:
    *   - path: string
@@ -1891,6 +1916,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * Set http header.
+   *
    * @param string $name
    * @param string $value
    */

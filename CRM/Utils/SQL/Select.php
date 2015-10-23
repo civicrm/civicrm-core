@@ -145,6 +145,8 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   }
 
   /**
+   * Merge something or other.
+   *
    * @param CRM_Utils_SQL_Select $other
    * @param array|NULL $parts
    *   ex: 'joins', 'wheres'

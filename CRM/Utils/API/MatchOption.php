@@ -65,6 +65,8 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   private static $_singleton = NULL;
 
   /**
+   * Singleton function.
+   *
    * @return CRM_Utils_API_MatchOption
    */
   public static function singleton() {
