@@ -949,7 +949,7 @@ WHERE  id = %1";
     $priceSetID = $params['priceSetId'];
     $priceFieldSelection = self::filterPriceFieldsFromParams($priceSetID, $params);
     $priceFieldMetadata = self::getCachedPriceSetDetail($priceSetID);
-    $displayParticipantCount = null;
+    $displayParticipantCount = NULL;
     $amount_level = array();
     foreach ($priceFieldMetadata['fields'] as $field) {
       if (!empty($priceFieldSelection[$field['id']])) {
