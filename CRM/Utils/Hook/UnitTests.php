@@ -49,8 +49,10 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   }
 
   /**
-   * Use a unit-testing mock object to handle hook invocations
+   * Use a unit-testing mock object to handle hook invocations.
+   *
    * e.g. hook_civicrm_foo === $mockObject->foo()
+   *
    * @param object $mockObject
    */
   public function setMock($mockObject) {

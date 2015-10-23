@@ -660,6 +660,10 @@ class CRM_Core_CodeGen_Specification {
 
   /**
    * Sets the size property of a textfield.
+   *
+   * @param string $fieldXML
+   *
+   * @return null|string
    */
   protected function getSize($fieldXML) {
     // Extract from <size> tag if supplied

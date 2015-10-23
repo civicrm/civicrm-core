@@ -458,6 +458,10 @@ class CRM_Pledge_BAO_Query {
 
   /**
    * This includes any extra fields that might need for export etc.
+   *
+   * @param string $mode
+   *
+   * @return array|null
    */
   public static function extraReturnProperties($mode) {
     $properties = NULL;

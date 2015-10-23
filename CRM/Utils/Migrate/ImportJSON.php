@@ -36,13 +36,18 @@ class CRM_Utils_Migrate_ImportJSON {
 
   protected $_saveMapping;
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     $this->_lookupCache = array();
     $this->_saveMapping = array();
   }
 
   /**
-   * @param $file
+   * Run import.
+   *
+   * @param string $file
    */
   public function run($file) {
     $json = file_get_contents($file);

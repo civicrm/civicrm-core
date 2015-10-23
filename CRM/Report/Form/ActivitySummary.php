@@ -277,6 +277,11 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
+  /**
+   * Generate from clause.
+   *
+   * @param bool|FALSE $durationMode
+   */
   public function from($durationMode = FALSE) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -334,6 +339,11 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
   }
 
+  /**
+   * Generate where clause.
+   *
+   * @param bool|FALSE $durationMode
+   */
   public function where($durationMode = FALSE) {
     $optionGroupClause = '';
     if (!$durationMode) {

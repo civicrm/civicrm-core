@@ -271,7 +271,7 @@ class CRM_Utils_File {
    */
   public static function addTrailingSlash($path, $slash = NULL) {
     if (!$slash) {
-      // FIXME: Defaulting to backslash on windows systems can produce 
+      // FIXME: Defaulting to backslash on windows systems can produce
       // unexpected results, esp for URL strings which should always use forward-slashes.
       // I think this fn should default to forward-slash instead.
       $slash = DIRECTORY_SEPARATOR;
@@ -381,8 +381,11 @@ class CRM_Utils_File {
   }
 
   /**
-   * Remove the 32 bit md5 we add to the fileName
-   * also remove the unknown tag if we added it
+   * Remove the 32 bit md5 we add to the fileName also remove the unknown tag if we added it.
+   *
+   * @param $name
+   *
+   * @return mixed
    */
   public static function cleanFileName($name) {
     // replace the last 33 character before the '.' with null
@@ -519,6 +522,8 @@ HTACCESS;
 
   /**
    * Determine if a path is absolute.
+   *
+   * @param string $path
    *
    * @return bool
    *   TRUE if absolute. FALSE if relative.

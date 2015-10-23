@@ -2290,8 +2290,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    * Type and select first occurrence of autocomplete.
+   *
    * @param $fieldName
-   * @param $label
+   * @param string $labels
    * @param bool $multiple
    * @param bool $xpath
    */

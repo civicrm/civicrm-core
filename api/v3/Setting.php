@@ -144,6 +144,14 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
   );
 }
 
+/**
+ * Get options for settings.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ */
 function civicrm_api3_setting_getoptions($params) {
   $specs = CRM_Core_BAO_Setting::getSettingSpecification();
 

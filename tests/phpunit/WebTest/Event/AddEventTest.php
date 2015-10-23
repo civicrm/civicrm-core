@@ -965,7 +965,9 @@ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
   }
 
   /**
-   * @param $status
+   * Test enabling participant statuses.
+   *
+   * @param int $statusId
    */
   public function _testEnableParticipantStatuses($statusId) {
     // enable participant status

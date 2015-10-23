@@ -427,9 +427,12 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   }
 
   /**
-   * ************************************************
-   * Produces error message and returns from class
-   * *************************************************
+   * Produces error message and returns from class.
+   *
+   * @param int $errorCode
+   * @param string $errorMessage
+   *
+   * @return object
    */
   public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
