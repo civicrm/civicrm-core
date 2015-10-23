@@ -661,6 +661,7 @@
         restrict: 'EA',
         scope: {
           crmTitle: '@',
+          crmIcon: '@',
           count: '@',
           id: '@'
         },
@@ -845,8 +846,11 @@
     .directive('crmIcon', function() {
       return {
         restrict: 'EA',
-        scope: {},
         link: function (scope, element, attrs) {
+          if (element.is('[crm-ui-tab]')) {
+            // handled in crmUiTab ctrl
+            return;
+          }
           if (attrs.crmIcon.substring(0,3) == 'fa-') {
             $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '"></i> ');
           }

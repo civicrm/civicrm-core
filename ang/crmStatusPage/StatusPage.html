@@ -9,11 +9,12 @@
 
     <div crm-ui-tab-set>
       <div
-        ng-repeat="tab in [{is_visible: 1, name: 'visible'}, {is_visible: 0, name: 'hidden'}]"
+        ng-repeat="tab in [{is_visible: 1, name: 'visible', icon: 'fa-bell'}, {is_visible: 0, name: 'hidden', icon: 'fa-bell-slash-o'}]"
         crm-ui-tab
         id="tab-{{tab.name}}"
         count="{{_.where(statuses, {is_visible: tab.is_visible}).length}}"
         crm-title="tab.is_visible ? ts('Active') : ts('Hushed/Snoozed')"
+        crm-icon="{{tab.icon}}"
         >
         <div id="crm-status-list" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
           <h3 class="crm-severity-{{status.severity}}">
