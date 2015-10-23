@@ -10,7 +10,8 @@
     <div crm-ui-tab-set>
       <div
         ng-repeat="tab in [{is_visible: 1, name: 'visible'}, {is_visible: 0, name: 'hidden'}]"
-        crm-ui-tab id="tab-{{tab.name}}"
+        crm-ui-tab
+        id="tab-{{tab.name}}"
         crm-title="tab.is_visible ? ts('Active') : ts('Hushed/Snoozed')"
         >
         <div id="crm-status-list" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
@@ -22,8 +23,8 @@
             </span>
             <a  ng-if="status.is_visible"  ng-click="showSnoozeOptions(status)" ng-show="!status.snoozeOptions.show" class="crm-hover-button" crm-icon="fa-clock-o" title="{{ts('Snooze')}}"></a>
             <a ng-click="showSnoozeOptions(status)" ng-show="status.snoozeOptions.show" class="crm-hover-button" crm-icon="fa-times" style="display: inline" title="{{ts('Close')}}"></a>
-            <a ng-if="status.is_visible" ng-click="hush(status.name, status.severity)" class="crm-hover-button" crm-icon="fa-bell-slash-o" title="{{ts('Hush')}}"></a>
-            <a ng-if="!status.is_visible" ng-click="unhush(status.name)" class="crm-hover-button" crm-icon="fa-bell-o" title="{{ts('Unhush And Unsnooze')}}"></a>
+            <a ng-if="status.is_visible" ng-click="hush(status)" class="crm-hover-button" crm-icon="fa-bell-slash-o" title="{{ts('Hush')}}"></a>
+            <a ng-if="!status.is_visible" ng-click="unhush(status)" class="crm-hover-button" crm-icon="fa-bell-o" title="{{ts('Unhush And Unsnooze')}}"></a>
           </h3>
           <h4>
             <div class="crm-block">
