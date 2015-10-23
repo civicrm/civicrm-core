@@ -88,6 +88,11 @@ abstract class CRM_SMS_Provider {
 
   /**
    * Send an SMS Message via the API Server.
+   *
+   * @param array $recipients
+   * @param string $header
+   * @param string $message
+   * @param int $dncID
    */
   abstract public function send($recipients, $header, $message, $dncID = NULL);
 

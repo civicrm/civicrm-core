@@ -176,6 +176,8 @@ class CRM_Core_State {
 
   /**
    * Setter for name.
+   *
+   * @param string $name
    */
   public function setName($name) {
     $this->_name = $name;

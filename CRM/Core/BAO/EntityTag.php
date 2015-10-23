@@ -274,6 +274,11 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
 
   /**
    * Get contact tags.
+   *
+   * @param int $contactID
+   * @param bool $count
+   *
+   * @return array
    */
   public static function getContactTags($contactID, $count = FALSE) {
     $contactTags = array();

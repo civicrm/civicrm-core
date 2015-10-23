@@ -83,7 +83,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * Given an id, extract the formValues of the saved search
+   * Given an id, extract the formValues of the saved search.
    *
    * @param int $id
    *   The id of the saved search.
@@ -165,6 +165,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
+   * Get search parameters.
+   *
    * @param int $id
    *
    * @return array
@@ -210,6 +212,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
+   * Contact IDS Sql (whatever that means!).
+   *
    * @param int $id
    *
    * @return string
@@ -234,6 +238,8 @@ WHERE  $where";
   }
 
   /**
+   * Get from where email (whatever that means!).
+   *
    * @param int $id
    *
    * @return array
@@ -266,8 +272,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given a saved search compute the clause and the tables
-   * and store it for future use
+   * Given a saved search compute the clause and the tables and store it for future use.
    */
   public function buildClause() {
     $fv = unserialize($this->form_values);
@@ -291,6 +296,11 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     }
   }
 
+  /**
+   * Save the search.
+   *
+   * @param bool $hook
+   */
   public function save($hook = TRUE) {
     // first build the computed fields
     $this->buildClause();
@@ -321,6 +331,10 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   /**
    * Given a label and a set of normalized POST
    * formValues, create a smart group with that
+   *
+   * @param array $params
+   *
+   * @return \CRM_Contact_DAO_SavedSearch
    */
   public static function create(&$params) {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();
@@ -343,6 +357,13 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     return $savedSearch;
   }
 
+  /**
+   * Assign test value.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
     if ($fieldName == 'form_values') {
       // A dummy value for form_values.

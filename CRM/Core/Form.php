@@ -1550,6 +1550,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $entities
    * @param bool $default
    *   //CRM-15427.
+   * @param string $usedFor
    */
   public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes, $entities, $default = FALSE, $usedFor = NULL) {
     // Output widget
@@ -1777,6 +1778,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    *  Function that will add date and time.
+   *
+   * @param string $name
+   * @param string $label
+   * @param bool $required
+   * @param null $attributes
    */
   public function addDateTime($name, $label, $required = FALSE, $attributes = NULL) {
     $addTime = array('addTime' => TRUE);
@@ -1826,6 +1832,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Add currency element to the form.
+   *
+   * @param string $name
+   * @param null $label
+   * @param bool $required
+   * @param string $defaultCurrency
+   * @param bool $freezeCurrency
    */
   public function addCurrency(
     $name = 'currency',

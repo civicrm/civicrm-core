@@ -169,6 +169,10 @@ class TokenRow {
 
   /**
    * Auto-convert between different formats
+   *
+   * @param string $format
+   *
+   * @return $this
    */
   public function fill($format = NULL) {
     if ($format === NULL) {

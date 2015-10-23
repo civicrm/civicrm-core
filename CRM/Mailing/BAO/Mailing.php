@@ -1393,9 +1393,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
+   * Replace tokens.
    *
-   * get mailing object and replaces subscribeInvite,
-   * domain and mailing tokens
+   * Get mailing object and replaces subscribeInvite, domain and mailing tokens.
+   *
+   * @param array $mailing
    */
   public static function tokenReplace(&$mailing) {
     $domain = CRM_Core_BAO_Domain::getDomain();
@@ -1416,9 +1418,16 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
+   * Get data to resolve tokens.
    *
-   *  getTokenData receives a token from an email
-   *  and returns the appropriate data for the token
+   * @param array $token_a
+   * @param bool $html
+   * @param array $contact
+   * @param string $verp
+   * @param array $urls
+   * @param int $event_queue_id
+   *
+   * @return bool|mixed|null|string
    */
   private function getTokenData(&$token_a, $html = FALSE, &$contact, &$verp, &$urls, $event_queue_id) {
     $type = $token_a['type'];

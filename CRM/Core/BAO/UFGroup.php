@@ -273,8 +273,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param string $orderBy
    * @param null $orderProfiles
    *
+   * @param bool $eventProfile
+   *
    * @return array
-   *   the fields that belong to this ufgroup(s)
+   *   The fields that belong to this ufgroup(s)
+   * @throws \Exception
    */
   public static function getFields(
     $id,

@@ -67,15 +67,29 @@ interface CRM_Report_Interface {
   public function summary();
 
   /**
+   * Get contact IDs.
+   *
    * List of contact ids that match the current input parameters
    * Used by different tasks. Will be also used to optimize the
    * 'all' query below to avoid excessive LEFT JOIN blowup
+   *
+   * @param int $offset
+   * @param int $rowcount
+   * @param string $sort
+   *
+   * @return
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL);
 
   /**
-   * Retrieve all the values that match the current input parameters
-   * Used by the selector
+   * Retrieve all the values that match the current input parameters used by the selector.
+   *
+   * @param int $offset
+   * @param int $rowcount
+   * @param string $sort
+   * @param bool $includeContactIDs
+   *
+   * @return
    */
   public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
@@ -98,6 +112,8 @@ interface CRM_Report_Interface {
 
   /**
    * The where clause for the query.
+   *
+   * @param bool $includeContactIDs
    */
   public function where($includeContactIDs = FALSE);
 

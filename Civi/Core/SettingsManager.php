@@ -325,6 +325,8 @@ class SettingsManager {
    * during bootstrap -- in particular, defaults cannot be loaded. For a very small number of settings,
    * we must define defaults before the system bootstraps.
    *
+   * @param string $entity
+   *
    * @return array
    */
   private static function getSystemDefaults($entity) {
