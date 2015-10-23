@@ -40,6 +40,9 @@
  */
 class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     parent::__construct('membership', array(
       'fee' => ts('Membership Fee'),

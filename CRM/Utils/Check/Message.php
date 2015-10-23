@@ -66,6 +66,8 @@ class CRM_Utils_Check_Message {
   private $isVisible;
 
   /**
+   * Class constructor.
+   *
    * @param string $name
    *   Symbolic name for the check.
    * @param string $message
@@ -89,6 +91,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Get name.
+   *
    * @return string
    */
   public function getName() {
@@ -96,6 +100,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Get message.
+   *
    * @return string
    */
   public function getMessage() {
@@ -110,6 +116,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Get level.
+   *
    * @return string
    * @see Psr\Log\LogLevel
    */
@@ -126,7 +134,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
-   * Set optional additional help text
+   * Set optional additional help text.
+   *
    * @param string $help
    */
   public function addHelp($help) {
@@ -134,6 +143,8 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * Convert to array.
+   *
    * @return array
    */
   public function toArray() {
@@ -150,10 +161,20 @@ class CRM_Utils_Check_Message {
     return $array;
   }
 
+  /**
+   * Getter for is visible.
+   *
+   * @return bool
+   */
   public function isVisible() {
     return $this->isVisible;
   }
 
+  /**
+   * Seter for is visible.
+   *
+   * @param bool $isVisible
+   */
   public function setVisible($isVisible) {
     $this->isVisible = $isVisible ? 1 : 0;
   }

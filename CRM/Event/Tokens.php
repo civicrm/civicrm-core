@@ -40,6 +40,9 @@
  */
 class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
+  /**
+   * Class constructor.
+   */
   public function __construct() {
     parent::__construct('event', array(
       'event_type' => ts('Event Type'),
@@ -59,6 +62,13 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     ));
   }
 
+  /**
+   * Check something about being active.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   *
+   * @return bool
+   */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
     return

@@ -57,6 +57,11 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     );
   }
 
+  /**
+   * Get alias tokens.
+   *
+   * @return array
+   */
   protected function getAliasTokens() {
     return array(
       'id' => 'contribution_id',

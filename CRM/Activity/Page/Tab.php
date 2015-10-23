@@ -56,6 +56,11 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId);
   }
 
+  /**
+   * Edit tab.
+   *
+   * @return mixed
+   */
   public function edit() {
     // used for ajax tabs
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
