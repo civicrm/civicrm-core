@@ -12,11 +12,8 @@
       templateUrl: '~/statuspage/StatusPage.html',
 
       resolve: {
-        statuses: function(statuspageGetStatuses) {
-          return statuspageGetStatuses({sequential: 1});
-        },
-        preferences: function(statuspageGetPreferences){
-          return statuspageGetPreferences();
+        statusData: function(crmApi) {
+          return crmApi('System', 'check', {sequential: 1});
         }
       }
     });
