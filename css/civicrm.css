@@ -3482,6 +3482,7 @@ div.m ul#civicrm-menu,
   background: rgba(255,255,255,0.1);
   border: 1px solid #111;
   font-size: 11px;
+  color: #fff;
 }
 .crm-container div.ui-notify-message th {
   background: rgba(200,200,200,0.2);
