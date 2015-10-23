@@ -163,6 +163,7 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
   /**
    * Build the list of plugins ("modules" in CiviCRM terminology) to be processed for hooks.
+   *
    * We need to do this to preserve the CiviCRM hook signatures for hooks that require
    * a return value, since the WordPress Plugin API seems to be incompatible with them.
    *

@@ -1,6 +1,8 @@
 <?php
 /**
- *  File for the CRM_Utils_Cache_AllTests class
+ * @file
+ *
+ * File for the CRM_Utils_Cache_AllTests class
  *
  *  (PHP 5)
  *
