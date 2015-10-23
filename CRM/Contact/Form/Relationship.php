@@ -200,6 +200,11 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
+    // retrieve relation type id from post variables
+    if (!$this->_relationshipTypeId) {
+      $rType = explode('_', CRM_Utils_Array::value('relationship_type_id', $_POST));
+      $this->_relationshipTypeId = $rType[0];
+    }
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_relationshipTypeId, 1, 'Relationship', $this->_relationshipId);
