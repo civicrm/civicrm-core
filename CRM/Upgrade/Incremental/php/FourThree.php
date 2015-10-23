@@ -938,8 +938,13 @@ ALTER TABLE civicrm_financial_account
   }
 
   /**
-   * Read creation and modification times from civicrm_log; add
-   * them to civicrm_contact.
+   * Read creation and modification times from civicrm_log; add them to civicrm_contact.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param int $startId
+   * @param int $endId
+   *
+   * @return bool
    */
   public function convertTimestamps(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $sql = "
@@ -1072,6 +1077,10 @@ id IN (' . implode(',', $val) . ')';
   /**
    * Update financial_account_id for bad data in financial_trxn table.
    * CRM-12844
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
    */
   public function updateLineItemData(CRM_Queue_TaskContext $ctx) {
     $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,

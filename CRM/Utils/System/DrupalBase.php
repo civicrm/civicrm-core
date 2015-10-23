@@ -497,6 +497,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * Fixme: Why are we overriding the parent function? Seems inconsistent.
    * This version supplies slightly different params to $this->url (not absolute and html encoded) but why?
+   *
+   * @param string $action
+   *
+   * @return string
    */
   public function postURL($action) {
     if (!empty($action)) {

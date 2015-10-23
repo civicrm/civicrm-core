@@ -130,6 +130,8 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
   /**
    * Provide cached default currency symbol.
    *
+   * @param string $defaultCurrency
+   *
    * @return string
    */
   public static function defaultCurrencySymbol($defaultCurrency = NULL) {

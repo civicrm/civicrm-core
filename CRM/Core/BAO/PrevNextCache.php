@@ -164,10 +164,10 @@ WHERE  cacheKey     = %3 AND
       return FALSE;
     }
 
-    $sql  = "SELECT pn.* 
+    $sql  = "SELECT pn.*
       FROM  civicrm_prevnext_cache pn
-      WHERE 
-      ((pn.entity_id1 = %1 AND pn.entity_id2 = %2) OR (pn.entity_id1 = %2 AND pn.entity_id2 = %1)) AND 
+      WHERE
+      ((pn.entity_id1 = %1 AND pn.entity_id2 = %2) OR (pn.entity_id1 = %2 AND pn.entity_id2 = %1)) AND
       (cacheKey = %3 OR cacheKey = %4)";
     $params = array(
       1 => array($id1, 'Integer'),
@@ -196,11 +196,15 @@ WHERE  cacheKey     = %3 AND
   }
 
   /**
-   * @param $cacheKey
-   * @param NULL $join
-   * @param NULL $where
+   * Retrieve from prev-next cache.
+   *
+   * @param string $cacheKey
+   * @param string $join
+   * @param string $where
    * @param int $offset
    * @param int $rowCount
+   *
+   * @param array $select
    *
    * @return array
    */

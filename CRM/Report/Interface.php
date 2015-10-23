@@ -29,21 +29,20 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 interface CRM_Report_Interface {
 
   /**
    * The constructor gets the submitted form values.
    *
-   * @param $formValues
+   * @param array $formValues
    */
   public function __construct(&$formValues);
 
   /**
    * Builds the quickform for this search.
-   * @param $form
+   *
+   * @param CRM_Core_Form $form
    */
   public function buildForm(&$form);
 
@@ -55,13 +54,13 @@ interface CRM_Report_Interface {
    */
 
   /**
-   * Count of records that match the current input parameters
-   * Used by pager
+   * Count of records that match the current input parameters Used by pager.
    */
   public function count();
 
   /**
-   * Summary information for the query that can be displayed in the template
+   * Summary information for the query that can be displayed in the template.
+   *
    * This is useful to pass total / sub total information if needed
    */
   public function summary();
@@ -76,8 +75,6 @@ interface CRM_Report_Interface {
    * @param int $offset
    * @param int $rowcount
    * @param string $sort
-   *
-   * @return
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL);
 
@@ -88,8 +85,6 @@ interface CRM_Report_Interface {
    * @param int $rowcount
    * @param string $sort
    * @param bool $includeContactIDs
-   *
-   * @return
    */
   public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,

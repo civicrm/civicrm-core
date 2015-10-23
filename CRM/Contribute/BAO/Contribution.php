@@ -943,7 +943,10 @@ LEFT JOIN  civicrm_line_item i ON ( i.contribution_id = c.id AND i.entity_table 
    * payments is important for forensic and outreach reasons.
    *
    * @param int $contributionID
+   * @param int $contactID
    * @param string $message
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function failPayment($contributionID, $contactID, $message) {
     civicrm_api3('activity', 'create', array(
@@ -1246,7 +1249,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
          AND b.is_test = 0
          AND b.receive_date >= $startDate
          AND b.receive_date <  $endDate
-      $additionalWhere 
+      $additionalWhere
       GROUP BY currency
       ";
     $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
@@ -1947,9 +1950,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $contactContributionsSQL = "
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
-      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution' $liWhere 
-      WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} 
-      $additionalWhere 
+      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution' $liWhere
+      WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId}
+      $additionalWhere
       AND i.id IS NULL";
 
     $contactSoftCreditContributionsSQL = "
