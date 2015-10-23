@@ -3028,6 +3028,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *  $this->createLoggedInUser();
    *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
    *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
+   *
+   * @param bool $isProfile
    */
   public function setupACL($isProfile = FALSE) {
     global $_REQUEST;

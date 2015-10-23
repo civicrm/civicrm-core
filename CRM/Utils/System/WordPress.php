@@ -301,12 +301,18 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * FIXME: Do something
+   *
+   * @param string $message
    */
   public function setMessage($message) {
   }
 
   /**
    * FIXME: Do something
+   *
+   * @param \obj $user
+   *
+   * @return bool
    */
   public function loadUser($user) {
     return TRUE;

@@ -47,7 +47,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Event_BAO_ManageEvent
+   * @return CRM_Event_DAO_Event
    */
   public static function retrieve(&$params, &$defaults) {
     $event = new CRM_Event_DAO_Event();
@@ -80,8 +80,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   *
-   * @return object
+   * @return CRM_Event_DAO_Event
    */
   public static function add(&$params) {
     CRM_Utils_System::flushCache();
@@ -228,7 +227,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    *   Location block id to be deleted.
    * @param int $eventId
    *   Event with which loc block is associated.
-   *
    */
   public static function deleteEventLocBlock($locBlockId, $eventId = NULL) {
     $query = "SELECT count(ce.id) FROM civicrm_event ce WHERE ce.loc_block_id = $locBlockId";
@@ -596,7 +594,6 @@ $event_summary_limit
    *   Consider role for participant count.
    * @param bool $role consider counted( is filter role) participant.
    *   Consider counted( is filter role) participant.
-   *
    *
    * @return array
    *   array with count of participants for each event based on status/role
@@ -1032,6 +1029,10 @@ WHERE civicrm_event.is_active = 1
    * This is sometimes called in a loop (during event search).
    *
    * We cache the values to prevent repeated calls to the db.
+   *
+   * @param int $id
+   *
+   * @return bool
    */
   public static function isMonetary($id) {
     static $isMonetary = array();
@@ -1252,17 +1253,18 @@ WHERE civicrm_event.is_active = 1
   }
 
   /**
-   * Add the custom fields OR array of participant's
-   * profile info
+   * Add the custom fields OR array of participant's profile info.
    *
    * @param int $id
    * @param string $name
    * @param int $cid
-   * @param $template
+   * @param string $template
    * @param int $participantId
-   * @param $isTest
+   * @param bool $isTest
    * @param bool $isCustomProfile
    * @param array $participantParams
+   *
+   * @return array|null
    */
   public static function buildCustomDisplay(
     $id,
@@ -1709,7 +1711,7 @@ WHERE  id = $cfID
   }
 
   /**
-   * Build the array for Additional participant's information  array of priamry and additional Ids
+   * Build the array for Additional participant's information  array of primary and additional Ids.
    *
    * @param int $participantId
    *   Id of Primary participant.

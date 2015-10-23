@@ -259,6 +259,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   /**
    * returns the list of fields that can be imported.
    *
+   * @param bool $prefix
+   *
    * @return array
    */
   static function &import($prefix = FALSE) {
@@ -280,7 +282,9 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_LineItem extends CRM_Core_DAO {
   }
 
   /**
-   * returns the list of fields that can be exported.
+   * Returns the list of fields that can be exported.
+   *
+   * @param bool $prefix
    *
    * @return array
    */

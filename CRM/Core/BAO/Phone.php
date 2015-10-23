@@ -260,6 +260,10 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
 
   /**
    * Call common delete function.
+   *
+   * @param int $id
+   *
+   * @return bool
    */
   public static function del($id) {
     // Ensure mysql phone function exists

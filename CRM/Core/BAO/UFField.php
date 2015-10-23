@@ -378,6 +378,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * Find out whether given profile group using Activity
    * Profile fields with contact fields
+   *
+   * @param int $ufGroupId
+   *
+   * @return bool
    */
   public static function checkContactActivityProfileType($ufGroupId) {
     $ufGroup = new CRM_Core_DAO_UFGroup();

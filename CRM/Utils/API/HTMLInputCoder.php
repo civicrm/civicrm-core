@@ -56,7 +56,10 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
   }
 
   /**
-   * @return array<string> list of field names
+   * Get skipped fields.
+   *
+   * @return array<string>
+   *   list of field names
    */
   public function getSkipFields() {
     if ($this->skipFields === NULL) {

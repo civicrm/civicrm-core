@@ -431,6 +431,10 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Save DAO object.
+   *
+   * @param bool $hook
+   *
    * @return $this
    */
   public function save($hook = TRUE) {

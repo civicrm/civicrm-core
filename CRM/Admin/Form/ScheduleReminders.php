@@ -294,10 +294,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *
    * @param array $fields
    *   The input form values.
+   * @param array $files
    * @param CRM_Admin_Form_ScheduleReminders $self
    *
-   * @return bool|array
-   *   true if no errors, else array of errors
+   * @return array|bool
+   *   True if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();

@@ -880,6 +880,8 @@ LIMIT {$offset}, {$rowCount}
 
   /**
    * Swap contacts in a dupe pair i.e main with duplicate contact.
+   *
+   * @param int $prevNextId
    */
   public static function flipDupePairs($prevNextId = NULL) {
     if (!$prevNextId) {
@@ -887,7 +889,7 @@ LIMIT {$offset}, {$rowCount}
     }
     $query = "
       UPDATE civicrm_prevnext_cache cpc
-      INNER JOIN civicrm_prevnext_cache old on cpc.id = old.id 
+      INNER JOIN civicrm_prevnext_cache old on cpc.id = old.id
       SET cpc.entity_id1 = cpc.entity_id2, cpc.entity_id2 = old.entity_id1 ";
     if (is_array($prevNextId) && !CRM_Utils_Array::crmIsEmptyArray($prevNextId)) {
       $prevNextId = implode(', ', $prevNextId);

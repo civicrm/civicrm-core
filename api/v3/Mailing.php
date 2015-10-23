@@ -157,12 +157,25 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   }
 }
 
+/**
+ * Adjust metadata for clone spec action.
+ *
+ * @param array $spec
+ */
 function _civicrm_api3_mailing_clone_spec(&$spec) {
   $mailingFields = CRM_Mailing_DAO_Mailing::fields();
   $spec['id'] = $mailingFields['id'];
   $spec['id']['api.required'] = 1;
 }
 
+/**
+ * Clone mailing.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \CiviCRM_API3_Exception
+ */
 function civicrm_api3_mailing_clone($params) {
   $BLACKLIST = array(
     'id',

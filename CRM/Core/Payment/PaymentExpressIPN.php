@@ -432,8 +432,11 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * Converts the comma separated name-value pairs in <TxnData2>
-   * to an array of values.
+   * Converts the comma separated name-value pairs in <TxnData2> to an array of values.
+   *
+   * @param string $str
+   *
+   * @return array
    */
   public static function stringToArray($str) {
     $vars = $labels = array();
