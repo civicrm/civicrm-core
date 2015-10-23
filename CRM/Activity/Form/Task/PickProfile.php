@@ -57,10 +57,8 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
 
+    // Initialize the task and row fields.
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
@@ -68,7 +66,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     CRM_Utils_System::setTitle(ts('Update multiple activities'));
 
     $validate = FALSE;
-    //validations
+    // Validations.
     if (count($this->_activityHolderIds) > $this->_maxActivities) {
       CRM_Core_Session::setStatus(ts("The maximum number of activities you can select for Update multiple activities is %1. You have selected %2. Please select fewer Activities from your search results and try again.", array(
             1 => $this->_maxActivities,
@@ -77,7 +75,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
       $validate = TRUE;
     }
 
-    // than redirect
+    // Then redirect.
     if ($validate) {
       CRM_Utils_System::redirect($this->_userContext);
     }

@@ -62,10 +62,8 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
 
+    // initialize the task and row fields.
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
@@ -136,21 +134,21 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-    //get assignee contacts
+    // Get assignee contacts.
     if (!empty($params['assigned_to'])) {
       foreach ($this->_activityHolderIds as $key => $id) {
         $ids = array_keys(CRM_Activity_BAO_ActivityContact::getNames($id, $assigneeID));
         $this->_contacts = array_merge($this->_contacts, $ids);
       }
     }
-    //get target contacts
+    // Get target contacts.
     if (!empty($params['with_contact'])) {
       foreach ($this->_activityHolderIds as $key => $id) {
         $ids = array_keys(CRM_Activity_BAO_ActivityContact::getNames($id, $targetID));
         $this->_contacts = array_merge($this->_contacts, $ids);
       }
     }
-    //get 'Added by' contacts
+    // Get 'Added by' contacts.
     if (!empty($params['created_by'])) {
       parent::setContactIDs();
       if (!empty($this->_contactIds)) {
@@ -159,7 +157,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     }
     $this->_contacts = array_unique($this->_contacts);
 
-    //bounce to pick option if no contacts to send to
+    // Bounce to pick option if no contacts to send to.
     if (empty($this->_contacts)) {
       $urlParams = "_qf_PickOption_display=true&qfKey={$params['qfKey']}";
       $urlRedirect = CRM_Utils_System::url('civicrm/activity/search', $urlParams);

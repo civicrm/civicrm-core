@@ -192,7 +192,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     $errorMessage = NULL;
 
-    //for date-Formats
+    // For date-Formats
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
     if (!isset($params['source_contact_id'])) {
@@ -216,9 +216,9 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         CRM_Contact_Import_Parser_Contact::addToErrorMsg('Activity Engagement Index', $errorMessage);
       }
     }
-    //date-Format part ends
+    // Date-Format part ends.
 
-    //checking error in custom data
+    // Checking error in custom data.
     $params['contact_type'] = isset($this->_contactType) ? $this->_contactType : 'Activity';
 
     CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
@@ -245,7 +245,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    *   the result of this processing
    */
   public function import($onDuplicate, &$values) {
-    // first make sure this is a valid line
+    // First make sure this is a valid line
     $response = $this->summary($values);
 
     if ($response != CRM_Import_Parser::VALID) {
@@ -256,7 +256,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     if ($activityLabel) {
       $params = array_merge($params, array('activity_label' => $values[$activityLabel]));
     }
-    //for date-Formats
+    // For date-Formats.
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
     if (!isset($params['source_contact_id'])) {
@@ -284,7 +284,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         $params['subject'] = $val;
       }
     }
-    //date-Format part ends
+    // Date-Format part ends.
     require_once 'CRM/Utils/DeprecatedUtils.php';
     $formatError = _civicrm_api3_deprecated_activity_formatted_param($params, $params, TRUE);
 
@@ -300,8 +300,8 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     if ($this->_contactIdIndex < 0) {
 
-      //retrieve contact id using contact dedupe rule.
-      //since we are support only individual's activity import.
+      // Retrieve contact id using contact dedupe rule.
+      // Since we are supporting only individual's activity import.
       $params['contact_type'] = 'Individual';
       $params['version'] = 3;
       $error = _civicrm_api3_deprecated_duplicate_formatted_contact($params);
@@ -391,12 +391,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $this->_newActivity[] = $newActivity['id'];
       return CRM_Import_Parser::VALID;
     }
-  }
-
-  /**
-   * The initializer code, called before the processing.
-   */
-  public function fini() {
   }
 
 }

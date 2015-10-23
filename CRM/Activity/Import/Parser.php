@@ -34,10 +34,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
-  /**#@+
-   * @var integer
-   */
-
   /**
    * Imported file size.
    */
@@ -128,7 +124,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         continue;
       }
 
-      /* trim whitespace around the values */
+      // Trim whitespace around the values.
 
       $empty = TRUE;
       foreach ($values as $k => $v) {
@@ -197,8 +193,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode & self::DUPLICATE) {
         if ($returnCode & self::MULTIPLE_DUPE) {
-          /* TODO: multi-dupes should be counted apart from singles
-           * on non-skip action */
+          // TODO: multi-dupes should be counted apart from singles
+          // on non-skip action.
         }
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
@@ -268,7 +264,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
     return $this->fini();
   }
 
@@ -371,7 +366,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
         $store->set('duplicatesFileName', $this->_duplicateFileName);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
   }
 
   /**

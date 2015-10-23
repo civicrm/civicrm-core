@@ -78,7 +78,7 @@ class CRM_Activity_Page_AJAX {
 
     $params = $_GET;
 
-    //CRM-14466 initialize variable to avoid php notice
+    // CRM-14466 initialize variable to avoid php notice.
     $sortSQL = "";
     if ($sort && $sortOrder) {
       $sortSQL = $sort . ' ' . $sortOrder;
@@ -331,12 +331,12 @@ class CRM_Activity_Page_AJAX {
     }
     $actDateTime = CRM_Utils_Date::isoToMysql($otherActivity->activity_date_time);
 
-    //create new activity record.
+    // Create new activity record.
     $mainActivity = new CRM_Activity_DAO_Activity();
     $mainActVals = array();
     CRM_Core_DAO::storeValues($otherActivity, $mainActVals);
 
-    //get new activity subject.
+    // Get new activity subject.
     if (!empty($params['newSubject'])) {
       $mainActVals['subject'] = $params['newSubject'];
     }
@@ -344,9 +344,9 @@ class CRM_Activity_Page_AJAX {
     $mainActivity->copyValues($mainActVals);
     $mainActivity->id = NULL;
     $mainActivity->activity_date_time = $actDateTime;
-    //make sure this is current revision.
+    // Make sure this is current revision.
     $mainActivity->is_current_revision = TRUE;
-    //drop all relations.
+    // Drop all relations.
     $mainActivity->parent_id = $mainActivity->original_id = NULL;
 
     $mainActivity->save();
@@ -354,10 +354,8 @@ class CRM_Activity_Page_AJAX {
     CRM_Activity_BAO_Activity::logActivityAction($mainActivity);
     $mainActivity->free();
 
-    /* Mark previous activity as deleted. If it was a non-case activity
-     * then just change the subject.
-     */
-
+    // Mark previous activity as deleted. If it was a non-case activity
+    // then just change the subject.
     if (in_array($params['mode'], array(
       'move',
       'file',
@@ -421,7 +419,7 @@ class CRM_Activity_Page_AJAX {
       CRM_Activity_BAO_ActivityContact::create($assigneeParams);
     }
 
-    //attach newly created activity to case.
+    // Attach newly created activity to case.
     $caseActivity = new CRM_Case_DAO_CaseActivity();
     $caseActivity->case_id = $params['caseID'];
     $caseActivity->activity_id = $mainActivityId;
@@ -464,7 +462,7 @@ class CRM_Activity_Page_AJAX {
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($params);
 
     foreach ($activities as $key => $value) {
-      //Check if recurring activity
+      // Check if recurring activity.
       if (!empty($value['is_recurring_activity'])) {
         $repeat = $value['is_recurring_activity'];
         $activities[$key]['activity_type'] .= '<br/><span class="bold">' . ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1])) . '</span>';
@@ -480,7 +478,9 @@ class CRM_Activity_Page_AJAX {
         'activity_type_exclude_filter_id' => empty($params['activity_type_exclude_id']) ? '' : CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Integer'),
       );
 
-      /** @var \Civi\Core\SettingsBag $cSettings */
+      /**
+       * @var \Civi\Core\SettingsBag $cSettings
+       */
       $cSettings = Civi::service('settings_manager')->getBagByContact(CRM_Core_Config::domainID(), $userID);
       $cSettings->set('activity_tab_filter', $activityFilter);
     }

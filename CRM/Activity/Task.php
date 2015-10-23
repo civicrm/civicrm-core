@@ -26,7 +26,6 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2015
  */
@@ -58,8 +57,8 @@ class CRM_Activity_Task {
   static $_optionalTasks = NULL;
 
   /**
-   * These tasks are the core set of tasks that the user can perform.
-   * on a contact / group of contacts
+   * These tasks are the core set of tasks that the user can perform
+   * on a contact / group of contacts.
    *
    * @return array
    *   the set of tasks for a group of contacts
@@ -131,7 +130,7 @@ class CRM_Activity_Task {
         }
       }
 
-      //CRM-4418, check for delete
+      // CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete activities')) {
         unset(self::$_tasks[1]);
       }
@@ -142,8 +141,7 @@ class CRM_Activity_Task {
   }
 
   /**
-   * These tasks are the core set of task titles.
-   * on activity
+   * These tasks are the core set of task titles on activity.
    *
    * @return array
    *   the set of task titles
@@ -158,8 +156,7 @@ class CRM_Activity_Task {
   }
 
   /**
-   * Show tasks selectively based on the permission level.
-   * of the user
+   * Show tasks selectively based on the permission level of the user.
    *
    * @param int $permission
    *
@@ -185,8 +182,7 @@ class CRM_Activity_Task {
   }
 
   /**
-   * These tasks are the core set of tasks that the user can perform.
-   * on activity
+   * These tasks are the core set of tasks that the user can perform on activity.
    *
    * @param int $value
    *
