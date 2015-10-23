@@ -159,6 +159,10 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   /**
    * Return custom data tables for specified entity / extends.
+   *
+   * @param string $extends
+   *
+   * @return array
    */
   public function entityCustomDataLogTables($extends) {
     $customGroupTables = array();
@@ -409,6 +413,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   /**
    * Get an array of column names of the given table.
+   *
+   * @param string$table
+   * @param bool $force
+   *
+   * @return array
    */
   private function columnsOf($table, $force = FALSE) {
     static $columnsOf = array();
@@ -432,6 +441,10 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   /**
    * Get an array of columns and their details like DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT for the given table.
+   *
+   * @param string $table
+   *
+   * @return array
    */
   private function columnSpecsOf($table) {
     static $columnSpecs = array(), $civiDB = NULL;
@@ -534,6 +547,8 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
 
   /**
    * Create a log table with schema mirroring the given table’s structure and seeding it with the given table’s contents.
+   *
+   * @param string $table
    */
   private function createLogTableFor($table) {
     $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);

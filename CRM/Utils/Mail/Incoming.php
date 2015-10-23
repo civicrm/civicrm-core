@@ -407,7 +407,15 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * Retrieve a contact ID and if not present.
-   * create one with this email
+   *
+   * Create one with this email
+   *
+   * @param string $email
+   * @param string $name
+   * @param bool $create
+   * @param string $mail
+   *
+   * @return int|null
    */
   public static function getContactID($email, $name = NULL, $create = TRUE, &$mail) {
     $dao = CRM_Contact_BAO_Contact::matchContactOnEmail($email, 'Individual');

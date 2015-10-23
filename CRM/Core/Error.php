@@ -291,6 +291,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * Also, if we do not return any value the PEAR_ErrorStack::push() then does the
    * action of PEAR_ERRORSTACK_PUSHANDLOG which displays the errors on the screen,
    * since the logger set for this error stack is 'display' - see CRM_Core_Config::getLog();
+   *
+   * @param mixed $pearError
+   *
+   * @return int
    */
   public static function handlePES($pearError) {
     return PEAR_ERRORSTACK_PUSH;
@@ -563,16 +567,16 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Display the error message on terminal.
    *
-   * @param $message
+   * @param string $message
    * @param bool $out
    *   Should we log or return the output.
    *
    * @param string $comp
    *   Message to be output.
+   * @param string $priority
+   *
    * @return string
-   *   format of the backtrace
-   *
-   *
+   *   Format of the backtrace
    */
   public static function debug_log_message($message, $out = FALSE, $comp = '', $priority = NULL) {
     $config = CRM_Core_Config::singleton();

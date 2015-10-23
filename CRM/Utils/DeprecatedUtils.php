@@ -605,7 +605,11 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
 }
 
 /**
- * check duplicate contacts based on de-deupe parameters
+ * Check duplicate contacts based on de-dupe parameters.
+ *
+ * @param array $params
+ *
+ * @return array
  */
 function _civicrm_api3_deprecated_check_contact_dedupe($params) {
   static $cIndieFields = NULL;

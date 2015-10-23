@@ -75,10 +75,13 @@ function civicrm_api3_uf_join_get($params) {
 }
 
 /**
- * Delete a CiviCRM UF_Join
+ * Delete a CiviCRM UF_Join.
  *
  * @param array $params
  *   Array of name/value pairs.
+ *
+ * @return array
+ *   API result array.
  */
 function civicrm_api3_uf_join_delete($params) {
   return _civicrm_api3_basic_delete('CRM_Core_BAO_UFJoin', $params);

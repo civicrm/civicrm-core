@@ -170,7 +170,9 @@ class CRM_Event_Badge {
   }
 
   /**
-   * This is supposed to be overrided.
+   * This is supposed to be overridden.
+   *
+   * @param array $participant
    */
   public function generateLabel($participant) {
     $txt = "{$this->event['title']}

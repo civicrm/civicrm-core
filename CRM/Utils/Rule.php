@@ -569,8 +569,10 @@ class CRM_Utils_Rule {
    * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is ascii
    *
+   * @param string $elementValue
+   *
    * @return bool
-   *   true if file has been uploaded, false otherwise
+   *   True if file has been uploaded, false otherwise
    */
   public static function asciiFile($elementValue) {
     if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||
@@ -584,8 +586,10 @@ class CRM_Utils_Rule {
   /**
    * Checks to make sure the uploaded file is in UTF-8, recodes if it's not
    *
+   * @param array $elementValue
+   *
    * @return bool
-   *   whether file has been uploaded properly and is now in UTF-8
+   *   Whether file has been uploaded properly and is now in UTF-8.
    */
   public static function utf8File($elementValue) {
     $success = FALSE;
@@ -612,8 +616,10 @@ class CRM_Utils_Rule {
    * See how file rules are written in HTML/QuickForm/file.php
    * Checks to make sure the uploaded file is html
    *
+   * @param array $elementValue
+   *
    * @return bool
-   *   true if file has been uploaded, false otherwise
+   *   True if file has been uploaded, false otherwise
    */
   public static function htmlFile($elementValue) {
     if ((isset($elementValue['error']) && $elementValue['error'] == 0) ||

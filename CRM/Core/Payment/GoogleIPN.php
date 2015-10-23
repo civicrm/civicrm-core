@@ -692,6 +692,10 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * Converts the comma separated name-value pairs in <merchant-private-data>
    * to an array of name-value pairs.
+   *
+   * @param string $str
+   *
+   * @return array
    */
   public static function stringToArray($str) {
     $vars = $labels = array();

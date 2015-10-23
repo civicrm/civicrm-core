@@ -464,8 +464,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Do the set default related to location type id,
-   * primary location,  default country
+   * Do the set default related to location type id, primary location,  default country.
+   *
+   * @param array $defaults
    */
   public function blockSetDefaults(&$defaults) {
     $locationTypeKeys = array_filter(array_keys(CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id')), 'is_int');

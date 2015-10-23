@@ -232,8 +232,11 @@ class CRM_Utils_Check {
   /**
    * Evaluate if a system check should be hushed/snoozed.
    *
+   * @param string $message
+   *
    * @return bool
    *   TRUE means hush/snooze, FALSE means display.
+   * @throws \CiviCRM_API3_Exception
    */
   public static function checkHushSnooze($message) {
     $statusPreferenceParams = array(
