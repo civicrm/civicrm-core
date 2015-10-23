@@ -653,7 +653,7 @@
       };
     })
 
-    // example <div crm-ui-tab crm-title="ts('My Title')">...content...</div>
+    // example <div crm-ui-tab id="tab-1" crm-title="ts('My Title')" count="3">...content...</div>
     // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {
       return {
@@ -661,6 +661,7 @@
         restrict: 'EA',
         scope: {
           crmTitle: '@',
+          count: '@',
           id: '@'
         },
         template: '<div ng-transclude></div>',

@@ -6,6 +6,7 @@
       var ts = $scope.ts = CRM.ts();
       $scope.alert = CRM.alert;
       $scope.statuses = statusData.values;
+      $scope._ = _;
 
       _.each($scope.statuses, function(status) {
         status.severity_id = status.severity;

@@ -12,6 +12,7 @@
         ng-repeat="tab in [{is_visible: 1, name: 'visible'}, {is_visible: 0, name: 'hidden'}]"
         crm-ui-tab
         id="tab-{{tab.name}}"
+        count="{{_.where(statuses, {is_visible: tab.is_visible}).length}}"
         crm-title="tab.is_visible ? ts('Active') : ts('Hushed/Snoozed')"
         >
         <div id="crm-status-list" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
