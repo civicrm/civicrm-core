@@ -103,6 +103,11 @@ function civicrm_api3_cxn_register($params) {
   return $result;
 }
 
+/**
+ * Adjust metadata for cxn unregister.
+ *
+ * @param array $spec
+ */
 function _civicrm_api3_cxn_unregister_spec(&$spec) {
   $daoFields = CRM_Cxn_DAO_Cxn::fields();
   $spec['cxn_guid'] = $daoFields['cxn_guid'];
@@ -167,6 +172,11 @@ function _civicrm_api3_cxn_parseCxnId($params) {
   return $cxnId;
 }
 
+/**
+ * Adjust metadata for cxn get action.
+ *
+ * @param array $spec
+ */
 function _civicrm_api3_cxn_get_spec(&$spec) {
   // Don't trust AJAX callers or other external code to modify, filter, or return the secret.
   unset($spec['secret']);

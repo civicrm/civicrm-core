@@ -5291,6 +5291,15 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     }
   }
 
+  /**
+   * Calculate date from age.
+   *
+   * @param string $asofDate
+   * @param int $age
+   * @param string $type
+   *
+   * @return string
+   */
   public static function calcDateFromAge($asofDate, $age, $type) {
     $date = new DateTime($asofDate);
     if ($type == "min") {

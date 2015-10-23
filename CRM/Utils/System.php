@@ -169,8 +169,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * If we are using a theming system, invoke theme, else just print the
-   * content.
+   * If we are using a theming system, invoke theme, else just print the content.
    *
    * @param string $content
    *   The content that will be themed.
@@ -194,6 +193,7 @@ class CRM_Utils_System {
    * Generate a query string if input is an array.
    *
    * @param array|string $query
+   *
    * @return string
    */
   public static function makeQueryString($query) {
@@ -224,6 +224,7 @@ class CRM_Utils_System {
    * @param bool $htmlize
    * @param bool $frontend
    * @param bool $forceBackend
+   *
    * @return string
    *   An HTML string containing a link to the given path.
    */
@@ -248,11 +249,13 @@ class CRM_Utils_System {
   }
 
   /**
-   * @param $text
-   * @param null $path
-   * @param null $query
+   * Get href.
+   *
+   * @param string $text
+   * @param string $path
+   * @param string|array $query
    * @param bool $absolute
-   * @param null $fragment
+   * @param string $fragment
    * @param bool $htmlize
    * @param bool $frontend
    * @param bool $forceBackend
@@ -268,6 +271,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * Permission denied.
+   *
    * @return mixed
    */
   public static function permissionDenied() {
@@ -276,6 +281,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * Log out.
+   *
    * @return mixed
    */
   public static function logout() {
@@ -284,7 +291,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * this is a very drupal specific function for now.
+   * This is a very drupal specific function for now.
    */
   public static function updateCategories() {
     $config = CRM_Core_Config::singleton();
@@ -294,7 +301,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * What menu path are we currently on. Called for the primary tpl
+   * What menu path are we currently on. Called for the primary tpl.
    *
    * @return string
    *   the current menu path
@@ -305,7 +312,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * called from a template to compose a url.
+   * Called from a template to compose a url.
    *
    * @param array $params
    *   List of parameters.
@@ -345,7 +352,7 @@ class CRM_Utils_System {
   /**
    * Figures and sets the userContext.
    *
-   * Uses the referer if valid else uses the default.
+   * Uses the referrer if valid else uses the default.
    *
    * @param array $names
    *   Referrer should match any str in this array.
@@ -460,7 +467,7 @@ class CRM_Utils_System {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumbs.
    *
-   * @param $breadCrumbs
+   * @param string $breadCrumbs
    */
   public static function appendBreadCrumb($breadCrumbs) {
     $config = CRM_Core_Config::singleton();
@@ -488,7 +495,7 @@ class CRM_Utils_System {
   /**
    * Determine the post URL for a form.
    *
-   * @param $action
+   * @param int $action
    *   The default action if one is pre-specified.
    *
    * @return string
@@ -528,6 +535,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * Authenticate key.
+   *
    * @param bool $abort
    *   (optional) Whether to exit; defaults to true.
    *
@@ -573,9 +582,11 @@ class CRM_Utils_System {
   }
 
   /**
+   * Authenticate script.
+   *
    * @param bool $abort
-   * @param null $name
-   * @param null $pass
+   * @param string $name
+   * @param string $pass
    * @param bool $storeInSession
    * @param bool $loadCMSBootstrap
    * @param bool $requireKey
@@ -639,7 +650,7 @@ class CRM_Utils_System {
    * @param string $password
    *   The password.
    * @param bool $loadCMSBootstrap
-   * @param $realPath
+   * @param string $realPath
    *
    * @return false|array
    */
@@ -679,8 +690,9 @@ class CRM_Utils_System {
   /**
    * Determine whether a value is null-ish.
    *
-   * @param $value
+   * @param mixed $value
    *   The value to check for null.
+   *
    * @return bool
    */
   public static function isNull($value) {
@@ -707,6 +719,7 @@ class CRM_Utils_System {
    *   The credit card number to obscure.
    * @param int $keep
    *   (optional) The number of digits to preserve unmodified.
+   *
    * @return string
    *   The obscured credit card number.
    */
@@ -771,7 +784,9 @@ class CRM_Utils_System {
   }
 
   /**
-   * @param $title
+   * Do something no-one bothered to document.
+   *
+   * @param string $title
    *   (optional)
    *
    * @return mixed|string
@@ -791,9 +806,11 @@ class CRM_Utils_System {
   }
 
   /**
+   * Download something or other.
+   *
    * @param string $name
    * @param string $mimeType
-   * @param $buffer
+   * @param string $buffer
    * @param string $ext
    * @param bool $output
    * @param string $disposition
@@ -862,6 +879,7 @@ class CRM_Utils_System {
    *
    * @param string $url
    *   The URL to operate on.
+   *
    * @return string
    *   The fixed URL.
    */
@@ -927,6 +945,7 @@ class CRM_Utils_System {
    * @param string $separator
    * @param string $string
    * @param int $limit
+   *
    * @return string[]
    */
   public static function explode($separator, $string, $limit) {
@@ -938,6 +957,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * Check url.
+   *
    * @param string $url
    *   The URL to check.
    * @param bool $addCookie
@@ -969,6 +990,7 @@ class CRM_Utils_System {
    * @param bool $abort
    *   (optional) Whether to fatally abort if the version requirement is not
    *   met. Defaults to TRUE.
+   *
    * @return bool
    *   Returns TRUE if the requirement is met, FALSE if the requirement is not
    *   met and we're not aborting due to the failed requirement. If $abort is
@@ -989,7 +1011,9 @@ class CRM_Utils_System {
   }
 
   /**
-   * @param $string
+   * Format wiki url.
+   *
+   * @param string $string
    * @param bool $encode
    *
    * @return string
@@ -1009,6 +1033,8 @@ class CRM_Utils_System {
   }
 
   /**
+   * Encode url.
+   *
    * @param string $url
    *
    * @return null|string
@@ -1493,6 +1519,11 @@ class CRM_Utils_System {
     return $config->userSystem->getLoggedInUfID();
   }
 
+  /**
+   * Get Base CMS url.
+   *
+   * @return mixed|string
+   */
   public static function baseCMSURL() {
     static $_baseURL = NULL;
     if (!$_baseURL) {
