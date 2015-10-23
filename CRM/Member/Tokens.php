@@ -55,6 +55,13 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     ));
   }
 
+  /**
+   * Is token active.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   *
+   * @return bool
+   */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
     return

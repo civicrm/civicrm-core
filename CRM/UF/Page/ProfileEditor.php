@@ -7,10 +7,18 @@ require_once 'CRM/Core/Page.php';
  * widgets
  */
 class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
+  /**
+   * Run page.
+   *
+   * @throws \Exception
+   */
   public function run() {
     CRM_Core_Error::fatal('This is not a real page!');
   }
 
+  /**
+   * Register profile scripts.
+   */
   public static function registerProfileScripts() {
     static $loaded = FALSE;
     if ($loaded || CRM_Core_Resources::isAjaxMode()) {
@@ -72,7 +80,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   }
 
   /**
-   * Register entity schemas for use in the editor's palette
+   * Register entity schemas for use in the editor's palette.
    *
    * @param array $entityTypes
    *   Strings, e.g. "IndividualModel", "ActivityModel".

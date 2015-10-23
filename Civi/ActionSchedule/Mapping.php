@@ -75,10 +75,22 @@ abstract class Mapping implements MappingInterface {
     'entity_date_end',
   );
 
+  /**
+   * Create mapping.
+   *
+   * @param array $params
+   *
+   * @return static
+   */
   public static function create($params) {
     return new static($params);
   }
 
+  /**
+   * Class constructor.
+   *
+   * @param array $params
+   */
   public function __construct($params) {
     foreach (self::$fields as $field) {
       if (isset($params[$field])) {
