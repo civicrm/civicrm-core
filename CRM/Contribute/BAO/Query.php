@@ -41,7 +41,7 @@ class CRM_Contribute_BAO_Query {
 
   static $_contribOrSoftCredit = "only_contribs";
 
-  static $_contribRecurPayment = "no";
+  static $_contribRecurPayment = FALSE;
 
   /**
    * Function get the import/export fields for contribution.
@@ -496,6 +496,19 @@ class CRM_Contribute_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
+      case 'contribution_recur_payment_made':
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.id", 'IS NOT EMPTY');
+        if ($value) {
+          $query->_qill[$grouping][] = ts("Made payment for the recurring contributions");
+          self::$_contribRecurPayment = TRUE;
+        }
+        else {
+          $query->_qill[$grouping][] = ts("All recurring contributions regardless of payments");
+          self::$_contribRecurPayment = FALSE;
+        }
+        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
+        return;
+
       case 'contribution_note':
         $value = $strtolower(CRM_Core_DAO::escapeString($value));
         if ($wildcard) {
@@ -609,7 +622,7 @@ class CRM_Contribute_BAO_Query {
       case 'civicrm_contribution_recur':
         if ($mode == 1) {
           // 'Made payment for the recurring contributions?' is ticked yes
-          if (self::$_contribRecurPayment == 'yes') {
+          if (self::$_contribRecurPayment == TRUE) {
             $from = " $side JOIN civicrm_contribution_recur ON contact_a.id = civicrm_contribution_recur.contact_id ";
             $from .= " INNER JOIN civicrm_contribution ON civicrm_contribution.contact_id = contact_a.id ";
           }
